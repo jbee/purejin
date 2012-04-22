@@ -8,7 +8,7 @@ package de.jbee.silk;
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
-public interface BasicBinder {
+public interface InternalBinder {
 
 	//OPEN maybe return the binding created ? 
 	<T> void bind( Reference<T> reference, Supplier<T> supplier, Scope scope );
