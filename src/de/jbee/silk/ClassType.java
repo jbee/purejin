@@ -6,7 +6,7 @@ import java.lang.reflect.Type;
 public final class ClassType<T>
 		implements ParameterizedType {
 
-	public static <T> ClassType<T> type( Class<T> type, T instance ) {
+	public static <T> ClassType<T> classtype( Class<T> type, T instance ) {
 
 		return null;
 	}

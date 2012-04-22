@@ -1,5 +1,8 @@
 package de.jbee.silk;
 
+import static de.jbee.silk.ClassType.classtype;
+import static de.jbee.silk.Instance.defaultInstance;
+
 public class CoreBinder
 		implements Binder {
 
@@ -24,9 +27,9 @@ public class CoreBinder
 		 * The binder instance who's {@link Binder#bind(Instance)} method had been called to get to
 		 * this {@link TypedBinder}.
 		 */
-		private final CoreBinder binder;
+		private final Binder binder;
 
-		TypedCoreBinder( CoreBinder binder ) {
+		TypedCoreBinder( Binder binder ) {
 			super();
 			this.binder = binder;
 		}
@@ -42,13 +45,19 @@ public class CoreBinder
 		}
 
 		public void toSupplier( Class<? extends Supplier<? extends T>> supplier ) {
-			// TODO somehow ensure there is a single instance of that supplier class given (created and used)
-
+			try {
+				to( supplier.newInstance() );
+			} catch ( InstantiationException e ) {
+				throw new RuntimeException( e );
+			} catch ( IllegalAccessException e ) {
+				throw new RuntimeException( e );
+			}
 		}
 
 		public void to( Provider<? extends T> provider ) {
 			to( Suppliers.valueFromProvider( provider ) );
-			binder.bind( ClassType.type( Provider.class, provider ) ).to( provider );
+			binder.bind( defaultInstance( classtype( Provider.class, provider ) ) ).to(
+					Suppliers.instance( provider ) );
 		}
 
 		public void to( Class<? extends T> implementation ) {

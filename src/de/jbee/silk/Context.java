@@ -22,9 +22,9 @@ public interface Context {
 
 	class Test {
 
-		void test( Context declarator ) {
+		void test( Context context ) {
 			// we simply cannot know what is a realistic assumption but we want to validate it so we can warn about injections that will not work as expected. 
-			declarator.consider( Scoped.THREAD ).within( Scoped.APPLICATION );
+			context.consider( Scoped.THREAD ).within( Scoped.APPLICATION );
 		}
 	}
 }

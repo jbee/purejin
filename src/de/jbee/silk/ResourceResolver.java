@@ -1,8 +1,7 @@
 package de.jbee.silk;
 
 /**
- * A special {@link Provider} that represents the binding used to provide the new instance (if
- * needed).
+ * Knows how to resolve a specific instance for the given dependency.
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  * 

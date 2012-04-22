@@ -1,10 +1,7 @@
 package de.jbee.silk;
 
 /**
- * Knows how to build things (might be scoped too).
- * 
- * Knows how to create instances by Identity. A identity is a logical reference to a object. That
- * object already exists or will be created.
+ * Knows how to *resolve* the instance for a given {@link Dependency}.
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
