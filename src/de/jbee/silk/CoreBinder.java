@@ -10,13 +10,11 @@ public class CoreBinder
 	}
 
 	public <T> TypedCoreBinder<T> bind( ClassType<T> type ) {
-
-		return null;
+		return bind( Instance.defaultInstance( type ) );
 	}
 
 	public <T> TypedCoreBinder<T> bind( Class<T> type ) {
-
-		return null;
+		return bind( ClassType.type( type ) );
 	}
 
 	static class TypedCoreBinder<T>
@@ -40,11 +38,11 @@ public class CoreBinder
 		}
 
 		public void to( T instance ) {
-
+			to( Suppliers.instance( instance ) );
 		}
 
 		public void toSupplier( Class<? extends Supplier<? extends T>> supplier ) {
-			// TODO Auto-generated method stub
+			// TODO somehow ensure there is a single instance of that supplier class given (created and used)
 
 		}
 

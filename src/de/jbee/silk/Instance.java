@@ -10,6 +10,10 @@ package de.jbee.silk;
  */
 public final class Instance<T> {
 
+	public static <T> Instance<T> defaultInstance( ClassType<T> type ) {
+		return new Instance<T>( Discriminator.DEFAULT, type );
+	}
+
 	private final Discriminator discriminator;
 	private final ClassType<T> type;
 
