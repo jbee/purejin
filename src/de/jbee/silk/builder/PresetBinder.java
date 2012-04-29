@@ -1,4 +1,8 @@
-package de.jbee.silk;
+package de.jbee.silk.builder;
+
+import de.jbee.silk.Instance;
+import de.jbee.silk.Scope;
+import de.jbee.silk.Supplier;
 
 public interface PresetBinder {
 

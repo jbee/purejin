@@ -1,4 +1,6 @@
-package de.jbee.silk;
+package de.jbee.silk.builder;
+
+import de.jbee.silk.Scope;
 
 
 /**

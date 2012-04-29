@@ -5,23 +5,52 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Suppliers {
 
-	static <T> Supplier<T> valueFromProvider( Provider<T> provider ) {
-		return new ProviderAsSupplier<T>( provider );
+	public static <T> Supplier<T> valueFromProvider( Provider<T> provider ) {
+		return new ProviderSupplier<T>( provider );
 	}
 
-	static <T> Supplier<Provider<T>> instance( Provider<T> provider ) {
+	public static <T> Supplier<Provider<T>> instance( Provider<T> provider ) {
 		return new InstanceSupplier<Provider<T>>( provider );
 	}
 
-	static <T> Supplier<T> instance( T instance ) {
+	public static <T> Supplier<T> instance( T instance ) {
 		return new InstanceSupplier<T>( instance );
 	}
 
-	static <T> Supplier<T> type( ClassType<T> type ) {
+	public static <T> Supplier<T> type( ClassType<T> type ) {
 		return new TypeSupplier<T>( type );
+	}
+
+	/**
+	 * Shows how support for {@link List}s and such works.
+	 * 
+	 * Basically we just resolve the array of the element type (generic of the list). Arrays itself
+	 * have build in support that will (if not redefined by a more precise binding) return all known
+	 * 
+	 * @author Jan Bernitt (jan.bernitt@gmx.de)
+	 * 
+	 */
+	static final class ListArrayBridgeSupplier
+			implements Supplier<List<?>> {
+
+		@Override
+		public List<?> supply( Dependency<List<?>> dependency, DependencyResolver resolver ) {
+			Type elementType = dependency.getParameterizedType().getActualTypeArguments()[0];
+			return new ArrayList<Object>(
+					Arrays.asList( supply( (Class<?>) elementType, resolver ) ) );
+		}
+
+		private <E> E[] supply( Class<E> elementType, DependencyResolver resolver ) {
+			Object proto = Array.newInstance( elementType, 0 );
+			return (E[]) resolver.resolve( References.type( proto.getClass() ) );
+		}
+
 	}
 
 	static final class InstanceSupplier<T>
@@ -84,12 +113,12 @@ public class Suppliers {
 
 	}
 
-	static final class ProviderAsSupplier<T>
+	static final class ProviderSupplier<T>
 			implements Supplier<T> {
 
 		private final Provider<T> provider;
 
-		ProviderAsSupplier( Provider<T> provider ) {
+		ProviderSupplier( Provider<T> provider ) {
 			super();
 			this.provider = provider;
 		}
@@ -101,7 +130,7 @@ public class Suppliers {
 
 	}
 
-	static final class ProviderSupplier
+	static final class ProviderBrideSupplier
 			implements Supplier<Provider<?>> {
 
 		@Override
@@ -109,18 +138,18 @@ public class Suppliers {
 			ParameterizedType type = dependency.getParameterizedType();
 			Type provided = type.getActualTypeArguments()[0];
 			// TODO ? add more information from the dependency ? 
-			return new LazyDependencyProvider<Object>( References.type( provided ), resolver );
+			return new DynamicProvider<Object>( References.type( provided ), resolver );
 		}
 
 	}
 
-	static final class LazyDependencyProvider<T>
+	static final class DynamicProvider<T>
 			implements Provider<T> {
 
 		private final Dependency<T> dependency;
 		private final DependencyResolver resolver;
 
-		LazyDependencyProvider( Dependency<T> dependency, DependencyResolver resolver ) {
+		DynamicProvider( Dependency<T> dependency, DependencyResolver resolver ) {
 			super();
 			this.dependency = dependency;
 			this.resolver = resolver;
