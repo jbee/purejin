@@ -1,7 +1,7 @@
 package de.jbee.silk;
 
 /**
- * Where does a bind came from ? Was is inplicit or explicit ?
+ * A VO to answer: Where does a bind came from ? Was is implicit or explicit ?
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */

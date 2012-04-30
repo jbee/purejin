@@ -1,4 +1,4 @@
-package de.jbee.silk.builder;
+package de.jbee.silk.base;
 
 import de.jbee.silk.Instance;
 import de.jbee.silk.Scope;

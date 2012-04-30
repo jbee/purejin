@@ -1,6 +1,5 @@
 package de.jbee.silk;
 
-import java.lang.reflect.ParameterizedType;
 
 /**
  * What do we want exactly ? Kind of a key
@@ -11,7 +10,7 @@ import java.lang.reflect.ParameterizedType;
  */
 public interface Reference<T> {
 
-	ParameterizedType getParameterizedType();
+	DeclaredType<T> getType();
 
 	// use this as key to instances/sources
 

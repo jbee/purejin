@@ -1,6 +1,6 @@
-package de.jbee.silk.draft;
+package de.jbee.silk.service;
 
-public interface ServiceBinderExample {
+public interface ServiceBinderDraft {
 
 	interface Binder {
 

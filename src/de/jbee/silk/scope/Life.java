@@ -1,4 +1,6 @@
-package de.jbee.silk;
+package de.jbee.silk.scope;
+
+import de.jbee.silk.Dependency;
 
 public class Life {
 

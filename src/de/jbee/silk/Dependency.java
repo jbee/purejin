@@ -13,4 +13,6 @@ public interface Dependency<T>
 	int resourceNr();
 
 	int resourceCardinality();
+
+	// also add target hierarchy: the class of the instance that is injected
 }

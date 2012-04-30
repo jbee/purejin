@@ -3,7 +3,6 @@ package de.jbee.silk;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,8 +10,11 @@ import java.util.List;
 
 public class Suppliers {
 
-	public static <T> Supplier<T> valueFromProvider( Provider<T> provider ) {
-		return new ProviderSupplier<T>( provider );
+	public static final Supplier<Provider<?>> PROVIDER = new ProviderSupplier();
+	public static final Supplier<List<?>> LIST_BRIDGE = new ArrayToListBridgeSupplier();
+
+	public static <T> Supplier<T> adapt( Provider<T> provider ) {
+		return new ProviderAdaptedSupplier<T>( provider );
 	}
 
 	public static <T> Supplier<Provider<T>> instance( Provider<T> provider ) {
@@ -23,7 +25,7 @@ public class Suppliers {
 		return new InstanceSupplier<T>( instance );
 	}
 
-	public static <T> Supplier<T> type( ClassType<T> type ) {
+	public static <T> Supplier<T> type( DeclaredType<T> type ) {
 		return new TypeSupplier<T>( type );
 	}
 
@@ -36,24 +38,28 @@ public class Suppliers {
 	 * @author Jan Bernitt (jan.bernitt@gmx.de)
 	 * 
 	 */
-	static final class ListArrayBridgeSupplier
+	private static final class ArrayToListBridgeSupplier
 			implements Supplier<List<?>> {
 
-		@Override
-		public List<?> supply( Dependency<List<?>> dependency, DependencyResolver resolver ) {
-			Type elementType = dependency.getParameterizedType().getActualTypeArguments()[0];
-			return new ArrayList<Object>(
-					Arrays.asList( supply( (Class<?>) elementType, resolver ) ) );
+		ArrayToListBridgeSupplier() {
+			//make visible
 		}
 
-		private <E> E[] supply( Class<E> elementType, DependencyResolver resolver ) {
+		@Override
+		public List<?> supply( Dependency<List<?>> dependency, DependencyContext context ) {
+			DeclaredType<?> elementType = dependency.getType().getTypeArguments()[0];
+			return new ArrayList<Object>( Arrays.asList( supplyArray( elementType.getRawType(),
+					context ) ) );
+		}
+
+		private <E> E[] supplyArray( Class<E> elementType, DependencyContext resolver ) {
 			Object proto = Array.newInstance( elementType, 0 );
 			return (E[]) resolver.resolve( References.type( proto.getClass() ) );
 		}
 
 	}
 
-	static final class InstanceSupplier<T>
+	private static final class InstanceSupplier<T>
 			implements Supplier<T> {
 
 		private final T instance;
@@ -64,13 +70,13 @@ public class Suppliers {
 		}
 
 		@Override
-		public T supply( Dependency<T> dependency, DependencyResolver resolver ) {
+		public T supply( Dependency<T> dependency, DependencyContext context ) {
 			return instance;
 		}
 
 	}
 
-	static final class ArraySupplier<T>
+	private static final class ArraySupplier<T>
 			implements Supplier<T[]> {
 
 		private final Class<T[]> type;
@@ -83,73 +89,79 @@ public class Suppliers {
 		}
 
 		@Override
-		public T[] supply( Dependency<T[]> dependency, DependencyResolver resolver ) {
+		public T[] supply( Dependency<T[]> dependency, DependencyContext context ) {
 			T[] res = (T[]) Array.newInstance( type.getComponentType(), elements.length );
 			int i = 0;
 			for ( Supplier<? extends T> e : elements ) {
 				//TODO The element type is the dependency
-				res[i++] = e.supply( null, resolver );
+				res[i++] = e.supply( null, context );
 			}
 			return res;
 		}
 
 	}
 
-	static final class TypeSupplier<T>
+	private static final class TypeSupplier<T>
 			implements Supplier<T> {
 
-		private final ClassType<T> type;
+		private final DeclaredType<T> type;
 
-		TypeSupplier( ClassType<T> type ) {
+		TypeSupplier( DeclaredType<T> type ) {
 			super();
 			this.type = type;
 		}
 
 		@Override
-		public T supply( Dependency<T> dependency, DependencyResolver resolver ) {
+		public T supply( Dependency<T> dependency, DependencyContext context ) {
 			// TODO ? add more information from the dependency ? 
-			return resolver.resolve( References.<T> type( type ) );
+			Dependency<T> typeDependency = null; //FIXME merge type and dependency 
+			return context.resolve( typeDependency );
 		}
 
 	}
 
-	static final class ProviderSupplier<T>
+	private static final class ProviderAdaptedSupplier<T>
 			implements Supplier<T> {
 
 		private final Provider<T> provider;
 
-		ProviderSupplier( Provider<T> provider ) {
+		ProviderAdaptedSupplier( Provider<T> provider ) {
 			super();
 			this.provider = provider;
 		}
 
 		@Override
-		public T supply( Dependency<T> dependency, DependencyResolver resolver ) {
+		public T supply( Dependency<T> dependency, DependencyContext context ) {
 			return provider.yield();
 		}
 
 	}
 
-	static final class ProviderBrideSupplier
+	private static final class ProviderSupplier
 			implements Supplier<Provider<?>> {
 
+		ProviderSupplier() {
+			//make visible
+		}
+
 		@Override
-		public Provider<?> supply( Dependency<Provider<?>> dependency, DependencyResolver resolver ) {
-			ParameterizedType type = dependency.getParameterizedType();
-			Type provided = type.getActualTypeArguments()[0];
+		public Provider<?> supply( Dependency<Provider<?>> dependency, DependencyContext context ) {
+			DeclaredType<Provider<?>> type = dependency.getType();
+			DeclaredType<?> provided = type.getTypeArguments()[0];
 			// TODO ? add more information from the dependency ? 
-			return new DynamicProvider<Object>( References.type( provided ), resolver );
+			Dependency<Object> providedDependency = null; //FIXME merge dependency and provided
+			return new DynamicProvider<Object>( providedDependency, context );
 		}
 
 	}
 
-	static final class DynamicProvider<T>
+	private static final class DynamicProvider<T>
 			implements Provider<T> {
 
 		private final Dependency<T> dependency;
-		private final DependencyResolver resolver;
+		private final DependencyContext resolver;
 
-		DynamicProvider( Dependency<T> dependency, DependencyResolver resolver ) {
+		DynamicProvider( Dependency<T> dependency, DependencyContext resolver ) {
 			super();
 			this.dependency = dependency;
 			this.resolver = resolver;
@@ -166,7 +178,7 @@ public class Suppliers {
 			implements Supplier<T> {
 
 		@Override
-		public T supply( Dependency<T> dependency, DependencyResolver resolver ) {
+		public T supply( Dependency<T> dependency, DependencyContext context ) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -202,7 +214,7 @@ public class Suppliers {
 		// in a validate we have to check that the arguments 
 
 		@Override
-		public T supply( Dependency<T> dependency, DependencyResolver resolver ) {
+		public T supply( Dependency<T> dependency, DependencyContext context ) {
 			Type[] types = constructor.getGenericParameterTypes();
 			Class<?>[] rawTypes = constructor.getParameterTypes();
 			Annotation[][] annotations = constructor.getParameterAnnotations();
@@ -211,7 +223,7 @@ public class Suppliers {
 				if ( args[i] instanceof Dependency<?>
 						&& !Dependency.class.isAssignableFrom( rawTypes[i] ) ) {
 					Dependency<?> argDependency = (Dependency<?>) args[i]; //OPEN what about the dependency given ?
-					dependencies[i] = resolver.resolve( argDependency );
+					dependencies[i] = context.resolve( argDependency );
 				} else {
 					dependencies[i] = args[i];
 				}

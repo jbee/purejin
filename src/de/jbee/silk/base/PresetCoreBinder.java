@@ -1,9 +1,9 @@
-package de.jbee.silk.builder;
+package de.jbee.silk.base;
 
-import static de.jbee.silk.ClassType.classtype;
+import static de.jbee.silk.DeclaredType.classtype;
 import static de.jbee.silk.Instance.defaultInstance;
 import de.jbee.silk.Binder;
-import de.jbee.silk.ClassType;
+import de.jbee.silk.DeclaredType;
 import de.jbee.silk.Instance;
 import de.jbee.silk.Provider;
 import de.jbee.silk.Supplier;
@@ -25,12 +25,12 @@ public class PresetCoreBinder
 		return null;
 	}
 
-	public <T> TypedCoreBinder<T> bind( ClassType<T> type ) {
+	public <T> TypedCoreBinder<T> bind( DeclaredType<T> type ) {
 		return bind( Instance.defaultInstance( type ) );
 	}
 
 	public <T> TypedCoreBinder<T> bind( Class<T> type ) {
-		return bind( ClassType.type( type ) );
+		return bind( DeclaredType.type( type ) );
 	}
 
 	static class TypedCoreBinder<T>
@@ -68,13 +68,13 @@ public class PresetCoreBinder
 		}
 
 		public void to( Provider<? extends T> provider ) {
-			to( Suppliers.valueFromProvider( provider ) );
+			to( Suppliers.adapt( provider ) );
 			binder.bind( defaultInstance( classtype( Provider.class, provider ) ) ).to(
 					Suppliers.instance( provider ) );
 		}
 
 		public void to( Class<? extends T> implementation ) {
-			to( Suppliers.type( ClassType.type( implementation ) ) );
+			to( Suppliers.type( DeclaredType.type( implementation ) ) );
 		}
 
 	}

@@ -91,25 +91,25 @@ public class Injector {
 			this.repository = repository;
 		}
 
-		public T yield( Dependency<T> dependency, DependencyResolver resolver ) {
+		public T yield( Dependency<T> dependency, DependencyContext resolver ) {
 			//FIXME pass dependency.with(nr) - cardinality will be applied by the calling injector context 
 			return repository.yield( dependency, new DependencyResourceResolver<T>( this, resolver ) );
 		}
 
 		@Override
-		public T supply( Dependency<T> dependency, DependencyResolver resolver ) {
-			return supplier.supply( dependency, resolver );
+		public T supply( Dependency<T> dependency, DependencyContext context ) {
+			return supplier.supply( dependency, context );
 		}
 
 	}
 
 	private static class DependencyResourceResolver<T>
-			implements ResourceResolver<T> {
+			implements DependencyResolver<T> {
 
 		private final Resource<T> resource;
-		private final DependencyResolver resolver;
+		private final DependencyContext resolver;
 
-		DependencyResourceResolver( Resource<T> resource, DependencyResolver resolver ) {
+		DependencyResourceResolver( Resource<T> resource, DependencyContext resolver ) {
 			super();
 			this.resource = resource;
 			this.resolver = resolver;

@@ -9,7 +9,7 @@ package de.jbee.silk;
  */
 public interface Supplier<T> {
 
-	T supply( Dependency<T> dependency, DependencyResolver resolver );
+	T supply( Dependency<T> dependency, DependencyContext context );
 
 	// TODO some way to validate the source - is the constructor available etc.
 }

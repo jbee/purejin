@@ -1,4 +1,4 @@
-package de.jbee.silk;
+package de.jbee.silk.scope;
 
 public interface Lifecycle {
 
