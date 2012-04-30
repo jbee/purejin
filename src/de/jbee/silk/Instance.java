@@ -6,21 +6,24 @@ package de.jbee.silk;
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  * 
- * @param <T>
  */
 public final class Instance<T> {
 
-	public static <T> Instance<T> defaultInstance( DeclaredType<T> type ) {
+	public static <T> Instance<T> defaultInstance( DefiniteType<T> type ) {
 		return new Instance<T>( Discriminator.DEFAULT, type );
 	}
 
 	private final Discriminator discriminator;
-	private final DeclaredType<T> type;
+	private final DefiniteType<T> type;
 
-	Instance( Discriminator discriminator, DeclaredType<T> type ) {
+	Instance( Discriminator discriminator, DefiniteType<T> type ) {
 		super();
 		this.discriminator = discriminator;
 		this.type = type;
 	}
 
+	public boolean equalTo( Instance<T> other ) {
+
+		return true;
+	}
 }

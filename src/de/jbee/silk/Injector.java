@@ -7,7 +7,7 @@ public class Injector {
 
 	public static Injector create( Module root ) {
 		//TODO setup context
-		List<Binding<?>> bindings = new ArrayList<Binding<?>>();
+		List<BindingImpl<?>> bindings = new ArrayList<BindingImpl<?>>();
 		Binder binder = new InjectorBinder( bindings );
 		root.configure( binder );
 
@@ -17,17 +17,16 @@ public class Injector {
 	static class InjectorBinder
 			implements Binder {
 
-		final List<Binding<?>> bindings;
+		final List<BindingImpl<?>> bindings;
 
-		InjectorBinder( List<Binding<?>> bindings ) {
+		InjectorBinder( List<BindingImpl<?>> bindings ) {
 			super();
 			this.bindings = bindings;
 		}
 
 		@Override
-		public <T> void bind( Reference<T> reference, Supplier<T> supplier, Scope scope,
-				Source source ) {
-			bindings.add( new Binding<T>( reference, supplier, source, scope ) );
+		public <T> void bind( Resource<T> resource, Supplier<T> supplier, Scope scope, Source source ) {
+			bindings.add( new BindingImpl<T>( resource, supplier, source, scope ) );
 		}
 
 	}
@@ -52,14 +51,14 @@ public class Injector {
 
 	// The Provider-bind can be done in a Default-Module 
 
-	private static class Binding<T> {
+	private static class BindingImpl<T> {
 
-		final Reference<T> reference;
+		final Resource<T> reference;
 		final Supplier<T> supplier;
 		final Source source;
 		final Scope scope;
 
-		Binding( Reference<T> reference, Supplier<T> supplier, Source source, Scope scope ) {
+		BindingImpl( Resource<T> reference, Supplier<T> supplier, Source source, Scope scope ) {
 			super();
 			this.reference = reference;
 			this.supplier = supplier;
@@ -67,21 +66,21 @@ public class Injector {
 			this.source = source;
 		}
 
-		Resource<T> makeResourceIn( Repository repository, int nr ) {
-			return new Resource<T>( nr, reference, supplier, source, repository );
+		InjectronImpl<T> makeResourceIn( Repository repository, int nr ) {
+			return new InjectronImpl<T>( nr, reference, supplier, source, repository );
 		}
 	}
 
-	private static class Resource<T>
-			implements Supplier<T> {
+	private static class InjectronImpl<T>
+			implements Supplier<T>, Injectron<T> {
 
 		final int nr;
-		final Reference<T> reference;
+		final Resource<T> reference;
 		final Supplier<T> supplier;
 		final Source source;
 		final Repository repository;
 
-		Resource( int nr, Reference<T> reference, Supplier<T> supplier, Source source,
+		InjectronImpl( int nr, Resource<T> reference, Supplier<T> supplier, Source source,
 				Repository repository ) {
 			super();
 			this.nr = nr;
@@ -91,9 +90,9 @@ public class Injector {
 			this.repository = repository;
 		}
 
-		public T yield( Dependency<T> dependency, DependencyContext resolver ) {
+		public T yield( Dependency<T> dependency, DependencyContext context ) {
 			//FIXME pass dependency.with(nr) - cardinality will be applied by the calling injector context 
-			return repository.yield( dependency, new DependencyResourceResolver<T>( this, resolver ) );
+			return repository.yield( dependency, new ContextDependencyResolver<T>( this, context ) );
 		}
 
 		@Override
@@ -103,21 +102,21 @@ public class Injector {
 
 	}
 
-	private static class DependencyResourceResolver<T>
+	private static class ContextDependencyResolver<T>
 			implements DependencyResolver<T> {
 
-		private final Resource<T> resource;
-		private final DependencyContext resolver;
+		private final Supplier<T> resource;
+		private final DependencyContext context;
 
-		DependencyResourceResolver( Resource<T> resource, DependencyContext resolver ) {
+		ContextDependencyResolver( Supplier<T> resource, DependencyContext context ) {
 			super();
 			this.resource = resource;
-			this.resolver = resolver;
+			this.context = context;
 		}
 
 		@Override
 		public T resolve( Dependency<T> dependency ) {
-			return resource.supply( dependency, resolver );
+			return resource.supply( dependency, context );
 		}
 	}
 }

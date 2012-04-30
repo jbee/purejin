@@ -7,8 +7,9 @@ package de.jbee.silk;
  * 
  * @param <T>
  */
-public interface Dependency<T>
-		extends Reference<T> {
+public interface Dependency<T> {
+
+	DefiniteType<T> getType();
 
 	int resourceNr();
 

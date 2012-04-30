@@ -11,6 +11,7 @@ import java.util.List;
 public class Suppliers {
 
 	public static final Supplier<Provider<?>> PROVIDER = new ProviderSupplier();
+
 	public static final Supplier<List<?>> LIST_BRIDGE = new ArrayToListBridgeSupplier();
 
 	public static <T> Supplier<T> adapt( Provider<T> provider ) {
@@ -25,7 +26,7 @@ public class Suppliers {
 		return new InstanceSupplier<T>( instance );
 	}
 
-	public static <T> Supplier<T> type( DeclaredType<T> type ) {
+	public static <T> Supplier<T> type( DefiniteType<T> type ) {
 		return new TypeSupplier<T>( type );
 	}
 
@@ -34,6 +35,8 @@ public class Suppliers {
 	 * 
 	 * Basically we just resolve the array of the element type (generic of the list). Arrays itself
 	 * have build in support that will (if not redefined by a more precise binding) return all known
+	 * 
+	 * TODO extract a abstract {@link Supplier} for 1 argument generic type's
 	 * 
 	 * @author Jan Bernitt (jan.bernitt@gmx.de)
 	 * 
@@ -47,14 +50,14 @@ public class Suppliers {
 
 		@Override
 		public List<?> supply( Dependency<List<?>> dependency, DependencyContext context ) {
-			DeclaredType<?> elementType = dependency.getType().getTypeArguments()[0];
+			DefiniteType<?> elementType = dependency.getType().getTypeArguments()[0];
 			return new ArrayList<Object>( Arrays.asList( supplyArray( elementType.getRawType(),
 					context ) ) );
 		}
 
 		private <E> E[] supplyArray( Class<E> elementType, DependencyContext resolver ) {
 			Object proto = Array.newInstance( elementType, 0 );
-			return (E[]) resolver.resolve( References.type( proto.getClass() ) );
+			return (E[]) resolver.resolve( Resource.type( proto.getClass() ) );
 		}
 
 	}
@@ -104,9 +107,9 @@ public class Suppliers {
 	private static final class TypeSupplier<T>
 			implements Supplier<T> {
 
-		private final DeclaredType<T> type;
+		private final DefiniteType<T> type;
 
-		TypeSupplier( DeclaredType<T> type ) {
+		TypeSupplier( DefiniteType<T> type ) {
 			super();
 			this.type = type;
 		}
@@ -146,8 +149,8 @@ public class Suppliers {
 
 		@Override
 		public Provider<?> supply( Dependency<Provider<?>> dependency, DependencyContext context ) {
-			DeclaredType<Provider<?>> type = dependency.getType();
-			DeclaredType<?> provided = type.getTypeArguments()[0];
+			DefiniteType<Provider<?>> type = dependency.getType();
+			DefiniteType<?> provided = type.getTypeArguments()[0];
 			// TODO ? add more information from the dependency ? 
 			Dependency<Object> providedDependency = null; //FIXME merge dependency and provided
 			return new DynamicProvider<Object>( providedDependency, context );
@@ -200,7 +203,7 @@ public class Suppliers {
 			Type[] types = constructor.getGenericParameterTypes();
 			Object[] values = new Object[types.length];
 			for ( int i = 0; i < types.length; i++ ) {
-				values[i] = References.type( types[i] );
+				values[i] = Resource.type( types[i] );
 			}
 			return values;
 		}
