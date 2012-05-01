@@ -11,6 +11,7 @@ public interface Injectron<T> {
 
 	Source getSource();
 
+	//OPEN maybe we change this so that it s a real 'inject' method that gets a receiver passed as one argument ? The receiver is a interface that accepts the instance: The InjectionPoint
 	T provide( Dependency<T> dependency, DependencyContext context );
 
 }

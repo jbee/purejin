@@ -74,21 +74,21 @@ public final class Type<T> {
 	}
 
 	private final Class<T> rawType;
-	private final Type<?>[] typeArgs;
+	private final Type<?>[] args;
 
 	/**
 	 * Used to model lower bound wildcard types like <code>? extends Foo</code>
 	 */
 	private final boolean lowerBound;
 
-	private Type( boolean lowerBound, Class<T> rawType, Type<?>[] typeArguments ) {
+	private Type( boolean lowerBound, Class<T> rawType, Type<?>[] arguments ) {
 		this.rawType = rawType;
-		this.typeArgs = typeArguments;
+		this.args = arguments;
 		this.lowerBound = lowerBound;
 	}
 
-	private Type( Class<T> rawType, Type<?>[] typeArguments ) {
-		this( false, rawType, typeArguments );
+	private Type( Class<T> rawType, Type<?>[] arguments ) {
+		this( false, rawType, arguments );
 	}
 
 	private Type( Class<T> rawType ) {
@@ -96,18 +96,18 @@ public final class Type<T> {
 	}
 
 	public Type<? extends T> asLoweBound() {
-		return new Type<T>( true, rawType, typeArgs );
+		return new Type<T>( true, rawType, args );
 	}
 
 	public boolean equalTo( Type<?> other ) {
 		if ( rawType != other.rawType ) {
 			return false;
 		}
-		if ( typeArgs.length != other.typeArgs.length ) {
+		if ( args.length != other.args.length ) {
 			return false;
 		}
-		for ( int i = 0; i < typeArgs.length; i++ ) {
-			if ( !typeArgs[i].equalTo( other.typeArgs[i] ) ) {
+		for ( int i = 0; i < args.length; i++ ) {
+			if ( !args[i].equalTo( other.args[i] ) ) {
 				return false;
 			}
 		}
@@ -125,7 +125,7 @@ public final class Type<T> {
 	}
 
 	public Type<?>[] getArguments() {
-		return typeArgs;
+		return args;
 	}
 
 	public boolean isAssignableFrom( Type<?> type ) {
@@ -148,7 +148,7 @@ public final class Type<T> {
 	}
 
 	public boolean isParameterized() {
-		return typeArgs.length > 0;
+		return args.length > 0;
 	}
 
 	public boolean isUnidimensionalArray() {
@@ -170,24 +170,24 @@ public final class Type<T> {
 		if ( !isParameterized() ) {
 			return this;
 		}
-		Type<?>[] arguments = new Type<?>[typeArgs.length];
-		for ( int i = 0; i < typeArgs.length; i++ ) {
-			arguments[i] = typeArgs[i].asLoweBound();
+		Type<?>[] arguments = new Type<?>[args.length];
+		for ( int i = 0; i < args.length; i++ ) {
+			arguments[i] = args[i].asLoweBound();
 		}
 		return new Type<T>( lowerBound, rawType, arguments );
 	}
 
-	public Type<T> parametizedWith( Class<?>... typeArguments ) {
-		Type<?>[] arguments = new Type<?>[typeArguments.length];
-		for ( int i = 0; i < typeArguments.length; i++ ) {
-			arguments[i] = rawType( typeArguments[i] );
+	public Type<T> parametizedWith( Class<?>... arguments ) {
+		Type<?>[] typeArgs = new Type<?>[arguments.length];
+		for ( int i = 0; i < arguments.length; i++ ) {
+			typeArgs[i] = rawType( arguments[i] );
 		}
-		return parametizedWith( arguments );
+		return parametizedWith( typeArgs );
 	}
 
-	public Type<T> parametizedWith( Type<?>... typeArguments ) {
-		validateTypeArguments( typeArguments );
-		return new Type<T>( lowerBound, rawType, typeArguments );
+	public Type<T> parametizedWith( Type<?>... arguments ) {
+		validateTypeArguments( arguments );
+		return new Type<T>( lowerBound, rawType, arguments );
 	}
 
 	@Override
@@ -204,18 +204,18 @@ public final class Type<T> {
 		b.append( rawType.getCanonicalName() );
 		if ( isParameterized() ) {
 			b.append( '<' );
-			typeArgs[0].toString( b );
-			for ( int i = 1; i < typeArgs.length; i++ ) {
+			args[0].toString( b );
+			for ( int i = 1; i < args.length; i++ ) {
 				b.append( ',' );
-				typeArgs[i].toString( b );
+				args[i].toString( b );
 			}
 			b.append( '>' );
 		}
 	}
 
-	private void validateTypeArguments( Type<?>... typeArguments ) {
-		TypeVariable<Class<T>>[] typeParams = rawType.getTypeParameters();
-		if ( typeParams.length != typeArguments.length ) {
+	private void validateTypeArguments( Type<?>... arguments ) {
+		TypeVariable<Class<T>>[] params = rawType.getTypeParameters();
+		if ( params.length != arguments.length ) {
 			//OPEN maybe we can allow to specify less than params - all not specified will be ?
 			throw new IllegalArgumentException( "Invalid nuber of type arguments" );
 		}
