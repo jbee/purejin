@@ -3,7 +3,6 @@ package de.jbee.silk;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,8 +25,13 @@ public class Suppliers {
 		return new InstanceSupplier<T>( instance );
 	}
 
-	public static <T> Supplier<T> type( DefiniteType<T> type ) {
+	public static <T> Supplier<T> type( Type<T> type ) {
 		return new TypeSupplier<T>( type );
+	}
+
+	public static <T> DependencyResolver<T> asDependencyResolver( Supplier<T> supplier,
+			DependencyContext context ) {
+		return new ContextDependencyResolver<T>( supplier, context );
 	}
 
 	/**
@@ -50,7 +54,7 @@ public class Suppliers {
 
 		@Override
 		public List<?> supply( Dependency<List<?>> dependency, DependencyContext context ) {
-			DefiniteType<?> elementType = dependency.getType().getTypeArguments()[0];
+			Type<?> elementType = dependency.getType().getTypeArguments()[0];
 			return new ArrayList<Object>( Arrays.asList( supplyArray( elementType.getRawType(),
 					context ) ) );
 		}
@@ -107,9 +111,9 @@ public class Suppliers {
 	private static final class TypeSupplier<T>
 			implements Supplier<T> {
 
-		private final DefiniteType<T> type;
+		private final Type<T> type;
 
-		TypeSupplier( DefiniteType<T> type ) {
+		TypeSupplier( Type<T> type ) {
 			super();
 			this.type = type;
 		}
@@ -149,8 +153,8 @@ public class Suppliers {
 
 		@Override
 		public Provider<?> supply( Dependency<Provider<?>> dependency, DependencyContext context ) {
-			DefiniteType<Provider<?>> type = dependency.getType();
-			DefiniteType<?> provided = type.getTypeArguments()[0];
+			Type<Provider<?>> type = dependency.getType();
+			Type<?> provided = type.getTypeArguments()[0];
 			// TODO ? add more information from the dependency ? 
 			Dependency<Object> providedDependency = null; //FIXME merge dependency and provided
 			return new DynamicProvider<Object>( providedDependency, context );
@@ -200,7 +204,7 @@ public class Suppliers {
 		}
 
 		private static <T> Object[] instances( Constructor<T> constructor ) {
-			Type[] types = constructor.getGenericParameterTypes();
+			java.lang.reflect.Type[] types = constructor.getGenericParameterTypes();
 			Object[] values = new Object[types.length];
 			for ( int i = 0; i < types.length; i++ ) {
 				values[i] = Resource.type( types[i] );
@@ -218,7 +222,7 @@ public class Suppliers {
 
 		@Override
 		public T supply( Dependency<T> dependency, DependencyContext context ) {
-			Type[] types = constructor.getGenericParameterTypes();
+			java.lang.reflect.Type[] types = constructor.getGenericParameterTypes();
 			Class<?>[] rawTypes = constructor.getParameterTypes();
 			Annotation[][] annotations = constructor.getParameterAnnotations();
 			Object[] dependencies = new Object[types.length];
@@ -236,6 +240,24 @@ public class Suppliers {
 			} catch ( Exception e ) {
 				throw new RuntimeException( e );
 			}
+		}
+	}
+
+	private static class ContextDependencyResolver<T>
+			implements DependencyResolver<T> {
+
+		private final Supplier<T> supplier;
+		private final DependencyContext context;
+
+		ContextDependencyResolver( Supplier<T> supplier, DependencyContext context ) {
+			super();
+			this.supplier = supplier;
+			this.context = context;
+		}
+
+		@Override
+		public T resolve( Dependency<T> dependency ) {
+			return supplier.supply( dependency, context );
 		}
 	}
 }

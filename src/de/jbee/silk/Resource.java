@@ -1,7 +1,5 @@
 package de.jbee.silk;
 
-import java.lang.reflect.Type;
-
 /**
  * Describes WHAT can be injected and WHERE it can be injected.
  * 
@@ -9,19 +7,29 @@ import java.lang.reflect.Type;
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
-public final class Resource<T> { // OPEN use Injectron for Resource and find another name here ?
+public final class Resource<T>
+		implements Comparable<Resource<T>> {
 
 	// Object has the meaning of ANY: e.g. binding Object to a concrete instance mean use that whenever possible (and no other more precise binding applies)
 
-	public static <T> Dependency<T> type( Type type ) {
+	public static <T> Dependency<T> type( java.lang.reflect.Type type ) {
 		return null;
 	}
 
-	public boolean fulfills( Dependency<T> dependency ) {
+	public boolean isApplicableFor( Dependency<T> dependency ) {
+		return isAvailableFor( dependency ) && isAssignableTo( dependency );
+	}
+
+	public boolean isAssignableTo( Dependency<T> dependency ) {
 		return false;
 	}
 
-	public DefiniteType<T> getType() {
+	boolean isAvailableFor( Dependency<T> dependency ) {
+
+		return false;
+	}
+
+	public Type<T> getType() {
 
 		return null;
 	}
@@ -33,5 +41,11 @@ public final class Resource<T> { // OPEN use Injectron for Resource and find ano
 
 		// check discriminator
 		return false;
+	}
+
+	@Override
+	public int compareTo( Resource<T> o ) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

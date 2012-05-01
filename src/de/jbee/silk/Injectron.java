@@ -7,5 +7,8 @@ package de.jbee.silk;
  */
 public interface Injectron<T> {
 
-	// we will see what will be published here - it will be read-only access only
+	Resource<T> getResource();
+
+	T yield( Dependency<T> dependency, DependencyContext context );
+
 }

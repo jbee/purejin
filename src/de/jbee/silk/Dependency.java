@@ -9,7 +9,7 @@ package de.jbee.silk;
  */
 public interface Dependency<T> {
 
-	DefiniteType<T> getType();
+	Type<T> getType();
 
 	int resourceNr();
 

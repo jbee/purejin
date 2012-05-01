@@ -9,14 +9,14 @@ package de.jbee.silk;
  */
 public final class Instance<T> {
 
-	public static <T> Instance<T> defaultInstance( DefiniteType<T> type ) {
+	public static <T> Instance<T> defaultInstance( Type<T> type ) {
 		return new Instance<T>( Discriminator.DEFAULT, type );
 	}
 
 	private final Discriminator discriminator;
-	private final DefiniteType<T> type;
+	private final Type<T> type;
 
-	Instance( Discriminator discriminator, DefiniteType<T> type ) {
+	Instance( Discriminator discriminator, Type<T> type ) {
 		super();
 		this.discriminator = discriminator;
 		this.type = type;
