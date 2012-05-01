@@ -42,15 +42,19 @@ public final class Type<T> {
 			}
 			return new Type<T>( rawType, types( pt.getActualTypeArguments() ) );
 		}
-		return null;
+		throw notSupportedYet( type );
 	}
 
-	private static Type<?>[] types( java.lang.reflect.Type[] args ) {
-		Type<?>[] typeArgs = new Type<?>[args.length];
-		for ( int i = 0; i < args.length; i++ ) {
-			typeArgs[i] = type( args[i] );
+	private static UnsupportedOperationException notSupportedYet( java.lang.reflect.Type type ) {
+		return new UnsupportedOperationException( "Type has no support yet: " + type );
+	}
+
+	private static Type<?>[] types( java.lang.reflect.Type[] arguments ) {
+		Type<?>[] args = new Type<?>[arguments.length];
+		for ( int i = 0; i < arguments.length; i++ ) {
+			args[i] = type( arguments[i] );
 		}
-		return typeArgs;
+		return args;
 	}
 
 	private static Type<?> type( java.lang.reflect.Type type ) {
@@ -60,7 +64,7 @@ public final class Type<T> {
 		if ( type instanceof ParameterizedType ) {
 			return parameterizedtype( (ParameterizedType) type );
 		}
-		return null;
+		throw notSupportedYet( type );
 	}
 
 	private static <T> Type<?> parameterizedtype( ParameterizedType type ) {
@@ -120,7 +124,7 @@ public final class Type<T> {
 		return rawType;
 	}
 
-	public Type<?>[] getTypeArguments() {
+	public Type<?>[] getArguments() {
 		return typeArgs;
 	}
 
@@ -166,19 +170,19 @@ public final class Type<T> {
 		if ( !isParameterized() ) {
 			return this;
 		}
-		Type<?>[] args = new Type<?>[typeArgs.length];
+		Type<?>[] arguments = new Type<?>[typeArgs.length];
 		for ( int i = 0; i < typeArgs.length; i++ ) {
-			args[i] = typeArgs[i].asLoweBound();
+			arguments[i] = typeArgs[i].asLoweBound();
 		}
-		return new Type<T>( lowerBound, rawType, args );
+		return new Type<T>( lowerBound, rawType, arguments );
 	}
 
 	public Type<T> parametizedWith( Class<?>... typeArguments ) {
-		Type<?>[] args = new Type<?>[typeArguments.length];
+		Type<?>[] arguments = new Type<?>[typeArguments.length];
 		for ( int i = 0; i < typeArguments.length; i++ ) {
-			args[i] = rawType( typeArguments[i] );
+			arguments[i] = rawType( typeArguments[i] );
 		}
-		return parametizedWith( args );
+		return parametizedWith( arguments );
 	}
 
 	public Type<T> parametizedWith( Type<?>... typeArguments ) {
@@ -215,5 +219,6 @@ public final class Type<T> {
 			//OPEN maybe we can allow to specify less than params - all not specified will be ?
 			throw new IllegalArgumentException( "Invalid nuber of type arguments" );
 		}
+		// TODO check bounds fulfilled by arguments
 	}
 }

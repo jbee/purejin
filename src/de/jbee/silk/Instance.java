@@ -7,7 +7,8 @@ package de.jbee.silk;
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  * 
  */
-public final class Instance<T> {
+public final class Instance<T>
+		implements Typed<T> {
 
 	public static <T> Instance<T> defaultInstance( Type<T> type ) {
 		return new Instance<T>( Discriminator.DEFAULT, type );
@@ -31,6 +32,7 @@ public final class Instance<T> {
 		return new Instance<T>( discriminator, type );
 	}
 
+	@Override
 	public Type<T> getType() {
 		return type;
 	}

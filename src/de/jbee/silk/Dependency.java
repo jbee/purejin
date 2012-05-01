@@ -7,7 +7,8 @@ package de.jbee.silk;
  * 
  * @param <T>
  */
-public final class Dependency<T> {
+public final class Dependency<T>
+		implements Typed<T> {
 
 	public static <T> Dependency<T> dependency( Type<T> type ) {
 		return new Dependency<T>( type );
@@ -28,19 +29,17 @@ public final class Dependency<T> {
 		this.injectronCardinality = injectronCardinality;
 	}
 
+	@Override
 	public Type<T> getType() {
-
-		return null;
+		return type;
 	}
 
 	public int injectronSerialNumber() {
-
-		return 0;
+		return injectronSerialNumber;
 	}
 
 	public int injectronCardinality() {
-
-		return 0;
+		return injectronCardinality;
 	}
 
 	public Dependency<T> onInjectronCardinality( int cardinality ) {

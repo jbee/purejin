@@ -8,7 +8,7 @@ package de.jbee.silk;
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
 public final class Resource<T>
-		implements Comparable<Resource<T>> {
+		implements Typed<T>, Comparable<Resource<T>> {
 
 	// Object has the meaning of ANY: e.g. binding Object to a concrete instance mean use that whenever possible (and no other more precise binding applies)
 
@@ -39,6 +39,7 @@ public final class Resource<T>
 		return true;
 	}
 
+	@Override
 	public Type<T> getType() {
 		return instance.getType();
 	}
