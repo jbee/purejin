@@ -61,7 +61,8 @@ public class Suppliers {
 
 		private <E> E[] supplyArray( Class<E> elementType, DependencyContext resolver ) {
 			Object proto = Array.newInstance( elementType, 0 );
-			return (E[]) resolver.resolve( Resource.type( proto.getClass() ) );
+			return (E[]) resolver.resolve( Dependency.dependency( Type.type( proto.getClass(),
+					proto.getClass() ) ) );
 		}
 
 	}
@@ -204,10 +205,11 @@ public class Suppliers {
 		}
 
 		private static <T> Object[] instances( Constructor<T> constructor ) {
+			Class<?>[] rawTypes = constructor.getParameterTypes();
 			java.lang.reflect.Type[] types = constructor.getGenericParameterTypes();
 			Object[] values = new Object[types.length];
 			for ( int i = 0; i < types.length; i++ ) {
-				values[i] = Resource.type( types[i] );
+				values[i] = Dependency.dependency( Type.type( rawTypes[i], types[i] ) );
 			}
 			return values;
 		}

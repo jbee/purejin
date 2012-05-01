@@ -6,7 +6,6 @@ package de.jbee.silk;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 class InjectorBinder
 		implements Binder {
@@ -26,11 +25,24 @@ class InjectorBinder
 	// 1. sort bindings
 	// 2. remove duplicates (implicit will be sorted after explicit)
 	// 3. detect ambiguous bindings (two explicit bindings that have same type and availability)
-	// 4. create map to array structure from single array		
-	public Map<Class<?>, Injectrons<?>> makeInjectrons() {
+
+	/**
+	 * OPEN create a intermediate object whose Injectrons can be visited instead of publish the
+	 * array here ? Right now this changes the bindings in place a lot so this object shouldn't
+	 * exist any longer after a call.
+	 */
+	public Injectron<?>[] makeInjectrons() {
 		Collections.sort( bindings );
 
-		return null;
+		return toInjectrons();
+	}
+
+	private Injectron<?>[] toInjectrons() {
+		Injectron<?>[] res = new Injectron<?>[bindings.size()];
+		for ( int i = 0; i < res.length; i++ ) {
+			res[i] = bindings.get( i ).toInjectron( i, null ); //FIXME get real repository
+		}
+		return res;
 	}
 
 	private static class InternalInjectron<T>
@@ -58,9 +70,14 @@ class InjectorBinder
 		}
 
 		@Override
-		public T yield( Dependency<T> dependency, DependencyContext context ) {
-			//FIXME pass dependency.with(nr) - cardinality will be applied by the calling injector context 
-			return repository.yield( dependency, Suppliers.asDependencyResolver( this, context ) );
+		public Source getSource() {
+			return source;
+		}
+
+		@Override
+		public T provide( Dependency<T> dependency, DependencyContext context ) {
+			return repository.yield( dependency.onInjectronSerialNumber( serialNumber ),
+					Suppliers.asDependencyResolver( this, context ) );
 		}
 
 		@Override

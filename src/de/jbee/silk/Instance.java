@@ -16,7 +16,7 @@ public final class Instance<T> {
 	private final Discriminator discriminator;
 	private final Type<T> type;
 
-	Instance( Discriminator discriminator, Type<T> type ) {
+	private Instance( Discriminator discriminator, Type<T> type ) {
 		super();
 		this.discriminator = discriminator;
 		this.type = type;
@@ -25,5 +25,13 @@ public final class Instance<T> {
 	public boolean equalTo( Instance<T> other ) {
 
 		return true;
+	}
+
+	public Instance<T> discriminableBy( Discriminator discriminator ) {
+		return new Instance<T>( discriminator, type );
+	}
+
+	public Type<T> getType() {
+		return type;
 	}
 }

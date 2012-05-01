@@ -9,6 +9,8 @@ public interface Injectron<T> {
 
 	Resource<T> getResource();
 
-	T yield( Dependency<T> dependency, DependencyContext context );
+	Source getSource();
+
+	T provide( Dependency<T> dependency, DependencyContext context );
 
 }

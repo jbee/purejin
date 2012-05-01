@@ -88,7 +88,7 @@ public class Scoped {
 			Repository repository = threadRepository.get();
 			if ( repository == null ) {
 				// since each thread is just accessing its own repo there cannot be a repo set for the running thread after we checked for null
-				repository = repositoryScope.init( dependency.resourceCardinality() );
+				repository = repositoryScope.init( dependency.injectronCardinality() );
 				threadRepository.set( repository );
 			}
 			return repository.yield( dependency, resolver );
@@ -200,16 +200,16 @@ public class Scoped {
 		@Override
 		@SuppressWarnings ( "unchecked" )
 		public <T> T yield( Dependency<T> dependency, DependencyResolver<T> resolver ) {
-			T res = (T) instances[dependency.resourceNr()];
+			T res = (T) instances[dependency.injectronSerialNumber()];
 			if ( res != null ) {
 				return res;
 			}
 			// just sync the (later) unexpected path that is executed once
 			synchronized ( instances ) {
-				res = (T) instances[dependency.resourceNr()];
+				res = (T) instances[dependency.injectronSerialNumber()];
 				if ( res != null ) { // we need to ask again since the instance could have been initialized before we got entrance to the sync block
 					res = resolver.resolve( dependency );
-					instances[dependency.resourceNr()] = res;
+					instances[dependency.injectronSerialNumber()] = res;
 				}
 			}
 			return res;
