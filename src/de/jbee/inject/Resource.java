@@ -20,8 +20,8 @@ public final class Resource<T>
 	}
 
 	public boolean isApplicableFor( Dependency<T> dependency ) {
-		//TODO what about the discriminator ? we also need to make sure that it fits
-		return isAvailableFor( dependency ) && isAssignableTo( dependency );
+		return isAvailableFor( dependency ) && isObtainable( dependency )
+				&& isAssignableTo( dependency );
 	}
 
 	/**
@@ -35,6 +35,15 @@ public final class Resource<T>
 	 * Does the given {@link Dependency} occur in the right package ?
 	 */
 	public boolean isAvailableFor( Dependency<T> dependency ) {
+
+		return true;
+	}
+
+	/**
+	 * Does this resource provide the instance wanted by the given {@link Dependency}'s
+	 * {@link Discriminator} ?
+	 */
+	public boolean isObtainable( Dependency<T> dependency ) { // better name ? see 'erreichbar'
 
 		return true;
 	}

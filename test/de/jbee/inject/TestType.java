@@ -10,8 +10,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-import de.jbee.inject.Type;
-
 public class TestType {
 
 	private List<String> aStringListField;
@@ -31,6 +29,14 @@ public class TestType {
 		Field stringList = TestType.class.getDeclaredField( "aStringListField" );
 		assertThat( Type.fieldType( stringList ).toString(),
 				is( "java.util.List<java.lang.String>" ) );
+	}
+
+	@Test
+	public void testIsAssignableTo() {
+		Type<Integer> integer = Type.rawType( Integer.class );
+		Type<Number> number = Type.rawType( Number.class );
+		assertTrue( integer.isAssignableTo( number ) );
+		assertFalse( number.isAssignableTo( integer ) );
 	}
 
 	@Test

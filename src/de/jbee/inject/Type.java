@@ -128,16 +128,19 @@ public final class Type<T> {
 		return args;
 	}
 
-	public boolean isAssignableFrom( Type<?> type ) {
+	public boolean isAssignableTo( Type<?> type ) {
 		if ( !type.rawType.isAssignableFrom( rawType ) ) {
 			return false;
 		}
-		//TODO
-		return false;
-	}
+		if ( !isParameterized() ) {
+			return true; //raw type is ok - no parameters to check
+		}
+		// both have the same rawType -> arguments need to be identical
 
-	public boolean isAssignableTo( Type<?> type ) {
-		return type.isAssignableFrom( this );
+		// this raw type is extending the rawType passed - check if it is implemented direct or passed
+
+		// there is another trivial case: type has ? extends object for all parameters - that means will allow all 
+		return true;
 	}
 
 	/**
