@@ -75,13 +75,13 @@ class InjectorBinder
 		}
 
 		@Override
-		public T provide( Dependency<T> dependency, DependencyContext context ) {
-			return repository.yield( dependency.onInjectronSerialNumber( serialNumber ),
-					Suppliers.asDependencyResolver( this, context ) );
+		public T instanceFor( Dependency<T> dependency, DependencyResolver context ) {
+			Injection<T> i = null;
+			return repository.yield( i, Suppliers.asDependencyResolver( this, context ) );
 		}
 
 		@Override
-		public T supply( Dependency<T> dependency, DependencyContext context ) {
+		public T supply( Dependency<T> dependency, DependencyResolver context ) {
 			return supplier.supply( dependency, context );
 		}
 

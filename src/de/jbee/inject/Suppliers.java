@@ -29,9 +29,9 @@ public class Suppliers {
 		return new TypeSupplier<T>( type );
 	}
 
-	public static <T> DependencyResolver<T> asDependencyResolver( Supplier<T> supplier,
-			DependencyContext context ) {
-		return new ContextDependencyResolver<T>( supplier, context );
+	public static <T> Injectable<T> asDependencyResolver( Supplier<T> supplier,
+			DependencyResolver context ) {
+		return new SpecificBrideSupplier<T>( supplier, context );
 	}
 
 	/**
@@ -53,13 +53,13 @@ public class Suppliers {
 		}
 
 		@Override
-		public List<?> supply( Dependency<List<?>> dependency, DependencyContext context ) {
+		public List<?> supply( Dependency<List<?>> dependency, DependencyResolver context ) {
 			Type<?> elementType = dependency.getType().getArguments()[0];
 			return new ArrayList<Object>( Arrays.asList( supplyArray( elementType.getRawType(),
 					context ) ) );
 		}
 
-		private <E> E[] supplyArray( Class<E> elementType, DependencyContext resolver ) {
+		private <E> E[] supplyArray( Class<E> elementType, DependencyResolver resolver ) {
 			Object proto = Array.newInstance( elementType, 0 );
 			return (E[]) resolver.resolve( Dependency.dependency( Type.type( proto.getClass(),
 					proto.getClass() ) ) );
@@ -78,7 +78,7 @@ public class Suppliers {
 		}
 
 		@Override
-		public T supply( Dependency<T> dependency, DependencyContext context ) {
+		public T supply( Dependency<T> dependency, DependencyResolver context ) {
 			return instance;
 		}
 
@@ -97,7 +97,7 @@ public class Suppliers {
 		}
 
 		@Override
-		public T[] supply( Dependency<T[]> dependency, DependencyContext context ) {
+		public T[] supply( Dependency<T[]> dependency, DependencyResolver context ) {
 			T[] res = (T[]) Array.newInstance( type.getComponentType(), elements.length );
 			int i = 0;
 			for ( Supplier<? extends T> e : elements ) {
@@ -120,7 +120,7 @@ public class Suppliers {
 		}
 
 		@Override
-		public T supply( Dependency<T> dependency, DependencyContext context ) {
+		public T supply( Dependency<T> dependency, DependencyResolver context ) {
 			// TODO ? add more information from the dependency ? 
 			Dependency<T> typeDependency = null; //FIXME merge type and dependency 
 			return context.resolve( typeDependency );
@@ -139,7 +139,7 @@ public class Suppliers {
 		}
 
 		@Override
-		public T supply( Dependency<T> dependency, DependencyContext context ) {
+		public T supply( Dependency<T> dependency, DependencyResolver context ) {
 			return provider.yield();
 		}
 
@@ -153,7 +153,7 @@ public class Suppliers {
 		}
 
 		@Override
-		public Provider<?> supply( Dependency<Provider<?>> dependency, DependencyContext context ) {
+		public Provider<?> supply( Dependency<Provider<?>> dependency, DependencyResolver context ) {
 			Type<Provider<?>> type = dependency.getType();
 			Type<?> provided = type.getArguments()[0];
 			// TODO ? add more information from the dependency ? 
@@ -167,9 +167,9 @@ public class Suppliers {
 			implements Provider<T> {
 
 		private final Dependency<T> dependency;
-		private final DependencyContext resolver;
+		private final DependencyResolver resolver;
 
-		DynamicProvider( Dependency<T> dependency, DependencyContext resolver ) {
+		DynamicProvider( Dependency<T> dependency, DependencyResolver resolver ) {
 			super();
 			this.dependency = dependency;
 			this.resolver = resolver;
@@ -182,16 +182,23 @@ public class Suppliers {
 
 	}
 
+	/**
+	 * Adapter to a simpler API that will not need any {@link DependencyResolver} to supply it's
+	 * value in any case.
+	 * 
+	 * @author Jan Bernitt (jan.bernitt@gmx.de)
+	 * 
+	 */
 	static final class FactorySupplier<T>
 			implements Supplier<T> {
 
 		@Override
-		public T supply( Dependency<T> dependency, DependencyContext context ) {
+		public T supply( Dependency<T> dependency, DependencyResolver context ) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
-		// some kind of factory method 
+		// some kind of factory method working on the type/dependency alone, not interested in the context
 	}
 
 	static final class ConstructorSupplier<T>
@@ -223,7 +230,7 @@ public class Suppliers {
 		// in a validate we have to check that the arguments 
 
 		@Override
-		public T supply( Dependency<T> dependency, DependencyContext context ) {
+		public T supply( Dependency<T> dependency, DependencyResolver context ) {
 			java.lang.reflect.Type[] types = constructor.getGenericParameterTypes();
 			Class<?>[] rawTypes = constructor.getParameterTypes();
 			Annotation[][] annotations = constructor.getParameterAnnotations();
@@ -245,21 +252,21 @@ public class Suppliers {
 		}
 	}
 
-	private static class ContextDependencyResolver<T>
-			implements DependencyResolver<T> {
+	private static class SpecificBrideSupplier<T>
+			implements Injectable<T> {
 
 		private final Supplier<T> supplier;
-		private final DependencyContext context;
+		private final DependencyResolver context;
 
-		ContextDependencyResolver( Supplier<T> supplier, DependencyContext context ) {
+		SpecificBrideSupplier( Supplier<T> supplier, DependencyResolver context ) {
 			super();
 			this.supplier = supplier;
 			this.context = context;
 		}
 
 		@Override
-		public T resolve( Dependency<T> dependency ) {
-			return supplier.supply( dependency, context );
+		public T instanceFor( Injection<T> injection ) {
+			return supplier.supply( injection.getDependency(), context );
 		}
 	}
 }

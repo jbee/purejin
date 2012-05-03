@@ -6,7 +6,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 public class Injector
-		implements DependencyContext {
+		implements DependencyResolver {
 
 	public static Injector create( Module root ) {
 		//TODO setup context
@@ -52,18 +52,18 @@ public class Injector
 		Injectron<T>[] injectrons = getInjectrons( type );
 		if ( injectrons == null ) {
 			if ( type.isUnidimensionalArray() ) {
-				resolveArray( type, type.getElementType() );
+				return resolveArray( type, type.getElementType() );
 			}
 			throw new RuntimeException( "No injectron for type: " + type );
 		}
 		for ( int i = 0; i < injectrons.length; i++ ) {
 			Injectron<T> injectron = injectrons[i];
 			if ( injectron.getResource().isApplicableFor( dependency ) ) {
-				return injectron.provide( dependency, this ); //OPEN I guess we need to add information about the type being injected here 
+				return injectron.instanceFor( dependency, this ); //OPEN I guess we need to add information about the type being injected here 
 			}
 		}
 		if ( type.isUnidimensionalArray() ) {
-			resolveArray( type, type.getElementType() );
+			return resolveArray( type, type.getElementType() );
 		}
 		return null;
 	}
@@ -75,7 +75,7 @@ public class Injector
 			E[] elements = (E[]) Array.newInstance( rawType, elementInjectrons.length );
 			for ( int i = 0; i < elementInjectrons.length; i++ ) {
 				Dependency<E> elementDependency = null; //TODO
-				elements[i] = elementInjectrons[i].provide( elementDependency, this );
+				elements[i] = elementInjectrons[i].instanceFor( elementDependency, this );
 			}
 			//FIXME check if the elements are isApplicableFor the type required
 			return (T) elements;

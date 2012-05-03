@@ -11,7 +11,6 @@ public interface Injectron<T> {
 
 	Source getSource();
 
-	T provide( Dependency<T> dependency, DependencyContext context );
+	T instanceFor( Dependency<T> dependency, DependencyResolver context );
 
-	//void inject( Dependency<T> dependency, InjectionPoint<T> point );
 }

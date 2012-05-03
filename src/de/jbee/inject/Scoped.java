@@ -3,22 +3,22 @@ package de.jbee.inject;
 public class Scoped {
 
 	/**
-	 * Asks the {@link DependencyResolver} once per injection.
+	 * Asks the {@link Injectable} once per injection.
 	 */
 	public static final Scope DEFAULT = new DefaultScope();
 	/**
-	 * Asks the {@link DependencyResolver} once per binding. Thereby instances become singletons
-	 * local to the application.
+	 * Asks the {@link Injectable} once per binding. Thereby instances become singletons local
+	 * to the application.
 	 */
 	public static final Scope APPLICATION = new ApplicationScope();
 	/**
-	 * Asks the {@link DependencyResolver} once per thread per binding which is understand commonly
-	 * as a usual 'per-thread' singleton.
+	 * Asks the {@link Injectable} once per thread per binding which is understand commonly as
+	 * a usual 'per-thread' singleton.
 	 */
 	public static final Scope THREAD = new ThreadScope( new ThreadLocal<Repository>(), APPLICATION );
 
-	public static Repository asSnapshot( Repository synchronous, Repository asynchronous ) {
-		return new SnapshotRepository( synchronous, asynchronous );
+	public static Repository asSnapshot( Repository src, Repository dest ) {
+		return new SnapshotRepository( src, dest );
 	}
 
 	static final class SnapshotScope
@@ -35,15 +35,14 @@ public class Scoped {
 
 		@Override
 		public Repository init( int cardinality ) {
-			return new SnapshotRepository( synchronous.init( cardinality ),
-					asynchronous.init( cardinality ) );
+			return new SnapshotRepository( asynchronous.init( cardinality ),
+					synchronous.init( cardinality ) );
 		}
 	}
 
 	/**
-	 * What is usually called a 'default'-{@link Scope} will ask the {@link DependencyResolver}
-	 * passed each time the {@link Repository#yield(Dependency, DependencyResolver)}-method is
-	 * invoked.
+	 * What is usually called a 'default'-{@link Scope} will ask the {@link Injectable} passed
+	 * each time the {@link Repository#yield(Dependency, Injectable)}-method is invoked.
 	 * 
 	 * The {@link Scope} is also used as {@link Repository} instance since both don#t have any
 	 * state.
@@ -65,8 +64,8 @@ public class Scoped {
 		}
 
 		@Override
-		public <T> T yield( Dependency<T> dependency, DependencyResolver<T> resolver ) {
-			return resolver.resolve( dependency );
+		public <T> T yield( Injection<T> injection, Injectable<T> injectable ) {
+			return injectable.instanceFor( injection );
 		}
 
 	}
@@ -84,14 +83,14 @@ public class Scoped {
 		}
 
 		@Override
-		public <T> T yield( Dependency<T> dependency, DependencyResolver<T> resolver ) {
+		public <T> T yield( Injection<T> injection, Injectable<T> injectable ) {
 			Repository repository = threadRepository.get();
 			if ( repository == null ) {
 				// since each thread is just accessing its own repo there cannot be a repo set for the running thread after we checked for null
-				repository = repositoryScope.init( dependency.injectronCardinality() );
+				repository = repositoryScope.init( injection.injectronCardinality() );
 				threadRepository.set( repository );
 			}
-			return repository.yield( dependency, resolver );
+			return repository.yield( injection, injectable );
 		}
 
 		@Override
@@ -114,36 +113,35 @@ public class Scoped {
 	private static final class SnapshotRepository
 			implements Repository {
 
-		private final Repository synchronous;
-		private final Repository asynchronous;
+		private final Repository dest;
+		private final Repository src;
 
-		SnapshotRepository( Repository synchronous, Repository asynchronous ) {
+		SnapshotRepository( Repository src, Repository dest ) {
 			super();
-			this.synchronous = synchronous;
-			this.asynchronous = asynchronous;
+			this.dest = dest;
+			this.src = src;
 		}
 
 		@Override
-		public <T> T yield( Dependency<T> dependency, DependencyResolver<T> resolver ) {
-			return synchronous.yield( dependency, new SnapshottedResourceResolver<T>( resolver,
-					asynchronous ) );
+		public <T> T yield( Injection<T> injection, Injectable<T> injectable ) {
+			return dest.yield( injection, new SnapshotingSupplier<T>( injectable, src ) );
 		}
 
-		private static final class SnapshottedResourceResolver<T>
-				implements DependencyResolver<T> {
+		private static final class SnapshotingSupplier<T>
+				implements Injectable<T> {
 
-			private final DependencyResolver<T> resolver;
-			private final Repository bound;
+			private final Injectable<T> supplier;
+			private final Repository src;
 
-			SnapshottedResourceResolver( DependencyResolver<T> resolver, Repository bound ) {
+			SnapshotingSupplier( Injectable<T> supplier, Repository src ) {
 				super();
-				this.resolver = resolver;
-				this.bound = bound;
+				this.supplier = supplier;
+				this.src = src;
 			}
 
 			@Override
-			public T resolve( Dependency<T> dependency ) {
-				return bound.yield( dependency, resolver );
+			public T instanceFor( Injection<T> injection ) {
+				return src.yield( injection, supplier );
 			}
 
 		}
@@ -153,7 +151,7 @@ public class Scoped {
 			implements Repository {
 
 		@Override
-		public <T> T yield( Dependency<T> dependency, DependencyResolver<T> resolver ) {
+		public <T> T yield( Injection<T> injection, Injectable<T> injectable ) {
 			// e.g. get receiver class from dependency -to be reusable the provider could offer a identity --> a wrapper class would be needed anyway so maybe best is to have quite similar impl. all using a identity hash-map
 			// TODO Auto-generated method stub
 			return null;
@@ -199,17 +197,17 @@ public class Scoped {
 
 		@Override
 		@SuppressWarnings ( "unchecked" )
-		public <T> T yield( Dependency<T> dependency, DependencyResolver<T> resolver ) {
-			T res = (T) instances[dependency.injectronSerialNumber()];
+		public <T> T yield( Injection<T> injection, Injectable<T> injectable ) {
+			T res = (T) instances[injection.injectronSerialNumber()];
 			if ( res != null ) {
 				return res;
 			}
 			// just sync the (later) unexpected path that is executed once
 			synchronized ( instances ) {
-				res = (T) instances[dependency.injectronSerialNumber()];
+				res = (T) instances[injection.injectronSerialNumber()];
 				if ( res != null ) { // we need to ask again since the instance could have been initialized before we got entrance to the sync block
-					res = resolver.resolve( dependency );
-					instances[dependency.injectronSerialNumber()] = res;
+					res = injectable.instanceFor( injection );
+					instances[injection.injectronSerialNumber()] = res;
 				}
 			}
 			return res;

@@ -9,7 +9,7 @@ package de.jbee.inject;
  */
 public interface Supplier<T> {
 
-	T supply( Dependency<T> dependency, DependencyContext context );
+	T supply( Dependency<T> dependency, DependencyResolver context );
 
 	// TODO some way to validate the source - is the constructor available etc.
 }
