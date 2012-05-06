@@ -95,8 +95,12 @@ public final class Type<T> {
 		this( false, rawType, new Type<?>[0] );
 	}
 
-	public Type<? extends T> asLoweBound() {
+	public Type<? extends T> asLowerBound() {
 		return new Type<T>( true, rawType, args );
+	}
+
+	public Type<? extends T> exact() {
+		return new Type<T>( false, rawType, args );
 	}
 
 	public boolean equalTo( Type<?> other ) {
@@ -128,19 +132,41 @@ public final class Type<T> {
 		return args;
 	}
 
-	public boolean isAssignableTo( Type<?> type ) {
-		if ( !type.rawType.isAssignableFrom( rawType ) ) {
+	public boolean isAssignableTo( Type<?> other ) {
+		if ( !other.rawType.isAssignableFrom( rawType ) ) {
 			return false;
 		}
 		if ( !isParameterized() ) {
 			return true; //raw type is ok - no parameters to check
 		}
-		// both have the same rawType -> arguments need to be identical
+
+		if ( other.rawType == rawType ) { // both have the same rawType
+			return areArgumentsAssignableTo( other );
+		}
 
 		// this raw type is extending the rawType passed - check if it is implemented direct or passed
 
 		// there is another trivial case: type has ? extends object for all parameters - that means will allow all 
 		return true;
+	}
+
+	public boolean areArgumentsAssignableTo( Type<?> other ) {
+		for ( int i = 0; i < args.length; i++ ) {
+			if ( !args[i].asArgumentAssignableTo( other.args[i] ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean asArgumentAssignableTo( Type<?> other ) {
+		if ( rawType == other.rawType ) {
+			return !isParameterized() || areArgumentsAssignableTo( other );
+		}
+		if ( other.isLowerBound() ) {
+			return isAssignableTo( other.exact() );
+		}
+		return false;
 	}
 
 	/**
@@ -167,15 +193,15 @@ public final class Type<T> {
 	}
 
 	/**
-	 * @return A {@link Type} having as its type arguments {@link #asLoweBound()}s.
+	 * @return A {@link Type} having as its type arguments {@link #asLowerBound()}s.
 	 */
-	public Type<T> parametizedAsLowerBounds() {
+	public Type<T> parametizedAsLowerBounds() { //TODO maybe this is already a lower bound type
 		if ( !isParameterized() ) {
 			return this;
 		}
 		Type<?>[] arguments = new Type<?>[args.length];
 		for ( int i = 0; i < args.length; i++ ) {
-			arguments[i] = args[i].asLoweBound();
+			arguments[i] = args[i].asLowerBound();
 		}
 		return new Type<T>( lowerBound, rawType, arguments );
 	}

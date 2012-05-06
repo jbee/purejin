@@ -20,7 +20,7 @@ public class TestType {
 		Type<List> l = Type.rawType( List.class ).parametizedWith( String.class );
 		assertThat( l.toString(), is( "java.util.List<java.lang.String>" ) );
 
-		l = Type.rawType( List.class ).parametizedWith( Type.rawType( String.class ).asLoweBound() );
+		l = Type.rawType( List.class ).parametizedWith( Type.rawType( String.class ).asLowerBound() );
 		assertThat( l.toString(), is( "java.util.List<? extends java.lang.String>" ) );
 
 		l = Type.rawType( List.class ).parametizedWith( Type.rawType( String.class ) ).parametizedAsLowerBounds();
@@ -37,6 +37,32 @@ public class TestType {
 		Type<Number> number = Type.rawType( Number.class );
 		assertTrue( integer.isAssignableTo( number ) );
 		assertFalse( number.isAssignableTo( integer ) );
+	}
+
+	@Test
+	public void testIsAssignableTo1Generic() {
+		Type<List> listOfIntegers = Type.rawType( List.class ).parametizedWith( Integer.class );
+		Type<List> listOfNumbers = Type.rawType( List.class ).parametizedWith( Number.class );
+		assertFalse( listOfIntegers.isAssignableTo( listOfNumbers ) );
+		assertFalse( listOfNumbers.isAssignableTo( listOfIntegers ) );
+		assertTrue( listOfIntegers.isAssignableTo( listOfNumbers.parametizedAsLowerBounds() ) );
+		assertFalse( listOfNumbers.isAssignableTo( listOfIntegers.parametizedAsLowerBounds() ) );
+	}
+
+	@Test
+	public void testIsAssignableTo2Generics() {
+		List<Class<Integer>> l = null;
+		List<? extends Class<? extends Number>> l2 = l;
+
+		Type<List> listOfClassesOfIntegers = Type.rawType( List.class ).parametizedWith(
+				Type.rawType( Class.class ).parametizedWith( Integer.class ) );
+		Type<Class> classOfNumbers = Type.rawType( Class.class ).parametizedWith( Number.class );
+		Type<List> listOfClassesOfNumbers = Type.rawType( List.class ).parametizedWith(
+				classOfNumbers );
+		assertFalse( listOfClassesOfIntegers.isAssignableTo( listOfClassesOfNumbers ) );
+		assertFalse( listOfClassesOfIntegers.isAssignableTo( listOfClassesOfNumbers.parametizedAsLowerBounds() ) );
+		Type<List> listOfExtendsClassesOfExtendsNumbers = listOfClassesOfNumbers.parametizedWith( classOfNumbers.asLowerBound().parametizedAsLowerBounds() );
+		assertTrue( listOfClassesOfIntegers.isAssignableTo( listOfExtendsClassesOfExtendsNumbers ) );
 	}
 
 	@Test
