@@ -6,24 +6,26 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestType {
 
-	private List<String> aStringListField;
+	List<String> aStringListField;
 
 	@Test
 	public void testToString()
 			throws Exception {
-		Type<List> l = Type.rawType( List.class ).parametizedWith( String.class );
+		Type<List> l = Type.rawType( List.class ).parametized( String.class );
 		assertThat( l.toString(), is( "java.util.List<java.lang.String>" ) );
 
-		l = Type.rawType( List.class ).parametizedWith( Type.rawType( String.class ).asLowerBound() );
+		l = Type.rawType( List.class ).parametized( Type.rawType( String.class ).asLowerBound() );
 		assertThat( l.toString(), is( "java.util.List<? extends java.lang.String>" ) );
 
-		l = Type.rawType( List.class ).parametizedWith( Type.rawType( String.class ) ).parametizedAsLowerBounds();
+		l = Type.rawType( List.class ).parametized( Type.rawType( String.class ) ).parametizedAsLowerBounds();
 		assertThat( l.toString(), is( "java.util.List<? extends java.lang.String>" ) );
 
 		Field stringList = TestType.class.getDeclaredField( "aStringListField" );
@@ -41,8 +43,8 @@ public class TestType {
 
 	@Test
 	public void testIsAssignableTo1Generic() {
-		Type<List> listOfIntegers = Type.rawType( List.class ).parametizedWith( Integer.class );
-		Type<List> listOfNumbers = Type.rawType( List.class ).parametizedWith( Number.class );
+		Type<List> listOfIntegers = Type.rawType( List.class ).parametized( Integer.class );
+		Type<List> listOfNumbers = Type.rawType( List.class ).parametized( Number.class );
 		assertFalse( listOfIntegers.isAssignableTo( listOfNumbers ) );
 		assertFalse( listOfNumbers.isAssignableTo( listOfIntegers ) );
 		assertTrue( listOfIntegers.isAssignableTo( listOfNumbers.parametizedAsLowerBounds() ) );
@@ -54,15 +56,22 @@ public class TestType {
 		List<Class<Integer>> l = null;
 		List<? extends Class<? extends Number>> l2 = l;
 
-		Type<List> listOfClassesOfIntegers = Type.rawType( List.class ).parametizedWith(
-				Type.rawType( Class.class ).parametizedWith( Integer.class ) );
-		Type<Class> classOfNumbers = Type.rawType( Class.class ).parametizedWith( Number.class );
-		Type<List> listOfClassesOfNumbers = Type.rawType( List.class ).parametizedWith(
+		Type<List> listOfClassesOfIntegers = Type.rawType( List.class ).parametized(
+				Type.rawType( Class.class ).parametized( Integer.class ) );
+		Type<Class> classOfNumbers = Type.rawType( Class.class ).parametized( Number.class );
+		Type<List> listOfClassesOfNumbers = Type.rawType( List.class ).parametized(
 				classOfNumbers );
 		assertFalse( listOfClassesOfIntegers.isAssignableTo( listOfClassesOfNumbers ) );
 		assertFalse( listOfClassesOfIntegers.isAssignableTo( listOfClassesOfNumbers.parametizedAsLowerBounds() ) );
-		Type<List> listOfExtendsClassesOfExtendsNumbers = listOfClassesOfNumbers.parametizedWith( classOfNumbers.asLowerBound().parametizedAsLowerBounds() );
+		Type<List> listOfExtendsClassesOfExtendsNumbers = listOfClassesOfNumbers.parametized( classOfNumbers.asLowerBound().parametizedAsLowerBounds() );
 		assertTrue( listOfClassesOfIntegers.isAssignableTo( listOfExtendsClassesOfExtendsNumbers ) );
+	}
+
+	@Test
+	public void testGenericArrays() {
+		Type<Class[]> classArray = Type.rawType( Class[].class ).parametized( String.class );
+		assertThat( classArray.getElementType().toString(),
+				is( "java.lang.Class<java.lang.String>" ) );
 	}
 
 	@Test
@@ -77,4 +86,12 @@ public class TestType {
 		assertFalse( t.isUnidimensionalArray() );
 	}
 
+	@Test
+	@Ignore
+	public void test() {
+		Type<ArrayList> listOfStrings = Type.rawType( ArrayList.class ).parametized(
+				String.class );
+		assertThat( listOfStrings.asSupertype( List.class ).toString(),
+				is( "java.util.List<java.lang.String>" ) );
+	}
 }

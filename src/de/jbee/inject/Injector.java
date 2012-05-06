@@ -8,28 +8,27 @@ import java.util.Map;
 public class Injector
 		implements DependencyResolver {
 
-	public static Injector create( Module root ) {
-		//TODO setup context
-		InjectorBinder binder = new InjectorBinder();
-		root.configure( binder );
-
-		return new Injector( binder.makeInjectrons() );
+	public static Injector create( Module root, ModuleBinder binder ) {
+		return new Injector( binder.bind( root ) );
 	}
 
-	public static Injector create( Injectron<?>[] injectrons ) {
+	public static Injector create( Binding<?>[] injectrons ) {
 		return new Injector( injectrons );
 	}
 
-	private final int cardinality;
 	private final Map<Class<?>, Injectron<?>[]> injectrons;
 
-	private Injector( Injectron<?>[] injectrons ) {
+	private Injector( Binding<?>[] bindings ) {
 		super();
-		this.cardinality = injectrons.length;
-		this.injectrons = splitAndMapByRawType( injectrons );
+		this.injectrons = splitAndMapByRawType( injectrons( bindings ) );
 	}
 
-	private static Map<Class<?>, Injectron<?>[]> splitAndMapByRawType( Injectron<?>[] injectrons ) {
+	private Injectron<?>[] injectrons( Binding<?>[] bindings ) {
+
+		return null;
+	}
+
+	private Map<Class<?>, Injectron<?>[]> splitAndMapByRawType( Injectron<?>[] injectrons ) {
 		Map<Class<?>, Injectron<?>[]> res = new IdentityHashMap<Class<?>, Injectron<?>[]>(
 				injectrons.length );
 		final int end = injectrons.length - 1;
@@ -46,7 +45,6 @@ public class Injector
 
 	@Override
 	public <T> T resolve( Dependency<T> dependency ) {
-		dependency = dependency.onInjectronCardinality( cardinality );
 		// TODO more information to add to dependency ?
 		Type<T> type = dependency.getType();
 		Injectron<T>[] injectrons = getInjectrons( type );
@@ -59,7 +57,7 @@ public class Injector
 		for ( int i = 0; i < injectrons.length; i++ ) {
 			Injectron<T> injectron = injectrons[i];
 			if ( injectron.getResource().isApplicableFor( dependency ) ) {
-				return injectron.instanceFor( dependency, this ); //OPEN I guess we need to add information about the type being injected here 
+				return injectron.instanceFor( dependency ); //OPEN I guess we need to add information about the type being injected here 
 			}
 		}
 		if ( type.isUnidimensionalArray() ) {
@@ -69,13 +67,13 @@ public class Injector
 	}
 
 	private <T, E> T resolveArray( Type<T> type, Type<E> elementType ) {
-		Class<E> rawType = elementType.getRawType();
 		Injectron<E>[] elementInjectrons = getInjectrons( elementType );
 		if ( elementInjectrons != null ) {
-			E[] elements = (E[]) Array.newInstance( rawType, elementInjectrons.length );
-			for ( int i = 0; i < elementInjectrons.length; i++ ) {
+			int length = elementInjectrons.length;
+			E[] elements = newArray( elementType, length );
+			for ( int i = 0; i < length; i++ ) {
 				Dependency<E> elementDependency = null; //TODO
-				elements[i] = elementInjectrons[i].instanceFor( elementDependency, this );
+				elements[i] = elementInjectrons[i].instanceFor( elementDependency );
 			}
 			//FIXME check if the elements are isApplicableFor the type required
 			return (T) elements;
@@ -84,8 +82,56 @@ public class Injector
 	}
 
 	@SuppressWarnings ( "unchecked" )
+	private <E> E[] newArray( Type<E> elementType, int length ) {
+		return (E[]) Array.newInstance( elementType.getRawType(), length );
+	}
+
+	@SuppressWarnings ( "unchecked" )
 	private <T> Injectron<T>[] getInjectrons( Type<T> type ) {
 		return (Injectron<T>[]) injectrons.get( type.getRawType() );
 	}
 
+	private static class InternalInjectron<T>
+			implements Supplier<T>, Injectron<T> {
+
+		final int serialNumber;
+		final Resource<T> resource;
+		final Supplier<T> supplier;
+		final Source source;
+		final Repository repository;
+		final DependencyResolver context;
+
+		InternalInjectron( int serialNumber, Resource<T> resource, Supplier<T> supplier,
+				Source source, Repository repository, DependencyResolver context ) {
+			super();
+			this.serialNumber = serialNumber;
+			this.resource = resource;
+			this.supplier = supplier;
+			this.source = source;
+			this.repository = repository;
+			this.context = context;
+		}
+
+		@Override
+		public Resource<T> getResource() {
+			return resource;
+		}
+
+		@Override
+		public Source getSource() {
+			return source;
+		}
+
+		@Override
+		public T instanceFor( Dependency<T> dependency ) {
+			Injection<T> i = null;
+			return repository.yield( i, Suppliers.asInjectable( this, context ) );
+		}
+
+		@Override
+		public T supply( Dependency<T> dependency, DependencyResolver context ) {
+			return supplier.supply( dependency, context );
+		}
+
+	}
 }

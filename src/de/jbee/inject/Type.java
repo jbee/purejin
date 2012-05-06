@@ -8,7 +8,8 @@ import java.lang.reflect.TypeVariable;
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
-public final class Type<T> {
+public final class Type<T>
+		implements Comparable<Type<?>> {
 
 	public static Type<?> fieldType( Field field ) {
 		return type( field.getType(), field.getGenericType() );
@@ -63,6 +64,9 @@ public final class Type<T> {
 		}
 		if ( type instanceof ParameterizedType ) {
 			return parameterizedtype( (ParameterizedType) type );
+		}
+		if ( type instanceof TypeVariable<?> ) {
+			// TODO
 		}
 		throw notSupportedYet( type );
 	}
@@ -119,8 +123,15 @@ public final class Type<T> {
 	}
 
 	public Type<?> getElementType() {
+		Type<?> elemRawType = getElementRawType();
+		return elemRawType == this
+			? this
+			: elemRawType.parametized( args );
+	}
+
+	private Type<?> getElementRawType() {
 		return rawType.isArray()
-			? new Type( rawType.getComponentType() ) //TODO add typeArguments?
+			? new Type( rawType.getComponentType() )
 			: this;
 	}
 
@@ -136,12 +147,12 @@ public final class Type<T> {
 		if ( !other.rawType.isAssignableFrom( rawType ) ) {
 			return false;
 		}
-		if ( !isParameterized() ) {
+		if ( !isArgumented() ) {
 			return true; //raw type is ok - no parameters to check
 		}
 
 		if ( other.rawType == rawType ) { // both have the same rawType
-			return areArgumentsAssignableTo( other );
+			return allArgumentsAreAssignableTo( other );
 		}
 
 		// this raw type is extending the rawType passed - check if it is implemented direct or passed
@@ -150,7 +161,7 @@ public final class Type<T> {
 		return true;
 	}
 
-	public boolean areArgumentsAssignableTo( Type<?> other ) {
+	public boolean allArgumentsAreAssignableTo( Type<?> other ) {
 		for ( int i = 0; i < args.length; i++ ) {
 			if ( !args[i].asArgumentAssignableTo( other.args[i] ) ) {
 				return false;
@@ -161,12 +172,9 @@ public final class Type<T> {
 
 	private boolean asArgumentAssignableTo( Type<?> other ) {
 		if ( rawType == other.rawType ) {
-			return !isParameterized() || areArgumentsAssignableTo( other );
+			return !isArgumented() || allArgumentsAreAssignableTo( other );
 		}
-		if ( other.isLowerBound() ) {
-			return isAssignableTo( other.exact() );
-		}
-		return false;
+		return other.isLowerBound() && isAssignableTo( other.exact() );
 	}
 
 	/**
@@ -176,16 +184,20 @@ public final class Type<T> {
 		return lowerBound;
 	}
 
-	public boolean isParameterized() {
+	public boolean isArgumented() {
 		return args.length > 0;
+	}
+
+	public boolean isParameterized() {
+		return rawType.getTypeParameters().length > 0;
 	}
 
 	public boolean isUnidimensionalArray() {
 		return rawType.isArray() && !rawType.getComponentType().isArray();
 	}
 
-	public boolean morePreciseThan( Type<T> other ) {
-		if ( !isParameterized() ) {
+	public boolean morePreciseThan( Type<? extends T> other ) {
+		if ( !isArgumented() ) {
 			return false; // it's equal
 		}
 		//TODO
@@ -195,8 +207,8 @@ public final class Type<T> {
 	/**
 	 * @return A {@link Type} having as its type arguments {@link #asLowerBound()}s.
 	 */
-	public Type<T> parametizedAsLowerBounds() { //TODO maybe this is already a lower bound type
-		if ( !isParameterized() ) {
+	public Type<T> parametizedAsLowerBounds() { //TODO recursive version or one with a depth ?
+		if ( !isArgumented() || allArgumentsAreLowerBounds() ) {
 			return this;
 		}
 		Type<?>[] arguments = new Type<?>[args.length];
@@ -206,16 +218,26 @@ public final class Type<T> {
 		return new Type<T>( lowerBound, rawType, arguments );
 	}
 
-	public Type<T> parametizedWith( Class<?>... arguments ) {
+	public boolean allArgumentsAreLowerBounds() {
+		int c = 0;
+		for ( int i = 0; i < args.length; i++ ) {
+			if ( args[i].isLowerBound() ) {
+				c++;
+			}
+		}
+		return c == args.length;
+	}
+
+	public Type<T> parametized( Class<?>... arguments ) {
 		Type<?>[] typeArgs = new Type<?>[arguments.length];
 		for ( int i = 0; i < arguments.length; i++ ) {
 			typeArgs[i] = rawType( arguments[i] );
 		}
-		return parametizedWith( typeArgs );
+		return parametized( typeArgs );
 	}
 
-	public Type<T> parametizedWith( Type<?>... arguments ) {
-		validateTypeArguments( arguments );
+	public Type<T> parametized( Type<?>... arguments ) {
+		validateArguments( arguments );
 		return new Type<T>( lowerBound, rawType, arguments );
 	}
 
@@ -231,7 +253,7 @@ public final class Type<T> {
 			b.append( "? extends " );
 		}
 		b.append( rawType.getCanonicalName() );
-		if ( isParameterized() ) {
+		if ( isArgumented() ) {
 			b.append( '<' );
 			args[0].toString( b );
 			for ( int i = 1; i < args.length; i++ ) {
@@ -242,12 +264,48 @@ public final class Type<T> {
 		}
 	}
 
-	private void validateTypeArguments( Type<?>... arguments ) {
+	private void validateArguments( Type<?>... arguments ) {
+		if ( arguments.length == 0 ) {
+			return; // its treated as raw-type
+		}
 		TypeVariable<Class<T>>[] params = rawType.getTypeParameters();
 		if ( params.length != arguments.length ) {
+			if ( isUnidimensionalArray() ) {
+				getElementRawType().validateArguments( arguments );
+				return;
+			}
 			//OPEN maybe we can allow to specify less than params - all not specified will be ?
 			throw new IllegalArgumentException( "Invalid nuber of type arguments" );
 		}
 		// TODO check bounds fulfilled by arguments
+	}
+
+	public Type<?> asSupertype( Class<? super T> supertype ) {
+		if ( supertype == rawType ) {
+			return this;
+		}
+		Class<? super T> superclass = rawType.getSuperclass();
+		java.lang.reflect.Type genericSuperclass = rawType.getGenericSuperclass();
+		while ( superclass != null && superclass != supertype ) {
+			genericSuperclass = superclass.getGenericSuperclass();
+			superclass = superclass.getSuperclass();
+		}
+		if ( superclass == supertype ) {
+			return type( superclass, genericSuperclass );
+		}
+		Class<?>[] interfaces = rawType.getInterfaces();
+		java.lang.reflect.Type[] genericInterfaces = rawType.getGenericInterfaces();
+		for ( int i = 0; i < interfaces.length; i++ ) {
+			if ( interfaces[i] == supertype ) {
+				return type( interfaces[i], genericInterfaces[i] );
+			}
+		}
+		throw new RuntimeException( "Couldn't find supertype " + supertype + " for type: " + this );
+	}
+
+	@Override
+	public int compareTo( Type<?> other ) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

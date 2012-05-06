@@ -10,17 +10,21 @@ package de.jbee.inject;
 public final class Resource<T>
 		implements Typed<T>, Comparable<Resource<T>> {
 
-	// Object has the meaning of ANY: e.g. binding Object to a concrete instance mean use that whenever possible (and no other more precise binding applies)
-
 	private final Instance<T> instance;
+	private final Availability availability;
 
-	private Resource( Instance<T> instance ) {
+	public Resource( Instance<T> instance ) {
+		this( instance, Availability.EVERYWHERE );
+	}
+
+	public Resource( Instance<T> instance, Availability availability ) {
 		super();
 		this.instance = instance;
+		this.availability = availability;
 	}
 
 	public boolean isApplicableFor( Dependency<T> dependency ) {
-		return isAvailableFor( dependency ) && isObtainable( dependency )
+		return isAvailableFor( dependency ) && isAdequateFor( dependency )
 				&& isAssignableTo( dependency );
 	}
 
@@ -32,20 +36,17 @@ public final class Resource<T>
 	}
 
 	/**
-	 * Does the given {@link Dependency} occur in the right package ?
+	 * Does the given {@link Dependency} occur in the right package and for the right target ?
 	 */
 	public boolean isAvailableFor( Dependency<T> dependency ) {
-
-		return true;
+		return availability.isApplicableFor( dependency );
 	}
 
 	/**
-	 * Does this resource provide the instance wanted by the given {@link Dependency}'s
-	 * {@link Discriminator} ?
+	 * Does this resource provide the instance wanted by the given {@link Dependency}'s {@link Name}
 	 */
-	public boolean isObtainable( Dependency<T> dependency ) { // better name ? see 'erreichbar'
-
-		return true;
+	public boolean isAdequateFor( Dependency<T> dependency ) {
+		return instance.getName().isApplicableFor( dependency.getName() );
 	}
 
 	@Override

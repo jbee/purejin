@@ -19,6 +19,18 @@ public interface PresetBinder {
 	}
 
 	/**
+	 * The ROOT- {@link RootBinder}.
+	 * 
+	 * @author Jan Bernitt (jan.bernitt@gmx.de)
+	 */
+	public interface RootBinder
+			extends ScopedBinder {
+
+		ScopedBinder in( Scope scope );
+
+	}
+
+	/**
 	 * A {@link Scope} had been defined.
 	 * 
 	 * @author Jan Bernitt (jan.bernitt@gmx.de)
@@ -27,9 +39,9 @@ public interface PresetBinder {
 			extends TargetedBinder {
 
 		// means when the type/instance is created and dependencies are injected into it
-		TargetedBinder injectingInto( Class<?> scope ); //move to a util method
+		TargetedBinder injectingInto( Class<?> target ); //move to a util method
 
-		TargetedBinder injectingInto( Instance<?> scope );
+		TargetedBinder injectingInto( Instance<?> target );
 	}
 
 	/**

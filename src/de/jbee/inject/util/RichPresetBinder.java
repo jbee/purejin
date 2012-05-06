@@ -9,40 +9,45 @@ import de.jbee.inject.Supplier;
 import de.jbee.inject.Suppliers;
 import de.jbee.inject.Type;
 
-public class PresetCoreBinder
+public class RichPresetBinder
 		implements PresetBinder {
 
 	private final Binder binder;
 
-	PresetCoreBinder( Binder binder ) {
+	RichPresetBinder( Binder binder ) {
 		super();
 		this.binder = binder;
 	}
 
 	@Override
-	public <T> TypedCoreBinder<T> bind( Instance<T> instance ) {
+	public <T> RichTypedBinder<T> bind( Instance<T> instance ) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public <T> TypedCoreBinder<T> bind( Type<T> type ) {
+	public <T> RichTypedBinder<T> bind( Type<T> type ) {
 		return bind( Instance.defaultInstance( type ) );
 	}
 
-	public <T> TypedCoreBinder<T> bind( Class<T> type ) {
+	public <T> RichTypedBinder<T> bind( Class<T> type ) {
 		return bind( Type.rawType( type ) );
 	}
 
-	static class TypedCoreBinder<T>
+	public static abstract class RichRootBinder
+			implements RootBinder {
+
+	}
+
+	public static class RichTypedBinder<T>
 			implements TypedBinder<T> {
 
 		/**
 		 * The binder instance who's {@link PresetBinder#bind(Instance)} method had been called to
 		 * get to this {@link TypedBinder}.
 		 */
-		private final PresetBinder binder;
+		private final RichPresetBinder binder;
 
-		TypedCoreBinder( PresetBinder binder ) {
+		RichTypedBinder( RichPresetBinder binder ) {
 			super();
 			this.binder = binder;
 		}

@@ -29,9 +29,9 @@ public class Suppliers {
 		return new TypeSupplier<T>( type );
 	}
 
-	public static <T> Injectable<T> asDependencyResolver( Supplier<T> supplier,
+	public static <T> Injectable<T> asInjectable( Supplier<T> supplier,
 			DependencyResolver context ) {
-		return new SpecificBrideSupplier<T>( supplier, context );
+		return new InjectableSupplier<T>( supplier, context );
 	}
 
 	/**
@@ -252,13 +252,13 @@ public class Suppliers {
 		}
 	}
 
-	private static class SpecificBrideSupplier<T>
+	private static class InjectableSupplier<T>
 			implements Injectable<T> {
 
 		private final Supplier<T> supplier;
 		private final DependencyResolver context;
 
-		SpecificBrideSupplier( Supplier<T> supplier, DependencyResolver context ) {
+		InjectableSupplier( Supplier<T> supplier, DependencyResolver context ) {
 			super();
 			this.supplier = supplier;
 			this.context = context;

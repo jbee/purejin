@@ -13,7 +13,7 @@ public abstract class PackageModule
 		if ( this.binder != null ) {
 			throw new IllegalStateException( "Reentrance not allowed!" );
 		}
-		this.binder = new PresetCoreBinder( binder ); //FIXME create root binder here
+		this.binder = new RichPresetBinder( binder ); //FIXME create root binder here
 		configure();
 	}
 

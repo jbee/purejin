@@ -11,6 +11,6 @@ public interface Injectron<T> {
 
 	Source getSource();
 
-	T instanceFor( Dependency<T> dependency, DependencyResolver context ); // remove resolver here and make it internal
+	T instanceFor( Dependency<T> dependency );
 
 }
