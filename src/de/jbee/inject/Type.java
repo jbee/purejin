@@ -50,10 +50,10 @@ public final class Type<T>
 		return new UnsupportedOperationException( "Type has no support yet: " + type );
 	}
 
-	private static Type<?>[] types( java.lang.reflect.Type[] arguments ) {
-		Type<?>[] args = new Type<?>[arguments.length];
-		for ( int i = 0; i < arguments.length; i++ ) {
-			args[i] = type( arguments[i] );
+	private static Type<?>[] types( java.lang.reflect.Type[] parameters ) {
+		Type<?>[] args = new Type<?>[parameters.length];
+		for ( int i = 0; i < parameters.length; i++ ) {
+			args[i] = type( parameters[i] );
 		}
 		return args;
 	}
@@ -78,21 +78,21 @@ public final class Type<T>
 	}
 
 	private final Class<T> rawType;
-	private final Type<?>[] args;
+	private final Type<?>[] params;
 
 	/**
 	 * Used to model lower bound wildcard types like <code>? extends Foo</code>
 	 */
 	private final boolean lowerBound;
 
-	private Type( boolean lowerBound, Class<T> rawType, Type<?>[] arguments ) {
+	private Type( boolean lowerBound, Class<T> rawType, Type<?>[] parameters ) {
 		this.rawType = rawType;
-		this.args = arguments;
+		this.params = parameters;
 		this.lowerBound = lowerBound;
 	}
 
-	private Type( Class<T> rawType, Type<?>[] arguments ) {
-		this( false, rawType, arguments );
+	private Type( Class<T> rawType, Type<?>[] parameters ) {
+		this( false, rawType, parameters );
 	}
 
 	private Type( Class<T> rawType ) {
@@ -100,22 +100,22 @@ public final class Type<T>
 	}
 
 	public Type<? extends T> asLowerBound() {
-		return new Type<T>( true, rawType, args );
+		return new Type<T>( true, rawType, params );
 	}
 
 	public Type<? extends T> exact() {
-		return new Type<T>( false, rawType, args );
+		return new Type<T>( false, rawType, params );
 	}
 
 	public boolean equalTo( Type<?> other ) {
 		if ( rawType != other.rawType ) {
 			return false;
 		}
-		if ( args.length != other.args.length ) {
+		if ( params.length != other.params.length ) {
 			return false;
 		}
-		for ( int i = 0; i < args.length; i++ ) {
-			if ( !args[i].equalTo( other.args[i] ) ) {
+		for ( int i = 0; i < params.length; i++ ) {
+			if ( !params[i].equalTo( other.params[i] ) ) {
 				return false;
 			}
 		}
@@ -126,7 +126,7 @@ public final class Type<T>
 		Type<?> elemRawType = getElementRawType();
 		return elemRawType == this
 			? this
-			: elemRawType.parametized( args );
+			: elemRawType.parametized( params );
 	}
 
 	private Type<?> getElementRawType() {
@@ -139,20 +139,23 @@ public final class Type<T>
 		return rawType;
 	}
 
-	public Type<?>[] getArguments() {
-		return args;
+	/**
+	 * @return The actual type parameters (arguments).
+	 */
+	public Type<?>[] getParameters() {
+		return params;
 	}
 
 	public boolean isAssignableTo( Type<?> other ) {
 		if ( !other.rawType.isAssignableFrom( rawType ) ) {
 			return false;
 		}
-		if ( !isArgumented() ) {
+		if ( !isParameterized() ) {
 			return true; //raw type is ok - no parameters to check
 		}
 
 		if ( other.rawType == rawType ) { // both have the same rawType
-			return allArgumentsAreAssignableTo( other );
+			return allParametersAreAssignableTo( other );
 		}
 
 		// this raw type is extending the rawType passed - check if it is implemented direct or passed
@@ -161,18 +164,18 @@ public final class Type<T>
 		return true;
 	}
 
-	public boolean allArgumentsAreAssignableTo( Type<?> other ) {
-		for ( int i = 0; i < args.length; i++ ) {
-			if ( !args[i].asArgumentAssignableTo( other.args[i] ) ) {
+	public boolean allParametersAreAssignableTo( Type<?> other ) {
+		for ( int i = 0; i < params.length; i++ ) {
+			if ( !params[i].asParameterAssignableTo( other.params[i] ) ) {
 				return false;
 			}
 		}
 		return true;
 	}
 
-	private boolean asArgumentAssignableTo( Type<?> other ) {
+	private boolean asParameterAssignableTo( Type<?> other ) {
 		if ( rawType == other.rawType ) {
-			return !isArgumented() || allArgumentsAreAssignableTo( other );
+			return !isParameterized() || allParametersAreAssignableTo( other );
 		}
 		return other.isLowerBound() && isAssignableTo( other.exact() );
 	}
@@ -184,11 +187,11 @@ public final class Type<T>
 		return lowerBound;
 	}
 
-	public boolean isArgumented() {
-		return args.length > 0;
+	public boolean isParameterized() {
+		return params.length > 0;
 	}
 
-	public boolean isParameterized() {
+	public boolean hasTypeParameter() {
 		return rawType.getTypeParameters().length > 0;
 	}
 
@@ -197,7 +200,7 @@ public final class Type<T>
 	}
 
 	public boolean morePreciseThan( Type<? extends T> other ) {
-		if ( !isArgumented() ) {
+		if ( !isParameterized() ) {
 			return false; // it's equal
 		}
 		//TODO
@@ -208,24 +211,24 @@ public final class Type<T>
 	 * @return A {@link Type} having as its type arguments {@link #asLowerBound()}s.
 	 */
 	public Type<T> parametizedAsLowerBounds() { //TODO recursive version or one with a depth ?
-		if ( !isArgumented() || allArgumentsAreLowerBounds() ) {
+		if ( !isParameterized() || allArgumentsAreLowerBounds() ) {
 			return this;
 		}
-		Type<?>[] arguments = new Type<?>[args.length];
-		for ( int i = 0; i < args.length; i++ ) {
-			arguments[i] = args[i].asLowerBound();
+		Type<?>[] parameters = new Type<?>[params.length];
+		for ( int i = 0; i < params.length; i++ ) {
+			parameters[i] = params[i].asLowerBound();
 		}
-		return new Type<T>( lowerBound, rawType, arguments );
+		return new Type<T>( lowerBound, rawType, parameters );
 	}
 
 	public boolean allArgumentsAreLowerBounds() {
 		int c = 0;
-		for ( int i = 0; i < args.length; i++ ) {
-			if ( args[i].isLowerBound() ) {
+		for ( int i = 0; i < params.length; i++ ) {
+			if ( params[i].isLowerBound() ) {
 				c++;
 			}
 		}
-		return c == args.length;
+		return c == params.length;
 	}
 
 	public Type<T> parametized( Class<?>... arguments ) {
@@ -236,9 +239,9 @@ public final class Type<T>
 		return parametized( typeArgs );
 	}
 
-	public Type<T> parametized( Type<?>... arguments ) {
-		validateArguments( arguments );
-		return new Type<T>( lowerBound, rawType, arguments );
+	public Type<T> parametized( Type<?>... parameters ) {
+		checkParameters( parameters );
+		return new Type<T>( lowerBound, rawType, parameters );
 	}
 
 	@Override
@@ -253,25 +256,25 @@ public final class Type<T>
 			b.append( "? extends " );
 		}
 		b.append( rawType.getCanonicalName() );
-		if ( isArgumented() ) {
+		if ( isParameterized() ) {
 			b.append( '<' );
-			args[0].toString( b );
-			for ( int i = 1; i < args.length; i++ ) {
+			params[0].toString( b );
+			for ( int i = 1; i < params.length; i++ ) {
 				b.append( ',' );
-				args[i].toString( b );
+				params[i].toString( b );
 			}
 			b.append( '>' );
 		}
 	}
 
-	private void validateArguments( Type<?>... arguments ) {
-		if ( arguments.length == 0 ) {
+	private void checkParameters( Type<?>... parameters ) {
+		if ( parameters.length == 0 ) {
 			return; // its treated as raw-type
 		}
 		TypeVariable<Class<T>>[] params = rawType.getTypeParameters();
-		if ( params.length != arguments.length ) {
+		if ( params.length != parameters.length ) {
 			if ( isUnidimensionalArray() ) {
-				getElementRawType().validateArguments( arguments );
+				getElementRawType().checkParameters( parameters );
 				return;
 			}
 			//OPEN maybe we can allow to specify less than params - all not specified will be ?

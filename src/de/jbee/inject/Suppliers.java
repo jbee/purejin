@@ -54,7 +54,7 @@ public class Suppliers {
 
 		@Override
 		public List<?> supply( Dependency<List<?>> dependency, DependencyResolver context ) {
-			Type<?> elementType = dependency.getType().getArguments()[0];
+			Type<?> elementType = dependency.getType().getParameters()[0];
 			return new ArrayList<Object>( Arrays.asList( supplyArray( elementType.getRawType(),
 					context ) ) );
 		}
@@ -155,7 +155,7 @@ public class Suppliers {
 		@Override
 		public Provider<?> supply( Dependency<Provider<?>> dependency, DependencyResolver context ) {
 			Type<Provider<?>> type = dependency.getType();
-			Type<?> provided = type.getArguments()[0];
+			Type<?> provided = type.getParameters()[0];
 			// TODO ? add more information from the dependency ? 
 			Dependency<Object> providedDependency = null; //FIXME merge dependency and provided
 			return new DynamicProvider<Object>( providedDependency, context );
