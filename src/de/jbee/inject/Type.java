@@ -46,6 +46,12 @@ public final class Type<T>
 		throw notSupportedYet( type );
 	}
 
+	public static <T> Type<T> supertype( Type<? extends T> actualType, Class<T> rawType,
+			java.lang.reflect.Type type ) {
+
+		return null;
+	}
+
 	private static UnsupportedOperationException notSupportedYet( java.lang.reflect.Type type ) {
 		return new UnsupportedOperationException( "Type has no support yet: " + type );
 	}
@@ -199,12 +205,28 @@ public final class Type<T>
 		return rawType.isArray() && !rawType.getComponentType().isArray();
 	}
 
-	public boolean morePreciseThan( Type<? extends T> other ) {
-		if ( !isParameterized() ) {
-			return false; // it's equal
+	public boolean morePreciseThan( Type<?> other ) {
+		if ( !rawType.isAssignableFrom( other.rawType ) ) {
+			return true;
 		}
-		//TODO
-		return true;
+		if ( ( hasTypeParameter() && !isParameterized() )
+				|| ( isLowerBound() && !other.isLowerBound() ) ) {
+			return false; // equal or other is a subtype of this
+		}
+		if ( ( other.hasTypeParameter() && !other.isParameterized() )
+				|| ( !isLowerBound() && other.isLowerBound() ) ) {
+			return true;
+		}
+		if ( params.length == 1 ) {
+			return params[0].morePreciseThan( other.params[0] );
+		}
+		int morePrecise = 0;
+		for ( int i = 0; i < params.length; i++ ) {
+			if ( params[i].morePreciseThan( other.params[0] ) ) {
+				morePrecise++;
+			}
+		}
+		return morePrecise > params.length - morePrecise;
 	}
 
 	/**
@@ -294,13 +316,14 @@ public final class Type<T>
 			superclass = superclass.getSuperclass();
 		}
 		if ( superclass == supertype ) {
-			return type( superclass, genericSuperclass );
+			return supertype( this, superclass, genericSuperclass );
 		}
-		Class<?>[] interfaces = rawType.getInterfaces();
+		@SuppressWarnings ( "unchecked" )
+		Class<? super T>[] interfaces = (Class<? super T>[]) rawType.getInterfaces();
 		java.lang.reflect.Type[] genericInterfaces = rawType.getGenericInterfaces();
 		for ( int i = 0; i < interfaces.length; i++ ) {
 			if ( interfaces[i] == supertype ) {
-				return type( interfaces[i], genericInterfaces[i] );
+				return supertype( this, interfaces[i], genericInterfaces[i] );
 			}
 		}
 		throw new RuntimeException( "Couldn't find supertype " + supertype + " for type: " + this );

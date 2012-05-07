@@ -23,29 +23,30 @@ public final class Resource<T>
 		this.availability = availability;
 	}
 
-	public boolean isApplicableFor( Dependency<T> dependency ) {
-		return isAvailableFor( dependency ) && isAdequateFor( dependency )
+	public boolean isApplicableFor( Dependency<? super T> dependency ) {
+		return isAvailableFor( dependency ) // 
+				&& isAdequateFor( dependency ) //
 				&& isAssignableTo( dependency );
 	}
 
 	/**
 	 * Does the {@link Type} of this a valid argument for the one of the {@link Dependency} given ?
 	 */
-	public boolean isAssignableTo( Dependency<T> dependency ) {
+	public boolean isAssignableTo( Dependency<? super T> dependency ) {
 		return instance.getType().isAssignableTo( dependency.getType() );
 	}
 
 	/**
 	 * Does the given {@link Dependency} occur in the right package and for the right target ?
 	 */
-	public boolean isAvailableFor( Dependency<T> dependency ) {
+	public boolean isAvailableFor( Dependency<? super T> dependency ) {
 		return availability.isApplicableFor( dependency );
 	}
 
 	/**
 	 * Does this resource provide the instance wanted by the given {@link Dependency}'s {@link Name}
 	 */
-	public boolean isAdequateFor( Dependency<T> dependency ) {
+	public boolean isAdequateFor( Dependency<? super T> dependency ) {
 		return instance.getName().isApplicableFor( dependency.getName() );
 	}
 

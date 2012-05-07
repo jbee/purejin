@@ -59,8 +59,7 @@ public class TestType {
 		Type<List> listOfClassesOfIntegers = Type.rawType( List.class ).parametized(
 				Type.rawType( Class.class ).parametized( Integer.class ) );
 		Type<Class> classOfNumbers = Type.rawType( Class.class ).parametized( Number.class );
-		Type<List> listOfClassesOfNumbers = Type.rawType( List.class ).parametized(
-				classOfNumbers );
+		Type<List> listOfClassesOfNumbers = Type.rawType( List.class ).parametized( classOfNumbers );
 		assertFalse( listOfClassesOfIntegers.isAssignableTo( listOfClassesOfNumbers ) );
 		assertFalse( listOfClassesOfIntegers.isAssignableTo( listOfClassesOfNumbers.parametizedAsLowerBounds() ) );
 		Type<List> listOfExtendsClassesOfExtendsNumbers = listOfClassesOfNumbers.parametized( classOfNumbers.asLowerBound().parametizedAsLowerBounds() );
@@ -87,10 +86,57 @@ public class TestType {
 	}
 
 	@Test
+	public void testMorePreciseThan() {
+		Type<Integer> integer = Type.rawType( Integer.class );
+		Type<Number> number = Type.rawType( Number.class );
+		assertMorePrecise( integer, number );
+	}
+
+	@Test
+	public void testMorePreciseThanLowerBound() {
+		Type<Integer> integer = Type.rawType( Integer.class );
+		Type<? extends Integer> integerLower = Type.rawType( Integer.class ).asLowerBound();
+		assertMorePrecise( integer, integerLower );
+	}
+
+	@Test
+	public void testMorePreciseThanIndependend() {
+		Type<Integer> integer = Type.rawType( Integer.class );
+		Type<String> string = Type.rawType( String.class );
+		assertTrue( integer.morePreciseThan( string ) );
+		assertTrue( string.morePreciseThan( integer ) );
+	}
+
+	private static void assertMorePrecise( Type<?> morePrecise, Type<?> lessPrecise ) {
+		assertTrue( morePrecise.morePreciseThan( lessPrecise ) );
+		assertFalse( lessPrecise.morePreciseThan( morePrecise ) );
+	}
+
+	@Test
+	public void testMorePreciseThanWithGenerics() {
+		Type<List> integer = Type.rawType( List.class ).parametized( Integer.class );
+		Type<List> number = Type.rawType( List.class ).parametized( Number.class );
+		assertMorePrecise( integer, number );
+	}
+
+	@Test
+	public void testMorePreciseThanWithGenericsAndWithout() {
+		Type<List> integer = Type.rawType( List.class ).parametized( Integer.class );
+		Type<List> wildcardList = Type.rawType( List.class );
+		assertMorePrecise( integer, wildcardList );
+	}
+
+	@Test
+	public void testMorePreciseThanWithWildcardGenerics() {
+		Type<List> integer = Type.rawType( List.class ).parametized( Integer.class );
+		Type<List> wildcardInteger = Type.rawType( List.class ).parametized( Integer.class ).parametizedAsLowerBounds();
+		assertMorePrecise( integer, wildcardInteger );
+	}
+
+	@Test
 	@Ignore
-	public void test() {
-		Type<ArrayList> listOfStrings = Type.rawType( ArrayList.class ).parametized(
-				String.class );
+	public void testAsSupertype() {
+		Type<ArrayList> listOfStrings = Type.rawType( ArrayList.class ).parametized( String.class );
 		assertThat( listOfStrings.asSupertype( List.class ).toString(),
 				is( "java.util.List<java.lang.String>" ) );
 	}
