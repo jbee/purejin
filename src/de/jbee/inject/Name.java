@@ -9,6 +9,7 @@ package de.jbee.inject;
 public final class Name {
 
 	public static final Name DEFAULT = new Name( "" );
+	public static final Name ANY = new Name( "*" );
 
 	private final String value;
 
@@ -33,13 +34,26 @@ public final class Name {
 		return value.hashCode();
 	}
 
+	public Name or( Name other ) {
+		return value.equals( other.value )
+			? this
+			: new Name( value + "|" + other.value );
+	}
+
 	@Override
 	public boolean equals( Object obj ) {
 		return obj instanceof Name && ( (Name) obj ).value.equals( value );
 	}
 
-	public boolean isApplicableFor( Name name ) {
-		// TODO Auto-generated method stub
-		return true;
+	public boolean isApplicableFor( Name other ) {
+		if ( other.value.indexOf( '|' ) > 0 ) {
+			for ( String name : other.value.split( "\\|" ) ) {
+				if ( isApplicableFor( named( name ) ) ) {
+					return true;
+				}
+			}
+		}
+		return other.value.equalsIgnoreCase( value ) || other.value.equals( ANY.value )
+				|| value.matches( other.value.replace( "*", ".*" ) );
 	}
 }

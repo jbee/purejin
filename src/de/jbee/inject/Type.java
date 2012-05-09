@@ -209,6 +209,7 @@ public final class Type<T>
 		if ( !rawType.isAssignableFrom( other.rawType ) ) {
 			return true;
 		}
+		//FIXME before generics can be compared we need to make sure we compare the same rawtype- otherwise those generics might mean different things
 		if ( ( hasTypeParameter() && !isParameterized() )
 				|| ( isLowerBound() && !other.isLowerBound() ) ) {
 			return false; // equal or other is a subtype of this

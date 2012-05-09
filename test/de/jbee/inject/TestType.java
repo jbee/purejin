@@ -105,6 +105,7 @@ public class TestType {
 		Type<String> string = Type.rawType( String.class );
 		assertTrue( integer.morePreciseThan( string ) );
 		assertTrue( string.morePreciseThan( integer ) );
+		//OPEN maybe this should eval to false both times ?
 	}
 
 	private static void assertMorePrecise( Type<?> morePrecise, Type<?> lessPrecise ) {
@@ -131,6 +132,15 @@ public class TestType {
 		Type<List> integer = Type.rawType( List.class ).parametized( Integer.class );
 		Type<List> wildcardInteger = Type.rawType( List.class ).parametized( Integer.class ).parametizedAsLowerBounds();
 		assertMorePrecise( integer, wildcardInteger );
+	}
+
+	@Test
+	public void testMorePreciseThanWithSubclassAndGenerics() {
+		Type<ArrayList> arrayListOfIntegers = Type.rawType( ArrayList.class ).parametized(
+				Integer.class );
+		Type<List> listOfIntegers = Type.rawType( List.class ).parametized( Integer.class );
+		assertMorePrecise( arrayListOfIntegers, listOfIntegers );
+		//TODO this actually works because List and ArrayList just have the same geneic but if the subclass uses another index we will compare the wrong thing right now
 	}
 
 	@Test
