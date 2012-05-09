@@ -8,5 +8,11 @@ package de.jbee.inject;
  */
 public interface Binding<T> {
 
-	// not really clear what will be published here 
+	Resource<T> getResource();
+
+	Supplier<T> getSupplier();
+
+	Source getSource();
+
+	Repository getRepository();
 }

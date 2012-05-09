@@ -2,6 +2,7 @@ package de.jbee.inject;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
@@ -20,25 +21,51 @@ public class Injector
 
 	private Injector( Binding<?>[] bindings ) {
 		super();
-		this.injectrons = splitAndMapByRawType( injectrons( bindings ) );
+		this.injectrons = injectrons( bindings, this );
 	}
 
-	private Injectron<?>[] injectrons( Binding<?>[] bindings ) {
+	private static Map<Class<?>, Injectron<?>[]> injectrons( Binding<?>[] bindings,
+			DependencyResolver resolver ) {
+		Arrays.sort( bindings, new Comparator<Binding<?>>() {
 
-		return null;
-	}
-
-	private Map<Class<?>, Injectron<?>[]> splitAndMapByRawType( Injectron<?>[] injectrons ) {
-		Map<Class<?>, Injectron<?>[]> res = new IdentityHashMap<Class<?>, Injectron<?>[]>(
-				injectrons.length );
-		final int end = injectrons.length - 1;
-		int start = 0;
-		for ( int i = 0; i <= end; i++ ) {
-			Resource<?> r = injectrons[i].getResource();
-			Class<?> rawType = r.getType().getRawType();
-			if ( i == end || injectrons[i + 1].getResource().getType().getRawType() != rawType ) {
-				res.put( rawType, Arrays.copyOfRange( injectrons, start, i + 1 ) );
+			@Override
+			public int compare( Binding<?> one, Binding<?> other ) {
+				return one.getResource().compareTo( other.getResource() );
 			}
+		} );
+		final int total = bindings.length;
+		Map<Class<?>, Injectron<?>[]> res = new IdentityHashMap<Class<?>, Injectron<?>[]>( total );
+		final int end = total - 1;
+		int start = 0;
+		Class<?> lastRawType = bindings[0].getResource().getType().getRawType();
+		for ( int i = 0; i < total; i++ ) {
+			Resource<?> r = bindings[i].getResource();
+			Class<?> rawType = r.getType().getRawType();
+			if ( i == end ) {
+				if ( rawType != lastRawType ) {
+					res.put( rawType, createTypeInjectrons( start, i - 1, bindings, resolver ) );
+					res.put( rawType, createTypeInjectrons( end, end, bindings, resolver ) );
+				} else {
+					res.put( rawType, createTypeInjectrons( start, end, bindings, resolver ) );
+				}
+			} else if ( rawType != lastRawType ) {
+				res.put( rawType, createTypeInjectrons( start, i - 1, bindings, resolver ) );
+				start = i;
+			}
+		}
+		return res;
+	}
+
+	private static <T> Injectron<T>[] createTypeInjectrons( int first, int last,
+			Binding<?>[] bindings, DependencyResolver resolver ) {
+		final int length = last - first + 1;
+		Injectron<T>[] res = new Injectron[length];
+		for ( int i = 0; i < length; i++ ) {
+			Binding<T> b = (Binding<T>) bindings[i + first];
+			res[i] = new InjectronImpl<T>( b.getResource(), b.getSource(),
+					new Injection<T>( Dependency.dependency( b.getResource().getType() ),
+							i + first, bindings.length ), b.getRepository(),
+					Suppliers.asInjectable( b.getSupplier(), resolver ) );
 		}
 		return res;
 	}
@@ -52,18 +79,23 @@ public class Injector
 			if ( type.isUnidimensionalArray() ) {
 				return resolveArray( type, type.getElementType() );
 			}
-			throw new RuntimeException( "No injectron for type: " + type );
+			throw noInjectronFor( type );
 		}
 		for ( int i = 0; i < injectrons.length; i++ ) {
 			Injectron<T> injectron = injectrons[i];
 			if ( injectron.getResource().isApplicableFor( dependency ) ) {
-				return injectron.instanceFor( dependency ); //OPEN I guess we need to add information about the type being injected here 
+				return injectron.instanceFor( dependency ); //OPEN I guess we need to add information about the target type being injected here 
 			}
 		}
+		// TODO try wildcard injectrons 
 		if ( type.isUnidimensionalArray() ) {
 			return resolveArray( type, type.getElementType() );
 		}
-		return null;
+		throw noInjectronFor( type );
+	}
+
+	private <T> RuntimeException noInjectronFor( Type<T> type ) {
+		return new RuntimeException( "No injectron for type: " + type );
 	}
 
 	private <T, E> T resolveArray( Type<T> type, Type<E> elementType ) {
@@ -91,25 +123,23 @@ public class Injector
 		return (Injectron<T>[]) injectrons.get( type.getRawType() );
 	}
 
-	private static class InternalInjectron<T>
-			implements Supplier<T>, Injectron<T> {
+	static class InjectronImpl<T>
+			implements Injectron<T> {
 
-		final int serialNumber;
 		final Resource<T> resource;
-		final Supplier<T> supplier;
 		final Source source;
+		final Injection<T> injection;
 		final Repository repository;
-		final DependencyResolver context;
+		final Injectable<T> injectable;
 
-		InternalInjectron( int serialNumber, Resource<T> resource, Supplier<T> supplier,
-				Source source, Repository repository, DependencyResolver context ) {
+		InjectronImpl( Resource<T> resource, Source source, Injection<T> injection,
+				Repository repository, Injectable<T> injectable ) {
 			super();
-			this.serialNumber = serialNumber;
 			this.resource = resource;
-			this.supplier = supplier;
 			this.source = source;
+			this.injection = injection;
 			this.repository = repository;
-			this.context = context;
+			this.injectable = injectable;
 		}
 
 		@Override
@@ -124,14 +154,9 @@ public class Injector
 
 		@Override
 		public T instanceFor( Dependency<T> dependency ) {
-			Injection<T> i = null;
-			return repository.yield( i, Suppliers.asInjectable( this, context ) );
-		}
-
-		@Override
-		public T supply( Dependency<T> dependency, DependencyResolver context ) {
-			return supplier.supply( dependency, context );
+			return repository.yield( injection.on( dependency ), injectable );
 		}
 
 	}
+
 }

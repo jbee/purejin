@@ -25,4 +25,8 @@ public class Injection<T> {
 		return injectronCardinality;
 	}
 
+	public Injection<T> on( Dependency<T> dependency ) {
+		return new Injection<T>( dependency, injectronSerialNumber, injectronCardinality );
+	}
+
 }

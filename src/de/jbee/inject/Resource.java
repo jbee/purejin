@@ -8,7 +8,7 @@ package de.jbee.inject;
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
 public final class Resource<T>
-		implements Typed<T>, Comparable<Resource<T>> {
+		implements Typed<T>, Comparable<Resource<?>> {
 
 	private final Instance<T> instance;
 	private final Availability availability;
@@ -60,7 +60,7 @@ public final class Resource<T>
 	}
 
 	@Override
-	public int compareTo( Resource<T> other ) {
+	public int compareTo( Resource<?> other ) {
 		// check type
 
 		// check location (package)
