@@ -6,13 +6,35 @@ package de.jbee.inject;
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  * 
  */
-public interface Binding<T> {
+public final class Binding<T> {
 
-	Resource<T> getResource();
+	private final Resource<T> resource;
+	private final Supplier<? extends T> supplier;
+	private final Repository repository;
+	private final Source source;
 
-	Supplier<T> getSupplier();
+	Binding( Resource<T> resource, Supplier<? extends T> supplier, Repository repository,
+			Source source ) {
+		super();
+		this.resource = resource;
+		this.supplier = supplier;
+		this.repository = repository;
+		this.source = source;
+	}
 
-	Source getSource();
+	public Resource<T> getResource() {
+		return resource;
+	}
 
-	Repository getRepository();
+	public Supplier<? extends T> getSupplier() {
+		return supplier;
+	}
+
+	public Source getSource() {
+		return source;
+	}
+
+	public Repository getRepository() {
+		return repository;
+	}
 }

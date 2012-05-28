@@ -8,46 +8,58 @@ import de.jbee.inject.Provider;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.Suppliers;
 import de.jbee.inject.Type;
+import de.jbee.inject.util.BasicBinder.TypedBinder;
+import de.jbee.inject.util.RichBinder.RichBasicBinder.RichRootBinder;
 
-public class RichPresetBinder
-		implements PresetBinder {
+public class RichBinder {
 
-	private final Binder binder;
-
-	RichPresetBinder( Binder binder ) {
-		super();
-		this.binder = binder;
-	}
-
-	@Override
-	public <T> RichTypedBinder<T> bind( Instance<T> instance ) {
-		// TODO Auto-generated method stub
+	public static RichRootBinder root( Binder binder ) {
 		return null;
 	}
 
-	public <T> RichTypedBinder<T> bind( Type<T> type ) {
-		return bind( Instance.defaultInstance( type ) );
-	}
+	public static class RichBasicBinder
+			implements BasicBinder {
 
-	public <T> RichTypedBinder<T> bind( Class<T> type ) {
-		return bind( Type.rawType( type ) );
-	}
+		private final Binder binder;
 
-	public static abstract class RichRootBinder
-			implements RootBinder {
+		RichBasicBinder( Binder binder ) {
+			super();
+			this.binder = binder;
+		}
 
+		@Override
+		public <T> RichTypedBinder<T> bind( Instance<T> instance ) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public <T> RichTypedBinder<T> bind( Type<T> type ) {
+			return bind( Instance.defaultInstance( type ) );
+		}
+
+		public <T> RichTypedBinder<T> bind( Class<T> type ) {
+			return bind( Type.rawType( type ) );
+		}
+
+		public static abstract class RichRootBinder
+				implements RootBinder {
+
+			public RichRootBinder( Binder binder ) {
+
+			}
+		}
 	}
 
 	public static class RichTypedBinder<T>
-			implements TypedBinder<T> {
+			implements BasicBinder.TypedBinder<T> {
 
 		/**
-		 * The binder instance who's {@link PresetBinder#bind(Instance)} method had been called to
-		 * get to this {@link TypedBinder}.
+		 * The binder instance who's {@link RichBasicBinder#bind(Instance)} method had been called
+		 * to get to this {@link TypedBinder}.
 		 */
-		private final RichPresetBinder binder;
+		private final RichBasicBinder binder;
 
-		RichTypedBinder( RichPresetBinder binder ) {
+		RichTypedBinder( RichBasicBinder binder ) {
 			super();
 			this.binder = binder;
 		}

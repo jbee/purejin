@@ -1,5 +1,7 @@
 package de.jbee.inject;
 
+import static de.jbee.inject.Source.source;
+
 /**
  * Installs all the build-in functionality by using the core API.
  * 
@@ -8,17 +10,15 @@ package de.jbee.inject;
 public class BuildInModule
 		implements Module {
 
+	private static final Source BUILD_IN = source( BuildInModule.class );
+
 	@Override
 	public void configure( Binder binder ) {
-		// TODO Auto-generated method stub
+		Resource<Provider> provider = Instance.anyOf(
+				Type.rawType( Provider.class ).parametizedAsLowerBounds() ).toResource();
+		binder.bind( provider, Suppliers.PROVIDER, Scoped.APPLICATION, BUILD_IN );
 
-		// TODO bind Provider and such build-in stuff
-	}
-
-	@Override
-	public void configure( Context context ) {
-		// TODO Auto-generated method stub
-
+		// TODO further build-in binds
 	}
 
 }

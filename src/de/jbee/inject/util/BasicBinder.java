@@ -4,7 +4,7 @@ import de.jbee.inject.Instance;
 import de.jbee.inject.Scope;
 import de.jbee.inject.Supplier;
 
-public interface PresetBinder {
+public interface BasicBinder {
 
 	<T> TypedBinder<T> bind( Instance<T> instance );
 
@@ -51,7 +51,7 @@ public interface PresetBinder {
 	 * @author Jan Bernitt (jan.bernitt@gmx.de)
 	 */
 	interface TargetedBinder
-			extends LocalisedBinder {
+			extends BasicBinder /* LocalisedBinder */{
 
 		//TODO improve this since from a dependency point of view it is good to localize all binds somehow
 		// instead of narrow explicit we could expose explicit and make binds as narrow as possible by default (classic interface to impl binds in same package)
@@ -64,7 +64,7 @@ public interface PresetBinder {
 	}
 
 	interface LocalisedBinder
-			extends PresetBinder {
+			extends BasicBinder {
 
 		LocalisedBinder havingParent( Class<?> type );
 

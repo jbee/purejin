@@ -8,5 +8,5 @@ package de.jbee.inject;
  */
 public interface Binder {
 
-	<T> void bind( Resource<T> resource, Supplier<T> supplier, Scope scope, Source source );
+	<T> void bind( Resource<T> resource, Supplier<? extends T> supplier, Scope scope, Source source );
 }

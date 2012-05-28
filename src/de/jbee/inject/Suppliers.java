@@ -29,7 +29,7 @@ public class Suppliers {
 		return new TypeSupplier<T>( type );
 	}
 
-	public static <T> Injectable<T> asInjectable( Supplier<T> supplier,
+	public static <T> Injectable<T> asInjectable( Supplier<? extends T> supplier,
 			DependencyResolver context ) {
 		return new InjectableSupplier<T>( supplier, context );
 	}
@@ -53,7 +53,7 @@ public class Suppliers {
 		}
 
 		@Override
-		public List<?> supply( Dependency<List<?>> dependency, DependencyResolver context ) {
+		public List<?> supply( Dependency<? super List<?>> dependency, DependencyResolver context ) {
 			Type<?> elementType = dependency.getType().getParameters()[0];
 			return new ArrayList<Object>( Arrays.asList( supplyArray( elementType.getRawType(),
 					context ) ) );
@@ -78,7 +78,7 @@ public class Suppliers {
 		}
 
 		@Override
-		public T supply( Dependency<T> dependency, DependencyResolver context ) {
+		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
 			return instance;
 		}
 
@@ -97,7 +97,7 @@ public class Suppliers {
 		}
 
 		@Override
-		public T[] supply( Dependency<T[]> dependency, DependencyResolver context ) {
+		public T[] supply( Dependency<? super T[]> dependency, DependencyResolver context ) {
 			T[] res = (T[]) Array.newInstance( type.getComponentType(), elements.length );
 			int i = 0;
 			for ( Supplier<? extends T> e : elements ) {
@@ -120,7 +120,7 @@ public class Suppliers {
 		}
 
 		@Override
-		public T supply( Dependency<T> dependency, DependencyResolver context ) {
+		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
 			// TODO ? add more information from the dependency ? 
 			Dependency<T> typeDependency = null; //FIXME merge type and dependency 
 			return context.resolve( typeDependency );
@@ -139,7 +139,7 @@ public class Suppliers {
 		}
 
 		@Override
-		public T supply( Dependency<T> dependency, DependencyResolver context ) {
+		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
 			return provider.yield();
 		}
 
@@ -153,8 +153,9 @@ public class Suppliers {
 		}
 
 		@Override
-		public Provider<?> supply( Dependency<Provider<?>> dependency, DependencyResolver context ) {
-			Type<Provider<?>> type = dependency.getType();
+		public Provider<?> supply( Dependency<? super Provider<?>> dependency,
+				DependencyResolver context ) {
+			Type<? super Provider<?>> type = dependency.getType();
 			Type<?> provided = type.getParameters()[0];
 			// TODO ? add more information from the dependency ? 
 			Dependency<Object> providedDependency = null; //FIXME merge dependency and provided
@@ -193,7 +194,7 @@ public class Suppliers {
 			implements Supplier<T> {
 
 		@Override
-		public T supply( Dependency<T> dependency, DependencyResolver context ) {
+		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -230,7 +231,7 @@ public class Suppliers {
 		// in a validate we have to check that the arguments 
 
 		@Override
-		public T supply( Dependency<T> dependency, DependencyResolver context ) {
+		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
 			java.lang.reflect.Type[] types = constructor.getGenericParameterTypes();
 			Class<?>[] rawTypes = constructor.getParameterTypes();
 			Annotation[][] annotations = constructor.getParameterAnnotations();
@@ -255,10 +256,10 @@ public class Suppliers {
 	private static class InjectableSupplier<T>
 			implements Injectable<T> {
 
-		private final Supplier<T> supplier;
+		private final Supplier<? extends T> supplier;
 		private final DependencyResolver context;
 
-		InjectableSupplier( Supplier<T> supplier, DependencyResolver context ) {
+		InjectableSupplier( Supplier<? extends T> supplier, DependencyResolver context ) {
 			super();
 			this.supplier = supplier;
 			this.context = context;

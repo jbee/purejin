@@ -15,11 +15,14 @@ public final class Instance<T>
 	 * binds of matching types. There is also a set of wildcard binds that are tried if no bind has
 	 * been made for a type.
 	 */
-	public static final Instance<? extends Object> ANY = defaultInstance( Type.rawType(
-			Object.class ).asLowerBound() );
+	public static final Instance<? extends Object> ANY = anyOf( Type.rawType( Object.class ).asLowerBound() );
 
 	public static <T> Instance<T> defaultInstance( Type<T> type ) {
 		return new Instance<T>( Name.DEFAULT, type );
+	}
+
+	public static <T> Instance<T> anyOf( Type<T> type ) {
+		return new Instance<T>( Name.ANY, type );
 	}
 
 	private final Name name;
@@ -47,5 +50,9 @@ public final class Instance<T>
 
 	public Name getName() {
 		return name;
+	}
+
+	public Resource<T> toResource() {
+		return new Resource<T>( this );
 	}
 }

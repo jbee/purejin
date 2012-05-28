@@ -2,18 +2,19 @@ package de.jbee.inject.util;
 
 import de.jbee.inject.Binder;
 import de.jbee.inject.Module;
+import de.jbee.inject.util.RichBinder.RichBasicBinder.RichRootBinder;
 
 public abstract class PackageModule
 		implements Module {
 
-	private PresetBinder binder;
+	private RichRootBinder root;
 
 	@Override
 	public final void configure( Binder binder ) {
-		if ( this.binder != null ) {
+		if ( this.root != null ) {
 			throw new IllegalStateException( "Reentrance not allowed!" );
 		}
-		this.binder = new RichPresetBinder( binder ); //FIXME create root binder here
+		this.root = RichBinder.root( binder );
 		configure();
 	}
 

@@ -3,16 +3,17 @@
  */
 package de.jbee.inject;
 
-
 class InjectorBinder
-		implements Binder {
+		//TODO find better name -> has nothing to do with the injector now 
+		implements Binder { // OPEN maybe make this a ModuleBinder instead ?
 
 	@Override
-	public <T> void bind( Resource<T> resource, Supplier<T> supplier, Scope scope, Source source ) {
+	public <T> void bind( Resource<T> resource, Supplier<? extends T> supplier, Scope scope,
+			Source source ) {
 
 	}
 
-	// From Bindings to Injectrons
+	// Find the initial set of bindings
 	// 0. Create Scope-Repositories
 	//   a. sort scopes from most stable to most fragile
 	// 	 b. init one repository for each scope

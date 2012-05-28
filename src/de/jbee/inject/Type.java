@@ -231,7 +231,8 @@ public final class Type<T>
 	}
 
 	/**
-	 * @return A {@link Type} having as its type arguments {@link #asLowerBound()}s.
+	 * @return A {@link Type} having all its type arguments {@link #asLowerBound()}s. Use this to
+	 *         model &lt;?&gt; wildcard generic.
 	 */
 	public Type<T> parametizedAsLowerBounds() { //TODO recursive version or one with a depth ?
 		if ( !isParameterized() || allArgumentsAreLowerBounds() ) {
