@@ -337,7 +337,14 @@ public final class Type<T>
 
 	@Override
 	public int compareTo( Type<?> other ) {
-		// TODO Auto-generated method stub
-		return 0;
+		if ( morePreciseThan( other ) ) {
+			return 1;
+		}
+		if ( other.morePreciseThan( this ) ) {
+			return -1;
+		}
+		return rawType == other.rawType
+			? 0
+			: rawType.getCanonicalName().compareTo( other.rawType.getCanonicalName() );
 	}
 }

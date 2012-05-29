@@ -45,6 +45,17 @@ public final class Name {
 		return obj instanceof Name && ( (Name) obj ).value.equals( value );
 	}
 
+	public boolean isAny() {
+		return value.equals( ANY.value );
+	}
+
+	public boolean morePreciseThan( Name other ) {
+		if ( ( !isAny() && other.isAny() ) || value.startsWith( other.value ) ) {
+			return true;
+		}
+		return false;
+	}
+
 	public boolean isApplicableFor( Name other ) {
 		if ( other.value.indexOf( '|' ) > 0 ) {
 			for ( String name : other.value.split( "\\|" ) ) {
