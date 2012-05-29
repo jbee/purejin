@@ -32,4 +32,8 @@ public class Availability {
 	public String toString() {
 		return "[" + path + "-" + depth + "-" + target + "]";
 	}
+
+	public Availability within( String path ) {
+		return new Availability( target, path, depth );
+	}
 }

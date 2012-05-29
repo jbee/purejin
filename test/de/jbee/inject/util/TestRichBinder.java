@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import de.jbee.inject.Binder;
 import de.jbee.inject.BuildInModule;
+import de.jbee.inject.Name;
 import de.jbee.inject.Resource;
 import de.jbee.inject.Scope;
 import de.jbee.inject.Scoped;
@@ -21,8 +22,17 @@ public class TestRichBinder {
 		@Override
 		public <T> void bind( Resource<T> resource, Supplier<? extends T> supplier, Scope scope,
 				Source source ) {
-			System.out.println( source + " / " + scope + " / " + resource + " / " + supplier );
+			System.out.println( source + " / " + scope + " / " + resource + " -> " + supplier );
 		}
+
+	}
+
+	static interface Leg {
+
+	}
+
+	static class LeftLeg
+			implements Leg {
 
 	}
 
@@ -34,5 +44,10 @@ public class TestRichBinder {
 
 		binder.bind( Integer.class ).to( 1 );
 		binder.bind( Number.class ).to( Integer.class );
+
+		Name left = Name.named( "left" );
+		binder.bind( left, Leg.class ).to( LeftLeg.class );
+
+		binder.inPackageOf( Leg.class ).bind( CharSequence.class ).to( String.class );
 	}
 }

@@ -277,6 +277,10 @@ public final class Type<T>
 
 	void toString( StringBuilder b ) {
 		if ( isLowerBound() ) {
+			if ( rawType == Object.class ) {
+				b.append( "?" );
+				return;
+			}
 			b.append( "? extends " );
 		}
 		b.append( rawType.getCanonicalName() );

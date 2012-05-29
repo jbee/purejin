@@ -8,7 +8,7 @@ package de.jbee.inject;
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
 public final class Resource<T>
-		implements Typed<T>, Comparable<Resource<?>> {
+		implements Typed<T>, Named, Comparable<Resource<?>> {
 
 	private final Instance<T> instance;
 	private final Availability availability;
@@ -72,5 +72,10 @@ public final class Resource<T>
 	@Override
 	public String toString() {
 		return availability + "-" + instance;
+	}
+
+	@Override
+	public Name getName() {
+		return instance.getName();
 	}
 }

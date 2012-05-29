@@ -7,6 +7,7 @@ import static de.jbee.inject.Type.rawType;
 import de.jbee.inject.Availability;
 import de.jbee.inject.Binder;
 import de.jbee.inject.Instance;
+import de.jbee.inject.Name;
 import de.jbee.inject.Provider;
 import de.jbee.inject.Resource;
 import de.jbee.inject.Scope;
@@ -45,6 +46,14 @@ public class RichBinder {
 		@Override
 		public <T> RichTypedBinder<T> bind( Instance<T> instance ) {
 			return new RichTypedBinder<T>( this, instance );
+		}
+
+		public <T> RichTypedBinder<T> bind( Name name, Class<T> type ) {
+			return bind( Instance.named( name, Type.rawType( type ) ) );
+		}
+
+		public <T> RichTypedBinder<T> bind( Name name, Type<T> type ) {
+			return bind( Instance.named( name, type ) );
 		}
 
 		public <T> RichTypedBinder<T> bind( Type<T> type ) {
@@ -122,15 +131,11 @@ public class RichBinder {
 		// instead of narrow explicit we could expose explicit and make binds as narrow as possible by default (classic interface to impl binds in same package)
 
 		public RichBasicBinder inPackageOf( Class<?> packageOf ) {
-			return this;
+			return with( availability().within( packageOf.getPackage().getName() ) );
 		}
 
-		public RichBasicBinder belowPackageOf( Class<?> packageOf ) {
-			return this;
-		}
-
-		public RichBasicBinder beneathPackageOf( Class<?> packageOf ) {
-			return this;
+		private RichBasicBinder with( Availability availability ) {
+			return new RichBasicBinder( binder(), source(), scope(), availability );
 		}
 	}
 

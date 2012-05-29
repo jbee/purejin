@@ -18,11 +18,15 @@ public final class Instance<T>
 	public static final Instance<? extends Object> ANY = anyOf( Type.rawType( Object.class ).asLowerBound() );
 
 	public static <T> Instance<T> defaultInstanceOf( Type<T> type ) {
-		return new Instance<T>( Name.DEFAULT, type );
+		return named( Name.DEFAULT, type );
 	}
 
 	public static <T> Instance<T> anyOf( Type<T> type ) {
-		return new Instance<T>( Name.ANY, type );
+		return named( Name.ANY, type );
+	}
+
+	public static <T> Instance<T> named( Name name, Type<T> type ) {
+		return new Instance<T>( name, type );
 	}
 
 	private final Name name;
@@ -59,6 +63,6 @@ public final class Instance<T>
 
 	@Override
 	public String toString() {
-		return type + ":" + name;
+		return name + " " + type;
 	}
 }
