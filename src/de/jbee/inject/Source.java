@@ -31,4 +31,11 @@ public final class Source {
 	public Source implicit() {
 		return new Source( module, false );
 	}
+
+	@Override
+	public String toString() {
+		return explicit
+			? module.getCanonicalName()
+			: "(" + module.getCanonicalName() + ")";
+	}
 }

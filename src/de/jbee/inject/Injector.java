@@ -123,7 +123,7 @@ public class Injector
 		return (Injectron<T>[]) injectrons.get( type.getRawType() );
 	}
 
-	static class InjectronImpl<T>
+	private static class InjectronImpl<T>
 			implements Injectron<T> {
 
 		final Resource<T> resource;

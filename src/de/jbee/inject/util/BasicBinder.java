@@ -8,8 +8,6 @@ public interface BasicBinder {
 
 	<T> TypedBinder<T> bind( Instance<T> instance );
 
-	//<T> TypedArrayBinder<T> bind( Class<T[]> type );
-
 	//void install( Module module ); // this would allow doing narrowed installations - could be confusing
 
 	interface TypedBinder<T> {
@@ -38,9 +36,6 @@ public interface BasicBinder {
 	interface ScopedBinder
 			extends TargetedBinder {
 
-		// means when the type/instance is created and dependencies are injected into it
-		TargetedBinder injectingInto( Class<?> target ); //move to a util method
-
 		TargetedBinder injectingInto( Instance<?> target );
 	}
 
@@ -53,14 +48,6 @@ public interface BasicBinder {
 	interface TargetedBinder
 			extends BasicBinder /* LocalisedBinder */{
 
-		//TODO improve this since from a dependency point of view it is good to localize all binds somehow
-		// instead of narrow explicit we could expose explicit and make binds as narrow as possible by default (classic interface to impl binds in same package)
-
-		LocalisedBinder inPackageOf( Class<?> packageOf );
-
-		LocalisedBinder belowPackageOf( Class<?> packageOf );
-
-		LocalisedBinder beneathPackageOf( Class<?> packageOf );
 	}
 
 	interface LocalisedBinder
@@ -71,6 +58,8 @@ public interface BasicBinder {
 		LocalisedBinder havingDirectParent( Class<?> type );
 
 	}
+
+	//<T> TypedArrayBinder<T> bind( Class<T[]> type );
 
 	/**
 	 * @deprecated No further interface is needed - we can do this with covariant return type

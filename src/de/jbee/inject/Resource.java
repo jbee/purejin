@@ -68,4 +68,9 @@ public final class Resource<T>
 		// check discriminator
 		return 0;
 	}
+
+	@Override
+	public String toString() {
+		return availability + "-" + instance;
+	}
 }

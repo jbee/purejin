@@ -8,7 +8,7 @@ package de.jbee.inject;
  * 
  */
 public final class Instance<T>
-		implements Typed<T> {
+		implements Typed<T>, Named {
 
 	/**
 	 * When a wildcard-type is used as bound instance type the bind will be added to all concrete
@@ -17,7 +17,7 @@ public final class Instance<T>
 	 */
 	public static final Instance<? extends Object> ANY = anyOf( Type.rawType( Object.class ).asLowerBound() );
 
-	public static <T> Instance<T> defaultInstance( Type<T> type ) {
+	public static <T> Instance<T> defaultInstanceOf( Type<T> type ) {
 		return new Instance<T>( Name.DEFAULT, type );
 	}
 
@@ -48,11 +48,17 @@ public final class Instance<T>
 		return type;
 	}
 
+	@Override
 	public Name getName() {
 		return name;
 	}
 
 	public Resource<T> toResource() {
 		return new Resource<T>( this );
+	}
+
+	@Override
+	public String toString() {
+		return type + ":" + name;
 	}
 }

@@ -13,8 +13,8 @@ public class Suppliers {
 
 	public static final Supplier<List<?>> LIST_BRIDGE = new ArrayToListBridgeSupplier();
 
-	public static <T> Supplier<T> adapt( Provider<T> provider ) {
-		return new ProviderAdaptedSupplier<T>( provider );
+	public static <T> Supplier<T> asSupplier( Provider<T> provider ) {
+		return new ProviderAsSupplier<T>( provider );
 	}
 
 	public static <T> Supplier<Provider<T>> instance( Provider<T> provider ) {
@@ -82,6 +82,11 @@ public class Suppliers {
 			return instance;
 		}
 
+		@Override
+		public String toString() {
+			return instance.toString();
+		}
+
 	}
 
 	private static final class ArraySupplier<T>
@@ -126,14 +131,18 @@ public class Suppliers {
 			return context.resolve( typeDependency );
 		}
 
+		@Override
+		public String toString() {
+			return type.toString();
+		}
 	}
 
-	private static final class ProviderAdaptedSupplier<T>
+	private static final class ProviderAsSupplier<T>
 			implements Supplier<T> {
 
 		private final Provider<T> provider;
 
-		ProviderAdaptedSupplier( Provider<T> provider ) {
+		ProviderAsSupplier( Provider<T> provider ) {
 			super();
 			this.provider = provider;
 		}

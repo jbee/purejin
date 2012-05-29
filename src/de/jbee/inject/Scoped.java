@@ -7,13 +7,13 @@ public class Scoped {
 	 */
 	public static final Scope DEFAULT = new DefaultScope();
 	/**
-	 * Asks the {@link Injectable} once per binding. Thereby instances become singletons local
-	 * to the application.
+	 * Asks the {@link Injectable} once per binding. Thereby instances become singletons local to
+	 * the application.
 	 */
 	public static final Scope APPLICATION = new ApplicationScope();
 	/**
-	 * Asks the {@link Injectable} once per thread per binding which is understand commonly as
-	 * a usual 'per-thread' singleton.
+	 * Asks the {@link Injectable} once per thread per binding which is understand commonly as a
+	 * usual 'per-thread' singleton.
 	 */
 	public static final Scope THREAD = new ThreadScope( new ThreadLocal<Repository>(), APPLICATION );
 
@@ -21,28 +21,32 @@ public class Scoped {
 		return new SnapshotRepository( src, dest );
 	}
 
-	static final class SnapshotScope
+	private static final class SnapshotScope
 			implements Scope {
 
-		private final Scope synchronous;
-		private final Scope asynchronous;
+		private final Scope dest;
+		private final Scope src;
 
 		SnapshotScope( Scope synchronous, Scope asynchronous ) {
 			super();
-			this.synchronous = synchronous;
-			this.asynchronous = asynchronous;
+			this.dest = synchronous;
+			this.src = asynchronous;
 		}
 
 		@Override
 		public Repository init( int cardinality ) {
-			return new SnapshotRepository( asynchronous.init( cardinality ),
-					synchronous.init( cardinality ) );
+			return new SnapshotRepository( src.init( cardinality ), dest.init( cardinality ) );
+		}
+
+		@Override
+		public String toString() {
+			return src + "->" + dest;
 		}
 	}
 
 	/**
-	 * What is usually called a 'default'-{@link Scope} will ask the {@link Injectable} passed
-	 * each time the {@link Repository#yield(Dependency, Injectable)}-method is invoked.
+	 * What is usually called a 'default'-{@link Scope} will ask the {@link Injectable} passed each
+	 * time the {@link Repository#yield(Dependency, Injectable)}-method is invoked.
 	 * 
 	 * The {@link Scope} is also used as {@link Repository} instance since both don#t have any
 	 * state.
@@ -66,6 +70,11 @@ public class Scoped {
 		@Override
 		public <T> T yield( Injection<T> injection, Injectable<T> injectable ) {
 			return injectable.instanceFor( injection );
+		}
+
+		@Override
+		public String toString() {
+			return "(default)";
 		}
 
 	}
@@ -98,6 +107,10 @@ public class Scoped {
 			return this;
 		}
 
+		@Override
+		public String toString() {
+			return "per thread";
+		}
 	}
 
 	/**
@@ -145,6 +158,7 @@ public class Scoped {
 			}
 
 		}
+
 	}
 
 	static final class PerIdentityRepository
@@ -177,11 +191,15 @@ public class Scoped {
 			return new ResourceRepository( new Object[cardinality] );
 		}
 
+		@Override
+		public String toString() {
+			return "#";
+		}
 	}
 
 	/**
-	 * Contains once instance per resource. Resources are never updates. This can for example be
-	 * used to create a thread or request {@link Scope}.
+	 * Contains once instance per resource. Resources are never updated. This can be used to create
+	 * a thread or request {@link Scope}.
 	 * 
 	 * @author Jan Bernitt (jan.bernitt@gmx.de)
 	 */
@@ -212,6 +230,7 @@ public class Scoped {
 			}
 			return res;
 		}
+
 	}
 
 }

@@ -3,14 +3,13 @@
  */
 package de.jbee.inject;
 
-class InjectorBinder
-		//TODO find better name -> has nothing to do with the injector now 
-		implements Binder { // OPEN maybe make this a ModuleBinder instead ?
+class BuildInModuleBinder
+		implements ModuleBinder {
 
 	@Override
-	public <T> void bind( Resource<T> resource, Supplier<? extends T> supplier, Scope scope,
-			Source source ) {
-
+	public Binding<?>[] bind( Module root ) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	// Find the initial set of bindings
