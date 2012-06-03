@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-public class NameTest {
+public class TestName {
 
 	@Test
 	public void exactSameNameShouldBeApplicable() {
@@ -32,4 +32,8 @@ public class NameTest {
 		assertTrue( named( "foo" ).isApplicableFor( named( "fo*" ) ) );
 	}
 
+	@Test
+	public void defaultShouldBeApplicableToAnyName() {
+		assertTrue( Name.DEFAULT.isApplicableFor( Name.ANY ) );
+	}
 }

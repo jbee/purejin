@@ -223,7 +223,7 @@ public class Scoped {
 			// just sync the (later) unexpected path that is executed once
 			synchronized ( instances ) {
 				res = (T) instances[injection.injectronSerialNumber()];
-				if ( res != null ) { // we need to ask again since the instance could have been initialized before we got entrance to the sync block
+				if ( res == null ) { // we need to ask again since the instance could have been initialized before we got entrance to the sync block
 					res = injectable.instanceFor( injection );
 					instances[injection.injectronSerialNumber()] = res;
 				}

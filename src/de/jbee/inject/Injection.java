@@ -29,4 +29,8 @@ public class Injection<T> {
 		return new Injection<T>( dependency, injectronSerialNumber, injectronCardinality );
 	}
 
+	@Override
+	public String toString() {
+		return dependency + "[" + injectronCardinality + "/" + injectronCardinality + "]";
+	}
 }

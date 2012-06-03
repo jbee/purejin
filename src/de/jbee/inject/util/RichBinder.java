@@ -1,6 +1,7 @@
 package de.jbee.inject.util;
 
 import static de.jbee.inject.Instance.defaultInstanceOf;
+import static de.jbee.inject.Instance.instance;
 import static de.jbee.inject.Suppliers.asSupplier;
 import static de.jbee.inject.Type.instanceType;
 import static de.jbee.inject.Type.rawType;
@@ -49,19 +50,48 @@ public class RichBinder {
 		}
 
 		public <T> RichTypedBinder<T> bind( Name name, Class<T> type ) {
-			return bind( Instance.named( name, Type.rawType( type ) ) );
+			return bind( instance( name, Type.rawType( type ) ) );
 		}
 
 		public <T> RichTypedBinder<T> bind( Name name, Type<T> type ) {
-			return bind( Instance.named( name, type ) );
+			return bind( instance( name, type ) );
 		}
 
 		public <T> RichTypedBinder<T> bind( Type<T> type ) {
-			return bind( Instance.defaultInstanceOf( type ) );
+			return bind( defaultInstanceOf( type ) );
 		}
 
 		public <T> RichTypedBinder<T> bind( Class<T> type ) {
 			return bind( Type.rawType( type ) );
+		}
+
+		public <T> RichTypedBinder<T> autobind( Type<T> type ) {
+			//FIXME need more bindings when chain is done - how to do that ?
+			return bind( type );
+		}
+
+		public <T> RichTypedBinder<T> autobind( Class<T> type ) {
+			return autobind( Type.rawType( type ) );
+		}
+
+		public <T> RichTypedBinder<T> multibind( Instance<T> instance ) {
+			return with( source.multi() ).bind( instance );
+		}
+
+		public <T> RichTypedBinder<T> multibind( Type<T> type ) {
+			return multibind( defaultInstanceOf( type ) );
+		}
+
+		public <T> RichTypedBinder<T> multibind( Class<T> type ) {
+			return multibind( Type.rawType( type ) );
+		}
+
+		public <T> RichTypedBinder<T> multibind( Name name, Class<T> type ) {
+			return multibind( instance( name, Type.rawType( type ) ) );
+		}
+
+		public <T> RichTypedBinder<T> multibind( Name name, Type<T> type ) {
+			return multibind( instance( name, type ) );
 		}
 
 		final Availability availability() {
@@ -78,6 +108,14 @@ public class RichBinder {
 
 		final Binder binder() {
 			return binder;
+		}
+
+		protected final RichBasicBinder with( Source source ) {
+			return new RichBasicBinder( binder, source, scope, availability );
+		}
+
+		protected final RichBasicBinder with( Availability availability ) {
+			return new RichBasicBinder( binder, source, scope, availability );
 		}
 	}
 
@@ -134,9 +172,6 @@ public class RichBinder {
 			return with( availability().within( packageOf.getPackage().getName() ) );
 		}
 
-		private RichBasicBinder with( Availability availability ) {
-			return new RichBasicBinder( binder(), source(), scope(), availability );
-		}
 	}
 
 	public static class RichTypedBinder<T>
@@ -182,6 +217,8 @@ public class RichBinder {
 
 		public void to( Class<? extends T> implementation ) {
 			to( Suppliers.type( Type.rawType( implementation ) ) );
+			//FIXME find best-match constructor and bind impl-class implicit to that constructor 
+			//(constructor resolution could also be made in a special supplier but I guess its better to make that a binders task) 
 		}
 
 	}

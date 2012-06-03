@@ -1,6 +1,7 @@
 package de.jbee.inject;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.TypeVariable;
 
@@ -13,6 +14,20 @@ public final class Type<T>
 
 	public static Type<?> fieldType( Field field ) {
 		return type( field.getType(), field.getGenericType() );
+	}
+
+	public static Type<?> returnType( Method method ) {
+		return type( method.getReturnType(), method.getGenericReturnType() );
+	}
+
+	public static Type<?>[] parameterTypes( Method method ) {
+		Class<?>[] parameterTypes = method.getParameterTypes();
+		java.lang.reflect.Type[] genericParameterTypes = method.getGenericParameterTypes();
+		Type<?>[] res = new Type<?>[parameterTypes.length];
+		for ( int i = 0; i < res.length; i++ ) {
+			res[i] = type( parameterTypes[i], genericParameterTypes[i] );
+		}
+		return res;
 	}
 
 	public static <T> Type<T> instanceType( Class<T> rawType, T instance ) {

@@ -8,16 +8,16 @@ package de.jbee.inject;
 public final class Source {
 
 	public static Source source( Class<? extends Module> module ) {
-		return new Source( module, true );
+		return new Source( module, DeclarationType.EXPLICIT );
 	}
 
 	private final Class<? extends Module> module;
-	private final boolean explicit;
+	private final DeclarationType declarationType;
 
-	private Source( Class<? extends Module> module, boolean explicit ) {
+	private Source( Class<? extends Module> module, DeclarationType declarationType ) {
 		super();
 		this.module = module;
-		this.explicit = explicit;
+		this.declarationType = declarationType;
 	}
 
 	public Class<? extends Module> getModule() {
@@ -25,17 +25,21 @@ public final class Source {
 	}
 
 	public boolean isExplicit() {
-		return explicit;
+		return declarationType == DeclarationType.EXPLICIT;
 	}
 
 	public Source implicit() {
-		return new Source( module, false );
+		return new Source( module, DeclarationType.IMPLICIT );
 	}
 
 	@Override
 	public String toString() {
-		return explicit
+		return isExplicit()
 			? module.getCanonicalName()
 			: "(" + module.getCanonicalName() + ")";
+	}
+
+	public Source multi() {
+		return new Source( module, DeclarationType.MULTI );
 	}
 }

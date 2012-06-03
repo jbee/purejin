@@ -33,5 +33,22 @@ public final class Dependency<T>
 		return name;
 	}
 
+	@Override
+	public String toString() {
+		return ( name + " " + type ).trim();
+	}
+
+	public Dependency<?> onTypeParameter() {
+		return dependency( type.getParameters()[0] );
+	}
+
+	public <E> Dependency<E> typed( Type<E> type ) {
+		return new Dependency<E>( name, type );
+	}
+
+	private static <T> Dependency<T> defaultDependency( Type<T> type ) {
+		return new Dependency<T>( Name.DEFAULT, type );
+	}
+
 	// also add target hierarchy: the class of the instance that is injected
 }

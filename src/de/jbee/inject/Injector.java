@@ -1,9 +1,11 @@
 package de.jbee.inject;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Injector
@@ -30,28 +32,29 @@ public class Injector
 
 			@Override
 			public int compare( Binding<?> one, Binding<?> other ) {
-				return one.getResource().compareTo( other.getResource() );
+				return one.resource().compareTo( other.resource() );
 			}
 		} );
 		final int total = bindings.length;
 		Map<Class<?>, Injectron<?>[]> res = new IdentityHashMap<Class<?>, Injectron<?>[]>( total );
 		final int end = total - 1;
 		int start = 0;
-		Class<?> lastRawType = bindings[0].getResource().getType().getRawType();
+		Class<?> lastRawType = bindings[0].resource().getType().getRawType();
 		for ( int i = 0; i < total; i++ ) {
-			Resource<?> r = bindings[i].getResource();
+			Resource<?> r = bindings[i].resource();
 			Class<?> rawType = r.getType().getRawType();
 			if ( i == end ) {
 				if ( rawType != lastRawType ) {
-					res.put( rawType, createTypeInjectrons( start, i - 1, bindings, resolver ) );
+					res.put( lastRawType, createTypeInjectrons( start, i - 1, bindings, resolver ) );
 					res.put( rawType, createTypeInjectrons( end, end, bindings, resolver ) );
 				} else {
 					res.put( rawType, createTypeInjectrons( start, end, bindings, resolver ) );
 				}
 			} else if ( rawType != lastRawType ) {
-				res.put( rawType, createTypeInjectrons( start, i - 1, bindings, resolver ) );
+				res.put( lastRawType, createTypeInjectrons( start, i - 1, bindings, resolver ) );
 				start = i;
 			}
+			lastRawType = rawType;
 		}
 		return res;
 	}
@@ -62,10 +65,9 @@ public class Injector
 		Injectron<T>[] res = new Injectron[length];
 		for ( int i = 0; i < length; i++ ) {
 			Binding<T> b = (Binding<T>) bindings[i + first];
-			res[i] = new InjectronImpl<T>( b.getResource(), b.getSource(),
-					new Injection<T>( Dependency.dependency( b.getResource().getType() ),
-							i + first, bindings.length ), b.getRepository(),
-					Suppliers.asInjectable( b.getSupplier(), resolver ) );
+			res[i] = new InjectronImpl<T>( b.resource(), b.source(), new Injection<T>(
+					Dependency.dependency( b.resource().getType() ), i + first, bindings.length ),
+					b.repository(), Suppliers.asInjectable( b.supplier(), resolver ) );
 		}
 		return res;
 	}
@@ -75,21 +77,17 @@ public class Injector
 		// TODO more information to add to dependency ?
 		Type<T> type = dependency.getType();
 		Injectron<T>[] injectrons = getInjectrons( type );
-		if ( injectrons == null ) {
-			if ( type.isUnidimensionalArray() ) {
-				return resolveArray( type, type.getElementType() );
-			}
-			throw noInjectronFor( type );
-		}
-		for ( int i = 0; i < injectrons.length; i++ ) {
-			Injectron<T> injectron = injectrons[i];
-			if ( injectron.getResource().isApplicableFor( dependency ) ) {
-				return injectron.instanceFor( dependency ); //OPEN I guess we need to add information about the target type being injected here 
+		if ( injectrons != null ) {
+			for ( int i = 0; i < injectrons.length; i++ ) {
+				Injectron<T> injectron = injectrons[i];
+				if ( injectron.getResource().isApplicableFor( dependency ) ) {
+					return injectron.instanceFor( dependency ); //OPEN I guess we need to add information about the target type being injected here 
+				}
 			}
 		}
 		// TODO try wildcard injectrons 
 		if ( type.isUnidimensionalArray() ) {
-			return resolveArray( type, type.getElementType() );
+			return resolveArray( dependency, type.getElementType() );
 		}
 		throw noInjectronFor( type );
 	}
@@ -98,19 +96,20 @@ public class Injector
 		return new RuntimeException( "No injectron for type: " + type );
 	}
 
-	private <T, E> T resolveArray( Type<T> type, Type<E> elementType ) {
+	private <T, E> T resolveArray( Dependency<T> dependency, Type<E> elementType ) {
 		Injectron<E>[] elementInjectrons = getInjectrons( elementType );
 		if ( elementInjectrons != null ) {
-			int length = elementInjectrons.length;
-			E[] elements = newArray( elementType, length );
-			for ( int i = 0; i < length; i++ ) {
-				Dependency<E> elementDependency = null; //TODO
-				elements[i] = elementInjectrons[i].instanceFor( elementDependency );
+			List<E> elements = new ArrayList<E>( elementInjectrons.length );
+			Dependency<E> elementDependency = dependency.typed( elementType );
+			for ( int i = 0; i < elementInjectrons.length; i++ ) {
+				Injectron<E> injectron = elementInjectrons[i];
+				if ( injectron.getResource().isApplicableFor( elementDependency ) ) {
+					elements.add( injectron.instanceFor( elementDependency ) );
+				}
 			}
-			//FIXME check if the elements are isApplicableFor the type required
-			return (T) elements;
+			return (T) elements.toArray( newArray( elementType, elements.size() ) );
 		}
-		throw new RuntimeException( "No injectron for array type: " + type );
+		throw new RuntimeException( "No injectron for array type: " + dependency.getType() );
 	}
 
 	@SuppressWarnings ( "unchecked" )
@@ -157,6 +156,10 @@ public class Injector
 			return repository.yield( injection.on( dependency ), injectable );
 		}
 
+		@Override
+		public String toString() {
+			return resource + ":" + injection;
+		}
 	}
 
 }

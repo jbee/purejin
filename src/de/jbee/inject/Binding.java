@@ -22,19 +22,24 @@ public final class Binding<T> {
 		this.source = source;
 	}
 
-	public Resource<T> getResource() {
+	public Resource<T> resource() {
 		return resource;
 	}
 
-	public Supplier<? extends T> getSupplier() {
+	public Supplier<? extends T> supplier() {
 		return supplier;
 	}
 
-	public Source getSource() {
+	public Source source() {
 		return source;
 	}
 
-	public Repository getRepository() {
+	public Repository repository() {
 		return repository;
+	}
+
+	@Override
+	public String toString() {
+		return source + " / " + resource + " / " + supplier;
 	}
 }

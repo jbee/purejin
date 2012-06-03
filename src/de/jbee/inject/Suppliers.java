@@ -5,13 +5,16 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Suppliers {
 
 	public static final Supplier<Provider<?>> PROVIDER = new ProviderSupplier();
 
 	public static final Supplier<List<?>> LIST_BRIDGE = new ArrayToListBridgeSupplier();
+	public static final Supplier<Set<?>> SET_BRIDGE = new ArrayToSetBridgeSupplier();
 
 	public static <T> Supplier<T> asSupplier( Provider<T> provider ) {
 		return new ProviderAsSupplier<T>( provider );
@@ -34,6 +37,29 @@ public class Suppliers {
 		return new InjectableSupplier<T>( supplier, context );
 	}
 
+	private static abstract class BridgeSupplier<T>
+			implements Supplier<T> {
+
+		BridgeSupplier() {
+			// make visible
+		}
+
+		@Override
+		public final T supply( Dependency<? super T> dependency, DependencyResolver context ) {
+			Type<?> elementType = dependency.getType().getParameters()[0];
+			return bridge( supplyArray( elementType.getRawType(), context ) );
+		}
+
+		@SuppressWarnings ( "unchecked" )
+		private <E> E[] supplyArray( Class<E> elementType, DependencyResolver resolver ) {
+			Object proto = Array.newInstance( elementType, 0 );
+			return (E[]) resolver.resolve( Dependency.dependency( Type.type( proto.getClass(),
+					proto.getClass() ) ) );
+		}
+
+		abstract <E> T bridge( E[] elements );
+	}
+
 	/**
 	 * Shows how support for {@link List}s and such works.
 	 * 
@@ -46,23 +72,29 @@ public class Suppliers {
 	 * 
 	 */
 	private static final class ArrayToListBridgeSupplier
-			implements Supplier<List<?>> {
+			extends BridgeSupplier<List<?>> {
 
 		ArrayToListBridgeSupplier() {
 			//make visible
 		}
 
 		@Override
-		public List<?> supply( Dependency<? super List<?>> dependency, DependencyResolver context ) {
-			Type<?> elementType = dependency.getType().getParameters()[0];
-			return new ArrayList<Object>( Arrays.asList( supplyArray( elementType.getRawType(),
-					context ) ) );
+		<E> List<E> bridge( E[] elements ) {
+			return new ArrayList<E>( Arrays.asList( elements ) );
 		}
 
-		private <E> E[] supplyArray( Class<E> elementType, DependencyResolver resolver ) {
-			Object proto = Array.newInstance( elementType, 0 );
-			return (E[]) resolver.resolve( Dependency.dependency( Type.type( proto.getClass(),
-					proto.getClass() ) ) );
+	}
+
+	private static final class ArrayToSetBridgeSupplier
+			extends BridgeSupplier<Set<?>> {
+
+		ArrayToSetBridgeSupplier() {
+			// make visible
+		}
+
+		@Override
+		<E> Set<E> bridge( E[] elements ) {
+			return new HashSet<E>( Arrays.asList( elements ) );
 		}
 
 	}
@@ -164,13 +196,12 @@ public class Suppliers {
 		@Override
 		public Provider<?> supply( Dependency<? super Provider<?>> dependency,
 				DependencyResolver context ) {
-			Type<? super Provider<?>> type = dependency.getType();
-			Type<?> provided = type.getParameters()[0];
-			// TODO ? add more information from the dependency ? 
-			Dependency<Object> providedDependency = null; //FIXME merge dependency and provided
-			return new DynamicProvider<Object>( providedDependency, context );
+			return newProvider( dependency.onTypeParameter(), context );
 		}
 
+		private <T> Provider<T> newProvider( Dependency<T> dependency, DependencyResolver context ) {
+			return new DynamicProvider<T>( dependency, context );
+		}
 	}
 
 	private static final class DynamicProvider<T>
@@ -190,6 +221,10 @@ public class Suppliers {
 			return resolver.resolve( dependency );
 		}
 
+		@Override
+		public String toString() {
+			return "provides<" + dependency + ">";
+		}
 	}
 
 	/**

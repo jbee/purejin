@@ -18,14 +18,14 @@ public final class Instance<T>
 	public static final Instance<? extends Object> ANY = anyOf( Type.rawType( Object.class ).asLowerBound() );
 
 	public static <T> Instance<T> defaultInstanceOf( Type<T> type ) {
-		return named( Name.DEFAULT, type );
+		return instance( Name.DEFAULT, type );
 	}
 
 	public static <T> Instance<T> anyOf( Type<T> type ) {
-		return named( Name.ANY, type );
+		return instance( Name.ANY, type );
 	}
 
-	public static <T> Instance<T> named( Name name, Type<T> type ) {
+	public static <T> Instance<T> instance( Name name, Type<T> type ) {
 		return new Instance<T>( name, type );
 	}
 

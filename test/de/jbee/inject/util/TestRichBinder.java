@@ -3,7 +3,7 @@ package de.jbee.inject.util;
 import org.junit.Test;
 
 import de.jbee.inject.Binder;
-import de.jbee.inject.BuildInModule;
+import de.jbee.inject.Module;
 import de.jbee.inject.Name;
 import de.jbee.inject.Resource;
 import de.jbee.inject.Scope;
@@ -38,7 +38,7 @@ public class TestRichBinder {
 
 	@Test
 	public void testBinder() {
-		RichRootBinder binder = RichBinder.root( BINDER, Source.source( BuildInModule.class ) );
+		RichRootBinder binder = RichBinder.root( BINDER, Source.source( Module.class ) );
 		binder.in( Scoped.APPLICATION ).injectingInto( Source.class ).bind( String.class ).to(
 				"FooBar" );
 
