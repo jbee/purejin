@@ -8,8 +8,6 @@ public interface BasicBinder {
 
 	<T> TypedBasicBinder<T> bind( Instance<T> instance );
 
-	//void install( Module module ); // this would allow doing narrowed installations - could be confusing
-
 	interface TypedBasicBinder<T> {
 
 		void to( Supplier<? extends T> supplier );
@@ -48,6 +46,7 @@ public interface BasicBinder {
 	interface TargetedBasicBinder
 			extends BasicBinder /* LocalisedBinder */{
 
+		//TODO add general method to change the availability
 	}
 
 	interface LocalisedBasicBinder
