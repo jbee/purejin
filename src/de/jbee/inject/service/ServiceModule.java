@@ -6,16 +6,16 @@ import static de.jbee.inject.Type.parameterTypes;
 
 import java.lang.reflect.Method;
 
-import de.jbee.inject.BasicBinder;
-import de.jbee.inject.Binder;
+import de.jbee.inject.SimpleBinder;
+import de.jbee.inject.BindInstructor;
 import de.jbee.inject.Dependency;
 import de.jbee.inject.DependencyResolver;
 import de.jbee.inject.Module;
 import de.jbee.inject.Scoped;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.Type;
-import de.jbee.inject.util.RichBinder;
-import de.jbee.inject.util.RichBinder.RichRootBinder;
+import de.jbee.inject.util.Binder;
+import de.jbee.inject.util.Binder.RootBinder;
 
 /**
  * When binding {@link Service}s this {@link Module} can be extended.
@@ -31,17 +31,17 @@ public abstract class ServiceModule
 
 	protected final void bindService( Class<?> service ) {
 		String name = SERVICE_NAME_PREFIX + service.getCanonicalName();
-		root.multibind( named( name ), Class.class ).to( service );
+		binder.multibind( named( name ), Class.class ).to( service );
 	}
 
-	private RichRootBinder root;
+	private RootBinder binder;
 
 	@Override
-	public final void configure( Binder binder ) {
-		if ( root != null ) {
+	public final void configure( BindInstructor instructor ) {
+		if ( binder != null ) {
 			throw new IllegalStateException( "Reentrance not allowed!" );
 		}
-		root = RichBinder.root( binder, source( getClass() ) );
+		binder = Binder.create( instructor, source( getClass() ) );
 		//TODO extends ServiceCoreModule
 		configure();
 	}
@@ -52,8 +52,8 @@ public abstract class ServiceModule
 			implements Module {
 
 		@Override
-		public void configure( Binder binder ) {
-			BasicBinder bb = new BasicBinder( binder, source( getClass() ), Scoped.DEFAULT );
+		public void configure( BindInstructor binder ) {
+			SimpleBinder bb = new SimpleBinder( binder, source( getClass() ), Scoped.DEFAULT );
 			bb.wildcardBind( Service.class, new ServiceSupplier() );
 		}
 
@@ -65,10 +65,10 @@ public abstract class ServiceModule
 		@Override
 		public Service<?, ?> supply( Dependency<? super Service<?, ?>> dependency,
 				DependencyResolver context ) {
+			//Class<?>[] serviceTypes = context.resolve( dependency )
 			// TODO find method matching dependency and return new ServiceMethod
 			return null;
 		}
-
 	}
 
 	static class ServiceMethod<P, T>

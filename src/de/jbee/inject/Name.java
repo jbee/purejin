@@ -13,6 +13,12 @@ public final class Name {
 
 	private final String value;
 
+	public static Name prefixed( String prefix ) {
+		return prefix == null || prefix.trim().isEmpty()
+			? ANY
+			: new Name( prefix + "*" );
+	}
+
 	public static Name named( String name ) {
 		return name == null || name.trim().isEmpty()
 			? DEFAULT

@@ -16,8 +16,8 @@ final class BuildinModule
 	private static final Source BUILD_IN = source( BuildinModule.class );
 
 	@Override
-	public void configure( Binder binder ) {
-		BasicBinder bb = new BasicBinder( binder, BUILD_IN, Scoped.DEFAULT );
+	public void configure( BindInstructor binder ) {
+		SimpleBinder bb = new SimpleBinder( binder, BUILD_IN, Scoped.DEFAULT );
 		bb.wildcardBind( Provider.class, Suppliers.PROVIDER );
 		bb.wildcardBind( List.class, Suppliers.LIST_BRIDGE );
 		bb.wildcardBind( Set.class, Suppliers.SET_BRIDGE );

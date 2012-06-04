@@ -6,25 +6,25 @@ import de.jbee.inject.Supplier;
 
 public interface BasicBinder {
 
-	<T> TypedBinder<T> bind( Instance<T> instance );
+	<T> TypedBasicBinder<T> bind( Instance<T> instance );
 
 	//void install( Module module ); // this would allow doing narrowed installations - could be confusing
 
-	interface TypedBinder<T> {
+	interface TypedBasicBinder<T> {
 
 		void to( Supplier<? extends T> supplier );
 
 	}
 
 	/**
-	 * The ROOT- {@link RootBinder}.
+	 * The ROOT- {@link RootBasicBinder}.
 	 * 
 	 * @author Jan Bernitt (jan.bernitt@gmx.de)
 	 */
-	public interface RootBinder
-			extends ScopedBinder {
+	public interface RootBasicBinder
+			extends ScopedBasicBinder {
 
-		ScopedBinder in( Scope scope );
+		ScopedBasicBinder in( Scope scope );
 
 	}
 
@@ -33,47 +33,30 @@ public interface BasicBinder {
 	 * 
 	 * @author Jan Bernitt (jan.bernitt@gmx.de)
 	 */
-	interface ScopedBinder
-			extends TargetedBinder {
+	interface ScopedBasicBinder
+			extends TargetedBasicBinder {
 
-		TargetedBinder injectingInto( Instance<?> target );
+		TargetedBasicBinder injectingInto( Instance<?> target );
 	}
 
 	/**
 	 * Bindings have been restricted and are just effective within a special scope defined before
-	 * using {@link ScopedBinder#injectingInto(Class)}-clauses.
+	 * using {@link ScopedBasicBinder#injectingInto(Class)}-clauses.
 	 * 
 	 * @author Jan Bernitt (jan.bernitt@gmx.de)
 	 */
-	interface TargetedBinder
+	interface TargetedBasicBinder
 			extends BasicBinder /* LocalisedBinder */{
 
 	}
 
-	interface LocalisedBinder
+	interface LocalisedBasicBinder
 			extends BasicBinder {
 
-		LocalisedBinder havingParent( Class<?> type );
+		LocalisedBasicBinder havingParent( Class<?> type );
 
-		LocalisedBinder havingDirectParent( Class<?> type );
+		LocalisedBasicBinder havingDirectParent( Class<?> type );
 
 	}
 
-	//<T> TypedArrayBinder<T> bind( Class<T[]> type );
-
-	/**
-	 * @deprecated No further interface is needed - we can do this with covariant return type
-	 *             overrides only.
-	 */
-	@Deprecated
-	interface TypedMultiBinder<T> {
-
-		void to( Class<? extends T> src1 );
-
-		void to( Class<? extends T> src1, Class<? extends T> src2 );
-
-		void to( Class<? extends T> src1, Class<? extends T> src2, Class<? extends T> src3 );
-
-		// and so on.... will avoid the warning here 
-	}
 }

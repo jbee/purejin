@@ -6,7 +6,7 @@ package de.jbee.inject;
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
-public interface Binder {
+public interface BindInstructor {
 
 	<T> void bind( Resource<T> resource, Supplier<? extends T> supplier, Scope scope, Source source );
 }

@@ -2,7 +2,7 @@ package de.jbee.inject.util;
 
 import org.junit.Test;
 
-import de.jbee.inject.Binder;
+import de.jbee.inject.BindInstructor;
 import de.jbee.inject.Module;
 import de.jbee.inject.Name;
 import de.jbee.inject.Resource;
@@ -10,14 +10,14 @@ import de.jbee.inject.Scope;
 import de.jbee.inject.Scoped;
 import de.jbee.inject.Source;
 import de.jbee.inject.Supplier;
-import de.jbee.inject.util.RichBinder.RichRootBinder;
+import de.jbee.inject.util.Binder.RootBinder;
 
 public class TestRichBinder {
 
-	static final Binder BINDER = new ToStringBinder();
+	static final BindInstructor BINDER = new ToStringBinder();
 
 	static class ToStringBinder
-			implements Binder {
+			implements BindInstructor {
 
 		@Override
 		public <T> void bind( Resource<T> resource, Supplier<? extends T> supplier, Scope scope,
@@ -38,7 +38,7 @@ public class TestRichBinder {
 
 	@Test
 	public void testBinder() {
-		RichRootBinder binder = RichBinder.root( BINDER, Source.source( Module.class ) );
+		RootBinder binder = Binder.create( BINDER, Source.source( Module.class ) );
 		binder.in( Scoped.APPLICATION ).injectingInto( Source.class ).bind( String.class ).to(
 				"FooBar" );
 

@@ -1,13 +1,13 @@
 package de.jbee.inject;
 
-public class BasicBinder
-		implements Binder {
+public class SimpleBinder
+		implements BindInstructor {
 
-	private final Binder binder;
+	private final BindInstructor binder;
 	private final Source source;
 	private final Scope scope;
 
-	public BasicBinder( Binder binder, Source source, Scope scope ) {
+	public SimpleBinder( BindInstructor binder, Source source, Scope scope ) {
 		super();
 		this.binder = binder;
 		this.source = source;

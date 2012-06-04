@@ -61,7 +61,7 @@ class BuildinModuleBinder
 	}
 
 	static class DeclarationBinder
-			implements Binder {
+			implements BindInstructor {
 
 		final List<BindDeclaration<?>> declarations = new LinkedList<BindDeclaration<?>>();
 

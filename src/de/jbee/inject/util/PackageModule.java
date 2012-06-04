@@ -1,103 +1,102 @@
 package de.jbee.inject.util;
 
 import static de.jbee.inject.Source.source;
-import de.jbee.inject.Binder;
+import de.jbee.inject.BindInstructor;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Module;
 import de.jbee.inject.Name;
 import de.jbee.inject.Scope;
 import de.jbee.inject.Type;
-import de.jbee.inject.util.RichBinder.RichBasicBinder;
-import de.jbee.inject.util.RichBinder.RichRootBinder;
-import de.jbee.inject.util.RichBinder.RichScopedBinder;
-import de.jbee.inject.util.RichBinder.RichTargetedBinder;
-import de.jbee.inject.util.RichBinder.RichTypedBinder;
+import de.jbee.inject.util.Binder.RootBinder;
+import de.jbee.inject.util.Binder.ScopedBinder;
+import de.jbee.inject.util.Binder.TargetedBinder;
+import de.jbee.inject.util.Binder.TypedBinder;
 
 public abstract class PackageModule
 		implements Module {
 
-	private RichRootBinder root;
+	private RootBinder binder;
 
 	@Override
-	public final void configure( Binder binder ) {
-		if ( this.root != null ) {
+	public final void configure( BindInstructor instructor ) {
+		if ( this.binder != null ) {
 			throw new IllegalStateException( "Reentrance not allowed!" );
 		}
-		this.root = RichBinder.root( binder, source( getClass() ) );
+		this.binder = Binder.create( instructor, source( getClass() ) );
 		configure();
 	}
 
 	protected abstract void configure();
 
 	public void install( Module module ) {
-		module.configure( root.binder() );
+		module.configure( binder.instructor() );
 	}
 
 	public void extend( Class<? extends Module> dependency ) {
 		//OPEN how to keep track of the installed modules transparent ? 
 	}
 
-	public RichScopedBinder in( Scope scope ) {
-		return root.in( scope );
+	public ScopedBinder in( Scope scope ) {
+		return binder.in( scope );
 	}
 
-	public RichTargetedBinder injectingInto( Class<?> target ) {
-		return root.injectingInto( target );
+	public TargetedBinder injectingInto( Class<?> target ) {
+		return binder.injectingInto( target );
 	}
 
-	public RichTargetedBinder injectingInto( Instance<?> target ) {
-		return root.injectingInto( target );
+	public TargetedBinder injectingInto( Instance<?> target ) {
+		return binder.injectingInto( target );
 	}
 
-	public RichBasicBinder inPackageOf( Class<?> packageOf ) {
-		return root.inPackageOf( packageOf );
+	public Binder inPackageOf( Class<?> packageOf ) {
+		return binder.inPackageOf( packageOf );
 	}
 
-	public <T> RichTypedBinder<T> bind( Class<T> type ) {
-		return root.bind( type );
+	public <T> TypedBinder<T> bind( Class<T> type ) {
+		return binder.bind( type );
 	}
 
-	public <T> RichTypedBinder<T> bind( Instance<T> instance ) {
-		return root.bind( instance );
+	public <T> TypedBinder<T> bind( Instance<T> instance ) {
+		return binder.bind( instance );
 	}
 
-	public <T> RichTypedBinder<T> bind( Name name, Class<T> type ) {
-		return root.bind( name, type );
+	public <T> TypedBinder<T> bind( Name name, Class<T> type ) {
+		return binder.bind( name, type );
 	}
 
-	public <T> RichTypedBinder<T> bind( Name name, Type<T> type ) {
-		return root.bind( name, type );
+	public <T> TypedBinder<T> bind( Name name, Type<T> type ) {
+		return binder.bind( name, type );
 	}
 
-	public <T> RichTypedBinder<T> bind( Type<T> type ) {
-		return root.bind( type );
+	public <T> TypedBinder<T> bind( Type<T> type ) {
+		return binder.bind( type );
 	}
 
-	public <T> RichTypedBinder<T> autobind( Type<T> type ) {
-		return root.autobind( type );
+	public <T> TypedBinder<T> autobind( Type<T> type ) {
+		return binder.autobind( type );
 	}
 
-	public <T> RichTypedBinder<T> autobind( Class<T> type ) {
-		return root.autobind( type );
+	public <T> TypedBinder<T> autobind( Class<T> type ) {
+		return binder.autobind( type );
 	}
 
-	public <T> RichTypedBinder<T> multibind( Instance<T> instance ) {
-		return root.multibind( instance );
+	public <T> TypedBinder<T> multibind( Instance<T> instance ) {
+		return binder.multibind( instance );
 	}
 
-	public <T> RichTypedBinder<T> multibind( Type<T> type ) {
-		return root.multibind( type );
+	public <T> TypedBinder<T> multibind( Type<T> type ) {
+		return binder.multibind( type );
 	}
 
-	public <T> RichTypedBinder<T> multibind( Class<T> type ) {
-		return root.multibind( type );
+	public <T> TypedBinder<T> multibind( Class<T> type ) {
+		return binder.multibind( type );
 	}
 
-	public <T> RichTypedBinder<T> multibind( Name name, Class<T> type ) {
-		return root.multibind( name, type );
+	public <T> TypedBinder<T> multibind( Name name, Class<T> type ) {
+		return binder.multibind( name, type );
 	}
 
-	public <T> RichTypedBinder<T> multibind( Name name, Type<T> type ) {
-		return root.multibind( name, type );
+	public <T> TypedBinder<T> multibind( Name name, Type<T> type ) {
+		return binder.multibind( name, type );
 	}
 }
