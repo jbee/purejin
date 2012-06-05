@@ -2,18 +2,18 @@ package de.jbee.inject;
 
 public class Injection<T> {
 
-	private final Dependency<T> dependency;
+	private final Dependency<? super T> dependency;
 	private final int injectronSerialNumber;
 	private final int injectronCardinality;
 
-	Injection( Dependency<T> dependency, int injectronSerialNumber, int injectronCardinality ) {
+	Injection( Dependency<? super T> dependency, int injectronSerialNumber, int injectronCardinality ) {
 		super();
 		this.dependency = dependency;
 		this.injectronSerialNumber = injectronSerialNumber;
 		this.injectronCardinality = injectronCardinality;
 	}
 
-	public Dependency<T> getDependency() {
+	public Dependency<? super T> getDependency() {
 		return dependency;
 	}
 
@@ -25,7 +25,7 @@ public class Injection<T> {
 		return injectronCardinality;
 	}
 
-	public Injection<T> on( Dependency<T> dependency ) {
+	public Injection<T> on( Dependency<? super T> dependency ) {
 		return new Injection<T>( dependency, injectronSerialNumber, injectronCardinality );
 	}
 

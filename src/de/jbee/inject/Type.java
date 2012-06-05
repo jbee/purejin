@@ -1,5 +1,6 @@
 package de.jbee.inject;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -84,7 +85,7 @@ public final class Type<T>
 			return rawType( (Class<?>) type );
 		}
 		if ( type instanceof ParameterizedType ) {
-			return parameterizedtype( (ParameterizedType) type );
+			return parameterizedType( (ParameterizedType) type );
 		}
 		if ( type instanceof TypeVariable<?> ) {
 			// TODO
@@ -92,7 +93,7 @@ public final class Type<T>
 		throw notSupportedYet( type );
 	}
 
-	private static <T> Type<?> parameterizedtype( ParameterizedType type ) {
+	private static <T> Type<?> parameterizedType( ParameterizedType type ) {
 		@SuppressWarnings ( "unchecked" )
 		Class<T> rawType = (Class<T>) type.getRawType();
 		return new Type<T>( rawType, types( type.getActualTypeArguments() ) );
@@ -128,6 +129,12 @@ public final class Type<T>
 		return new Type<T>( false, rawType, params );
 	}
 
+	@SuppressWarnings ( "unchecked" )
+	public Type<T[]> getArrayType() {
+		Object proto = Array.newInstance( rawType, 0 );
+		return new Type<T[]>( lowerBound, (Class<T[]>) proto.getClass(), params );
+	}
+
 	public boolean equalTo( Type<?> other ) {
 		if ( rawType != other.rawType ) {
 			return false;
@@ -152,7 +159,7 @@ public final class Type<T>
 
 	private Type<?> getElementRawType() {
 		return rawType.isArray()
-			? new Type( rawType.getComponentType() )
+			? new Type( lowerBound, rawType.getComponentType(), params )
 			: this;
 	}
 

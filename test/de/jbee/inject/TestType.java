@@ -150,4 +150,10 @@ public class TestType {
 		assertThat( listOfStrings.asSupertype( List.class ).toString(),
 				is( "java.util.List<java.lang.String>" ) );
 	}
+
+	@Test
+	public void testArrayType() {
+		Type<? extends Number> t = Type.rawType( Number.class ).asLowerBound();
+		assertThat( t.getArrayType().toString(), is( "? extends java.lang.Number[]" ) );
+	}
 }

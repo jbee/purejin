@@ -18,6 +18,8 @@ public class TestInjector {
 			install( Module.BUILD_IN );
 			bind( String.class ).to( "foobar" );
 			bind( CharSequence.class ).to( "bar" );
+			bind( Integer.class ).to( 42 );
+			bind( Float.class ).to( 42.0f );
 		}
 
 	}
@@ -39,5 +41,15 @@ public class TestInjector {
 		Provider<Set<String>> p3 = injector.resolve( Dependency.dependency( Type.rawType(
 				Provider.class ).parametized( Type.rawType( Set.class ).parametized( String.class ) ) ) );
 		System.out.println( p3.toString() + " = " + p3.yield() );
+
+		System.out.println( injector.resolve( Dependency.dependency( Type.rawType( List.class ).parametized(
+				Integer.class ) ) ) );
+
+		System.out.println( injector.resolve( Dependency.dependency( Type.rawType( List.class ).parametized(
+				Number.class ).parametizedAsLowerBounds() ) ) );
+
+		List<List<String>> lls = injector.resolve( Dependency.dependency( Type.rawType( List.class ).parametized(
+				Type.rawType( List.class ).parametized( String.class ) ) ) );
+		System.out.println( lls );
 	}
 }

@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class Injector
 		implements DependencyResolver {
@@ -85,7 +86,6 @@ public class Injector
 				}
 			}
 		}
-		// TODO try wildcard injectrons 
 		if ( type.isUnidimensionalArray() ) {
 			return resolveArray( dependency, type.getElementType() );
 		}
@@ -100,21 +100,39 @@ public class Injector
 		Injectron<E>[] elementInjectrons = getInjectrons( elementType );
 		if ( elementInjectrons != null ) {
 			List<E> elements = new ArrayList<E>( elementInjectrons.length );
-			Dependency<E> elementDependency = dependency.typed( elementType );
-			for ( int i = 0; i < elementInjectrons.length; i++ ) {
-				Injectron<E> injectron = elementInjectrons[i];
-				if ( injectron.getResource().isApplicableFor( elementDependency ) ) {
-					elements.add( injectron.instanceFor( elementDependency ) );
+			addAllApplicable( elements, dependency, elementType, elementInjectrons );
+			return toArray( elements, elementType );
+		}
+		if ( elementType.isLowerBound() ) { // wildcard bindings:
+			List<E> elements = new ArrayList<E>();
+			for ( Entry<Class<?>, Injectron<?>[]> e : injectrons.entrySet() ) {
+				if ( Type.rawType( e.getKey() ).isAssignableTo( elementType ) ) {
+					addAllApplicable( elements, dependency, elementType,
+							(Injectron<? extends E>[]) e.getValue() );
 				}
 			}
-			return (T) elements.toArray( newArray( elementType, elements.size() ) );
+			if ( elements.size() > 0 ) {
+				return toArray( elements, elementType );
+			}
 		}
 		throw new RuntimeException( "No injectron for array type: " + dependency.getType() );
 	}
 
+	private <E, T> void addAllApplicable( List<E> elements, Dependency<T> dependency,
+			Type<E> elementType, Injectron<? extends E>[] elementInjectrons ) {
+		Dependency<E> elementDependency = dependency.typed( elementType );
+		for ( int i = 0; i < elementInjectrons.length; i++ ) {
+			Injectron<? extends E> injectron = elementInjectrons[i];
+			if ( injectron.getResource().isApplicableFor( elementDependency ) ) {
+				elements.add( injectron.instanceFor( elementDependency ) );
+			}
+		}
+	}
+
 	@SuppressWarnings ( "unchecked" )
-	private <E> E[] newArray( Type<E> elementType, int length ) {
-		return (E[]) Array.newInstance( elementType.getRawType(), length );
+	private <T, E> T toArray( List<E> elements, Type<E> elementType ) {
+		return (T) elements.toArray( (E[]) Array.newInstance( elementType.getRawType(),
+				elements.size() ) );
 	}
 
 	@SuppressWarnings ( "unchecked" )
@@ -152,7 +170,7 @@ public class Injector
 		}
 
 		@Override
-		public T instanceFor( Dependency<T> dependency ) {
+		public T instanceFor( Dependency<? super T> dependency ) {
 			return repository.yield( injection.on( dependency ), injectable );
 		}
 

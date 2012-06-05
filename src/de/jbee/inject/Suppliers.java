@@ -37,24 +37,21 @@ public class Suppliers {
 		return new InjectableSupplier<T>( supplier, context );
 	}
 
-	private static abstract class BridgeSupplier<T>
+	private static abstract class ArrayBridgeSupplier<T>
 			implements Supplier<T> {
 
-		BridgeSupplier() {
+		ArrayBridgeSupplier() {
 			// make visible
 		}
 
 		@Override
 		public final T supply( Dependency<? super T> dependency, DependencyResolver context ) {
 			Type<?> elementType = dependency.getType().getParameters()[0];
-			return bridge( supplyArray( elementType.getRawType(), context ) );
+			return bridge( supplyArray( elementType, context ) );
 		}
 
-		@SuppressWarnings ( "unchecked" )
-		private <E> E[] supplyArray( Class<E> elementType, DependencyResolver resolver ) {
-			Object proto = Array.newInstance( elementType, 0 );
-			return (E[]) resolver.resolve( Dependency.dependency( Type.type( proto.getClass(),
-					proto.getClass() ) ) );
+		private <E> E[] supplyArray( Type<E> elementType, DependencyResolver resolver ) {
+			return resolver.resolve( Dependency.dependency( elementType.getArrayType() ) );
 		}
 
 		abstract <E> T bridge( E[] elements );
@@ -72,7 +69,7 @@ public class Suppliers {
 	 * 
 	 */
 	private static final class ArrayToListBridgeSupplier
-			extends BridgeSupplier<List<?>> {
+			extends ArrayBridgeSupplier<List<?>> {
 
 		ArrayToListBridgeSupplier() {
 			//make visible
@@ -86,7 +83,7 @@ public class Suppliers {
 	}
 
 	private static final class ArrayToSetBridgeSupplier
-			extends BridgeSupplier<Set<?>> {
+			extends ArrayBridgeSupplier<Set<?>> {
 
 		ArrayToSetBridgeSupplier() {
 			// make visible
