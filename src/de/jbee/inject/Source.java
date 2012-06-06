@@ -6,7 +6,7 @@ package de.jbee.inject;
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
 public final class Source
-		implements Preciser<Source> {
+		implements PreciserThan<Source> {
 
 	public static Source source( Class<? extends Module> module ) {
 		return new Source( module, DeclarationType.EXPLICIT );

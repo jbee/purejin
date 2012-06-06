@@ -11,7 +11,7 @@ import java.lang.reflect.TypeVariable;
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
 public final class Type<T>
-		implements Preciser<Type<?>> {
+		implements PreciserThan<Type<?>> {
 
 	public static Type<?> fieldType( Field field ) {
 		return type( field.getType(), field.getGenericType() );

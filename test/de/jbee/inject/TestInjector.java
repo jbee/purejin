@@ -6,6 +6,7 @@ import static de.jbee.inject.Type.raw;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -69,6 +70,15 @@ public class TestInjector {
 		assertInjectsProviderFor( list, raw( List.class ).parametized( String.class ) );
 		assertInjectsProviderFor( singleton( "foobar" ),
 				raw( Set.class ).parametized( String.class ) );
+	}
+
+	@Test
+	public void testInjectron() {
+		Dependency<Injectron> dependency = dependency( raw( Injectron.class ).parametized(
+				String.class ) );
+		Injectron<String> injectron = injector.resolve( dependency );
+		assertThat( injectron, notNullValue() );
+		assertThat( injectron.instanceFor( dependency( raw( String.class ) ) ), is( "foobar" ) );
 	}
 
 	@Test

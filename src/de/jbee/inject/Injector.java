@@ -72,8 +72,10 @@ public class Injector
 	private static <T> Injectron<T>[] createTypeInjectrons( int first, int last,
 			Binding<?>[] bindings, DependencyResolver resolver ) {
 		final int length = last - first + 1;
+		@SuppressWarnings ( "unchecked" )
 		Injectron<T>[] res = new Injectron[length];
 		for ( int i = 0; i < length; i++ ) {
+			@SuppressWarnings ( "unchecked" )
 			Binding<T> b = (Binding<T>) bindings[i + first];
 			res[i] = new InjectronImpl<T>( b.resource(), b.source(), new Injection<T>(
 					Dependency.dependency( b.resource().getType() ), i + first, bindings.length ),
@@ -91,20 +93,38 @@ public class Injector
 			throw new UnsupportedOperationException( "Wildcard-binds are not supported yet: "
 					+ type );
 		}
-		Injectron<T>[] injectrons = getInjectrons( type );
-		if ( injectrons != null ) {
-			for ( int i = 0; i < injectrons.length; i++ ) {
-				Injectron<T> injectron = injectrons[i];
-				if ( injectron.getResource().isApplicableFor( dependency ) ) {
-					return injectron.instanceFor( dependency ); //OPEN I guess we need to add information about the target type being injected here 
-				}
-			}
+		Injectron<T> injectron = resolveInjectron( dependency );
+		if ( injectron != null ) {
+			return injectron.instanceFor( dependency ); //OPEN I guess we need to add information about the target type being injected here
 		}
 		if ( type.isUnidimensionalArray() ) {
 			return resolveArray( dependency, type.getElementType() );
 		}
 		//TODO support asking for Injectrons --> allows to "store" pre-resolved references
+		if ( type.getRawType() == Injectron.class ) {
+			Injectron<?> i = resolveInjectron( dependency.onTypeParameter() );
+			if ( i != null ) {
+				return (T) i;
+			}
+		}
 		throw noInjectronFor( dependency );
+	}
+
+	private <T> Injectron<T> resolveInjectron( Dependency<T> dependency ) {
+		return mostPrecise( dependency, getInjectrons( dependency.getType() ) );
+	}
+
+	private <T> Injectron<T> mostPrecise( Dependency<T> dependency, Injectron<T>[] injectrons ) {
+		if ( injectrons == null ) {
+			return null;
+		}
+		for ( int i = 0; i < injectrons.length; i++ ) {
+			Injectron<T> injectron = injectrons[i];
+			if ( injectron.getResource().isApplicableFor( dependency ) ) {
+				return injectron;
+			}
+		}
+		return null;
 	}
 
 	private <T> RuntimeException noInjectronFor( Dependency<T> dependency ) {

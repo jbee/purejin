@@ -8,7 +8,7 @@ package de.jbee.inject;
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
 public final class Resource<T>
-		implements Typed<T>, Named, Preciser<Resource<T>> {
+		implements Typed<T>, Named, PreciserThan<Resource<T>> {
 
 	private final Instance<T> instance;
 	private final Availability availability;

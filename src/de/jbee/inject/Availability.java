@@ -1,7 +1,7 @@
 package de.jbee.inject;
 
 public class Availability
-		implements Preciser<Availability> {
+		implements PreciserThan<Availability> {
 
 	public static final Availability EVERYWHERE = availability( Instance.ANY );
 

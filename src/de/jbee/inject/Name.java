@@ -7,7 +7,7 @@ package de.jbee.inject;
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
 public final class Name
-		implements Preciser<Name> {
+		implements PreciserThan<Name> {
 
 	public static final Name DEFAULT = new Name( "" );
 	public static final Name ANY = new Name( "*" );

@@ -1,7 +1,7 @@
 package de.jbee.inject;
 
 public enum DeclarationType
-		implements Preciser<DeclarationType> {
+		implements PreciserThan<DeclarationType> {
 
 	/**
 	 * Has been added by the binder as a fallback since some bind-calls can have ambiguous
