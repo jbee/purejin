@@ -17,7 +17,11 @@ package de.jbee.inject;
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  * 
  */
-public interface Installer {
-
-	void install( Module module );
+public interface Bootstrapper {
+	//
+	//	void install( Module module );
+	//
+	//	void install( Bundle bundle );
+	//
+	//	<T extends Module & Bundle> void install( T e );
 }

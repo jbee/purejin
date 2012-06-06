@@ -4,9 +4,9 @@ import static de.jbee.inject.Instance.defaultInstanceOf;
 import static de.jbee.inject.Instance.instance;
 import static de.jbee.inject.Suppliers.asSupplier;
 import static de.jbee.inject.Type.instanceType;
-import static de.jbee.inject.Type.rawType;
+import static de.jbee.inject.Type.raw;
 import de.jbee.inject.Availability;
-import de.jbee.inject.BindInstructor;
+import de.jbee.inject.BindDeclarator;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Name;
 import de.jbee.inject.Provider;
@@ -21,18 +21,18 @@ import de.jbee.inject.Type;
 public class Binder
 		implements BasicBinder {
 
-	public static RootBinder create( BindInstructor instructor, Source source ) {
-		return new RootBinder( instructor, source );
+	public static RootBinder create( BindDeclarator declarator, Source source ) {
+		return new RootBinder( declarator, source );
 	}
 
-	private final BindInstructor instructor;
+	private final BindDeclarator declarator;
 	private final Source source;
 	private final Scope scope;
 	private final Availability availability;
 
-	Binder( BindInstructor instructor, Source source, Scope scope, Availability availability ) {
+	Binder( BindDeclarator declarator, Source source, Scope scope, Availability availability ) {
 		super();
-		this.instructor = instructor;
+		this.declarator = declarator;
 		this.source = source;
 		this.scope = scope;
 		this.availability = availability;
@@ -44,7 +44,7 @@ public class Binder
 	}
 
 	public <T> TypedBinder<T> bind( Name name, Class<T> type ) {
-		return bind( instance( name, Type.rawType( type ) ) );
+		return bind( instance( name, Type.raw( type ) ) );
 	}
 
 	public <T> TypedBinder<T> bind( Name name, Type<T> type ) {
@@ -56,7 +56,7 @@ public class Binder
 	}
 
 	public <T> TypedBinder<T> bind( Class<T> type ) {
-		return bind( Type.rawType( type ) );
+		return bind( Type.raw( type ) );
 	}
 
 	public <E> TypedMultiBinder<E> bind( Class<E[]> type ) {
@@ -70,7 +70,7 @@ public class Binder
 	}
 
 	public <T> TypedBinder<T> autobind( Class<T> type ) {
-		return autobind( Type.rawType( type ) );
+		return autobind( Type.raw( type ) );
 	}
 
 	public <T> TypedBinder<T> multibind( Instance<T> instance ) {
@@ -82,11 +82,11 @@ public class Binder
 	}
 
 	public <T> TypedBinder<T> multibind( Class<T> type ) {
-		return multibind( Type.rawType( type ) );
+		return multibind( Type.raw( type ) );
 	}
 
 	public <T> TypedBinder<T> multibind( Name name, Class<T> type ) {
-		return multibind( instance( name, Type.rawType( type ) ) );
+		return multibind( instance( name, Type.raw( type ) ) );
 	}
 
 	public <T> TypedBinder<T> multibind( Name name, Type<T> type ) {
@@ -105,16 +105,16 @@ public class Binder
 		return scope;
 	}
 
-	final BindInstructor instructor() {
-		return instructor;
+	final BindDeclarator declarator() {
+		return declarator;
 	}
 
 	protected final Binder with( Source source ) {
-		return new Binder( instructor, source, scope, availability );
+		return new Binder( declarator, source, scope, availability );
 	}
 
 	protected final Binder with( Availability availability ) {
-		return new Binder( instructor, source, scope, availability );
+		return new Binder( declarator, source, scope, availability );
 	}
 
 	public static class TypedMultiBinder<E>
@@ -138,13 +138,13 @@ public class Binder
 			extends ScopedBinder
 			implements RootBasicBinder {
 
-		RootBinder( BindInstructor instructor, Source source ) {
-			super( instructor, source, Scoped.DEFAULT );
+		RootBinder( BindDeclarator declarator, Source source ) {
+			super( declarator, source, Scoped.DEFAULT );
 		}
 
 		@Override
 		public ScopedBinder in( Scope scope ) {
-			return new ScopedBinder( instructor(), source(), scope );
+			return new ScopedBinder( declarator(), source(), scope );
 		}
 	}
 
@@ -152,18 +152,18 @@ public class Binder
 			extends TargetedBinder
 			implements ScopedBasicBinder {
 
-		ScopedBinder( BindInstructor instructor, Source source, Scope scope ) {
-			super( instructor, source, scope );
+		ScopedBinder( BindDeclarator declarator, Source source, Scope scope ) {
+			super( declarator, source, scope );
 		}
 
 		// means when the type/instance is created and dependencies are injected into it
 		public TargetedBinder injectingInto( Class<?> target ) {
-			return injectingInto( defaultInstanceOf( rawType( target ) ) );
+			return injectingInto( defaultInstanceOf( raw( target ) ) );
 		}
 
 		@Override
 		public TargetedBinder injectingInto( Instance<?> target ) {
-			return new TargetedBinder( instructor(), source(), scope(), target );
+			return new TargetedBinder( declarator(), source(), scope(), target );
 		}
 
 	}
@@ -172,12 +172,12 @@ public class Binder
 			extends Binder
 			implements TargetedBasicBinder {
 
-		TargetedBinder( BindInstructor instructor, Source source, Scope scope ) {
-			super( instructor, source, scope, Availability.EVERYWHERE );
+		TargetedBinder( BindDeclarator declarator, Source source, Scope scope ) {
+			super( declarator, source, scope, Availability.EVERYWHERE );
 		}
 
-		TargetedBinder( BindInstructor instructor, Source source, Scope scope, Instance<?> target ) {
-			super( instructor, source, scope, Availability.availability( target ) );
+		TargetedBinder( BindDeclarator declarator, Source source, Scope scope, Instance<?> target ) {
+			super( declarator, source, scope, Availability.availability( target ) );
 		}
 
 		//TODO improve this since from a dependency point of view it is good to localize all binds somehow
@@ -207,7 +207,7 @@ public class Binder
 
 		@Override
 		public void to( Supplier<? extends T> supplier ) {
-			builder.instructor().bind( resource, supplier, builder.scope(), builder.source() );
+			builder.declarator().bind( resource, supplier, builder.scope(), builder.source() );
 		}
 
 		public void to( T instance ) {
@@ -231,7 +231,7 @@ public class Binder
 		}
 
 		public void to( Class<? extends T> implementation ) {
-			to( Suppliers.type( Type.rawType( implementation ) ) );
+			to( Suppliers.type( Type.raw( implementation ) ) );
 			//FIXME find best-match constructor and bind impl-class implicit to that constructor 
 			//(constructor resolution could also be made in a special supplier but I guess its better to make that a binders task) 
 		}

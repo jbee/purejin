@@ -6,7 +6,7 @@ package de.jbee.inject;
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
-public interface BindInstructor {
+public interface BindDeclarator { //OPEN rename to Bindings ? -- its more or less just a collector for binds
 
 	<T> void bind( Resource<T> resource, Supplier<? extends T> supplier, Scope scope, Source source );
 }

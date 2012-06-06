@@ -1,7 +1,7 @@
 package de.jbee.inject.util;
 
 import static de.jbee.inject.Source.source;
-import de.jbee.inject.BindInstructor;
+import de.jbee.inject.BindDeclarator;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Module;
 import de.jbee.inject.Name;
@@ -18,18 +18,18 @@ public abstract class PackageModule
 	private RootBinder binder;
 
 	@Override
-	public final void configure( BindInstructor instructor ) {
+	public final void configure( BindDeclarator declarator ) {
 		if ( this.binder != null ) {
 			throw new IllegalStateException( "Reentrance not allowed!" );
 		}
-		this.binder = Binder.create( instructor, source( getClass() ) );
+		this.binder = Binder.create( declarator, source( getClass() ) );
 		configure();
 	}
 
 	protected abstract void configure();
 
 	public void install( Module module ) {
-		module.configure( binder.instructor() );
+		module.configure( binder.declarator() );
 	}
 
 	public void extend( Class<? extends Module> dependency ) {

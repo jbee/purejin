@@ -7,7 +7,7 @@ import static de.jbee.inject.Type.parameterTypes;
 import java.lang.reflect.Method;
 
 import de.jbee.inject.SimpleBinder;
-import de.jbee.inject.BindInstructor;
+import de.jbee.inject.BindDeclarator;
 import de.jbee.inject.Dependency;
 import de.jbee.inject.DependencyResolver;
 import de.jbee.inject.Module;
@@ -37,7 +37,7 @@ public abstract class ServiceModule
 	private RootBinder binder;
 
 	@Override
-	public final void configure( BindInstructor instructor ) {
+	public final void configure( BindDeclarator instructor ) {
 		if ( binder != null ) {
 			throw new IllegalStateException( "Reentrance not allowed!" );
 		}
@@ -52,7 +52,7 @@ public abstract class ServiceModule
 			implements Module {
 
 		@Override
-		public void configure( BindInstructor binder ) {
+		public void configure( BindDeclarator binder ) {
 			SimpleBinder bb = new SimpleBinder( binder, source( getClass() ), Scoped.DEFAULT );
 			bb.wildcardBind( Service.class, new ServiceSupplier() );
 		}

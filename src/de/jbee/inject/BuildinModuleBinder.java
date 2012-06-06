@@ -3,6 +3,8 @@
  */
 package de.jbee.inject;
 
+import static de.jbee.inject.PreciserComparator.comparePrecision;
+
 import java.util.Arrays;
 import java.util.IdentityHashMap;
 import java.util.LinkedList;
@@ -61,15 +63,15 @@ class BuildinModuleBinder
 	}
 
 	static class DeclarationBinder
-			implements BindInstructor {
+			implements BindDeclarator {
 
 		final List<BindDeclaration<?>> declarations = new LinkedList<BindDeclaration<?>>();
 
 		@Override
 		public <T> void bind( Resource<T> resource, Supplier<? extends T> supplier, Scope scope,
 				Source source ) {
-			declarations.add( new BindDeclaration<T>( declarations.size(), resource, supplier, scope,
-					source ) );
+			declarations.add( new BindDeclaration<T>( declarations.size(), resource, supplier,
+					scope, source ) );
 		}
 
 	}
@@ -115,17 +117,15 @@ class BuildinModuleBinder
 
 		@Override
 		public int compareTo( BindDeclaration<?> other ) {
-			int res = resource.getType().compareTo( other.resource.getType() );
+			int res = comparePrecision( resource.getType(), other.resource.getType() );
 			if ( res != 0 ) {
 				return res;
 			}
-			if ( resource.getName().morePreciseThan( other.resource.getName() ) ) {
-				return 1;
+			res = comparePrecision( resource.getName(), other.resource.getName() );
+			if ( res != 0 ) {
+				return res;
 			}
-			if ( other.resource.getName().morePreciseThan( resource.getName() ) ) {
-				return -1;
-			}
-			res = Boolean.valueOf( source.isExplicit() ).compareTo( other.source.isExplicit() );
+			res = comparePrecision( source, other.source );
 			if ( res != 0 ) {
 				return res;
 			}

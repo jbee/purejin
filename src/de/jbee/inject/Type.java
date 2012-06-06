@@ -11,7 +11,7 @@ import java.lang.reflect.TypeVariable;
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
 public final class Type<T>
-		implements Comparable<Type<?>> {
+		implements Preciser<Type<?>> {
 
 	public static Type<?> fieldType( Field field ) {
 		return type( field.getType(), field.getGenericType() );
@@ -43,13 +43,13 @@ public final class Type<T>
 		return null;
 	}
 
-	public static <T> Type<T> rawType( Class<T> type ) {
+	public static <T> Type<T> raw( Class<T> type ) {
 		return new Type<T>( type );
 	}
 
 	public static <T> Type<T> type( Class<T> rawType, java.lang.reflect.Type type ) {
 		if ( type instanceof Class<?> ) {
-			return rawType( rawType );
+			return raw( rawType );
 		}
 		if ( type instanceof ParameterizedType ) {
 			ParameterizedType pt = (ParameterizedType) type;
@@ -82,7 +82,7 @@ public final class Type<T>
 
 	private static Type<?> type( java.lang.reflect.Type type ) {
 		if ( type instanceof Class<?> ) {
-			return rawType( (Class<?>) type );
+			return raw( (Class<?>) type );
 		}
 		if ( type instanceof ParameterizedType ) {
 			return parameterizedType( (ParameterizedType) type );
@@ -280,7 +280,7 @@ public final class Type<T>
 	public Type<T> parametized( Class<?>... arguments ) {
 		Type<?>[] typeArgs = new Type<?>[arguments.length];
 		for ( int i = 0; i < arguments.length; i++ ) {
-			typeArgs[i] = rawType( arguments[i] );
+			typeArgs[i] = raw( arguments[i] );
 		}
 		return parametized( typeArgs );
 	}
@@ -357,16 +357,4 @@ public final class Type<T>
 		throw new RuntimeException( "Couldn't find supertype " + supertype + " for type: " + this );
 	}
 
-	@Override
-	public int compareTo( Type<?> other ) {
-		if ( morePreciseThan( other ) ) {
-			return 1;
-		}
-		if ( other.morePreciseThan( this ) ) {
-			return -1;
-		}
-		return rawType == other.rawType
-			? 0
-			: rawType.getCanonicalName().compareTo( other.rawType.getCanonicalName() );
-	}
 }

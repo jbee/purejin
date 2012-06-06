@@ -46,6 +46,14 @@ public final class Dependency<T>
 		return new Dependency<E>( name, type );
 	}
 
+	public Dependency<T> named( String name ) {
+		return named( Name.named( name ) );
+	}
+
+	public Dependency<T> named( Name name ) {
+		return new Dependency<T>( name, type );
+	}
+
 	private static <T> Dependency<T> defaultDependency( Type<T> type ) {
 		return new Dependency<T>( Name.DEFAULT, type );
 	}

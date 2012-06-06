@@ -19,13 +19,13 @@ public class TestType {
 	@Test
 	public void testToString()
 			throws Exception {
-		Type<List> l = Type.rawType( List.class ).parametized( String.class );
+		Type<List> l = Type.raw( List.class ).parametized( String.class );
 		assertThat( l.toString(), is( "java.util.List<java.lang.String>" ) );
 
-		l = Type.rawType( List.class ).parametized( Type.rawType( String.class ).asLowerBound() );
+		l = Type.raw( List.class ).parametized( Type.raw( String.class ).asLowerBound() );
 		assertThat( l.toString(), is( "java.util.List<? extends java.lang.String>" ) );
 
-		l = Type.rawType( List.class ).parametized( Type.rawType( String.class ) ).parametizedAsLowerBounds();
+		l = Type.raw( List.class ).parametized( Type.raw( String.class ) ).parametizedAsLowerBounds();
 		assertThat( l.toString(), is( "java.util.List<? extends java.lang.String>" ) );
 
 		Field stringList = TestType.class.getDeclaredField( "aStringListField" );
@@ -35,16 +35,16 @@ public class TestType {
 
 	@Test
 	public void testIsAssignableTo() {
-		Type<Integer> integer = Type.rawType( Integer.class );
-		Type<Number> number = Type.rawType( Number.class );
+		Type<Integer> integer = Type.raw( Integer.class );
+		Type<Number> number = Type.raw( Number.class );
 		assertTrue( integer.isAssignableTo( number ) );
 		assertFalse( number.isAssignableTo( integer ) );
 	}
 
 	@Test
 	public void testIsAssignableTo1Generic() {
-		Type<List> listOfIntegers = Type.rawType( List.class ).parametized( Integer.class );
-		Type<List> listOfNumbers = Type.rawType( List.class ).parametized( Number.class );
+		Type<List> listOfIntegers = Type.raw( List.class ).parametized( Integer.class );
+		Type<List> listOfNumbers = Type.raw( List.class ).parametized( Number.class );
 		assertFalse( listOfIntegers.isAssignableTo( listOfNumbers ) );
 		assertFalse( listOfNumbers.isAssignableTo( listOfIntegers ) );
 		assertTrue( listOfIntegers.isAssignableTo( listOfNumbers.parametizedAsLowerBounds() ) );
@@ -56,10 +56,10 @@ public class TestType {
 		List<Class<Integer>> l = null;
 		List<? extends Class<? extends Number>> l2 = l;
 
-		Type<List> listOfClassesOfIntegers = Type.rawType( List.class ).parametized(
-				Type.rawType( Class.class ).parametized( Integer.class ) );
-		Type<Class> classOfNumbers = Type.rawType( Class.class ).parametized( Number.class );
-		Type<List> listOfClassesOfNumbers = Type.rawType( List.class ).parametized( classOfNumbers );
+		Type<List> listOfClassesOfIntegers = Type.raw( List.class ).parametized(
+				Type.raw( Class.class ).parametized( Integer.class ) );
+		Type<Class> classOfNumbers = Type.raw( Class.class ).parametized( Number.class );
+		Type<List> listOfClassesOfNumbers = Type.raw( List.class ).parametized( classOfNumbers );
 		assertFalse( listOfClassesOfIntegers.isAssignableTo( listOfClassesOfNumbers ) );
 		assertFalse( listOfClassesOfIntegers.isAssignableTo( listOfClassesOfNumbers.parametizedAsLowerBounds() ) );
 		Type<List> listOfExtendsClassesOfExtendsNumbers = listOfClassesOfNumbers.parametized( classOfNumbers.asLowerBound().parametizedAsLowerBounds() );
@@ -68,41 +68,41 @@ public class TestType {
 
 	@Test
 	public void testGenericArrays() {
-		Type<Class[]> classArray = Type.rawType( Class[].class ).parametized( String.class );
+		Type<Class[]> classArray = Type.raw( Class[].class ).parametized( String.class );
 		assertThat( classArray.getElementType().toString(),
 				is( "java.lang.Class<java.lang.String>" ) );
 	}
 
 	@Test
 	public void shouldRecognize1DimensionalArrayTypes() {
-		Type<Number[]> t = Type.rawType( Number[].class );
+		Type<Number[]> t = Type.raw( Number[].class );
 		assertTrue( t.isUnidimensionalArray() );
 	}
 
 	@Test
 	public void shouldNotRecognizeMultiDimensionalArrayTypesAsArray1D() {
-		Type<Number[][]> t = Type.rawType( Number[][].class );
+		Type<Number[][]> t = Type.raw( Number[][].class );
 		assertFalse( t.isUnidimensionalArray() );
 	}
 
 	@Test
 	public void testMorePreciseThan() {
-		Type<Integer> integer = Type.rawType( Integer.class );
-		Type<Number> number = Type.rawType( Number.class );
+		Type<Integer> integer = Type.raw( Integer.class );
+		Type<Number> number = Type.raw( Number.class );
 		assertMorePrecise( integer, number );
 	}
 
 	@Test
 	public void testMorePreciseThanLowerBound() {
-		Type<Integer> integer = Type.rawType( Integer.class );
-		Type<? extends Integer> integerLower = Type.rawType( Integer.class ).asLowerBound();
+		Type<Integer> integer = Type.raw( Integer.class );
+		Type<? extends Integer> integerLower = Type.raw( Integer.class ).asLowerBound();
 		assertMorePrecise( integer, integerLower );
 	}
 
 	@Test
 	public void testMorePreciseThanIndependend() {
-		Type<Integer> integer = Type.rawType( Integer.class );
-		Type<String> string = Type.rawType( String.class );
+		Type<Integer> integer = Type.raw( Integer.class );
+		Type<String> string = Type.raw( String.class );
 		assertTrue( integer.morePreciseThan( string ) );
 		assertTrue( string.morePreciseThan( integer ) );
 		//OPEN maybe this should eval to false both times ?
@@ -115,30 +115,30 @@ public class TestType {
 
 	@Test
 	public void testMorePreciseThanWithGenerics() {
-		Type<List> integer = Type.rawType( List.class ).parametized( Integer.class );
-		Type<List> number = Type.rawType( List.class ).parametized( Number.class );
+		Type<List> integer = Type.raw( List.class ).parametized( Integer.class );
+		Type<List> number = Type.raw( List.class ).parametized( Number.class );
 		assertMorePrecise( integer, number );
 	}
 
 	@Test
 	public void testMorePreciseThanWithGenericsAndWithout() {
-		Type<List> integer = Type.rawType( List.class ).parametized( Integer.class );
-		Type<List> wildcardList = Type.rawType( List.class );
+		Type<List> integer = Type.raw( List.class ).parametized( Integer.class );
+		Type<List> wildcardList = Type.raw( List.class );
 		assertMorePrecise( integer, wildcardList );
 	}
 
 	@Test
 	public void testMorePreciseThanWithWildcardGenerics() {
-		Type<List> integer = Type.rawType( List.class ).parametized( Integer.class );
-		Type<List> wildcardInteger = Type.rawType( List.class ).parametized( Integer.class ).parametizedAsLowerBounds();
+		Type<List> integer = Type.raw( List.class ).parametized( Integer.class );
+		Type<List> wildcardInteger = Type.raw( List.class ).parametized( Integer.class ).parametizedAsLowerBounds();
 		assertMorePrecise( integer, wildcardInteger );
 	}
 
 	@Test
 	public void testMorePreciseThanWithSubclassAndGenerics() {
-		Type<ArrayList> arrayListOfIntegers = Type.rawType( ArrayList.class ).parametized(
+		Type<ArrayList> arrayListOfIntegers = Type.raw( ArrayList.class ).parametized(
 				Integer.class );
-		Type<List> listOfIntegers = Type.rawType( List.class ).parametized( Integer.class );
+		Type<List> listOfIntegers = Type.raw( List.class ).parametized( Integer.class );
 		assertMorePrecise( arrayListOfIntegers, listOfIntegers );
 		//TODO this actually works because List and ArrayList just have the same geneic but if the subclass uses another index we will compare the wrong thing right now
 	}
@@ -146,14 +146,14 @@ public class TestType {
 	@Test
 	@Ignore
 	public void testAsSupertype() {
-		Type<ArrayList> listOfStrings = Type.rawType( ArrayList.class ).parametized( String.class );
+		Type<ArrayList> listOfStrings = Type.raw( ArrayList.class ).parametized( String.class );
 		assertThat( listOfStrings.asSupertype( List.class ).toString(),
 				is( "java.util.List<java.lang.String>" ) );
 	}
 
 	@Test
 	public void testArrayType() {
-		Type<? extends Number> t = Type.rawType( Number.class ).asLowerBound();
+		Type<? extends Number> t = Type.raw( Number.class ).asLowerBound();
 		assertThat( t.getArrayType().toString(), is( "? extends java.lang.Number[]" ) );
 	}
 }

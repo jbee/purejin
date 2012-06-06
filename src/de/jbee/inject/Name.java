@@ -6,7 +6,8 @@ package de.jbee.inject;
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
-public final class Name {
+public final class Name
+		implements Preciser<Name> {
 
 	public static final Name DEFAULT = new Name( "" );
 	public static final Name ANY = new Name( "*" );
@@ -55,11 +56,18 @@ public final class Name {
 		return value.equals( ANY.value );
 	}
 
+	public boolean isDefault() {
+		return value.isEmpty();
+	}
+
+	@Override
 	public boolean morePreciseThan( Name other ) {
-		if ( ( !isAny() && other.isAny() ) || value.startsWith( other.value ) ) {
+		if ( ( !isAny() && other.isAny() ) || !isDefault() && other.isDefault()
+				|| value.startsWith( other.value ) ) {
 			return true;
 		}
-		return false;
+		//TODO or names
+		return other.value.isEmpty();
 	}
 
 	public boolean isApplicableFor( Name other ) {
@@ -70,7 +78,8 @@ public final class Name {
 				}
 			}
 		}
-		return other.value.equalsIgnoreCase( value ) || other.value.equals( ANY.value )
+		return isAny() || other.value.equalsIgnoreCase( value )
 				|| value.matches( other.value.replace( "*", ".*" ) );
 	}
+
 }

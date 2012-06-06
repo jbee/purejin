@@ -1,5 +1,7 @@
 package de.jbee.inject;
 
+import static de.jbee.inject.PreciserComparator.comparePrecision;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +35,14 @@ public class Injector
 
 			@Override
 			public int compare( Binding<?> one, Binding<?> other ) {
-				return one.resource().compareTo( other.resource() );
+				Resource<?> rOne = one.resource();
+				Resource<?> rOther = other.resource();
+				Class<?> rawOne = rOne.getType().getRawType();
+				Class<?> rawOther = rOther.getType().getRawType();
+				if ( rawOne != rawOther ) {
+					return rawOne.getCanonicalName().compareTo( rawOther.getCanonicalName() );
+				}
+				return comparePrecision( rOne, rOther );
 			}
 		} );
 		final int total = bindings.length;
@@ -77,6 +86,11 @@ public class Injector
 	public <T> T resolve( Dependency<T> dependency ) {
 		// TODO more information to add to dependency ?
 		Type<T> type = dependency.getType();
+		if ( !type.isUnidimensionalArray() && type.isLowerBound() ) {
+			//TODO return best match from wildcard binds (not mapped by raw-type since it doesn't help)
+			throw new UnsupportedOperationException( "Wildcard-binds are not supported yet: "
+					+ type );
+		}
 		Injectron<T>[] injectrons = getInjectrons( type );
 		if ( injectrons != null ) {
 			for ( int i = 0; i < injectrons.length; i++ ) {
@@ -89,11 +103,12 @@ public class Injector
 		if ( type.isUnidimensionalArray() ) {
 			return resolveArray( dependency, type.getElementType() );
 		}
-		throw noInjectronFor( type );
+		//TODO support asking for Injectrons --> allows to "store" pre-resolved references
+		throw noInjectronFor( dependency );
 	}
 
-	private <T> RuntimeException noInjectronFor( Type<T> type ) {
-		return new RuntimeException( "No injectron for type: " + type );
+	private <T> RuntimeException noInjectronFor( Dependency<T> dependency ) {
+		return new RuntimeException( "No injectron for type: " + dependency );
 	}
 
 	private <T, E> T resolveArray( Dependency<T> dependency, Type<E> elementType ) {
@@ -106,7 +121,8 @@ public class Injector
 		if ( elementType.isLowerBound() ) { // wildcard bindings:
 			List<E> elements = new ArrayList<E>();
 			for ( Entry<Class<?>, Injectron<?>[]> e : injectrons.entrySet() ) {
-				if ( Type.rawType( e.getKey() ).isAssignableTo( elementType ) ) {
+				if ( Type.raw( e.getKey() ).isAssignableTo( elementType ) ) {
+					//FIXME some of the injectrons are just bridges and such - no real values - recursion causes errors here
 					addAllApplicable( elements, dependency, elementType,
 							(Injectron<? extends E>[]) e.getValue() );
 				}

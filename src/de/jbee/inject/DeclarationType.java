@@ -1,6 +1,7 @@
 package de.jbee.inject;
 
-public enum DeclarationType {
+public enum DeclarationType
+		implements Preciser<DeclarationType> {
 
 	/**
 	 * Has been added by the binder as a fallback since some bind-calls can have ambiguous
@@ -19,6 +20,11 @@ public enum DeclarationType {
 	/**
 	 * The bind has been made explicitly by a module (should be a unique {@link Resource})
 	 */
-	EXPLICIT
+	EXPLICIT;
+
+	@Override
+	public boolean morePreciseThan( DeclarationType other ) {
+		return ordinal() > other.ordinal();
+	}
 
 }

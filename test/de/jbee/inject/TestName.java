@@ -36,4 +36,9 @@ public class TestName {
 	public void defaultShouldBeApplicableToAnyName() {
 		assertTrue( Name.DEFAULT.isApplicableFor( Name.ANY ) );
 	}
+
+	@Test
+	public void anyShouldBeApplicableToWhateverName() {
+		assertTrue( Name.ANY.isApplicableFor( named( "foo" ) ) );
+	}
 }

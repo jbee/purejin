@@ -2,7 +2,7 @@ package de.jbee.inject.util;
 
 import org.junit.Test;
 
-import de.jbee.inject.BindInstructor;
+import de.jbee.inject.BindDeclarator;
 import de.jbee.inject.Module;
 import de.jbee.inject.Name;
 import de.jbee.inject.Resource;
@@ -14,10 +14,10 @@ import de.jbee.inject.util.Binder.RootBinder;
 
 public class TestRichBinder {
 
-	static final BindInstructor BINDER = new ToStringBinder();
+	static final BindDeclarator BINDER = new ToStringBinder();
 
 	static class ToStringBinder
-			implements BindInstructor {
+			implements BindDeclarator {
 
 		@Override
 		public <T> void bind( Resource<T> resource, Supplier<? extends T> supplier, Scope scope,

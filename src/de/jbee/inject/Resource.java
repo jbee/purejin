@@ -8,7 +8,7 @@ package de.jbee.inject;
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
 public final class Resource<T>
-		implements Typed<T>, Named, Comparable<Resource<?>> {
+		implements Typed<T>, Named, Preciser<Resource<T>> {
 
 	private final Instance<T> instance;
 	private final Availability availability;
@@ -55,18 +55,12 @@ public final class Resource<T>
 		return instance.getType();
 	}
 
-	public boolean morePreciseThan( Resource<T> other ) {
-		return compareTo( other ) == 1;
-	}
-
 	@Override
-	public int compareTo( Resource<?> other ) {
-		// check type
-
-		// check location (package)
-
-		// check discriminator
-		return 0;
+	public boolean morePreciseThan( Resource<T> other ) {
+		// the sequence in OR is very important here!!!
+		return getType().morePreciseThan( other.getType() )
+				|| availability.morePreciseThan( other.availability )
+				|| getName().morePreciseThan( other.getName() );
 	}
 
 	@Override

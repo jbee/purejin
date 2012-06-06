@@ -1,6 +1,7 @@
 package de.jbee.inject;
 
-public class Availability {
+public class Availability
+		implements Preciser<Availability> {
 
 	public static final Availability EVERYWHERE = availability( Instance.ANY );
 
@@ -30,10 +31,19 @@ public class Availability {
 
 	@Override
 	public String toString() {
+		if ( target.isAny() && path.isEmpty() && depth < 0 ) {
+			return "everywhere";
+		}
 		return "[" + path + "-" + depth + "-" + target + "]";
 	}
 
 	public Availability within( String path ) {
 		return new Availability( target, path, depth );
+	}
+
+	@Override
+	public boolean morePreciseThan( Availability other ) {
+		// TODO Auto-generated method stub
+		return true;
 	}
 }

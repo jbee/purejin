@@ -5,7 +5,8 @@ package de.jbee.inject;
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
-public final class Source {
+public final class Source
+		implements Preciser<Source> {
 
 	public static Source source( Class<? extends Module> module ) {
 		return new Source( module, DeclarationType.EXPLICIT );
@@ -41,5 +42,10 @@ public final class Source {
 
 	public Source multi() {
 		return new Source( module, DeclarationType.MULTI );
+	}
+
+	@Override
+	public boolean morePreciseThan( Source other ) {
+		return declarationType.morePreciseThan( other.declarationType );
 	}
 }

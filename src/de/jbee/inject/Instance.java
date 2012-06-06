@@ -15,7 +15,7 @@ public final class Instance<T>
 	 * binds of matching types. There is also a set of wildcard binds that are tried if no bind has
 	 * been made for a type.
 	 */
-	public static final Instance<? extends Object> ANY = anyOf( Type.rawType( Object.class ).asLowerBound() );
+	public static final Instance<? extends Object> ANY = anyOf( Type.raw( Object.class ).asLowerBound() );
 
 	public static <T> Instance<T> defaultInstanceOf( Type<T> type ) {
 		return instance( Name.DEFAULT, type );
@@ -64,5 +64,9 @@ public final class Instance<T>
 	@Override
 	public String toString() {
 		return name + " " + type;
+	}
+
+	public boolean isAny() {
+		return name.isAny() && type.equalTo( ANY.type );
 	}
 }
