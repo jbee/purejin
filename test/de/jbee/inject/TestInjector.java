@@ -8,6 +8,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -47,11 +48,22 @@ public class TestInjector {
 
 	@Test
 	public void test() {
+		assertResolvedTo( new String[] { "foobar" }, raw( String[].class ) );
+		assertResolvedTo( "bar", raw( CharSequence.class ) );
+		List<String> list = Arrays.asList( new String[] { "foobar" } );
+		assertResolvedTo( list, raw( List.class ).parametized( String.class ) );
+		assertResolvedTo( Arrays.asList( new Integer[] { 846, 42 } ),
+				raw( List.class ).parametized( Integer.class ) );
+		assertResolvedTo( Arrays.asList( new Number[] { 846, 42, 42.0f } ),
+				raw( List.class ).parametized( Number.class ).parametizedAsLowerBounds() );
+		List<List<String>> listList = new LinkedList<List<String>>();
+		listList.add( list );
+		assertResolvedTo( listList, raw( List.class ).parametized(
+				Type.raw( List.class ).parametized( String.class ) ) );
+	}
 
-		System.out.println( Arrays.toString( injector.resolve( Dependency.dependency( Type.raw( String[].class ) ) ) ) );
-		System.out.println( injector.resolve( Dependency.dependency( Type.raw( CharSequence.class ) ) ) );
-		System.out.println( injector.resolve( Dependency.dependency( Type.raw( List.class ).parametized(
-				String.class ) ) ) );
+	@Test
+	public void testProvider() {
 		Provider<List<String>> p2 = injector.resolve( Dependency.dependency( Type.raw(
 				Provider.class ).parametized( Type.raw( List.class ).parametized( String.class ) ) ) );
 		System.out.println( p2.yield() );
@@ -59,20 +71,10 @@ public class TestInjector {
 		Provider<Set<String>> p3 = injector.resolve( Dependency.dependency( Type.raw(
 				Provider.class ).parametized( Type.raw( Set.class ).parametized( String.class ) ) ) );
 		System.out.println( p3.toString() + " = " + p3.yield() );
+	}
 
-		System.out.println( injector.resolve( Dependency.dependency( Type.raw( List.class ).parametized(
-				Integer.class ) ) ) );
-
-		System.out.println( injector.resolve( Dependency.dependency( Type.raw( List.class ).parametized(
-				Number.class ).parametizedAsLowerBounds() ) ) );
-
-		List<List<String>> lls = injector.resolve( Dependency.dependency( Type.raw( List.class ).parametized(
-				Type.raw( List.class ).parametized( String.class ) ) ) );
-		System.out.println( lls );
-
-		System.out.println( injector.resolve( Dependency.dependency( Type.raw( Integer.class ) ).named(
-				"foo" ) ) );
-
+	@Test
+	public void testMissingFeature() {
 		injector.resolve( Dependency.dependency( Type.raw( Number.class ).asLowerBound() ).named(
 				"foo" ) );
 	}
