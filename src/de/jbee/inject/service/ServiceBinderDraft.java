@@ -1,5 +1,7 @@
 package de.jbee.inject.service;
 
+import de.jbee.inject.Type;
+
 public interface ServiceBinderDraft {
 
 	interface Binder {
@@ -41,7 +43,12 @@ public interface ServiceBinderDraft {
 
 	interface ServiceFactory<S> {
 
-		<R, T> S wrap( Service<R, T> service, Class<R> returnType, Class<T> parameterType );
+		/**
+		 * Wraps the given service in a object S that is a 'service' as well but the class is not
+		 * part of the DI framework. Therbey it is possible to use a won service-interface but also
+		 * make use of all the build in functionality operation of the {@link Service}-interface.
+		 */
+		<R, T> S decouple( Service<R, T> service, Type<R> returnType, Type<T> parameterType );
 	}
 
 	interface Service<R, T> {
@@ -56,8 +63,8 @@ public interface ServiceBinderDraft {
 			implements ServiceFactory<MyService<?, ?>> {
 
 		@Override
-		public <R, T> MyService<R, T> wrap( Service<R, T> service, Class<R> returnType,
-				Class<T> parameterType ) {
+		public <R, T> MyService<R, T> decouple( Service<R, T> service, Type<R> returnType,
+				Type<T> parameterType ) {
 			// TODO Auto-generated method stub
 			return null;
 		}

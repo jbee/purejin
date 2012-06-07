@@ -3,15 +3,17 @@ package de.jbee.inject.service;
 import static de.jbee.inject.Name.named;
 import static de.jbee.inject.Source.source;
 import static de.jbee.inject.Type.parameterTypes;
+import static de.jbee.inject.Type.returnType;
 
 import java.lang.reflect.Method;
 
-import de.jbee.inject.SimpleBinder;
 import de.jbee.inject.BindDeclarator;
 import de.jbee.inject.Dependency;
 import de.jbee.inject.DependencyResolver;
 import de.jbee.inject.Module;
+import de.jbee.inject.Name;
 import de.jbee.inject.Scoped;
+import de.jbee.inject.SimpleBinder;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.Type;
 import de.jbee.inject.util.Binder;
@@ -42,6 +44,8 @@ public abstract class ServiceModule
 			throw new IllegalStateException( "Reentrance not allowed!" );
 		}
 		binder = Binder.create( instructor, source( getClass() ) );
+
+		new ServiceCoreModule().configure( instructor );
 		//TODO extends ServiceCoreModule
 		configure();
 	}
@@ -62,41 +66,86 @@ public abstract class ServiceModule
 	static class ServiceSupplier
 			implements Supplier<Service<?, ?>> {
 
+		private Class<?>[] serviceTypes;
+
 		@Override
 		public Service<?, ?> supply( Dependency<? super Service<?, ?>> dependency,
 				DependencyResolver context ) {
-			//Class<?>[] serviceTypes = context.resolve( dependency )
-			// TODO find method matching dependency and return new ServiceMethod
+			if ( serviceTypes == null ) {
+				resolveServiceTypes( context );
+			}
+			Method service = resolveServiceMethod( dependency );
+			Type<?>[] parameters = dependency.getType().getParameters();
+			return newServiceMethod( service, parameters[0].getRawType(),
+					parameters[1].getRawType(), context );
+		}
+
+		private <P, T> Service<P, T> newServiceMethod( Method service, Class<P> parameterType,
+				Class<T> returnType, DependencyResolver context ) {
+			try {
+				return new ServiceMethod<P, T>( service.getDeclaringClass().newInstance(), service,
+						parameterType, returnType, context );
+			} catch ( Exception e ) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+
+		private <P, T> Method resolveServiceMethod( Dependency<? super Service<P, T>> dependency ) {
+			Type<?> paramType = dependency.getType().getParameters()[0];
+			Type<?> returnType = dependency.getType().getParameters()[1];
+			for ( Class<?> st : serviceTypes ) {
+				for ( Method sm : st.getDeclaredMethods() ) {
+					Type<?> rt = returnType( sm );
+					if ( rt.equalTo( returnType ) ) {
+						for ( Type<?> pt : parameterTypes( sm ) ) {
+							if ( pt.equalTo( paramType ) ) {
+								return sm;
+							}
+						}
+					}
+				}
+			}
 			return null;
 		}
+
+		private synchronized void resolveServiceTypes( DependencyResolver context ) {
+			if ( serviceTypes == null ) {
+				Dependency<Class[]> serviceClassesDependency = Dependency.dependency(
+						Type.raw( Class[].class ).parametized( Object.class ).parametizedAsLowerBounds() ).named(
+						Name.prefixed( SERVICE_NAME_PREFIX ) );
+				serviceTypes = context.resolve( serviceClassesDependency );
+			}
+		}
+
 	}
 
 	static class ServiceMethod<P, T>
 			implements Service<P, T> {
 
-		private final Class<?> declaredIn;
+		private final Object object;
 		private final Method method;
 		private final Class<P> parameterType;
 		private final Class<T> returnType;
 		private final DependencyResolver context;
 		private final Type<?>[] parameterTypes;
 
-		ServiceMethod( Class<?> declaredIn, Method method, Class<P> parameterType,
-				Class<T> returnType, DependencyResolver context ) {
+		ServiceMethod( Object object, Method service, Class<P> parameterType, Class<T> returnType,
+				DependencyResolver context ) {
 			super();
-			this.declaredIn = declaredIn;
-			this.method = method;
+			this.object = object;
+			this.method = service;
 			this.parameterType = parameterType;
 			this.returnType = returnType;
 			this.context = context;
-			this.parameterTypes = parameterTypes( method );
+			this.parameterTypes = parameterTypes( service );
 		}
 
 		@Override
 		public T invoke( P params ) {
 			Object[] args = actualArguments( params );
 			try {
-				return returnType.cast( method.invoke( declaredIn, args ) );
+				return returnType.cast( method.invoke( object, args ) );
 			} catch ( Exception e ) {
 				throw new RuntimeException( "Failed to invoke service", e );
 			}
