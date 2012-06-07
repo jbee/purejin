@@ -1,6 +1,7 @@
 package de.jbee.inject;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -21,9 +22,17 @@ public final class Type<T>
 		return type( method.getReturnType(), method.getGenericReturnType() );
 	}
 
+	public static Type<?>[] parameterTypes( Constructor<?> constructor ) {
+		return parameterTypes( constructor.getParameterTypes(),
+				constructor.getGenericParameterTypes() );
+	}
+
 	public static Type<?>[] parameterTypes( Method method ) {
-		Class<?>[] parameterTypes = method.getParameterTypes();
-		java.lang.reflect.Type[] genericParameterTypes = method.getGenericParameterTypes();
+		return parameterTypes( method.getParameterTypes(), method.getGenericParameterTypes() );
+	}
+
+	private static Type<?>[] parameterTypes( Class<?>[] parameterTypes,
+			java.lang.reflect.Type[] genericParameterTypes ) {
 		Type<?>[] res = new Type<?>[parameterTypes.length];
 		for ( int i = 0; i < res.length; i++ ) {
 			res[i] = type( parameterTypes[i], genericParameterTypes[i] );

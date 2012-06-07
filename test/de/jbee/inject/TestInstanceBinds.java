@@ -20,7 +20,7 @@ import org.junit.Test;
 
 import de.jbee.inject.util.PackageModule;
 
-public class TestInjector {
+public class TestInstanceBinds {
 
 	static class TestModule
 			extends PackageModule {

@@ -1,6 +1,7 @@
 package de.jbee.inject;
 
-import java.lang.annotation.Annotation;
+import static de.jbee.inject.Dependency.dependency;
+
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class Suppliers {
 
 	public static <T> Injectable<T> asInjectable( Supplier<? extends T> supplier,
 			DependencyResolver context ) {
-		return new InjectableSupplier<T>( supplier, context );
+		return new SupplierToInjectable<T>( supplier, context );
 	}
 
 	private static abstract class ArrayBridgeSupplier<T>
@@ -62,8 +63,6 @@ public class Suppliers {
 	 * 
 	 * Basically we just resolve the array of the element type (generic of the list). Arrays itself
 	 * have build in support that will (if not redefined by a more precise binding) return all known
-	 * 
-	 * TODO extract a abstract {@link Supplier} for 1 argument generic type's
 	 * 
 	 * @author Jan Bernitt (jan.bernitt@gmx.de)
 	 * 
@@ -118,13 +117,13 @@ public class Suppliers {
 
 	}
 
-	private static final class ArraySupplier<T>
+	private static final class MultiArraySupplier<T>
 			implements Supplier<T[]> {
 
 		private final Class<T[]> type;
 		private final Supplier<? extends T>[] elements;
 
-		ArraySupplier( Class<T[]> type, Supplier<? extends T>[] elements ) {
+		MultiArraySupplier( Class<T[]> type, Supplier<? extends T>[] elements ) {
 			super();
 			this.type = type;
 			this.elements = elements;
@@ -155,9 +154,8 @@ public class Suppliers {
 
 		@Override
 		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
-			// TODO ? add more information from the dependency ? 
-			Dependency<T> typeDependency = null; //FIXME merge type and dependency 
-			return context.resolve( typeDependency );
+			//OPEN is it correct to keep name from dependency ?
+			return context.resolve( dependency.typed( type ) );
 		}
 
 		@Override
@@ -250,17 +248,7 @@ public class Suppliers {
 		private final Object[] args;
 
 		ConstructorSupplier( Constructor<T> constructor ) {
-			this( constructor, instances( constructor ) );
-		}
-
-		private static <T> Object[] instances( Constructor<T> constructor ) {
-			Class<?>[] rawTypes = constructor.getParameterTypes();
-			java.lang.reflect.Type[] types = constructor.getGenericParameterTypes();
-			Object[] values = new Object[types.length];
-			for ( int i = 0; i < types.length; i++ ) {
-				values[i] = Dependency.dependency( Type.type( rawTypes[i], types[i] ) );
-			}
-			return values;
+			this( constructor, dependencies( constructor ) );
 		}
 
 		ConstructorSupplier( Constructor<T> constructor, Object[] args ) {
@@ -269,38 +257,46 @@ public class Suppliers {
 			this.args = args;
 		}
 
+		private static <T> Object[] dependencies( Constructor<T> constructor ) {
+			Type<?>[] types = Type.parameterTypes( constructor );
+			Object[] values = new Object[types.length];
+			for ( int i = 0; i < types.length; i++ ) {
+				values[i] = dependency( types[i] );
+			}
+			return values;
+		}
+
 		// in a validate we have to check that the arguments 
 
 		@Override
 		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
 			java.lang.reflect.Type[] types = constructor.getGenericParameterTypes();
 			Class<?>[] rawTypes = constructor.getParameterTypes();
-			Annotation[][] annotations = constructor.getParameterAnnotations();
-			Object[] dependencies = new Object[types.length];
+			Object[] resolvedArgs = new Object[types.length];
 			for ( int i = 0; i < types.length; i++ ) {
-				if ( args[i] instanceof Dependency<?>
-						&& !Dependency.class.isAssignableFrom( rawTypes[i] ) ) {
-					Dependency<?> argDependency = (Dependency<?>) args[i]; //OPEN what about the dependency given ?
-					dependencies[i] = context.resolve( argDependency );
+				if ( args[i] instanceof Dependency<?> && rawTypes[i] != Dependency.class ) {
+					//OPEN annotations from constructor could be transformed into names for the arguments ?!
+					Dependency<?> argDependency = (Dependency<?>) args[i];
+					resolvedArgs[i] = context.resolve( argDependency );
 				} else {
-					dependencies[i] = args[i];
+					resolvedArgs[i] = args[i];
 				}
 			}
 			try {
-				return constructor.newInstance( dependencies );
+				return constructor.newInstance( resolvedArgs );
 			} catch ( Exception e ) {
 				throw new RuntimeException( e );
 			}
 		}
 	}
 
-	private static class InjectableSupplier<T>
+	private static class SupplierToInjectable<T>
 			implements Injectable<T> {
 
 		private final Supplier<? extends T> supplier;
 		private final DependencyResolver context;
 
-		InjectableSupplier( Supplier<? extends T> supplier, DependencyResolver context ) {
+		SupplierToInjectable( Supplier<? extends T> supplier, DependencyResolver context ) {
 			super();
 			this.supplier = supplier;
 			this.context = context;
