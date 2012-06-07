@@ -31,7 +31,7 @@ public abstract class ServiceModule
 
 	private static final String SERVICE_NAME_PREFIX = "Service-";
 
-	protected final void bindService( Class<?> service ) {
+	protected final void bindServices( Class<?> service ) {
 		String name = SERVICE_NAME_PREFIX + service.getCanonicalName();
 		binder.multibind( named( name ), Class.class ).to( service );
 	}
@@ -159,7 +159,7 @@ public abstract class ServiceModule
 					args[i] = params;
 				} else {
 					// TODO add information from method (like annotations ?)
-					context.resolve( Dependency.dependency( paramType ) );
+					args[i] = context.resolve( Dependency.dependency( paramType ) );
 				}
 			}
 			return args;

@@ -16,15 +16,19 @@ public class TestServiceBinds {
 
 		@Override
 		protected void configure() {
-			bindService( SomeTestService.class );
+			bindServices( SomeTestService.class );
 		}
 
 	}
 
 	public static class SomeTestService {
 
-		public Integer mul2( Integer value ) {
-			return value * 2;
+		public Integer mul2( Integer value, Service<Float, Integer> service ) {
+			return value * 2 + service.invoke( 2.8f );
+		}
+
+		public Integer round( Float value ) {
+			return Math.round( value );
 		}
 	}
 
@@ -35,6 +39,6 @@ public class TestServiceBinds {
 				Integer.class, Integer.class ) );
 		Service<Integer, Integer> service = injector.resolve( dependency );
 		assertNotNull( service );
-		assertThat( service.invoke( 3 ), is( 6 ) );
+		assertThat( service.invoke( 3 ), is( 9 ) );
 	}
 }
