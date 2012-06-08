@@ -29,6 +29,10 @@ public class Suppliers {
 		return new InstanceSupplier<T>( instance );
 	}
 
+	public static <T> Supplier<T> link( Class<? extends Supplier<? extends T>> type ) {
+		return new LinkSupplier<T>( type );
+	}
+
 	public static <T> Supplier<T> type( Class<T> type ) {
 		return type( Type.raw( type ) );
 	}
@@ -148,6 +152,23 @@ public class Suppliers {
 			return res;
 		}
 
+	}
+
+	private static final class LinkSupplier<T>
+			implements Supplier<T> {
+
+		private final Class<? extends Supplier<? extends T>> type;
+
+		LinkSupplier( Class<? extends Supplier<? extends T>> type ) {
+			super();
+			this.type = type;
+		}
+
+		@Override
+		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
+			final Supplier<? extends T> supplier = context.resolve( dependency.typed( Type.raw( type ) ) );
+			return supplier.supply( dependency, context );
+		}
 	}
 
 	private static final class TypeSupplier<T>

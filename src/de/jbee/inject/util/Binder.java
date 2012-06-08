@@ -256,9 +256,8 @@ public class Binder
 			to( Suppliers.instance( instance ) );
 		}
 
-		@SuppressWarnings ( "unchecked" )
 		public <I extends Supplier<? extends T>> void toSupplier( Class<I> implementation ) {
-			to( (Supplier<? extends T>) Suppliers.type( implementation ) );
+			to( Suppliers.link( implementation ) );
 			try {
 				binder.implicit().bind( implementation ).to( implementation.newInstance() );
 			} catch ( Exception e ) {
