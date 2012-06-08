@@ -13,7 +13,6 @@ import java.util.Set;
 public class Suppliers {
 
 	public static final Supplier<Provider<?>> PROVIDER = new ProviderSupplier();
-
 	public static final Supplier<List<?>> LIST_BRIDGE = new ArrayToListBridgeSupplier();
 	public static final Supplier<Set<?>> SET_BRIDGE = new ArrayToSetBridgeSupplier();
 
@@ -129,13 +128,19 @@ public class Suppliers {
 
 	}
 
-	private static final class MultiArraySupplier<T>
+	/**
+	 * A {@link Supplier} uses multiple different separate suppliers to provide the elements of a
+	 * array of the supplied type.
+	 * 
+	 * @author Jan Bernitt (jan.bernitt@gmx.de)
+	 */
+	private static final class MultiSupplier<T>
 			implements Supplier<T[]> {
 
 		private final Class<T[]> type;
 		private final Supplier<? extends T>[] elements;
 
-		MultiArraySupplier( Class<T[]> type, Supplier<? extends T>[] elements ) {
+		MultiSupplier( Class<T[]> type, Supplier<? extends T>[] elements ) {
 			super();
 			this.type = type;
 			this.elements = elements;
@@ -145,9 +150,10 @@ public class Suppliers {
 		public T[] supply( Dependency<? super T[]> dependency, DependencyResolver context ) {
 			T[] res = (T[]) Array.newInstance( type.getComponentType(), elements.length );
 			int i = 0;
+			final Dependency<T> elementDependency = (Dependency<T>) dependency.typed( Type.raw(
+					type ).getElementType() );
 			for ( Supplier<? extends T> e : elements ) {
-				//TODO The element type is the dependency
-				res[i++] = e.supply( null, context );
+				res[i++] = e.supply( elementDependency, context );
 			}
 			return res;
 		}
@@ -224,17 +230,17 @@ public class Suppliers {
 		}
 
 		private <T> Provider<T> newProvider( Dependency<T> dependency, DependencyResolver context ) {
-			return new DynamicProvider<T>( dependency, context );
+			return new LazyResolvedDependencyProvider<T>( dependency, context );
 		}
 	}
 
-	private static final class DynamicProvider<T>
+	private static final class LazyResolvedDependencyProvider<T>
 			implements Provider<T> {
 
 		private final Dependency<T> dependency;
 		private final DependencyResolver resolver;
 
-		DynamicProvider( Dependency<T> dependency, DependencyResolver resolver ) {
+		LazyResolvedDependencyProvider( Dependency<T> dependency, DependencyResolver resolver ) {
 			super();
 			this.dependency = dependency;
 			this.resolver = resolver;

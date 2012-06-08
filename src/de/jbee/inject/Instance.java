@@ -8,7 +8,7 @@ package de.jbee.inject;
  * 
  */
 public final class Instance<T>
-		implements Typed<T>, Named {
+		implements Typed<T>, Named, PreciserThan<Instance<?>> {
 
 	/**
 	 * When a wildcard-type is used as bound instance type the bind will be added to all concrete
@@ -39,8 +39,7 @@ public final class Instance<T>
 	}
 
 	public boolean equalTo( Instance<T> other ) {
-
-		return true;
+		return type.equalTo( other.type ) && name.equals( other.name );
 	}
 
 	public Instance<T> discriminableBy( Name name ) {
@@ -68,5 +67,11 @@ public final class Instance<T>
 
 	public boolean isAny() {
 		return name.isAny() && type.equalTo( ANY.type );
+	}
+
+	@Override
+	public boolean morePreciseThan( Instance<?> other ) {
+		// sequence in OR is very important!!!
+		return type.morePreciseThan( other.type ) || name.morePreciseThan( other.name );
 	}
 }

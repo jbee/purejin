@@ -25,13 +25,13 @@ public class Availability
 	}
 
 	public boolean isApplicableFor( Dependency<?> dependency ) {
-
+		// TODO Auto-generated method stub
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		if ( target.isAny() && path.isEmpty() && depth < 0 ) {
+		if ( target.isAny() && isGlobal() && depth < 0 ) {
 			return "everywhere";
 		}
 		return "[" + path + "-" + depth + "-" + target + "]";
@@ -41,9 +41,30 @@ public class Availability
 		return new Availability( target, path, depth );
 	}
 
+	public boolean isTrageted() {
+		return !target.isAny();
+	}
+
+	public boolean isLocal() {
+		return !isGlobal();
+	}
+
+	private boolean isGlobal() {
+		return path.isEmpty();
+	}
+
 	@Override
 	public boolean morePreciseThan( Availability other ) {
-		// TODO Auto-generated method stub
-		return true;
+		if ( isLocal() && other.isGlobal() ) {
+			return true;
+		}
+		if ( other.isLocal() && isGlobal() ) {
+			return false;
+		}
+		//FIXME what about the case that path is a subpackage of other package or other way around ? ---> if they are excluding each other both are equal
+		if ( isLocal() && other.isLocal() && depth != other.depth ) {
+			return depth < other.depth;
+		}
+		return target.morePreciseThan( other.target );
 	}
 }
