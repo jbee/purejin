@@ -17,6 +17,7 @@ public class TestServiceBinds {
 		@Override
 		protected void configure() {
 			bindServices( SomeTestService.class );
+			bindServices( AnotherTestService.class );
 		}
 
 	}
@@ -32,6 +33,13 @@ public class TestServiceBinds {
 		}
 	}
 
+	public static class AnotherTestService {
+
+		public Integer negate( Number value ) {
+			return -value.intValue();
+		}
+	}
+
 	@Test
 	public void test() {
 		Injector injector = Injector.create( new ServiceBindsModule(), new BuildinModuleBinder() );
@@ -40,5 +48,10 @@ public class TestServiceBinds {
 		Service<Integer, Integer> service = injector.resolve( dependency );
 		assertNotNull( service );
 		assertThat( service.invoke( 3 ), is( 9 ) );
+		Dependency<Service> dependency2 = Dependency.dependency( Type.raw( Service.class ).parametized(
+				Number.class, Integer.class ) );
+		Service<Number, Integer> negate = injector.resolve( dependency2 );
+		assertNotNull( service );
+		assertThat( negate.invoke( 3 ), is( -3 ) );
 	}
 }

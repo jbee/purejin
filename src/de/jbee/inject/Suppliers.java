@@ -29,8 +29,16 @@ public class Suppliers {
 		return new InstanceSupplier<T>( instance );
 	}
 
+	public static <T> Supplier<T> type( Class<T> type ) {
+		return type( Type.raw( type ) );
+	}
+
 	public static <T> Supplier<T> type( Type<T> type ) {
 		return new TypeSupplier<T>( type );
+	}
+
+	public static <T> Supplier<T> costructor( Constructor<T> constructor ) {
+		return new ConstructorSupplier<T>( constructor );
 	}
 
 	public static <T> Injectable<T> asInjectable( Supplier<? extends T> supplier,
@@ -145,9 +153,9 @@ public class Suppliers {
 	private static final class TypeSupplier<T>
 			implements Supplier<T> {
 
-		private final Type<T> type;
+		private final Type<? extends T> type;
 
-		TypeSupplier( Type<T> type ) {
+		TypeSupplier( Type<? extends T> type ) {
 			super();
 			this.type = type;
 		}

@@ -5,6 +5,9 @@ import static de.jbee.inject.Instance.instance;
 import static de.jbee.inject.Suppliers.asSupplier;
 import static de.jbee.inject.Type.instanceType;
 import static de.jbee.inject.Type.raw;
+
+import java.lang.reflect.Constructor;
+
 import de.jbee.inject.Availability;
 import de.jbee.inject.BindDeclarator;
 import de.jbee.inject.Instance;
@@ -21,18 +24,40 @@ import de.jbee.inject.Type;
 public class Binder
 		implements BasicBinder {
 
+	static class SimpleBindStrategy
+			implements BindStrategy {
+
+		@Override
+		public <T> Constructor<T> defaultConstructor( Class<T> type ) {
+			try {
+				return type.getConstructor( new Class<?>[0] );
+			} catch ( Exception e ) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+
+	}
+
 	public static RootBinder create( BindDeclarator declarator, Source source ) {
-		return new RootBinder( declarator, source );
+		return create( declarator, new SimpleBindStrategy(), source );
+	}
+
+	public static RootBinder create( BindDeclarator declarator, BindStrategy strategy, Source source ) {
+		return new RootBinder( declarator, strategy, source );
 	}
 
 	private final BindDeclarator declarator;
+	private final BindStrategy strategy;
 	private final Source source;
 	private final Scope scope;
 	private final Availability availability;
 
-	Binder( BindDeclarator declarator, Source source, Scope scope, Availability availability ) {
+	Binder( BindDeclarator declarator, BindStrategy strategy, Source source, Scope scope,
+			Availability availability ) {
 		super();
 		this.declarator = declarator;
+		this.strategy = strategy;
 		this.source = source;
 		this.scope = scope;
 		this.availability = availability;
@@ -109,12 +134,24 @@ public class Binder
 		return declarator;
 	}
 
+	final BindStrategy strategy() {
+		return strategy;
+	}
+
+	final <T> void bindInternal( Resource<T> resource, Supplier<? extends T> supplier ) {
+		declarator.bind( resource, supplier, scope, source );
+	}
+
+	protected final Binder implicit() {
+		return with( source.implicit() );
+	}
+
 	protected final Binder with( Source source ) {
-		return new Binder( declarator, source, scope, availability );
+		return new Binder( declarator, strategy, source, scope, availability );
 	}
 
 	protected final Binder with( Availability availability ) {
-		return new Binder( declarator, source, scope, availability );
+		return new Binder( declarator, strategy, source, scope, availability );
 	}
 
 	public static class TypedMultiBinder<E>
@@ -138,13 +175,13 @@ public class Binder
 			extends ScopedBinder
 			implements RootBasicBinder {
 
-		RootBinder( BindDeclarator declarator, Source source ) {
-			super( declarator, source, Scoped.DEFAULT );
+		RootBinder( BindDeclarator declarator, BindStrategy strategy, Source source ) {
+			super( declarator, strategy, source, Scoped.DEFAULT );
 		}
 
 		@Override
 		public ScopedBinder in( Scope scope ) {
-			return new ScopedBinder( declarator(), source(), scope );
+			return new ScopedBinder( declarator(), strategy(), source(), scope );
 		}
 	}
 
@@ -152,8 +189,8 @@ public class Binder
 			extends TargetedBinder
 			implements ScopedBasicBinder {
 
-		ScopedBinder( BindDeclarator declarator, Source source, Scope scope ) {
-			super( declarator, source, scope );
+		ScopedBinder( BindDeclarator declarator, BindStrategy strategy, Source source, Scope scope ) {
+			super( declarator, strategy, source, scope );
 		}
 
 		// means when the type/instance is created and dependencies are injected into it
@@ -163,7 +200,7 @@ public class Binder
 
 		@Override
 		public TargetedBinder injectingInto( Instance<?> target ) {
-			return new TargetedBinder( declarator(), source(), scope(), target );
+			return new TargetedBinder( declarator(), strategy(), source(), scope(), target );
 		}
 
 	}
@@ -172,12 +209,13 @@ public class Binder
 			extends Binder
 			implements TargetedBasicBinder {
 
-		TargetedBinder( BindDeclarator declarator, Source source, Scope scope ) {
-			super( declarator, source, scope, Availability.EVERYWHERE );
+		TargetedBinder( BindDeclarator declarator, BindStrategy strategy, Source source, Scope scope ) {
+			super( declarator, strategy, source, scope, Availability.EVERYWHERE );
 		}
 
-		TargetedBinder( BindDeclarator declarator, Source source, Scope scope, Instance<?> target ) {
-			super( declarator, source, scope, Availability.availability( target ) );
+		TargetedBinder( BindDeclarator declarator, BindStrategy strategy, Source source,
+				Scope scope, Instance<?> target ) {
+			super( declarator, strategy, source, scope, Availability.availability( target ) );
 		}
 
 		//TODO improve this since from a dependency point of view it is good to localize all binds somehow
@@ -196,44 +234,50 @@ public class Binder
 		 * The binder instance who's {@link RichBasicBinder#bind(Instance)} method had been called
 		 * to get to this {@link TypedBasicBinder}.
 		 */
-		private final Binder builder;
+		private final Binder binder;
 		private final Resource<T> resource;
 
 		TypedBinder( Binder binder, Instance<T> instance ) {
 			super();
-			this.builder = binder;
+			this.binder = binder;
 			this.resource = new Resource<T>( instance, binder.availability() );
 		}
 
 		@Override
 		public void to( Supplier<? extends T> supplier ) {
-			builder.declarator().bind( resource, supplier, builder.scope(), builder.source() );
+			binder.bindInternal( resource, supplier );
+		}
+
+		public void to( Constructor<? extends T> constructor ) {
+			to( Suppliers.costructor( constructor ) );
 		}
 
 		public void to( T instance ) {
 			to( Suppliers.instance( instance ) );
 		}
 
-		public void toSupplier( Class<? extends Supplier<? extends T>> supplier ) {
+		@SuppressWarnings ( "unchecked" )
+		public <I extends Supplier<? extends T>> void toSupplier( Class<I> implementation ) {
+			to( (Supplier<? extends T>) Suppliers.type( implementation ) );
 			try {
-				to( supplier.newInstance() );
-			} catch ( InstantiationException e ) {
-				throw new RuntimeException( e );
-			} catch ( IllegalAccessException e ) {
+				binder.implicit().bind( implementation ).to( implementation.newInstance() );
+			} catch ( Exception e ) {
 				throw new RuntimeException( e );
 			}
 		}
 
 		public void to( Provider<? extends T> provider ) {
 			to( asSupplier( provider ) );
-			builder.bind( defaultInstanceOf( instanceType( Provider.class, provider ) ) ).to(
-					Suppliers.instance( provider ) ); //TODO implicit source ?
+			binder.implicit().bind( defaultInstanceOf( instanceType( Provider.class, provider ) ) ).to(
+					Suppliers.instance( provider ) );
 		}
 
-		public void to( Class<? extends T> implementation ) {
+		public <I extends T> void to( Class<I> implementation ) {
 			to( Suppliers.type( Type.raw( implementation ) ) );
-			//FIXME find best-match constructor and bind impl-class implicit to that constructor 
-			//(constructor resolution could also be made in a special supplier but I guess its better to make that a binders task) 
+			Constructor<I> constructor = binder.strategy().defaultConstructor( implementation );
+			if ( constructor != null ) {
+				binder.implicit().bind( implementation ).to( constructor );
+			}
 		}
 
 	}
