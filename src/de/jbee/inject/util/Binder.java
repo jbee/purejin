@@ -258,11 +258,7 @@ public class Binder
 
 		public <I extends Supplier<? extends T>> void toSupplier( Class<I> implementation ) {
 			to( Suppliers.link( implementation ) );
-			try {
-				binder.implicit().bind( implementation ).to( implementation.newInstance() );
-			} catch ( Exception e ) {
-				throw new RuntimeException( e );
-			}
+			implicitToConstructor( implementation );
 		}
 
 		public void to( Provider<? extends T> provider ) {
@@ -273,6 +269,10 @@ public class Binder
 
 		public <I extends T> void to( Class<I> implementation ) {
 			to( Suppliers.type( Type.raw( implementation ) ) );
+			implicitToConstructor( implementation );
+		}
+
+		private <I> void implicitToConstructor( Class<I> implementation ) {
 			Constructor<I> constructor = binder.strategy().defaultConstructor( implementation );
 			if ( constructor != null ) {
 				binder.implicit().bind( implementation ).to( constructor );
