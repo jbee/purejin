@@ -52,6 +52,11 @@ public final class Instance<T>
 	}
 
 	@Override
+	public <E> Instance<E> typed( Type<E> type ) {
+		return new Instance<E>( name, type );
+	}
+
+	@Override
 	public Name getName() {
 		return name;
 	}

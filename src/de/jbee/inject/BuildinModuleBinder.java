@@ -63,12 +63,12 @@ class BuildinModuleBinder
 	}
 
 	static class DeclarationBinder
-			implements BindDeclarator {
+			implements Bindings {
 
 		final List<BindDeclaration<?>> declarations = new LinkedList<BindDeclaration<?>>();
 
 		@Override
-		public <T> void bind( Resource<T> resource, Supplier<? extends T> supplier, Scope scope,
+		public <T> void add( Resource<T> resource, Supplier<? extends T> supplier, Scope scope,
 				Source source ) {
 			declarations.add( new BindDeclaration<T>( declarations.size(), resource, supplier,
 					scope, source ) );

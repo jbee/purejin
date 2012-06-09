@@ -6,6 +6,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.TypeVariable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -71,8 +73,8 @@ public final class Type<T>
 		throw notSupportedYet( type );
 	}
 
-	public static <T> Type<T> supertype( Type<? extends T> actualType, Class<T> rawType,
-			java.lang.reflect.Type type ) {
+	public static <T> Type<T> supertype( Type<? extends T> actualType, Class<T> rawSupertype,
+			java.lang.reflect.Type supertype ) {
 
 		return null;
 	}
@@ -342,28 +344,56 @@ public final class Type<T>
 		// TODO check bounds fulfilled by arguments
 	}
 
-	public Type<?> asSupertype( Class<? super T> supertype ) {
+	public Type<? super T> asSupertype( Class<? super T> supertype ) {
 		if ( supertype == rawType ) {
 			return this;
 		}
-		Class<? super T> superclass = rawType.getSuperclass();
+		if ( supertype.isInterface() ) {
+			return asSuperInterface( supertype );
+		}
+		return asSuperClass( supertype );
+	}
+
+	private Type<? super T> asSuperClass( Class<? super T> superclass ) {
+		Class<? super T> currentSuperclass = rawType.getSuperclass();
 		java.lang.reflect.Type genericSuperclass = rawType.getGenericSuperclass();
-		while ( superclass != null && superclass != supertype ) {
-			genericSuperclass = superclass.getGenericSuperclass();
-			superclass = superclass.getSuperclass();
+		while ( currentSuperclass != null && currentSuperclass != superclass ) {
+			genericSuperclass = currentSuperclass.getGenericSuperclass();
+			currentSuperclass = currentSuperclass.getSuperclass();
 		}
-		if ( superclass == supertype ) {
-			return supertype( this, superclass, genericSuperclass );
+		if ( currentSuperclass == superclass ) {
+			return supertype( this, currentSuperclass, genericSuperclass );
 		}
+		throw new RuntimeException( "Couldn't find supertype " + superclass + " for type: " + this );
+	}
+
+	private Type<? super T> asSuperInterface( Class<? super T> superinterface ) {
 		@SuppressWarnings ( "unchecked" )
 		Class<? super T>[] interfaces = (Class<? super T>[]) rawType.getInterfaces();
 		java.lang.reflect.Type[] genericInterfaces = rawType.getGenericInterfaces();
 		for ( int i = 0; i < interfaces.length; i++ ) {
-			if ( interfaces[i] == supertype ) {
+			if ( interfaces[i] == superinterface ) {
 				return supertype( this, interfaces[i], genericInterfaces[i] );
 			}
 		}
-		throw new RuntimeException( "Couldn't find supertype " + supertype + " for type: " + this );
+		throw new RuntimeException( "Couldn't find supertype " + superinterface + " for type: "
+				+ this );
+	}
+
+	@SuppressWarnings ( "unchecked" )
+	public Type<? super T>[] getSupertypes() {
+		//FIXME no generics are supported here - add them
+		List<Type<? super T>> res = new ArrayList<Type<? super T>>();
+		Class<? super T> supertype = rawType;
+		while ( supertype != null ) {
+			res.add( raw( supertype ) );
+			for ( Class<?> si : supertype.getInterfaces() ) {
+				res.add( (Type<? super T>) Type.raw( si ) );
+			}
+			supertype = supertype.getSuperclass();
+		}
+		res.remove( 0 ); // that is this raw type itself
+		return (Type<? super T>[]) res.toArray( new Type<?>[res.size()] );
 	}
 
 }

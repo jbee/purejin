@@ -9,7 +9,7 @@ import static de.jbee.inject.Type.raw;
 import java.lang.reflect.Constructor;
 
 import de.jbee.inject.Availability;
-import de.jbee.inject.BindDeclarator;
+import de.jbee.inject.Bindings;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Name;
 import de.jbee.inject.Provider;
@@ -23,6 +23,31 @@ import de.jbee.inject.Type;
 
 public class Binder
 		implements BasicBinder {
+
+	private static class AutobindBindings
+			implements Bindings {
+
+		private final Bindings delegate;
+
+		AutobindBindings( Bindings delegate ) {
+			super();
+			this.delegate = delegate;
+		}
+
+		@Override
+		public <T> void add( Resource<T> resource, Supplier<? extends T> supplier, Scope scope,
+				Source source ) {
+			delegate.add( resource, supplier, scope, source );
+			Type<T> type = resource.getType();
+			for ( Type<? super T> supertype : type.getSupertypes() ) {
+				delegate.add( resource.typed( supertype ), supplier, scope, source );
+			}
+		}
+	}
+
+	public static Bindings autobinds( Bindings delegate ) {
+		return new AutobindBindings( delegate );
+	}
 
 	static class SimpleBindStrategy
 			implements BindStrategy {
@@ -39,24 +64,24 @@ public class Binder
 
 	}
 
-	public static RootBinder create( BindDeclarator declarator, Source source ) {
-		return create( declarator, new SimpleBindStrategy(), source );
+	public static RootBinder create( Bindings bindings, Source source ) {
+		return create( bindings, new SimpleBindStrategy(), source );
 	}
 
-	public static RootBinder create( BindDeclarator declarator, BindStrategy strategy, Source source ) {
-		return new RootBinder( declarator, strategy, source );
+	public static RootBinder create( Bindings bindings, BindStrategy strategy, Source source ) {
+		return new RootBinder( bindings, strategy, source );
 	}
 
-	private final BindDeclarator declarator;
+	private final Bindings bindings;
 	private final BindStrategy strategy;
 	private final Source source;
 	private final Scope scope;
 	private final Availability availability;
 
-	Binder( BindDeclarator declarator, BindStrategy strategy, Source source, Scope scope,
+	Binder( Bindings bindings, BindStrategy strategy, Source source, Scope scope,
 			Availability availability ) {
 		super();
-		this.declarator = declarator;
+		this.bindings = bindings;
 		this.strategy = strategy;
 		this.source = source;
 		this.scope = scope;
@@ -85,13 +110,12 @@ public class Binder
 	}
 
 	public <E> TypedMultiBinder<E> bind( Class<E[]> type ) {
-
+		//TODO
 		return null;
 	}
 
 	public <T> TypedBinder<T> autobind( Type<T> type ) {
-		//FIXME need more bindings when chain is done - how to do that ?
-		return bind( type );
+		return with( autobinds( bindings ) ).bind( type );
 	}
 
 	public <T> TypedBinder<T> autobind( Class<T> type ) {
@@ -130,8 +154,9 @@ public class Binder
 		return scope;
 	}
 
-	final BindDeclarator declarator() {
-		return declarator;
+	//OPEN maybe Binder implements bindings and delegates instead of exposing it here
+	final Bindings bindings() {
+		return bindings;
 	}
 
 	final BindStrategy strategy() {
@@ -139,7 +164,7 @@ public class Binder
 	}
 
 	final <T> void bindInternal( Resource<T> resource, Supplier<? extends T> supplier ) {
-		declarator.bind( resource, supplier, scope, source );
+		bindings.add( resource, supplier, scope, source );
 	}
 
 	protected final Binder implicit() {
@@ -147,11 +172,15 @@ public class Binder
 	}
 
 	protected final Binder with( Source source ) {
-		return new Binder( declarator, strategy, source, scope, availability );
+		return new Binder( bindings, strategy, source, scope, availability );
 	}
 
 	protected final Binder with( Availability availability ) {
-		return new Binder( declarator, strategy, source, scope, availability );
+		return new Binder( bindings, strategy, source, scope, availability );
+	}
+
+	protected final Binder with( Bindings bindings ) {
+		return new Binder( bindings, strategy, source, scope, availability );
 	}
 
 	public static class TypedMultiBinder<E>
@@ -175,13 +204,13 @@ public class Binder
 			extends ScopedBinder
 			implements RootBasicBinder {
 
-		RootBinder( BindDeclarator declarator, BindStrategy strategy, Source source ) {
-			super( declarator, strategy, source, Scoped.DEFAULT );
+		RootBinder( Bindings bindings, BindStrategy strategy, Source source ) {
+			super( bindings, strategy, source, Scoped.DEFAULT );
 		}
 
 		@Override
 		public ScopedBinder in( Scope scope ) {
-			return new ScopedBinder( declarator(), strategy(), source(), scope );
+			return new ScopedBinder( bindings(), strategy(), source(), scope );
 		}
 	}
 
@@ -189,8 +218,8 @@ public class Binder
 			extends TargetedBinder
 			implements ScopedBasicBinder {
 
-		ScopedBinder( BindDeclarator declarator, BindStrategy strategy, Source source, Scope scope ) {
-			super( declarator, strategy, source, scope );
+		ScopedBinder( Bindings bindings, BindStrategy strategy, Source source, Scope scope ) {
+			super( bindings, strategy, source, scope );
 		}
 
 		// means when the type/instance is created and dependencies are injected into it
@@ -200,7 +229,7 @@ public class Binder
 
 		@Override
 		public TargetedBinder injectingInto( Instance<?> target ) {
-			return new TargetedBinder( declarator(), strategy(), source(), scope(), target );
+			return new TargetedBinder( bindings(), strategy(), source(), scope(), target );
 		}
 
 	}
@@ -209,13 +238,13 @@ public class Binder
 			extends Binder
 			implements TargetedBasicBinder {
 
-		TargetedBinder( BindDeclarator declarator, BindStrategy strategy, Source source, Scope scope ) {
-			super( declarator, strategy, source, scope, Availability.EVERYWHERE );
+		TargetedBinder( Bindings bindings, BindStrategy strategy, Source source, Scope scope ) {
+			super( bindings, strategy, source, scope, Availability.EVERYWHERE );
 		}
 
-		TargetedBinder( BindDeclarator declarator, BindStrategy strategy, Source source,
-				Scope scope, Instance<?> target ) {
-			super( declarator, strategy, source, scope, Availability.availability( target ) );
+		TargetedBinder( Bindings bindings, BindStrategy strategy, Source source, Scope scope,
+				Instance<?> target ) {
+			super( bindings, strategy, source, scope, Availability.availability( target ) );
 		}
 
 		//TODO improve this since from a dependency point of view it is good to localize all binds somehow
@@ -268,7 +297,9 @@ public class Binder
 		}
 
 		public <I extends T> void to( Class<I> implementation ) {
-			to( Suppliers.type( Type.raw( implementation ) ) );
+			if ( resource.getType().getRawType() != implementation ) {
+				to( Suppliers.type( Type.raw( implementation ) ) );
+			}
 			implicitToConstructor( implementation );
 		}
 

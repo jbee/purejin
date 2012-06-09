@@ -42,6 +42,7 @@ public final class Dependency<T>
 		return dependency( type.getParameters()[0] );
 	}
 
+	@Override
 	public <E> Dependency<E> typed( Type<E> type ) {
 		return new Dependency<E>( name, type );
 	}

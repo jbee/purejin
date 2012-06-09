@@ -72,4 +72,9 @@ public final class Resource<T>
 	public Name getName() {
 		return instance.getName();
 	}
+
+	@Override
+	public <E> Resource<E> typed( Type<E> type ) {
+		return new Resource<E>( instance.typed( type ), availability );
+	}
 }
