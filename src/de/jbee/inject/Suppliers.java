@@ -20,12 +20,12 @@ public class Suppliers {
 		return new ProviderAsSupplier<T>( provider );
 	}
 
-	public static <T> Supplier<Provider<T>> instance( Provider<T> provider ) {
-		return new InstanceSupplier<Provider<T>>( provider );
+	public static <T> Supplier<Provider<T>> constant( Provider<T> provider ) {
+		return new ConstantSupplier<Provider<T>>( provider );
 	}
 
-	public static <T> Supplier<T> instance( T instance ) {
-		return new InstanceSupplier<T>( instance );
+	public static <T> Supplier<T> constant( T constant ) {
+		return new ConstantSupplier<T>( constant );
 	}
 
 	public static <T> Supplier<T> link( Class<? extends Supplier<? extends T>> type ) {
@@ -110,12 +110,12 @@ public class Suppliers {
 
 	}
 
-	private static final class InstanceSupplier<T>
+	private static final class ConstantSupplier<T>
 			implements Supplier<T> {
 
 		private final T instance;
 
-		InstanceSupplier( T instance ) {
+		ConstantSupplier( T instance ) {
 			super();
 			this.instance = instance;
 		}

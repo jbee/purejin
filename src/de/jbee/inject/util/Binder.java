@@ -3,7 +3,7 @@ package de.jbee.inject.util;
 import static de.jbee.inject.Instance.defaultInstanceOf;
 import static de.jbee.inject.Instance.instance;
 import static de.jbee.inject.Suppliers.asSupplier;
-import static de.jbee.inject.Suppliers.instance;
+import static de.jbee.inject.Suppliers.constant;
 import static de.jbee.inject.Type.instanceType;
 import static de.jbee.inject.Type.raw;
 
@@ -217,19 +217,19 @@ public class Binder
 			to( (Supplier<? extends E>[]) new Supplier<?>[] { supplier1, supplier2, supplier3 } );
 		}
 
-		public void toElements( E instance1, E instance2 ) {
-			to( instance( instance1 ), instance( instance2 ) );
+		public void toElements( E constant1, E constant2 ) {
+			to( constant( constant1 ), constant( constant2 ) );
 		}
 
-		public void toElements( Class<? extends E> elem1, Class<? extends E> elem2 ) {
-			to( Suppliers.type( elem1 ), Suppliers.type( elem2 ) );
-			bindImplicitToConstructor( elem1, elem2 );
+		public void toElements( Class<? extends E> impl1, Class<? extends E> impl2 ) {
+			to( Suppliers.type( impl1 ), Suppliers.type( impl2 ) );
+			bindImplicitToConstructor( impl1, impl2 );
 		}
 
-		public void toElements( Class<? extends E> elem1, Class<? extends E> elem2,
-				Class<? extends E> elem3 ) {
-			to( Suppliers.type( elem1 ), Suppliers.type( elem2 ), Suppliers.type( elem3 ) );
-			bindImplicitToConstructor( elem1, elem2, elem3 );
+		public void toElements( Class<? extends E> impl1, Class<? extends E> impl2,
+				Class<? extends E> impl3 ) {
+			to( Suppliers.type( impl1 ), Suppliers.type( impl2 ), Suppliers.type( impl3 ) );
+			bindImplicitToConstructor( impl1, impl2, impl3 );
 		}
 
 		// and so on.... will avoid generic array warning here 
@@ -324,8 +324,8 @@ public class Binder
 			to( Suppliers.costructor( constructor ) );
 		}
 
-		public void to( T instance ) {
-			andTo( instance );
+		public void to( T constant ) {
+			toConstant( constant );
 		}
 
 		/**
@@ -333,47 +333,47 @@ public class Binder
 		 * are use when a module just does one bind but that is meant to co-exist with others from
 		 * other modules.
 		 */
-		public void to( T instance1, T instance2 ) {
-			multi().andTo( instance1 ).andTo( instance2 );
+		public void to( T constant1, T constant2 ) {
+			multi().toConstant( constant1 ).toConstant( constant2 );
 		}
 
-		public <I extends Supplier<? extends T>> void toSupplier( Class<I> implementation ) {
-			to( Suppliers.link( implementation ) );
-			bindImplicitToConstructor( implementation );
+		public <I extends Supplier<? extends T>> void toSupplier( Class<I> impl ) {
+			to( Suppliers.link( impl ) );
+			bindImplicitToConstructor( impl );
 		}
 
 		public void to( Provider<? extends T> provider ) {
 			to( asSupplier( provider ) );
 			binder.implicit().bind( defaultInstanceOf( instanceType( Provider.class, provider ) ) ).to(
-					Suppliers.instance( provider ) );
+					Suppliers.constant( provider ) );
 		}
 
-		public <I extends T> void to( Class<I> implementation ) {
-			if ( resource.getType().getRawType() != implementation ) {
-				to( Suppliers.type( Type.raw( implementation ) ) );
+		public <I extends T> void to( Class<I> impl ) {
+			if ( resource.getType().getRawType() != impl ) {
+				to( Suppliers.type( Type.raw( impl ) ) );
 			}
-			bindImplicitToConstructor( implementation );
+			bindImplicitToConstructor( impl );
 		}
 
 		protected final TypedBinder<T> multi() {
 			return new TypedBinder<T>( binder.multi(), resource );
 		}
 
-		private TypedBinder<T> andTo( T instance ) {
-			to( Suppliers.instance( instance ) );
+		private TypedBinder<T> toConstant( T constant ) {
+			to( Suppliers.constant( constant ) );
 			return this;
 		}
 
-		protected final void bindImplicitToConstructor( Class<?>... implementations ) {
-			for ( Class<?> i : implementations ) {
-				bindImplicitToConstructor( i );
+		protected final void bindImplicitToConstructor( Class<?>... impls ) {
+			for ( Class<?> impl : impls ) {
+				bindImplicitToConstructor( impl );
 			}
 		}
 
-		protected final <I> void bindImplicitToConstructor( Class<I> implementation ) {
-			Constructor<I> constructor = binder.strategy().defaultConstructor( implementation );
+		protected final <I> void bindImplicitToConstructor( Class<I> impl ) {
+			Constructor<I> constructor = binder.strategy().defaultConstructor( impl );
 			if ( constructor != null ) {
-				binder.implicit().bind( implementation ).to( constructor );
+				binder.implicit().bind( impl ).to( constructor );
 			}
 		}
 
