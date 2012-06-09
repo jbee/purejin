@@ -40,6 +40,10 @@ public class Suppliers {
 		return new TypeSupplier<T>( type );
 	}
 
+	public static <E> Supplier<E[]> elements( Class<E[]> arrayType, Supplier<? extends E>[] elements ) {
+		return new ElementsSupplier<E>( arrayType, elements );
+	}
+
 	public static <T> Supplier<T> costructor( Constructor<T> constructor ) {
 		return new ConstructorSupplier<T>( constructor );
 	}
@@ -134,25 +138,25 @@ public class Suppliers {
 	 * 
 	 * @author Jan Bernitt (jan.bernitt@gmx.de)
 	 */
-	private static final class MultiSupplier<T>
-			implements Supplier<T[]> {
+	private static final class ElementsSupplier<E>
+			implements Supplier<E[]> {
 
-		private final Class<T[]> type;
-		private final Supplier<? extends T>[] elements;
+		private final Class<E[]> arrayType;
+		private final Supplier<? extends E>[] elements;
 
-		MultiSupplier( Class<T[]> type, Supplier<? extends T>[] elements ) {
+		ElementsSupplier( Class<E[]> arrayType, Supplier<? extends E>[] elements ) {
 			super();
-			this.type = type;
+			this.arrayType = arrayType;
 			this.elements = elements;
 		}
 
 		@Override
-		public T[] supply( Dependency<? super T[]> dependency, DependencyResolver context ) {
-			T[] res = (T[]) Array.newInstance( type.getComponentType(), elements.length );
+		public E[] supply( Dependency<? super E[]> dependency, DependencyResolver context ) {
+			E[] res = (E[]) Array.newInstance( arrayType.getComponentType(), elements.length );
 			int i = 0;
-			final Dependency<T> elementDependency = (Dependency<T>) dependency.typed( Type.raw(
-					type ).getElementType() );
-			for ( Supplier<? extends T> e : elements ) {
+			final Dependency<E> elementDependency = (Dependency<E>) dependency.typed( Type.raw(
+					arrayType ).getElementType() );
+			for ( Supplier<? extends E> e : elements ) {
 				res[i++] = e.supply( elementDependency, context );
 			}
 			return res;
@@ -318,6 +322,7 @@ public class Suppliers {
 				}
 			}
 			try {
+				constructor.setAccessible( true );
 				return constructor.newInstance( resolvedArgs );
 			} catch ( Exception e ) {
 				throw new RuntimeException( e );

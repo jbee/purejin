@@ -3,7 +3,7 @@
  */
 package de.jbee.inject;
 
-import static de.jbee.inject.PreciserComparator.comparePrecision;
+import static de.jbee.inject.PreciserThanComparator.comparePrecision;
 
 import java.util.Arrays;
 import java.util.IdentityHashMap;

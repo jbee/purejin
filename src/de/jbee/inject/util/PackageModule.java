@@ -11,6 +11,7 @@ import de.jbee.inject.util.Binder.RootBinder;
 import de.jbee.inject.util.Binder.ScopedBinder;
 import de.jbee.inject.util.Binder.TargetedBinder;
 import de.jbee.inject.util.Binder.TypedBinder;
+import de.jbee.inject.util.Binder.TypedElementBinder;
 
 public abstract class PackageModule
 		implements Module {
@@ -53,6 +54,10 @@ public abstract class PackageModule
 	}
 
 	public <T> TypedBinder<T> bind( Class<T> type ) {
+		return binder.bind( type );
+	}
+
+	public <E> TypedElementBinder<E> bind( Class<E[]> type ) {
 		return binder.bind( type );
 	}
 

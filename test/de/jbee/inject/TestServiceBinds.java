@@ -22,7 +22,7 @@ public class TestServiceBinds {
 
 	}
 
-	public static class SomeTestService {
+	private static class SomeTestService {
 
 		public Integer mul2( Integer value, Service<Float, Integer> service ) {
 			return value * 2 + service.invoke( 2.8f );
@@ -33,7 +33,7 @@ public class TestServiceBinds {
 		}
 	}
 
-	public static class AnotherTestService {
+	private static class AnotherTestService {
 
 		public Integer negate( Number value ) {
 			return -value.intValue();

@@ -3,6 +3,7 @@ package de.jbee.inject.util;
 import static de.jbee.inject.Instance.defaultInstanceOf;
 import static de.jbee.inject.Instance.instance;
 import static de.jbee.inject.Suppliers.asSupplier;
+import static de.jbee.inject.Suppliers.instance;
 import static de.jbee.inject.Type.instanceType;
 import static de.jbee.inject.Type.raw;
 
@@ -109,9 +110,8 @@ public class Binder
 		return bind( Type.raw( type ) );
 	}
 
-	public <E> TypedMultiBinder<E> bind( Class<E[]> type ) {
-		//TODO
-		return null;
+	public <E> TypedElementBinder<E> bind( Class<E[]> type ) {
+		return new TypedElementBinder<E>( this, Instance.defaultInstanceOf( raw( type ) ) );
 	}
 
 	public <T> TypedBinder<T> autobind( Type<T> type ) {
@@ -171,6 +171,10 @@ public class Binder
 		return with( source.implicit() );
 	}
 
+	protected final Binder multi() {
+		return with( source.multi() );
+	}
+
 	protected final Binder with( Source source ) {
 		return new Binder( bindings, strategy, source, scope, availability );
 	}
@@ -183,18 +187,49 @@ public class Binder
 		return new Binder( bindings, strategy, source, scope, availability );
 	}
 
-	public static class TypedMultiBinder<E>
+	/**
+	 * This kind of bindings actually re-map the []-type so that the automatic behavior of returning
+	 * all known instances of the element type will no longer be used whenever the bind made
+	 * applies.
+	 * 
+	 * @author Jan Bernitt (jan.bernitt@gmx.de)
+	 * 
+	 */
+	public static class TypedElementBinder<E>
 			extends TypedBinder<E[]> {
 
-		TypedMultiBinder( Binder binder, Instance<E[]> instance ) {
-			super( binder, instance );
+		TypedElementBinder( Binder binder, Instance<E[]> instance ) {
+			super( binder.multi(), instance );
 		}
 
-		void to( Class<? extends E> src1, Class<? extends E> src2 ) {
+		public void to( Supplier<? extends E>[] elements ) {
+			to( Suppliers.elements( getType().getRawType(), elements ) );
 		}
 
-		void to( Class<? extends E> src1, Class<? extends E> src2, Class<? extends E> src3 ) {
+		@SuppressWarnings ( "unchecked" )
+		public void to( Supplier<? extends E> supplier1, Supplier<? extends E> supplier2 ) {
+			to( (Supplier<? extends E>[]) new Supplier<?>[] { supplier1, supplier2 } );
+		}
 
+		@SuppressWarnings ( "unchecked" )
+		public void to( Supplier<? extends E> supplier1, Supplier<? extends E> supplier2,
+				Supplier<? extends E> supplier3 ) {
+			to( (Supplier<? extends E>[]) new Supplier<?>[] { supplier1, supplier2, supplier3 } );
+		}
+
+		public void toElements( E instance1, E instance2 ) {
+			to( instance( instance1 ), instance( instance2 ) );
+		}
+
+		public void toElements( Class<? extends E> elem1, Class<? extends E> elem2 ) {
+			to( Suppliers.type( elem1 ), Suppliers.type( elem2 ) );
+			bindImplicitToConstructor( elem1, elem2 );
+		}
+
+		public void toElements( Class<? extends E> elem1, Class<? extends E> elem2,
+				Class<? extends E> elem3 ) {
+			to( Suppliers.type( elem1 ), Suppliers.type( elem2 ), Suppliers.type( elem3 ) );
+			bindImplicitToConstructor( elem1, elem2, elem3 );
 		}
 
 		// and so on.... will avoid generic array warning here 
@@ -267,9 +302,17 @@ public class Binder
 		private final Resource<T> resource;
 
 		TypedBinder( Binder binder, Instance<T> instance ) {
+			this( binder, new Resource<T>( instance, binder.availability() ) );
+		}
+
+		TypedBinder( Binder binder, Resource<T> resource ) {
 			super();
 			this.binder = binder;
-			this.resource = new Resource<T>( instance, binder.availability() );
+			this.resource = resource;
+		}
+
+		protected final Type<T> getType() {
+			return resource.getType();
 		}
 
 		@Override
@@ -282,12 +325,21 @@ public class Binder
 		}
 
 		public void to( T instance ) {
-			to( Suppliers.instance( instance ) );
+			andTo( instance );
+		}
+
+		/**
+		 * This is to do multi-binds in the same module. The {@link Binder#multibind(Class)} methods
+		 * are use when a module just does one bind but that is meant to co-exist with others from
+		 * other modules.
+		 */
+		public void to( T instance1, T instance2 ) {
+			multi().andTo( instance1 ).andTo( instance2 );
 		}
 
 		public <I extends Supplier<? extends T>> void toSupplier( Class<I> implementation ) {
 			to( Suppliers.link( implementation ) );
-			implicitToConstructor( implementation );
+			bindImplicitToConstructor( implementation );
 		}
 
 		public void to( Provider<? extends T> provider ) {
@@ -300,10 +352,25 @@ public class Binder
 			if ( resource.getType().getRawType() != implementation ) {
 				to( Suppliers.type( Type.raw( implementation ) ) );
 			}
-			implicitToConstructor( implementation );
+			bindImplicitToConstructor( implementation );
 		}
 
-		private <I> void implicitToConstructor( Class<I> implementation ) {
+		protected final TypedBinder<T> multi() {
+			return new TypedBinder<T>( binder.multi(), resource );
+		}
+
+		private TypedBinder<T> andTo( T instance ) {
+			to( Suppliers.instance( instance ) );
+			return this;
+		}
+
+		protected final void bindImplicitToConstructor( Class<?>... implementations ) {
+			for ( Class<?> i : implementations ) {
+				bindImplicitToConstructor( i );
+			}
+		}
+
+		protected final <I> void bindImplicitToConstructor( Class<I> implementation ) {
 			Constructor<I> constructor = binder.strategy().defaultConstructor( implementation );
 			if ( constructor != null ) {
 				binder.implicit().bind( implementation ).to( constructor );

@@ -54,6 +54,11 @@ public final class Type<T>
 		return null;
 	}
 
+	@SuppressWarnings ( "unchecked" )
+	public static <T> Type<T> elementType( Class<T[]> arrayType ) {
+		return (Type<T>) raw( arrayType ).getElementType();
+	}
+
 	public static <T> Type<T> raw( Class<T> type ) {
 		return new Type<T>( type );
 	}
@@ -380,6 +385,11 @@ public final class Type<T>
 				+ this );
 	}
 
+	/**
+	 * @return a list of all super-classes and super-interfaces of this type starting with the
+	 *         direct super-class followed by the direct super-interfaces continuing by going up the
+	 *         type hierarchy.
+	 */
 	@SuppressWarnings ( "unchecked" )
 	public Type<? super T>[] getSupertypes() {
 		//FIXME no generics are supported here - add them

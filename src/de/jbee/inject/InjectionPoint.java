@@ -1,6 +1,7 @@
 package de.jbee.inject;
 
 /**
+ * This about the HOW to inject (field, constructor/setter)
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  * 

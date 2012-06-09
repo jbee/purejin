@@ -5,6 +5,7 @@ import static de.jbee.inject.Source.source;
 import static de.jbee.inject.Type.parameterTypes;
 import static de.jbee.inject.Type.returnType;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 import de.jbee.inject.Bindings;
@@ -83,8 +84,11 @@ public abstract class ServiceModule
 		private <P, T> Service<P, T> newServiceMethod( Method service, Class<P> parameterType,
 				Class<T> returnType, DependencyResolver context ) {
 			try {
-				return new ServiceMethod<P, T>( service.getDeclaringClass().newInstance(), service,
-						parameterType, returnType, context );
+				Constructor<?> constructor = service.getDeclaringClass().getDeclaredConstructor(
+						new Class<?>[0] );
+				constructor.setAccessible( true );
+				return new ServiceMethod<P, T>( constructor.newInstance(), service, parameterType,
+						returnType, context );
 			} catch ( Exception e ) {
 				e.printStackTrace();
 				return null;
@@ -146,9 +150,10 @@ public abstract class ServiceModule
 		public T invoke( P params ) {
 			Object[] args = actualArguments( params );
 			try {
+				method.setAccessible( true );
 				return returnType.cast( method.invoke( object, args ) );
 			} catch ( Exception e ) {
-				throw new RuntimeException( "Failed to invoke service", e );
+				throw new RuntimeException( "Failed to invoke service:\n" + e.getMessage(), e );
 			}
 		}
 

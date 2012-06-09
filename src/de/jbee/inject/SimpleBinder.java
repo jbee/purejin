@@ -1,5 +1,11 @@
 package de.jbee.inject;
 
+/**
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * 
+ * @deprecated find a nicer solution for the core bootstrap
+ */
+@Deprecated
 public class SimpleBinder
 		implements Bindings {
 

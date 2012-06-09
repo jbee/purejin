@@ -1,6 +1,6 @@
 package de.jbee.inject;
 
-public class Scoped {
+public class Scoped { //OPEN what about Scoping ?
 
 	/**
 	 * Asks the {@link Injectable} once per injection.

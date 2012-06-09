@@ -2,7 +2,7 @@ package de.jbee.inject;
 
 import java.util.Comparator;
 
-public class PreciserComparator<T extends PreciserThan<? super T>>
+public class PreciserThanComparator<T extends PreciserThan<? super T>>
 		implements Comparator<T> {
 
 	public static <T extends PreciserThan<? super T>> int comparePrecision( T one, T other ) {
