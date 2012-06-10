@@ -11,6 +11,7 @@ import java.lang.reflect.Constructor;
 
 import de.jbee.inject.Availability;
 import de.jbee.inject.Bindings;
+import de.jbee.inject.InjectionStrategy;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Name;
 import de.jbee.inject.Provider;
@@ -41,20 +42,26 @@ public class Binder
 			delegate.add( resource, supplier, scope, source );
 			Type<T> type = resource.getType();
 			for ( Type<? super T> supertype : type.getSupertypes() ) {
-				delegate.add( resource.typed( supertype ), supplier, scope, source );
+				// Object is of cause a superclass of everything but not indented when doing auto-binds
+				if ( supertype.getRawType() != Object.class ) {
+					delegate.add( resource.typed( supertype ), supplier, scope, source );
+				}
 			}
 		}
 	}
 
-	public static Bindings autobinds( Bindings delegate ) {
+	public static Bindings autobinding( Bindings delegate ) {
 		return new AutobindBindings( delegate );
 	}
 
 	static class SimpleBindStrategy
-			implements BindStrategy {
+			implements InjectionStrategy {
 
 		@Override
-		public <T> Constructor<T> defaultConstructor( Class<T> type ) {
+		public <T> Constructor<T> constructorFor( Class<T> type ) {
+			if ( type.isInterface() ) {
+				throw new IllegalArgumentException( "Interfaces don't have constructors: " + type );
+			}
 			try {
 				return type.getConstructor( new Class<?>[0] );
 			} catch ( Exception e ) {
@@ -69,17 +76,17 @@ public class Binder
 		return create( bindings, new SimpleBindStrategy(), source );
 	}
 
-	public static RootBinder create( Bindings bindings, BindStrategy strategy, Source source ) {
+	public static RootBinder create( Bindings bindings, InjectionStrategy strategy, Source source ) {
 		return new RootBinder( bindings, strategy, source );
 	}
 
 	private final Bindings bindings;
-	private final BindStrategy strategy;
+	private final InjectionStrategy strategy;
 	private final Source source;
 	private final Scope scope;
 	private final Availability availability;
 
-	Binder( Bindings bindings, BindStrategy strategy, Source source, Scope scope,
+	Binder( Bindings bindings, InjectionStrategy strategy, Source source, Scope scope,
 			Availability availability ) {
 		super();
 		this.bindings = bindings;
@@ -115,7 +122,7 @@ public class Binder
 	}
 
 	public <T> TypedBinder<T> autobind( Type<T> type ) {
-		return with( autobinds( bindings ) ).bind( type );
+		return with( autobinding( bindings ) ).bind( type );
 	}
 
 	public <T> TypedBinder<T> autobind( Class<T> type ) {
@@ -159,11 +166,11 @@ public class Binder
 		return bindings;
 	}
 
-	final BindStrategy strategy() {
+	final InjectionStrategy strategy() {
 		return strategy;
 	}
 
-	final <T> void bindInternal( Resource<T> resource, Supplier<? extends T> supplier ) {
+	protected final <T> void bind( Resource<T> resource, Supplier<? extends T> supplier ) {
 		bindings.add( resource, supplier, scope, source );
 	}
 
@@ -239,7 +246,7 @@ public class Binder
 			extends ScopedBinder
 			implements RootBasicBinder {
 
-		RootBinder( Bindings bindings, BindStrategy strategy, Source source ) {
+		RootBinder( Bindings bindings, InjectionStrategy strategy, Source source ) {
 			super( bindings, strategy, source, Scoped.DEFAULT );
 		}
 
@@ -253,7 +260,7 @@ public class Binder
 			extends TargetedBinder
 			implements ScopedBasicBinder {
 
-		ScopedBinder( Bindings bindings, BindStrategy strategy, Source source, Scope scope ) {
+		ScopedBinder( Bindings bindings, InjectionStrategy strategy, Source source, Scope scope ) {
 			super( bindings, strategy, source, scope );
 		}
 
@@ -273,11 +280,11 @@ public class Binder
 			extends Binder
 			implements TargetedBasicBinder {
 
-		TargetedBinder( Bindings bindings, BindStrategy strategy, Source source, Scope scope ) {
+		TargetedBinder( Bindings bindings, InjectionStrategy strategy, Source source, Scope scope ) {
 			super( bindings, strategy, source, scope, Availability.EVERYWHERE );
 		}
 
-		TargetedBinder( Bindings bindings, BindStrategy strategy, Source source, Scope scope,
+		TargetedBinder( Bindings bindings, InjectionStrategy strategy, Source source, Scope scope,
 				Instance<?> target ) {
 			super( bindings, strategy, source, scope, Availability.availability( target ) );
 		}
@@ -317,7 +324,7 @@ public class Binder
 
 		@Override
 		public void to( Supplier<? extends T> supplier ) {
-			binder.bindInternal( resource, supplier );
+			binder.bind( resource, supplier );
 		}
 
 		public void to( Constructor<? extends T> constructor ) {
@@ -371,7 +378,7 @@ public class Binder
 		}
 
 		protected final <I> void bindImplicitToConstructor( Class<I> impl ) {
-			Constructor<I> constructor = binder.strategy().defaultConstructor( impl );
+			Constructor<I> constructor = binder.strategy().constructorFor( impl );
 			if ( constructor != null ) {
 				binder.implicit().bind( impl ).to( constructor );
 			}

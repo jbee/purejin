@@ -9,6 +9,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 import de.jbee.inject.Bindings;
+import de.jbee.inject.Bootstrapper;
+import de.jbee.inject.Bundle;
 import de.jbee.inject.Dependency;
 import de.jbee.inject.DependencyResolver;
 import de.jbee.inject.Module;
@@ -28,7 +30,7 @@ import de.jbee.inject.util.Binder.RootBinder;
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
 public abstract class ServiceModule
-		implements Module {
+		implements Module, Bundle {
 
 	private static final String SERVICE_NAME_PREFIX = "Service-";
 
@@ -40,26 +42,37 @@ public abstract class ServiceModule
 	private RootBinder binder;
 
 	@Override
+	public final void bootstrap( Bootstrapper bootstrapper ) {
+		bootstrapper.install( ServiceSupplierModule.class );
+		bootstrapper.install( this );
+	}
+
+	@Override
 	public final void configure( Bindings instructor ) {
 		if ( binder != null ) {
 			throw new IllegalStateException( "Reentrance not allowed!" );
 		}
 		binder = Binder.create( instructor, source( getClass() ) );
 
-		new ServiceCoreModule().configure( instructor );
-		//TODO extends ServiceCoreModule
+		new ServiceSupplierModule().configure( instructor ); //FIXME remove this as soon as bootstrap is in place
 		configure();
 	}
 
 	protected abstract void configure();
 
-	static class ServiceCoreModule
-			implements Module {
+	static class ServiceSupplierModule
+			implements Module, Bundle {
 
 		@Override
 		public void configure( Bindings binder ) {
 			SimpleBinder bb = new SimpleBinder( binder, source( getClass() ), Scoped.DEFAULT );
 			bb.wildcardBind( Service.class, new ServiceSupplier() );
+		}
+
+		//TODO this can be in a abstract Module called BootstrappingModule
+		@Override
+		public void bootstrap( Bootstrapper bootstrapper ) {
+			bootstrapper.install( this );
 		}
 
 	}

@@ -18,10 +18,25 @@ package de.jbee.inject;
  * 
  */
 public interface Bootstrapper {
-	//
-	//	void install( Module module );
-	//
-	//	void install( Bundle bundle );
-	//
-	//	<T extends Module & Bundle> void install( T e );
+
+	void install( Class<? extends Bundle> bundle );
+
+	/**
+	 * Uninstalling is very different from overriding. It allows to totally remove a well defined
+	 * part from the consideration while a override complects the overridden and the overriding
+	 * {@linkplain Bundle} with each other and requires to considerer both in a complected form.
+	 * 
+	 * To allow predictability uninstalling is a final decision. Further calls that install the very
+	 * same {@link Bundle} will not re-install it!
+	 * 
+	 * There is no need to uninstall a {@link Module} since uninstalling the {@linkplain Bundle}
+	 * that installed the module will effectively uninstall the module as well (as long as that
+	 * module is not installed by another installed bundle too). Allowing to uninstall separate
+	 * {@link Module}s would break the well defined borders of bundles and lead to the need to
+	 * consider something close to overrides.
+	 */
+	void uninstall( Class<? extends Bundle> bundle );
+
+	void install( Module module );
+
 }
