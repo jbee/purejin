@@ -24,7 +24,7 @@ public class TestAutobindBinds {
 
 	}
 
-	private final Injector injector = Injector.create( new AutobindBindsModule(),
+	private final Injector injector = Injector.create( AutobindBindsModule.class,
 			new BuildinModuleBinder() );
 
 	@Test

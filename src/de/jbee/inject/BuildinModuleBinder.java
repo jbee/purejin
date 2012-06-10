@@ -25,7 +25,7 @@ class BuildinModuleBinder
 	// 	 b. init one repository for each scope
 	// 	 c. apply snapshots wrapper to repository instances
 	@Override
-	public Binding<?>[] bind( Module root ) {
+	public Binding<?>[] bind( Class<? extends Bundle> root ) {
 		return bind( cleanedUp( declarationsFrom( root ) ) );
 	}
 
@@ -56,14 +56,14 @@ class BuildinModuleBinder
 		return instructions;
 	}
 
-	private BindDeclaration<?>[] declarationsFrom( Module root ) {
-		DeclarationBinder binder = new DeclarationBinder();
-		root.configure( binder );
+	private BindDeclaration<?>[] declarationsFrom( Class<? extends Bundle> root ) {
+		EagerBootstrapper binder = new EagerBootstrapper();
+		binder.install( root );
 		return binder.declarations.toArray( new BindDeclaration<?>[0] );
 	}
 
-	static class DeclarationBinder
-			implements Bindings {
+	static class EagerBootstrapper
+			implements Bindings, Bootstrapper {
 
 		final List<BindDeclaration<?>> declarations = new LinkedList<BindDeclaration<?>>();
 
@@ -72,6 +72,22 @@ class BuildinModuleBinder
 				Source source ) {
 			declarations.add( new BindDeclaration<T>( declarations.size(), resource, supplier,
 					scope, source ) );
+		}
+
+		@Override
+		public void install( Class<? extends Bundle> bundle ) {
+			TypeReflector.newInstance( bundle ).bootstrap( this );
+		}
+
+		@Override
+		public void install( Module module ) {
+			module.configure( this );
+		}
+
+		@Override
+		public void uninstall( Class<? extends Bundle> bundle ) {
+			//TODO
+			throw new UnsupportedOperationException( "Not yet" );
 		}
 
 	}

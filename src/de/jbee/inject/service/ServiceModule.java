@@ -5,7 +5,6 @@ import static de.jbee.inject.Source.source;
 import static de.jbee.inject.Type.parameterTypes;
 import static de.jbee.inject.Type.returnType;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 import de.jbee.inject.Bindings;
@@ -19,6 +18,7 @@ import de.jbee.inject.Scoped;
 import de.jbee.inject.SimpleBinder;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.Type;
+import de.jbee.inject.TypeReflector;
 import de.jbee.inject.util.Binder;
 import de.jbee.inject.util.Binder.RootBinder;
 
@@ -53,8 +53,6 @@ public abstract class ServiceModule
 			throw new IllegalStateException( "Reentrance not allowed!" );
 		}
 		binder = Binder.create( instructor, source( getClass() ) );
-
-		new ServiceSupplierModule().configure( instructor ); //FIXME remove this as soon as bootstrap is in place
 		configure();
 	}
 
@@ -96,16 +94,9 @@ public abstract class ServiceModule
 
 		private <P, T> Service<P, T> newServiceMethod( Method service, Class<P> parameterType,
 				Class<T> returnType, DependencyResolver context ) {
-			try {
-				Constructor<?> constructor = service.getDeclaringClass().getDeclaredConstructor(
-						new Class<?>[0] );
-				constructor.setAccessible( true );
-				return new ServiceMethod<P, T>( constructor.newInstance(), service, parameterType,
-						returnType, context );
-			} catch ( Exception e ) {
-				e.printStackTrace();
-				return null;
-			}
+			return new ServiceMethod<P, T>(
+					TypeReflector.newInstance( service.getDeclaringClass() ), service,
+					parameterType, returnType, context );
 		}
 
 		private <P, T> Method resolveServiceMethod( Dependency<? super Service<P, T>> dependency ) {

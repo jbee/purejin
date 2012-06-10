@@ -12,7 +12,7 @@ import de.jbee.inject.util.PackageModule;
 
 public class TestTypeBinds {
 
-	static class TypeBindsModule
+	private static class TypeBindsModule
 			extends PackageModule {
 
 		@Override
@@ -25,7 +25,7 @@ public class TestTypeBinds {
 
 	@Test
 	public void test() {
-		Injector injector = Injector.create( new TypeBindsModule(), new BuildinModuleBinder() );
+		Injector injector = Injector.create( TypeBindsModule.class, new BuildinModuleBinder() );
 		Number number = injector.resolve( dependency( raw( Number.class ) ) );
 		assertThat( number, instanceOf( Integer.class ) );
 		assertThat( number.intValue(), is( 42 ) );

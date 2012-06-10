@@ -22,6 +22,7 @@ import de.jbee.inject.Source;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.Suppliers;
 import de.jbee.inject.Type;
+import de.jbee.inject.TypeReflector;
 
 public class Binder
 		implements BasicBinder {
@@ -59,15 +60,7 @@ public class Binder
 
 		@Override
 		public <T> Constructor<T> constructorFor( Class<T> type ) {
-			if ( type.isInterface() ) {
-				throw new IllegalArgumentException( "Interfaces don't have constructors: " + type );
-			}
-			try {
-				return type.getConstructor( new Class<?>[0] );
-			} catch ( Exception e ) {
-				e.printStackTrace();
-				return null;
-			}
+			return TypeReflector.accessibleNoArgsConstructor( type );
 		}
 
 	}

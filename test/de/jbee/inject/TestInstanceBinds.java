@@ -22,7 +22,7 @@ import de.jbee.inject.util.PackageModule;
 
 public class TestInstanceBinds {
 
-	static class TestModule
+	private static class InstanceBindsModule
 			extends PackageModule {
 
 		@Override
@@ -37,7 +37,8 @@ public class TestInstanceBinds {
 
 	}
 
-	private final Injector injector = Injector.create( new TestModule(), new BuildinModuleBinder() );
+	private final Injector injector = Injector.create( InstanceBindsModule.class,
+			new BuildinModuleBinder() );
 
 	@Test
 	public void buildinProviderShouldBeAvailableForAnyBoundType() {

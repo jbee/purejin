@@ -14,7 +14,7 @@ import de.jbee.inject.util.Binder.TypedBinder;
 import de.jbee.inject.util.Binder.TypedElementBinder;
 
 public abstract class PackageModule
-		implements Module {
+		extends BootstrappingModule {
 
 	private RootBinder binder;
 

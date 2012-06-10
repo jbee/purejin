@@ -42,7 +42,7 @@ public class TestServiceBinds {
 
 	@Test
 	public void test() {
-		Injector injector = Injector.create( new ServiceBindsModule(), new BuildinModuleBinder() );
+		Injector injector = Injector.create( ServiceBindsModule.class, new BuildinModuleBinder() );
 		Dependency<Service> dependency = Dependency.dependency( Type.raw( Service.class ).parametized(
 				Integer.class, Integer.class ) );
 		Service<Integer, Integer> service = injector.resolve( dependency );

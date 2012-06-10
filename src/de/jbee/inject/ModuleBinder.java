@@ -2,5 +2,6 @@ package de.jbee.inject;
 
 public interface ModuleBinder {
 
-	Binding<?>[] bind( Module root );
+	//TODO I guess we start with a root Bundle
+	Binding<?>[] bind( Class<? extends Bundle> root );
 }

@@ -14,7 +14,7 @@ import java.util.Map.Entry;
 public class Injector
 		implements DependencyResolver {
 
-	public static Injector create( Module root, ModuleBinder binder ) {
+	public static Injector create( Class<? extends Bundle> root, ModuleBinder binder ) {
 		return new Injector( binder.bind( root ) );
 	}
 

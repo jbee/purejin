@@ -27,7 +27,7 @@ public class TestSupplierBinds {
 
 	@Test
 	public void test() {
-		Injector injector = Injector.create( new SupplierBindsModule(), new BuildinModuleBinder() );
+		Injector injector = Injector.create( SupplierBindsModule.class, new BuildinModuleBinder() );
 		String value = injector.resolve( Dependency.dependency( Type.raw( String.class ) ) );
 		assertThat( value, is( "foobar" ) );
 	}

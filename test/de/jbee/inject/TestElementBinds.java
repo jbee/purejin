@@ -28,7 +28,7 @@ public class TestElementBinds {
 		}
 	}
 
-	private final Injector injector = Injector.create( new ElementBindsModule(),
+	private final Injector injector = Injector.create( ElementBindsModule.class,
 			new BuildinModuleBinder() );
 
 	@Test
