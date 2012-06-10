@@ -40,9 +40,9 @@ public class TestInstanceBinds {
 			implements Bundle {
 
 		@Override
-		public void bootstrap( Bootstrapper bootstrapper ) {
-			bootstrapper.install( BuildinModule.class );
-			bootstrapper.install( InstanceBindsModule.class );
+		public void bootstrap( Bootstrapper bootstrap ) {
+			bootstrap.install( BuildinModule.class );
+			bootstrap.install( InstanceBindsModule.class );
 		}
 
 	}

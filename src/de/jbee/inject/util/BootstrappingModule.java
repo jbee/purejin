@@ -8,7 +8,7 @@ public abstract class BootstrappingModule
 		implements Module, Bundle {
 
 	@Override
-	public final void bootstrap( Bootstrapper bootstrapper ) {
-		bootstrapper.install( this );
+	public final void bootstrap( Bootstrapper bootstrap ) {
+		bootstrap.install( this );
 	}
 }

@@ -16,8 +16,8 @@ public final class BuildinModule
 		extends BootstrappingModule {
 
 	@Override
-	public void configure( Bindings binder ) {
-		SimpleBinder bb = new SimpleBinder( binder, source( BuildinModule.class ), Scoped.DEFAULT );
+	public void configure( Bindings bindings ) {
+		SimpleBinder bb = new SimpleBinder( bindings, source( BuildinModule.class ), Scoped.DEFAULT );
 		bb.wildcardBind( Provider.class, Suppliers.PROVIDER );
 		bb.wildcardBind( List.class, Suppliers.LIST_BRIDGE );
 		bb.wildcardBind( Set.class, Suppliers.SET_BRIDGE );

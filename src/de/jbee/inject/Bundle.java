@@ -10,5 +10,5 @@ package de.jbee.inject;
  */
 public interface Bundle {
 
-	void bootstrap( Bootstrapper bootstrapper );
+	void bootstrap( Bootstrapper bootstrap );
 }

@@ -43,9 +43,9 @@ public abstract class ServiceModule
 	private RootBinder binder;
 
 	@Override
-	public final void bootstrap( Bootstrapper bootstrapper ) {
-		bootstrapper.install( ServiceSupplierModule.class );
-		bootstrapper.install( this );
+	public final void bootstrap( Bootstrapper bootstrap ) {
+		bootstrap.install( ServiceSupplierModule.class );
+		bootstrap.install( this );
 	}
 
 	@Override
@@ -63,8 +63,8 @@ public abstract class ServiceModule
 			extends BootstrappingModule {
 
 		@Override
-		public void configure( Bindings binder ) {
-			SimpleBinder bb = new SimpleBinder( binder, source( getClass() ), Scoped.DEFAULT );
+		public void configure( Bindings bindings ) {
+			SimpleBinder bb = new SimpleBinder( bindings, source( getClass() ), Scoped.DEFAULT );
 			bb.wildcardBind( Service.class, new ServiceSupplier() );
 		}
 

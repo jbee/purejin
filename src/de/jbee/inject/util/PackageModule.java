@@ -18,11 +18,11 @@ public abstract class PackageModule
 	private RootBinder binder;
 
 	@Override
-	public final void configure( Bindings declarator ) {
+	public final void configure( Bindings bindings ) {
 		if ( this.binder != null ) {
 			throw new IllegalStateException( "Reentrance not allowed!" );
 		}
-		this.binder = Binder.create( declarator, source( getClass() ) );
+		this.binder = Binder.create( bindings, source( getClass() ) );
 		configure();
 	}
 
