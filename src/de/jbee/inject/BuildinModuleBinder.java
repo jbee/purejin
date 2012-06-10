@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 class BuildinModuleBinder
-		implements ModuleBinder {
+		implements BundleBinder {
 
 	// Find the initial set of bindings
 	// 0. create BindInstruction
@@ -25,7 +25,7 @@ class BuildinModuleBinder
 	// 	 b. init one repository for each scope
 	// 	 c. apply snapshots wrapper to repository instances
 	@Override
-	public Binding<?>[] bind( Class<? extends Bundle> root ) {
+	public Binding<?>[] install( Class<? extends Bundle> root ) {
 		return bind( cleanedUp( declarationsFrom( root ) ) );
 	}
 

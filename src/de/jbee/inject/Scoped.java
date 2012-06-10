@@ -46,7 +46,7 @@ public class Scoped { //OPEN what about Scoping ?
 
 	/**
 	 * What is usually called a 'default'-{@link Scope} will ask the {@link Injectable} passed each
-	 * time the {@link Repository#yield(Dependency, Injectable)}-method is invoked.
+	 * time the {@link Repository#serve(Dependency, Injectable)}-method is invoked.
 	 * 
 	 * The {@link Scope} is also used as {@link Repository} instance since both don#t have any
 	 * state.
@@ -68,7 +68,7 @@ public class Scoped { //OPEN what about Scoping ?
 		}
 
 		@Override
-		public <T> T yield( Injection<T> injection, Injectable<T> injectable ) {
+		public <T> T serve( Injection<T> injection, Injectable<T> injectable ) {
 			return injectable.instanceFor( injection );
 		}
 
@@ -92,14 +92,14 @@ public class Scoped { //OPEN what about Scoping ?
 		}
 
 		@Override
-		public <T> T yield( Injection<T> injection, Injectable<T> injectable ) {
+		public <T> T serve( Injection<T> injection, Injectable<T> injectable ) {
 			Repository repository = threadRepository.get();
 			if ( repository == null ) {
 				// since each thread is just accessing its own repo there cannot be a repo set for the running thread after we checked for null
 				repository = repositoryScope.init( injection.injectronCardinality() );
 				threadRepository.set( repository );
 			}
-			return repository.yield( injection, injectable );
+			return repository.serve( injection, injectable );
 		}
 
 		@Override
@@ -136,17 +136,18 @@ public class Scoped { //OPEN what about Scoping ?
 		}
 
 		@Override
-		public <T> T yield( Injection<T> injection, Injectable<T> injectable ) {
-			return dest.yield( injection, new SnapshotingSupplier<T>( injectable, src ) );
+		public <T> T serve( Injection<T> injection, Injectable<T> injectable ) {
+			//FIXME at some point the dest repo is outdated - do we ask the src again in that case ? I'm note sure 
+			return dest.serve( injection, new SnapshotingInjectable<T>( injectable, src ) );
 		}
 
-		private static final class SnapshotingSupplier<T>
+		private static final class SnapshotingInjectable<T>
 				implements Injectable<T> {
 
 			private final Injectable<T> supplier;
 			private final Repository src;
 
-			SnapshotingSupplier( Injectable<T> supplier, Repository src ) {
+			SnapshotingInjectable( Injectable<T> supplier, Repository src ) {
 				super();
 				this.supplier = supplier;
 				this.src = src;
@@ -154,7 +155,7 @@ public class Scoped { //OPEN what about Scoping ?
 
 			@Override
 			public T instanceFor( Injection<T> injection ) {
-				return src.yield( injection, supplier );
+				return src.serve( injection, supplier );
 			}
 
 		}
@@ -165,7 +166,7 @@ public class Scoped { //OPEN what about Scoping ?
 			implements Repository {
 
 		@Override
-		public <T> T yield( Injection<T> injection, Injectable<T> injectable ) {
+		public <T> T serve( Injection<T> injection, Injectable<T> injectable ) {
 			// e.g. get receiver class from dependency -to be reusable the provider could offer a identity --> a wrapper class would be needed anyway so maybe best is to have quite similar impl. all using a identity hash-map
 			// TODO Auto-generated method stub
 			return null;
@@ -215,7 +216,7 @@ public class Scoped { //OPEN what about Scoping ?
 
 		@Override
 		@SuppressWarnings ( "unchecked" )
-		public <T> T yield( Injection<T> injection, Injectable<T> injectable ) {
+		public <T> T serve( Injection<T> injection, Injectable<T> injectable ) {
 			T res = (T) instances[injection.injectronSerialNumber()];
 			if ( res != null ) {
 				return res;

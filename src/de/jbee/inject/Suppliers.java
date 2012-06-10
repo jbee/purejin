@@ -215,7 +215,7 @@ public class Suppliers {
 
 		@Override
 		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
-			return provider.yield();
+			return provider.provide();
 		}
 
 	}
@@ -251,7 +251,7 @@ public class Suppliers {
 		}
 
 		@Override
-		public T yield() {
+		public T provide() {
 			return resolver.resolve( dependency );
 		}
 

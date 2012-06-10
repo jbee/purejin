@@ -7,5 +7,5 @@ package de.jbee.inject;
  */
 public interface Provider<T> {
 
-	T yield();
+	T provide();
 }

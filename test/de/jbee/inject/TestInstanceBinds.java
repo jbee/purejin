@@ -107,7 +107,7 @@ public class TestInstanceBinds {
 			Name name ) {
 		Type<Provider> type = raw( Provider.class ).parametized( dependencyType );
 		Provider<?> provider = injector.resolve( dependency( type ).named( name ) );
-		assertEquals( provider.yield(), expected );
+		assertEquals( provider.provide(), expected );
 	}
 
 	private <T> void assertInjects( T expected, Type<? extends T> dependencyType ) {

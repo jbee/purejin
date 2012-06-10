@@ -14,8 +14,8 @@ import java.util.Map.Entry;
 public class Injector
 		implements DependencyResolver {
 
-	public static Injector create( Class<? extends Bundle> root, ModuleBinder binder ) {
-		return new Injector( binder.bind( root ) );
+	public static Injector create( Class<? extends Bundle> root, BundleBinder binder ) {
+		return new Injector( binder.install( root ) );
 	}
 
 	public static Injector create( Binding<?>[] injectrons ) {
@@ -207,7 +207,7 @@ public class Injector
 
 		@Override
 		public T instanceFor( Dependency<? super T> dependency ) {
-			return repository.yield( injection.on( dependency ), injectable );
+			return repository.serve( injection.on( dependency ), injectable );
 		}
 
 		@Override
