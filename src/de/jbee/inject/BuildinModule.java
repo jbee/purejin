@@ -5,19 +5,19 @@ import static de.jbee.inject.Source.source;
 import java.util.List;
 import java.util.Set;
 
+import de.jbee.inject.util.BootstrappingModule;
+
 /**
  * Installs all the build-in functionality by using the core API.
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
-final class BuildinModule
-		implements Module {
-
-	private static final Source BUILD_IN = source( BuildinModule.class );
+public final class BuildinModule
+		extends BootstrappingModule {
 
 	@Override
 	public void configure( Bindings binder ) {
-		SimpleBinder bb = new SimpleBinder( binder, BUILD_IN, Scoped.DEFAULT );
+		SimpleBinder bb = new SimpleBinder( binder, source( BuildinModule.class ), Scoped.DEFAULT );
 		bb.wildcardBind( Provider.class, Suppliers.PROVIDER );
 		bb.wildcardBind( List.class, Suppliers.LIST_BRIDGE );
 		bb.wildcardBind( Set.class, Suppliers.SET_BRIDGE );

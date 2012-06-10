@@ -27,7 +27,6 @@ public class TestInstanceBinds {
 
 		@Override
 		protected void configure() {
-			install( Module.BUILD_IN );
 			bind( String.class ).to( "foobar" );
 			bind( CharSequence.class ).to( "bar" );
 			bind( Integer.class ).to( 42 );
@@ -37,7 +36,18 @@ public class TestInstanceBinds {
 
 	}
 
-	private final Injector injector = Injector.create( InstanceBindsModule.class,
+	private static class InstanceBindsBundle
+			implements Bundle {
+
+		@Override
+		public void bootstrap( Bootstrapper bootstrapper ) {
+			bootstrapper.install( BuildinModule.class );
+			bootstrapper.install( InstanceBindsModule.class );
+		}
+
+	}
+
+	private final Injector injector = Injector.create( InstanceBindsBundle.class,
 			new BuildinModuleBinder() );
 
 	@Test

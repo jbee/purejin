@@ -20,6 +20,7 @@ import de.jbee.inject.Supplier;
 import de.jbee.inject.Type;
 import de.jbee.inject.TypeReflector;
 import de.jbee.inject.util.Binder;
+import de.jbee.inject.util.BootstrappingModule;
 import de.jbee.inject.util.Binder.RootBinder;
 
 /**
@@ -59,18 +60,12 @@ public abstract class ServiceModule
 	protected abstract void configure();
 
 	static class ServiceSupplierModule
-			implements Module, Bundle {
+			extends BootstrappingModule {
 
 		@Override
 		public void configure( Bindings binder ) {
 			SimpleBinder bb = new SimpleBinder( binder, source( getClass() ), Scoped.DEFAULT );
 			bb.wildcardBind( Service.class, new ServiceSupplier() );
-		}
-
-		//TODO this can be in a abstract Module called BootstrappingModule
-		@Override
-		public void bootstrap( Bootstrapper bootstrapper ) {
-			bootstrapper.install( this );
 		}
 
 	}

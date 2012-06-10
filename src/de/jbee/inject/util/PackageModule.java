@@ -3,7 +3,6 @@ package de.jbee.inject.util;
 import static de.jbee.inject.Source.source;
 import de.jbee.inject.Bindings;
 import de.jbee.inject.Instance;
-import de.jbee.inject.Module;
 import de.jbee.inject.Name;
 import de.jbee.inject.Scope;
 import de.jbee.inject.Type;
@@ -28,14 +27,6 @@ public abstract class PackageModule
 	}
 
 	protected abstract void configure();
-
-	public void install( Module module ) {
-		module.configure( binder.bindings() );
-	}
-
-	public void extend( Class<? extends Module> dependency ) {
-		//OPEN how to keep track of the installed modules transparent ? 
-	}
 
 	public ScopedBinder in( Scope scope ) {
 		return binder.in( scope );
