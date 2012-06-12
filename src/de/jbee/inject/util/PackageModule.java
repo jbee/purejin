@@ -68,6 +68,10 @@ public abstract class PackageModule
 		return binder.bind( type );
 	}
 
+	public <T> TypedBinder<T> superbind( Class<T> type ) {
+		return binder.superbind( type );
+	}
+
 	public <T> TypedBinder<T> autobind( Type<T> type ) {
 		return binder.autobind( type );
 	}

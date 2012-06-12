@@ -12,17 +12,58 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.jbee.inject.util.PackageModule;
+
 public class Silk {
 
 	public static enum CoreModule {
-		PROVIDER( BuildinModule.class ),
-		LIST( BuildinModule.class ),
-		SET( BuildinModule.class );
+		PROVIDER( BuildinProviderModule.class ),
+		LIST( BuildinListModule.class ),
+		SET( BuildinSetModule.class );
 
-		private final Class<? extends Bundle> bundle;
+		final Class<? extends Bundle> bundle;
 
 		private CoreModule( Class<? extends Bundle> bundle ) {
 			this.bundle = bundle;
+		}
+
+	}
+
+	public static void install( Bootstrapper bs, CoreModule... modules ) {
+		for ( CoreModule m : modules ) {
+			bs.install( m.bundle );
+		}
+	}
+
+	/**
+	 * Installs all the build-in functionality by using the core API.
+	 */
+	private static final class BuildinProviderModule
+			extends PackageModule {
+
+		@Override
+		protected void configure() {
+			superbind( Provider.class ).to( Suppliers.PROVIDER );
+		}
+
+	}
+
+	private static final class BuildinListModule
+			extends PackageModule {
+
+		@Override
+		public void configure() {
+			superbind( List.class ).to( Suppliers.LIST_BRIDGE );
+		}
+
+	}
+
+	private static final class BuildinSetModule
+			extends PackageModule {
+
+		@Override
+		public void configure() {
+			superbind( Set.class ).to( Suppliers.SET_BRIDGE );
 		}
 
 	}

@@ -41,4 +41,5 @@ public class TestAutobindBinds {
 		assertEquals( injector.resolve( dependency( raw( Serializable.class ) ) ), 42 );
 	}
 
+	//TODO compareable<Integer>
 }

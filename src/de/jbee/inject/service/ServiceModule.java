@@ -14,13 +14,11 @@ import de.jbee.inject.Dependency;
 import de.jbee.inject.DependencyResolver;
 import de.jbee.inject.Module;
 import de.jbee.inject.Name;
-import de.jbee.inject.Scoped;
-import de.jbee.inject.SimpleBinder;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.Type;
 import de.jbee.inject.TypeReflector;
 import de.jbee.inject.util.Binder;
-import de.jbee.inject.util.BootstrappingModule;
+import de.jbee.inject.util.PackageModule;
 import de.jbee.inject.util.Binder.RootBinder;
 
 /**
@@ -60,12 +58,11 @@ public abstract class ServiceModule
 	protected abstract void configure();
 
 	static class ServiceSupplierModule
-			extends BootstrappingModule {
+			extends PackageModule {
 
 		@Override
-		public void configure( Bindings bindings ) {
-			SimpleBinder bb = new SimpleBinder( bindings, source( getClass() ), Scoped.DEFAULT );
-			bb.wildcardBind( Service.class, new ServiceSupplier() );
+		public void configure() {
+			superbind( Service.class ).toSupplier( ServiceSupplier.class );
 		}
 
 	}

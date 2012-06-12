@@ -93,6 +93,10 @@ public class Binder
 		this.availability = availability;
 	}
 
+	public <T> TypedBinder<T> superbind( Class<T> type ) {
+		return bind( Instance.anyOf( Type.raw( type ).parametizedAsLowerBounds() ) );
+	}
+
 	@Override
 	public <T> TypedBinder<T> bind( Instance<T> instance ) {
 		return new TypedBinder<T>( this, instance );
@@ -299,8 +303,8 @@ public class Binder
 			implements BasicBinder.TypedBasicBinder<T> {
 
 		/**
-		 * The binder instance who's {@link RichBasicBinder#install(Instance)} method had been called
-		 * to get to this {@link TypedBasicBinder}.
+		 * The binder instance who's {@link RichBasicBinder#install(Instance)} method had been
+		 * called to get to this {@link TypedBasicBinder}.
 		 */
 		private final Binder binder;
 		private final Resource<T> resource;

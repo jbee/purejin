@@ -18,6 +18,7 @@ import java.util.Set;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import de.jbee.inject.Silk.CoreModule;
 import de.jbee.inject.util.PackageModule;
 
 public class TestInstanceBinds {
@@ -41,7 +42,7 @@ public class TestInstanceBinds {
 
 		@Override
 		public void bootstrap( Bootstrapper bootstrap ) {
-			bootstrap.install( BuildinModule.class );
+			Silk.install( bootstrap, CoreModule.values() );
 			bootstrap.install( InstanceBindsModule.class );
 		}
 
