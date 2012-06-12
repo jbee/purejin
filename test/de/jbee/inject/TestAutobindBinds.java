@@ -24,8 +24,7 @@ public class TestAutobindBinds {
 
 	}
 
-	private final Injector injector = Injector.create( AutobindBindsModule.class,
-			new BuildinModuleBinder() );
+	private final Injector injector = Silk.injector( AutobindBindsModule.class );
 
 	@Test
 	public void thatTheAutoboundTypeItselfIsBound() {

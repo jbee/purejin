@@ -28,8 +28,7 @@ public class TestElementBinds {
 		}
 	}
 
-	private final Injector injector = Injector.create( ElementBindsModule.class,
-			new BuildinModuleBinder() );
+	private final Injector injector = Silk.injector( ElementBindsModule.class );
 
 	@Test
 	public void thatInstancesAreBoundAsElements() {

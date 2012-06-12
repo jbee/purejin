@@ -47,8 +47,7 @@ public class TestInstanceBinds {
 
 	}
 
-	private final Injector injector = Injector.create( InstanceBindsBundle.class,
-			new BuildinModuleBinder() );
+	private final Injector injector = Silk.injector( InstanceBindsBundle.class );
 
 	@Test
 	public void buildinProviderShouldBeAvailableForAnyBoundType() {

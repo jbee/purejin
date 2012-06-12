@@ -25,7 +25,7 @@ public class TestTypeBinds {
 
 	@Test
 	public void test() {
-		Injector injector = Injector.create( TypeBindsModule.class, new BuildinModuleBinder() );
+		Injector injector = Silk.injector( TypeBindsModule.class );
 		Number number = injector.resolve( dependency( raw( Number.class ) ) );
 		assertThat( number, instanceOf( Integer.class ) );
 		assertThat( number.intValue(), is( 42 ) );

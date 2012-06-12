@@ -27,7 +27,7 @@ public class TestSupplierBinds {
 
 	@Test
 	public void test() {
-		Injector injector = Injector.create( SupplierBindsModule.class, new BuildinModuleBinder() );
+		Injector injector = Silk.injector( SupplierBindsModule.class );
 		String value = injector.resolve( Dependency.dependency( Type.raw( String.class ) ) );
 		assertThat( value, is( "foobar" ) );
 	}
