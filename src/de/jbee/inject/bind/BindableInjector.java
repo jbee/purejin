@@ -1,4 +1,4 @@
-package de.jbee.inject;
+package de.jbee.inject.bind;
 
 import static de.jbee.inject.PreciserThanComparator.comparePrecision;
 
@@ -11,24 +11,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import de.jbee.inject.bind.Binding;
-import de.jbee.inject.bind.Bundle;
-import de.jbee.inject.bind.BundleBinder;
+import de.jbee.inject.Dependency;
+import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Injectable;
+import de.jbee.inject.Injection;
+import de.jbee.inject.Injectron;
+import de.jbee.inject.Repository;
+import de.jbee.inject.Resource;
+import de.jbee.inject.Source;
+import de.jbee.inject.Suppliers;
+import de.jbee.inject.Type;
 
-public class Injector
+public class BindableInjector
 		implements DependencyResolver {
 
-	public static Injector create( Class<? extends Bundle> root, BundleBinder binder ) {
-		return new Injector( binder.install( root ) );
+	public static BindableInjector create( Class<? extends Bundle> root, BundleBinder binder ) {
+		return new BindableInjector( binder.install( root ) );
 	}
 
-	public static Injector create( Binding<?>[] injectrons ) {
-		return new Injector( injectrons );
+	public static BindableInjector create( Binding<?>[] injectrons ) {
+		return new BindableInjector( injectrons );
 	}
 
 	private final Map<Class<?>, Injectron<?>[]> injectrons;
 
-	private Injector( Binding<?>[] bindings ) {
+	private BindableInjector( Binding<?>[] bindings ) {
 		super();
 		this.injectrons = injectrons( bindings, this );
 	}

@@ -6,7 +6,8 @@ public class Injection<T> {
 	private final int injectronSerialNumber;
 	private final int injectronCardinality;
 
-	Injection( Dependency<? super T> dependency, int injectronSerialNumber, int injectronCardinality ) {
+	public Injection( Dependency<? super T> dependency, int injectronSerialNumber,
+			int injectronCardinality ) {
 		super();
 		this.dependency = dependency;
 		this.injectronSerialNumber = injectronSerialNumber;

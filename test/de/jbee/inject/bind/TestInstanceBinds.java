@@ -19,15 +19,11 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import de.jbee.inject.Dependency;
-import de.jbee.inject.Injector;
+import de.jbee.inject.DependencyResolver;
 import de.jbee.inject.Injectron;
 import de.jbee.inject.Name;
 import de.jbee.inject.Provider;
 import de.jbee.inject.Type;
-import de.jbee.inject.bind.Bootstrap;
-import de.jbee.inject.bind.Bootstrapper;
-import de.jbee.inject.bind.Bundle;
-import de.jbee.inject.bind.PackageModule;
 import de.jbee.inject.bind.Bootstrap.CoreModule;
 
 public class TestInstanceBinds {
@@ -57,7 +53,7 @@ public class TestInstanceBinds {
 
 	}
 
-	private final Injector injector = Bootstrap.injector( InstanceBindsBundle.class );
+	private final DependencyResolver injector = Bootstrap.injector( InstanceBindsBundle.class );
 
 	@Test
 	public void buildinProviderShouldBeAvailableForAnyBoundType() {

@@ -1,6 +1,5 @@
 package de.jbee.inject;
 
-import de.jbee.inject.bind.Module;
 
 /**
  * A VO to answer: Where does a bind came from ? Was is implicit or explicit ?
@@ -10,20 +9,20 @@ import de.jbee.inject.bind.Module;
 public final class Source
 		implements PreciserThan<Source> {
 
-	public static Source source( Class<? extends Module> module ) {
+	public static Source source( Class<?> module ) {
 		return new Source( module, DeclarationType.EXPLICIT );
 	}
 
-	private final Class<? extends Module> module;
+	private final Class<?> module;
 	private final DeclarationType declarationType;
 
-	private Source( Class<? extends Module> module, DeclarationType declarationType ) {
+	private Source( Class<?> module, DeclarationType declarationType ) {
 		super();
 		this.module = module;
 		this.declarationType = declarationType;
 	}
 
-	public Class<? extends Module> getModule() {
+	public Class<?> getModule() {
 		return module;
 	}
 

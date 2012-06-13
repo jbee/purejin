@@ -10,9 +10,7 @@ import java.io.Serializable;
 
 import org.junit.Test;
 
-import de.jbee.inject.Injector;
-import de.jbee.inject.bind.Bootstrap;
-import de.jbee.inject.bind.PackageModule;
+import de.jbee.inject.DependencyResolver;
 
 public class TestAutobindBinds {
 
@@ -26,7 +24,7 @@ public class TestAutobindBinds {
 
 	}
 
-	private final Injector injector = Bootstrap.injector( AutobindBindsModule.class );
+	private final DependencyResolver injector = Bootstrap.injector( AutobindBindsModule.class );
 
 	@Test
 	public void thatTheAutoboundTypeItselfIsBound() {

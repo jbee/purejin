@@ -7,9 +7,8 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 import de.jbee.inject.Dependency;
-import de.jbee.inject.Injector;
+import de.jbee.inject.DependencyResolver;
 import de.jbee.inject.Type;
-import de.jbee.inject.bind.Bootstrap;
 import de.jbee.inject.service.Service;
 import de.jbee.inject.service.ServiceModule;
 
@@ -46,7 +45,7 @@ public class TestServiceBinds {
 
 	@Test
 	public void test() {
-		Injector injector = Bootstrap.injector( ServiceBindsModule.class );
+		DependencyResolver injector = Bootstrap.injector( ServiceBindsModule.class );
 		Dependency<Service> dependency = Dependency.dependency( Type.raw( Service.class ).parametized(
 				Integer.class, Integer.class ) );
 		Service<Integer, Integer> service = injector.resolve( dependency );

@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import de.jbee.inject.Injector;
+import de.jbee.inject.DependencyResolver;
 import de.jbee.inject.Provider;
 import de.jbee.inject.Repository;
 import de.jbee.inject.Resource;
@@ -23,6 +23,16 @@ import de.jbee.inject.Suppliers;
 import de.jbee.inject.TypeReflector;
 
 public class Bootstrap {
+
+	public static DependencyResolver injector( Class<? extends Bundle> root ) {
+		return BindableInjector.create( root, new BuildinBundleBinder() );
+	}
+
+	public static void install( Bootstrapper bs, CoreModule... modules ) {
+		for ( CoreModule m : modules ) {
+			bs.install( m.bundle );
+		}
+	}
 
 	public static enum CoreModule {
 		PROVIDER( BuildinProviderModule.class ),
@@ -37,47 +47,64 @@ public class Bootstrap {
 
 	}
 
-	public static void install( Bootstrapper bs, CoreModule... modules ) {
-		for ( CoreModule m : modules ) {
-			bs.install( m.bundle );
-		}
-	}
+	static final class BindDeclaration<T>
+			implements Comparable<BindDeclaration<?>> {
 
-	/**
-	 * Installs all the build-in functionality by using the core API.
-	 */
-	private static final class BuildinProviderModule
-			extends PackageModule {
+		private final int nr;
+		private final Resource<T> resource;
+		private final Supplier<? extends T> supplier;
+		private final Scope scope;
+		private final Source source;
+
+		BindDeclaration( int nr, Resource<T> resource, Supplier<? extends T> supplier, Scope scope,
+				Source source ) {
+			super();
+			this.nr = nr;
+			this.resource = resource;
+			this.supplier = supplier;
+			this.scope = scope;
+			this.source = source;
+		}
 
 		@Override
-		protected void configure() {
-			superbind( Provider.class ).to( Suppliers.PROVIDER );
+		public int compareTo( BindDeclaration<?> other ) {
+			int res = comparePrecision( resource.getInstance(), other.resource.getInstance() );
+			if ( res != 0 ) {
+				return res;
+			}
+			//TODO what about the Availability ? 
+			res = comparePrecision( source, other.source );
+			if ( res != 0 ) {
+				return res;
+			}
+			return Integer.valueOf( nr ).compareTo( other.nr );
 		}
-
-	}
-
-	private static final class BuildinListModule
-			extends PackageModule {
 
 		@Override
-		public void configure() {
-			superbind( List.class ).to( Suppliers.LIST_BRIDGE );
+		public String toString() {
+			return source + " / " + resource + " / " + scope;
 		}
 
-	}
-
-	private static final class BuildinSetModule
-			extends PackageModule {
-
-		@Override
-		public void configure() {
-			superbind( Set.class ).to( Suppliers.SET_BRIDGE );
+		Resource<T> resource() {
+			return resource;
 		}
 
-	}
+		Scope scope() {
+			return scope;
+		}
 
-	public static Injector injector( Class<? extends Bundle> root ) {
-		return Injector.create( root, new BuildinBundleBinder() );
+		Source source() {
+			return source;
+		}
+
+		Supplier<? extends T> supplier() {
+			return supplier;
+		}
+
+		Binding<T> toBinding( Repository repository ) {
+			return new Binding<T>( resource, supplier, repository, source );
+		}
+
 	}
 
 	static class BuildinBootstrapper
@@ -123,18 +150,6 @@ public class Bootstrap {
 			modules.add( module );
 		}
 
-		@Override
-		public void uninstall( Class<? extends Bundle> bundle ) {
-			if ( uninstalled.contains( bundle ) ) {
-				return;
-			}
-			for ( Set<Class<? extends Bundle>> c : bundleChildren.values() ) {
-				c.remove( bundle );
-			}
-			bundleModules.remove( bundle ); // we are sure we don't need its modules
-			uninstalled.add( bundle );
-		}
-
 		public List<Module> installed( Class<? extends Bundle> root ) {
 			Set<Class<? extends Bundle>> installed = new LinkedHashSet<Class<? extends Bundle>>();
 			allInstalledIn( root, installed );
@@ -150,6 +165,18 @@ public class Bootstrap {
 				}
 			}
 			return installed;
+		}
+
+		@Override
+		public void uninstall( Class<? extends Bundle> bundle ) {
+			if ( uninstalled.contains( bundle ) ) {
+				return;
+			}
+			for ( Set<Class<? extends Bundle>> c : bundleChildren.values() ) {
+				c.remove( bundle );
+			}
+			bundleModules.remove( bundle ); // we are sure we don't need its modules
+			uninstalled.add( bundle );
 		}
 
 		private void allInstalledIn( Class<? extends Bundle> bundle,
@@ -244,62 +271,35 @@ public class Bootstrap {
 
 	}
 
-	static final class BindDeclaration<T>
-			implements Comparable<BindDeclaration<?>> {
-
-		private final int nr;
-		private final Resource<T> resource;
-		private final Supplier<? extends T> supplier;
-		private final Scope scope;
-		private final Source source;
-
-		BindDeclaration( int nr, Resource<T> resource, Supplier<? extends T> supplier, Scope scope,
-				Source source ) {
-			super();
-			this.nr = nr;
-			this.resource = resource;
-			this.supplier = supplier;
-			this.scope = scope;
-			this.source = source;
-		}
-
-		Resource<T> resource() {
-			return resource;
-		}
-
-		Supplier<? extends T> supplier() {
-			return supplier;
-		}
-
-		Scope scope() {
-			return scope;
-		}
-
-		Source source() {
-			return source;
-		}
-
-		Binding<T> toBinding( Repository repository ) {
-			return new Binding<T>( resource, supplier, repository, source );
-		}
+	private static final class BuildinListModule
+			extends PackageModule {
 
 		@Override
-		public int compareTo( BindDeclaration<?> other ) {
-			int res = comparePrecision( resource.getInstance(), other.resource.getInstance() );
-			if ( res != 0 ) {
-				return res;
-			}
-			//TODO what about the Availability ? 
-			res = comparePrecision( source, other.source );
-			if ( res != 0 ) {
-				return res;
-			}
-			return Integer.valueOf( nr ).compareTo( other.nr );
+		public void configure() {
+			superbind( List.class ).to( Suppliers.LIST_BRIDGE );
 		}
 
+	}
+
+	/**
+	 * Installs all the build-in functionality by using the core API.
+	 */
+	private static final class BuildinProviderModule
+			extends PackageModule {
+
 		@Override
-		public String toString() {
-			return source + " / " + resource + " / " + scope;
+		protected void configure() {
+			superbind( Provider.class ).to( Suppliers.PROVIDER );
+		}
+
+	}
+
+	private static final class BuildinSetModule
+			extends PackageModule {
+
+		@Override
+		public void configure() {
+			superbind( Set.class ).to( Suppliers.SET_BRIDGE );
 		}
 
 	}
