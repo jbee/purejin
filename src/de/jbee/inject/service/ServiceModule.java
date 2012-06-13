@@ -7,19 +7,19 @@ import static de.jbee.inject.Type.returnType;
 
 import java.lang.reflect.Method;
 
-import de.jbee.inject.Bindings;
-import de.jbee.inject.Bootstrapper;
-import de.jbee.inject.Bundle;
 import de.jbee.inject.Dependency;
 import de.jbee.inject.DependencyResolver;
-import de.jbee.inject.Module;
 import de.jbee.inject.Name;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.Type;
 import de.jbee.inject.TypeReflector;
-import de.jbee.inject.util.Binder;
-import de.jbee.inject.util.PackageModule;
-import de.jbee.inject.util.Binder.RootBinder;
+import de.jbee.inject.bind.Binder;
+import de.jbee.inject.bind.Bindings;
+import de.jbee.inject.bind.Bootstrapper;
+import de.jbee.inject.bind.Bundle;
+import de.jbee.inject.bind.Module;
+import de.jbee.inject.bind.PackageModule;
+import de.jbee.inject.bind.Binder.RootBinder;
 
 /**
  * When binding {@link Service}s this {@link Module} can be extended.

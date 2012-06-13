@@ -1,4 +1,5 @@
-package de.jbee.inject;
+package de.jbee.inject.bind;
+
 
 /**
  * The basic idea is to split the binding process into 2 steps: installing modules and do bindings

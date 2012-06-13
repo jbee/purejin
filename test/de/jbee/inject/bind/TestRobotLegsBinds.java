@@ -1,8 +1,8 @@
-package de.jbee.inject;
+package de.jbee.inject.bind;
 
 import org.junit.Test;
 
-import de.jbee.inject.util.PackageModule;
+import de.jbee.inject.bind.PackageModule;
 
 public class TestRobotLegsBinds {
 

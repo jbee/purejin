@@ -1,4 +1,4 @@
-package de.jbee.inject;
+package de.jbee.inject.bind;
 
 import static de.jbee.inject.Dependency.dependency;
 import static de.jbee.inject.Type.raw;
@@ -8,7 +8,9 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import de.jbee.inject.util.PackageModule;
+import de.jbee.inject.Injector;
+import de.jbee.inject.bind.Bootstrap;
+import de.jbee.inject.bind.PackageModule;
 
 public class TestTypeBinds {
 
@@ -25,7 +27,7 @@ public class TestTypeBinds {
 
 	@Test
 	public void test() {
-		Injector injector = Silk.injector( TypeBindsModule.class );
+		Injector injector = Bootstrap.injector( TypeBindsModule.class );
 		Number number = injector.resolve( dependency( raw( Number.class ) ) );
 		assertThat( number, instanceOf( Integer.class ) );
 		assertThat( number.intValue(), is( 42 ) );

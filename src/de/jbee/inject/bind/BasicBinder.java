@@ -1,4 +1,4 @@
-package de.jbee.inject.util;
+package de.jbee.inject.bind;
 
 import de.jbee.inject.Instance;
 import de.jbee.inject.Scope;

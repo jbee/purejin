@@ -1,11 +1,17 @@
-package de.jbee.inject;
+package de.jbee.inject.bind;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import de.jbee.inject.util.PackageModule;
+import de.jbee.inject.Dependency;
+import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Injector;
+import de.jbee.inject.Supplier;
+import de.jbee.inject.Type;
+import de.jbee.inject.bind.Bootstrap;
+import de.jbee.inject.bind.PackageModule;
 
 public class TestSupplierBinds {
 
@@ -27,7 +33,7 @@ public class TestSupplierBinds {
 
 	@Test
 	public void test() {
-		Injector injector = Silk.injector( SupplierBindsModule.class );
+		Injector injector = Bootstrap.injector( SupplierBindsModule.class );
 		String value = injector.resolve( Dependency.dependency( Type.raw( String.class ) ) );
 		assertThat( value, is( "foobar" ) );
 	}

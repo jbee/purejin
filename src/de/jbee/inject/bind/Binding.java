@@ -1,4 +1,9 @@
-package de.jbee.inject;
+package de.jbee.inject.bind;
+
+import de.jbee.inject.Repository;
+import de.jbee.inject.Resource;
+import de.jbee.inject.Source;
+import de.jbee.inject.Supplier;
 
 /**
  * Gives read-only access to the binds done.
@@ -13,7 +18,7 @@ public final class Binding<T> {
 	private final Repository repository;
 	private final Source source;
 
-	Binding( Resource<T> resource, Supplier<? extends T> supplier, Repository repository,
+	public Binding( Resource<T> resource, Supplier<? extends T> supplier, Repository repository,
 			Source source ) {
 		super();
 		this.resource = resource;

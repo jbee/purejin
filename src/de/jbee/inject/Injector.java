@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import de.jbee.inject.bind.Binding;
+import de.jbee.inject.bind.Bundle;
+import de.jbee.inject.bind.BundleBinder;
+
 public class Injector
 		implements DependencyResolver {
 

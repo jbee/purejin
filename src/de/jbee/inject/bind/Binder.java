@@ -1,4 +1,4 @@
-package de.jbee.inject.util;
+package de.jbee.inject.bind;
 
 import static de.jbee.inject.Instance.defaultInstanceOf;
 import static de.jbee.inject.Instance.instance;
@@ -11,7 +11,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 
 import de.jbee.inject.Availability;
-import de.jbee.inject.Bindings;
 import de.jbee.inject.InjectionStrategy;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Name;
@@ -56,7 +55,7 @@ public class Binder
 		return new AutobindBindings( delegate );
 	}
 
-	static class SimpleBindStrategy
+	static class BuildinInjectionStrategy
 			implements InjectionStrategy {
 
 		@Override
@@ -71,7 +70,7 @@ public class Binder
 	}
 
 	public static RootBinder create( Bindings bindings, Source source ) {
-		return create( bindings, new SimpleBindStrategy(), source );
+		return create( bindings, new BuildinInjectionStrategy(), source );
 	}
 
 	public static RootBinder create( Bindings bindings, InjectionStrategy strategy, Source source ) {

@@ -1,4 +1,6 @@
-package de.jbee.inject;
+package de.jbee.inject.bind;
+
+import de.jbee.inject.Scope;
 
 /**
  * OPEN if we constrain {@link Context} declarations to the root-{@link Module} and have a separate

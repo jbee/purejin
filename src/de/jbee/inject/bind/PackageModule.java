@@ -1,16 +1,15 @@
-package de.jbee.inject.util;
+package de.jbee.inject.bind;
 
 import static de.jbee.inject.Source.source;
-import de.jbee.inject.Bindings;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Name;
 import de.jbee.inject.Scope;
 import de.jbee.inject.Type;
-import de.jbee.inject.util.Binder.RootBinder;
-import de.jbee.inject.util.Binder.ScopedBinder;
-import de.jbee.inject.util.Binder.TargetedBinder;
-import de.jbee.inject.util.Binder.TypedBinder;
-import de.jbee.inject.util.Binder.TypedElementBinder;
+import de.jbee.inject.bind.Binder.RootBinder;
+import de.jbee.inject.bind.Binder.ScopedBinder;
+import de.jbee.inject.bind.Binder.TargetedBinder;
+import de.jbee.inject.bind.Binder.TypedBinder;
+import de.jbee.inject.bind.Binder.TypedElementBinder;
 
 public abstract class PackageModule
 		extends BootstrappingModule {

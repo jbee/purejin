@@ -1,4 +1,5 @@
-package de.jbee.inject;
+package de.jbee.inject.bind;
+
 
 public interface Module {
 

@@ -1,4 +1,4 @@
-package de.jbee.inject;
+package de.jbee.inject.bind;
 
 import static de.jbee.inject.Dependency.dependency;
 import static de.jbee.inject.Type.raw;
@@ -10,7 +10,9 @@ import java.io.Serializable;
 
 import org.junit.Test;
 
-import de.jbee.inject.util.PackageModule;
+import de.jbee.inject.Injector;
+import de.jbee.inject.bind.Bootstrap;
+import de.jbee.inject.bind.PackageModule;
 
 public class TestAutobindBinds {
 
@@ -24,7 +26,7 @@ public class TestAutobindBinds {
 
 	}
 
-	private final Injector injector = Silk.injector( AutobindBindsModule.class );
+	private final Injector injector = Bootstrap.injector( AutobindBindsModule.class );
 
 	@Test
 	public void thatTheAutoboundTypeItselfIsBound() {

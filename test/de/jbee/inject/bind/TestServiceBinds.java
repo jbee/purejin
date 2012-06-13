@@ -1,4 +1,4 @@
-package de.jbee.inject;
+package de.jbee.inject.bind;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
@@ -6,6 +6,10 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
+import de.jbee.inject.Dependency;
+import de.jbee.inject.Injector;
+import de.jbee.inject.Type;
+import de.jbee.inject.bind.Bootstrap;
 import de.jbee.inject.service.Service;
 import de.jbee.inject.service.ServiceModule;
 
@@ -42,7 +46,7 @@ public class TestServiceBinds {
 
 	@Test
 	public void test() {
-		Injector injector = Silk.injector( ServiceBindsModule.class );
+		Injector injector = Bootstrap.injector( ServiceBindsModule.class );
 		Dependency<Service> dependency = Dependency.dependency( Type.raw( Service.class ).parametized(
 				Integer.class, Integer.class ) );
 		Service<Integer, Integer> service = injector.resolve( dependency );

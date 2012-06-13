@@ -1,4 +1,5 @@
-package de.jbee.inject;
+package de.jbee.inject.bind;
+
 
 /**
  * A bundle installs sub-bundles and {@link Module}s.

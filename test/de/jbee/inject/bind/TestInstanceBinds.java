@@ -1,4 +1,4 @@
-package de.jbee.inject;
+package de.jbee.inject.bind;
 
 import static de.jbee.inject.Dependency.dependency;
 import static de.jbee.inject.Name.named;
@@ -18,8 +18,17 @@ import java.util.Set;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import de.jbee.inject.Silk.CoreModule;
-import de.jbee.inject.util.PackageModule;
+import de.jbee.inject.Dependency;
+import de.jbee.inject.Injector;
+import de.jbee.inject.Injectron;
+import de.jbee.inject.Name;
+import de.jbee.inject.Provider;
+import de.jbee.inject.Type;
+import de.jbee.inject.bind.Bootstrap;
+import de.jbee.inject.bind.Bootstrapper;
+import de.jbee.inject.bind.Bundle;
+import de.jbee.inject.bind.PackageModule;
+import de.jbee.inject.bind.Bootstrap.CoreModule;
 
 public class TestInstanceBinds {
 
@@ -42,13 +51,13 @@ public class TestInstanceBinds {
 
 		@Override
 		public void bootstrap( Bootstrapper bootstrap ) {
-			Silk.install( bootstrap, CoreModule.values() );
+			Bootstrap.install( bootstrap, CoreModule.values() );
 			bootstrap.install( InstanceBindsModule.class );
 		}
 
 	}
 
-	private final Injector injector = Silk.injector( InstanceBindsBundle.class );
+	private final Injector injector = Bootstrap.injector( InstanceBindsBundle.class );
 
 	@Test
 	public void buildinProviderShouldBeAvailableForAnyBoundType() {

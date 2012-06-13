@@ -1,5 +1,7 @@
 package de.jbee.inject;
 
+import de.jbee.inject.bind.Module;
+
 /**
  * A VO to answer: Where does a bind came from ? Was is implicit or explicit ?
  * 
