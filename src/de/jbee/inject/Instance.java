@@ -77,6 +77,7 @@ public final class Instance<T>
 	@Override
 	public boolean morePreciseThan( Instance<?> other ) {
 		// sequence in OR is very important!!!
-		return type.morePreciseThan( other.type ) || name.morePreciseThan( other.name );
+		return type.morePreciseThan( other.type )
+				|| ( !other.type.morePreciseThan( type ) && name.morePreciseThan( other.name ) );
 	}
 }

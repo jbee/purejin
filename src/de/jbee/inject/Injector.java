@@ -31,6 +31,11 @@ public class Injector
 
 	private static Map<Class<?>, Injectron<?>[]> injectrons( Binding<?>[] bindings,
 			DependencyResolver resolver ) {
+		final int total = bindings.length;
+		Map<Class<?>, Injectron<?>[]> res = new IdentityHashMap<Class<?>, Injectron<?>[]>( total );
+		if ( total == 0 ) {
+			return res;
+		}
 		Arrays.sort( bindings, new Comparator<Binding<?>>() {
 
 			@Override
@@ -45,8 +50,6 @@ public class Injector
 				return comparePrecision( rOne, rOther );
 			}
 		} );
-		final int total = bindings.length;
-		Map<Class<?>, Injectron<?>[]> res = new IdentityHashMap<Class<?>, Injectron<?>[]>( total );
 		final int end = total - 1;
 		int start = 0;
 		Class<?> lastRawType = bindings[0].resource().getType().getRawType();

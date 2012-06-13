@@ -47,11 +47,11 @@ public abstract class ServiceModule
 	}
 
 	@Override
-	public final void configure( Bindings instructor ) {
+	public final void configure( Bindings bindings ) {
 		if ( binder != null ) {
 			throw new IllegalStateException( "Reentrance not allowed!" );
 		}
-		binder = Binder.create( instructor, source( getClass() ) );
+		binder = Binder.create( bindings, source( getClass() ) );
 		configure();
 	}
 

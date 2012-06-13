@@ -8,6 +8,6 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses ( { TestAutobindBinds.class, TestElementBinds.class, TestInstanceBinds.class,
 		TestRobotLegsBinds.class, TestServiceBinds.class, TestSupplierBinds.class,
 		TestTypeBinds.class, TestName.class, TestType.class } )
-public class TestSilk {
+public class TestSuiteSilk {
 	// all project tests
 }

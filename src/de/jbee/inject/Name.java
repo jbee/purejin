@@ -62,12 +62,18 @@ public final class Name
 
 	@Override
 	public boolean morePreciseThan( Name other ) {
+		if ( isDefault() ) {
+			return false;
+		}
+		if ( other.isDefault() ) {
+			return !isDefault();
+		}
 		if ( ( !isAny() && other.isAny() ) || !isDefault() && other.isDefault()
 				|| value.startsWith( other.value ) ) {
 			return true;
 		}
 		//TODO or names
-		return other.value.isEmpty();
+		return false;
 	}
 
 	public boolean isApplicableFor( Name other ) {

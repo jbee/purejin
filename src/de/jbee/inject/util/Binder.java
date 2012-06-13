@@ -8,6 +8,7 @@ import static de.jbee.inject.Type.instanceType;
 import static de.jbee.inject.Type.raw;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 
 import de.jbee.inject.Availability;
 import de.jbee.inject.Bindings;
@@ -115,6 +116,7 @@ public class Binder
 	}
 
 	public <T> TypedBinder<T> bind( Class<T> type ) {
+		bindImplicitToConstructor( type );
 		return bind( Type.raw( type ) );
 	}
 
@@ -173,6 +175,24 @@ public class Binder
 
 	protected final <T> void bind( Resource<T> resource, Supplier<? extends T> supplier ) {
 		bindings.add( resource, supplier, scope, source );
+	}
+
+	protected final void bindImplicitToConstructor( Class<?>... impls ) {
+		for ( Class<?> impl : impls ) {
+			bindImplicitToConstructor( impl );
+		}
+	}
+
+	protected final <I> void bindImplicitToConstructor( Class<I> impl ) {
+		if ( source.isImplicit() || impl.isInterface() || impl.isEnum() || impl.isPrimitive()
+				|| impl.isArray() || Modifier.isAbstract( impl.getModifiers() )
+				|| impl == String.class ) {
+			return;
+		}
+		Constructor<I> constructor = strategy().constructorFor( impl );
+		if ( constructor != null ) {
+			implicit().bind( impl ).to( constructor );
+		}
 	}
 
 	protected final Binder implicit() {
@@ -363,6 +383,14 @@ public class Binder
 			bindImplicitToConstructor( impl );
 		}
 
+		void bindImplicitToConstructor( Class<?>... impls ) {
+			binder.bindImplicitToConstructor( impls );
+		}
+
+		<I> void bindImplicitToConstructor( Class<I> impl ) {
+			binder.bindImplicitToConstructor( impl );
+		}
+
 		protected final TypedBinder<T> multi() {
 			return new TypedBinder<T>( binder.multi(), resource );
 		}
@@ -370,19 +398,6 @@ public class Binder
 		private TypedBinder<T> toConstant( T constant ) {
 			to( Suppliers.constant( constant ) );
 			return this;
-		}
-
-		protected final void bindImplicitToConstructor( Class<?>... impls ) {
-			for ( Class<?> impl : impls ) {
-				bindImplicitToConstructor( impl );
-			}
-		}
-
-		protected final <I> void bindImplicitToConstructor( Class<I> impl ) {
-			Constructor<I> constructor = binder.strategy().constructorFor( impl );
-			if ( constructor != null ) {
-				binder.implicit().bind( impl ).to( constructor );
-			}
 		}
 
 	}

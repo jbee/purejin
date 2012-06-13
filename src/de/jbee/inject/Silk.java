@@ -164,7 +164,7 @@ public class Silk {
 
 		// Find the initial set of bindings
 		// 0. create BindInstruction
-		// 2. sort instructions
+		// 2. sort declarations
 		// 3. remove duplicates (implicit will be sorted after explicit)
 		// 4. detect ambiguous bindings (two explicit bindings that have same type and availability)
 
@@ -187,21 +187,28 @@ public class Silk {
 			return bindings;
 		}
 
-		private Map<Scope, Repository> buildRepositories( BindDeclaration<?>[] instructions ) {
+		private Map<Scope, Repository> buildRepositories( BindDeclaration<?>[] declarations ) {
 			Map<Scope, Repository> repositories = new IdentityHashMap<Scope, Repository>();
-			for ( BindDeclaration<?> i : instructions ) {
+			for ( BindDeclaration<?> i : declarations ) {
 				Repository repository = repositories.get( i.scope() );
 				if ( repository == null ) {
-					repositories.put( i.scope(), i.scope().init( instructions.length ) );
+					repositories.put( i.scope(), i.scope().init( declarations.length ) );
 				}
 			}
 			return repositories;
 		}
 
-		private BindDeclaration<?>[] cleanedUp( BindDeclaration<?>[] instructions ) {
-			Arrays.sort( instructions );
-
-			return instructions;
+		private BindDeclaration<?>[] cleanedUp( BindDeclaration<?>[] declarations ) {
+			if ( declarations.length == 0 ) {
+				return declarations;
+			}
+			List<BindDeclaration<?>> res = new ArrayList<BindDeclaration<?>>( declarations.length );
+			Arrays.sort( declarations );
+			for ( BindDeclaration<?> d : declarations ) {
+				//TODO filter
+				res.add( d );
+			}
+			return res.toArray( new BindDeclaration[res.size()] );
 		}
 
 		private BindDeclaration<?>[] declarationsFrom( Class<? extends Bundle> root ) {
@@ -270,19 +277,21 @@ public class Silk {
 
 		@Override
 		public int compareTo( BindDeclaration<?> other ) {
-			int res = comparePrecision( resource.getType(), other.resource.getType() );
+			int res = comparePrecision( resource.getInstance(), other.resource.getInstance() );
 			if ( res != 0 ) {
 				return res;
 			}
-			res = comparePrecision( resource.getName(), other.resource.getName() );
-			if ( res != 0 ) {
-				return res;
-			}
+			//TODO what about the Availability ? 
 			res = comparePrecision( source, other.source );
 			if ( res != 0 ) {
 				return res;
 			}
 			return Integer.valueOf( nr ).compareTo( other.nr );
+		}
+
+		@Override
+		public String toString() {
+			return source + " / " + resource + " / " + scope;
 		}
 
 	}

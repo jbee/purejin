@@ -48,4 +48,8 @@ public final class Source
 	public boolean morePreciseThan( Source other ) {
 		return declarationType.morePreciseThan( other.declarationType );
 	}
+
+	public boolean isImplicit() {
+		return declarationType == DeclarationType.IMPLICIT;
+	}
 }
