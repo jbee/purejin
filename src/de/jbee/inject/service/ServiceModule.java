@@ -1,8 +1,10 @@
 package de.jbee.inject.service;
 
+import static de.jbee.inject.Dependency.dependency;
 import static de.jbee.inject.Name.named;
 import static de.jbee.inject.Source.source;
 import static de.jbee.inject.Type.parameterTypes;
+import static de.jbee.inject.Type.raw;
 import static de.jbee.inject.Type.returnType;
 
 import java.lang.reflect.Method;
@@ -20,6 +22,7 @@ import de.jbee.inject.bind.Bundle;
 import de.jbee.inject.bind.Module;
 import de.jbee.inject.bind.PackageModule;
 import de.jbee.inject.bind.Binder.RootBinder;
+import de.jbee.inject.service.Service.ServiceDecoupler;
 
 /**
  * When binding {@link Service}s this {@link Module} can be extended.
@@ -36,6 +39,11 @@ public abstract class ServiceModule
 	protected final void bindServices( Class<?> service ) {
 		String name = SERVICE_NAME_PREFIX + service.getCanonicalName();
 		binder.multibind( named( name ), Class.class ).to( service );
+	}
+
+	protected final <T> void bind( Class<T> service, ServiceDecoupler<? extends T> decoupler ) {
+		//TODO service must be a interface with just one method that has at least one generic for the parameter - optional a second one for the return type
+		binder.bind( service ).to( new ServiceDecoratorSupplier<T>( service, decoupler ) );
 	}
 
 	private RootBinder binder;
@@ -67,7 +75,35 @@ public abstract class ServiceModule
 
 	}
 
-	static class ServiceSupplier
+	private static class ServiceDecoratorSupplier<T>
+			implements Supplier<T> {
+
+		private final Class<T> type;
+		private final ServiceDecoupler<? extends T> decoupler;
+
+		ServiceDecoratorSupplier( Class<T> type, ServiceDecoupler<? extends T> decoupler ) {
+			super();
+			this.type = type;
+			this.decoupler = decoupler;
+		}
+
+		@Override
+		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
+			Type<?> parameterType = dependency.getType().getParameters()[0];
+			Type<?> returnType = dependency.getType().getParameters()[1];
+			Service<?, ?> service = context.resolve( dependency( raw( Service.class ).parametized(
+					parameterType, returnType ) ) );
+			return supply( service, parameterType, returnType );
+		}
+
+		@SuppressWarnings ( "unchecked" )
+		private <P, R> T supply( Service<?, ?> service, Type<P> parameterType, Type<R> returnType ) {
+			return decoupler.decouple( (Service<P, R>) service, returnType, parameterType );
+		}
+
+	}
+
+	private static class ServiceSupplier
 			implements Supplier<Service<?, ?>> {
 
 		private Class<?>[] serviceTypes;

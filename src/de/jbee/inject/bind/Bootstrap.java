@@ -234,16 +234,27 @@ public class Bootstrap {
 		}
 
 		private BindDeclaration<?>[] cleanedUp( BindDeclaration<?>[] declarations ) {
-			if ( declarations.length == 0 ) {
+			if ( declarations.length <= 1 ) {
 				return declarations;
 			}
 			List<BindDeclaration<?>> res = new ArrayList<BindDeclaration<?>>( declarations.length );
 			Arrays.sort( declarations );
-			for ( BindDeclaration<?> d : declarations ) {
-				//TODO filter
-				res.add( d );
+			res.add( declarations[0] );
+			for ( int i = 1; i < declarations.length; i++ ) {
+				if ( independent( declarations[i], declarations[i - 1] ) ) {
+					res.add( declarations[i] );
+				}
 			}
 			return res.toArray( new BindDeclaration[res.size()] );
+		}
+
+		private boolean independent( BindDeclaration<?> one, BindDeclaration<?> other ) {
+			if ( one.resource().includes( other.resource() ) ) {
+				if ( one.source().isImplicit() ) {
+					return false;
+				}
+			}
+			return true;
 		}
 
 		private BindDeclaration<?>[] declarationsFrom( Class<? extends Bundle> root ) {

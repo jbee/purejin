@@ -80,4 +80,9 @@ public final class Instance<T>
 		return type.morePreciseThan( other.type )
 				|| ( !other.type.morePreciseThan( type ) && name.morePreciseThan( other.name ) );
 	}
+
+	public boolean includes( Instance<?> other ) {
+		//TODO other cases
+		return type.equalTo( other.type ) && name.equalTo( other.name );
+	}
 }

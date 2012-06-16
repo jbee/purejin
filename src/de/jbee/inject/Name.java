@@ -47,9 +47,13 @@ public final class Name
 			: new Name( value + "|" + other.value );
 	}
 
+	public boolean equalTo( Name other ) {
+		return value.equalsIgnoreCase( other.value );
+	}
+
 	@Override
 	public boolean equals( Object obj ) {
-		return obj instanceof Name && ( (Name) obj ).value.equals( value );
+		return obj instanceof Name && equalTo( (Name) obj );
 	}
 
 	public boolean isAny() {

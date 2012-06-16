@@ -25,6 +25,13 @@ public class TestServiceBinds {
 
 	}
 
+	private static class AnotherTestService {
+
+		public Integer negate( Number value ) {
+			return -value.intValue();
+		}
+	}
+
 	private static class SomeTestService {
 
 		public Integer mul2( Integer value, Service<Float, Integer> service ) {
@@ -33,13 +40,6 @@ public class TestServiceBinds {
 
 		public Integer round( Float value ) {
 			return Math.round( value );
-		}
-	}
-
-	private static class AnotherTestService {
-
-		public Integer negate( Number value ) {
-			return -value.intValue();
 		}
 	}
 
