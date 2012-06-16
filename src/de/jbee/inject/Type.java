@@ -64,7 +64,7 @@ public final class Type<T>
 	}
 
 	public static <T> Type<T> type( Class<T> rawType, java.lang.reflect.Type type ) {
-		if ( type instanceof Class<?> ) {
+		if ( type == rawType ) {
 			return raw( rawType );
 		}
 		if ( type instanceof ParameterizedType ) {

@@ -8,6 +8,7 @@ import static de.jbee.inject.Type.raw;
 import static de.jbee.inject.Type.returnType;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.TypeVariable;
 
 import de.jbee.inject.Dependency;
 import de.jbee.inject.DependencyResolver;
@@ -41,9 +42,11 @@ public abstract class ServiceModule
 		binder.multibind( named( name ), Class.class ).to( service );
 	}
 
-	protected final <T> void bind( Class<T> service, ServiceDecoupler<? extends T> decoupler ) {
+	protected final <T> void bind( Class<T> service,
+			Class<? extends ServiceDecoupler<? extends T>> decoupler ) {
 		//TODO service must be a interface with just one method that has at least one generic for the parameter - optional a second one for the return type
-		binder.bind( service ).to( new ServiceDecoratorSupplier<T>( service, decoupler ) );
+		binder.bind( service ).to(
+				new ServiceDecouplerSupplier<T>( service, TypeReflector.newInstance( decoupler ) ) );
 	}
 
 	private RootBinder binder;
@@ -75,13 +78,13 @@ public abstract class ServiceModule
 
 	}
 
-	private static class ServiceDecoratorSupplier<T>
+	private static class ServiceDecouplerSupplier<T>
 			implements Supplier<T> {
 
 		private final Class<T> type;
 		private final ServiceDecoupler<? extends T> decoupler;
 
-		ServiceDecoratorSupplier( Class<T> type, ServiceDecoupler<? extends T> decoupler ) {
+		ServiceDecouplerSupplier( Class<T> type, ServiceDecoupler<? extends T> decoupler ) {
 			super();
 			this.type = type;
 			this.decoupler = decoupler;
@@ -89,11 +92,39 @@ public abstract class ServiceModule
 
 		@Override
 		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
-			Type<?> parameterType = dependency.getType().getParameters()[0];
-			Type<?> returnType = dependency.getType().getParameters()[1];
-			Service<?, ?> service = context.resolve( dependency( raw( Service.class ).parametized(
-					parameterType, returnType ) ) );
-			return supply( service, parameterType, returnType );
+			Type<?> parameterType = parameterType( dependency.getType() );
+			Type<?> returnType = returnType( dependency.getType() );
+			Type<Service> type = raw( Service.class ).parametized( parameterType, returnType );
+			return supply( context.resolve( dependency( type ) ), parameterType, returnType );
+		}
+
+		private Type<?> returnType( Type<? super T> concreteType ) {
+			Method method = type.getDeclaredMethods()[0];
+			return variableType( concreteType, method.getGenericReturnType(),
+					method.getReturnType() );
+		}
+
+		private Type<?> variableType( Type<? super T> concreteType,
+				java.lang.reflect.Type genericReturnType, Class<?> returnType ) {
+			if ( genericReturnType instanceof TypeVariable<?> ) {
+				TypeVariable<?> v = (TypeVariable<?>) genericReturnType;
+				if ( v.getGenericDeclaration() == type ) {
+					int i = 0;
+					for ( TypeVariable<Class<T>> p : type.getTypeParameters() ) {
+						if ( p.getName().equals( v.getName() ) ) {
+							return concreteType.getParameters()[i];
+						}
+						i++;
+					}
+				}
+			}
+			return Type.type( returnType, genericReturnType );
+		}
+
+		private Type<?> parameterType( Type<? super T> concreteType ) {
+			Method method = type.getDeclaredMethods()[0];
+			return variableType( concreteType, method.getGenericParameterTypes()[0],
+					method.getParameterTypes()[0] );
 		}
 
 		@SuppressWarnings ( "unchecked" )

@@ -20,7 +20,7 @@ public class TestServiceDecouplerBinds {
 	 * only place you are coupled to the DI-framework is still in the binding code that is
 	 * additional to the app-code.
 	 */
-	public static interface AppService<P, R> {
+	static interface AppService<P, R> {
 
 		R doIt( P param );
 	}
@@ -56,30 +56,64 @@ public class TestServiceDecouplerBinds {
 		}
 	}
 
+	static interface AppCommand<P> {
+
+		Long doIt( P param );
+	}
+
+	static class AppCommandDecoupler
+			implements Service.ServiceDecoupler<AppCommand<?>> {
+
+		@SuppressWarnings ( "unchecked" )
+		@Override
+		public <P, R> AppCommand<?> decouple( Service<P, R> service, Type<R> returnType,
+				Type<P> parameterType ) {
+			return new AppCommandAdapter<P>( (Service<P, Long>) service );
+		}
+
+		static class AppCommandAdapter<P>
+				implements AppCommand<P> {
+
+			private final Service<P, Long> service;
+
+			AppCommandAdapter( Service<P, Long> service ) {
+				super();
+				this.service = service;
+			}
+
+			@Override
+			public Long doIt( P param ) {
+				return service.invoke( param );
+			}
+
+		}
+	}
+
 	static class ServiceDecouplerBindsModule
 			extends ServiceModule {
 
 		@Override
 		protected void configure() {
 			bindServices( SomeService.class );
-			bind( AppService.class, new AppServiceDecoupler() );
+			bind( AppService.class, AppServiceDecoupler.class );
+			bind( AppCommand.class, AppCommandDecoupler.class );
 		}
 
 	}
 
-	private static class SomeService {
+	static class SomeService {
 
-		Integer square( Integer value ) {
-			return value * value;
+		Long square( Integer value ) {
+			return value.longValue() * value;
 		}
 	}
 
 	@Test
 	public void thatAppServiceCanBeResolvedWhenHavingGenericsInSameOrder() {
 		DependencyResolver injector = Bootstrap.injector( ServiceDecouplerBindsModule.class );
-		AppService<Integer, Integer> service = injector.resolve( Dependency.dependency( Type.raw(
-				AppService.class ).parametized( Integer.class, Integer.class ) ) );
-		assertThat( service.doIt( 2 ), is( 4 ) );
+		AppService<Integer, Long> service = injector.resolve( Dependency.dependency( Type.raw(
+				AppService.class ).parametized( Integer.class, Long.class ) ) );
+		assertThat( service.doIt( 2 ), is( 4L ) );
 	}
 
 	@Test
@@ -89,7 +123,10 @@ public class TestServiceDecouplerBinds {
 
 	@Test
 	public void thatAppServiceCanBeResolvedWhenHavingJustOneGeneric() {
-		//TODO
+		DependencyResolver injector = Bootstrap.injector( ServiceDecouplerBindsModule.class );
+		AppCommand<Integer> command = injector.resolve( Dependency.dependency( Type.raw(
+				AppCommand.class ).parametized( Integer.class ) ) );
+		assertThat( command.doIt( 3 ), is( 9L ) );
 	}
 
 }
