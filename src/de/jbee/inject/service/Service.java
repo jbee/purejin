@@ -13,6 +13,8 @@ public interface Service<P, R> {
 
 	R invoke( P params );
 
+	//TODO maybe it is better to provide a singleton object that can resolve something callable for parameter and return-type - a decouple becomes more an adapter that fetches this and calls it.
+
 	interface ServiceDecoupler<T> {
 
 		/**

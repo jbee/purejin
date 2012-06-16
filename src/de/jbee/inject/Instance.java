@@ -83,6 +83,6 @@ public final class Instance<T>
 
 	public boolean includes( Instance<?> other ) {
 		//TODO other cases
-		return type.equalTo( other.type ) && name.equalTo( other.name );
+		return type.includes( other.type ) && name.equalTo( other.name );
 	}
 }

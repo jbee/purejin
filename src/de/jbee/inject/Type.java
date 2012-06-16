@@ -406,4 +406,11 @@ public final class Type<T>
 		return (Type<? super T>[]) res.toArray( new Type<?>[res.size()] );
 	}
 
+	public boolean includes( Type<?> other ) {
+		if ( !isParameterized() ) {
+			return rawType == other.rawType || other.rawType.isAssignableFrom( rawType );
+		}
+		return equalTo( other );
+	}
+
 }

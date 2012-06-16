@@ -116,6 +116,10 @@ public class Binder
 
 	public <T> TypedBinder<T> bind( Class<T> type ) {
 		bindImplicitToConstructor( type );
+		return bindType( type );
+	}
+
+	private <T> TypedBinder<T> bindType( Class<T> type ) {
 		return bind( Type.raw( type ) );
 	}
 
@@ -183,15 +187,18 @@ public class Binder
 	}
 
 	protected final <I> void bindImplicitToConstructor( Class<I> impl ) {
-		if ( source.isImplicit() || impl.isInterface() || impl.isEnum() || impl.isPrimitive()
-				|| impl.isArray() || Modifier.isAbstract( impl.getModifiers() )
-				|| impl == String.class ) {
+		if ( notConstructable( impl ) ) {
 			return;
 		}
 		Constructor<I> constructor = strategy().constructorFor( impl );
 		if ( constructor != null ) {
-			implicit().bind( impl ).to( constructor );
+			implicit().bindType( impl ).to( constructor );
 		}
+	}
+
+	protected final boolean notConstructable( Class<?> type ) {
+		return type.isInterface() || type.isEnum() || type.isPrimitive() || type.isArray()
+				|| Modifier.isAbstract( type.getModifiers() ) || type == String.class;
 	}
 
 	protected final Binder implicit() {
