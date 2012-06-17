@@ -1,5 +1,6 @@
 package de.jbee.inject.bind;
 
+import static de.jbee.inject.Dependency.dependency;
 import static de.jbee.inject.PreciserThanComparator.comparePrecision;
 
 import java.lang.reflect.Array;
@@ -92,7 +93,7 @@ public class BindableInjector
 			@SuppressWarnings ( "unchecked" )
 			Binding<T> b = (Binding<T>) bindings[i + first];
 			res[i] = new InjectronImpl<T>( b.resource(), b.source(), new Injection<T>(
-					Dependency.dependency( b.resource().getType() ), i + first, bindings.length ),
+					dependency( b.resource().getType() ), i + first, bindings.length ),
 					b.repository(), Suppliers.asInjectable( b.supplier(), resolver ) );
 		}
 		return res;

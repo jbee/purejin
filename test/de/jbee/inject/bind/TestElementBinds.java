@@ -1,7 +1,6 @@
 package de.jbee.inject.bind;
 
 import static de.jbee.inject.Dependency.dependency;
-import static de.jbee.inject.Type.raw;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertArrayEquals;
@@ -32,19 +31,18 @@ public class TestElementBinds {
 
 	@Test
 	public void thatInstancesAreBoundAsElements() {
-		assertArrayEquals( injector.resolve( dependency( raw( String[].class ) ) ), new String[] {
-				"foo", "bar" } );
+		assertArrayEquals( injector.resolve( dependency( String[].class ) ), new String[] { "foo",
+				"bar" } );
 	}
 
 	@Test
 	public void thatSubtypeInstancesAreBoundAsElements() {
-		assertArrayEquals( injector.resolve( dependency( raw( Number[].class ) ) ), new Number[] {
-				2, 3f } );
+		assertArrayEquals( injector.resolve( dependency( Number[].class ) ), new Number[] { 2, 3f } );
 	}
 
 	@Test
 	public void thatTypesAreBoundAsElements() {
-		List<?>[] elems = injector.resolve( dependency( raw( List[].class ) ) );
+		List<?>[] elems = injector.resolve( dependency( List[].class ) );
 		assertThat( elems.length, is( 2 ) );
 		assertThat( elems[0], instanceOf( ArrayList.class ) );
 		assertThat( elems[1], instanceOf( LinkedList.class ) );

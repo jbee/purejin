@@ -12,7 +12,8 @@ import de.jbee.inject.bind.Binder.TypedBinder;
 import de.jbee.inject.bind.Binder.TypedElementBinder;
 
 public abstract class PackageModule
-		extends BootstrappingModule {
+		extends BootstrappingModule
+		implements BasicBinder.RootBasicBinder {
 
 	private RootBinder binder;
 
@@ -27,6 +28,7 @@ public abstract class PackageModule
 
 	protected abstract void configure();
 
+	@Override
 	public ScopedBinder in( Scope scope ) {
 		return binder.in( scope );
 	}
@@ -35,6 +37,7 @@ public abstract class PackageModule
 		return binder.injectingInto( target );
 	}
 
+	@Override
 	public TargetedBinder injectingInto( Instance<?> target ) {
 		return binder.injectingInto( target );
 	}
@@ -51,6 +54,7 @@ public abstract class PackageModule
 		return binder.bind( type );
 	}
 
+	@Override
 	public <T> TypedBinder<T> bind( Instance<T> instance ) {
 		return binder.bind( instance );
 	}

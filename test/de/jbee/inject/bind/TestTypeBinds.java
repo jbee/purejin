@@ -1,7 +1,6 @@
 package de.jbee.inject.bind;
 
 import static de.jbee.inject.Dependency.dependency;
-import static de.jbee.inject.Type.raw;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -26,7 +25,7 @@ public class TestTypeBinds {
 	@Test
 	public void test() {
 		DependencyResolver injector = Bootstrap.injector( TypeBindsModule.class );
-		Number number = injector.resolve( dependency( raw( Number.class ) ) );
+		Number number = injector.resolve( dependency( Number.class ) );
 		assertThat( number, instanceOf( Integer.class ) );
 		assertThat( number.intValue(), is( 42 ) );
 	}

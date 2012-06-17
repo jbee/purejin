@@ -300,6 +300,7 @@ public class Bootstrap {
 
 		@Override
 		protected void configure() {
+			// TODO use scope that leads to one instance per exact type (including generics)
 			superbind( Provider.class ).to( Suppliers.PROVIDER );
 		}
 

@@ -1,5 +1,7 @@
 package de.jbee.inject;
 
+import static de.jbee.inject.Type.raw;
+
 /**
  * Describes what is wanted/needed as parameter to construct a instance of T.
  * 
@@ -10,6 +12,10 @@ package de.jbee.inject;
 public final class Dependency<T>
 		implements Typed<T>, Named {
 
+	public static <T> Dependency<T> dependency( Class<T> type ) {
+		return dependency( raw( type ) );
+	}
+	
 	public static <T> Dependency<T> dependency( Type<T> type ) {
 		return new Dependency<T>( Name.ANY, type );
 	}

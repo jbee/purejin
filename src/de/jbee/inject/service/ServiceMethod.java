@@ -1,6 +1,5 @@
 package de.jbee.inject.service;
 
-import de.jbee.inject.Type;
 
 /**
  * 
@@ -9,22 +8,9 @@ import de.jbee.inject.Type;
  * @param <R>
  *            The return type of the method wired to this service
  */
-public interface Service<P, R> {
+public interface ServiceMethod<P, R> {
 
 	R invoke( P params );
-
-	//TODO maybe it is better to provide a singleton object that can resolve something callable for parameter and return-type - a decouple becomes more an adapter that fetches this and calls it.
-
-	interface ServiceDecoupler<T> {
-
-		/**
-		 * Wraps the given service in a object T that is a 'service' as well but the class is not
-		 * part of the DI framework. Thereby it is possible to use a own service-interface in the
-		 * application-code but also make use of all the build in functionality build on the
-		 * {@link Service}-interface.
-		 */
-		<P, R> T decouple( Service<P, R> service, Type<R> returnType, Type<P> parameterType );
-	}
 
 	// OPEN how to do classical service-wrapper like logger etc.
 

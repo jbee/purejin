@@ -43,12 +43,12 @@ public class TestInstanceBinds {
 	}
 
 	private static class InstanceBindsBundle
-			implements Bundle {
+			extends PackageBundle {
 
 		@Override
-		public void bootstrap( Bootstrapper bootstrap ) {
-			Bootstrap.install( bootstrap, CoreModule.values() );
-			bootstrap.install( InstanceBindsModule.class );
+		protected void bootstrap() {
+			install( CoreModule.values() );
+			install( InstanceBindsModule.class );
 		}
 
 	}
@@ -94,7 +94,7 @@ public class TestInstanceBinds {
 				String.class ) );
 		Injectron<String> injectron = injector.resolve( dependency );
 		assertThat( injectron, notNullValue() );
-		assertThat( injectron.instanceFor( dependency( raw( String.class ) ) ), is( "foobar" ) );
+		assertThat( injectron.instanceFor( dependency( String.class ) ), is( "foobar" ) );
 	}
 
 	@Test

@@ -2,13 +2,13 @@ package de.jbee.inject.service;
 
 import static de.jbee.inject.Dependency.dependency;
 import static de.jbee.inject.Name.named;
+import static de.jbee.inject.Scoped.APPLICATION;
 import static de.jbee.inject.Source.source;
 import static de.jbee.inject.Type.parameterTypes;
 import static de.jbee.inject.Type.raw;
 import static de.jbee.inject.Type.returnType;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.TypeVariable;
 
 import de.jbee.inject.Dependency;
 import de.jbee.inject.DependencyResolver;
@@ -23,10 +23,10 @@ import de.jbee.inject.bind.Bundle;
 import de.jbee.inject.bind.Module;
 import de.jbee.inject.bind.PackageModule;
 import de.jbee.inject.bind.Binder.RootBinder;
-import de.jbee.inject.service.Service.ServiceDecoupler;
+import de.jbee.inject.bind.Binder.TypedBinder;
 
 /**
- * When binding {@link Service}s this {@link Module} can be extended.
+ * When binding {@link ServiceMethod}s this {@link Module} can be extended.
  * 
  * It provides service-related build methods.
  * 
@@ -37,23 +37,20 @@ public abstract class ServiceModule
 
 	private static final String SERVICE_NAME_PREFIX = "Service-";
 
-	protected final void bindServices( Class<?> service ) {
+	protected final void bindServiceMethods( Class<?> service ) {
 		String name = SERVICE_NAME_PREFIX + service.getCanonicalName();
 		binder.multibind( named( name ), Class.class ).to( service );
 	}
 
-	protected final <T> void bind( Class<T> service,
-			Class<? extends ServiceDecoupler<? extends T>> decoupler ) {
-		//TODO service must be a interface with just one method that has at least one generic for the parameter - optional a second one for the return type
-		binder.bind( service ).to(
-				new ServiceDecouplerSupplier<T>( service, TypeReflector.newInstance( decoupler ) ) );
+	protected final <T> TypedBinder<T> superbind( Class<T> service ) {
+		return binder.superbind( service );
 	}
 
 	private RootBinder binder;
 
 	@Override
 	public final void bootstrap( Bootstrapper bootstrap ) {
-		bootstrap.install( ServiceSupplierModule.class );
+		bootstrap.install( ServiceMethodModule.class );
 		bootstrap.install( this );
 	}
 
@@ -68,105 +65,48 @@ public abstract class ServiceModule
 
 	protected abstract void configure();
 
-	static class ServiceSupplierModule
+	static class ServiceMethodModule
 			extends PackageModule {
 
 		@Override
 		public void configure() {
-			superbind( Service.class ).toSupplier( ServiceSupplier.class );
+			in( APPLICATION ).bind( ServiceProvider.class ).to( ServiceMethodProvider.class );
+			// TODO use scope that leads to one instance per exact type (including generics)
+			superbind( ServiceMethod.class ).toSupplier( ServiceSupplier.class );
 		}
 
 	}
 
-	private static class ServiceDecouplerSupplier<T>
-			implements Supplier<T> {
-
-		private final Class<T> type;
-		private final ServiceDecoupler<? extends T> decoupler;
-
-		ServiceDecouplerSupplier( Class<T> type, ServiceDecoupler<? extends T> decoupler ) {
-			super();
-			this.type = type;
-			this.decoupler = decoupler;
-		}
-
-		@Override
-		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
-			Type<?> parameterType = parameterType( dependency.getType() );
-			Type<?> returnType = returnType( dependency.getType() );
-			Type<Service> type = raw( Service.class ).parametized( parameterType, returnType );
-			return supply( context.resolve( dependency( type ) ), parameterType, returnType );
-		}
-
-		private Type<?> returnType( Type<? super T> concreteType ) {
-			Method method = type.getDeclaredMethods()[0];
-			return variableType( concreteType, method.getGenericReturnType(),
-					method.getReturnType() );
-		}
-
-		private Type<?> variableType( Type<? super T> concreteType,
-				java.lang.reflect.Type genericReturnType, Class<?> returnType ) {
-			if ( genericReturnType instanceof TypeVariable<?> ) {
-				TypeVariable<?> v = (TypeVariable<?>) genericReturnType;
-				if ( v.getGenericDeclaration() == type ) {
-					int i = 0;
-					for ( TypeVariable<Class<T>> p : type.getTypeParameters() ) {
-						if ( p.getName().equals( v.getName() ) ) {
-							return concreteType.getParameters()[i];
-						}
-						i++;
-					}
-				}
-			}
-			return Type.type( returnType, genericReturnType );
-		}
-
-		private Type<?> parameterType( Type<? super T> concreteType ) {
-			Method method = type.getDeclaredMethods()[0];
-			return variableType( concreteType, method.getGenericParameterTypes()[0],
-					method.getParameterTypes()[0] );
-		}
-
-		@SuppressWarnings ( "unchecked" )
-		private <P, R> T supply( Service<?, ?> service, Type<P> parameterType, Type<R> returnType ) {
-			return decoupler.decouple( (Service<P, R>) service, returnType, parameterType );
-		}
-
-	}
-
-	private static class ServiceSupplier
-			implements Supplier<Service<?, ?>> {
+	private static final class ServiceMethodProvider
+			implements ServiceProvider {
 
 		private Class<?>[] serviceTypes;
 
 		@Override
-		public Service<?, ?> supply( Dependency<? super Service<?, ?>> dependency,
+		public <P, R> ServiceMethod<P, R> provide( Type<P> parameterType, Type<R> returnType,
 				DependencyResolver context ) {
 			if ( serviceTypes == null ) {
 				resolveServiceTypes( context );
 			}
-			Method service = resolveServiceMethod( dependency );
-			Type<?>[] parameters = dependency.getType().getParameters();
-			return newServiceMethod( service, parameters[0].getRawType(),
-					parameters[1].getRawType(), context );
+			Method service = resolveServiceMethod( parameterType, returnType );
+			return newServiceMethod( service, parameterType.getRawType(), returnType.getRawType(),
+					context );
 		}
 
-		private <P, T> Service<P, T> newServiceMethod( Method service, Class<P> parameterType,
-				Class<T> returnType, DependencyResolver context ) {
-			return new ServiceMethod<P, T>(
+		private <P, T> ServiceMethod<P, T> newServiceMethod( Method service,
+				Class<P> parameterType, Class<T> returnType, DependencyResolver context ) {
+			return new LazyServiceMethod<P, T>(
 					TypeReflector.newInstance( service.getDeclaringClass() ), service,
 					parameterType, returnType, context );
 		}
 
-		private <P, T> Method resolveServiceMethod( Dependency<? super Service<P, T>> dependency ) {
-			Type<?> paramType = dependency.getType().getParameters()[0];
-			Type<?> returnType = dependency.getType().getParameters()[1];
+		private <P, T> Method resolveServiceMethod( Type<P> parameterType, Type<T> returnType ) {
 			for ( Class<?> st : serviceTypes ) {
 				for ( Method sm : st.getDeclaredMethods() ) {
 					Type<?> rt = returnType( sm );
 					if ( rt.equalTo( returnType ) ) {
 						for ( Type<?> pt : parameterTypes( sm ) ) {
-							if ( pt.equalTo( paramType ) ) {
+							if ( pt.equalTo( parameterType ) ) {
 								return sm;
 							}
 						}
@@ -179,8 +119,8 @@ public abstract class ServiceModule
 
 		private synchronized void resolveServiceTypes( DependencyResolver context ) {
 			if ( serviceTypes == null ) {
-				Dependency<Class[]> serviceClassesDependency = Dependency.dependency(
-						Type.raw( Class[].class ).parametized( Object.class ).parametizedAsLowerBounds() ).named(
+				Dependency<Class[]> serviceClassesDependency = dependency(
+						raw( Class[].class ).parametized( Object.class ).parametizedAsLowerBounds() ).named(
 						Name.prefixed( SERVICE_NAME_PREFIX ) );
 				serviceTypes = context.resolve( serviceClassesDependency );
 			}
@@ -188,8 +128,20 @@ public abstract class ServiceModule
 
 	}
 
-	static class ServiceMethod<P, T>
-			implements Service<P, T> {
+	private static class ServiceSupplier
+			implements Supplier<ServiceMethod<?, ?>> {
+
+		@Override
+		public ServiceMethod<?, ?> supply( Dependency<? super ServiceMethod<?, ?>> dependency,
+				DependencyResolver context ) {
+			ServiceProvider serviceResolver = context.resolve( dependency( ServiceProvider.class ) );
+			Type<?>[] parameters = dependency.getType().getParameters();
+			return serviceResolver.provide( parameters[0], parameters[1], context );
+		}
+	}
+
+	static class LazyServiceMethod<P, T>
+			implements ServiceMethod<P, T> {
 
 		private final Object object;
 		private final Method method;
@@ -198,8 +150,8 @@ public abstract class ServiceModule
 		private final DependencyResolver context;
 		private final Type<?>[] parameterTypes;
 
-		ServiceMethod( Object object, Method service, Class<P> parameterType, Class<T> returnType,
-				DependencyResolver context ) {
+		LazyServiceMethod( Object object, Method service, Class<P> parameterType,
+				Class<T> returnType, DependencyResolver context ) {
 			super();
 			this.object = object;
 			this.method = service;
@@ -228,7 +180,7 @@ public abstract class ServiceModule
 					args[i] = params;
 				} else {
 					// TODO add information from method (like annotations ?)
-					args[i] = context.resolve( Dependency.dependency( paramType ) );
+					args[i] = context.resolve( dependency( paramType ) );
 				}
 			}
 			return args;
