@@ -41,7 +41,7 @@ public class TestServiceBinds {
 				DependencyResolver context ) {
 			ServiceProvider provider = context.resolve( dependency( ServiceProvider.class ) );
 			Type<?>[] parameters = dependency.getType().getParameters();
-			return newService( provider.provide( parameters[0], parameters[1], context ) );
+			return newService( provider.provide( parameters[0], parameters[1] ) );
 		}
 
 		private <P, R> AppService<P, R> newService( ServiceMethod<P, R> service ) {
@@ -80,7 +80,7 @@ public class TestServiceBinds {
 				DependencyResolver context ) {
 			ServiceProvider provider = context.resolve( dependency( ServiceProvider.class ) );
 			return newCommand( provider.provide( dependency.getType().getParameters()[0],
-					raw( Long.class ), context ) );
+					raw( Long.class ) ) );
 		}
 
 		private <P> AppCommand<P> newCommand( ServiceMethod<P, Long> service ) {

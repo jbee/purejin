@@ -70,9 +70,21 @@ public abstract class ServiceModule
 
 		@Override
 		public void configure() {
-			in( APPLICATION ).bind( ServiceProvider.class ).to( ServiceMethodProvider.class );
+			in( APPLICATION ).bind( ServiceProvider.class ).toSupplier(
+					ServiceProviderSupplier.class );
 			// TODO use scope that leads to one instance per exact type (including generics)
 			superbind( ServiceMethod.class ).toSupplier( ServiceSupplier.class );
+		}
+
+	}
+
+	private static final class ServiceProviderSupplier
+			implements Supplier<ServiceProvider> {
+
+		@Override
+		public ServiceProvider supply( Dependency<? super ServiceProvider> dependency,
+				DependencyResolver context ) {
+			return new ServiceMethodProvider( context );
 		}
 
 	}
@@ -80,14 +92,24 @@ public abstract class ServiceModule
 	private static final class ServiceMethodProvider
 			implements ServiceProvider {
 
-		private Class<?>[] serviceTypes;
+		private final DependencyResolver context;
+		private final Class<?>[] serviceTypes;
+
+		ServiceMethodProvider( DependencyResolver context ) {
+			super();
+			this.context = context;
+			this.serviceTypes = resolveServiceTypes( context );
+		}
+
+		private static Class<?>[] resolveServiceTypes( DependencyResolver context ) {
+			Dependency<Class[]> serviceClassesDependency = dependency(
+					raw( Class[].class ).parametized( Object.class ).parametizedAsLowerBounds() ).named(
+					Name.prefixed( SERVICE_NAME_PREFIX ) );
+			return context.resolve( serviceClassesDependency );
+		}
 
 		@Override
-		public <P, R> ServiceMethod<P, R> provide( Type<P> parameterType, Type<R> returnType,
-				DependencyResolver context ) {
-			if ( serviceTypes == null ) {
-				resolveServiceTypes( context );
-			}
+		public <P, R> ServiceMethod<P, R> provide( Type<P> parameterType, Type<R> returnType ) {
 			Method service = resolveServiceMethod( parameterType, returnType );
 			return newServiceMethod( service, parameterType.getRawType(), returnType.getRawType(),
 					context );
@@ -117,17 +139,9 @@ public abstract class ServiceModule
 			return null;
 		}
 
-		private synchronized void resolveServiceTypes( DependencyResolver context ) {
-			if ( serviceTypes == null ) {
-				Dependency<Class[]> serviceClassesDependency = dependency(
-						raw( Class[].class ).parametized( Object.class ).parametizedAsLowerBounds() ).named(
-						Name.prefixed( SERVICE_NAME_PREFIX ) );
-				serviceTypes = context.resolve( serviceClassesDependency );
-			}
-		}
-
 	}
 
+	//OPEN move this to test-code since it is more of an example using the SM directly as the service interface
 	private static class ServiceSupplier
 			implements Supplier<ServiceMethod<?, ?>> {
 
@@ -136,7 +150,7 @@ public abstract class ServiceModule
 				DependencyResolver context ) {
 			ServiceProvider serviceResolver = context.resolve( dependency( ServiceProvider.class ) );
 			Type<?>[] parameters = dependency.getType().getParameters();
-			return serviceResolver.provide( parameters[0], parameters[1], context );
+			return serviceResolver.provide( parameters[0], parameters[1] );
 		}
 	}
 
