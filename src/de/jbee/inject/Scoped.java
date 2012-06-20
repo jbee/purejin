@@ -34,8 +34,8 @@ public class Scoped { //OPEN what about Scoping ?
 		}
 
 		@Override
-		public Repository init( int cardinality ) {
-			return new SnapshotRepository( src.init( cardinality ), dest.init( cardinality ) );
+		public Repository init() {
+			return new SnapshotRepository( src.init(), dest.init() );
 		}
 
 		@Override
@@ -63,7 +63,7 @@ public class Scoped { //OPEN what about Scoping ?
 		}
 
 		@Override
-		public Repository init( int cardinality ) {
+		public Repository init() {
 			return this;
 		}
 
@@ -96,14 +96,14 @@ public class Scoped { //OPEN what about Scoping ?
 			Repository repository = threadRepository.get();
 			if ( repository == null ) {
 				// since each thread is just accessing its own repo there cannot be a repo set for the running thread after we checked for null
-				repository = repositoryScope.init( injection.injectronCardinality() );
+				repository = repositoryScope.init();
 				threadRepository.set( repository );
 			}
 			return repository.serve( injection, injectable );
 		}
 
 		@Override
-		public Repository init( int cardinality ) {
+		public Repository init() {
 			return this;
 		}
 
@@ -188,8 +188,8 @@ public class Scoped { //OPEN what about Scoping ?
 		}
 
 		@Override
-		public Repository init( int cardinality ) {
-			return new ResourceRepository( new Object[cardinality] );
+		public Repository init() {
+			return new ResourceRepository();
 		}
 
 		@Override
@@ -207,16 +207,18 @@ public class Scoped { //OPEN what about Scoping ?
 	private static final class ResourceRepository
 			implements Repository {
 
-		private final Object[] instances;
+		private Object[] instances;
 
-		ResourceRepository( Object[] instances ) {
+		ResourceRepository() {
 			super();
-			this.instances = instances;
 		}
 
 		@Override
 		@SuppressWarnings ( "unchecked" )
 		public <T> T serve( Injection<T> injection, Injectable<T> injectable ) {
+			if ( instances == null ) {
+				instances = new Object[injection.injectronCardinality()];
+			}
 			T res = (T) instances[injection.injectronSerialNumber()];
 			if ( res != null ) {
 				return res;

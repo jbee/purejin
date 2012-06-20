@@ -242,7 +242,7 @@ public class Bootstrap {
 			for ( BindDeclaration<?> i : declarations ) {
 				Repository repository = repositories.get( i.scope() );
 				if ( repository == null ) {
-					repositories.put( i.scope(), i.scope().init( declarations.length ) );
+					repositories.put( i.scope(), i.scope().init() );
 				}
 			}
 			return repositories;
