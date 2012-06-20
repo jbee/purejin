@@ -1,6 +1,5 @@
 package de.jbee.inject.bind;
 
-
 /**
  * The basic idea is to split the binding process into 2 steps: installing modules and do bindings
  * in the installed modules.
@@ -38,8 +37,11 @@ public interface Bootstrapper {
 	 */
 	void uninstall( Class<? extends Bundle> bundle );
 
+	//OPEN <E extends Enum<?> & Bundle> void install( E... bundles );
+
 	void install( Module module );
 
 	//OPEN beside Bundle and Module there should be a Config. That is basically a module that provides constants that are kind of configuration. Should that be a separate core concept or just a class/type of Module ?
 
+	//TODO we can also use enum constants since we know they cannot change and there is just that constant values existing in the enum. thereby we also can define families of bundles/modules that can be refered to by the enum class.
 }

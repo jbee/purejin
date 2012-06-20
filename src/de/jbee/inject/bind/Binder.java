@@ -94,7 +94,7 @@ public class Binder
 	}
 
 	public <T> TypedBinder<T> superbind( Class<T> type ) {
-		return bind( Instance.anyOf( Type.raw( type ).parametizedAsLowerBounds() ) );
+		return bind( Instance.anyOf( Type.raw( type ) ) );
 	}
 
 	@Override

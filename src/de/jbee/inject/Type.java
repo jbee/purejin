@@ -16,6 +16,8 @@ import java.util.List;
 public final class Type<T>
 		implements PreciserThan<Type<?>> {
 
+	public static final Type<? extends Object> WILDCARD = raw( Object.class ).asLowerBound();
+
 	public static Type<?> fieldType( Field field ) {
 		return type( field.getType(), field.getGenericType() );
 	}
@@ -38,6 +40,14 @@ public final class Type<T>
 		Type<?>[] res = new Type<?>[parameterTypes.length];
 		for ( int i = 0; i < res.length; i++ ) {
 			res[i] = type( parameterTypes[i], genericParameterTypes[i] );
+		}
+		return res;
+	}
+
+	public static Type<?>[] wildcards( TypeVariable<?>... variables ) {
+		Type<?>[] res = new Type<?>[variables.length];
+		for ( int i = 0; i < res.length; i++ ) {
+			res[i] = WILDCARD;
 		}
 		return res;
 	}
@@ -273,7 +283,13 @@ public final class Type<T>
 	 *         model &lt;?&gt; wildcard generic.
 	 */
 	public Type<T> parametizedAsLowerBounds() { //TODO recursive version or one with a depth ?
-		if ( !isParameterized() || allArgumentsAreLowerBounds() ) {
+		if ( !isParameterized() ) {
+			if ( isRawType() ) {
+				return parametized( wildcards( rawType.getTypeParameters() ) );
+			}
+			return this;
+		}
+		if ( allArgumentsAreLowerBounds() ) {
 			return this;
 		}
 		Type<?>[] parameters = new Type<?>[params.length];
@@ -281,6 +297,14 @@ public final class Type<T>
 			parameters[i] = params[i].asLowerBound();
 		}
 		return new Type<T>( lowerBound, rawType, parameters );
+	}
+
+	/**
+	 * @return true, in case this is a raw type - that is a generic type without any generic type
+	 *         information available.
+	 */
+	public boolean isRawType() {
+		return !isParameterized() && rawType.getTypeParameters().length > 0;
 	}
 
 	public boolean allArgumentsAreLowerBounds() {

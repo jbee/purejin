@@ -34,7 +34,8 @@ public class Bootstrap {
 		}
 	}
 
-	public static enum CoreModule {
+	public static enum CoreModule
+			implements Bundle, Module {
 		PROVIDER( BuildinProviderModule.class ),
 		LIST( BuildinListModule.class ),
 		SET( BuildinSetModule.class );
@@ -43,6 +44,17 @@ public class Bootstrap {
 
 		private CoreModule( Class<? extends Bundle> bundle ) {
 			this.bundle = bundle;
+		}
+
+		@Override
+		public void bootstrap( Bootstrapper bootstrap ) {
+			bootstrap.install( this );
+		}
+
+		@Override
+		public void configure( Bindings bindings ) {
+			// TODO Auto-generated method stub
+
 		}
 
 	}
@@ -113,13 +125,15 @@ public class Bootstrap {
 		private final Map<Class<? extends Bundle>, Set<Class<? extends Bundle>>> bundleChildren = new IdentityHashMap<Class<? extends Bundle>, Set<Class<? extends Bundle>>>();
 		private final Map<Class<? extends Bundle>, List<Module>> bundleModules = new IdentityHashMap<Class<? extends Bundle>, List<Module>>();
 		private final Set<Class<? extends Bundle>> uninstalled = new HashSet<Class<? extends Bundle>>();
+		private final Set<Class<? extends Bundle>> installed = new HashSet<Class<? extends Bundle>>();
 		private final LinkedList<Class<? extends Bundle>> stack = new LinkedList<Class<? extends Bundle>>();
 
 		@Override
 		public void install( Class<? extends Bundle> bundle ) {
-			if ( uninstalled.contains( bundle ) ) {
+			if ( uninstalled.contains( bundle ) || installed.contains( bundle ) ) {
 				return;
 			}
+			installed.add( bundle );
 			if ( !stack.isEmpty() ) {
 				final Class<? extends Bundle> parent = stack.peek();
 				Set<Class<? extends Bundle>> children = bundleChildren.get( parent );
@@ -172,6 +186,7 @@ public class Bootstrap {
 			if ( uninstalled.contains( bundle ) ) {
 				return;
 			}
+			installed.remove( bundle );
 			for ( Set<Class<? extends Bundle>> c : bundleChildren.values() ) {
 				c.remove( bundle );
 			}
