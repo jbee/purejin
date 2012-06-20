@@ -1,6 +1,5 @@
 package de.jbee.inject.service;
 
-
 /**
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)

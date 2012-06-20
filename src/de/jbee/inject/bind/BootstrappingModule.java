@@ -1,6 +1,5 @@
 package de.jbee.inject.bind;
 
-
 public abstract class BootstrappingModule
 		implements Module, Bundle {
 

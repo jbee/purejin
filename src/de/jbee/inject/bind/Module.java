@@ -1,6 +1,5 @@
 package de.jbee.inject.bind;
 
-
 public interface Module {
 
 	void configure( Bindings bindings );

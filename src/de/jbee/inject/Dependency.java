@@ -15,7 +15,7 @@ public final class Dependency<T>
 	public static <T> Dependency<T> dependency( Class<T> type ) {
 		return dependency( raw( type ) );
 	}
-	
+
 	public static <T> Dependency<T> dependency( Type<T> type ) {
 		return new Dependency<T>( Name.ANY, type );
 	}

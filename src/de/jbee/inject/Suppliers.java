@@ -344,7 +344,7 @@ public class Suppliers {
 
 		@Override
 		public T instanceFor( Injection<T> injection ) {
-			return supplier.supply( injection.getDependency(), context );
+			return supplier.supply( injection.dependency(), context );
 		}
 	}
 }

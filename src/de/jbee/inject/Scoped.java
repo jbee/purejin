@@ -217,18 +217,18 @@ public class Scoped { //OPEN what about Scoping ?
 		@SuppressWarnings ( "unchecked" )
 		public <T> T serve( Injection<T> injection, Injectable<T> injectable ) {
 			if ( instances == null ) {
-				instances = new Object[injection.injectronCardinality()];
+				instances = new Object[injection.cardinality()];
 			}
-			T res = (T) instances[injection.injectronSerialNumber()];
+			T res = (T) instances[injection.serialNumber()];
 			if ( res != null ) {
 				return res;
 			}
 			// just sync the (later) unexpected path that is executed once
 			synchronized ( instances ) {
-				res = (T) instances[injection.injectronSerialNumber()];
+				res = (T) instances[injection.serialNumber()];
 				if ( res == null ) { // we need to ask again since the instance could have been initialized before we got entrance to the sync block
 					res = injectable.instanceFor( injection );
-					instances[injection.injectronSerialNumber()] = res;
+					instances[injection.serialNumber()] = res;
 				}
 			}
 			return res;
