@@ -30,7 +30,7 @@ public class TestBootstrapper {
 	}
 
 	@Test
-	public void thatBundleCyclesDontoCauseStackOverflowErrors() {
+	public void thatBundleCyclesDontCauseStackOverflowErrors() {
 		DependencyResolver injector = Bootstrap.injector( OneBundle.class );
 		assertThat( injector, notNullValue() );
 	}

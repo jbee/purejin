@@ -1,5 +1,7 @@
 package de.jbee.inject;
 
+import static de.jbee.inject.Precision.morePreciseThan2;
+
 /**
  * Describes WHAT can be injected and WHERE it can be injected.
  * 
@@ -58,9 +60,7 @@ public final class Resource<T>
 	@Override
 	public boolean morePreciseThan( Resource<?> other ) {
 		// the sequence in OR is very important here!!!
-		return instance.morePreciseThan( other.instance )
-				|| !other.instance.morePreciseThan( instance )
-				&& availability.morePreciseThan( other.availability );
+		return morePreciseThan2( instance, other.instance, availability, other.availability );
 	}
 
 	@Override

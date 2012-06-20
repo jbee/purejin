@@ -1,7 +1,6 @@
 package de.jbee.inject.bind;
 
 import static de.jbee.inject.Dependency.dependency;
-import static de.jbee.inject.PreciserThanComparator.comparePrecision;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -17,6 +16,7 @@ import de.jbee.inject.DependencyResolver;
 import de.jbee.inject.Injectable;
 import de.jbee.inject.Injection;
 import de.jbee.inject.Injectron;
+import de.jbee.inject.Precision;
 import de.jbee.inject.Repository;
 import de.jbee.inject.Resource;
 import de.jbee.inject.Source;
@@ -59,7 +59,7 @@ public class BindableInjector
 				if ( rawOne != rawOther ) {
 					return rawOne.getCanonicalName().compareTo( rawOther.getCanonicalName() );
 				}
-				return comparePrecision( rOne, rOther );
+				return Precision.comparePrecision( rOne, rOther );
 			}
 		} );
 		final int end = total - 1;

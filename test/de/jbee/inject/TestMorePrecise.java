@@ -3,7 +3,6 @@ package de.jbee.inject;
 import static de.jbee.inject.Instance.defaultInstanceOf;
 import static de.jbee.inject.Instance.instance;
 import static de.jbee.inject.Name.named;
-import static de.jbee.inject.PreciserThanComparator.comparePrecision;
 import static de.jbee.inject.Type.raw;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertFalse;
@@ -55,7 +54,7 @@ public class TestMorePrecise {
 	@Test
 	public void thatMorePreciseComesFirstInSortOrder() {
 		HigherIsPreciser[] values = new HigherIsPreciser[] { hip( 1 ), hip( 2 ) };
-		Arrays.sort( values, new PreciserThanComparator<HigherIsPreciser>() );
+		Arrays.sort( values, Precision.<HigherIsPreciser> comparator() );
 		assertTrue( values[0].value == 2 );
 	}
 
@@ -90,6 +89,6 @@ public class TestMorePrecise {
 
 	private <T extends PreciserThan<? super T>> void assertNotMorePreciseThanItself( T type ) {
 		assertFalse( type.morePreciseThan( type ) );
-		assertThat( comparePrecision( type, type ), is( 0 ) );
+		assertThat( Precision.comparePrecision( type, type ), is( 0 ) );
 	}
 }

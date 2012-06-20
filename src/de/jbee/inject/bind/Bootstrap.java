@@ -1,7 +1,5 @@
 package de.jbee.inject.bind;
 
-import static de.jbee.inject.PreciserThanComparator.comparePrecision;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -13,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Precision;
 import de.jbee.inject.Provider;
 import de.jbee.inject.Repository;
 import de.jbee.inject.Resource;
@@ -80,12 +79,13 @@ public class Bootstrap {
 
 		@Override
 		public int compareTo( BindDeclaration<?> other ) {
-			int res = comparePrecision( resource.getInstance(), other.resource.getInstance() );
+			int res = Precision.comparePrecision( resource.getInstance(),
+					other.resource.getInstance() );
 			if ( res != 0 ) {
 				return res;
 			}
 			//TODO what about the Availability ? 
-			res = comparePrecision( source, other.source );
+			res = Precision.comparePrecision( source, other.source );
 			if ( res != 0 ) {
 				return res;
 			}

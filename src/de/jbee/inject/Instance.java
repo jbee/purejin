@@ -1,5 +1,7 @@
 package de.jbee.inject;
 
+import static de.jbee.inject.Precision.morePreciseThan2;
+
 /**
  * Used to tell that we don#t want just one singleton at a time but multiple distinguished by the
  * {@link Name} used.
@@ -15,7 +17,7 @@ public final class Instance<T>
 	 * binds of matching types. There is also a set of wildcard binds that are tried if no bind has
 	 * been made for a type.
 	 */
-	public static final Instance<? extends Object> ANY = anyOf( Type.raw( Object.class ).asLowerBound() );
+	public static final Instance<? extends Object> ANY = anyOf( Type.WILDCARD );
 
 	public static <T> Instance<T> defaultInstanceOf( Type<T> type ) {
 		return instance( Name.DEFAULT, type );
@@ -77,8 +79,7 @@ public final class Instance<T>
 	@Override
 	public boolean morePreciseThan( Instance<?> other ) {
 		// sequence in OR is very important!!!
-		return type.morePreciseThan( other.type )
-				|| ( !other.type.morePreciseThan( type ) && name.morePreciseThan( other.name ) );
+		return morePreciseThan2( type, other.type, name, other.name );
 	}
 
 	public boolean includes( Instance<?> other ) {
