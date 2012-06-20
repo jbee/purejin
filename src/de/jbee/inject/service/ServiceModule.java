@@ -3,6 +3,7 @@ package de.jbee.inject.service;
 import static de.jbee.inject.Dependency.dependency;
 import static de.jbee.inject.Name.named;
 import static de.jbee.inject.Scoped.APPLICATION;
+import static de.jbee.inject.Scoped.DEPENDENCY_TYPE;
 import static de.jbee.inject.Source.source;
 import static de.jbee.inject.Type.parameterTypes;
 import static de.jbee.inject.Type.raw;
@@ -43,7 +44,7 @@ public abstract class ServiceModule
 	}
 
 	protected final <T> TypedBinder<T> superbind( Class<T> service ) {
-		return binder.superbind( service );
+		return binder.in( DEPENDENCY_TYPE ).superbind( service );
 	}
 
 	private RootBinder binder;
@@ -73,7 +74,8 @@ public abstract class ServiceModule
 			in( APPLICATION ).bind( ServiceProvider.class ).toSupplier(
 					ServiceProviderSupplier.class );
 			// TODO use scope that leads to one instance per exact type (including generics)
-			superbind( ServiceMethod.class ).toSupplier( ServiceSupplier.class );
+			in( DEPENDENCY_TYPE ).superbind( ServiceMethod.class ).toSupplier(
+					ServiceSupplier.class );
 		}
 
 	}

@@ -1,5 +1,8 @@
 package de.jbee.inject;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Scoped { //OPEN what about Scoping ?
 
 	/**
@@ -16,6 +19,8 @@ public class Scoped { //OPEN what about Scoping ?
 	 * usual 'per-thread' singleton.
 	 */
 	public static final Scope THREAD = new ThreadScope( new ThreadLocal<Repository>(), APPLICATION );
+
+	public static final Scope DEPENDENCY_TYPE = new DependencyTypeScope();
 
 	public static Repository asSnapshot( Repository src, Repository dest ) {
 		return new SnapshotRepository( src, dest );
@@ -162,15 +167,48 @@ public class Scoped { //OPEN what about Scoping ?
 
 	}
 
-	static final class PerIdentityRepository
-			implements Repository {
+	private static final class DependencyTypeScope
+			implements Scope {
+
+		DependencyTypeScope() {
+			// make visisble
+		}
 
 		@Override
-		public <T> T serve( Injection<T> injection, Injectable<T> injectable ) {
-			// e.g. get receiver class from dependency -to be reusable the provider could offer a identity --> a wrapper class would be needed anyway so maybe best is to have quite similar impl. all using a identity hash-map
-			// TODO Auto-generated method stub
-			return null;
+		public Repository init() {
+			return new DependencyTypeRepository();
 		}
+
+		@Override
+		public String toString() {
+			return "(per-dependendy-type)";
+		}
+
+	}
+
+	static final class DependencyTypeRepository
+			implements Repository {
+
+		private final Map<String, Object> instances = new HashMap<String, Object>();
+
+		@Override
+		@SuppressWarnings ( "unchecked" )
+		public <T> T serve( Injection<T> injection, Injectable<T> injectable ) {
+			String key = injection.dependency().getType().toString();
+			T instance = (T) instances.get( key );
+			if ( instance != null ) {
+				return instance;
+			}
+			synchronized ( instances ) {
+				instance = (T) instances.get( key );
+				if ( instance == null ) {
+					instance = injectable.instanceFor( injection );
+					instances.put( key, instance );
+				}
+			}
+			return instance;
+		}
+		// e.g. get receiver class from dependency -to be reusable the provider could offer a identity --> a wrapper class would be needed anyway so maybe best is to have quite similar impl. all using a identity hash-map
 
 	}
 
