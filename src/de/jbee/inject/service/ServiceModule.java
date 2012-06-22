@@ -8,6 +8,7 @@ import static de.jbee.inject.Source.source;
 import static de.jbee.inject.Type.parameterTypes;
 import static de.jbee.inject.Type.raw;
 import static de.jbee.inject.Type.returnType;
+import static de.jbee.inject.bind.Bootstrap.nonnullThrowsReentranceException;
 
 import java.lang.reflect.Method;
 
@@ -18,11 +19,11 @@ import de.jbee.inject.Supplier;
 import de.jbee.inject.Type;
 import de.jbee.inject.TypeReflector;
 import de.jbee.inject.bind.Binder;
+import de.jbee.inject.bind.BinderModule;
 import de.jbee.inject.bind.Bindings;
 import de.jbee.inject.bind.Bootstrapper;
 import de.jbee.inject.bind.Bundle;
 import de.jbee.inject.bind.Module;
-import de.jbee.inject.bind.PackageModule;
 import de.jbee.inject.bind.Binder.RootBinder;
 import de.jbee.inject.bind.Binder.TypedBinder;
 
@@ -56,21 +57,19 @@ public abstract class ServiceModule
 	}
 
 	@Override
-	public final void configure( Bindings bindings ) {
-		if ( binder != null ) {
-			throw new IllegalStateException( "Reentrance not allowed!" );
-		}
+	public final void declare( Bindings bindings ) {
+		nonnullThrowsReentranceException( binder );
 		binder = Binder.create( bindings, source( getClass() ) );
-		configure();
+		declare();
 	}
 
-	protected abstract void configure();
+	protected abstract void declare();
 
 	static class ServiceMethodModule
-			extends PackageModule {
+			extends BinderModule {
 
 		@Override
-		public void configure() {
+		public void declare() {
 			per( APPLICATION ).bind( ServiceProvider.class ).toSupplier(
 					ServiceProviderSupplier.class );
 			per( DEPENDENCY_TYPE ).superbind( ServiceMethod.class ).toSupplier(
@@ -112,12 +111,11 @@ public abstract class ServiceModule
 		@Override
 		public <P, R> ServiceMethod<P, R> provide( Type<P> parameterType, Type<R> returnType ) {
 			Method service = resolveServiceMethod( parameterType, returnType );
-			return newServiceMethod( service, parameterType.getRawType(), returnType.getRawType(),
-					context );
+			return create( service, parameterType.getRawType(), returnType.getRawType(), context );
 		}
 
-		private <P, T> ServiceMethod<P, T> newServiceMethod( Method service,
-				Class<P> parameterType, Class<T> returnType, DependencyResolver context ) {
+		private <P, T> ServiceMethod<P, T> create( Method service, Class<P> parameterType,
+				Class<T> returnType, DependencyResolver context ) {
 			return new LazyServiceMethod<P, T>(
 					TypeReflector.newInstance( service.getDeclaringClass() ), service,
 					parameterType, returnType, context );

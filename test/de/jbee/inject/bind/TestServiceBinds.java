@@ -109,7 +109,7 @@ public class TestServiceBinds {
 			extends ServiceModule {
 
 		@Override
-		protected void configure() {
+		protected void declare() {
 			bindServiceMethods( SomeService.class );
 			superbind( AppService.class ).toSupplier( AppServiceSupplier.class );
 			superbind( AppCommand.class ).toSupplier( AppCommandSupplier.class );

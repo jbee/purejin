@@ -10,7 +10,7 @@ import de.jbee.inject.DependencyResolver;
 public class TestBootstrapper {
 
 	private static class OneBundle
-			extends PackageBundle {
+			extends DirectBundle {
 
 		@Override
 		protected void bootstrap() {
@@ -20,7 +20,7 @@ public class TestBootstrapper {
 	}
 
 	private static class OtherBundle
-			extends PackageBundle {
+			extends DirectBundle {
 
 		@Override
 		protected void bootstrap() {

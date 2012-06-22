@@ -12,10 +12,10 @@ import de.jbee.inject.DependencyResolver;
 public class TestTypeBinds {
 
 	private static class TypeBindsModule
-			extends PackageModule {
+			extends BinderModule {
 
 		@Override
-		protected void configure() {
+		protected void declare() {
 			bind( Number.class ).to( Integer.class );
 			bind( Integer.class ).to( 42 );
 		}

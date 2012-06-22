@@ -14,10 +14,10 @@ import de.jbee.inject.DependencyResolver;
 public class TestAutobindBinds {
 
 	static class AutobindBindsModule
-			extends PackageModule {
+			extends BinderModule {
 
 		@Override
-		protected void configure() {
+		protected void declare() {
 			autobind( Integer.class ).to( 42 );
 		}
 

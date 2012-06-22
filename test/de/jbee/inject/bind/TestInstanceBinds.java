@@ -28,10 +28,10 @@ import de.jbee.inject.Type;
 public class TestInstanceBinds {
 
 	private static class InstanceBindsModule
-			extends PackageModule {
+			extends BinderModule {
 
 		@Override
-		protected void configure() {
+		protected void declare() {
 			bind( String.class ).to( "foobar" );
 			bind( CharSequence.class ).to( "bar" );
 			bind( Integer.class ).to( 42 );
@@ -42,7 +42,7 @@ public class TestInstanceBinds {
 	}
 
 	private static class InstanceBindsBundle
-			extends PackageBundle {
+			extends DirectBundle {
 
 		@Override
 		protected void bootstrap() {

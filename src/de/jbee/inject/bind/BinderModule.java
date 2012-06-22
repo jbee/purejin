@@ -1,6 +1,7 @@
 package de.jbee.inject.bind;
 
 import static de.jbee.inject.Source.source;
+import static de.jbee.inject.bind.Bootstrap.nonnullThrowsReentranceException;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Name;
 import de.jbee.inject.Scope;
@@ -11,22 +12,20 @@ import de.jbee.inject.bind.Binder.TargetedBinder;
 import de.jbee.inject.bind.Binder.TypedBinder;
 import de.jbee.inject.bind.Binder.TypedElementBinder;
 
-public abstract class PackageModule
+public abstract class BinderModule
 		extends BootstrappingModule
 		implements BasicBinder.RootBasicBinder {
 
 	private RootBinder binder;
 
 	@Override
-	public final void configure( Bindings bindings ) {
-		if ( this.binder != null ) {
-			throw new IllegalStateException( "Reentrance not allowed!" );
-		}
+	public final void declare( Bindings bindings ) {
+		nonnullThrowsReentranceException( binder );
 		this.binder = Binder.create( bindings, source( getClass() ) );
-		configure();
+		declare();
 	}
 
-	protected abstract void configure();
+	protected abstract void declare();
 
 	@Override
 	public ScopedBinder per( Scope scope ) {

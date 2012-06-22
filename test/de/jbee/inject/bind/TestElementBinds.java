@@ -17,10 +17,10 @@ import de.jbee.inject.DependencyResolver;
 public class TestElementBinds {
 
 	static class ElementBindsModule
-			extends PackageModule {
+			extends BinderModule {
 
 		@Override
-		protected void configure() {
+		protected void declare() {
 			bind( String[].class ).toElements( "foo", "bar" );
 			bind( Number[].class ).toElements( 2, 3f );
 			bind( List[].class ).toElements( ArrayList.class, LinkedList.class );

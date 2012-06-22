@@ -19,7 +19,7 @@ public class TestServiceMethodBinds {
 			extends ServiceModule {
 
 		@Override
-		protected void configure() {
+		protected void declare() {
 			bindServiceMethods( SomeTestService.class );
 			bindServiceMethods( AnotherTestService.class );
 		}

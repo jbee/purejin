@@ -13,11 +13,11 @@ import de.jbee.inject.Supplier;
 public class TestSupplierBinds {
 
 	public static class SupplierBindsModule
-			extends PackageModule
+			extends BinderModule
 			implements Supplier<String> {
 
 		@Override
-		protected void configure() {
+		protected void declare() {
 			bind( String.class ).toSupplier( SupplierBindsModule.class );
 		}
 

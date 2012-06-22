@@ -24,30 +24,30 @@ public enum BridgeBundle
 	}
 
 	static class ProviderBridgeModule
-			extends PackageModule {
+			extends BinderModule {
 
 		@Override
-		protected void configure() {
-			superbind( Provider.class ).to( Suppliers.PROVIDER );
+		protected void declare() {
+			superbind( Provider.class ).to( Suppliers.PROVIDER_BRIDGE );
 		}
 
 	}
 
 	static class ListBridgeModule
-			extends PackageModule {
+			extends BinderModule {
 
 		@Override
-		protected void configure() {
+		protected void declare() {
 			superbind( List.class ).to( Suppliers.LIST_BRIDGE );
 		}
 
 	}
 
 	static class SetBridgeModule
-			extends PackageModule {
+			extends BinderModule {
 
 		@Override
-		protected void configure() {
+		protected void declare() {
 			superbind( Set.class ).to( Suppliers.SET_BRIDGE );
 		}
 

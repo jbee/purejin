@@ -1,12 +1,15 @@
 package de.jbee.inject.bind;
 
-public abstract class PackageBundle
+import static de.jbee.inject.bind.Bootstrap.nonnullThrowsReentranceException;
+
+public abstract class DirectBundle
 		implements Bundle, Bootstrapper {
 
 	private Bootstrapper bootstrap;
 
 	@Override
 	public final void bootstrap( Bootstrapper bootstrap ) {
+		nonnullThrowsReentranceException( this.bootstrap );
 		this.bootstrap = bootstrap;
 		bootstrap();
 	}

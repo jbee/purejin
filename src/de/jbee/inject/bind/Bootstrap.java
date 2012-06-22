@@ -30,6 +30,12 @@ public final class Bootstrap {
 		// util class
 	}
 
+	public static void nonnullThrowsReentranceException( Object field ) {
+		if ( field != null ) {
+			throw new IllegalStateException( "Reentrance not allowed!" );
+		}
+	}
+
 	static class BuildinBundleBinder
 			implements BundleBinder {
 
@@ -89,7 +95,7 @@ public final class Bootstrap {
 			bootstrapper.install( root );
 			ListBindings bindings = new ListBindings();
 			for ( Module m : bootstrapper.installed( root ) ) {
-				m.configure( bindings );
+				m.declare( bindings );
 			}
 			return bindings.declarations.toArray( new BindDeclaration<?>[0] );
 		}

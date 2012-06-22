@@ -2,15 +2,15 @@ package de.jbee.inject.bind;
 
 import org.junit.Test;
 
-import de.jbee.inject.bind.PackageModule;
+import de.jbee.inject.bind.BinderModule;
 
 public class TestRobotLegsBinds {
 
 	public static class RobotLegsModule
-			extends PackageModule {
+			extends BinderModule {
 
 		@Override
-		protected void configure() {
+		protected void declare() {
 			// TODO Auto-generated method stub
 
 		}

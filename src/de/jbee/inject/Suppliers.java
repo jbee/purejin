@@ -12,7 +12,7 @@ import java.util.Set;
 
 public class Suppliers {
 
-	public static final Supplier<Provider<?>> PROVIDER = new ProviderSupplier();
+	public static final Supplier<Provider<?>> PROVIDER_BRIDGE = new ProviderSupplier();
 	public static final Supplier<List<?>> LIST_BRIDGE = new ArrayToListBridgeSupplier();
 	public static final Supplier<Set<?>> SET_BRIDGE = new ArrayToSetBridgeSupplier();
 
