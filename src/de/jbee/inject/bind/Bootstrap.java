@@ -20,194 +20,14 @@ import de.jbee.inject.Source;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.TypeReflector;
 
-public class Bootstrap {
+public final class Bootstrap {
 
 	public static DependencyResolver injector( Class<? extends Bundle> root ) {
 		return BindableInjector.create( root, new BuildinBundleBinder() );
 	}
 
-	static final class BindDeclaration<T>
-			implements Comparable<BindDeclaration<?>> {
-
-		private final int nr;
-		private final Resource<T> resource;
-		private final Supplier<? extends T> supplier;
-		private final Scope scope;
-		private final Source source;
-
-		BindDeclaration( int nr, Resource<T> resource, Supplier<? extends T> supplier, Scope scope,
-				Source source ) {
-			super();
-			this.nr = nr;
-			this.resource = resource;
-			this.supplier = supplier;
-			this.scope = scope;
-			this.source = source;
-		}
-
-		@Override
-		public int compareTo( BindDeclaration<?> other ) {
-			int res = Precision.comparePrecision( resource.getInstance(),
-					other.resource.getInstance() );
-			if ( res != 0 ) {
-				return res;
-			}
-			//TODO what about the Availability ? 
-			res = Precision.comparePrecision( source, other.source );
-			if ( res != 0 ) {
-				return res;
-			}
-			return Integer.valueOf( nr ).compareTo( other.nr );
-		}
-
-		@Override
-		public String toString() {
-			return source + " / " + resource + " / " + scope;
-		}
-
-		Resource<T> resource() {
-			return resource;
-		}
-
-		Scope scope() {
-			return scope;
-		}
-
-		Source source() {
-			return source;
-		}
-
-		Supplier<? extends T> supplier() {
-			return supplier;
-		}
-
-		Binding<T> toBinding( Repository repository ) {
-			return new Binding<T>( resource, supplier, repository, source );
-		}
-
-	}
-
-	static class BuildinBootstrapper
-			implements Bootstrapper {
-
-		private final Map<Class<? extends Bundle>, Set<Class<? extends Bundle>>> bundleChildren = new IdentityHashMap<Class<? extends Bundle>, Set<Class<? extends Bundle>>>();
-		private final Map<Class<? extends Bundle>, List<Module>> bundleModules = new IdentityHashMap<Class<? extends Bundle>, List<Module>>();
-		private final Set<Class<? extends Bundle>> uninstalled = new HashSet<Class<? extends Bundle>>();
-		private final Set<Class<? extends Bundle>> installed = new HashSet<Class<? extends Bundle>>();
-		private final LinkedList<Class<? extends Bundle>> stack = new LinkedList<Class<? extends Bundle>>();
-
-		@Override
-		public void install( Class<? extends Bundle> bundle ) {
-			if ( uninstalled.contains( bundle ) || installed.contains( bundle ) ) {
-				return;
-			}
-			installed.add( bundle );
-			if ( !stack.isEmpty() ) {
-				final Class<? extends Bundle> parent = stack.peek();
-				Set<Class<? extends Bundle>> children = bundleChildren.get( parent );
-				if ( children == null ) {
-					children = new LinkedHashSet<Class<? extends Bundle>>();
-					bundleChildren.put( parent, children );
-				}
-				children.add( bundle );
-			}
-			stack.push( bundle );
-			TypeReflector.newInstance( bundle ).bootstrap( this );
-			if ( stack.pop() != bundle ) {
-				throw new IllegalStateException( bundle.getCanonicalName() );
-			}
-		}
-
-		@Override
-		public void install( Module module ) {
-			Class<? extends Bundle> bundle = stack.peek();
-			if ( uninstalled.contains( bundle ) ) {
-				return;
-			}
-			List<Module> modules = bundleModules.get( bundle );
-			if ( modules == null ) {
-				modules = new ArrayList<Module>();
-				bundleModules.put( bundle, modules );
-			}
-			modules.add( module );
-		}
-
-		public List<Module> installed( Class<? extends Bundle> root ) {
-			Set<Class<? extends Bundle>> installed = new LinkedHashSet<Class<? extends Bundle>>();
-			allInstalledIn( root, installed );
-			return modulesOf( installed );
-		}
-
-		public List<Module> modulesOf( Set<Class<? extends Bundle>> bundles ) {
-			List<Module> installed = new ArrayList<Module>( bundles.size() );
-			for ( Class<? extends Bundle> b : bundles ) {
-				List<Module> modules = bundleModules.get( b );
-				if ( modules != null ) {
-					installed.addAll( modules );
-				}
-			}
-			return installed;
-		}
-
-		@Override
-		public void uninstall( Class<? extends Bundle> bundle ) {
-			if ( uninstalled.contains( bundle ) ) {
-				return;
-			}
-			uninstalled.add( bundle );
-			installed.remove( bundle );
-			for ( Set<Class<? extends Bundle>> c : bundleChildren.values() ) {
-				c.remove( bundle );
-			}
-			bundleModules.remove( bundle ); // we are sure we don't need its modules
-		}
-
-		private void allInstalledIn( Class<? extends Bundle> bundle,
-				Set<Class<? extends Bundle>> accu ) {
-			accu.add( bundle );
-			Set<Class<? extends Bundle>> children = bundleChildren.get( bundle );
-			if ( children == null ) {
-				return;
-			}
-			for ( Class<? extends Bundle> c : children ) {
-				if ( !accu.contains( c ) ) {
-					allInstalledIn( c, accu );
-				}
-			}
-		}
-
-		@Override
-		public <M extends Enum<M> & ModularBundle<M>> void install( M... modules ) {
-			if ( modules.length > 0 ) {
-				modules[0].bootstrap( new BuildinModularBootstrapper<M>( modules ) );
-			}
-		}
-
-		@Override
-		public <M extends Enum<M> & ModularBundle<M>> void uninstall( M... modules ) {
-			// TODO Auto-generated method stub
-
-		}
-
-		final class BuildinModularBootstrapper<M extends Enum<M> & ModularBundle<M>>
-				implements ModularBootstrapper<M> {
-
-			private final EnumSet<M> installing;
-
-			BuildinModularBootstrapper( M... installing ) {
-				super();
-				this.installing = EnumSet.of( installing[0], installing );
-			}
-
-			@Override
-			public void install( Class<? extends Bundle> bundle, M module ) {
-				if ( installing.contains( module ) ) {
-					BuildinBootstrapper.this.install( bundle );
-				}
-			}
-
-		}
-
+	private Bootstrap() {
+		// util class
 	}
 
 	static class BuildinBundleBinder
@@ -264,6 +84,16 @@ public class Bootstrap {
 			return res.toArray( new BindDeclaration[res.size()] );
 		}
 
+		private BindDeclaration<?>[] declarationsFrom( Class<? extends Bundle> root ) {
+			BuildinBootstrapper bootstrapper = new BuildinBootstrapper();
+			bootstrapper.install( root );
+			ListBindings bindings = new ListBindings();
+			for ( Module m : bootstrapper.installed( root ) ) {
+				m.configure( bindings );
+			}
+			return bindings.declarations.toArray( new BindDeclaration<?>[0] );
+		}
+
 		private boolean independent( BindDeclaration<?> one, BindDeclaration<?> other ) {
 			if ( one.resource().includes( other.resource() ) ) {
 				if ( one.source().isImplicit() ) {
@@ -272,19 +102,9 @@ public class Bootstrap {
 			}
 			return true;
 		}
-
-		private BindDeclaration<?>[] declarationsFrom( Class<? extends Bundle> root ) {
-			BuildinBootstrapper binder = new BuildinBootstrapper();
-			binder.install( root );
-			SimpleBindings bindings = new SimpleBindings();
-			for ( Module m : binder.installed( root ) ) {
-				m.configure( bindings );
-			}
-			return bindings.declarations.toArray( new BindDeclaration<?>[0] );
-		}
 	}
 
-	static class SimpleBindings
+	static class ListBindings
 			implements Bindings {
 
 		final List<BindDeclaration<?>> declarations = new LinkedList<BindDeclaration<?>>();
@@ -294,6 +114,190 @@ public class Bootstrap {
 				Source source ) {
 			declarations.add( new BindDeclaration<T>( declarations.size(), resource, supplier,
 					scope, source ) );
+		}
+
+	}
+
+	private static final class BindDeclaration<T>
+			implements Comparable<BindDeclaration<?>> {
+
+		private final int nr;
+		private final Resource<T> resource;
+		private final Supplier<? extends T> supplier;
+		private final Scope scope;
+		private final Source source;
+
+		BindDeclaration( int nr, Resource<T> resource, Supplier<? extends T> supplier, Scope scope,
+				Source source ) {
+			super();
+			this.nr = nr;
+			this.resource = resource;
+			this.supplier = supplier;
+			this.scope = scope;
+			this.source = source;
+		}
+
+		@Override
+		public int compareTo( BindDeclaration<?> other ) {
+			int res = Precision.comparePrecision( resource.getInstance(),
+					other.resource.getInstance() );
+			if ( res != 0 ) {
+				return res;
+			}
+			//TODO what about the Availability ? 
+			res = Precision.comparePrecision( source, other.source );
+			if ( res != 0 ) {
+				return res;
+			}
+			return Integer.valueOf( nr ).compareTo( other.nr );
+		}
+
+		@Override
+		public String toString() {
+			return source + " / " + resource + " / " + scope;
+		}
+
+		Resource<T> resource() {
+			return resource;
+		}
+
+		Scope scope() {
+			return scope;
+		}
+
+		Source source() {
+			return source;
+		}
+
+		Binding<T> toBinding( Repository repository ) {
+			return new Binding<T>( resource, supplier, repository, source );
+		}
+
+	}
+
+	private static class BuildinBootstrapper
+			implements Bootstrapper {
+
+		private final Map<Class<? extends Bundle>, Set<Class<? extends Bundle>>> bundleChildren = new IdentityHashMap<Class<? extends Bundle>, Set<Class<? extends Bundle>>>();
+		private final Map<Class<? extends Bundle>, List<Module>> bundleModules = new IdentityHashMap<Class<? extends Bundle>, List<Module>>();
+		private final Set<Class<? extends Bundle>> uninstalled = new HashSet<Class<? extends Bundle>>();
+		private final Set<Class<? extends Bundle>> installed = new HashSet<Class<? extends Bundle>>();
+		private final LinkedList<Class<? extends Bundle>> stack = new LinkedList<Class<? extends Bundle>>();
+
+		BuildinBootstrapper() {
+			// make visible
+		}
+
+		@Override
+		public void install( Class<? extends Bundle> bundle ) {
+			if ( uninstalled.contains( bundle ) || installed.contains( bundle ) ) {
+				return;
+			}
+			installed.add( bundle );
+			if ( !stack.isEmpty() ) {
+				final Class<? extends Bundle> parent = stack.peek();
+				Set<Class<? extends Bundle>> children = bundleChildren.get( parent );
+				if ( children == null ) {
+					children = new LinkedHashSet<Class<? extends Bundle>>();
+					bundleChildren.put( parent, children );
+				}
+				children.add( bundle );
+			}
+			stack.push( bundle );
+			TypeReflector.newInstance( bundle ).bootstrap( this );
+			if ( stack.pop() != bundle ) {
+				throw new IllegalStateException( bundle.getCanonicalName() );
+			}
+		}
+
+		@Override
+		public <M extends Enum<M> & ModularBundle<M>> void install( M... modules ) {
+			if ( modules.length > 0 ) {
+				final EnumSet<M> installing = EnumSet.of( modules[0], modules );
+				modules[0].bootstrap( new ModularBootstrapper<M>() {
+
+					@Override
+					public void install( Class<? extends Bundle> bundle, M module ) {
+						if ( installing.contains( module ) ) {
+							BuildinBootstrapper.this.install( bundle );
+						}
+					}
+				} );
+			}
+		}
+
+		@Override
+		public void install( Module module ) {
+			Class<? extends Bundle> bundle = stack.peek();
+			if ( uninstalled.contains( bundle ) ) {
+				return;
+			}
+			List<Module> modules = bundleModules.get( bundle );
+			if ( modules == null ) {
+				modules = new ArrayList<Module>();
+				bundleModules.put( bundle, modules );
+			}
+			modules.add( module );
+		}
+
+		public List<Module> installed( Class<? extends Bundle> root ) {
+			Set<Class<? extends Bundle>> installed = new LinkedHashSet<Class<? extends Bundle>>();
+			allInstalledIn( root, installed );
+			return modulesOf( installed );
+		}
+
+		public List<Module> modulesOf( Set<Class<? extends Bundle>> bundles ) {
+			List<Module> installed = new ArrayList<Module>( bundles.size() );
+			for ( Class<? extends Bundle> b : bundles ) {
+				List<Module> modules = bundleModules.get( b );
+				if ( modules != null ) {
+					installed.addAll( modules );
+				}
+			}
+			return installed;
+		}
+
+		@Override
+		public void uninstall( Class<? extends Bundle> bundle ) {
+			if ( uninstalled.contains( bundle ) ) {
+				return;
+			}
+			uninstalled.add( bundle );
+			installed.remove( bundle );
+			for ( Set<Class<? extends Bundle>> c : bundleChildren.values() ) {
+				c.remove( bundle );
+			}
+			bundleModules.remove( bundle ); // we are sure we don't need its modules
+		}
+
+		@Override
+		public <M extends Enum<M> & ModularBundle<M>> void uninstall( M... modules ) {
+			if ( modules.length > 0 ) {
+				final EnumSet<M> uninstalling = EnumSet.of( modules[0], modules );
+				modules[0].bootstrap( new ModularBootstrapper<M>() {
+
+					@Override
+					public void install( Class<? extends Bundle> bundle, M module ) {
+						if ( uninstalling.contains( module ) ) {
+							uninstall( bundle );
+						}
+					}
+				} );
+			}
+		}
+
+		private void allInstalledIn( Class<? extends Bundle> bundle,
+				Set<Class<? extends Bundle>> accu ) {
+			accu.add( bundle );
+			Set<Class<? extends Bundle>> children = bundleChildren.get( bundle );
+			if ( children == null ) {
+				return;
+			}
+			for ( Class<? extends Bundle> c : children ) {
+				if ( !accu.contains( c ) ) {
+					allInstalledIn( c, accu );
+				}
+			}
 		}
 
 	}

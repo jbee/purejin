@@ -18,9 +18,9 @@ public enum BridgeBundle
 
 	@Override
 	public void bootstrap( ModularBootstrapper<BridgeBundle> bootstrap ) {
-		bootstrap.install( BridgeBundle.ListBridgeModule.class, LIST );
-		bootstrap.install( BridgeBundle.SetBridgeModule.class, SET );
-		bootstrap.install( BridgeBundle.ProviderBridgeModule.class, PROVIDER );
+		bootstrap.install( ListBridgeModule.class, LIST );
+		bootstrap.install( SetBridgeModule.class, SET );
+		bootstrap.install( ProviderBridgeModule.class, PROVIDER );
 	}
 
 	static class ProviderBridgeModule
