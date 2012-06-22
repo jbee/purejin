@@ -29,8 +29,8 @@ public abstract class PackageModule
 	protected abstract void configure();
 
 	@Override
-	public ScopedBinder in( Scope scope ) {
-		return binder.in( scope );
+	public ScopedBinder per( Scope scope ) {
+		return binder.per( scope );
 	}
 
 	public TargetedBinder injectingInto( Class<?> target ) {

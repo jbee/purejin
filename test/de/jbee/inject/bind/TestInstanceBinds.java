@@ -24,7 +24,6 @@ import de.jbee.inject.Injectron;
 import de.jbee.inject.Name;
 import de.jbee.inject.Provider;
 import de.jbee.inject.Type;
-import de.jbee.inject.bind.Bootstrap.CoreModule;
 
 public class TestInstanceBinds {
 
@@ -47,7 +46,7 @@ public class TestInstanceBinds {
 
 		@Override
 		protected void bootstrap() {
-			install( CoreModule.values() );
+			installAll( BridgeBundle.class );
 			install( InstanceBindsModule.class );
 		}
 

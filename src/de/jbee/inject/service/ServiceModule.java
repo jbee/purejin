@@ -44,7 +44,7 @@ public abstract class ServiceModule
 	}
 
 	protected final <T> TypedBinder<T> superbind( Class<T> service ) {
-		return binder.in( DEPENDENCY_TYPE ).superbind( service );
+		return binder.per( DEPENDENCY_TYPE ).superbind( service );
 	}
 
 	private RootBinder binder;
@@ -71,10 +71,9 @@ public abstract class ServiceModule
 
 		@Override
 		public void configure() {
-			in( APPLICATION ).bind( ServiceProvider.class ).toSupplier(
+			per( APPLICATION ).bind( ServiceProvider.class ).toSupplier(
 					ServiceProviderSupplier.class );
-			// TODO use scope that leads to one instance per exact type (including generics)
-			in( DEPENDENCY_TYPE ).superbind( ServiceMethod.class ).toSupplier(
+			per( DEPENDENCY_TYPE ).superbind( ServiceMethod.class ).toSupplier(
 					ServiceSupplier.class );
 		}
 

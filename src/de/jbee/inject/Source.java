@@ -8,21 +8,21 @@ package de.jbee.inject;
 public final class Source
 		implements PreciserThan<Source> {
 
-	public static Source source( Class<?> module ) {
+	public static Source source( Object module ) {
 		return new Source( module, DeclarationType.EXPLICIT );
 	}
 
-	private final Class<?> module;
+	private final Object ident;
 	private final DeclarationType declarationType;
 
-	private Source( Class<?> module, DeclarationType declarationType ) {
+	private Source( Object ident, DeclarationType declarationType ) {
 		super();
-		this.module = module;
+		this.ident = ident;
 		this.declarationType = declarationType;
 	}
 
-	public Class<?> getModule() {
-		return module;
+	public Object getIdent() {
+		return ident;
 	}
 
 	public boolean isExplicit() {
@@ -30,18 +30,22 @@ public final class Source
 	}
 
 	public Source implicit() {
-		return new Source( module, DeclarationType.IMPLICIT );
+		return new Source( ident, DeclarationType.IMPLICIT );
 	}
 
 	@Override
 	public String toString() {
+		String i = ident.toString();
+		if ( ! ( ident instanceof Class<?> ) ) {
+			i = ident.getClass().getCanonicalName() + ":" + i;
+		}
 		return isExplicit()
-			? module.getCanonicalName()
-			: "(" + module.getCanonicalName() + ")";
+			? i
+			: "(" + i + ")";
 	}
 
 	public Source multi() {
-		return new Source( module, DeclarationType.MULTI );
+		return new Source( ident, DeclarationType.MULTI );
 	}
 
 	@Override

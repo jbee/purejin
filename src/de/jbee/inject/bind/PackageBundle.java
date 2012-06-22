@@ -1,7 +1,5 @@
 package de.jbee.inject.bind;
 
-import de.jbee.inject.bind.Bootstrap.CoreModule;
-
 public abstract class PackageBundle
 		implements Bundle, Bootstrapper {
 
@@ -28,8 +26,22 @@ public abstract class PackageBundle
 		bootstrap.uninstall( bundle );
 	}
 
-	protected final void install( CoreModule... modules ) {
-		Bootstrap.install( bootstrap, modules );
+	@Override
+	public <M extends Enum<M> & ModularBundle<M>> void install( M... modules ) {
+		bootstrap.install( modules );
+	}
+
+	@Override
+	public <M extends Enum<M> & ModularBundle<M>> void uninstall( M... modules ) {
+		bootstrap.uninstall( modules );
+	}
+
+	protected final <M extends Enum<M> & ModularBundle<M>> void installAll( Class<M> modules ) {
+		install( modules.getEnumConstants() );
+	}
+
+	protected final <M extends Enum<M> & ModularBundle<M>> void uninstallAll( Class<M> modules ) {
+		uninstall( modules.getEnumConstants() );
 	}
 
 	protected abstract void bootstrap();

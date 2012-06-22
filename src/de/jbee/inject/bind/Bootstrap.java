@@ -2,6 +2,7 @@ package de.jbee.inject.bind;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashSet;
@@ -12,50 +13,17 @@ import java.util.Set;
 
 import de.jbee.inject.DependencyResolver;
 import de.jbee.inject.Precision;
-import de.jbee.inject.Provider;
 import de.jbee.inject.Repository;
 import de.jbee.inject.Resource;
 import de.jbee.inject.Scope;
 import de.jbee.inject.Source;
 import de.jbee.inject.Supplier;
-import de.jbee.inject.Suppliers;
 import de.jbee.inject.TypeReflector;
 
 public class Bootstrap {
 
 	public static DependencyResolver injector( Class<? extends Bundle> root ) {
 		return BindableInjector.create( root, new BuildinBundleBinder() );
-	}
-
-	public static void install( Bootstrapper bs, CoreModule... modules ) {
-		for ( CoreModule m : modules ) {
-			bs.install( m.bundle );
-		}
-	}
-
-	public static enum CoreModule
-			implements Bundle, Module {
-		PROVIDER( BuildinProviderModule.class ),
-		LIST( BuildinListModule.class ),
-		SET( BuildinSetModule.class );
-
-		final Class<? extends Bundle> bundle;
-
-		private CoreModule( Class<? extends Bundle> bundle ) {
-			this.bundle = bundle;
-		}
-
-		@Override
-		public void bootstrap( Bootstrapper bootstrap ) {
-			bootstrap.install( this );
-		}
-
-		@Override
-		public void configure( Bindings bindings ) {
-			// TODO Auto-generated method stub
-
-		}
-
 	}
 
 	static final class BindDeclaration<T>
@@ -186,12 +154,12 @@ public class Bootstrap {
 			if ( uninstalled.contains( bundle ) ) {
 				return;
 			}
+			uninstalled.add( bundle );
 			installed.remove( bundle );
 			for ( Set<Class<? extends Bundle>> c : bundleChildren.values() ) {
 				c.remove( bundle );
 			}
 			bundleModules.remove( bundle ); // we are sure we don't need its modules
-			uninstalled.add( bundle );
 		}
 
 		private void allInstalledIn( Class<? extends Bundle> bundle,
@@ -207,6 +175,39 @@ public class Bootstrap {
 				}
 			}
 		}
+
+		@Override
+		public <M extends Enum<M> & ModularBundle<M>> void install( M... modules ) {
+			if ( modules.length > 0 ) {
+				modules[0].bootstrap( new BuildinModularBootstrapper<M>( modules ) );
+			}
+		}
+
+		@Override
+		public <M extends Enum<M> & ModularBundle<M>> void uninstall( M... modules ) {
+			// TODO Auto-generated method stub
+
+		}
+
+		final class BuildinModularBootstrapper<M extends Enum<M> & ModularBundle<M>>
+				implements ModularBootstrapper<M> {
+
+			private final EnumSet<M> installing;
+
+			BuildinModularBootstrapper( M... installing ) {
+				super();
+				this.installing = EnumSet.of( installing[0], installing );
+			}
+
+			@Override
+			public void install( Class<? extends Bundle> bundle, M module ) {
+				if ( installing.contains( module ) ) {
+					BuildinBootstrapper.this.install( bundle );
+				}
+			}
+
+		}
+
 	}
 
 	static class BuildinBundleBinder
@@ -297,37 +298,4 @@ public class Bootstrap {
 
 	}
 
-	private static final class BuildinListModule
-			extends PackageModule {
-
-		@Override
-		public void configure() {
-			superbind( List.class ).to( Suppliers.LIST_BRIDGE );
-		}
-
-	}
-
-	/**
-	 * Installs all the build-in functionality by using the core API.
-	 */
-	private static final class BuildinProviderModule
-			extends PackageModule {
-
-		@Override
-		protected void configure() {
-			// TODO use scope that leads to one instance per exact type (including generics)
-			superbind( Provider.class ).to( Suppliers.PROVIDER );
-		}
-
-	}
-
-	private static final class BuildinSetModule
-			extends PackageModule {
-
-		@Override
-		public void configure() {
-			superbind( Set.class ).to( Suppliers.SET_BRIDGE );
-		}
-
-	}
 }

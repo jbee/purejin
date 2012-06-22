@@ -37,11 +37,19 @@ public interface Bootstrapper {
 	 */
 	void uninstall( Class<? extends Bundle> bundle );
 
-	//OPEN <E extends Enum<?> & Bundle> void install( E... bundles );
-
 	void install( Module module );
 
-	//OPEN beside Bundle and Module there should be a Config. That is basically a module that provides constants that are kind of configuration. Should that be a separate core concept or just a class/type of Module ?
+	<M extends Enum<M> & ModularBundle<M>> void install( M... modules );
 
-	//TODO we can also use enum constants since we know they cannot change and there is just that constant values existing in the enum. thereby we also can define families of bundles/modules that can be refered to by the enum class.
+	<M extends Enum<M> & ModularBundle<M>> void uninstall( M... modules );
+
+	interface ModularBootstrapper<M> {
+
+		/**
+		 * Installs the bundle in/for the given module.
+		 */
+		void install( Class<? extends Bundle> bundle, M module );
+	}
+
+	//OPEN beside Bundle and Module there should be a Config. That is basically a module that provides constants that are kind of configuration. Should that be a separate core concept or just a class/type of Module ?
 }

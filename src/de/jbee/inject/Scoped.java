@@ -6,9 +6,9 @@ import java.util.Map;
 public class Scoped { //OPEN what about Scoping ?
 
 	/**
-	 * Asks the {@link Injectable} once per injection.
+	 * Often called the 'default'-scope. Asks the {@link Injectable} once per injection.
 	 */
-	public static final Scope DEFAULT = new DefaultScope();
+	public static final Scope INJECTION = new InjectionScope();
 	/**
 	 * Asks the {@link Injectable} once per binding. Thereby instances become singletons local to
 	 * the application.
@@ -56,14 +56,14 @@ public class Scoped { //OPEN what about Scoping ?
 	 * The {@link Scope} is also used as {@link Repository} instance since both don#t have any
 	 * state.
 	 * 
-	 * @see Scoped#DEFAULT
+	 * @see Scoped#INJECTION
 	 * 
 	 * @author Jan Bernitt (jan.bernitt@gmx.de)
 	 */
-	private static final class DefaultScope
+	private static final class InjectionScope
 			implements Scope, Repository {
 
-		DefaultScope() {
+		InjectionScope() {
 			// make visible
 		}
 

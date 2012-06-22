@@ -128,7 +128,7 @@ public class Binder
 	}
 
 	public <T> TypedBinder<T> autobind( Type<T> type ) {
-		return with( autobinding( bindings ) ).bind( type );
+		return into( autobinding( bindings ) ).bind( type );
 	}
 
 	public <T> TypedBinder<T> autobind( Class<T> type ) {
@@ -209,15 +209,15 @@ public class Binder
 		return with( source.multi() );
 	}
 
-	protected final Binder with( Source source ) {
+	protected Binder with( Source source ) {
 		return new Binder( bindings, strategy, source, scope, availability );
 	}
 
-	protected final Binder with( Availability availability ) {
+	protected Binder with( Availability availability ) {
 		return new Binder( bindings, strategy, source, scope, availability );
 	}
 
-	protected final Binder with( Bindings bindings ) {
+	protected Binder into( Bindings bindings ) {
 		return new Binder( bindings, strategy, source, scope, availability );
 	}
 
@@ -274,13 +274,24 @@ public class Binder
 			implements RootBasicBinder {
 
 		RootBinder( Bindings bindings, InjectionStrategy strategy, Source source ) {
-			super( bindings, strategy, source, Scoped.DEFAULT );
+			super( bindings, strategy, source, Scoped.INJECTION );
 		}
 
 		@Override
-		public ScopedBinder in( Scope scope ) {
+		public ScopedBinder per( Scope scope ) {
 			return new ScopedBinder( bindings(), strategy(), source(), scope );
 		}
+
+		@Override
+		protected RootBinder with( Source source ) {
+			return new RootBinder( bindings(), strategy(), source );
+		}
+
+		@Override
+		protected RootBinder into( Bindings bindings ) {
+			return new RootBinder( bindings, strategy(), source() );
+		}
+
 	}
 
 	public static class ScopedBinder

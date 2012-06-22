@@ -22,7 +22,7 @@ public interface BasicBinder {
 	public interface RootBasicBinder
 			extends ScopedBasicBinder {
 
-		ScopedBasicBinder in( Scope scope );
+		ScopedBasicBinder per( Scope scope );
 
 	}
 
