@@ -73,8 +73,7 @@ public class TestMorePrecise {
 		Type<Integer> type = raw( Integer.class );
 		Instance<Integer> named = instance( named( "foo" ), type );
 		Instance<Integer> unnamed = defaultInstanceOf( type );
-		assertTrue( named.morePreciseThan( unnamed ) );
-		assertFalse( unnamed.morePreciseThan( named ) );
+		assertMorePrecise( named, unnamed );
 	}
 
 	@Test
@@ -85,6 +84,37 @@ public class TestMorePrecise {
 	@Test
 	public void thatUnnamedIsNotMorePreciseThanNamed() {
 		assertFalse( Name.DEFAULT.morePreciseThan( named( "bar" ) ) );
+	}
+
+	@Test
+	public void thatSameSpecificPackageIsNotMorePrecise() {
+		assertNotMorePreciseThanItself( Packages.packageOf( String.class ) );
+	}
+
+	@Test
+	public void thatSpecificPackageIsMorePreciseThanGlobal() {
+		assertMorePrecise( Packages.packageOf( String.class ), Packages.ALL );
+	}
+
+	@Test
+	public void thatSpecificPackageIsMorePreciseThanSubPackages() {
+		assertMorePrecise( Packages.packageOf( String.class ),
+				Packages.withinAndUnder( String.class ) );
+	}
+
+	@Test
+	public void thatSpecificPackageIsNotMorePreciseThanSubPackagesUnderIt() {
+		assertEqualPrecise( Packages.packageOf( String.class ), Packages.under( String.class ) );
+	}
+
+	private <T extends PreciserThan<? super T>> void assertEqualPrecise( T one, T other ) {
+		assertFalse( one.morePreciseThan( other ) );
+		assertFalse( other.morePreciseThan( one ) );
+	}
+
+	private <T extends PreciserThan<? super T>> void assertMorePrecise( T morePrecise, T lessPrecise ) {
+		assertTrue( morePrecise.morePreciseThan( lessPrecise ) );
+		assertFalse( lessPrecise.morePreciseThan( morePrecise ) );
 	}
 
 	private <T extends PreciserThan<? super T>> void assertNotMorePreciseThanItself( T type ) {

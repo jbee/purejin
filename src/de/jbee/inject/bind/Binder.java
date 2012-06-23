@@ -340,7 +340,7 @@ public class Binder
 		// instead of narrow explicit we could expose explicit and make binds as narrow as possible by default (classic interface to impl binds in same package)
 
 		public Binder inPackageOf( Class<?> packageOf ) {
-			return with( availability().within( packageOf.getPackage().getName() ) );
+			return with( availability().within( packageOf ) );
 		}
 
 	}

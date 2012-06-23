@@ -15,28 +15,28 @@ import java.util.Arrays;
 public final class Dependency<T>
 		implements Typed<T>, Named {
 
-	private static final Class<?>[] UNKNOWN_TARGET = new Class<?>[0];
+	private static final Type<?>[] UNTARGETED = new Type<?>[0];
 
 	public static <T> Dependency<T> dependency( Class<T> type ) {
 		return dependency( raw( type ) );
 	}
 
 	public static <T> Dependency<T> dependency( Type<T> type ) {
-		return dependency( type, UNKNOWN_TARGET );
+		return dependency( type, UNTARGETED );
 	}
 
-	private static <T> Dependency<T> dependency( Type<T> type, Class<?>[] targetHierarchy ) {
+	private static <T> Dependency<T> dependency( Type<T> type, Type<?>[] targetHierarchy ) {
 		return dependency( instance( Name.ANY, type ), targetHierarchy );
 	}
 
-	private static <T> Dependency<T> dependency( Instance<T> instance, Class<?>[] targetHierarchy ) {
+	private static <T> Dependency<T> dependency( Instance<T> instance, Type<?>[] targetHierarchy ) {
 		return new Dependency<T>( instance, targetHierarchy );
 	}
 
-	private final Class<?>[] targetHierarchy;
+	private final Type<?>[] targetHierarchy;
 	private final Instance<T> instance;
 
-	private Dependency( Instance<T> instance, Class<?>[] targetHierarchy ) {
+	private Dependency( Instance<T> instance, Type<?>[] targetHierarchy ) {
 		this.instance = instance;
 		this.targetHierarchy = targetHierarchy;
 	}
@@ -77,14 +77,32 @@ public final class Dependency<T>
 		return dependency( instance( name, getType() ), targetHierarchy );
 	}
 
+	public Dependency<T> untargeted() {
+		return dependency( instance, UNTARGETED );
+	}
+
+	public boolean isUntargeted() {
+		return targetHierarchy.length == 0;
+	}
+
+	public Type<?> target() {
+		return isUntargeted()
+			? Type.WILDCARD
+			: targetHierarchy[targetHierarchy.length - 1];
+	}
+
 	/**
 	 * Means we inject into the argument target class.
 	 */
 	public Dependency<T> into( Class<?> target ) {
+		return into( raw( target ) );
+	}
+
+	public Dependency<T> into( Type<?> target ) {
 		if ( targetHierarchy.length == 0 ) {
-			return new Dependency<T>( instance, new Class<?>[] { target } );
+			return new Dependency<T>( instance, new Type<?>[] { target } );
 		}
-		Class<?>[] hierarchy = Arrays.copyOf( targetHierarchy, targetHierarchy.length + 1 );
+		Type<?>[] hierarchy = Arrays.copyOf( targetHierarchy, targetHierarchy.length + 1 );
 		hierarchy[targetHierarchy.length] = target;
 		return new Dependency<T>( instance, hierarchy );
 	}

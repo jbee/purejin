@@ -1,6 +1,7 @@
 package de.jbee.inject;
 
 import static de.jbee.inject.Dependency.dependency;
+import static de.jbee.inject.Resource.resource;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 
@@ -35,8 +36,8 @@ public class TestScopes {
 	@Test
 	public void thatDependencyTypeScopeEnsuresSingletonPerExactGenericType() {
 		Repository r = Scoped.DEPENDENCY_TYPE.init();
-		Injection<A> ai = new Injection<A>( dependency( A.class ), 1, 2 );
-		Injection<B> bi = new Injection<B>( dependency( B.class ), 2, 2 );
+		Injection<A> ai = new Injection<A>( resource( A.class ), dependency( A.class ), 1, 2 );
+		Injection<B> bi = new Injection<B>( resource( B.class ), dependency( B.class ), 2, 2 );
 		A a = new A();
 		B b = new B();
 		Injectable<A> ia = new ConstantInjectable<A>( a );

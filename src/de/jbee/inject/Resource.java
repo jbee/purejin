@@ -1,6 +1,7 @@
 package de.jbee.inject;
 
 import static de.jbee.inject.Precision.morePreciseThan2;
+import static de.jbee.inject.Type.raw;
 
 /**
  * Describes WHAT can be injected and WHERE it can be injected.
@@ -11,6 +12,10 @@ import static de.jbee.inject.Precision.morePreciseThan2;
  */
 public final class Resource<T>
 		implements Typed<T>, Named, PreciserThan<Resource<?>> {
+
+	public static <T> Resource<T> resource( Class<T> type ) {
+		return new Resource<T>( Instance.anyOf( raw( type ) ) );
+	}
 
 	private final Instance<T> instance;
 	private final Availability availability;

@@ -2,12 +2,15 @@ package de.jbee.inject;
 
 public class Injection<T> {
 
-	private final Dependency<? super T> dependency;
+	private final Resource<T> resource;
 	private final int serialNumber;
 	private final int cardinality;
+	private final Dependency<? super T> dependency;
 
-	public Injection( Dependency<? super T> dependency, int serialNumber, int cardinality ) {
+	public Injection( Resource<T> resource, Dependency<? super T> dependency, int serialNumber,
+			int cardinality ) {
 		super();
+		this.resource = resource;
 		this.dependency = dependency;
 		this.serialNumber = serialNumber;
 		this.cardinality = cardinality;
@@ -15,6 +18,10 @@ public class Injection<T> {
 
 	public Dependency<? super T> dependency() {
 		return dependency;
+	}
+
+	public Resource<T> resource() {
+		return resource;
 	}
 
 	/**
@@ -32,7 +39,7 @@ public class Injection<T> {
 	}
 
 	public Injection<T> on( Dependency<? super T> dependency ) {
-		return new Injection<T>( dependency, serialNumber, cardinality );
+		return new Injection<T>( resource, dependency, serialNumber, cardinality );
 	}
 
 	@Override

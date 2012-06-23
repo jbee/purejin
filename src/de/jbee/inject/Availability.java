@@ -1,70 +1,63 @@
 package de.jbee.inject;
 
+import static de.jbee.inject.Precision.morePreciseThan2;
+
 public class Availability
 		implements PreciserThan<Availability> {
 
 	public static final Availability EVERYWHERE = availability( Instance.ANY );
 
 	public static Availability availability( Instance<?> target ) {
-		return new Availability( target, "", -1 );
+		return new Availability( target, Packages.ALL );
 	}
 
 	private final Instance<?> target;
-	private final String path;
-	private final int depth;
+	private final Packages packages;
 
-	private Availability( Instance<?> target, String path, int depth ) {
+	private Availability( Instance<?> target, Packages packages ) {
 		super();
 		this.target = target;
-		this.path = path;
-		this.depth = depth;
+		this.packages = packages;
 	}
 
 	public Availability injectingInto( Instance<?> target ) {
-		return new Availability( target, path, depth );
+		return new Availability( target, packages );
 	}
 
 	public boolean isApplicableFor( Dependency<?> dependency ) {
-		// TODO Auto-generated method stub
-		return true;
+		return isAccessibleFor( dependency ); //TODO target
+	}
+
+	public boolean isAccessibleFor( Dependency<?> dependency ) {
+		return packages.isMember( dependency.target() );
 	}
 
 	@Override
 	public String toString() {
-		if ( target.isAny() && isGlobal() && depth < 0 ) {
+		if ( target.isAny() && packages.isAll() ) {
 			return "everywhere";
 		}
-		return "[" + path + "-" + depth + "-" + target + "]";
+		return "[" + packages + " " + target + "]";
 	}
 
-	public Availability within( String path ) {
-		return new Availability( target, path, depth );
+	public Availability withinAndUnder( Class<?> packageOf ) {
+		return new Availability( target, Packages.withinAndUnder( packageOf ) );
+	}
+
+	public Availability within( Class<?> packageOf ) {
+		return new Availability( target, Packages.packageOf( packageOf ) );
+	}
+
+	public Availability under( Class<?> packageOf ) {
+		return new Availability( target, Packages.under( packageOf ) );
 	}
 
 	public boolean isTrageted() {
 		return !target.isAny();
 	}
 
-	public boolean isLocal() {
-		return !isGlobal();
-	}
-
-	private boolean isGlobal() {
-		return path.isEmpty();
-	}
-
 	@Override
 	public boolean morePreciseThan( Availability other ) {
-		if ( isLocal() && other.isGlobal() ) {
-			return true;
-		}
-		if ( other.isLocal() && isGlobal() ) {
-			return false;
-		}
-		//FIXME what about the case that path is a subpackage of other package or other way around ? ---> if they are excluding each other both are equal
-		if ( isLocal() && other.isLocal() && depth != other.depth ) {
-			return depth < other.depth;
-		}
-		return target.morePreciseThan( other.target );
+		return morePreciseThan2( packages, other.packages, target, other.target );
 	}
 }
