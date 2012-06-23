@@ -4,6 +4,7 @@ import static de.jbee.inject.Source.source;
 import static de.jbee.inject.bind.Bootstrap.nonnullThrowsReentranceException;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Name;
+import de.jbee.inject.Packages;
 import de.jbee.inject.Scope;
 import de.jbee.inject.Type;
 import de.jbee.inject.bind.Binder.RootBinder;
@@ -45,8 +46,21 @@ public abstract class BinderModule
 		return binder.injectingInto( target );
 	}
 
-	public Binder inPackageOf( Class<?> packageOf ) {
-		return binder.inPackageOf( packageOf );
+	public Binder inPackageOf( Class<?> type ) {
+		return binder.inPackageOf( type );
+	}
+
+	public Binder inSubPackagesOf( Class<?> type ) {
+		return binder.inSubPackagesOf( type );
+	}
+
+	public Binder inPackageAndSubPackagesOf( Class<?> type ) {
+		return binder.inPackageAndSubPackagesOf( type );
+	}
+
+	@Override
+	public BasicBinder within( Packages packages ) {
+		return binder.within( packages );
 	}
 
 	public <T> TypedBinder<T> bind( Class<T> type ) {
