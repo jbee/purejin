@@ -9,29 +9,33 @@ import de.jbee.inject.DependencyResolver;
 
 public class TestBootstrapper {
 
-	private static class OneBundle
+	private static class CycleOneBundle
 			extends DirectBundle {
 
 		@Override
 		protected void bootstrap() {
-			install( OtherBundle.class );
+			install( CycleTwoBundle.class );
 		}
 
 	}
 
-	private static class OtherBundle
+	private static class CycleTwoBundle
 			extends DirectBundle {
 
 		@Override
 		protected void bootstrap() {
-			install( OneBundle.class );
+			install( CycleOneBundle.class );
 		}
 
 	}
 
+	/**
+	 * The assert itself doesn't play such huge role here. we just want to reach this code.
+	 */
 	@Test
-	public void thatBundleCyclesDontCauseStackOverflowErrors() {
-		DependencyResolver injector = Bootstrap.injector( OneBundle.class );
+	public void thatBundlesAreNotBootstrappedMultipleTimesEvenIfTheyHaveCycles() {
+		DependencyResolver injector = Bootstrap.injector( CycleOneBundle.class );
 		assertThat( injector, notNullValue() );
 	}
+
 }

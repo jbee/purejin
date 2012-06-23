@@ -1,6 +1,8 @@
 package de.jbee.inject.bind;
 
+import de.jbee.inject.Suppliable;
+
 public interface BundleBinder {
 
-	Binding<?>[] install( Class<? extends Bundle> root );
+	Suppliable<?>[] install( Class<? extends Bundle> root );
 }

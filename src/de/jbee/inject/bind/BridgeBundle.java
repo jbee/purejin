@@ -23,7 +23,7 @@ public enum BridgeBundle
 		bootstrap.install( ProviderBridgeModule.class, PROVIDER );
 	}
 
-	static class ProviderBridgeModule
+	private static class ProviderBridgeModule
 			extends BinderModule {
 
 		@Override
@@ -33,7 +33,7 @@ public enum BridgeBundle
 
 	}
 
-	static class ListBridgeModule
+	private static class ListBridgeModule
 			extends BinderModule {
 
 		@Override
@@ -43,7 +43,7 @@ public enum BridgeBundle
 
 	}
 
-	static class SetBridgeModule
+	private static class SetBridgeModule
 			extends BinderModule {
 
 		@Override

@@ -46,7 +46,10 @@ public interface Bootstrapper {
 	interface ModularBootstrapper<M> {
 
 		/**
-		 * Installs the bundle in/for the given module.
+		 * Installs the bundle within the given module.
+		 * 
+		 * If the module passed hasn't been {@link Bootstrapper#install(Enum...)}ed the call will be
+		 * ignored.
 		 */
 		void install( Class<? extends Bundle> bundle, M module );
 	}

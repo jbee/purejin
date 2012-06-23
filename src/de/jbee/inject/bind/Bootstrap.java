@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.jbee.inject.Suppliable;
 import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Injector;
 import de.jbee.inject.Precision;
 import de.jbee.inject.Repository;
 import de.jbee.inject.Resource;
@@ -23,7 +25,11 @@ import de.jbee.inject.TypeReflector;
 public final class Bootstrap {
 
 	public static DependencyResolver injector( Class<? extends Bundle> root ) {
-		return BindableInjector.create( root, new BuildinBundleBinder() );
+		return injector( root, new BuildinBundleBinder() );
+	}
+
+	public static DependencyResolver injector( Class<? extends Bundle> root, BundleBinder binder ) {
+		return Injector.create( binder.install( root ) );
 	}
 
 	private Bootstrap() {
@@ -50,13 +56,13 @@ public final class Bootstrap {
 		// 	 b. init one repository for each scope
 		// 	 c. apply snapshots wrapper to repository instances
 		@Override
-		public Binding<?>[] install( Class<? extends Bundle> root ) {
+		public Suppliable<?>[] install( Class<? extends Bundle> root ) {
 			return bind( cleanedUp( declarationsFrom( root ) ) );
 		}
 
-		private Binding<?>[] bind( BindDeclaration<?>[] declarations ) {
+		private Suppliable<?>[] bind( BindDeclaration<?>[] declarations ) {
 			Map<Scope, Repository> repositories = buildRepositories( declarations );
-			Binding<?>[] bindings = new Binding<?>[declarations.length];
+			Suppliable<?>[] bindings = new Suppliable<?>[declarations.length];
 			for ( int i = 0; i < declarations.length; i++ ) {
 				BindDeclaration<?> instruction = declarations[i];
 				bindings[i] = instruction.toBinding( repositories.get( instruction.scope() ) );
@@ -175,8 +181,8 @@ public final class Bootstrap {
 			return source;
 		}
 
-		Binding<T> toBinding( Repository repository ) {
-			return new Binding<T>( resource, supplier, repository, source );
+		Suppliable<T> toBinding( Repository repository ) {
+			return new Suppliable<T>( resource, supplier, repository, source );
 		}
 
 	}

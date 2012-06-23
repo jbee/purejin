@@ -1,24 +1,19 @@
-package de.jbee.inject.bind;
-
-import de.jbee.inject.Repository;
-import de.jbee.inject.Resource;
-import de.jbee.inject.Source;
-import de.jbee.inject.Supplier;
+package de.jbee.inject;
 
 /**
- * Gives read-only access to the binds done.
+ * Description of WHAT is supplied, HOW to supply it and WHERE it came from.
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  * 
  */
-public final class Binding<T> {
+public final class Suppliable<T> {
 
 	private final Resource<T> resource;
 	private final Supplier<? extends T> supplier;
 	private final Repository repository;
 	private final Source source;
 
-	public Binding( Resource<T> resource, Supplier<? extends T> supplier, Repository repository,
+	public Suppliable( Resource<T> resource, Supplier<? extends T> supplier, Repository repository,
 			Source source ) {
 		super();
 		this.resource = resource;

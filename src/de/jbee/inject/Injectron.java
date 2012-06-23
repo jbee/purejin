@@ -1,9 +1,8 @@
 package de.jbee.inject;
 
-import de.jbee.inject.bind.BindableInjector;
 
 /**
- * A kind of singleton for a {@link Resource} inside a {@link BindableInjector}.
+ * A kind of singleton for a {@link Resource} inside a {@link Injector}.
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */

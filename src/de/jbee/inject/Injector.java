@@ -1,6 +1,7 @@
-package de.jbee.inject.bind;
+package de.jbee.inject;
 
 import static de.jbee.inject.Dependency.dependency;
+import static de.jbee.inject.Precision.comparePrecision;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -11,47 +12,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import de.jbee.inject.Dependency;
-import de.jbee.inject.DependencyResolver;
-import de.jbee.inject.Injectable;
-import de.jbee.inject.Injection;
-import de.jbee.inject.Injectron;
-import de.jbee.inject.Precision;
-import de.jbee.inject.Repository;
-import de.jbee.inject.Resource;
-import de.jbee.inject.Source;
-import de.jbee.inject.Suppliers;
-import de.jbee.inject.Type;
-
-public class BindableInjector
+public class Injector
 		implements DependencyResolver {
 
-	public static BindableInjector create( Class<? extends Bundle> root, BundleBinder binder ) {
-		return new BindableInjector( binder.install( root ) );
-	}
-
-	public static BindableInjector create( Binding<?>[] injectrons ) {
-		return new BindableInjector( injectrons );
+	public static Injector create( Suppliable<?>[] suppliables ) {
+		return new Injector( suppliables );
 	}
 
 	private final Map<Class<?>, Injectron<?>[]> injectrons;
 
-	private BindableInjector( Binding<?>[] bindings ) {
+	private Injector( Suppliable<?>[] suppliables ) {
 		super();
-		this.injectrons = injectrons( bindings, this );
+		this.injectrons = injectrons( suppliables, this );
 	}
 
-	private static Map<Class<?>, Injectron<?>[]> injectrons( Binding<?>[] bindings,
+	private static Map<Class<?>, Injectron<?>[]> injectrons( Suppliable<?>[] suppliables,
 			DependencyResolver resolver ) {
-		final int total = bindings.length;
+		final int total = suppliables.length;
 		Map<Class<?>, Injectron<?>[]> res = new IdentityHashMap<Class<?>, Injectron<?>[]>( total );
 		if ( total == 0 ) {
 			return res;
 		}
-		Arrays.sort( bindings, new Comparator<Binding<?>>() {
+		Arrays.sort( suppliables, new Comparator<Suppliable<?>>() {
 
 			@Override
-			public int compare( Binding<?> one, Binding<?> other ) {
+			public int compare( Suppliable<?> one, Suppliable<?> other ) {
 				Resource<?> rOne = one.resource();
 				Resource<?> rOther = other.resource();
 				Class<?> rawOne = rOne.getType().getRawType();
@@ -59,24 +44,25 @@ public class BindableInjector
 				if ( rawOne != rawOther ) {
 					return rawOne.getCanonicalName().compareTo( rawOther.getCanonicalName() );
 				}
-				return Precision.comparePrecision( rOne, rOther );
+				return comparePrecision( rOne, rOther );
 			}
 		} );
 		final int end = total - 1;
 		int start = 0;
-		Class<?> lastRawType = bindings[0].resource().getType().getRawType();
+		Class<?> lastRawType = suppliables[0].resource().getType().getRawType();
 		for ( int i = 0; i < total; i++ ) {
-			Resource<?> r = bindings[i].resource();
+			Resource<?> r = suppliables[i].resource();
 			Class<?> rawType = r.getType().getRawType();
 			if ( i == end ) {
 				if ( rawType != lastRawType ) {
-					res.put( lastRawType, createTypeInjectrons( start, i - 1, bindings, resolver ) );
-					res.put( rawType, createTypeInjectrons( end, end, bindings, resolver ) );
+					res.put( lastRawType,
+							createTypeInjectrons( start, i - 1, suppliables, resolver ) );
+					res.put( rawType, createTypeInjectrons( end, end, suppliables, resolver ) );
 				} else {
-					res.put( rawType, createTypeInjectrons( start, end, bindings, resolver ) );
+					res.put( rawType, createTypeInjectrons( start, end, suppliables, resolver ) );
 				}
 			} else if ( rawType != lastRawType ) {
-				res.put( lastRawType, createTypeInjectrons( start, i - 1, bindings, resolver ) );
+				res.put( lastRawType, createTypeInjectrons( start, i - 1, suppliables, resolver ) );
 				start = i;
 			}
 			lastRawType = rawType;
@@ -85,15 +71,15 @@ public class BindableInjector
 	}
 
 	private static <T> Injectron<T>[] createTypeInjectrons( int first, int last,
-			Binding<?>[] bindings, DependencyResolver resolver ) {
+			Suppliable<?>[] suppliables, DependencyResolver resolver ) {
 		final int length = last - first + 1;
 		@SuppressWarnings ( "unchecked" )
 		Injectron<T>[] res = new Injectron[length];
 		for ( int i = 0; i < length; i++ ) {
 			@SuppressWarnings ( "unchecked" )
-			Binding<T> b = (Binding<T>) bindings[i + first];
+			Suppliable<T> b = (Suppliable<T>) suppliables[i + first];
 			res[i] = new InjectronImpl<T>( b.resource(), b.source(), new Injection<T>(
-					dependency( b.resource().getType() ), i + first, bindings.length ),
+					dependency( b.resource().getType() ), i + first, suppliables.length ),
 					b.repository(), Suppliers.asInjectable( b.supplier(), resolver ) );
 		}
 		return res;
@@ -104,9 +90,9 @@ public class BindableInjector
 		// TODO more information to add to dependency ?
 		Type<T> type = dependency.getType();
 		if ( !type.isUnidimensionalArray() && type.isLowerBound() ) {
-			//TODO return best match from wildcard binds (not mapped by raw-type since it doesn't help)
-			throw new UnsupportedOperationException( "Wildcard-binds are not supported yet: "
-					+ type );
+			//TODO return best match from wildcard dependencies (not mapped by raw-type since it doesn't help)
+			throw new UnsupportedOperationException(
+					"Wildcard-dependencies are not supported yet: " + type );
 		}
 		Injectron<T> injectron = resolveInjectron( dependency );
 		if ( injectron != null ) {
@@ -153,7 +139,7 @@ public class BindableInjector
 			addAllApplicable( elements, dependency, elementType, elementInjectrons );
 			return toArray( elements, elementType );
 		}
-		if ( elementType.isLowerBound() ) { // wildcard bindings:
+		if ( elementType.isLowerBound() ) { // wildcard dependency:
 			List<E> elements = new ArrayList<E>();
 			for ( Entry<Class<?>, Injectron<?>[]> e : injectrons.entrySet() ) {
 				if ( Type.raw( e.getKey() ).isAssignableTo( elementType ) ) {
