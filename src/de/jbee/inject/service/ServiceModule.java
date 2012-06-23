@@ -11,6 +11,9 @@ import static de.jbee.inject.Type.returnType;
 import static de.jbee.inject.bind.Bootstrap.nonnullThrowsReentranceException;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 import de.jbee.inject.Dependency;
 import de.jbee.inject.DependencyResolver;
@@ -110,6 +113,9 @@ public abstract class ServiceModule
 	private static final class ServiceMethodProvider
 			implements ServiceProvider {
 
+		private final Map<Class<?>, Method[]> methodsCache = new IdentityHashMap<Class<?>, Method[]>();
+		private final Map<String, Method> methodCache = new HashMap<String, Method>();
+
 		private final DependencyResolver context;
 		private final Class<?>[] serviceClasses;
 		private final ServiceStrategy strategy;
@@ -142,9 +148,25 @@ public abstract class ServiceModule
 					parameterType, returnType, context );
 		}
 
+		private <P, T> Method serviceMethod( Type<P> parameterType, Type<T> returnType ) {
+			String signatur = parameterType + "-" + returnType;
+			Method method = methodCache.get( signatur );
+			if ( method != null ) {
+				return method;
+			}
+			synchronized ( methodCache ) {
+				method = methodCache.get( signatur );
+				if ( method == null ) {
+					method = resolveServiceMethod( parameterType, returnType );
+					methodCache.put( signatur, method );
+				}
+			}
+			return method;
+		}
+
 		private <P, T> Method resolveServiceMethod( Type<P> parameterType, Type<T> returnType ) {
 			for ( Class<?> service : serviceClasses ) {
-				for ( Method sm : strategy.serviceMethodsIn( service ) ) {
+				for ( Method sm : serviceClassMethods( service ) ) {
 					Type<?> rt = returnType( sm );
 					if ( rt.equalTo( returnType ) ) {
 						for ( Type<?> pt : parameterTypes( sm ) ) {
@@ -157,6 +179,21 @@ public abstract class ServiceModule
 			}
 			//FIXME primitives types aren't covered...but ... they can be put as parameter for Type 
 			return null;
+		}
+
+		private Method[] serviceClassMethods( Class<?> service ) {
+			Method[] methods = methodsCache.get( service );
+			if ( methods != null ) {
+				return methods;
+			}
+			synchronized ( methodsCache ) {
+				methods = methodsCache.get( service );
+				if ( methods == null ) {
+					methods = strategy.serviceMethodsIn( service );
+					methodsCache.put( service, methods );
+				}
+			}
+			return methods;
 		}
 
 	}
