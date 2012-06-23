@@ -69,7 +69,7 @@ public final class Instance<T>
 
 	@Override
 	public String toString() {
-		return name + " " + type;
+		return ( name + " " + type ).trim();
 	}
 
 	public boolean isAny() {
