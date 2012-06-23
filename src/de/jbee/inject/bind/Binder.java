@@ -14,6 +14,7 @@ import de.jbee.inject.Availability;
 import de.jbee.inject.InjectionStrategy;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Name;
+import de.jbee.inject.Packages;
 import de.jbee.inject.Provider;
 import de.jbee.inject.Resource;
 import de.jbee.inject.Scope;
@@ -339,10 +340,22 @@ public class Binder
 		//TODO improve this since from a dependency point of view it is good to localize all binds somehow
 		// instead of narrow explicit we could expose explicit and make binds as narrow as possible by default (classic interface to impl binds in same package)
 
-		public Binder inPackageOf( Class<?> packageOf ) {
-			return with( availability().within( packageOf ) );
+		@Override
+		public Binder within( Packages packages ) {
+			return with( availability().within( packages ) );
 		}
 
+		public Binder inPackageOf( Class<?> type ) {
+			return with( availability().inPackageOf( type ) );
+		}
+
+		public Binder inSubPackagesOf( Class<?> type ) {
+			return with( availability().inSubPackagesOf( type ) );
+		}
+
+		public Binder inPackageAndSubPackagesOf( Class<?> type ) {
+			return with( availability().inPackageAndSubPackagesOf( type ) );
+		}
 	}
 
 	public static class TypedBinder<T>

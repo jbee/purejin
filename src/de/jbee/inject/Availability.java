@@ -40,16 +40,16 @@ public class Availability
 		return "[" + packages + " " + target + "]";
 	}
 
-	public Availability withinAndUnder( Class<?> packageOf ) {
-		return new Availability( target, Packages.withinAndUnder( packageOf ) );
+	public Availability inPackageAndSubPackagesOf( Class<?> type ) {
+		return within( Packages.withinAndUnder( type ) );
 	}
 
-	public Availability within( Class<?> packageOf ) {
-		return new Availability( target, Packages.packageOf( packageOf ) );
+	public Availability inPackageOf( Class<?> type ) {
+		return within( Packages.packageOf( type ) );
 	}
 
-	public Availability under( Class<?> packageOf ) {
-		return new Availability( target, Packages.under( packageOf ) );
+	public Availability inSubPackagesOf( Class<?> type ) {
+		return within( Packages.under( type ) );
 	}
 
 	public boolean isTrageted() {
@@ -59,5 +59,9 @@ public class Availability
 	@Override
 	public boolean morePreciseThan( Availability other ) {
 		return morePreciseThan2( packages, other.packages, target, other.target );
+	}
+
+	public Availability within( Packages packages ) {
+		return new Availability( target, packages );
 	}
 }

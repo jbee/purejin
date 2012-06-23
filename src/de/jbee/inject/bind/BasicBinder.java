@@ -1,6 +1,7 @@
 package de.jbee.inject.bind;
 
 import de.jbee.inject.Instance;
+import de.jbee.inject.Packages;
 import de.jbee.inject.Scope;
 import de.jbee.inject.Supplier;
 
@@ -46,7 +47,7 @@ public interface BasicBinder {
 	interface TargetedBasicBinder
 			extends BasicBinder /* LocalisedBinder */{
 
-		//TODO add general method to change the availability
+		BasicBinder within( Packages packages );
 	}
 
 	interface LocalisedBasicBinder
