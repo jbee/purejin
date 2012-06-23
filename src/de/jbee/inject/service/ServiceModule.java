@@ -68,12 +68,30 @@ public abstract class ServiceModule
 	static class ServiceMethodModule
 			extends BinderModule {
 
+		static final ServiceStrategy DEFAULT_SERVICE_STRATEGY = new BuildinServiceStrategy();
+
 		@Override
 		public void declare() {
 			per( APPLICATION ).bind( ServiceProvider.class ).toSupplier(
 					ServiceProviderSupplier.class );
 			per( DEPENDENCY_TYPE ).superbind( ServiceMethod.class ).toSupplier(
 					ServiceSupplier.class );
+			asDefault().per( APPLICATION ).bind( ServiceStrategy.class ).to(
+					DEFAULT_SERVICE_STRATEGY );
+		}
+
+	}
+
+	private static final class BuildinServiceStrategy
+			implements ServiceStrategy {
+
+		BuildinServiceStrategy() {
+			// make visible
+		}
+
+		@Override
+		public Method[] serviceMethodsIn( Class<?> serviceClass ) {
+			return serviceClass.getDeclaredMethods();
 		}
 
 	}
@@ -93,15 +111,17 @@ public abstract class ServiceModule
 			implements ServiceProvider {
 
 		private final DependencyResolver context;
-		private final Class<?>[] serviceTypes;
+		private final Class<?>[] serviceClasses;
+		private final ServiceStrategy strategy;
 
 		ServiceMethodProvider( DependencyResolver context ) {
 			super();
 			this.context = context;
-			this.serviceTypes = resolveServiceTypes( context );
+			this.serviceClasses = resolveServiceClasses( context );
+			this.strategy = context.resolve( dependency( ServiceStrategy.class ) );
 		}
 
-		private static Class<?>[] resolveServiceTypes( DependencyResolver context ) {
+		private static Class<?>[] resolveServiceClasses( DependencyResolver context ) {
 			Dependency<Class[]> serviceClassesDependency = dependency(
 					raw( Class[].class ).parametized( Object.class ).parametizedAsLowerBounds() ).named(
 					Name.prefixed( SERVICE_NAME_PREFIX ) );
@@ -122,8 +142,8 @@ public abstract class ServiceModule
 		}
 
 		private <P, T> Method resolveServiceMethod( Type<P> parameterType, Type<T> returnType ) {
-			for ( Class<?> st : serviceTypes ) {
-				for ( Method sm : st.getDeclaredMethods() ) {
+			for ( Class<?> service : serviceClasses ) {
+				for ( Method sm : strategy.serviceMethodsIn( service ) ) {
 					Type<?> rt = returnType( sm );
 					if ( rt.equalTo( returnType ) ) {
 						for ( Type<?> pt : parameterTypes( sm ) ) {

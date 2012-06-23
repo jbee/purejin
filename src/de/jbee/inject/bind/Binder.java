@@ -27,6 +27,26 @@ import de.jbee.inject.TypeReflector;
 public class Binder
 		implements BasicBinder {
 
+	public static final InjectionStrategy DEFAULE_INJECTION_STRATEGY = new BuildinInjectionStrategy();
+
+	private static class BuildinInjectionStrategy
+			implements InjectionStrategy {
+
+		BuildinInjectionStrategy() {
+			// make visible
+		}
+
+		@Override
+		public <T> Constructor<T> constructorFor( Class<T> type ) {
+			try {
+				return TypeReflector.accessibleNoArgsConstructor( type );
+			} catch ( RuntimeException e ) {
+				return null;
+			}
+		}
+
+	}
+
 	private static class AutobindBindings
 			implements Bindings {
 
@@ -55,22 +75,8 @@ public class Binder
 		return new AutobindBindings( delegate );
 	}
 
-	static class BuildinInjectionStrategy
-			implements InjectionStrategy {
-
-		@Override
-		public <T> Constructor<T> constructorFor( Class<T> type ) {
-			try {
-				return TypeReflector.accessibleNoArgsConstructor( type );
-			} catch ( RuntimeException e ) {
-				return null;
-			}
-		}
-
-	}
-
 	public static RootBinder create( Bindings bindings, Source source ) {
-		return create( bindings, new BuildinInjectionStrategy(), source );
+		return create( bindings, DEFAULE_INJECTION_STRATEGY, source );
 	}
 
 	public static RootBinder create( Bindings bindings, InjectionStrategy strategy, Source source ) {
@@ -292,6 +298,9 @@ public class Binder
 			return new RootBinder( bindings, strategy(), source() );
 		}
 
+		protected RootBinder asDefault() {
+			return with( source().asDefault() );
+		}
 	}
 
 	public static class ScopedBinder

@@ -46,7 +46,7 @@ public class TestInstanceBinds {
 
 		@Override
 		protected void bootstrap() {
-			installAll( BridgeBundle.class );
+			installAll( BuildinBundle.class );
 			install( InstanceBindsModule.class );
 		}
 

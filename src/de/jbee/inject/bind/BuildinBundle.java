@@ -10,14 +10,14 @@ import de.jbee.inject.bind.Bootstrapper.ModularBootstrapper;
 /**
  * Installs all the build-in functionality by using the core API.
  */
-public enum BridgeBundle
-		implements ModularBundle<BridgeBundle> {
+public enum BuildinBundle
+		implements ModularBundle<BuildinBundle> {
 	PROVIDER,
 	LIST,
 	SET;
 
 	@Override
-	public void bootstrap( ModularBootstrapper<BridgeBundle> bootstrap ) {
+	public void bootstrap( ModularBootstrapper<BuildinBundle> bootstrap ) {
 		bootstrap.install( ListBridgeModule.class, LIST );
 		bootstrap.install( SetBridgeModule.class, SET );
 		bootstrap.install( ProviderBridgeModule.class, PROVIDER );
@@ -52,4 +52,5 @@ public enum BridgeBundle
 		}
 
 	}
+
 }

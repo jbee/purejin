@@ -56,4 +56,8 @@ public final class Source
 	public boolean isImplicit() {
 		return declarationType == DeclarationType.IMPLICIT;
 	}
+
+	public Source asDefault() {
+		return new Source( ident, DeclarationType.DEFAULT );
+	}
 }

@@ -28,8 +28,8 @@ public final class Bootstrap {
 		return injector( root, new BuildinBundleBinder() );
 	}
 
-	public static DependencyResolver injector( Class<? extends Bundle> root, BundleBinder binder ) {
-		return Injector.create( binder.install( root ) );
+	public static DependencyResolver injector( Class<? extends Bundle> root, Installer installer ) {
+		return Injector.create( installer.install( root ) );
 	}
 
 	private Bootstrap() {
@@ -43,7 +43,7 @@ public final class Bootstrap {
 	}
 
 	static class BuildinBundleBinder
-			implements BundleBinder {
+			implements Installer {
 
 		// Find the initial set of bindings
 		// 0. create BindInstruction

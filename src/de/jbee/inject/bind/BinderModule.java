@@ -32,6 +32,10 @@ public abstract class BinderModule
 		return binder.per( scope );
 	}
 
+	public RootBinder asDefault() {
+		return binder.asDefault();
+	}
+
 	public TargetedBinder injectingInto( Class<?> target ) {
 		return binder.injectingInto( target );
 	}

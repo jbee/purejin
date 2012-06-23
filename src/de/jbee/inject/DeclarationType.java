@@ -4,10 +4,18 @@ public enum DeclarationType
 		implements PreciserThan<DeclarationType> {
 
 	/**
-	 * Has been added by the binder as a fallback since some bind-calls can have ambiguous
+	 * Has been added by the binder as a fall-back since some bind-calls can have ambiguous
 	 * intentions.
 	 */
 	IMPLICIT,
+	/**
+	 * Used to provide a default of required parts of a module that can be replaced *once* to
+	 * customize behavior.
+	 * 
+	 * There can be just *one* default for each {@link Resource} and still just one explicit
+	 * replacement for it.
+	 */
+	DEFAULT,
 	/**
 	 * A auto-bind has been used. That is binding a class or instance to the exact type as
 	 * {@link #EXPLICIT} and to all its super-classes and -interfaces as a {@link #AUTO} bound bind.
