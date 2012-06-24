@@ -329,7 +329,7 @@ public class Binder
 			implements TargetedBasicBinder {
 
 		TargetedBinder( Bindings bindings, InjectionStrategy strategy, Source source, Scope scope ) {
-			super( bindings, strategy, source, scope, Target.EVERYWHERE );
+			super( bindings, strategy, source, scope, Target.ANY );
 		}
 
 		TargetedBinder( Bindings bindings, InjectionStrategy strategy, Source source, Scope scope,

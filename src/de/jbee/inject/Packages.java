@@ -1,23 +1,30 @@
 package de.jbee.inject;
 
-public class Packages
+import java.util.regex.Pattern;
+
+public final class Packages
 		implements PreciserThan<Packages> {
+
+	private static final Pattern PATTERN = Pattern.compile( "^(([a-zA-Z_]{1}[a-zA-Z0-9_]*(\\.[a-zA-Z_]{1}[a-zA-Z0-9_]*)*)(\\.\\*|\\*)?|\\*)$" );
 
 	public static final Packages ALL = new Packages( "*" );
 
-	public static Packages withinAndUnder( Class<?> packageOf ) {
-		return new Packages( path( packageOf ) + "*" );
+	public static Packages packageAndSubPackagesOf( Class<?> type ) {
+		return new Packages( path( type ) + "*" );
 	}
 
 	public static Packages packageOf( Class<?> type ) {
 		return new Packages( path( type ) );
 	}
 
-	public static Packages under( Class<?> packageOf ) {
+	public static Packages subPackagesOf( Class<?> packageOf ) {
 		return new Packages( path( packageOf ) + ".*" );
 	}
 
 	public static Packages packages( String pattern ) {
+		if ( !PATTERN.matcher( pattern ).matches() ) {
+			throw new IllegalArgumentException( "Not a valid package pattern: " + pattern );
+		}
 		return new Packages( pattern );
 	}
 

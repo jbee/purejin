@@ -99,12 +99,12 @@ public class TestMorePrecise {
 	@Test
 	public void thatSpecificPackageIsMorePreciseThanSubPackages() {
 		assertMorePrecise( Packages.packageOf( String.class ),
-				Packages.withinAndUnder( String.class ) );
+				Packages.packageAndSubPackagesOf( String.class ) );
 	}
 
 	@Test
 	public void thatSpecificPackageIsNotMorePreciseThanSubPackagesUnderIt() {
-		assertEqualPrecise( Packages.packageOf( String.class ), Packages.under( String.class ) );
+		assertEqualPrecise( Packages.packageOf( String.class ), Packages.subPackagesOf( String.class ) );
 	}
 
 	private <T extends PreciserThan<? super T>> void assertEqualPrecise( T one, T other ) {

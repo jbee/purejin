@@ -21,7 +21,7 @@ public final class Resource<T>
 	private final Target target;
 
 	public Resource( Instance<T> instance ) {
-		this( instance, Target.EVERYWHERE );
+		this( instance, Target.ANY );
 	}
 
 	public Resource( Instance<T> instance, Target target ) {

@@ -1,11 +1,12 @@
 package de.jbee.inject;
 
 import static de.jbee.inject.Precision.morePreciseThan2;
+import static de.jbee.inject.Type.raw;
 
-public class Target
+public final class Target
 		implements PreciserThan<Target> {
 
-	public static final Target EVERYWHERE = targeting( Instance.ANY );
+	public static final Target ANY = targeting( Instance.ANY );
 
 	public static Target targeting( Instance<?> instance ) {
 		return new Target( instance, Packages.ALL );
@@ -24,8 +25,16 @@ public class Target
 		return new Target( instance, packages );
 	}
 
+	public Target injectingInto( Type<?> type ) {
+		return injectingInto( Instance.anyOf( type ) );
+	}
+
+	public Target injectingInto( Class<?> type ) {
+		return injectingInto( raw( type ) );
+	}
+
 	public boolean isApplicableFor( Dependency<?> dependency ) {
-		return isAccessibleFor( dependency ); //TODO target
+		return isAccessibleFor( dependency ); //TODO target instance
 	}
 
 	public boolean isAccessibleFor( Dependency<?> dependency ) {
@@ -35,13 +44,13 @@ public class Target
 	@Override
 	public String toString() {
 		if ( instance.isAny() && packages.isAll() ) {
-			return "everywhere";
+			return "any";
 		}
 		return "[" + packages + " " + instance + "]";
 	}
 
 	public Target inPackageAndSubPackagesOf( Class<?> type ) {
-		return within( Packages.withinAndUnder( type ) );
+		return within( Packages.packageAndSubPackagesOf( type ) );
 	}
 
 	public Target inPackageOf( Class<?> type ) {
@@ -49,7 +58,7 @@ public class Target
 	}
 
 	public Target inSubPackagesOf( Class<?> type ) {
-		return within( Packages.under( type ) );
+		return within( Packages.subPackagesOf( type ) );
 	}
 
 	public boolean isSpecificInstance() {
