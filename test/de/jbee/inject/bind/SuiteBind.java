@@ -7,7 +7,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith ( Suite.class )
 @SuiteClasses ( { TestAutobindBinds.class, TestElementBinds.class, TestInstanceBinds.class,
 		TestServiceMethodBinds.class, TestServiceBinds.class, TestSupplierBinds.class,
-		TestTypeBinds.class, TestBootstrapper.class, TestLocalisedBinds.class } )
+		TestTypeBinds.class, TestBootstrapper.class, TestPackageLocalisedBinds.class } )
 public class SuiteBind {
 
 }
