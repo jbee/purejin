@@ -184,8 +184,12 @@ public final class Type<T>
 	}
 
 	private Type<?> getElementRawType() {
+		return asElementRawType( rawType.getComponentType() );
+	}
+
+	private <E> Type<?> asElementRawType( Class<E> elementType ) {
 		return rawType.isArray()
-			? new Type( lowerBound, rawType.getComponentType(), params )
+			? new Type<E>( lowerBound, elementType, params )
 			: this;
 	}
 

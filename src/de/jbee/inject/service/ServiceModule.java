@@ -130,7 +130,7 @@ public abstract class ServiceModule
 
 		private static Class<?>[] resolveServiceClasses( DependencyResolver context ) {
 			Dependency<Class[]> serviceClassesDependency = dependency(
-					raw( Class[].class ).parametized( Object.class ).parametizedAsLowerBounds() ).named(
+					raw( Class[].class ).parametizedAsLowerBounds() ).named(
 					Name.prefixed( SERVICE_NAME_PREFIX ) ).into( ServiceMethodProvider.class );
 			return context.resolve( serviceClassesDependency );
 		}
