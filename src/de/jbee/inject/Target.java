@@ -38,12 +38,12 @@ public final class Target
 	}
 
 	public boolean isAccessibleFor( Dependency<?> dependency ) {
-		return packages.isMember( dependency.target() );
+		return packages.contains( dependency.target() );
 	}
 
 	@Override
 	public String toString() {
-		if ( instance.isAny() && packages.isAll() ) {
+		if ( instance.isAny() && packages.containsAll() ) {
 			return "any";
 		}
 		return "[" + packages + " " + instance + "]";

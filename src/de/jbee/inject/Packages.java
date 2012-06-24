@@ -10,15 +10,11 @@ public final class Packages
 	public static final Packages ALL = new Packages( "*" );
 
 	public static Packages packageAndSubPackagesOf( Class<?> type ) {
-		return new Packages( path( type ) + "*" );
+		return new Packages( packageNameOf( type ) + "*" );
 	}
 
 	public static Packages packageOf( Class<?> type ) {
-		return new Packages( path( type ) );
-	}
-
-	public static Packages subPackagesOf( Class<?> packageOf ) {
-		return new Packages( path( packageOf ) + ".*" );
+		return new Packages( packageNameOf( type ) );
 	}
 
 	public static Packages packages( String pattern ) {
@@ -28,6 +24,18 @@ public final class Packages
 		return new Packages( pattern );
 	}
 
+	public static Packages subPackagesOf( Class<?> type ) {
+		return new Packages( packageNameOf( type ) + ".*" );
+	}
+
+	private static String packageNameOf( Class<?> packageOf ) {
+		return packageOf.getPackage().getName();
+	}
+
+	private static String packageNameOf( Type<?> packageOf ) {
+		return packageNameOf( packageOf.getRawType() );
+	}
+
 	private final String pattern;
 
 	private Packages( String pattern ) {
@@ -35,73 +43,33 @@ public final class Packages
 		this.pattern = pattern;
 	}
 
-	@Override
-	public boolean morePreciseThan( Packages other ) {
-		if ( equalTo( other ) ) {
-			return false;
-		}
-		boolean localSelf = isLocal();
-		if ( localSelf && other.isAll() ) {
-			return true;
-		}
-		boolean localOther = other.isLocal();
-		if ( localOther && isAll() ) {
-			return false;
-		}
-		if ( isSpecific() ) {
-			return other.pattern.equals( pattern + "*" );
-		}
-		if ( other.isSpecific() ) {
-			return pattern.equals( other.pattern + "*" );
-		}
-		return localSelf && localOther && other.subpath( this );
-	}
-
-	private boolean subpath( Packages other ) {
-		return other.pattern.regionMatches( 0, pattern, 0, isGroup()
-			? pattern.length() - 1
-			: pattern.length() );
-	}
-
-	public boolean isMember( Type<?> type ) {
-		return isGroup()
+	public boolean contains( Type<?> type ) {
+		return containsMultiple()
 			? pattern.length() == 1
 				? true
-				: pattern.regionMatches( 0, path( type ), 0, pattern.length() - 1 )
-			: pattern.equals( path( type ) );
+				: pattern.regionMatches( 0, packageNameOf( type ), 0, pattern.length() - 1 )
+			: pattern.equals( packageNameOf( type ) );
 	}
 
-	private boolean isGroup() {
+	public boolean containsAll() {
+		return pattern.equals( "*" );
+	}
+
+	public boolean containsMultiple() {
 		return pattern.endsWith( "*" );
 	}
 
-	private static String path( Type<?> packageOf ) {
-		return path( packageOf.getRawType() );
+	public boolean containsOneSpecific() {
+		return !containsMultiple();
 	}
 
-	private static String path( Class<?> packageOf ) {
-		return packageOf.getPackage().getName();
-	}
-
-	public boolean isSpecific() {
-		return !isGroup();
-	}
-
-	public boolean isLocal() {
-		return !isAll();
-	}
-
-	public boolean isAll() {
-		return pattern.equals( "*" );
+	public boolean containsSome() {
+		return !containsAll();
 	}
 
 	@Override
 	public boolean equals( Object obj ) {
 		return obj instanceof Packages && equalTo( ( (Packages) obj ) );
-	}
-
-	private boolean equalTo( Packages other ) {
-		return other.pattern.equals( pattern );
 	}
 
 	@Override
@@ -110,7 +78,39 @@ public final class Packages
 	}
 
 	@Override
+	public boolean morePreciseThan( Packages other ) {
+		if ( equalTo( other ) ) {
+			return false;
+		}
+		boolean someInThin = containsSome();
+		if ( someInThin && other.containsAll() ) {
+			return true;
+		}
+		boolean someInOther = other.containsSome();
+		if ( someInOther && containsAll() ) {
+			return false;
+		}
+		if ( containsOneSpecific() ) {
+			return other.pattern.equals( pattern + "*" );
+		}
+		if ( other.containsOneSpecific() ) {
+			return pattern.equals( other.pattern + "*" );
+		}
+		return someInThin && someInOther && other.isSubPackage( this );
+	}
+
+	@Override
 	public String toString() {
 		return pattern;
+	}
+
+	private boolean equalTo( Packages other ) {
+		return other.pattern.equals( pattern );
+	}
+
+	private boolean isSubPackage( Packages other ) {
+		return other.pattern.regionMatches( 0, pattern, 0, containsMultiple()
+			? pattern.length() - 1
+			: pattern.length() );
 	}
 }
