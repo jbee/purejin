@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import de.jbee.inject.Suppliable;
 import de.jbee.inject.DependencyResolver;
 import de.jbee.inject.Injector;
 import de.jbee.inject.Precision;
@@ -19,6 +18,7 @@ import de.jbee.inject.Repository;
 import de.jbee.inject.Resource;
 import de.jbee.inject.Scope;
 import de.jbee.inject.Source;
+import de.jbee.inject.Suppliable;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.TypeReflector;
 
@@ -49,7 +49,7 @@ public final class Bootstrap {
 		// 0. create BindInstruction
 		// 2. sort declarations
 		// 3. remove duplicates (implicit will be sorted after explicit)
-		// 4. detect ambiguous bindings (two explicit bindings that have same type and availability)
+		// 4. detect ambiguous bindings (two explicit bindings that have same type and target)
 
 		// 1. Create Scope-Repositories
 		//   a. sort scopes from most stable to most fragile

@@ -10,7 +10,7 @@ import static de.jbee.inject.Type.raw;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 
-import de.jbee.inject.Availability;
+import de.jbee.inject.Target;
 import de.jbee.inject.InjectionStrategy;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Name;
@@ -88,16 +88,16 @@ public class Binder
 	private final InjectionStrategy strategy;
 	private final Source source;
 	private final Scope scope;
-	private final Availability availability;
+	private final Target target;
 
 	Binder( Bindings bindings, InjectionStrategy strategy, Source source, Scope scope,
-			Availability availability ) {
+			Target target ) {
 		super();
 		this.bindings = bindings;
 		this.strategy = strategy;
 		this.source = source;
 		this.scope = scope;
-		this.availability = availability;
+		this.target = target;
 	}
 
 	public <T> TypedBinder<T> superbind( Class<T> type ) {
@@ -162,8 +162,8 @@ public class Binder
 		return multibind( instance( name, type ) );
 	}
 
-	final Availability availability() {
-		return availability;
+	final Target target() {
+		return target;
 	}
 
 	final Source source() {
@@ -217,15 +217,15 @@ public class Binder
 	}
 
 	protected Binder with( Source source ) {
-		return new Binder( bindings, strategy, source, scope, availability );
+		return new Binder( bindings, strategy, source, scope, target );
 	}
 
-	protected Binder with( Availability availability ) {
-		return new Binder( bindings, strategy, source, scope, availability );
+	protected Binder with( Target target ) {
+		return new Binder( bindings, strategy, source, scope, target );
 	}
 
 	protected Binder into( Bindings bindings ) {
-		return new Binder( bindings, strategy, source, scope, availability );
+		return new Binder( bindings, strategy, source, scope, target );
 	}
 
 	/**
@@ -329,12 +329,12 @@ public class Binder
 			implements TargetedBasicBinder {
 
 		TargetedBinder( Bindings bindings, InjectionStrategy strategy, Source source, Scope scope ) {
-			super( bindings, strategy, source, scope, Availability.EVERYWHERE );
+			super( bindings, strategy, source, scope, Target.EVERYWHERE );
 		}
 
 		TargetedBinder( Bindings bindings, InjectionStrategy strategy, Source source, Scope scope,
 				Instance<?> target ) {
-			super( bindings, strategy, source, scope, Availability.availability( target ) );
+			super( bindings, strategy, source, scope, Target.targeting( target ) );
 		}
 
 		//TODO improve this since from a dependency point of view it is good to localize all binds somehow
@@ -342,19 +342,19 @@ public class Binder
 
 		@Override
 		public Binder within( Packages packages ) {
-			return with( availability().within( packages ) );
+			return with( target().within( packages ) );
 		}
 
 		public Binder inPackageOf( Class<?> type ) {
-			return with( availability().inPackageOf( type ) );
+			return with( target().inPackageOf( type ) );
 		}
 
 		public Binder inSubPackagesOf( Class<?> type ) {
-			return with( availability().inSubPackagesOf( type ) );
+			return with( target().inSubPackagesOf( type ) );
 		}
 
 		public Binder inPackageAndSubPackagesOf( Class<?> type ) {
-			return with( availability().inPackageAndSubPackagesOf( type ) );
+			return with( target().inPackageAndSubPackagesOf( type ) );
 		}
 	}
 
@@ -369,7 +369,7 @@ public class Binder
 		private final Resource<T> resource;
 
 		TypedBinder( Binder binder, Instance<T> instance ) {
-			this( binder, new Resource<T>( instance, binder.availability() ) );
+			this( binder, new Resource<T>( instance, binder.target() ) );
 		}
 
 		TypedBinder( Binder binder, Resource<T> resource ) {

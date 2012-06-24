@@ -18,22 +18,22 @@ public final class Resource<T>
 	}
 
 	private final Instance<T> instance;
-	private final Availability availability;
+	private final Target target;
 
 	public Resource( Instance<T> instance ) {
-		this( instance, Availability.EVERYWHERE );
+		this( instance, Target.EVERYWHERE );
 	}
 
-	public Resource( Instance<T> instance, Availability availability ) {
+	public Resource( Instance<T> instance, Target target ) {
 		super();
 		this.instance = instance;
-		this.availability = availability;
+		this.target = target;
 	}
 
 	public boolean isApplicableFor( Dependency<? super T> dependency ) {
 		return isAvailableFor( dependency ) // 
 				&& isAdequateFor( dependency ) //
-				&& isAssignableTo( dependency );
+				&& isAssignableTo( dependency ); // most 'expensive' check so we do it last
 	}
 
 	/**
@@ -47,7 +47,7 @@ public final class Resource<T>
 	 * Does the given {@link Dependency} occur in the right package and for the right target ?
 	 */
 	public boolean isAvailableFor( Dependency<? super T> dependency ) {
-		return availability.isApplicableFor( dependency );
+		return target.isApplicableFor( dependency );
 	}
 
 	/**
@@ -64,13 +64,12 @@ public final class Resource<T>
 
 	@Override
 	public boolean morePreciseThan( Resource<?> other ) {
-		// the sequence in OR is very important here!!!
-		return morePreciseThan2( instance, other.instance, availability, other.availability );
+		return morePreciseThan2( instance, other.instance, target, other.target );
 	}
 
 	@Override
 	public String toString() {
-		return availability + "-" + instance;
+		return target + "-" + instance;
 	}
 
 	@Override
@@ -84,11 +83,11 @@ public final class Resource<T>
 
 	@Override
 	public <E> Resource<E> typed( Type<E> type ) {
-		return new Resource<E>( instance.typed( type ), availability );
+		return new Resource<E>( instance.typed( type ), target );
 	}
 
 	public boolean includes( Resource<?> other ) {
-		//TODO add availability
+		//TODO add target
 		return instance.includes( other.instance );
 	}
 }
