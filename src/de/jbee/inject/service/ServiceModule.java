@@ -124,14 +124,15 @@ public abstract class ServiceModule
 			super();
 			this.context = context;
 			this.serviceClasses = resolveServiceClasses( context );
-			this.strategy = context.resolve( dependency( ServiceStrategy.class ).into(
+			this.strategy = context.resolve( dependency( ServiceStrategy.class ).injectingInto(
 					ServiceMethodProvider.class ) );
 		}
 
 		private static Class<?>[] resolveServiceClasses( DependencyResolver context ) {
 			Dependency<Class[]> serviceClassesDependency = dependency(
 					raw( Class[].class ).parametizedAsLowerBounds() ).named(
-					Name.prefixed( SERVICE_NAME_PREFIX ) ).into( ServiceMethodProvider.class );
+					Name.prefixed( SERVICE_NAME_PREFIX ) ).injectingInto(
+					ServiceMethodProvider.class );
 			return context.resolve( serviceClassesDependency );
 		}
 

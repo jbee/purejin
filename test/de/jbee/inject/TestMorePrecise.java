@@ -69,21 +69,21 @@ public class TestMorePrecise {
 	}
 
 	@Test
-	public void thatInstanceWithNameIsMorePreciseThanWithoutName() {
+	public void thatUnnamedIsMorePreciseThanNamedInstance() {
 		Type<Integer> type = raw( Integer.class );
 		Instance<Integer> named = instance( named( "foo" ), type );
 		Instance<Integer> unnamed = defaultInstanceOf( type );
-		assertMorePrecise( named, unnamed );
+		assertMorePrecise( unnamed, named );
 	}
 
 	@Test
-	public void thatNamedIsMorePreciseThanUnnamed() {
-		assertTrue( named( "foo" ).morePreciseThan( Name.DEFAULT ) );
+	public void thatUnnamedIsMorePreciseThanNamed() {
+		assertTrue( Name.DEFAULT.morePreciseThan( named( "foo" ) ) );
 	}
 
 	@Test
-	public void thatUnnamedIsNotMorePreciseThanNamed() {
-		assertFalse( Name.DEFAULT.morePreciseThan( named( "bar" ) ) );
+	public void thatNamedIsNotMorePreciseThanUnnamed() {
+		assertFalse( named( "bar" ).morePreciseThan( Name.DEFAULT ) );
 	}
 
 	@Test
@@ -97,14 +97,15 @@ public class TestMorePrecise {
 	}
 
 	@Test
-	public void thatSpecificPackageIsMorePreciseThanSubPackages() {
+	public void thatSpecificPackageIsMorePreciseThanThatPackageWithItsSubPackages() {
 		assertMorePrecise( Packages.packageOf( String.class ),
 				Packages.packageAndSubPackagesOf( String.class ) );
 	}
 
 	@Test
 	public void thatSpecificPackageIsNotMorePreciseThanSubPackagesUnderIt() {
-		assertEqualPrecise( Packages.packageOf( String.class ), Packages.subPackagesOf( String.class ) );
+		assertEqualPrecise( Packages.packageOf( String.class ),
+				Packages.subPackagesOf( String.class ) );
 	}
 
 	private <T extends PreciserThan<? super T>> void assertEqualPrecise( T one, T other ) {

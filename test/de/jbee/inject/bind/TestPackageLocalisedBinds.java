@@ -37,31 +37,31 @@ public class TestPackageLocalisedBinds {
 
 	@Test
 	public void thatDependencyWithTargetResolvedToSpecificBindInThatPackage() {
-		Dependency<String> stringInBind = stringGlobal.into( TestPackageLocalisedBinds.class );
+		Dependency<String> stringInBind = stringGlobal.injectingInto( TestPackageLocalisedBinds.class );
 		assertThat( injector.resolve( stringInBind ), is( "test" ) );
 	}
 
 	@Test
 	public void thatDependencyWithTargetSomewhereElseResolvedToGlobalBind() {
-		Dependency<String> stringSomewhereElse = stringGlobal.into( java.awt.font.TextAttribute.class );
+		Dependency<String> stringSomewhereElse = stringGlobal.injectingInto( java.awt.font.TextAttribute.class );
 		assertThat( injector.resolve( stringSomewhereElse ), is( "default" ) );
 	}
 
 	@Test
 	public void thatDependencyWithTargetResolvedToRelevantSubPackagesBind() {
-		Dependency<String> stringInAnnotation = stringGlobal.into( java.lang.annotation.Target.class );
+		Dependency<String> stringInAnnotation = stringGlobal.injectingInto( java.lang.annotation.Target.class );
 		assertThat( injector.resolve( stringInAnnotation ), is( "java-lang.*" ) );
 	}
 
 	@Test
 	public void thatDependencyWithTargetResolvedToRelevantPackageOfPackageAndSubPackagesBind() {
-		Dependency<String> stringInUtil = stringGlobal.into( java.util.List.class );
+		Dependency<String> stringInUtil = stringGlobal.injectingInto( java.util.List.class );
 		assertThat( injector.resolve( stringInUtil ), is( "java-util.*" ) );
 	}
 
 	@Test
 	public void thatDependencyWithTargetResolvedToRelevantSubPackageOfPackageAndSubPackagesBind() {
-		Dependency<String> stringInUtil = stringGlobal.into( java.util.concurrent.Callable.class );
+		Dependency<String> stringInUtil = stringGlobal.injectingInto( java.util.concurrent.Callable.class );
 		assertThat( injector.resolve( stringInUtil ), is( "java-util.*" ) );
 	}
 

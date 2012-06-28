@@ -44,27 +44,27 @@ public final class Packages
 	}
 
 	public boolean contains( Type<?> type ) {
-		return containsMultiple()
+		return includesMultiple()
 			? pattern.length() == 1
 				? true
 				: pattern.regionMatches( 0, packageNameOf( type ), 0, pattern.length() - 1 )
 			: pattern.equals( packageNameOf( type ) );
 	}
 
-	public boolean containsAll() {
+	public boolean includesAll() {
 		return pattern.equals( "*" );
 	}
 
-	public boolean containsMultiple() {
+	public boolean includesMultiple() {
 		return pattern.endsWith( "*" );
 	}
 
-	public boolean containsOneSpecific() {
-		return !containsMultiple();
+	public boolean includesOneSpecific() {
+		return !includesMultiple();
 	}
 
-	public boolean containsSome() {
-		return !containsAll();
+	public boolean includesSome() {
+		return !includesAll();
 	}
 
 	@Override
@@ -82,21 +82,16 @@ public final class Packages
 		if ( equalTo( other ) ) {
 			return false;
 		}
-		boolean someInThin = containsSome();
-		if ( someInThin && other.containsAll() ) {
-			return true;
+		final boolean thisIncludesAll = includesAll();
+		final boolean otherIncludesAll = other.includesAll();
+		if ( thisIncludesAll || otherIncludesAll ) {
+			return !thisIncludesAll;
 		}
-		boolean someInOther = other.containsSome();
-		if ( someInOther && containsAll() ) {
-			return false;
-		}
-		if ( containsOneSpecific() ) {
+		if ( includesOneSpecific() ) {
 			return other.pattern.equals( pattern + "*" );
 		}
-		if ( other.containsOneSpecific() ) {
-			return pattern.equals( other.pattern + "*" );
-		}
-		return someInThin && someInOther && other.isSubPackage( this );
+		//TODO I guess the containsOneSpecific is not needed - test
+		return !other.includesOneSpecific() && other.isSubPackage( this );
 	}
 
 	@Override
@@ -109,8 +104,9 @@ public final class Packages
 	}
 
 	private boolean isSubPackage( Packages other ) {
-		return other.pattern.regionMatches( 0, pattern, 0, containsMultiple()
+		final int length = includesMultiple()
 			? pattern.length() - 1
-			: pattern.length() );
+			: pattern.length();
+		return other.pattern.regionMatches( 0, pattern, 0, length );
 	}
 }

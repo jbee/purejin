@@ -41,6 +41,18 @@ public abstract class BinderModule
 		return binder.injectingInto( target );
 	}
 
+	public TargetedBinder injectingInto( Type<?> target ) {
+		return binder.injectingInto( target );
+	}
+
+	public TargetedBinder injectingInto( Name name, Class<?> type ) {
+		return binder.injectingInto( name, type );
+	}
+
+	public TargetedBinder injectingInto( Name name, Type<?> type ) {
+		return binder.injectingInto( name, type );
+	}
+
 	@Override
 	public TargetedBinder injectingInto( Instance<?> target ) {
 		return binder.injectingInto( target );

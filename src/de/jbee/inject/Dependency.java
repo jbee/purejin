@@ -94,7 +94,7 @@ public final class Dependency<T>
 	/**
 	 * Means we inject into the argument target class.
 	 */
-	public Dependency<T> into( Class<?> target ) {
+	public Dependency<T> injectingInto( Class<?> target ) {
 		return into( raw( target ) );
 	}
 

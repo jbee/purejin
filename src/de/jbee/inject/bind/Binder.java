@@ -10,7 +10,6 @@ import static de.jbee.inject.Type.raw;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 
-import de.jbee.inject.Target;
 import de.jbee.inject.InjectionStrategy;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Name;
@@ -22,6 +21,7 @@ import de.jbee.inject.Scoped;
 import de.jbee.inject.Source;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.Suppliers;
+import de.jbee.inject.Target;
 import de.jbee.inject.Type;
 import de.jbee.inject.TypeReflector;
 
@@ -90,8 +90,7 @@ public class Binder
 	private final Scope scope;
 	private final Target target;
 
-	Binder( Bindings bindings, InjectionStrategy strategy, Source source, Scope scope,
-			Target target ) {
+	Binder( Bindings bindings, InjectionStrategy strategy, Source source, Scope scope, Target target ) {
 		super();
 		this.bindings = bindings;
 		this.strategy = strategy;
@@ -312,9 +311,20 @@ public class Binder
 			super( bindings, strategy, source, scope );
 		}
 
-		// means when the type/instance is created and dependencies are injected into it
 		public TargetedBinder injectingInto( Class<?> target ) {
-			return injectingInto( defaultInstanceOf( raw( target ) ) );
+			return injectingInto( raw( target ) );
+		}
+
+		public TargetedBinder injectingInto( Type<?> target ) {
+			return injectingInto( defaultInstanceOf( target ) );
+		}
+
+		public TargetedBinder injectingInto( Name name, Class<?> type ) {
+			return injectingInto( name, raw( type ) );
+		}
+
+		public TargetedBinder injectingInto( Name name, Type<?> type ) {
+			return injectingInto( Instance.instance( name, type ) );
 		}
 
 		@Override

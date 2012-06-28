@@ -8,6 +8,14 @@ public final class Target
 
 	public static final Target ANY = targeting( Instance.ANY );
 
+	public static Target targeting( Class<?> type ) {
+		return targeting( raw( type ) );
+	}
+
+	public static Target targeting( Type<?> type ) {
+		return targeting( Instance.anyOf( type ) );
+	}
+
 	public static Target targeting( Instance<?> instance ) {
 		return new Target( instance, Packages.ALL );
 	}
@@ -34,7 +42,16 @@ public final class Target
 	}
 
 	public boolean isApplicableFor( Dependency<?> dependency ) {
-		return isAccessibleFor( dependency ); //TODO target instance
+		return isAccessibleFor( dependency ) && isAdequateFor( dependency );
+	}
+
+	public boolean isAdequateFor( Dependency<?> dependency ) {
+		if ( instance.isAny() ) {
+			return true;
+		}
+		//TODO also check instance name
+		Type<?> target = dependency.target();
+		return instance.getType().equalTo( target );
 	}
 
 	public boolean isAccessibleFor( Dependency<?> dependency ) {
@@ -43,7 +60,7 @@ public final class Target
 
 	@Override
 	public String toString() {
-		if ( instance.isAny() && packages.containsAll() ) {
+		if ( instance.isAny() && packages.includesAll() ) {
 			return "any";
 		}
 		return "[" + packages + " " + instance + "]";

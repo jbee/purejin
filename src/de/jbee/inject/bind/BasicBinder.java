@@ -35,6 +35,9 @@ public interface BasicBinder {
 	interface ScopedBasicBinder
 			extends TargetedBasicBinder {
 
+		/**
+		 * Means when the target type/instance is created and dependencies are injected into it.
+		 */
 		TargetedBasicBinder injectingInto( Instance<?> target );
 	}
 
@@ -48,6 +51,7 @@ public interface BasicBinder {
 			extends BasicBinder /* LocalisedBinder */{
 
 		BasicBinder within( Packages packages );
+
 	}
 
 	interface LocalisedBasicBinder

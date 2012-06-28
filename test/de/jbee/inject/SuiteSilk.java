@@ -7,7 +7,8 @@ import org.junit.runners.Suite.SuiteClasses;
 import de.jbee.inject.bind.SuiteBind;
 
 @RunWith ( Suite.class )
-@SuiteClasses ( { TestName.class, TestType.class, SuiteBind.class, TestPackages.class } )
+@SuiteClasses ( { TestName.class, TestType.class, SuiteBind.class, TestPackages.class,
+		TestMorePrecise.class, TestTarget.class } )
 public class SuiteSilk {
 	// all project tests
 }

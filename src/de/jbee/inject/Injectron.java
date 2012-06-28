@@ -1,6 +1,5 @@
 package de.jbee.inject;
 
-
 /**
  * A kind of singleton for a {@link Resource} inside a {@link Injector}.
  * 
