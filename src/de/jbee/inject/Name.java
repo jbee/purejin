@@ -9,7 +9,13 @@ package de.jbee.inject;
 public final class Name
 		implements PreciserThan<Name> {
 
+	/**
+	 * Used when no name is specified. It is the most precise name of all.
+	 */
 	public static final Name DEFAULT = new Name( "" );
+	/**
+	 * It is the least precise name of all.
+	 */
 	public static final Name ANY = new Name( "*" );
 
 	private final String value;
@@ -66,18 +72,18 @@ public final class Name
 
 	@Override
 	public boolean morePreciseThan( Name other ) {
-		if ( isDefault() ) {
-			return false;
+		final boolean thisIsDefault = isDefault();
+		final boolean otherIsDefault = other.isDefault();
+		if ( thisIsDefault || otherIsDefault ) {
+			return !otherIsDefault;
 		}
-		if ( other.isDefault() ) {
-			return !isDefault();
+		final boolean thisIsAny = isAny();
+		final boolean otherIsAny = other.isAny();
+		if ( thisIsAny || otherIsAny ) {
+			return !thisIsAny;
 		}
-		if ( ( !isAny() && other.isAny() ) || !isDefault() && other.isDefault()
-				|| value.startsWith( other.value ) ) {
-			return true;
-		}
-		//TODO or names
-		return false;
+		//TODO or multi-names
+		return value.startsWith( other.value ) && value.length() > other.value.length();
 	}
 
 	public boolean isApplicableFor( Name other ) {
