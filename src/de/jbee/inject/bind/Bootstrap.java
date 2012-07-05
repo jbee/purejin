@@ -25,7 +25,11 @@ import de.jbee.inject.TypeReflector;
 public final class Bootstrap {
 
 	public static DependencyResolver injector( Class<? extends Bundle> root ) {
-		return injector( root, new BuildinBundleBinder() );
+		return injector( root, new BuildinInstaller( Edition.FULL ) );
+	}
+
+	public static DependencyResolver injector( Class<? extends Bundle> root, Edition edition ) {
+		return injector( root, new BuildinInstaller( edition ) );
 	}
 
 	public static DependencyResolver injector( Class<? extends Bundle> root, Installer installer ) {
@@ -42,7 +46,30 @@ public final class Bootstrap {
 		}
 	}
 
-	static class BuildinBundleBinder
+	public static <T extends Enum<T> & Feature<T>> Edition edition( T... featured ) {
+		return new FeatureEdition<T>( featured[0], EnumSet.of( featured[0], featured ) );
+	}
+
+	private static class FeatureEdition<T extends Enum<T>>
+			implements Edition {
+
+		private final Feature<T> feature;
+		private final EnumSet<T> featured;
+
+		FeatureEdition( Feature<T> feature, EnumSet<T> featured ) {
+			super();
+			this.feature = feature;
+			this.featured = featured;
+		}
+
+		@Override
+		public boolean featured( Class<?> bundleOrModule ) {
+			T f = feature.featureOf( bundleOrModule );
+			return f == null || featured.contains( f );
+		}
+	}
+
+	static class BuildinInstaller
 			implements Installer {
 
 		// Find the initial set of bindings
@@ -55,9 +82,17 @@ public final class Bootstrap {
 		//   a. sort scopes from most stable to most fragile
 		// 	 b. init one repository for each scope
 		// 	 c. apply snapshots wrapper to repository instances
+
+		private final Edition edition;
+
+		BuildinInstaller( Edition edition ) {
+			super();
+			this.edition = edition;
+		}
+
 		@Override
 		public Suppliable<?>[] install( Class<? extends Bundle> root ) {
-			return bind( cleanedUp( declarationsFrom( root ) ) );
+			return bind( cleanedUp( declarationsFrom( root, edition ) ) );
 		}
 
 		private Suppliable<?>[] bind( BindDeclaration<?>[] declarations ) {
@@ -96,8 +131,8 @@ public final class Bootstrap {
 			return res.toArray( new BindDeclaration[res.size()] );
 		}
 
-		private BindDeclaration<?>[] declarationsFrom( Class<? extends Bundle> root ) {
-			BuildinBootstrapper bootstrapper = new BuildinBootstrapper();
+		private BindDeclaration<?>[] declarationsFrom( Class<? extends Bundle> root, Edition edition ) {
+			BuildinBootstrapper bootstrapper = new BuildinBootstrapper( edition );
 			bootstrapper.install( root );
 			ListBindings bindings = new ListBindings();
 			for ( Module m : bootstrapper.installed( root ) ) {
@@ -195,14 +230,20 @@ public final class Bootstrap {
 		private final Set<Class<? extends Bundle>> uninstalled = new HashSet<Class<? extends Bundle>>();
 		private final Set<Class<? extends Bundle>> installed = new HashSet<Class<? extends Bundle>>();
 		private final LinkedList<Class<? extends Bundle>> stack = new LinkedList<Class<? extends Bundle>>();
+		private final Edition edition;
 
-		BuildinBootstrapper() {
-			// make visible
+		BuildinBootstrapper( Edition edition ) {
+			super();
+			this.edition = edition;
 		}
 
 		@Override
 		public void install( Class<? extends Bundle> bundle ) {
 			if ( uninstalled.contains( bundle ) || installed.contains( bundle ) ) {
+				return;
+			}
+			if ( !edition.featured( bundle ) ) {
+				uninstalled.add( bundle ); // this way we will never ask again - something not featured is finally not featured
 				return;
 			}
 			installed.add( bundle );
@@ -242,6 +283,9 @@ public final class Bootstrap {
 		public void install( Module module ) {
 			Class<? extends Bundle> bundle = stack.peek();
 			if ( uninstalled.contains( bundle ) ) {
+				return;
+			}
+			if ( !edition.featured( module.getClass() ) ) {
 				return;
 			}
 			List<Module> modules = bundleModules.get( bundle );

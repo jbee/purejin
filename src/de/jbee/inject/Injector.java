@@ -22,13 +22,14 @@ public class Injector
 
 	@Override
 	public <T> T resolve( Dependency<T> dependency ) {
+		// OPEN is it true, that the dependency passed to the injectron can/should get the type/name added ? 
 		Type<T> type = dependency.getType();
 		if ( !type.isUnidimensionalArray() && type.isLowerBound() ) {
 			//TODO return best match from wildcard dependencies (not mapped by raw-type since it doesn't help)
 			throw new UnsupportedOperationException(
 					"Wildcard-dependencies are not supported yet: " + type );
 		}
-		Injectron<T> injectron = resolveInjectron( dependency );
+		Injectron<T> injectron = applicableInjectron( dependency );
 		if ( injectron != null ) {
 			return injectron.instanceFor( dependency );
 		}
@@ -36,7 +37,7 @@ public class Injector
 			return resolveArray( dependency, type.getElementType() );
 		}
 		if ( type.getRawType() == Injectron.class ) {
-			Injectron<?> i = resolveInjectron( dependency.onTypeParameter() );
+			Injectron<?> i = applicableInjectron( dependency.onTypeParameter() );
 			if ( i != null ) {
 				return (T) i;
 			}
@@ -44,7 +45,7 @@ public class Injector
 		throw noInjectronFor( dependency );
 	}
 
-	private <T> Injectron<T> resolveInjectron( Dependency<T> dependency ) {
+	private <T> Injectron<T> applicableInjectron( Dependency<T> dependency ) {
 		return mostPreciseOf( typeInjectrons( dependency.getType() ), dependency );
 	}
 

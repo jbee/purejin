@@ -315,6 +315,7 @@ public class Suppliers {
 			for ( int i = 0; i < types.length; i++ ) {
 				if ( args[i] instanceof Dependency<?> && rawTypes[i] != Dependency.class ) {
 					//OPEN annotations from constructor could be transformed into names for the arguments ?!
+					//TODO add/merge target from argument dependency
 					Dependency<?> argDependency = (Dependency<?>) args[i];
 					resolvedArgs[i] = context.resolve( argDependency );
 				} else {

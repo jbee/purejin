@@ -3,6 +3,7 @@ package de.jbee.inject.bind;
 import static de.jbee.inject.bind.Bootstrap.nonnullThrowsReentranceException;
 
 public abstract class DirectBundle
+		//TODO better name
 		implements Bundle, Bootstrapper {
 
 	private Bootstrapper bootstrap;

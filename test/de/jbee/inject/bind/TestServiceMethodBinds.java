@@ -20,20 +20,20 @@ public class TestServiceMethodBinds {
 
 		@Override
 		protected void declare() {
-			bindServiceMethods( SomeTestService.class );
-			bindServiceMethods( AnotherTestService.class );
+			bindServiceMethods( MyService.class );
+			bindServiceMethods( MyOtherService.class );
 		}
 
 	}
 
-	private static class AnotherTestService {
+	static class MyService {
 
 		public Integer negate( Number value ) {
 			return -value.intValue();
 		}
 	}
 
-	private static class SomeTestService {
+	static class MyOtherService {
 
 		public Integer mul2( Integer value, ServiceMethod<Float, Integer> service ) {
 			return value * 2 + service.invoke( 2.8f );

@@ -19,6 +19,25 @@ public class TypeReflector {
 		return c;
 	}
 
+	public static <T> Constructor<T> accessibleConstructor( Class<T> declaringClass ) {
+
+		Constructor<?>[] constructors = declaringClass.getDeclaredConstructors();
+		if ( constructors.length == 0 ) {
+			throw new RuntimeException( new NoSuchMethodException(
+					declaringClass.getCanonicalName() ) );
+		}
+		int noArgsIndex = 0;
+		for ( int i = 0; i < constructors.length; i++ ) {
+			if ( constructors[i].getParameterTypes().length == 0 ) {
+				noArgsIndex = i;
+			}
+		}
+		@SuppressWarnings ( "unchecked" )
+		Constructor<T> c = (Constructor<T>) constructors[noArgsIndex];
+		c.setAccessible( true );
+		return c;
+	}
+
 	public static <T> T newInstance( Class<T> type ) {
 		try {
 			return accessibleNoArgsConstructor( type ).newInstance();

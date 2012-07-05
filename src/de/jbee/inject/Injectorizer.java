@@ -101,7 +101,9 @@ public class Injectorizer {
 
 		@Override
 		public T instanceFor( Dependency<? super T> dependency ) {
-			return repository.serve( injection.on( dependency ), injectable );
+			return repository.serve(
+					injection.on( dependency.injectingInto( resource.getType().getClass() ) ),
+					injectable );
 		}
 
 		@Override

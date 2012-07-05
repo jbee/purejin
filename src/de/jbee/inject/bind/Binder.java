@@ -40,7 +40,7 @@ public class Binder
 		@Override
 		public <T> Constructor<T> constructorFor( Class<T> type ) {
 			try {
-				return TypeReflector.accessibleNoArgsConstructor( type );
+				return TypeReflector.accessibleConstructor( type );
 			} catch ( RuntimeException e ) {
 				return null;
 			}
