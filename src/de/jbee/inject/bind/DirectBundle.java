@@ -36,6 +36,12 @@ public abstract class DirectBundle
 	}
 
 	@Override
+	public <C extends Enum<C> & Const> void install( Class<? extends ModularBundle<C>> bundle,
+			Class<C> property ) {
+		bootstrap.install( bundle, property );
+	}
+
+	@Override
 	public <M extends Enum<M> & ModularBundle<M>> void uninstall( M... modules ) {
 		bootstrap.uninstall( modules );
 	}

@@ -43,6 +43,9 @@ public interface Bootstrapper {
 
 	<M extends Enum<M> & ModularBundle<M>> void uninstall( M... modules );
 
+	<C extends Enum<C> & Const> void install( Class<? extends ModularBundle<C>> bundle,
+			Class<C> property );
+
 	interface ModularBootstrapper<M> {
 
 		/**

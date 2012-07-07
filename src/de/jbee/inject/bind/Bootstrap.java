@@ -25,11 +25,16 @@ import de.jbee.inject.TypeReflector;
 public final class Bootstrap {
 
 	public static DependencyResolver injector( Class<? extends Bundle> root ) {
-		return injector( root, new BuildinInstaller( Edition.FULL ) );
+		return injector( root, Edition.FULL );
 	}
 
 	public static DependencyResolver injector( Class<? extends Bundle> root, Edition edition ) {
-		return injector( root, new BuildinInstaller( edition ) );
+		return injector( root, edition, Constants.NONE );
+	}
+
+	public static DependencyResolver injector( Class<? extends Bundle> root, Edition edition,
+			Constants constants ) {
+		return injector( root, new BuildinInstaller( edition, constants ) );
 	}
 
 	public static DependencyResolver injector( Class<? extends Bundle> root, Installer installer ) {
@@ -84,10 +89,12 @@ public final class Bootstrap {
 		// 	 c. apply snapshots wrapper to repository instances
 
 		private final Edition edition;
+		private final Constants constants;
 
-		BuildinInstaller( Edition edition ) {
+		BuildinInstaller( Edition edition, Constants constants ) {
 			super();
 			this.edition = edition;
+			this.constants = constants;
 		}
 
 		@Override
@@ -132,7 +139,7 @@ public final class Bootstrap {
 		}
 
 		private BindDeclaration<?>[] declarationsFrom( Class<? extends Bundle> root, Edition edition ) {
-			BuildinBootstrapper bootstrapper = new BuildinBootstrapper( edition );
+			BuildinBootstrapper bootstrapper = new BuildinBootstrapper( edition, constants );
 			bootstrapper.install( root );
 			ListBindings bindings = new ListBindings();
 			for ( Module m : bootstrapper.installed( root ) ) {
@@ -231,10 +238,12 @@ public final class Bootstrap {
 		private final Set<Class<? extends Bundle>> installed = new HashSet<Class<? extends Bundle>>();
 		private final LinkedList<Class<? extends Bundle>> stack = new LinkedList<Class<? extends Bundle>>();
 		private final Edition edition;
+		private final Constants constants;
 
-		BuildinBootstrapper( Edition edition ) {
+		BuildinBootstrapper( Edition edition, Constants constants ) {
 			super();
 			this.edition = edition;
+			this.constants = constants;
 		}
 
 		@Override
@@ -264,10 +273,32 @@ public final class Bootstrap {
 		}
 
 		@Override
+		public <C extends Enum<C> & Const> void install( Class<? extends ModularBundle<C>> bundle,
+				Class<C> property ) {
+			if ( !edition.featured( property ) ) {
+				return;
+			}
+			final C value = constants.value( property );
+			TypeReflector.newInstance( bundle ).bootstrap( new ModularBootstrapper<C>() {
+
+				@Override
+				public void install( Class<? extends Bundle> bundle, C module ) {
+					if ( module == value ) { // null is a valid value to define what happens when no configuration is present
+						BuildinBootstrapper.this.install( bundle );
+					}
+				}
+			} );
+		}
+
+		@Override
 		public <M extends Enum<M> & ModularBundle<M>> void install( M... modules ) {
 			if ( modules.length > 0 ) {
-				final EnumSet<M> installing = EnumSet.of( modules[0], modules );
-				modules[0].bootstrap( new ModularBootstrapper<M>() {
+				final M bundle = modules[0];
+				if ( !edition.featured( bundle.getClass() ) ) {
+					return;
+				}
+				final EnumSet<M> installing = EnumSet.of( bundle, modules );
+				bundle.bootstrap( new ModularBootstrapper<M>() {
 
 					@Override
 					public void install( Class<? extends Bundle> bundle, M module ) {
@@ -282,10 +313,7 @@ public final class Bootstrap {
 		@Override
 		public void install( Module module ) {
 			Class<? extends Bundle> bundle = stack.peek();
-			if ( uninstalled.contains( bundle ) ) {
-				return;
-			}
-			if ( !edition.featured( module.getClass() ) ) {
+			if ( uninstalled.contains( bundle ) || !edition.featured( module.getClass() ) ) {
 				return;
 			}
 			List<Module> modules = bundleModules.get( bundle );
