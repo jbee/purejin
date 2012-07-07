@@ -1,7 +1,5 @@
 package de.jbee.inject;
 
-import static de.jbee.inject.Dependency.dependency;
-
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -63,11 +61,11 @@ public class Suppliers {
 		@Override
 		public final T supply( Dependency<? super T> dependency, DependencyResolver context ) {
 			Type<?> elementType = dependency.getType().getParameters()[0];
-			return bridge( supplyArray( elementType, context ) );
+			return bridge( supplyArray( dependency.anyTyped( elementType.getArrayType() ), context ) );
 		}
 
-		private <E> E[] supplyArray( Type<E> elementType, DependencyResolver resolver ) {
-			return resolver.resolve( Dependency.dependency( elementType.getArrayType() ) );
+		private <E> E[] supplyArray( Dependency<E[]> elementType, DependencyResolver resolver ) {
+			return resolver.resolve( elementType );
 		}
 
 		abstract <E> T bridge( E[] elements );
@@ -176,7 +174,7 @@ public class Suppliers {
 
 		@Override
 		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
-			final Supplier<? extends T> supplier = context.resolve( dependency.typed( Type.raw( type ) ) );
+			final Supplier<? extends T> supplier = context.resolve( dependency.anyTyped( type ) );
 			return supplier.supply( dependency, context );
 		}
 	}
@@ -193,8 +191,8 @@ public class Suppliers {
 
 		@Override
 		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
-			//OPEN is it correct to keep name from dependency ?
-			return context.resolve( dependency.typed( type ) );
+			//OPEN is it correct to keep/remove name from dependency ?
+			return context.resolve( dependency.anyTyped( type ) );
 		}
 
 		@Override
@@ -299,9 +297,7 @@ public class Suppliers {
 		private static <T> Object[] dependencies( Constructor<T> constructor ) {
 			Type<?>[] types = Type.parameterTypes( constructor );
 			Object[] values = new Object[types.length];
-			for ( int i = 0; i < types.length; i++ ) {
-				values[i] = dependency( types[i] );
-			}
+			System.arraycopy( types, 0, values, 0, types.length );
 			return values;
 		}
 
@@ -309,21 +305,20 @@ public class Suppliers {
 
 		@Override
 		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
-			java.lang.reflect.Type[] types = constructor.getGenericParameterTypes();
 			Class<?>[] rawTypes = constructor.getParameterTypes();
-			Object[] resolvedArgs = new Object[types.length];
-			for ( int i = 0; i < types.length; i++ ) {
-				if ( args[i] instanceof Dependency<?> && rawTypes[i] != Dependency.class ) {
+			Object[] resolvedArgs = new Object[rawTypes.length];
+			for ( int i = 0; i < rawTypes.length; i++ ) {
+				if ( args[i] instanceof Type<?> && rawTypes[i] != Type.class ) {
 					//OPEN annotations from constructor could be transformed into names for the arguments ?!
 					//TODO add/merge target from argument dependency
-					Dependency<?> argDependency = (Dependency<?>) args[i];
-					resolvedArgs[i] = context.resolve( argDependency );
+					Dependency<?> argDependency = dependency.anyTyped( (Type<?>) args[i] );
+					resolvedArgs[i] = context.resolve( argDependency ); //FIXME change to Type so dep is constructed using retype 
 				} else {
 					resolvedArgs[i] = args[i];
 				}
 			}
 			try {
-				constructor.setAccessible( true );
+				constructor.setAccessible( true ); //TODO just do it once
 				return constructor.newInstance( resolvedArgs );
 			} catch ( Exception e ) {
 				throw new RuntimeException( e );

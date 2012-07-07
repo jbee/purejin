@@ -20,8 +20,8 @@ public class TestServiceMethodBinds {
 
 		@Override
 		protected void declare() {
-			bindServiceMethods( MyService.class );
-			bindServiceMethods( MyOtherService.class );
+			bindServiceMethodsIn( MyService.class );
+			bindServiceMethodsIn( MyOtherService.class );
 		}
 
 	}

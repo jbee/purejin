@@ -42,7 +42,7 @@ public abstract class ServiceModule
 
 	private static final String SERVICE_NAME_PREFIX = "Service-";
 
-	protected final void bindServiceMethods( Class<?> service ) {
+	protected final void bindServiceMethodsIn( Class<?> service ) {
 		String name = SERVICE_NAME_PREFIX + service.getCanonicalName();
 		binder.multibind( named( name ), Class.class ).to( service );
 	}
@@ -206,7 +206,7 @@ public abstract class ServiceModule
 		@Override
 		public ServiceMethod<?, ?> supply( Dependency<? super ServiceMethod<?, ?>> dependency,
 				DependencyResolver context ) {
-			ServiceProvider serviceResolver = context.resolve( dependency( ServiceProvider.class ) );
+			ServiceProvider serviceResolver = context.resolve( dependency.anyTyped( ServiceProvider.class ) );
 			Type<?>[] parameters = dependency.getType().getParameters();
 			return serviceResolver.provide( parameters[0], parameters[1] );
 		}
@@ -237,7 +237,7 @@ public abstract class ServiceModule
 		public T invoke( P params ) {
 			Object[] args = actualArguments( params );
 			try {
-				method.setAccessible( true );
+				method.setAccessible( true ); //TODO just do it once
 				return returnType.cast( method.invoke( object, args ) );
 			} catch ( Exception e ) {
 				throw new RuntimeException( "Failed to invoke service:\n" + e.getMessage(), e );

@@ -20,11 +20,11 @@ public class TestServiceBinds {
 	/**
 	 * Think of this as an application specific service interface that normally would have been
 	 * defined within your application code. This is what 'your' code asks for whereby you don't get
-	 * any dependencies pointing in direction of the DI framework inside your normal app-code. The
-	 * only place you are coupled to the DI-framework is still in the binding code that is
-	 * additional to the app-code.
+	 * any dependencies pointing in direction of the DI framework inside your normal application
+	 * code. The only place you are coupled to the DI-framework is still in the binding code that is
+	 * additional to the application code.
 	 */
-	static interface AppService<P, R> {
+	private static interface Service<P, R> {
 
 		R doIt( P param );
 	}
@@ -33,27 +33,27 @@ public class TestServiceBinds {
 	 * This is an adapter to 'your' application specific service interface adapting to the
 	 * {@link ServiceMethod} interface of the DI-framework. So internally both are resolvable.
 	 */
-	static class AppServiceSupplier
-			implements Supplier<AppService<?, ?>> {
+	private static class ServiceSupplier
+			implements Supplier<Service<?, ?>> {
 
 		@Override
-		public AppService<?, ?> supply( Dependency<? super AppService<?, ?>> dependency,
+		public Service<?, ?> supply( Dependency<? super Service<?, ?>> dependency,
 				DependencyResolver context ) {
 			ServiceProvider provider = context.resolve( dependency( ServiceProvider.class ) );
 			Type<?>[] parameters = dependency.getType().getParameters();
 			return newService( provider.provide( parameters[0], parameters[1] ) );
 		}
 
-		private <P, R> AppService<P, R> newService( ServiceMethod<P, R> service ) {
-			return new AppServiceImpl<P, R>( service );
+		private <P, R> Service<P, R> newService( ServiceMethod<P, R> service ) {
+			return new ServiceToServiceMethodAdapter<P, R>( service );
 		}
 
-		static class AppServiceImpl<P, R>
-				implements AppService<P, R> {
+		static class ServiceToServiceMethodAdapter<P, R>
+				implements Service<P, R> {
 
 			private final ServiceMethod<P, R> service;
 
-			AppServiceImpl( ServiceMethod<P, R> service ) {
+			ServiceToServiceMethodAdapter( ServiceMethod<P, R> service ) {
 				super();
 				this.service = service;
 			}
@@ -67,32 +67,32 @@ public class TestServiceBinds {
 
 	}
 
-	static interface AppCommand<P> {
+	private static interface Command<P> {
 
 		Long doIt( P param );
 	}
 
-	static class AppCommandSupplier
-			implements Supplier<AppCommand<?>> {
+	private static class CommandSupplier
+			implements Supplier<Command<?>> {
 
 		@Override
-		public AppCommand<?> supply( Dependency<? super AppCommand<?>> dependency,
+		public Command<?> supply( Dependency<? super Command<?>> dependency,
 				DependencyResolver context ) {
 			ServiceProvider provider = context.resolve( dependency( ServiceProvider.class ) );
 			return newCommand( provider.provide( dependency.getType().getParameters()[0],
 					raw( Long.class ) ) );
 		}
 
-		private <P> AppCommand<P> newCommand( ServiceMethod<P, Long> service ) {
-			return new AppCommandImpl<P>( service );
+		private <P> Command<P> newCommand( ServiceMethod<P, Long> service ) {
+			return new CommandToServiceMethodAdapter<P>( service );
 		}
 
-		static class AppCommandImpl<P>
-				implements AppCommand<P> {
+		static class CommandToServiceMethodAdapter<P>
+				implements Command<P> {
 
 			private final ServiceMethod<P, Long> service;
 
-			AppCommandImpl( ServiceMethod<P, Long> service ) {
+			CommandToServiceMethodAdapter( ServiceMethod<P, Long> service ) {
 				super();
 				this.service = service;
 			}
@@ -105,19 +105,19 @@ public class TestServiceBinds {
 		}
 	}
 
-	static class ServiceDecouplerBindsModule
+	private static class ServiceBindsModule
 			extends ServiceModule {
 
 		@Override
 		protected void declare() {
-			bindServiceMethods( SomeService.class );
-			superbind( AppService.class ).toSupplier( AppServiceSupplier.class );
-			superbind( AppCommand.class ).toSupplier( AppCommandSupplier.class );
+			bindServiceMethodsIn( MathService.class );
+			superbind( Service.class ).toSupplier( ServiceSupplier.class );
+			superbind( Command.class ).toSupplier( CommandSupplier.class );
 		}
 
 	}
 
-	static class SomeService {
+	static class MathService {
 
 		Long square( Integer value ) {
 			return value.longValue() * value;
@@ -125,23 +125,25 @@ public class TestServiceBinds {
 	}
 
 	@Test
-	public void thatAppServiceCanBeResolvedWhenHavingGenericsInSameOrder() {
-		DependencyResolver injector = Bootstrap.injector( ServiceDecouplerBindsModule.class );
-		AppService<Integer, Long> service = injector.resolve( Dependency.dependency( Type.raw(
-				AppService.class ).parametized( Integer.class, Long.class ) ) );
+	public void thatServiceCanBeResolvedWhenHavingGenericsInSameOrder() {
+		DependencyResolver injector = Bootstrap.injector( ServiceBindsModule.class );
+		Dependency<Service> dependency = dependency( raw( Service.class ).parametized(
+				Integer.class, Long.class ) );
+		Service<Integer, Long> service = injector.resolve( dependency );
 		assertThat( service.doIt( 2 ), is( 4L ) );
 	}
 
 	@Test
-	public void thatAppServiceCanBeResolvedWhenHavingGenericsInDifferentOrder() {
+	public void thatServiceCanBeResolvedWhenHavingGenericsInDifferentOrder() {
 		//TODO
 	}
 
 	@Test
-	public void thatAppServiceCanBeResolvedWhenHavingJustOneGeneric() {
-		DependencyResolver injector = Bootstrap.injector( ServiceDecouplerBindsModule.class );
-		AppCommand<Integer> command = injector.resolve( Dependency.dependency( Type.raw(
-				AppCommand.class ).parametized( Integer.class ) ) );
+	public void thatServiceCanBeResolvedWhenHavingJustOneGeneric() {
+		DependencyResolver injector = Bootstrap.injector( ServiceBindsModule.class );
+		Dependency<Command> dependency = dependency( raw( Command.class ).parametized(
+				Integer.class ) );
+		Command<Integer> command = injector.resolve( dependency );
 		assertThat( command.doIt( 3 ), is( 9L ) );
 	}
 

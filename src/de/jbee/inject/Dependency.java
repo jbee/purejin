@@ -69,6 +69,14 @@ public final class Dependency<T>
 		return dependency( instance( getName(), type ), targetHierarchy );
 	}
 
+	public <E> Dependency<E> anyTyped( Type<E> type ) {
+		return dependency( instance( Name.ANY, type ), targetHierarchy );
+	}
+
+	public <E> Dependency<E> anyTyped( Class<E> type ) {
+		return anyTyped( raw( type ) );
+	}
+
 	public Dependency<T> named( String name ) {
 		return named( Name.named( name ) );
 	}
@@ -95,10 +103,10 @@ public final class Dependency<T>
 	 * Means we inject into the argument target class.
 	 */
 	public Dependency<T> injectingInto( Class<?> target ) {
-		return into( raw( target ) );
+		return injectingInto( raw( target ) );
 	}
 
-	public Dependency<T> into( Type<?> target ) {
+	public Dependency<T> injectingInto( Type<?> target ) {
 		if ( targetHierarchy.length == 0 ) {
 			return new Dependency<T>( instance, new Type<?>[] { target } );
 		}
