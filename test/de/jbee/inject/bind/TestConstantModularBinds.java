@@ -7,7 +7,6 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 import de.jbee.inject.DependencyResolver;
-import de.jbee.inject.bind.Bootstrapper.ModularBootstrapper;
 
 public class TestConstantModularBinds {
 
@@ -18,7 +17,7 @@ public class TestConstantModularBinds {
 	}
 
 	private static class ConstantModularBindsBundle
-			extends DirectBundle {
+			extends BootstrapperBundle {
 
 		@Override
 		protected void bootstrap() {
@@ -28,13 +27,13 @@ public class TestConstantModularBinds {
 	}
 
 	private static class MachineBundle
-			implements ModularBundle<Machine> { //TODO base-class that offers small nice builder ?
+			extends ModularBootstrapperBundle<Machine> {
 
 		@Override
-		public void bootstrap( ModularBootstrapper<Machine> bootstrap ) {
-			bootstrap.install( GenericMachineBundle.class, null );
-			bootstrap.install( LocalhostBundle.class, Machine.LOCALHOST );
-			bootstrap.install( Worker1Bundle.class, Machine.WORKER_1 );
+		protected void bootstrap() {
+			install( GenericMachineBundle.class, null );
+			install( LocalhostBundle.class, Machine.LOCALHOST );
+			install( Worker1Bundle.class, Machine.WORKER_1 );
 		}
 	}
 

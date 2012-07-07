@@ -38,7 +38,7 @@ public class TestEditionFeatureBinds {
 
 	@Featured ( MyFeature.FOO )
 	static class FeaturedBundle
-			extends DirectBundle {
+			extends BootstrapperBundle {
 
 		@Override
 		protected void bootstrap() {
@@ -57,7 +57,7 @@ public class TestEditionFeatureBinds {
 	}
 
 	static class RootBundle
-			extends DirectBundle {
+			extends BootstrapperBundle {
 
 		@Override
 		protected void bootstrap() {

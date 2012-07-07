@@ -42,7 +42,7 @@ public class TestInstanceBinds {
 	}
 
 	private static class InstanceBindsBundle
-			extends DirectBundle {
+			extends BootstrapperBundle {
 
 		@Override
 		protected void bootstrap() {
