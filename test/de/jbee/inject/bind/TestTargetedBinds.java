@@ -9,6 +9,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
+import de.jbee.inject.Dependency;
 import de.jbee.inject.DependencyResolver;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Name;
@@ -24,6 +25,7 @@ public class TestTargetedBinds {
 
 	static final Bar BAR_IN_FOO = new Bar();
 	static final Bar BAR_EVERYWHERE_ELSE = new Bar();
+	static final Bar BAR_IN_AWESOME_FOO = new Bar();
 
 	private static class TargetedBindsModule
 			extends BinderModule {
@@ -36,6 +38,9 @@ public class TestTargetedBinds {
 			Name special = named( "special" );
 			bind( special, Foo.class ).toConstructor( Bar.class ); // if we would use a type bind like to(Foo.class) it wouldn't work since we use a Foo that is not created as special Foo so it got the other Bar 
 			injectingInto( special, Foo.class ).bind( Bar.class ).to( BAR_EVERYWHERE_ELSE );
+			Name awesome = named( "awesome" );
+			bind( awesome, Foo.class ).toConstructor( Bar.class );
+			injectingInto( awesome, Foo.class ).bind( Bar.class ).to( BAR_IN_AWESOME_FOO );
 		}
 	}
 
@@ -81,8 +86,10 @@ public class TestTargetedBinds {
 
 	@Test
 	public void thatBindWithNamedTargetIsUsedWhenInjectingIntoIt() {
-		Foo foo = injector.resolve( dependency( Foo.class ).named( named( "special" ) ) );
-		// FIXME the problem is that we use linked bind as well what adds another instance frame on the target stack that is not the special foo whereby we get the wrong bar
+		Dependency<Foo> fooDependency = dependency( Foo.class );
+		Foo foo = injector.resolve( fooDependency.named( named( "special" ) ) );
 		assertThat( foo.bar, sameInstance( BAR_EVERYWHERE_ELSE ) );
+		foo = injector.resolve( fooDependency.named( named( "Awesome" ) ) );
+		assertThat( foo.bar, sameInstance( BAR_IN_AWESOME_FOO ) );
 	}
 }
