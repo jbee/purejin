@@ -94,9 +94,13 @@ public final class Dependency<T>
 	}
 
 	public Type<?> target() {
+		return targetUp( 0 );
+	}
+
+	public Type<?> targetUp( int level ) {
 		return isUntargeted()
 			? Type.WILDCARD
-			: targetHierarchy[targetHierarchy.length - 1];
+			: targetHierarchy[targetHierarchy.length - 1 - level];
 	}
 
 	/**

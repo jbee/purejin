@@ -7,12 +7,14 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 public class Suppliers {
 
 	public static final Supplier<Provider<?>> PROVIDER_BRIDGE = new ProviderSupplier();
 	public static final Supplier<List<?>> LIST_BRIDGE = new ArrayToListBridgeSupplier();
 	public static final Supplier<Set<?>> SET_BRIDGE = new ArrayToSetBridgeSupplier();
+	public static final Supplier<Logger> LOGGER = new LoggerSupplier();
 
 	public static <T> Supplier<T> asSupplier( Provider<T> provider ) {
 		return new ProviderAsSupplier<T>( provider );
@@ -342,5 +344,19 @@ public class Suppliers {
 		public T instanceFor( Injection<T> injection ) {
 			return supplier.supply( injection.dependency(), context );
 		}
+	}
+
+	private static class LoggerSupplier
+			implements Supplier<Logger> {
+
+		LoggerSupplier() {
+			// make visible
+		}
+
+		@Override
+		public Logger supply( Dependency<? super Logger> dependency, DependencyResolver context ) {
+			return Logger.getLogger( dependency.targetUp( 1 ).getRawType().getCanonicalName() );
+		}
+
 	}
 }

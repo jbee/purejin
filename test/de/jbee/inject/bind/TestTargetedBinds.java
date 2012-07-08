@@ -43,14 +43,14 @@ public class TestTargetedBinds {
 	}
 
 	@Test
-	public void thatBindWithTargetIsUsedWhenInjectingBarIntoFoo() {
+	public void thatBindWithTargetIsUsedWhenInjectingIntoIt() {
 		DependencyResolver injector = Bootstrap.injector( TargetedBindsModule.class );
 		MyFoo foo = injector.resolve( dependency( MyFoo.class ) );
 		assertThat( foo.bar, sameInstance( BAR1 ) );
 	}
 
 	@Test
-	public void thatBindWithTargetIsNotUsedWhenNotInjectingBarIntoFoo() {
+	public void thatBindWithTargetIsNotUsedWhenNotInjectingIntoIt() {
 		DependencyResolver injector = Bootstrap.injector( TargetedBindsModule.class );
 		assertThat( injector.resolve( dependency( MyBar.class ) ), sameInstance( BAR0 ) );
 	}

@@ -8,7 +8,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses ( { TestAutobindBinds.class, TestElementBinds.class, TestInstanceBinds.class,
 		TestServiceMethodBinds.class, TestServiceBinds.class, TestSupplierBinds.class,
 		TestTypeBinds.class, TestBootstrapper.class, TestPackageLocalisedBinds.class,
-		TestEditionFeatureBinds.class, TestConstantModularBinds.class } )
+		TestEditionFeatureBinds.class, TestConstantModularBinds.class, TestTargetedBinds.class,
+		TestLoggerBinds.class } )
 public class SuiteBind {
-
+	// all tests in the bind package
 }
