@@ -134,11 +134,6 @@ public class TestServiceBinds {
 	}
 
 	@Test
-	public void thatServiceCanBeResolvedWhenHavingGenericsInDifferentOrder() {
-		//TODO
-	}
-
-	@Test
 	public void thatServiceCanBeResolvedWhenHavingJustOneGeneric() {
 		DependencyResolver injector = Bootstrap.injector( ServiceBindsModule.class );
 		Dependency<Command> dependency = dependency( raw( Command.class ).parametized(

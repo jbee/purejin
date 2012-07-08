@@ -11,6 +11,12 @@ import org.junit.Test;
 
 import de.jbee.inject.DependencyResolver;
 
+/**
+ * The tests demonstrates the meaning of a {@link Binder#autobind(Class)} call. It will create
+ * multiple separate binds binding to the type itself and all its superclasses and -interfaces.
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ */
 public class TestAutobindBinds {
 
 	static class AutobindBindsModule

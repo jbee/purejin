@@ -7,6 +7,13 @@ import org.junit.Test;
 
 import de.jbee.inject.DependencyResolver;
 
+/**
+ * The tests shows an example of cyclic depended {@link Bundle}s. It shows that a {@link Bundle}
+ * doesn't have to know or consider other bundles since it is valid to make cyclic references or
+ * install the {@link Bundle}s multiple times.
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ */
 public class TestBootstrapper {
 
 	private static class CycleOneBundle

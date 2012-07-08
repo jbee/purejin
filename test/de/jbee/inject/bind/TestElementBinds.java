@@ -13,10 +13,18 @@ import java.util.List;
 import org.junit.Test;
 
 import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.bind.Binder.TypedElementBinder;
 
+/**
+ * Tests that demonstrates how to overlay the default behavior of 1-dimensional array types by
+ * defining the elements of them explicitly using the
+ * {@link TypedElementBinder#toElements(Class, Class)} methods.
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ */
 public class TestElementBinds {
 
-	static class ElementBindsModule
+	private static class ElementBindsModule
 			extends BinderModule {
 
 		@Override

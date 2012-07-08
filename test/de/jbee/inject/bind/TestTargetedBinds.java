@@ -7,38 +7,45 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.bind.BasicBinder.ScopedBasicBinder;
 
+/**
+ * A test that demonstrates how to inject a specific instance into another type using the
+ * {@link ScopedBasicBinder#injectingInto(de.jbee.inject.Instance)} method.
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ */
 public class TestTargetedBinds {
 
-	static final MyBar BAR_IN_FOO = new MyBar();
-	static final MyBar BAR_EVERYWHERE_ELSE = new MyBar();
+	static final Bar BAR_IN_FOO = new Bar();
+	static final Bar BAR_EVERYWHERE_ELSE = new Bar();
 
 	private static class TargetedBindsModule
 			extends BinderModule {
 
 		@Override
 		protected void declare() {
-			bind( MyFoo.class ).to( MyFoo.class );
-			injectingInto( MyFoo.class ).bind( MyBar.class ).to( BAR_IN_FOO );
-			bind( MyBar.class ).to( BAR_EVERYWHERE_ELSE );
+			bind( Foo.class ).to( Foo.class );
+			injectingInto( Foo.class ).bind( Bar.class ).to( BAR_IN_FOO );
+			bind( Bar.class ).to( BAR_EVERYWHERE_ELSE );
 		}
 	}
 
-	private static class MyFoo {
+	private static class Foo {
 
-		final MyBar bar;
+		final Bar bar;
 
 		@SuppressWarnings ( "unused" )
-		MyFoo( MyBar bar ) {
+		Foo( Bar bar ) {
 			super();
 			this.bar = bar;
 		}
 
 	}
 
-	private static class MyBar {
+	private static class Bar {
 
-		MyBar() {
+		Bar() {
 			// make visible
 		}
 	}
@@ -46,14 +53,14 @@ public class TestTargetedBinds {
 	@Test
 	public void thatBindWithTargetIsUsedWhenInjectingIntoIt() {
 		DependencyResolver injector = Bootstrap.injector( TargetedBindsModule.class );
-		MyFoo foo = injector.resolve( dependency( MyFoo.class ) );
+		Foo foo = injector.resolve( dependency( Foo.class ) );
 		assertThat( foo.bar, sameInstance( BAR_IN_FOO ) );
 	}
 
 	@Test
 	public void thatBindWithTargetIsNotUsedWhenNotInjectingIntoIt() {
 		DependencyResolver injector = Bootstrap.injector( TargetedBindsModule.class );
-		MyBar bar = injector.resolve( dependency( MyBar.class ) );
+		Bar bar = injector.resolve( dependency( Bar.class ) );
 		assertThat( bar, sameInstance( BAR_EVERYWHERE_ELSE ) );
 	}
 }

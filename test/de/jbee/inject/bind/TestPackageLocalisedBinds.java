@@ -10,7 +10,18 @@ import org.junit.Test;
 
 import de.jbee.inject.Dependency;
 import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.bind.BasicBinder.TargetedBasicBinder;
+import de.jbee.inject.bind.Binder.TargetedBinder;
 
+/**
+ * A test that demonstrates how to overlay general binds in specified packages and/or sub-packages
+ * using {@link TargetedBasicBinder#within(de.jbee.inject.Packages)} or any of the utility methods
+ * on top of it: {@link TargetedBinder#inPackageOf(Class)},
+ * {@link TargetedBinder#inSubPackagesOf(Class)},
+ * {@link TargetedBinder#inPackageAndSubPackagesOf(Class)}.
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ */
 public class TestPackageLocalisedBinds {
 
 	private static class PackageLocalisedBindsModule
