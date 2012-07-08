@@ -109,7 +109,7 @@ public class Binder
 	}
 
 	public <T> TypedBinder<T> bind( Name name, Class<T> type ) {
-		return bind( instance( name, Type.raw( type ) ) );
+		return bind( name, Type.raw( type ) );
 	}
 
 	public <T> TypedBinder<T> bind( Name name, Type<T> type ) {
@@ -425,8 +425,16 @@ public class Binder
 					Suppliers.constant( provider ) );
 		}
 
+		public void toConstructor( Class<?>... parameterTypes ) {
+			try {
+				to( resource.getType().getRawType().getDeclaredConstructor( parameterTypes ) );
+			} catch ( Exception e ) {
+				throw new RuntimeException( e );
+			}
+		}
+
 		public <I extends T> void to( Class<I> impl ) {
-			if ( resource.getType().getRawType() != impl ) {
+			if ( resource.getType().getRawType() != impl || !resource.getName().isDefault() ) {
 				to( Suppliers.type( Type.raw( impl ) ) );
 			}
 			bindImplicitToConstructor( impl );

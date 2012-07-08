@@ -49,21 +49,26 @@ public final class Target
 		if ( instance.isAny() ) {
 			return true;
 		}
-		//TODO also check instance name
-		Type<?> target = dependency.target();
-		return instance.getType().equalTo( target );
+		Instance<?> target = dependency.target();
+		return instance.getName().isApplicableFor( target.getName() ) //TODO could be other way around 
+				&& instance.getType().equalTo( target.getType() );
 	}
 
 	public boolean isAccessibleFor( Dependency<?> dependency ) {
-		return packages.contains( dependency.target() );
+		return packages.contains( dependency.target().getType() );
 	}
 
 	@Override
 	public String toString() {
-		if ( instance.isAny() && packages.includesAll() ) {
-			return "any";
-		}
-		return "[" + packages + " " + instance + "]";
+		String res = "[";
+		res += instance.isAny()
+			? "anything"
+			: instance.toString();
+		res += " ";
+		res += packages.includesAll()
+			? "anywhere"
+			: packages.toString();
+		return res + "]";
 	}
 
 	public Target inPackageAndSubPackagesOf( Class<?> type ) {

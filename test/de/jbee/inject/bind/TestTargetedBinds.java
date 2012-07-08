@@ -1,12 +1,17 @@
 package de.jbee.inject.bind;
 
 import static de.jbee.inject.Dependency.dependency;
+import static de.jbee.inject.Instance.instance;
+import static de.jbee.inject.Name.named;
+import static de.jbee.inject.Type.raw;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
 import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Instance;
+import de.jbee.inject.Name;
 import de.jbee.inject.bind.BasicBinder.ScopedBasicBinder;
 
 /**
@@ -28,6 +33,9 @@ public class TestTargetedBinds {
 			bind( Foo.class ).to( Foo.class );
 			injectingInto( Foo.class ).bind( Bar.class ).to( BAR_IN_FOO );
 			bind( Bar.class ).to( BAR_EVERYWHERE_ELSE );
+			Name special = named( "special" );
+			bind( special, Foo.class ).toConstructor( Bar.class ); // if we would use a type bind like to(Foo.class) it wouldn't work since we use a Foo that is not created as special Foo so it got the other Bar 
+			injectingInto( special, Foo.class ).bind( Bar.class ).to( BAR_EVERYWHERE_ELSE );
 		}
 	}
 
@@ -50,17 +58,31 @@ public class TestTargetedBinds {
 		}
 	}
 
+	private final DependencyResolver injector = Bootstrap.injector( TargetedBindsModule.class );
+
 	@Test
 	public void thatBindWithTargetIsUsedWhenInjectingIntoIt() {
-		DependencyResolver injector = Bootstrap.injector( TargetedBindsModule.class );
 		Foo foo = injector.resolve( dependency( Foo.class ) );
 		assertThat( foo.bar, sameInstance( BAR_IN_FOO ) );
 	}
 
 	@Test
 	public void thatBindWithTargetIsNotUsedWhenNotInjectingIntoIt() {
-		DependencyResolver injector = Bootstrap.injector( TargetedBindsModule.class );
 		Bar bar = injector.resolve( dependency( Bar.class ) );
 		assertThat( bar, sameInstance( BAR_EVERYWHERE_ELSE ) );
+	}
+
+	@Test
+	public void thatNamedTargetIsUsedWhenInjectingIntoIt() {
+		Instance<Foo> specialFoo = instance( named( "special" ), raw( Foo.class ) );
+		Bar bar = injector.resolve( dependency( Bar.class ).injectingInto( specialFoo ) );
+		assertThat( bar, sameInstance( BAR_EVERYWHERE_ELSE ) );
+	}
+
+	@Test
+	public void thatBindWithNamedTargetIsUsedWhenInjectingIntoIt() {
+		Foo foo = injector.resolve( dependency( Foo.class ).named( named( "special" ) ) );
+		// FIXME the problem is that we use linked bind as well what adds another instance frame on the target stack that is not the special foo whereby we get the wrong bar
+		assertThat( foo.bar, sameInstance( BAR_EVERYWHERE_ELSE ) );
 	}
 }

@@ -69,7 +69,7 @@ public final class Resource<T>
 
 	@Override
 	public String toString() {
-		return target + "-" + instance;
+		return instance + " " + target;
 	}
 
 	@Override

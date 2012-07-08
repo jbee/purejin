@@ -63,7 +63,7 @@ public class Injectorizer {
 			@SuppressWarnings ( "unchecked" )
 			Suppliable<T> b = (Suppliable<T>) suppliables[i + first];
 			res[i] = new InjectronImpl<T>( b.resource(), b.source(), new Injection<T>(
-					b.resource(), dependency( b.resource().getType() ), i + first,
+					b.resource(), dependency( b.resource().getInstance() ), i + first,
 					suppliables.length ), b.repository(), Suppliers.asInjectable( b.supplier(),
 					resolver ) );
 		}
@@ -102,8 +102,7 @@ public class Injectorizer {
 		@Override
 		public T instanceFor( Dependency<? super T> dependency ) {
 			return repository.serve(
-					injection.on( dependency.injectingInto( resource.getType() ) ), // TODO check: but the type injected into has to be given before we invoke the the Supplier since the Supplier might want to create a value depending on that type - a example of that is a LoggerSupplier 
-					injectable );
+					injection.on( dependency.injectingInto( resource.getInstance() ) ), injectable );
 		}
 
 		@Override
