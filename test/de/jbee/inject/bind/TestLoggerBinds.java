@@ -37,13 +37,14 @@ public class TestLoggerBinds {
 
 		final Logger logger;
 
+		@SuppressWarnings ( "unused" )
 		Foo( Logger logger ) {
 			this.logger = logger;
 		}
 	}
 
 	@Test
-	public void test() {
+	public void thatEachClassGetsTheLoggerWithItsCanonicalName() {
 		DependencyResolver injector = Bootstrap.injector( LoggerBindsBundle.class );
 		Foo foo = injector.resolve( dependency( Foo.class ) );
 		assertThat( foo.logger, sameInstance( Logger.getLogger( Foo.class.getCanonicalName() ) ) );

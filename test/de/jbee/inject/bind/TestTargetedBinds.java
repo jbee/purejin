@@ -10,8 +10,8 @@ import de.jbee.inject.DependencyResolver;
 
 public class TestTargetedBinds {
 
-	static final MyBar BAR0 = new MyBar();
-	static final MyBar BAR1 = new MyBar();
+	static final MyBar BAR_IN_FOO = new MyBar();
+	static final MyBar BAR_EVERYWHERE_ELSE = new MyBar();
 
 	private static class TargetedBindsModule
 			extends BinderModule {
@@ -19,8 +19,8 @@ public class TestTargetedBinds {
 		@Override
 		protected void declare() {
 			bind( MyFoo.class ).to( MyFoo.class );
-			bind( MyBar.class ).to( BAR0 );
-			injectingInto( MyFoo.class ).bind( MyBar.class ).to( BAR1 );
+			injectingInto( MyFoo.class ).bind( MyBar.class ).to( BAR_IN_FOO );
+			bind( MyBar.class ).to( BAR_EVERYWHERE_ELSE );
 		}
 	}
 
@@ -28,6 +28,7 @@ public class TestTargetedBinds {
 
 		final MyBar bar;
 
+		@SuppressWarnings ( "unused" )
 		MyFoo( MyBar bar ) {
 			super();
 			this.bar = bar;
@@ -46,12 +47,13 @@ public class TestTargetedBinds {
 	public void thatBindWithTargetIsUsedWhenInjectingIntoIt() {
 		DependencyResolver injector = Bootstrap.injector( TargetedBindsModule.class );
 		MyFoo foo = injector.resolve( dependency( MyFoo.class ) );
-		assertThat( foo.bar, sameInstance( BAR1 ) );
+		assertThat( foo.bar, sameInstance( BAR_IN_FOO ) );
 	}
 
 	@Test
 	public void thatBindWithTargetIsNotUsedWhenNotInjectingIntoIt() {
 		DependencyResolver injector = Bootstrap.injector( TargetedBindsModule.class );
-		assertThat( injector.resolve( dependency( MyBar.class ) ), sameInstance( BAR0 ) );
+		MyBar bar = injector.resolve( dependency( MyBar.class ) );
+		assertThat( bar, sameInstance( BAR_EVERYWHERE_ELSE ) );
 	}
 }
