@@ -15,7 +15,7 @@ import de.jbee.inject.service.ServiceModule;
 
 public class TestServiceMethodBinds {
 
-	static class ServiceBindsModule
+	private static class ServiceBindsModule
 			extends ServiceModule {
 
 		@Override

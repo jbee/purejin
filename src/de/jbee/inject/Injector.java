@@ -112,4 +112,15 @@ public class Injector
 		return (Injectron<T>[]) injectrons.get( type.getRawType() );
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder b = new StringBuilder();
+		for ( Entry<Class<?>, Injectron<?>[]> e : injectrons.entrySet() ) {
+			b.append( e.getKey() ).append( '\n' );
+			for ( Injectron<?> i : e.getValue() ) {
+				b.append( '\t' ).append( i ).append( '\n' );
+			}
+		}
+		return b.toString();
+	}
 }

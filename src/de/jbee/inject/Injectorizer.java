@@ -102,7 +102,7 @@ public class Injectorizer {
 		@Override
 		public T instanceFor( Dependency<? super T> dependency ) {
 			return repository.serve(
-					injection.on( dependency.injectingInto( resource.getType().getClass() ) ), // TODO check: but the type injected into has to be given before we invoke the the Supplier since the Supplier might want to create a value depending on that type - a example of that is a LoggerSupplier 
+					injection.on( dependency.injectingInto( resource.getType() ) ), // TODO check: but the type injected into has to be given before we invoke the the Supplier since the Supplier might want to create a value depending on that type - a example of that is a LoggerSupplier 
 					injectable );
 		}
 

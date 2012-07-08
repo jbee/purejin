@@ -57,7 +57,7 @@ public final class Dependency<T>
 
 	@Override
 	public String toString() {
-		return instance.toString();
+		return instance.toString() + " " + Arrays.toString( targetHierarchy );
 	}
 
 	public Dependency<?> onTypeParameter() {
