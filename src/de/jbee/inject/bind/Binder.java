@@ -109,6 +109,7 @@ public class Binder
 	}
 
 	public <T> TypedBinder<T> bind( Name name, Class<T> type ) {
+		// also do a implicit bind to constructor ?!
 		return bind( name, Type.raw( type ) );
 	}
 
@@ -121,16 +122,12 @@ public class Binder
 	}
 
 	public <T> TypedBinder<T> bind( Class<T> type ) {
-		bindImplicitToConstructor( type );
-		return bindType( type );
-	}
-
-	private <T> TypedBinder<T> bindType( Class<T> type ) {
+		implicitBindToConstructor( defaultInstanceOf( raw( type ) ) );
 		return bind( Type.raw( type ) );
 	}
 
 	public <E> TypedElementBinder<E> bind( Class<E[]> type ) {
-		return new TypedElementBinder<E>( this, Instance.defaultInstanceOf( raw( type ) ) );
+		return new TypedElementBinder<E>( this, defaultInstanceOf( raw( type ) ) );
 	}
 
 	public <T> TypedBinder<T> autobind( Type<T> type ) {
@@ -186,19 +183,24 @@ public class Binder
 		bindings.add( resource, supplier, scope, source );
 	}
 
-	protected final void bindImplicitToConstructor( Class<?>... impls ) {
+	protected final void implicitBindToConstructor( Class<?>... impls ) {
 		for ( Class<?> impl : impls ) {
-			bindImplicitToConstructor( impl );
+			implicitBindToConstructor( impl );
 		}
 	}
 
-	protected final <I> void bindImplicitToConstructor( Class<I> impl ) {
+	protected final <I> void implicitBindToConstructor( Class<I> impl ) {
+		implicitBindToConstructor( defaultInstanceOf( raw( impl ) ) );
+	}
+
+	protected final <I> void implicitBindToConstructor( Instance<I> instance ) {
+		Class<I> impl = instance.getType().getRawType();
 		if ( notConstructable( impl ) ) {
 			return;
 		}
 		Constructor<I> constructor = strategy().constructorFor( impl );
 		if ( constructor != null ) {
-			implicit().bindType( impl ).to( constructor );
+			implicit().with( Target.ANY ).bind( instance ).to( constructor );
 		}
 	}
 
@@ -263,13 +265,13 @@ public class Binder
 
 		public void toElements( Class<? extends E> impl1, Class<? extends E> impl2 ) {
 			to( Suppliers.type( impl1 ), Suppliers.type( impl2 ) );
-			bindImplicitToConstructor( impl1, impl2 );
+			implicitBindToConstructor( impl1, impl2 );
 		}
 
 		public void toElements( Class<? extends E> impl1, Class<? extends E> impl2,
 				Class<? extends E> impl3 ) {
 			to( Suppliers.type( impl1 ), Suppliers.type( impl2 ), Suppliers.type( impl3 ) );
-			bindImplicitToConstructor( impl1, impl2, impl3 );
+			implicitBindToConstructor( impl1, impl2, impl3 );
 		}
 
 		// and so on.... will avoid generic array warning here 
@@ -415,8 +417,8 @@ public class Binder
 		}
 
 		public <I extends Supplier<? extends T>> void toSupplier( Class<I> impl ) {
-			to( Suppliers.link( impl ) );
-			bindImplicitToConstructor( impl );
+			to( Suppliers.supplier( impl ) );
+			implicitBindToConstructor( impl );
 		}
 
 		public void to( Provider<? extends T> provider ) {
@@ -425,27 +427,41 @@ public class Binder
 					Suppliers.constant( provider ) );
 		}
 
-		public void toConstructor( Class<?>... parameterTypes ) {
-			try {
-				to( resource.getType().getRawType().getDeclaredConstructor( parameterTypes ) );
-			} catch ( Exception e ) {
-				throw new RuntimeException( e );
-			}
+		public void toConstructor() {
+			to( binder.strategy().constructorFor( resource.getType().getRawType() ) );
 		}
 
 		public <I extends T> void to( Class<I> impl ) {
 			if ( resource.getType().getRawType() != impl || !resource.getName().isDefault() ) {
 				to( Suppliers.type( Type.raw( impl ) ) );
 			}
-			bindImplicitToConstructor( impl );
+			implicitBindToConstructor( impl );
 		}
 
-		void bindImplicitToConstructor( Class<?>... impls ) {
-			binder.bindImplicitToConstructor( impls );
+		public <I extends T> void to( Name name, Type<I> type ) {
+			to( instance( name, type ) );
 		}
 
-		<I> void bindImplicitToConstructor( Class<I> impl ) {
-			binder.bindImplicitToConstructor( impl );
+		public <I extends T> void to( Name name, Class<I> type ) {
+			to( instance( name, raw( type ) ) );
+		}
+
+		public <I extends T> void to( Instance<I> instance ) {
+			//FIXME don#t do the below when this is exactly the same instance as the resource - would describe a loop
+			to( Suppliers.instance( instance ) );
+			implicitBindToConstructor( instance );
+		}
+
+		void implicitBindToConstructor( Class<?>... impls ) {
+			binder.implicitBindToConstructor( impls );
+		}
+
+		<I> void implicitBindToConstructor( Class<I> impl ) {
+			binder.implicitBindToConstructor( impl );
+		}
+
+		<I> void implicitBindToConstructor( Instance<I> instance ) {
+			binder.implicitBindToConstructor( instance );
 		}
 
 		protected final TypedBinder<T> multi() {

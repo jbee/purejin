@@ -50,7 +50,7 @@ public final class Target
 			return true;
 		}
 		Instance<?> target = dependency.target();
-		return instance.getName().isApplicableFor( target.getName() ) //TODO could be other way around 
+		return target.getName().isApplicableFor( instance.getName() ) //TODO could be other way around 
 				&& instance.getType().equalTo( target.getType() );
 	}
 

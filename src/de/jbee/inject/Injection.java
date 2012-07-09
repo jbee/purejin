@@ -44,6 +44,6 @@ public class Injection<T> {
 
 	@Override
 	public String toString() {
-		return serialNumber + "/" + cardinality + "\t" + dependency;
+		return serialNumber + " " + dependency;
 	}
 }

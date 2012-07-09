@@ -31,8 +31,8 @@ public final class Resource<T>
 	}
 
 	public boolean isApplicableFor( Dependency<? super T> dependency ) {
-		return isAvailableFor( dependency ) // 
-				&& isAdequateFor( dependency ) //
+		return isAdequateFor( dependency ) // check names first since default goes sorts first but will not match any named 
+				&& isAvailableFor( dependency )//
 				&& isAssignableTo( dependency ); // most 'expensive' check so we do it last
 	}
 
@@ -79,6 +79,10 @@ public final class Resource<T>
 
 	public Instance<T> getInstance() {
 		return instance;
+	}
+
+	public Target getTarget() {
+		return target;
 	}
 
 	@Override

@@ -68,6 +68,10 @@ public final class Dependency<T>
 		return dependency( getType().getParameters()[0], targetHierarchy );
 	}
 
+	public <E> Dependency<E> instanced( Instance<E> instance ) {
+		return dependency( instance, targetHierarchy );
+	}
+
 	@Override
 	public <E> Dependency<E> typed( Type<E> type ) {
 		return dependency( instance( getName(), type ), targetHierarchy );

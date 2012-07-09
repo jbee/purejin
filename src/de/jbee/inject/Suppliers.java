@@ -28,8 +28,8 @@ public class Suppliers {
 		return new ConstantSupplier<T>( constant );
 	}
 
-	public static <T> Supplier<T> link( Class<? extends Supplier<? extends T>> type ) {
-		return new LinkSupplier<T>( type );
+	public static <T> Supplier<T> supplier( Class<? extends Supplier<? extends T>> type ) {
+		return new IndirectSupplier<T>( type );
 	}
 
 	public static <T> Supplier<T> type( Class<T> type ) {
@@ -37,7 +37,11 @@ public class Suppliers {
 	}
 
 	public static <T> Supplier<T> type( Type<T> type ) {
-		return new TypeSupplier<T>( type );
+		return instance( Instance.anyOf( type ) );
+	}
+
+	public static <T> Supplier<T> instance( Instance<T> instance ) {
+		return new InstanceSupplier<T>( instance );
 	}
 
 	public static <E> Supplier<E[]> elements( Class<E[]> arrayType, Supplier<? extends E>[] elements ) {
@@ -164,12 +168,12 @@ public class Suppliers {
 
 	}
 
-	private static final class LinkSupplier<T>
+	private static final class IndirectSupplier<T>
 			implements Supplier<T> {
 
 		private final Class<? extends Supplier<? extends T>> type;
 
-		LinkSupplier( Class<? extends Supplier<? extends T>> type ) {
+		IndirectSupplier( Class<? extends Supplier<? extends T>> type ) {
 			super();
 			this.type = type;
 		}
@@ -181,25 +185,24 @@ public class Suppliers {
 		}
 	}
 
-	private static final class TypeSupplier<T>
+	private static final class InstanceSupplier<T>
 			implements Supplier<T> {
 
-		private final Type<? extends T> type;
+		private final Instance<? extends T> instance;
 
-		TypeSupplier( Type<? extends T> type ) {
+		InstanceSupplier( Instance<? extends T> instance ) {
 			super();
-			this.type = type;
+			this.instance = instance;
 		}
 
 		@Override
 		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
-			//OPEN is it correct to keep/remove name from dependency ?
-			return context.resolve( dependency.anyTyped( type ) );
+			return context.resolve( dependency.instanced( instance ) );
 		}
 
 		@Override
 		public String toString() {
-			return type.toString();
+			return instance.toString();
 		}
 	}
 

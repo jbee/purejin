@@ -107,7 +107,8 @@ public class Injectorizer {
 
 		@Override
 		public String toString() {
-			return injection.toString();
+			String res = injection.toString();
+			return res.substring( 0, res.length() - 2 ).concat( resource.getTarget().toString() );
 		}
 	}
 }
