@@ -31,7 +31,7 @@ public enum BuildinBundle
 
 		@Override
 		protected void declare() {
-			superbind( Logger.class ).to( Suppliers.LOGGER );
+			starbind( Logger.class ).to( Suppliers.LOGGER );
 		}
 
 	}
@@ -41,7 +41,7 @@ public enum BuildinBundle
 
 		@Override
 		protected void declare() {
-			superbind( Provider.class ).to( Suppliers.PROVIDER_BRIDGE );
+			starbind( Provider.class ).to( Suppliers.PROVIDER_BRIDGE );
 		}
 
 	}
@@ -51,7 +51,7 @@ public enum BuildinBundle
 
 		@Override
 		protected void declare() {
-			superbind( List.class ).to( Suppliers.LIST_BRIDGE );
+			starbind( List.class ).to( Suppliers.LIST_BRIDGE );
 		}
 
 	}
@@ -61,7 +61,7 @@ public enum BuildinBundle
 
 		@Override
 		protected void declare() {
-			superbind( Set.class ).to( Suppliers.SET_BRIDGE );
+			starbind( Set.class ).to( Suppliers.SET_BRIDGE );
 		}
 
 	}

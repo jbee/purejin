@@ -99,7 +99,7 @@ public class Binder
 		this.target = target;
 	}
 
-	public <T> TypedBinder<T> superbind( Class<T> type ) {
+	public <T> TypedBinder<T> starbind( Class<T> type ) {
 		return bind( Instance.anyOf( Type.raw( type ) ) );
 	}
 

@@ -100,8 +100,8 @@ public abstract class BinderModule
 		return binder.bind( type );
 	}
 
-	public <T> TypedBinder<T> superbind( Class<T> type ) {
-		return binder.superbind( type );
+	public <T> TypedBinder<T> starbind( Class<T> type ) {
+		return binder.starbind( type );
 	}
 
 	public <T> TypedBinder<T> autobind( Type<T> type ) {

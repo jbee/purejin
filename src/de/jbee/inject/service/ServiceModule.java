@@ -48,7 +48,7 @@ public abstract class ServiceModule
 	}
 
 	protected final <T> TypedBinder<T> superbind( Class<T> service ) {
-		return binder.per( DEPENDENCY_TYPE ).superbind( service );
+		return binder.per( DEPENDENCY_TYPE ).starbind( service );
 	}
 
 	private RootBinder binder;
@@ -77,7 +77,7 @@ public abstract class ServiceModule
 		public void declare() {
 			per( APPLICATION ).bind( ServiceProvider.class ).toSupplier(
 					ServiceProviderSupplier.class );
-			per( DEPENDENCY_TYPE ).superbind( ServiceMethod.class ).toSupplier(
+			per( DEPENDENCY_TYPE ).starbind( ServiceMethod.class ).toSupplier(
 					ServiceSupplier.class );
 			asDefault().per( APPLICATION ).bind( ServiceStrategy.class ).to(
 					DEFAULT_SERVICE_STRATEGY );
