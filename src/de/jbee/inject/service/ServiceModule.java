@@ -47,7 +47,7 @@ public abstract class ServiceModule
 		binder.multibind( named( name ), Class.class ).to( service );
 	}
 
-	protected final <T> TypedBinder<T> superbind( Class<T> service ) {
+	protected final <T> TypedBinder<T> starbind( Class<T> service ) {
 		return binder.per( DEPENDENCY_TYPE ).starbind( service );
 	}
 

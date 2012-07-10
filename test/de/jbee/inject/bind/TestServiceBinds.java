@@ -111,8 +111,8 @@ public class TestServiceBinds {
 		@Override
 		protected void declare() {
 			bindServiceMethodsIn( MathService.class );
-			superbind( Service.class ).toSupplier( ServiceSupplier.class );
-			superbind( Command.class ).toSupplier( CommandSupplier.class );
+			starbind( Service.class ).toSupplier( ServiceSupplier.class );
+			starbind( Command.class ).toSupplier( CommandSupplier.class );
 		}
 
 	}

@@ -5,6 +5,13 @@ import java.util.Map;
 
 public class Scoped { //OPEN what about Scoping ?
 
+	interface InjectionKey {
+
+		<T> String key( Injection<T> injection );
+	}
+
+	private static final DependencyTypeInjectionKey DEPENDENCY_TYPE_KEY = new DependencyTypeInjectionKey();
+
 	/**
 	 * Often called the 'default'-scope. Asks the {@link Injectable} once per injection.
 	 */
@@ -20,33 +27,10 @@ public class Scoped { //OPEN what about Scoping ?
 	 */
 	public static final Scope THREAD = new ThreadScope( new ThreadLocal<Repository>(), APPLICATION );
 
-	public static final Scope DEPENDENCY_TYPE = new DependencyTypeScope();
+	public static final Scope DEPENDENCY_TYPE = new InjectionKeyScope( DEPENDENCY_TYPE_KEY );
 
 	public static Repository asSnapshot( Repository src, Repository dest ) {
 		return new SnapshotRepository( src, dest );
-	}
-
-	private static final class SnapshotScope
-			implements Scope {
-
-		private final Scope dest;
-		private final Scope src;
-
-		SnapshotScope( Scope synchronous, Scope asynchronous ) {
-			super();
-			this.dest = synchronous;
-			this.src = asynchronous;
-		}
-
-		@Override
-		public Repository init() {
-			return new SnapshotRepository( src.init(), dest.init() );
-		}
-
-		@Override
-		public String toString() {
-			return src + "->" + dest;
-		}
 	}
 
 	/**
@@ -167,34 +151,64 @@ public class Scoped { //OPEN what about Scoping ?
 
 	}
 
-	private static final class DependencyTypeScope
+	private static final class InjectionKeyScope
 			implements Scope {
 
-		DependencyTypeScope() {
-			// make visisble
+		private final InjectionKey injectionKey;
+
+		InjectionKeyScope( InjectionKey injectionKey ) {
+			super();
+			this.injectionKey = injectionKey;
 		}
 
 		@Override
 		public Repository init() {
-			return new DependencyTypeRepository();
+			return new InjectionKeyRepository( injectionKey );
 		}
 
 		@Override
 		public String toString() {
-			return "(per-dependendy-type)";
+			return "(per-" + injectionKey + ")";
 		}
 
 	}
 
-	static final class DependencyTypeRepository
+	private static final class DependencyTypeInjectionKey
+			implements InjectionKey {
+
+		DependencyTypeInjectionKey() {
+			// make visible
+		}
+
+		@Override
+		public <T> String key( Injection<T> injection ) {
+			return injection.dependency().getType().toString();
+		}
+
+		@Override
+		public String toString() {
+			return "dependendy-type";
+		}
+
+	}
+
+	// e.g. get receiver class from dependency -to be reusable the provider could offer a identity --> a wrapper class would be needed anyway so maybe best is to have quite similar impl. all using a identity hash-map
+
+	private static final class InjectionKeyRepository
 			implements Repository {
 
 		private final Map<String, Object> instances = new HashMap<String, Object>();
+		private final InjectionKey injectionKey;
+
+		InjectionKeyRepository( InjectionKey injectionKey ) {
+			super();
+			this.injectionKey = injectionKey;
+		}
 
 		@Override
 		@SuppressWarnings ( "unchecked" )
 		public <T> T serve( Injection<T> injection, Injectable<T> injectable ) {
-			String key = injection.dependency().getType().toString();
+			final String key = injectionKey.key( injection );
 			T instance = (T) instances.get( key );
 			if ( instance != null ) {
 				return instance;
@@ -208,7 +222,6 @@ public class Scoped { //OPEN what about Scoping ?
 			}
 			return instance;
 		}
-		// e.g. get receiver class from dependency -to be reusable the provider could offer a identity --> a wrapper class would be needed anyway so maybe best is to have quite similar impl. all using a identity hash-map
 
 	}
 
