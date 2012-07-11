@@ -1,4 +1,4 @@
-package de.jbee.inject.scope;
+package de.jbee.inject.util;
 
 import java.util.HashMap;
 import java.util.Map;

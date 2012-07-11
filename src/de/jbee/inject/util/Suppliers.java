@@ -1,4 +1,4 @@
-package de.jbee.inject;
+package de.jbee.inject.util;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -8,6 +8,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+
+import de.jbee.inject.Dependency;
+import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Instance;
+import de.jbee.inject.Supplier;
+import de.jbee.inject.Type;
 
 public class Suppliers {
 
@@ -50,11 +56,6 @@ public class Suppliers {
 
 	public static <T> Supplier<T> costructor( Constructor<T> constructor ) {
 		return new ConstructorSupplier<T>( constructor );
-	}
-
-	public static <T> Injectable<T> asInjectable( Supplier<? extends T> supplier,
-			DependencyResolver context ) {
-		return new SupplierToInjectable<T>( supplier, context );
 	}
 
 	private static abstract class ArrayBridgeSupplier<T>
@@ -328,24 +329,6 @@ public class Suppliers {
 			} catch ( Exception e ) {
 				throw new RuntimeException( e );
 			}
-		}
-	}
-
-	private static class SupplierToInjectable<T>
-			implements Injectable<T> {
-
-		private final Supplier<? extends T> supplier;
-		private final DependencyResolver context;
-
-		SupplierToInjectable( Supplier<? extends T> supplier, DependencyResolver context ) {
-			super();
-			this.supplier = supplier;
-			this.context = context;
-		}
-
-		@Override
-		public T instanceFor( Injection<T> injection ) {
-			return supplier.supply( injection.dependency(), context );
 		}
 	}
 

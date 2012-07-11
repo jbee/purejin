@@ -7,8 +7,8 @@ import static de.jbee.inject.Type.parameterTypes;
 import static de.jbee.inject.Type.raw;
 import static de.jbee.inject.Type.returnType;
 import static de.jbee.inject.bind.Bootstrap.nonnullThrowsReentranceException;
-import static de.jbee.inject.scope.Scoped.APPLICATION;
-import static de.jbee.inject.scope.Scoped.DEPENDENCY_TYPE;
+import static de.jbee.inject.util.Scoped.APPLICATION;
+import static de.jbee.inject.util.Scoped.DEPENDENCY_TYPE;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;

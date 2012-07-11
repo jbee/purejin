@@ -10,6 +10,29 @@ import java.util.Map;
 
 public class Injectorizer {
 
+	public static <T> Injectable<T> asInjectable( Supplier<? extends T> supplier,
+			DependencyResolver context ) {
+		return new SupplierToInjectable<T>( supplier, context );
+	}
+
+	private static class SupplierToInjectable<T>
+			implements Injectable<T> {
+
+		private final Supplier<? extends T> supplier;
+		private final DependencyResolver context;
+
+		SupplierToInjectable( Supplier<? extends T> supplier, DependencyResolver context ) {
+			super();
+			this.supplier = supplier;
+			this.context = context;
+		}
+
+		@Override
+		public T instanceFor( Injection<T> injection ) {
+			return supplier.supply( injection.dependency(), context );
+		}
+	}
+
 	public static Map<Class<?>, Injectron<?>[]> injectrons( Suppliable<?>[] suppliables,
 			DependencyResolver resolver ) {
 		final int total = suppliables.length;
@@ -64,8 +87,7 @@ public class Injectorizer {
 			Suppliable<T> b = (Suppliable<T>) suppliables[i + first];
 			res[i] = new InjectronImpl<T>( b.resource(), b.source(), new Injection<T>(
 					b.resource(), dependency( b.resource().getInstance() ), i + first,
-					suppliables.length ), b.repository(), Suppliers.asInjectable( b.supplier(),
-					resolver ) );
+					suppliables.length ), b.repository(), asInjectable( b.supplier(), resolver ) );
 		}
 		return res;
 	}

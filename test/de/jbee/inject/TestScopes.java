@@ -7,7 +7,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import de.jbee.inject.scope.Scoped;
+import de.jbee.inject.util.Scoped;
 
 public class TestScopes {
 

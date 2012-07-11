@@ -2,10 +2,10 @@ package de.jbee.inject.bind;
 
 import static de.jbee.inject.Instance.defaultInstanceOf;
 import static de.jbee.inject.Instance.instance;
-import static de.jbee.inject.Suppliers.asSupplier;
-import static de.jbee.inject.Suppliers.constant;
 import static de.jbee.inject.Type.instanceType;
 import static de.jbee.inject.Type.raw;
+import static de.jbee.inject.util.Suppliers.asSupplier;
+import static de.jbee.inject.util.Suppliers.constant;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
@@ -14,16 +14,16 @@ import de.jbee.inject.InjectionStrategy;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Name;
 import de.jbee.inject.Packages;
-import de.jbee.inject.Provider;
 import de.jbee.inject.Resource;
 import de.jbee.inject.Scope;
 import de.jbee.inject.Source;
 import de.jbee.inject.Supplier;
-import de.jbee.inject.Suppliers;
 import de.jbee.inject.Target;
 import de.jbee.inject.Type;
 import de.jbee.inject.TypeReflector;
-import de.jbee.inject.scope.Scoped;
+import de.jbee.inject.util.Provider;
+import de.jbee.inject.util.Scoped;
+import de.jbee.inject.util.Suppliers;
 
 public class Binder
 		implements BasicBinder {

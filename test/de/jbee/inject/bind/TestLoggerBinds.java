@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 import org.junit.Test;
 
 import de.jbee.inject.DependencyResolver;
-import de.jbee.inject.Suppliers;
+import de.jbee.inject.util.Suppliers;
 
 /**
  * A test that demonstrates how to extend the DI so that e.g. a class gets its class-specific-

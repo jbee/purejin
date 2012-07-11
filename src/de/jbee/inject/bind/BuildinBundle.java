@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import de.jbee.inject.Provider;
-import de.jbee.inject.Suppliers;
 import de.jbee.inject.bind.Bootstrapper.ModularBootstrapper;
+import de.jbee.inject.util.Provider;
+import de.jbee.inject.util.Suppliers;
 
 /**
  * Installs all the build-in functionality by using the core API.

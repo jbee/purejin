@@ -22,8 +22,8 @@ import de.jbee.inject.Dependency;
 import de.jbee.inject.DependencyResolver;
 import de.jbee.inject.Injectron;
 import de.jbee.inject.Name;
-import de.jbee.inject.Provider;
 import de.jbee.inject.Type;
+import de.jbee.inject.util.Provider;
 
 public class TestInstanceBinds {
 
