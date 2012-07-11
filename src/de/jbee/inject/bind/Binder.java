@@ -4,8 +4,8 @@ import static de.jbee.inject.Instance.defaultInstanceOf;
 import static de.jbee.inject.Instance.instance;
 import static de.jbee.inject.Type.instanceType;
 import static de.jbee.inject.Type.raw;
-import static de.jbee.inject.util.SuppliedBy.provider;
 import static de.jbee.inject.util.SuppliedBy.constant;
+import static de.jbee.inject.util.SuppliedBy.provider;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
@@ -206,7 +206,8 @@ public class Binder
 
 	protected final boolean notConstructable( Class<?> type ) {
 		return type.isInterface() || type.isEnum() || type.isPrimitive() || type.isArray()
-				|| Modifier.isAbstract( type.getModifiers() ) || type == String.class;
+				|| Modifier.isAbstract( type.getModifiers() ) || type == String.class
+				|| Number.class.isAssignableFrom( type );
 	}
 
 	protected final Binder implicit() {

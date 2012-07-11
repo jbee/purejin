@@ -20,5 +20,4 @@ public interface InjectionStrategy {
 	 */
 	<T> Constructor<T> constructorFor( Class<T> type );
 
-	//TODO something to create dependencies (e.g. for each constructor parameter when constructor is invoked)
 }

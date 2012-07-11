@@ -71,8 +71,7 @@ public class TestInstanceBinds {
 		assertInjects( "bar", raw( CharSequence.class ) );
 		List<String> list = singletonList( "foobar" );
 		assertInjects( list, raw( List.class ).parametized( String.class ) );
-		assertInjects( Arrays.asList( new Integer[] { 42, 846 } ), raw( List.class ).parametized(
-				Integer.class ) );
+		assertInjects( Arrays.asList( new Integer[] { 42, 846 } ), Type.listOf( Integer.class ) );
 		assertInjectsItems( Arrays.asList( new Number[] { 846, 42, 42.0f } ),
 				raw( List.class ).parametized( Number.class ).parametizedAsLowerBounds() );
 		assertInjects( singletonList( list ), raw( List.class ).parametized(

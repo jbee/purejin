@@ -73,6 +73,11 @@ public final class Type<T>
 		return new Type<T>( type );
 	}
 
+	@SuppressWarnings ( "unchecked" )
+	public static <T> Type<? extends List<T>> listOf( Class<T> elementType ) {
+		return (Type<? extends List<T>>) raw( List.class ).parametized( elementType );
+	}
+
 	public static <T> Type<T> type( Class<T> rawType, java.lang.reflect.Type type ) {
 		if ( type == rawType ) {
 			return raw( rawType );
@@ -432,13 +437,6 @@ public final class Type<T>
 		}
 		res.remove( 0 ); // that is this raw type itself
 		return (Type<? super T>[]) res.toArray( new Type<?>[res.size()] );
-	}
-
-	public boolean includes( Type<?> other ) {
-		if ( !isParameterized() ) {
-			return rawType == other.rawType || other.rawType.isAssignableFrom( rawType );
-		}
-		return equalTo( other );
 	}
 
 }

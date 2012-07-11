@@ -89,9 +89,4 @@ public final class Resource<T>
 	public <E> Resource<E> typed( Type<E> type ) {
 		return new Resource<E>( instance.typed( type ), target );
 	}
-
-	public boolean includes( Resource<?> other ) {
-		//TODO add target
-		return instance.includes( other.instance );
-	}
 }

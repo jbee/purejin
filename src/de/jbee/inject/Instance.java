@@ -82,8 +82,4 @@ public final class Instance<T>
 		return morePreciseThan2( type, other.type, name, other.name );
 	}
 
-	public boolean includes( Instance<?> other ) {
-		//TODO other cases
-		return type.includes( other.type ) && name.equalTo( other.name );
-	}
 }

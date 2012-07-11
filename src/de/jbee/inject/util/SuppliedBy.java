@@ -155,6 +155,7 @@ public class SuppliedBy {
 			this.elements = elements;
 		}
 
+		@SuppressWarnings ( "unchecked" )
 		@Override
 		public E[] supply( Dependency<? super E[]> dependency, DependencyResolver context ) {
 			E[] res = (E[]) Array.newInstance( arrayType.getComponentType(), elements.length );
@@ -307,18 +308,15 @@ public class SuppliedBy {
 			return values;
 		}
 
-		// in a validate we have to check that the arguments 
-
 		@Override
 		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
 			Class<?>[] rawTypes = constructor.getParameterTypes();
 			Object[] resolvedArgs = new Object[rawTypes.length];
 			for ( int i = 0; i < rawTypes.length; i++ ) {
 				if ( args[i] instanceof Type<?> && rawTypes[i] != Type.class ) {
-					//OPEN annotations from constructor could be transformed into names for the arguments ?!
-					//TODO add/merge target from argument dependency
+					//OPEN annotations from constructor could be transformed into names for the arguments ?! --> that can be done by strategy returning Instance-values from analyze call
 					Dependency<?> argDependency = dependency.anyTyped( (Type<?>) args[i] );
-					resolvedArgs[i] = context.resolve( argDependency ); //FIXME change to Type so dep is constructed using retype 
+					resolvedArgs[i] = context.resolve( argDependency );
 				} else {
 					resolvedArgs[i] = args[i];
 				}

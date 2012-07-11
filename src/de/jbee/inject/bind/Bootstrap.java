@@ -149,7 +149,7 @@ public final class Bootstrap {
 		}
 
 		private boolean independent( BindDeclaration<?> one, BindDeclaration<?> other ) {
-			if ( one.resource().includes( other.resource() ) ) {
+			if ( one.equals( other.resource() ) ) {
 				if ( one.source().isImplicit() ) {
 					return false;
 				}
