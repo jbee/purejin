@@ -40,7 +40,7 @@ public final class Instance<T>
 		this.type = type;
 	}
 
-	public boolean equalTo( Instance<T> other ) {
+	public boolean equalTo( Instance<?> other ) {
 		return type.equalTo( other.type ) && name.equals( other.name );
 	}
 

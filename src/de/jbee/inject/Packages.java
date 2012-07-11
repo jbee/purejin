@@ -99,7 +99,7 @@ public final class Packages
 		return pattern;
 	}
 
-	private boolean equalTo( Packages other ) {
+	public boolean equalTo( Packages other ) {
 		return other.pattern.equals( pattern );
 	}
 

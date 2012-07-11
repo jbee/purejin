@@ -89,4 +89,8 @@ public final class Resource<T>
 	public <E> Resource<E> typed( Type<E> type ) {
 		return new Resource<E>( instance.typed( type ), target );
 	}
+
+	public boolean equalTo( Resource<?> other ) {
+		return instance.equalTo( other.instance ) && target.equalTo( other.target );
+	}
 }

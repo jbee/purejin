@@ -130,9 +130,11 @@ public final class Bootstrap {
 			List<BindDeclaration<?>> res = new ArrayList<BindDeclaration<?>>( declarations.length );
 			Arrays.sort( declarations );
 			res.add( declarations[0] );
+			int lastIndependend = 0;
 			for ( int i = 1; i < declarations.length; i++ ) {
-				if ( independent( declarations[i], declarations[i - 1] ) ) {
+				if ( independent( declarations[lastIndependend], declarations[i] ) ) {
 					res.add( declarations[i] );
+					lastIndependend = i;
 				}
 			}
 			return res.toArray( new BindDeclaration[res.size()] );
@@ -149,8 +151,8 @@ public final class Bootstrap {
 		}
 
 		private boolean independent( BindDeclaration<?> one, BindDeclaration<?> other ) {
-			if ( one.equals( other.resource() ) ) {
-				if ( one.source().isImplicit() ) {
+			if ( one.resource().equalTo( other.resource() ) ) {
+				if ( other.source().isImplicit() ) {
 					return false;
 				}
 			}

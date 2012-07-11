@@ -95,4 +95,8 @@ public final class Target
 	public Target within( Packages packages ) {
 		return new Target( instance, packages );
 	}
+
+	public boolean equalTo( Target other ) {
+		return packages.equalTo( other.packages ) && instance.equalTo( other.instance );
+	}
 }
