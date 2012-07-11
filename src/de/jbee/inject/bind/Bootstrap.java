@@ -20,7 +20,7 @@ import de.jbee.inject.Scope;
 import de.jbee.inject.Source;
 import de.jbee.inject.Suppliable;
 import de.jbee.inject.Supplier;
-import de.jbee.inject.TypeReflector;
+import de.jbee.inject.util.TypeReflector;
 
 public final class Bootstrap {
 

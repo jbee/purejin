@@ -20,10 +20,10 @@ import de.jbee.inject.Source;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.Target;
 import de.jbee.inject.Type;
-import de.jbee.inject.TypeReflector;
 import de.jbee.inject.util.Provider;
 import de.jbee.inject.util.Scoped;
 import de.jbee.inject.util.SuppliedBy;
+import de.jbee.inject.util.TypeReflector;
 
 public class Binder
 		implements BasicBinder {

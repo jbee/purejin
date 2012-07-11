@@ -20,7 +20,6 @@ import de.jbee.inject.DependencyResolver;
 import de.jbee.inject.Name;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.Type;
-import de.jbee.inject.TypeReflector;
 import de.jbee.inject.bind.Binder;
 import de.jbee.inject.bind.BinderModule;
 import de.jbee.inject.bind.Bindings;
@@ -29,6 +28,7 @@ import de.jbee.inject.bind.Bundle;
 import de.jbee.inject.bind.Module;
 import de.jbee.inject.bind.Binder.RootBinder;
 import de.jbee.inject.bind.Binder.TypedBinder;
+import de.jbee.inject.util.TypeReflector;
 
 /**
  * When binding {@link ServiceMethod}s this {@link Module} can be extended.
