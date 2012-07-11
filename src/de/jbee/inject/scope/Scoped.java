@@ -1,7 +1,13 @@
-package de.jbee.inject;
+package de.jbee.inject.scope;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import de.jbee.inject.Dependency;
+import de.jbee.inject.Injectable;
+import de.jbee.inject.Injection;
+import de.jbee.inject.Repository;
+import de.jbee.inject.Scope;
 
 public class Scoped { //OPEN what about Scoping ?
 
@@ -104,7 +110,7 @@ public class Scoped { //OPEN what about Scoping ?
 
 		@Override
 		public String toString() {
-			return "per thread";
+			return "(per-thread)";
 		}
 	}
 
@@ -270,7 +276,7 @@ public class Scoped { //OPEN what about Scoping ?
 
 		@Override
 		public String toString() {
-			return "#";
+			return "(per-app)";
 		}
 	}
 

@@ -1,7 +1,7 @@
 package de.jbee.inject.bind;
 
-import de.jbee.inject.Scoped;
 import de.jbee.inject.bind.Context;
+import de.jbee.inject.scope.Scoped;
 
 public class TestContext {
 

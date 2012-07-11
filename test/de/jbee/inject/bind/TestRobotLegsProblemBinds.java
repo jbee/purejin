@@ -1,7 +1,7 @@
 package de.jbee.inject.bind;
 
 import static de.jbee.inject.Dependency.dependency;
-import static de.jbee.inject.Scoped.TARGET_INSTANCE;
+import static de.jbee.inject.scope.Scoped.TARGET_INSTANCE;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;

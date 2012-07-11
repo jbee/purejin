@@ -7,6 +7,8 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
+import de.jbee.inject.scope.Scoped;
+
 public class TestScopes {
 
 	private static class ConstantInjectable<T>

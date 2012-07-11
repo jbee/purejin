@@ -2,13 +2,13 @@ package de.jbee.inject.service;
 
 import static de.jbee.inject.Dependency.dependency;
 import static de.jbee.inject.Name.named;
-import static de.jbee.inject.Scoped.APPLICATION;
-import static de.jbee.inject.Scoped.DEPENDENCY_TYPE;
 import static de.jbee.inject.Source.source;
 import static de.jbee.inject.Type.parameterTypes;
 import static de.jbee.inject.Type.raw;
 import static de.jbee.inject.Type.returnType;
 import static de.jbee.inject.bind.Bootstrap.nonnullThrowsReentranceException;
+import static de.jbee.inject.scope.Scoped.APPLICATION;
+import static de.jbee.inject.scope.Scoped.DEPENDENCY_TYPE;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;

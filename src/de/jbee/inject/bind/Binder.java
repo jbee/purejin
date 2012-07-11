@@ -17,13 +17,13 @@ import de.jbee.inject.Packages;
 import de.jbee.inject.Provider;
 import de.jbee.inject.Resource;
 import de.jbee.inject.Scope;
-import de.jbee.inject.Scoped;
 import de.jbee.inject.Source;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.Suppliers;
 import de.jbee.inject.Target;
 import de.jbee.inject.Type;
 import de.jbee.inject.TypeReflector;
+import de.jbee.inject.scope.Scoped;
 
 public class Binder
 		implements BasicBinder {
