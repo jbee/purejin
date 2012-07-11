@@ -9,11 +9,11 @@ import java.util.logging.Logger;
 import org.junit.Test;
 
 import de.jbee.inject.DependencyResolver;
-import de.jbee.inject.util.Suppliers;
+import de.jbee.inject.util.SuppliedBy;
 
 /**
  * A test that demonstrates how to extend the DI so that e.g. a class gets its class-specific-
- * {@link Logger} injected. Have a look how {@link Suppliers#LOGGER} is implemented.
+ * {@link Logger} injected. Have a look how {@link SuppliedBy#LOGGER} is implemented.
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */

@@ -4,8 +4,8 @@ import static de.jbee.inject.Instance.defaultInstanceOf;
 import static de.jbee.inject.Instance.instance;
 import static de.jbee.inject.Type.instanceType;
 import static de.jbee.inject.Type.raw;
-import static de.jbee.inject.util.Suppliers.asSupplier;
-import static de.jbee.inject.util.Suppliers.constant;
+import static de.jbee.inject.util.SuppliedBy.provider;
+import static de.jbee.inject.util.SuppliedBy.constant;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
@@ -23,7 +23,7 @@ import de.jbee.inject.Type;
 import de.jbee.inject.TypeReflector;
 import de.jbee.inject.util.Provider;
 import de.jbee.inject.util.Scoped;
-import de.jbee.inject.util.Suppliers;
+import de.jbee.inject.util.SuppliedBy;
 
 public class Binder
 		implements BasicBinder {
@@ -245,7 +245,7 @@ public class Binder
 		}
 
 		public void to( Supplier<? extends E>[] elements ) {
-			to( Suppliers.elements( getType().getRawType(), elements ) );
+			to( SuppliedBy.elements( getType().getRawType(), elements ) );
 		}
 
 		@SuppressWarnings ( "unchecked" )
@@ -264,13 +264,13 @@ public class Binder
 		}
 
 		public void toElements( Class<? extends E> impl1, Class<? extends E> impl2 ) {
-			to( Suppliers.type( impl1 ), Suppliers.type( impl2 ) );
+			to( SuppliedBy.type( impl1 ), SuppliedBy.type( impl2 ) );
 			implicitBindToConstructor( impl1, impl2 );
 		}
 
 		public void toElements( Class<? extends E> impl1, Class<? extends E> impl2,
 				Class<? extends E> impl3 ) {
-			to( Suppliers.type( impl1 ), Suppliers.type( impl2 ), Suppliers.type( impl3 ) );
+			to( SuppliedBy.type( impl1 ), SuppliedBy.type( impl2 ), SuppliedBy.type( impl3 ) );
 			implicitBindToConstructor( impl1, impl2, impl3 );
 		}
 
@@ -400,7 +400,7 @@ public class Binder
 		}
 
 		public void to( Constructor<? extends T> constructor ) {
-			to( Suppliers.costructor( constructor ) );
+			to( SuppliedBy.costructor( constructor ) );
 		}
 
 		public void to( T constant ) {
@@ -417,14 +417,14 @@ public class Binder
 		}
 
 		public <I extends Supplier<? extends T>> void toSupplier( Class<I> impl ) {
-			to( Suppliers.supplier( impl ) );
+			to( SuppliedBy.reference( impl ) );
 			implicitBindToConstructor( impl );
 		}
 
 		public void to( Provider<? extends T> provider ) {
-			to( asSupplier( provider ) );
+			to( provider( provider ) );
 			binder.implicit().bind( defaultInstanceOf( instanceType( Provider.class, provider ) ) ).to(
-					Suppliers.constant( provider ) );
+					SuppliedBy.constant( provider ) );
 		}
 
 		public void toConstructor() {
@@ -433,7 +433,7 @@ public class Binder
 
 		public <I extends T> void to( Class<I> impl ) {
 			if ( resource.getType().getRawType() != impl || !resource.getName().isDefault() ) {
-				to( Suppliers.type( Type.raw( impl ) ) );
+				to( SuppliedBy.type( Type.raw( impl ) ) );
 			}
 			implicitBindToConstructor( impl );
 		}
@@ -448,7 +448,7 @@ public class Binder
 
 		public <I extends T> void to( Instance<I> instance ) {
 			//FIXME don#t do the below when this is exactly the same instance as the resource - would describe a loop
-			to( Suppliers.instance( instance ) );
+			to( SuppliedBy.instance( instance ) );
 			implicitBindToConstructor( instance );
 		}
 
@@ -469,7 +469,7 @@ public class Binder
 		}
 
 		private TypedBinder<T> toConstant( T constant ) {
-			to( Suppliers.constant( constant ) );
+			to( SuppliedBy.constant( constant ) );
 			return this;
 		}
 

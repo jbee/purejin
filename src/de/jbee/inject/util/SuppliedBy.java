@@ -15,14 +15,14 @@ import de.jbee.inject.Instance;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.Type;
 
-public class Suppliers {
+public class SuppliedBy {
 
 	public static final Supplier<Provider<?>> PROVIDER_BRIDGE = new ProviderSupplier();
 	public static final Supplier<List<?>> LIST_BRIDGE = new ArrayToListBridgeSupplier();
 	public static final Supplier<Set<?>> SET_BRIDGE = new ArrayToSetBridgeSupplier();
 	public static final Supplier<Logger> LOGGER = new LoggerSupplier();
 
-	public static <T> Supplier<T> asSupplier( Provider<T> provider ) {
+	public static <T> Supplier<T> provider( Provider<T> provider ) {
 		return new ProviderAsSupplier<T>( provider );
 	}
 
@@ -34,8 +34,8 @@ public class Suppliers {
 		return new ConstantSupplier<T>( constant );
 	}
 
-	public static <T> Supplier<T> supplier( Class<? extends Supplier<? extends T>> type ) {
-		return new IndirectSupplier<T>( type );
+	public static <T> Supplier<T> reference( Class<? extends Supplier<? extends T>> type ) {
+		return new ReferencingSupplier<T>( type );
 	}
 
 	public static <T> Supplier<T> type( Class<T> type ) {
@@ -169,12 +169,12 @@ public class Suppliers {
 
 	}
 
-	private static final class IndirectSupplier<T>
+	private static final class ReferencingSupplier<T>
 			implements Supplier<T> {
 
 		private final Class<? extends Supplier<? extends T>> type;
 
-		IndirectSupplier( Class<? extends Supplier<? extends T>> type ) {
+		ReferencingSupplier( Class<? extends Supplier<? extends T>> type ) {
 			super();
 			this.type = type;
 		}
