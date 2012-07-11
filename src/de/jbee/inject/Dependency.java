@@ -102,10 +102,10 @@ public final class Dependency<T>
 	}
 
 	public Instance<?> target() {
-		return targetUp( 0 );
+		return target( 0 );
 	}
 
-	public Instance<?> targetUp( int level ) {
+	public Instance<?> target( int level ) {
 		return isUntargeted()
 			? Instance.ANY
 			: targetHierarchy[targetHierarchy.length - 1 - level];

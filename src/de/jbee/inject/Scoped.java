@@ -5,12 +5,13 @@ import java.util.Map;
 
 public class Scoped { //OPEN what about Scoping ?
 
-	interface InjectionKey {
+	interface KeyDeduction {
 
-		<T> String key( Injection<T> injection );
+		<T> String deduceKey( Injection<T> injection );
 	}
 
-	private static final DependencyTypeInjectionKey DEPENDENCY_TYPE_KEY = new DependencyTypeInjectionKey();
+	public static final KeyDeduction DEPENDENCY_TYPE_KEY = new DependencyTypeAsKey();
+	public static final KeyDeduction TARGET_INSTANCE_KEY = new TargetInstanceAsKey();
 
 	/**
 	 * Often called the 'default'-scope. Asks the {@link Injectable} once per injection.
@@ -27,7 +28,12 @@ public class Scoped { //OPEN what about Scoping ?
 	 */
 	public static final Scope THREAD = new ThreadScope( new ThreadLocal<Repository>(), APPLICATION );
 
-	public static final Scope DEPENDENCY_TYPE = new InjectionKeyScope( DEPENDENCY_TYPE_KEY );
+	public static final Scope DEPENDENCY_TYPE = uniqueBy( DEPENDENCY_TYPE_KEY );
+	public static final Scope TARGET_INSTANCE = uniqueBy( TARGET_INSTANCE_KEY );
+
+	public static Scope uniqueBy( KeyDeduction keyDeduction ) {
+		return new KeyDeductionScope( keyDeduction );
+	}
 
 	public static Repository asSnapshot( Repository src, Repository dest ) {
 		return new SnapshotRepository( src, dest );
@@ -151,37 +157,56 @@ public class Scoped { //OPEN what about Scoping ?
 
 	}
 
-	private static final class InjectionKeyScope
+	private static final class KeyDeductionScope
 			implements Scope {
 
-		private final InjectionKey injectionKey;
+		private final KeyDeduction keyDeduction;
 
-		InjectionKeyScope( InjectionKey injectionKey ) {
+		KeyDeductionScope( KeyDeduction keyDeduction ) {
 			super();
-			this.injectionKey = injectionKey;
+			this.keyDeduction = keyDeduction;
 		}
 
 		@Override
 		public Repository init() {
-			return new InjectionKeyRepository( injectionKey );
+			return new KeyDeductionRepository( keyDeduction );
 		}
 
 		@Override
 		public String toString() {
-			return "(per-" + injectionKey + ")";
+			return "(per-" + keyDeduction + ")";
 		}
 
 	}
 
-	private static final class DependencyTypeInjectionKey
-			implements InjectionKey {
+	private static final class TargetInstanceAsKey
+			implements KeyDeduction {
 
-		DependencyTypeInjectionKey() {
+		TargetInstanceAsKey() {
 			// make visible
 		}
 
 		@Override
-		public <T> String key( Injection<T> injection ) {
+		public <T> String deduceKey( Injection<T> injection ) {
+			return injection.dependency().target( 1 ).toString();
+		}
+
+		@Override
+		public String toString() {
+			return "target-instance";
+		}
+
+	}
+
+	private static final class DependencyTypeAsKey
+			implements KeyDeduction {
+
+		DependencyTypeAsKey() {
+			// make visible
+		}
+
+		@Override
+		public <T> String deduceKey( Injection<T> injection ) {
 			return injection.dependency().getType().toString();
 		}
 
@@ -194,13 +219,13 @@ public class Scoped { //OPEN what about Scoping ?
 
 	// e.g. get receiver class from dependency -to be reusable the provider could offer a identity --> a wrapper class would be needed anyway so maybe best is to have quite similar impl. all using a identity hash-map
 
-	private static final class InjectionKeyRepository
+	private static final class KeyDeductionRepository
 			implements Repository {
 
 		private final Map<String, Object> instances = new HashMap<String, Object>();
-		private final InjectionKey injectionKey;
+		private final KeyDeduction injectionKey;
 
-		InjectionKeyRepository( InjectionKey injectionKey ) {
+		KeyDeductionRepository( KeyDeduction injectionKey ) {
 			super();
 			this.injectionKey = injectionKey;
 		}
@@ -208,7 +233,7 @@ public class Scoped { //OPEN what about Scoping ?
 		@Override
 		@SuppressWarnings ( "unchecked" )
 		public <T> T serve( Injection<T> injection, Injectable<T> injectable ) {
-			final String key = injectionKey.key( injection );
+			final String key = injectionKey.deduceKey( injection );
 			T instance = (T) instances.get( key );
 			if ( instance != null ) {
 				return instance;

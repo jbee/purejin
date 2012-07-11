@@ -1,6 +1,7 @@
 package de.jbee.inject.bind;
 
 import static de.jbee.inject.Dependency.dependency;
+import static de.jbee.inject.Scoped.TARGET_INSTANCE;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
@@ -8,6 +9,7 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Instance;
 import de.jbee.inject.Name;
 
 public class TestRobotLegsProblemBinds {
@@ -27,14 +29,17 @@ public class TestRobotLegsProblemBinds {
 		}
 	}
 
-	// per parent/target instance scope would make it also very easy
+	static Name left = Name.named( "left" );
+	static Name right = Name.named( "right" );
+
+	/**
+	 * left and right {@link Foot} could be explicitly bind to left or right {@link Leg}.
+	 */
 	private static class RobotLegsProblemBindsModule
 			extends BinderModule {
 
 		@Override
 		protected void declare() {
-			Name left = Name.named( "left" );
-			Name right = Name.named( "right" );
 			bind( left, Leg.class ).toConstructor();
 			bind( right, Leg.class ).toConstructor();
 			injectingInto( left, Leg.class ).bind( Foot.class ).to( left, Foot.class );
@@ -42,12 +47,34 @@ public class TestRobotLegsProblemBinds {
 		}
 	}
 
+	/**
+	 * Or generally there should be one {@link Foot} for each {@link Instance} one is injected to.
+	 */
+	private static class RobotLegsProblemScopeBindsModule
+			extends BinderModule {
+
+		@Override
+		protected void declare() {
+			per( TARGET_INSTANCE ).bind( Foot.class );
+			bind( left, Leg.class ).toConstructor();
+			bind( right, Leg.class ).toConstructor();
+		}
+	}
+
 	@Test
-	public void test() {
-		DependencyResolver injector = Bootstrap.injector( RobotLegsProblemBindsModule.class );
-		Leg leftLeg = injector.resolve( dependency( Leg.class ).named( "left" ) );
-		Leg rightLeg = injector.resolve( dependency( Leg.class ).named( "right" ) );
-		assertThat( leftLeg, not( sameInstance( rightLeg ) ) );
-		assertThat( leftLeg.foot, not( sameInstance( rightLeg.foot ) ) );
+	public void thatRobotHasDifferentLegsWhenUsingInjectingIntoClause() {
+		assertRobotHasDifferentLegs( Bootstrap.injector( RobotLegsProblemBindsModule.class ) );
+	}
+
+	@Test
+	public void thatRobotHasDifferentLegsWhenUsingTargetInstanceScopedFeets() {
+		assertRobotHasDifferentLegs( Bootstrap.injector( RobotLegsProblemScopeBindsModule.class ) );
+	}
+
+	private void assertRobotHasDifferentLegs( DependencyResolver injector ) {
+		Leg leftLeg = injector.resolve( dependency( Leg.class ).named( left ) );
+		Leg rightLeg = injector.resolve( dependency( Leg.class ).named( right ) );
+		assertThat( "same leg", leftLeg, not( sameInstance( rightLeg ) ) );
+		assertThat( "same foot", leftLeg.foot, not( sameInstance( rightLeg.foot ) ) );
 	}
 }

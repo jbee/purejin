@@ -358,7 +358,7 @@ public class Suppliers {
 
 		@Override
 		public Logger supply( Dependency<? super Logger> dependency, DependencyResolver context ) {
-			return Logger.getLogger( dependency.targetUp( 1 ).getType().getRawType().getCanonicalName() );
+			return Logger.getLogger( dependency.target( 1 ).getType().getRawType().getCanonicalName() );
 		}
 
 	}
