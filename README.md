@@ -10,6 +10,7 @@
 - no AOP
 - no accessible mutable state
 - no reconfiguration 
+- no annotations (easy to add but why would you want to ?)
 
 #### Modular
 - powerful modularisation with bundles and modules
