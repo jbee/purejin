@@ -3,9 +3,9 @@
 ### Java Dependency Injection
 
 #### 100% Clean
-- **Configuration in code**
-- **beside your application code** (no dependency within it)
-- no further runtime dependencies (libraries)
+- **Configuration by code**
+- **separated from your application code** (no dependency will ever point to silk except the configuration code itself)
+- no further runtime dependencies (libraries) needed
 
 #### Less _Magic_
 - no AOP
@@ -18,6 +18,12 @@
 - allows: repeated install of bundles (also circular), uninstall bundles
 - configuration through editions, features and constant-properties
 
+#### Efficient
+- fast bootsrap
+- declarative dependency descriptions (using a guice like binding-builder)
+- about 120 KB jar archive
+- does the right thing (see below)
+
 #### Further Characteristics
 - data driven (core uses a lot Value Objects)
 - pushes for immutability: enforces Constructor-Injection
@@ -27,8 +33,6 @@
 - easy to extend (e.g. with Set or List support)
 - decouples application layers through services
 - Unit-testable 
-- declarative dependency descriptions (using a guice like binding-builder)
-- and yes: it's pretty fast too
 
 #### Status
 The project is in a late conception phase. Most of the core concepts are implemented and will just get minor adjustments. But a few are missing. As long as those are under development there will be no examples but you can always look at the tests (the ones in the `bind` package demonstarte the features quite nice).
