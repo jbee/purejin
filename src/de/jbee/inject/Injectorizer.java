@@ -44,8 +44,8 @@ public class Injectorizer {
 
 			@Override
 			public int compare( Suppliable<?> one, Suppliable<?> other ) {
-				Resource<?> rOne = one.resource();
-				Resource<?> rOther = other.resource();
+				Resource<?> rOne = one.resource;
+				Resource<?> rOther = other.resource;
 				Class<?> rawOne = rOne.getType().getRawType();
 				Class<?> rawOther = rOther.getType().getRawType();
 				if ( rawOne != rawOther ) {
@@ -56,9 +56,9 @@ public class Injectorizer {
 		} );
 		final int end = total - 1;
 		int start = 0;
-		Class<?> lastRawType = suppliables[0].resource().getType().getRawType();
+		Class<?> lastRawType = suppliables[0].resource.getType().getRawType();
 		for ( int i = 0; i < total; i++ ) {
-			Resource<?> r = suppliables[i].resource();
+			Resource<?> r = suppliables[i].resource;
 			Class<?> rawType = r.getType().getRawType();
 			if ( i == end ) {
 				if ( rawType != lastRawType ) {
@@ -85,9 +85,9 @@ public class Injectorizer {
 		for ( int i = 0; i < length; i++ ) {
 			@SuppressWarnings ( "unchecked" )
 			Suppliable<T> b = (Suppliable<T>) suppliables[i + first];
-			res[i] = new InjectronImpl<T>( b.resource(), b.source(), new Injection<T>(
-					b.resource(), dependency( b.resource().getInstance() ), i + first,
-					suppliables.length ), b.repository(), asInjectable( b.supplier(), resolver ) );
+			res[i] = new InjectronImpl<T>( b.resource, b.source, new Injection<T>( b.resource,
+					dependency( b.resource.getInstance() ), i + first, suppliables.length ),
+					b.repository, asInjectable( b.supplier, resolver ) );
 		}
 		return res;
 	}

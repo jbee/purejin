@@ -8,10 +8,10 @@ package de.jbee.inject;
  */
 public final class Suppliable<T> {
 
-	private final Resource<T> resource;
-	private final Supplier<? extends T> supplier;
-	private final Repository repository;
-	private final Source source;
+	public final Resource<T> resource;
+	public final Supplier<? extends T> supplier;
+	public final Repository repository;
+	public final Source source;
 
 	public Suppliable( Resource<T> resource, Supplier<? extends T> supplier, Repository repository,
 			Source source ) {
@@ -20,22 +20,6 @@ public final class Suppliable<T> {
 		this.supplier = supplier;
 		this.repository = repository;
 		this.source = source;
-	}
-
-	public Resource<T> resource() {
-		return resource;
-	}
-
-	public Supplier<? extends T> supplier() {
-		return supplier;
-	}
-
-	public Source source() {
-		return source;
-	}
-
-	public Repository repository() {
-		return repository;
 	}
 
 	@Override
