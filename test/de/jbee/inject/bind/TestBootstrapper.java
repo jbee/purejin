@@ -36,6 +36,17 @@ public class TestBootstrapper {
 
 	}
 
+	private static class ClashingBindsModule
+			extends BinderModule {
+
+		@Override
+		protected void declare() {
+			bind( Integer.class ).to( 42 );
+			bind( Integer.class ).to( 8 );
+		}
+
+	}
+
 	/**
 	 * The assert itself doesn't play such huge role here. we just want to reach this code.
 	 */
@@ -43,6 +54,11 @@ public class TestBootstrapper {
 	public void thatBundlesAreNotBootstrappedMultipleTimesEvenIfTheyHaveCycles() {
 		DependencyResolver injector = Bootstrap.injector( CycleOneBundle.class );
 		assertThat( injector, notNullValue() );
+	}
+
+	@Test ( expected = IllegalStateException.class )
+	public void thatChlashingBindsThrowAnException() {
+		Bootstrap.injector( ClashingBindsModule.class );
 	}
 
 }

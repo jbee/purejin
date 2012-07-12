@@ -25,6 +25,10 @@ public final class Source
 		return ident;
 	}
 
+	public DeclarationType getType() {
+		return declarationType;
+	}
+
 	public boolean isExplicit() {
 		return declarationType == DeclarationType.EXPLICIT;
 	}

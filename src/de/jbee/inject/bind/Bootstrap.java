@@ -132,9 +132,15 @@ public final class Bootstrap {
 			res.add( declarations[0] );
 			int lastIndependend = 0;
 			for ( int i = 1; i < declarations.length; i++ ) {
-				if ( independent( declarations[lastIndependend], declarations[i] ) ) {
-					res.add( declarations[i] );
+				BindDeclaration<?> one = declarations[lastIndependend];
+				BindDeclaration<?> other = declarations[i];
+				boolean equalResource = one.resource().equalTo( other.resource() );
+				if ( !equalResource
+						|| !other.source().getType().replacedBy( one.source().getType() ) ) {
+					res.add( other );
 					lastIndependend = i;
+				} else if ( one.source().getType().clashesWith( other.source().getType() ) ) {
+					throw new IllegalStateException( "Duplicate binds:" + one + "," + other );
 				}
 			}
 			return res.toArray( new BindDeclaration[res.size()] );
@@ -150,14 +156,6 @@ public final class Bootstrap {
 			return bindings.declarations.toArray( new BindDeclaration<?>[0] );
 		}
 
-		private boolean independent( BindDeclaration<?> one, BindDeclaration<?> other ) {
-			if ( one.resource().equalTo( other.resource() ) ) {
-				if ( other.source().isImplicit() ) {
-					return false;
-				}
-			}
-			return true;
-		}
 	}
 
 	static class ListBindings

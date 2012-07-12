@@ -35,4 +35,12 @@ public enum DeclarationType
 		return ordinal() > other.ordinal();
 	}
 
+	public boolean clashesWith( DeclarationType other ) {
+		return this == EXPLICIT && other == EXPLICIT;
+	}
+
+	public boolean replacedBy( DeclarationType other ) {
+		return other.ordinal() > ordinal() || clashesWith( other );
+	}
+
 }
