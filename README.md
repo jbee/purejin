@@ -2,9 +2,10 @@
 
 ### Java Dependency Injection
 
-#### 100%
+#### 100% Clean
 - **Configuration in code**
 - **beside your application code** (no dependency within it)
+- no further runtime dependencies (libraries)
 
 #### Less _Magic_
 - no AOP
@@ -12,10 +13,10 @@
 - no reconfiguration 
 - no annotations (easy to add but why would you want to ?)
 
-#### Modular
+#### `if`-less Modularity
 - powerful modularisation with bundles and modules
 - allows: repeated install of bundles (also circular), uninstall bundles
-- if-less configuration through editions, features and constant-properties
+- configuration through editions, features and constant-properties
 
 #### Further Characteristics
 - data driven (core uses a lot Value Objects)
@@ -26,7 +27,7 @@
 - easy to extend (e.g. with Set or List support)
 - decouples application layers through services
 - Unit-testable 
-- has a guice like binding-builder
+- declarative dependency descriptions (using a guice like binding-builder)
 - and yes: it's pretty fast too
 
 #### Status
