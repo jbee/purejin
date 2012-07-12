@@ -20,7 +20,7 @@ public class SuppliedBy {
 	public static final Supplier<Provider<?>> PROVIDER_BRIDGE = new ProviderSupplier();
 	public static final Supplier<List<?>> LIST_BRIDGE = new ArrayToListBridgeSupplier();
 	public static final Supplier<Set<?>> SET_BRIDGE = new ArrayToSetBridgeSupplier();
-	public static final Supplier<Logger> LOGGER = new LoggerSupplier();
+	public static final Factory<Logger> LOGGER = new LoggerSupplier();
 
 	public static <T> Supplier<T> provider( Provider<T> provider ) {
 		return new ProviderAsSupplier<T>( provider );
@@ -56,6 +56,10 @@ public class SuppliedBy {
 
 	public static <T> Supplier<T> costructor( Constructor<T> constructor ) {
 		return new ConstructorSupplier<T>( constructor );
+	}
+
+	public static <T> Supplier<T> factory( Factory<T> factory ) {
+		return new FactorySupplier<T>( factory );
 	}
 
 	private static abstract class ArrayBridgeSupplier<T>
@@ -273,19 +277,24 @@ public class SuppliedBy {
 	 * @author Jan Bernitt (jan.bernitt@gmx.de)
 	 * 
 	 */
-	static final class FactorySupplier<T>
+	private static final class FactorySupplier<T>
 			implements Supplier<T> {
+
+		private final Factory<T> factory;
+
+		FactorySupplier( Factory<T> factory ) {
+			super();
+			this.factory = factory;
+		}
 
 		@Override
 		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
-			// TODO Auto-generated method stub
-			return null;
+			return factory.produce( dependency.getInstance(), dependency.target( 1 ) );
 		}
 
-		// some kind of factory method working on the type/dependency alone, not interested in the context
 	}
 
-	static final class ConstructorSupplier<T>
+	private static final class ConstructorSupplier<T>
 			implements Supplier<T> {
 
 		private final Constructor<T> constructor;
@@ -311,19 +320,19 @@ public class SuppliedBy {
 		@Override
 		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
 			Class<?>[] rawTypes = constructor.getParameterTypes();
-			Object[] resolvedArgs = new Object[rawTypes.length];
+			Object[] arguments = new Object[rawTypes.length];
 			for ( int i = 0; i < rawTypes.length; i++ ) {
 				if ( args[i] instanceof Type<?> && rawTypes[i] != Type.class ) {
 					//OPEN annotations from constructor could be transformed into names for the arguments ?! --> that can be done by strategy returning Instance-values from analyze call
 					Dependency<?> argDependency = dependency.anyTyped( (Type<?>) args[i] );
-					resolvedArgs[i] = context.resolve( argDependency );
+					arguments[i] = context.resolve( argDependency );
 				} else {
-					resolvedArgs[i] = args[i];
+					arguments[i] = args[i];
 				}
 			}
 			try {
 				constructor.setAccessible( true ); //TODO just do it once
-				return constructor.newInstance( resolvedArgs );
+				return constructor.newInstance( arguments );
 			} catch ( Exception e ) {
 				throw new RuntimeException( e );
 			}
@@ -331,15 +340,15 @@ public class SuppliedBy {
 	}
 
 	private static class LoggerSupplier
-			implements Supplier<Logger> {
+			implements Factory<Logger> {
 
 		LoggerSupplier() {
 			// make visible
 		}
 
 		@Override
-		public Logger supply( Dependency<? super Logger> dependency, DependencyResolver context ) {
-			return Logger.getLogger( dependency.target( 1 ).getType().getRawType().getCanonicalName() );
+		public <P> Logger produce( Instance<? super Logger> produced, Instance<P> injected ) {
+			return Logger.getLogger( injected.getType().getRawType().getCanonicalName() );
 		}
 
 	}

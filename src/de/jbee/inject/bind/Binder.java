@@ -20,6 +20,7 @@ import de.jbee.inject.Source;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.Target;
 import de.jbee.inject.Type;
+import de.jbee.inject.util.Factory;
 import de.jbee.inject.util.Provider;
 import de.jbee.inject.util.Scoped;
 import de.jbee.inject.util.SuppliedBy;
@@ -398,6 +399,10 @@ public class Binder
 		@Override
 		public void to( Supplier<? extends T> supplier ) {
 			binder.bind( resource, supplier );
+		}
+
+		public void to( Factory<? extends T> factory ) {
+			to( SuppliedBy.factory( factory ) );
 		}
 
 		public void to( Constructor<? extends T> constructor ) {
