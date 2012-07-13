@@ -55,7 +55,12 @@ public class SuppliedBy {
 	}
 
 	public static <T> Supplier<T> costructor( Constructor<T> constructor ) {
-		return new ConstructorSupplier<T>( constructor );
+		final Class<?>[] params = constructor.getParameterTypes();
+		if ( params.length == 0 ) {
+			return new NoArgsConstructorSupplier<T>( constructor );
+		}
+		return new ConstructorSupplier<T>( constructor, new Object[params.length],
+				Type.parameterTypes( constructor ) );
 	}
 
 	public static <T> Supplier<T> factory( Factory<T> factory ) {
@@ -294,49 +299,66 @@ public class SuppliedBy {
 
 	}
 
-	private static final class ConstructorSupplier<T>
+	/**
+	 * A simple version for all the no-args constructors hopefully used in large numbers.
+	 */
+	private static final class NoArgsConstructorSupplier<T>
 			implements Supplier<T> {
 
-		private final Constructor<T> constructor;
-		private final Object[] args;
+		private final Constructor<T> noArgsConstructor;
 
-		ConstructorSupplier( Constructor<T> constructor ) {
-			this( constructor, dependencies( constructor ) );
-		}
-
-		ConstructorSupplier( Constructor<T> constructor, Object[] args ) {
+		NoArgsConstructorSupplier( Constructor<T> noArgsConstructor ) {
 			super();
-			this.constructor = constructor;
-			this.args = args;
-		}
-
-		private static <T> Object[] dependencies( Constructor<T> constructor ) {
-			Type<?>[] types = Type.parameterTypes( constructor );
-			Object[] values = new Object[types.length];
-			System.arraycopy( types, 0, values, 0, types.length );
-			return values;
+			TypeReflector.makeAccessible( noArgsConstructor );
+			this.noArgsConstructor = noArgsConstructor;
 		}
 
 		@Override
 		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
-			Class<?>[] rawTypes = constructor.getParameterTypes();
-			Object[] arguments = new Object[rawTypes.length];
-			for ( int i = 0; i < rawTypes.length; i++ ) {
-				if ( args[i] instanceof Type<?> && rawTypes[i] != Type.class ) {
-					//OPEN annotations from constructor could be transformed into names for the arguments ?! --> that can be done by strategy returning Instance-values from analyze call
-					Dependency<?> argDependency = dependency.anyTyped( (Type<?>) args[i] );
-					arguments[i] = context.resolve( argDependency );
+			return TypeReflector.construct( noArgsConstructor );
+		}
+
+	}
+
+	private static final class ConstructorSupplier<T>
+			implements Supplier<T> {
+
+		private final Constructor<T> constructor;
+		private final Type<?>[] types;
+		private final Object[] hints;
+
+		ConstructorSupplier( Constructor<T> constructor, Object[] hints, Type<?>[] types ) {
+			super();
+			TypeReflector.makeAccessible( constructor );
+			this.constructor = constructor;
+			this.hints = hints;
+			this.types = types;
+		}
+
+		@Override
+		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
+			Object[] args = hints.clone();
+			for ( int i = 0; i < types.length; i++ ) {
+				final Object hint = hints[i];
+				final Type<?> type = types[i];
+				if ( hint != null ) {
+					final Class<?> rawType = type.getRawType();
+					if ( hint instanceof Instance<?> && rawType != Instance.class ) {
+						args[i] = context.resolve( dependency.instanced( (Instance<?>) hint ) );
+					} else if ( hint instanceof Type<?> && rawType != Type.class ) {
+						args[i] = context.resolve( dependency.anyTyped( (Type<?>) hint ) );
+					} else if ( hint instanceof Class<?> && rawType != Class.class ) {
+						args[i] = context.resolve( dependency.anyTyped( (Class<?>) hint ) );
+					} else if ( hint instanceof Dependency<?> && rawType != Dependency.class ) {
+						args[i] = context.resolve( (Dependency<?>) hint );
+					}
 				} else {
-					arguments[i] = args[i];
+					args[i] = context.resolve( dependency.anyTyped( type ) );
 				}
 			}
-			try {
-				constructor.setAccessible( true ); //TODO just do it once
-				return constructor.newInstance( arguments );
-			} catch ( Exception e ) {
-				throw new RuntimeException( e );
-			}
+			return TypeReflector.construct( constructor, args );
 		}
+
 	}
 
 	private static class LoggerSupplier

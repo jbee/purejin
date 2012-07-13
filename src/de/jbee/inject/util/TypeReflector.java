@@ -1,5 +1,6 @@
 package de.jbee.inject.util;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 
 public class TypeReflector {
@@ -34,13 +35,25 @@ public class TypeReflector {
 		}
 		@SuppressWarnings ( "unchecked" )
 		Constructor<T> c = (Constructor<T>) constructors[noArgsIndex];
-		c.setAccessible( true );
+		makeAccessible( c );
 		return c;
 	}
 
 	public static <T> T newInstance( Class<T> type ) {
 		try {
 			return accessibleNoArgsConstructor( type ).newInstance();
+		} catch ( Exception e ) {
+			throw new RuntimeException( e );
+		}
+	}
+
+	public static void makeAccessible( AccessibleObject obj ) {
+		obj.setAccessible( true );
+	}
+
+	public static <T> T construct( Constructor<T> constructor, Object... args ) {
+		try {
+			return constructor.newInstance( args );
 		} catch ( Exception e ) {
 			throw new RuntimeException( e );
 		}

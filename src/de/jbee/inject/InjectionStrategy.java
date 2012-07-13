@@ -20,6 +20,8 @@ public interface InjectionStrategy {
 	 */
 	<T> Constructor<T> constructorFor( Class<T> type );
 
+	<T> Instance<?>[] parametersFor( Constructor<T> constructor );
+
 	//<T> InjectionPoint<?>[] injectionPointsFor(Class<T> type);
 
 }
