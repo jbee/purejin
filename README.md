@@ -2,10 +2,11 @@
 
 ### Java Dependency Injection
 
-#### 100% Clean
+#### 100%
 - **Configuration by code**
 - **separated from your application code** (no dependency will ever point to silk except the configuration code itself)
 - no further runtime dependencies (libraries) needed
+- transparent (renaming refactorings cannot cause problems)
 
 #### Less _Magic_
 - no AOP
