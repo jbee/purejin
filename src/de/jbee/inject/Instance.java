@@ -10,7 +10,7 @@ import static de.jbee.inject.Precision.morePreciseThan2;
  * 
  */
 public final class Instance<T>
-		implements Typed<T>, Named, PreciserThan<Instance<?>> {
+		implements Typed<T>, Named, PreciserThan<Instance<?>>, Hint {
 
 	/**
 	 * When a wildcard-type is used as bound instance type the bind will be added to all concrete

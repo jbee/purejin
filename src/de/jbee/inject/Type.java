@@ -14,7 +14,7 @@ import java.util.List;
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
 public final class Type<T>
-		implements PreciserThan<Type<?>> {
+		implements PreciserThan<Type<?>>, Hint {
 
 	public static final Type<? extends Object> WILDCARD = raw( Object.class ).asLowerBound();
 

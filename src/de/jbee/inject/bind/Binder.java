@@ -415,6 +415,10 @@ public class Binder
 			to( SuppliedBy.costructor( constructor ) );
 		}
 
+		public void toConstructor( Object... hints ) {
+
+		}
+
 		public void to( T constant ) {
 			toConstant( constant );
 		}

@@ -13,7 +13,7 @@ import java.util.Arrays;
  * @param <T>
  */
 public final class Dependency<T>
-		implements Typed<T>, Named {
+		implements Typed<T>, Named, Hint {
 
 	private static final Instance<?>[] UNTARGETED = new Instance<?>[0];
 

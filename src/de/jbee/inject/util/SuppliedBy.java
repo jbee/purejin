@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 
 import de.jbee.inject.Dependency;
 import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Hint;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.Type;
@@ -59,8 +60,23 @@ public class SuppliedBy {
 		if ( params.length == 0 ) {
 			return new NoArgsConstructorSupplier<T>( constructor );
 		}
-		return new ConstructorSupplier<T>( constructor, new Object[params.length],
-				Type.parameterTypes( constructor ) );
+		return new ConstructorSupplier<T>( constructor, new Object[params.length] );
+	}
+
+	public static <T> Supplier<T> costructor( Constructor<T> constructor, Object... hints ) {
+		Type<?>[] types = Type.parameterTypes( constructor );
+		Object[] params = new Object[constructor.getParameterTypes().length];
+		for ( Object hint : hints ) {
+			int i = 0;
+			boolean found = false;
+			while ( i < types.length && !found ) {
+				Class<?> hintClass = hint.getClass();
+			}
+			if ( !found ) {
+				throw new IllegalArgumentException( "Couldn't understand hint: " + hint );
+			}
+		}
+		return new ConstructorSupplier<T>( constructor, params );
 	}
 
 	public static <T> Supplier<T> factory( Factory<T> factory ) {
@@ -327,12 +343,13 @@ public class SuppliedBy {
 		private final Type<?>[] types;
 		private final Object[] hints;
 
-		ConstructorSupplier( Constructor<T> constructor, Object[] hints, Type<?>[] types ) {
+		ConstructorSupplier( Constructor<T> constructor, Object[] hints ) {
 			super();
 			TypeReflector.makeAccessible( constructor );
 			this.constructor = constructor;
 			this.hints = hints;
-			this.types = types;
+			this.types = Type.parameterTypes( constructor );
+			// TODO when all hints are already actual arguments we can directly invoke the constructor with the hints --> maybe we use the no-args constructor for that and make it a fixed args constructor 
 		}
 
 		@Override
@@ -341,19 +358,18 @@ public class SuppliedBy {
 			for ( int i = 0; i < types.length; i++ ) {
 				final Object hint = hints[i];
 				final Type<?> type = types[i];
-				if ( hint != null ) {
-					final Class<?> rawType = type.getRawType();
-					if ( hint instanceof Instance<?> && rawType != Instance.class ) {
+				if ( hint == null ) {
+					args[i] = context.resolve( dependency.anyTyped( type ) );
+				} else if ( hint instanceof Class<?> ) {
+					args[i] = context.resolve( dependency.anyTyped( (Class<?>) hint ) );
+				} else if ( hint instanceof Hint ) {
+					if ( hint instanceof Instance<?> ) {
 						args[i] = context.resolve( dependency.instanced( (Instance<?>) hint ) );
-					} else if ( hint instanceof Type<?> && rawType != Type.class ) {
+					} else if ( hint instanceof Type<?> ) {
 						args[i] = context.resolve( dependency.anyTyped( (Type<?>) hint ) );
-					} else if ( hint instanceof Class<?> && rawType != Class.class ) {
-						args[i] = context.resolve( dependency.anyTyped( (Class<?>) hint ) );
-					} else if ( hint instanceof Dependency<?> && rawType != Dependency.class ) {
+					} else if ( hint instanceof Dependency<?> ) {
 						args[i] = context.resolve( (Dependency<?>) hint );
 					}
-				} else {
-					args[i] = context.resolve( dependency.anyTyped( type ) );
 				}
 			}
 			return TypeReflector.construct( constructor, args );
