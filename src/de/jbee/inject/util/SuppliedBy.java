@@ -15,6 +15,7 @@ import de.jbee.inject.Hint;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.Type;
+import de.jbee.inject.Typed;
 
 public class SuppliedBy {
 
@@ -65,18 +66,31 @@ public class SuppliedBy {
 
 	public static <T> Supplier<T> costructor( Constructor<T> constructor, Object... hints ) {
 		Type<?>[] types = Type.parameterTypes( constructor );
-		Object[] params = new Object[constructor.getParameterTypes().length];
+		Object[] matchingHints = new Object[constructor.getParameterTypes().length];
 		for ( Object hint : hints ) {
 			int i = 0;
 			boolean found = false;
 			while ( i < types.length && !found ) {
-				Class<?> hintClass = hint.getClass();
+				final Type<?> paramType = types[i];
+				if ( hint instanceof Class<?> ) {
+					found = Type.raw( (Class<?>) hint ).isAssignableTo( paramType );
+				} else if ( hint instanceof Type<?> ) {
+					found = ( (Type<?>) hint ).isAssignableTo( paramType );
+				} else if ( hint instanceof Typed<?> ) {
+					found = ( (Typed<?>) hint ).getType().isAssignableTo( paramType );
+				} else {
+					found = Type.raw( hint.getClass() ).isAssignableTo( paramType );
+				}
+				if ( found ) {
+					matchingHints[i] = hint;
+				}
+				i++;
 			}
 			if ( !found ) {
 				throw new IllegalArgumentException( "Couldn't understand hint: " + hint );
 			}
 		}
-		return new ConstructorSupplier<T>( constructor, params );
+		return new ConstructorSupplier<T>( constructor, matchingHints );
 	}
 
 	public static <T> Supplier<T> factory( Factory<T> factory ) {
