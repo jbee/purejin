@@ -415,9 +415,12 @@ public class Binder
 			to( SuppliedBy.costructor( constructor ) );
 		}
 
+		public void to( Constructor<? extends T> constructor, Object... hints ) {
+			to( SuppliedBy.costructor( constructor, hints ) );
+		}
+
 		public void toConstructor( Class<? extends T> type, Object... hints ) {
-			to( SuppliedBy.costructor( binder.strategy().constructorFor(
-					resource.getType().getRawType() ), hints ) );
+			to( SuppliedBy.costructor( binder.strategy().constructorFor( type ), hints ) );
 		}
 
 		public void toConstructor( Object... hints ) {

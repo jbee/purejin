@@ -65,6 +65,9 @@ public class SuppliedBy {
 	}
 
 	public static <T> Supplier<T> costructor( Constructor<T> constructor, Object... hints ) {
+		if ( hints.length == 0 ) {
+			return costructor( constructor );
+		}
 		Type<?>[] types = Type.parameterTypes( constructor );
 		Object[] matchingHints = new Object[constructor.getParameterTypes().length];
 		for ( Object hint : hints ) {
