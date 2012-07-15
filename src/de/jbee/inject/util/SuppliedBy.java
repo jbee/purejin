@@ -74,18 +74,20 @@ public class SuppliedBy {
 			int i = 0;
 			boolean found = false;
 			while ( i < types.length && !found ) {
-				final Type<?> paramType = types[i];
-				if ( hint instanceof Class<?> ) {
-					found = Type.raw( (Class<?>) hint ).isAssignableTo( paramType );
-				} else if ( hint instanceof Type<?> ) {
-					found = ( (Type<?>) hint ).isAssignableTo( paramType );
-				} else if ( hint instanceof Typed<?> ) {
-					found = ( (Typed<?>) hint ).getType().isAssignableTo( paramType );
-				} else {
-					found = Type.raw( hint.getClass() ).isAssignableTo( paramType );
-				}
-				if ( found ) {
-					matchingHints[i] = hint;
+				if ( matchingHints[i] == null ) {
+					final Type<?> paramType = types[i];
+					if ( hint instanceof Class<?> ) {
+						found = Type.raw( (Class<?>) hint ).isAssignableTo( paramType );
+					} else if ( hint instanceof Type<?> ) {
+						found = ( (Type<?>) hint ).isAssignableTo( paramType );
+					} else if ( hint instanceof Typed<?> ) {
+						found = ( (Typed<?>) hint ).getType().isAssignableTo( paramType );
+					} else {
+						found = Type.raw( hint.getClass() ).isAssignableTo( paramType );
+					}
+					if ( found ) {
+						matchingHints[i] = hint;
+					}
 				}
 				i++;
 			}
