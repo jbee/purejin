@@ -16,11 +16,11 @@ public class TypeReflector {
 		} catch ( Exception e ) {
 			throw new RuntimeException( e );
 		}
-		c.setAccessible( true );
+		makeAccessible( c );
 		return c;
 	}
 
-	public static <T> Constructor<T> accessibleConstructor( Class<T> declaringClass ) {
+	public static <T> Constructor<T> defaultConstructor( Class<T> declaringClass ) {
 
 		Constructor<?>[] constructors = declaringClass.getDeclaredConstructors();
 		if ( constructors.length == 0 ) {
@@ -35,7 +35,6 @@ public class TypeReflector {
 		}
 		@SuppressWarnings ( "unchecked" )
 		Constructor<T> c = (Constructor<T>) constructors[noArgsIndex];
-		makeAccessible( c );
 		return c;
 	}
 
