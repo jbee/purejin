@@ -418,14 +418,14 @@ public class Binder
 			to( SuppliedBy.costructor( constructor, hints ) );
 		}
 
-		public void toConstructor( Class<? extends T> type, Object... hints ) {
+		public void toClassHaving( Class<? extends T> type, Object... hints ) {
 			//OPEN the constructor given through the strategy might not match the hints but another one could possibly. If we don't search for a matching constructor (I guess its better to keep magic low here too) than a Class is a useless hint and can be removed. 
 			//FIXME the type might be a nonConstructable type
 			to( SuppliedBy.costructor( binder.strategy().constructorFor( type ), hints ) );
 		}
 
-		public void toConstructor( Object... hints ) {
-			toConstructor( resource.getType().getRawType(), hints );
+		public void toConstructorHaving( Object... hints ) {
+			toClassHaving( resource.getType().getRawType(), hints );
 		}
 
 		public void to( T constant ) {

@@ -54,10 +54,10 @@ public class TestHintConstructorBinds {
 			bind( named( "x" ), String.class ).to( "x" );
 			bind( named( "y" ), String.class ).to( "y" );
 			bind( Integer.class ).to( 42 );
-			bind( Foo.class ).toConstructor( String.class );
+			bind( Foo.class ).toConstructorHaving( String.class );
 			Instance<String> y = instance( named( "y" ), raw( String.class ) );
-			bind( Bar.class ).toConstructor( raw( Integer.class ), y );
-			bind( Baz.class ).toConstructor( y, y );
+			bind( Bar.class ).toConstructorHaving( raw( Integer.class ), y );
+			bind( Baz.class ).toConstructorHaving( y, y );
 		}
 	}
 
@@ -66,7 +66,7 @@ public class TestHintConstructorBinds {
 
 		@Override
 		protected void declare() {
-			bind( Bar.class ).toConstructor( Float.class );
+			bind( Bar.class ).toConstructorHaving( Float.class );
 		}
 
 	}
