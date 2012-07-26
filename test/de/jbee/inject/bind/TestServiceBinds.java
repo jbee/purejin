@@ -26,7 +26,7 @@ public class TestServiceBinds {
 	 */
 	private static interface Service<P, R> {
 
-		R doIt( P param );
+		R calc( P param );
 	}
 
 	/**
@@ -59,50 +59,12 @@ public class TestServiceBinds {
 			}
 
 			@Override
-			public R doIt( P param ) {
+			public R calc( P param ) {
 				return service.invoke( param );
 			}
 
 		}
 
-	}
-
-	private static interface Command<P> {
-
-		Long doIt( P param );
-	}
-
-	private static class CommandSupplier
-			implements Supplier<Command<?>> {
-
-		@Override
-		public Command<?> supply( Dependency<? super Command<?>> dependency,
-				DependencyResolver context ) {
-			ServiceProvider provider = context.resolve( dependency( ServiceProvider.class ) );
-			return newCommand( provider.provide( dependency.getType().getParameters()[0],
-					raw( Long.class ) ) );
-		}
-
-		private <P> Command<P> newCommand( ServiceMethod<P, Long> service ) {
-			return new CommandToServiceMethodAdapter<P>( service );
-		}
-
-		static class CommandToServiceMethodAdapter<P>
-				implements Command<P> {
-
-			private final ServiceMethod<P, Long> service;
-
-			CommandToServiceMethodAdapter( ServiceMethod<P, Long> service ) {
-				super();
-				this.service = service;
-			}
-
-			@Override
-			public Long doIt( P param ) {
-				return service.invoke( param );
-			}
-
-		}
 	}
 
 	private static class ServiceBindsModule
@@ -112,7 +74,6 @@ public class TestServiceBinds {
 		protected void declare() {
 			bindServiceMethodsIn( MathService.class );
 			starbind( Service.class ).toSupplier( ServiceSupplier.class );
-			starbind( Command.class ).toSupplier( CommandSupplier.class );
 		}
 
 	}
@@ -129,17 +90,8 @@ public class TestServiceBinds {
 		DependencyResolver injector = Bootstrap.injector( ServiceBindsModule.class );
 		Dependency<Service> dependency = dependency( raw( Service.class ).parametized(
 				Integer.class, Long.class ) );
-		Service<Integer, Long> service = injector.resolve( dependency );
-		assertThat( service.doIt( 2 ), is( 4L ) );
-	}
-
-	@Test
-	public void thatServiceCanBeResolvedWhenHavingJustOneGeneric() {
-		DependencyResolver injector = Bootstrap.injector( ServiceBindsModule.class );
-		Dependency<Command> dependency = dependency( raw( Command.class ).parametized(
-				Integer.class ) );
-		Command<Integer> command = injector.resolve( dependency );
-		assertThat( command.doIt( 3 ), is( 9L ) );
+		Service<Integer, Long> square = injector.resolve( dependency );
+		assertThat( square.calc( 2 ), is( 4L ) );
 	}
 
 }

@@ -55,20 +55,28 @@ public class TestInstanceBinds {
 	private final DependencyResolver injector = Bootstrap.injector( InstanceBindsBundle.class );
 
 	@Test
-	public void buildinProviderShouldBeAvailableForAnyBoundType() {
+	public void thatProviderIsAvailableForAnyBoundType() {
 		assertInjectsProviderFor( "foobar", raw( String.class ) );
 		assertInjectsProviderFor( 42, raw( Integer.class ) );
 	}
 
 	@Test
-	public void buildinProviderShouldBeAvailableForAnyNamedBoundType() {
+	public void thatProviderIsAvailableForAnyNamedBoundType() {
 		assertInjectsProviderFor( 42, raw( Integer.class ), named( "foo" ) );
 	}
 
 	@Test
-	public void test() {
-		assertInjects( new String[] { "foobar" }, raw( String[].class ) );
+	public void thatInstanceInjectedBasedOnTheDependencyType() {
 		assertInjects( "bar", raw( CharSequence.class ) );
+	}
+
+	@Test
+	public void thatArrayTypeIsAvailableForAnyBoundType() {
+		assertInjects( new String[] { "foobar" }, raw( String[].class ) );
+	}
+
+	@Test
+	public void test() {
 		List<String> list = singletonList( "foobar" );
 		assertInjects( list, raw( List.class ).parametized( String.class ) );
 		assertInjects( Arrays.asList( new Integer[] { 42, 846 } ), Type.listOf( Integer.class ) );
@@ -79,15 +87,19 @@ public class TestInstanceBinds {
 	}
 
 	@Test
-	public void testProvider() {
+	public void thatProviderIsAvailableAlsoForListType() {
 		List<String> list = singletonList( "foobar" );
 		assertInjectsProviderFor( list, raw( List.class ).parametized( String.class ) );
-		assertInjectsProviderFor( singleton( "foobar" ),
-				raw( Set.class ).parametized( String.class ) );
 	}
 
 	@Test
-	public void testInjectron() {
+	public void thatProviderIsAvailableAlsoForSetType() {
+		Set<String> set = singleton( "foobar" );
+		assertInjectsProviderFor( set, raw( Set.class ).parametized( String.class ) );
+	}
+
+	@Test
+	public void thatSingleInjectronIsAvailableForAnyBoundResource() {
 		Dependency<Injectron> dependency = dependency( raw( Injectron.class ).parametized(
 				String.class ) );
 		Injectron<String> injectron = injector.resolve( dependency );
@@ -97,9 +109,8 @@ public class TestInstanceBinds {
 
 	@Test
 	@Ignore
-	public void testMissingFeature() {
-		injector.resolve( Dependency.dependency( Type.raw( Number.class ).asLowerBound() ).named(
-				"foo" ) );
+	public void thatLowerBoundsCanBeUsedToGetAnAvailableResource() {
+		injector.resolve( dependency( Type.raw( Number.class ).asLowerBound() ).named( "foo" ) );
 	}
 
 	private <T> void assertInjectsProviderFor( T expected, Type<? extends T> dependencyType ) {

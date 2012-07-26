@@ -9,13 +9,11 @@ import java.util.Arrays;
  * Describes what is wanted/needed as parameter to construct a instance of T.
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
- * 
- * @param <T>
  */
 public final class Dependency<T>
 		implements Typed<T>, Named, Hint {
 
-	private static final Instance<?>[] UNTARGETED = new Instance<?>[0];
+	private static final Parent[] UNTARGETED = new Parent[0];
 
 	public static <T> Dependency<T> dependency( Class<T> type ) {
 		return dependency( raw( type ) );
@@ -25,7 +23,7 @@ public final class Dependency<T>
 		return dependency( type, UNTARGETED );
 	}
 
-	private static <T> Dependency<T> dependency( Type<T> type, Instance<?>[] targetHierarchy ) {
+	private static <T> Dependency<T> dependency( Type<T> type, Parent[] targetHierarchy ) {
 		return dependency( instance( Name.ANY, type ), targetHierarchy );
 	}
 
@@ -33,14 +31,14 @@ public final class Dependency<T>
 		return dependency( instance, UNTARGETED );
 	}
 
-	private static <T> Dependency<T> dependency( Instance<T> instance, Instance<?>[] targetHierarchy ) {
+	private static <T> Dependency<T> dependency( Instance<T> instance, Parent[] targetHierarchy ) {
 		return new Dependency<T>( instance, targetHierarchy );
 	}
 
-	private final Instance<?>[] targetHierarchy;
+	private final Parent[] targetHierarchy;
 	private final Instance<T> instance;
 
-	private Dependency( Instance<T> instance, Instance<?>[] targetHierarchy ) {
+	private Dependency( Instance<T> instance, Parent[] targetHierarchy ) {
 		this.instance = instance;
 		this.targetHierarchy = targetHierarchy;
 	}
@@ -108,7 +106,7 @@ public final class Dependency<T>
 	public Instance<?> target( int level ) {
 		return isUntargeted()
 			? Instance.ANY
-			: targetHierarchy[targetHierarchy.length - 1 - level];
+			: targetHierarchy[targetHierarchy.length - 1 - level].getTarget();
 	}
 
 	/**
@@ -123,12 +121,23 @@ public final class Dependency<T>
 	}
 
 	public Dependency<T> injectingInto( Instance<?> target ) {
+		Parent parent = new Parent( this, target );
 		if ( targetHierarchy.length == 0 ) {
-			return new Dependency<T>( instance, new Instance<?>[] { target } );
+			return new Dependency<T>( instance, new Parent[] { parent } );
 		}
-		Instance<?>[] hierarchy = Arrays.copyOf( targetHierarchy, targetHierarchy.length + 1 );
-		hierarchy[targetHierarchy.length] = target;
+		ensureNoCycle( target );
+		Parent[] hierarchy = Arrays.copyOf( targetHierarchy, targetHierarchy.length + 1 );
+		hierarchy[targetHierarchy.length] = parent;
 		return new Dependency<T>( instance, hierarchy );
 	}
 
+	private void ensureNoCycle( Instance<?> target )
+			throws DependencyCycleException {
+		for ( int i = 0; i < targetHierarchy.length; i++ ) {
+			Parent parent = targetHierarchy[i];
+			if ( parent.getDependency().instance.equalTo( target ) ) {
+				throw new DependencyCycleException( this, target );
+			}
+		}
+	}
 }
