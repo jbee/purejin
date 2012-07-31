@@ -121,7 +121,7 @@ public final class Dependency<T>
 	}
 
 	public Dependency<T> injectingInto( Instance<?> target ) {
-		Parent parent = new Parent( this, target );
+		Parent parent = new Parent( this.instance, target );
 		if ( targetHierarchy.length == 0 ) {
 			return new Dependency<T>( instance, new Parent[] { parent } );
 		}
@@ -135,7 +135,7 @@ public final class Dependency<T>
 			throws DependencyCycleException {
 		for ( int i = 0; i < targetHierarchy.length; i++ ) {
 			Parent parent = targetHierarchy[i];
-			if ( parent.getDependency().instance.equalTo( target ) ) {
+			if ( parent.getDependency().equalTo( instance ) && parent.getTarget().equalTo( target ) ) {
 				throw new DependencyCycleException( this, target );
 			}
 		}

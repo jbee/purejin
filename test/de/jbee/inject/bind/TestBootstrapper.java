@@ -2,10 +2,15 @@ package de.jbee.inject.bind;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
+import de.jbee.inject.Dependency;
+import de.jbee.inject.DependencyCycleException;
 import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Name;
+import de.jbee.inject.Resource;
 
 /**
  * The tests shows an example of cyclic depended {@link Bundle}s. It shows that a {@link Bundle}
@@ -16,26 +21,35 @@ import de.jbee.inject.DependencyResolver;
  */
 public class TestBootstrapper {
 
-	private static class CycleOneBundle
+	/**
+	 * One of two bundles in a minimal example of mutual dependent bundles. While this installs
+	 * {@link OtherMutualDependentBundle} that bundle itself installs this bundle. This should not
+	 * be a problem and both bundles are just installed once.
+	 */
+	private static class OneMutualDependentBundle
 			extends BootstrapperBundle {
 
 		@Override
 		protected void bootstrap() {
-			install( CycleTwoBundle.class );
+			install( OtherMutualDependentBundle.class );
 		}
 
 	}
 
-	private static class CycleTwoBundle
+	private static class OtherMutualDependentBundle
 			extends BootstrapperBundle {
 
 		@Override
 		protected void bootstrap() {
-			install( CycleOneBundle.class );
+			install( OneMutualDependentBundle.class );
 		}
 
 	}
 
+	/**
+	 * Because the same {@link Resource} is defined twice (the {@link Name#DEFAULT} {@link Integer}
+	 * instance) this module should cause an exception. All {@link Resource} have to be unique.
+	 */
 	private static class ClashingBindsModule
 			extends BinderModule {
 
@@ -47,18 +61,49 @@ public class TestBootstrapper {
 
 	}
 
+	static class Foo {
+
+		public Foo( Bar bar ) {
+		}
+	}
+
+	static class Bar {
+
+		public Bar( Foo foo ) {
+		}
+
+	}
+
+	private static class CyclicBindsModule
+			extends BinderModule {
+
+		@Override
+		protected void declare() {
+			bind( Foo.class ).toConstructorHaving( Bar.class );
+			bind( Bar.class ).toConstructorHaving( Foo.class );
+		}
+
+	}
+
 	/**
 	 * The assert itself doesn't play such huge role here. we just want to reach this code.
 	 */
 	@Test
-	public void thatBundlesAreNotBootstrappedMultipleTimesEvenIfTheyHaveCycles() {
-		DependencyResolver injector = Bootstrap.injector( CycleOneBundle.class );
+	public void thatBundlesAreNotBootstrappedMultipleTimesEvenWhenTheyAreMutual() {
+		DependencyResolver injector = Bootstrap.injector( OneMutualDependentBundle.class );
 		assertThat( injector, notNullValue() );
 	}
 
 	@Test ( expected = IllegalStateException.class )
-	public void thatChlashingBindsThrowAnException() {
+	public void thatNonUniqueResourcesThrowAnException() {
 		Bootstrap.injector( ClashingBindsModule.class );
+	}
+
+	@Test ( expected = DependencyCycleException.class )
+	public void thatDependencyCyclesAreDetected() {
+		DependencyResolver injector = Bootstrap.injector( CyclicBindsModule.class );
+		Foo foo = injector.resolve( Dependency.dependency( Foo.class ) );
+		fail( "foo should not be resolvable but was: " + foo );
 	}
 
 }

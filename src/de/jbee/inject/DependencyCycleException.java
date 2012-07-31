@@ -7,13 +7,13 @@ public class DependencyCycleException
 	private final Instance<?> cycleTarget;
 
 	public DependencyCycleException( Dependency<?> dependency, Instance<?> cycleTarget ) {
-		super();
+		super( cycleTarget + " into " + dependency );
 		this.dependency = dependency;
 		this.cycleTarget = cycleTarget;
 	}
 
 	@Override
 	public String toString() {
-		return cycleTarget + " into " + dependency;
+		return getMessage();
 	}
 }

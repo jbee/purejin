@@ -113,7 +113,15 @@ public abstract class ServiceModule
 	private static final class ServiceMethodProvider
 			implements ServiceProvider {
 
+		/**
+		 * A list of service methods for each service class.
+		 */
 		private final Map<Class<?>, Method[]> methodsCache = new IdentityHashMap<Class<?>, Method[]>();
+		/**
+		 * All already created service methods identified by a unique function signature.
+		 * 
+		 * OPEN why not put the {@link ServiceMethod} in cache ?
+		 */
 		private final Map<String, Method> methodCache = new HashMap<String, Method>();
 
 		private final DependencyResolver context;
@@ -138,7 +146,7 @@ public abstract class ServiceModule
 
 		@Override
 		public <P, R> ServiceMethod<P, R> provide( Type<P> parameterType, Type<R> returnType ) {
-			Method service = resolveServiceMethod( parameterType, returnType );
+			Method service = serviceMethod( parameterType, returnType );
 			return create( service, parameterType.getRawType(), returnType.getRawType(), context );
 		}
 
@@ -150,7 +158,7 @@ public abstract class ServiceModule
 		}
 
 		private <P, T> Method serviceMethod( Type<P> parameterType, Type<T> returnType ) {
-			String signatur = parameterType + "-" + returnType;
+			String signatur = parameterType + "->" + returnType; // haskell like function signature
 			Method method = methodCache.get( signatur );
 			if ( method != null ) {
 				return method;
@@ -178,7 +186,7 @@ public abstract class ServiceModule
 					}
 				}
 			}
-			//FIXME primitives types aren't covered...but ... they can be put as parameter for Type 
+			//FIXME primitives types aren't covered...but ... they can be used as parameter for Type 
 			return null;
 		}
 
