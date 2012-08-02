@@ -7,6 +7,8 @@ import static de.jbee.inject.Type.raw;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 
+import java.io.Serializable;
+
 import org.junit.Test;
 
 import de.jbee.inject.Dependency;
@@ -26,6 +28,7 @@ public class TestTargetedBinds {
 	static final Bar BAR_IN_FOO = new Bar();
 	static final Bar BAR_EVERYWHERE_ELSE = new Bar();
 	static final Bar BAR_IN_AWESOME_FOO = new Bar();
+	static final Bar BAR_IN_SERIALIZABLE = new Bar();
 
 	private static class TargetedBindsModule
 			extends BinderModule {
@@ -41,6 +44,8 @@ public class TestTargetedBinds {
 			Name awesome = named( "awesome" );
 			bind( awesome, Foo.class ).toConstructor();
 			injectingInto( awesome, Foo.class ).bind( Bar.class ).to( BAR_IN_AWESOME_FOO );
+			bind( Baz.class );
+			injectingInto( Serializable.class ).bind( Bar.class ).to( BAR_IN_SERIALIZABLE );
 		}
 	}
 
@@ -50,7 +55,6 @@ public class TestTargetedBinds {
 
 		@SuppressWarnings ( "unused" )
 		Foo( Bar bar ) {
-			super();
 			this.bar = bar;
 		}
 
@@ -60,6 +64,17 @@ public class TestTargetedBinds {
 
 		Bar() {
 			// make visible
+		}
+	}
+
+	private static class Baz
+			implements Serializable {
+
+		final Bar bar;
+
+		@SuppressWarnings ( "unused" )
+		Baz( Bar bar ) {
+			this.bar = bar;
 		}
 	}
 
@@ -91,5 +106,11 @@ public class TestTargetedBinds {
 		assertThat( foo.bar, sameInstance( BAR_EVERYWHERE_ELSE ) );
 		foo = injector.resolve( fooDependency.named( named( "Awesome" ) ) );
 		assertThat( foo.bar, sameInstance( BAR_IN_AWESOME_FOO ) );
+	}
+
+	@Test
+	public void thatBindWithInterfaceTargetIsUsedWhenInjectingIntoClassHavingThatInterface() {
+		Baz baz = injector.resolve( dependency( Baz.class ) );
+		assertThat( baz.bar, sameInstance( BAR_IN_SERIALIZABLE ) );
 	}
 }

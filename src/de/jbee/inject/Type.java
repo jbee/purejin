@@ -243,6 +243,10 @@ public final class Type<T>
 		return other.isLowerBound() && isAssignableTo( other.exact() );
 	}
 
+	public boolean isInterface() {
+		return rawType.isInterface();
+	}
+
 	/**
 	 * @return true if this type describes the lower bound of the required types.
 	 */

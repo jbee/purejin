@@ -49,10 +49,14 @@ public final class Target
 		if ( instance.isAny() ) {
 			return true;
 		}
-		Instance<?> target = dependency.target();
-		//FIXME interface type ? --> means is it implementing the type
-		return instance.getName().isApplicableFor( target.getName() )
-				&& instance.getType().equalTo( target.getType() );
+		final Instance<?> target = dependency.target();
+		if ( !instance.getName().isApplicableFor( target.getName() ) ) {
+			return false;
+		}
+		final Type<?> type = instance.getType();
+		return type.isInterface()
+			? target.getType().isAssignableTo( type )
+			: target.getType().equalTo( type );
 	}
 
 	public boolean isAccessibleFor( Dependency<?> dependency ) {
