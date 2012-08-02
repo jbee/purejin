@@ -1,6 +1,6 @@
 package de.jbee.inject;
 
-public class DependencyCycleException
+public final class DependencyCycleException
 		extends RuntimeException {
 
 	private final Dependency<?> dependency;

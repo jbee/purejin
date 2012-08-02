@@ -61,17 +61,39 @@ public class TestBootstrapper {
 
 	}
 
-	static class Foo {
+	@SuppressWarnings ( "unused" )
+	private static class Foo {
 
-		public Foo( Bar bar ) {
+		Foo( Bar bar ) {
+			// something
 		}
 	}
 
-	static class Bar {
+	@SuppressWarnings ( "unused" )
+	private static class Bar {
 
 		public Bar( Foo foo ) {
+			// something
 		}
+	}
 
+	private static class A {
+
+		A( B b ) {
+
+		}
+	}
+
+	private static class B {
+
+		B( C c ) {
+		}
+	}
+
+	private static class C {
+
+		C( A a ) {
+		}
 	}
 
 	private static class CyclicBindsModule
@@ -81,6 +103,18 @@ public class TestBootstrapper {
 		protected void declare() {
 			bind( Foo.class ).toConstructorHaving( Bar.class );
 			bind( Bar.class ).toConstructorHaving( Foo.class );
+		}
+
+	}
+
+	private static class CircleBindsModule
+			extends BinderModule {
+
+		@Override
+		protected void declare() {
+			bind( A.class ).toConstructorHaving( B.class );
+			bind( B.class ).toConstructorHaving( C.class );
+			bind( C.class ).toConstructorHaving( A.class );
 		}
 
 	}
@@ -104,6 +138,13 @@ public class TestBootstrapper {
 		DependencyResolver injector = Bootstrap.injector( CyclicBindsModule.class );
 		Foo foo = injector.resolve( Dependency.dependency( Foo.class ) );
 		fail( "foo should not be resolvable but was: " + foo );
+	}
+
+	@Test ( expected = DependencyCycleException.class )
+	public void thatDependencyCyclesInCirclesAreDetected() {
+		DependencyResolver injector = Bootstrap.injector( CircleBindsModule.class );
+		A a = injector.resolve( Dependency.dependency( A.class ) );
+		fail( "A should not be resolvable but was: " + a );
 	}
 
 }

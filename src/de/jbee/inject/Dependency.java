@@ -13,7 +13,7 @@ import java.util.Arrays;
 public final class Dependency<T>
 		implements Typed<T>, Named, Hint {
 
-	private static final Parent[] UNTARGETED = new Parent[0];
+	private static final Injection[] UNTARGETED = new Injection[0];
 
 	public static <T> Dependency<T> dependency( Class<T> type ) {
 		return dependency( raw( type ) );
@@ -23,24 +23,25 @@ public final class Dependency<T>
 		return dependency( type, UNTARGETED );
 	}
 
-	private static <T> Dependency<T> dependency( Type<T> type, Parent[] targetHierarchy ) {
-		return dependency( instance( Name.ANY, type ), targetHierarchy );
+	private static <T> Dependency<T> dependency( Type<T> type, Injection[] injectionHierarchy ) {
+		return dependency( instance( Name.ANY, type ), injectionHierarchy );
 	}
 
 	public static <T> Dependency<T> dependency( Instance<T> instance ) {
 		return dependency( instance, UNTARGETED );
 	}
 
-	private static <T> Dependency<T> dependency( Instance<T> instance, Parent[] targetHierarchy ) {
-		return new Dependency<T>( instance, targetHierarchy );
+	private static <T> Dependency<T> dependency( Instance<T> instance,
+			Injection[] injectionHierarchy ) {
+		return new Dependency<T>( instance, injectionHierarchy );
 	}
 
-	private final Parent[] targetHierarchy;
+	private final Injection[] injectionHierarchy;
 	private final Instance<T> instance;
 
-	private Dependency( Instance<T> instance, Parent[] targetHierarchy ) {
+	private Dependency( Instance<T> instance, Injection[] injectionHierarchy ) {
 		this.instance = instance;
-		this.targetHierarchy = targetHierarchy;
+		this.injectionHierarchy = injectionHierarchy;
 	}
 
 	public Instance<T> getInstance() {
@@ -59,24 +60,24 @@ public final class Dependency<T>
 
 	@Override
 	public String toString() {
-		return instance.toString() + " " + Arrays.toString( targetHierarchy );
+		return instance.toString() + " " + Arrays.toString( injectionHierarchy );
 	}
 
 	public Dependency<?> onTypeParameter() {
-		return dependency( getType().getParameters()[0], targetHierarchy );
+		return dependency( getType().getParameters()[0], injectionHierarchy );
 	}
 
 	public <E> Dependency<E> instanced( Instance<E> instance ) {
-		return dependency( instance, targetHierarchy );
+		return dependency( instance, injectionHierarchy );
 	}
 
 	@Override
 	public <E> Dependency<E> typed( Type<E> type ) {
-		return dependency( instance( getName(), type ), targetHierarchy );
+		return dependency( instance( getName(), type ), injectionHierarchy );
 	}
 
 	public <E> Dependency<E> anyTyped( Type<E> type ) {
-		return dependency( instance( Name.ANY, type ), targetHierarchy );
+		return dependency( instance( Name.ANY, type ), injectionHierarchy );
 	}
 
 	public <E> Dependency<E> anyTyped( Class<E> type ) {
@@ -88,7 +89,7 @@ public final class Dependency<T>
 	}
 
 	public Dependency<T> named( Name name ) {
-		return dependency( instance( name, getType() ), targetHierarchy );
+		return dependency( instance( name, getType() ), injectionHierarchy );
 	}
 
 	public Dependency<T> untargeted() {
@@ -96,7 +97,7 @@ public final class Dependency<T>
 	}
 
 	public boolean isUntargeted() {
-		return targetHierarchy.length == 0;
+		return injectionHierarchy.length == 0;
 	}
 
 	public Instance<?> target() {
@@ -106,7 +107,7 @@ public final class Dependency<T>
 	public Instance<?> target( int level ) {
 		return isUntargeted()
 			? Instance.ANY
-			: targetHierarchy[targetHierarchy.length - 1 - level].getTarget();
+			: injectionHierarchy[injectionHierarchy.length - 1 - level].getTarget();
 	}
 
 	/**
@@ -121,22 +122,22 @@ public final class Dependency<T>
 	}
 
 	public Dependency<T> injectingInto( Instance<?> target ) {
-		Parent parent = new Parent( this.instance, target );
-		if ( targetHierarchy.length == 0 ) {
-			return new Dependency<T>( instance, new Parent[] { parent } );
+		Injection injection = new Injection( instance, target );
+		if ( injectionHierarchy.length == 0 ) {
+			return new Dependency<T>( instance, new Injection[] { injection } );
 		}
-		ensureNoCycle( target );
-		Parent[] hierarchy = Arrays.copyOf( targetHierarchy, targetHierarchy.length + 1 );
-		hierarchy[targetHierarchy.length] = parent;
+		ensureNoCycle( injection );
+		Injection[] hierarchy = Arrays.copyOf( injectionHierarchy, injectionHierarchy.length + 1 );
+		hierarchy[injectionHierarchy.length] = injection;
 		return new Dependency<T>( instance, hierarchy );
 	}
 
-	private void ensureNoCycle( Instance<?> target )
+	private void ensureNoCycle( Injection injection )
 			throws DependencyCycleException {
-		for ( int i = 0; i < targetHierarchy.length; i++ ) {
-			Parent parent = targetHierarchy[i];
-			if ( parent.getDependency().equalTo( instance ) && parent.getTarget().equalTo( target ) ) {
-				throw new DependencyCycleException( this, target );
+		for ( int i = 0; i < injectionHierarchy.length; i++ ) {
+			Injection parent = injectionHierarchy[i];
+			if ( parent.equalTo( injection ) ) {
+				throw new DependencyCycleException( this, injection.getTarget() );
 			}
 		}
 	}

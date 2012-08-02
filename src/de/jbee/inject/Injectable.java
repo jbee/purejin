@@ -9,5 +9,5 @@ package de.jbee.inject;
  */
 public interface Injectable<T> {
 
-	T instanceFor( Injection<T> injection );
+	T instanceFor( Resolution<T> resolution );
 }

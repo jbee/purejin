@@ -28,8 +28,8 @@ public class Injectorizer {
 		}
 
 		@Override
-		public T instanceFor( Injection<T> injection ) {
-			return supplier.supply( injection.dependency(), context );
+		public T instanceFor( Resolution<T> resolution ) {
+			return supplier.supply( resolution.dependency(), context );
 		}
 	}
 
@@ -85,7 +85,7 @@ public class Injectorizer {
 		for ( int i = 0; i < length; i++ ) {
 			@SuppressWarnings ( "unchecked" )
 			Suppliable<T> b = (Suppliable<T>) suppliables[i + first];
-			res[i] = new InjectronImpl<T>( b.resource, b.source, new Injection<T>( b.resource,
+			res[i] = new InjectronImpl<T>( b.resource, b.source, new Resolution<T>( b.resource,
 					dependency( b.resource.getInstance() ), i + first, suppliables.length ),
 					b.repository, asInjectable( b.supplier, resolver ) );
 		}
@@ -97,16 +97,16 @@ public class Injectorizer {
 
 		final Resource<T> resource;
 		final Source source;
-		final Injection<T> injection;
+		final Resolution<T> injection;
 		final Repository repository;
 		final Injectable<T> injectable;
 
-		InjectronImpl( Resource<T> resource, Source source, Injection<T> injection,
+		InjectronImpl( Resource<T> resource, Source source, Resolution<T> resolution,
 				Repository repository, Injectable<T> injectable ) {
 			super();
 			this.resource = resource;
 			this.source = source;
-			this.injection = injection;
+			this.injection = resolution;
 			this.repository = repository;
 			this.injectable = injectable;
 		}

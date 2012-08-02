@@ -1,49 +1,26 @@
 package de.jbee.inject;
 
-public class Injection<T> {
+public final class Injection {
 
-	private final Resource<T> resource;
-	private final int serialNumber;
-	private final int cardinality;
-	private final Dependency<? super T> dependency;
+	private final Instance<?> dependency;
+	private final Instance<?> target;
 
-	public Injection( Resource<T> resource, Dependency<? super T> dependency, int serialNumber,
-			int cardinality ) {
+	Injection( Instance<?> dependency, Instance<?> target ) {
 		super();
-		this.resource = resource;
 		this.dependency = dependency;
-		this.serialNumber = serialNumber;
-		this.cardinality = cardinality;
+		this.target = target;
 	}
 
-	public Dependency<? super T> dependency() {
-		return dependency;
+	public Instance<?> getTarget() {
+		return target;
 	}
 
-	public Resource<T> resource() {
-		return resource;
-	}
-
-	/**
-	 * @return the number of the {@link Injectron} being injected.
-	 */
-	public final int serialNumber() {
-		return serialNumber;
-	}
-
-	/**
-	 * @return the total amount of {@link Injectron} in the same context (injector).
-	 */
-	public final int cardinality() {
-		return cardinality;
-	}
-
-	public Injection<T> on( Dependency<? super T> dependency ) {
-		return new Injection<T>( resource, dependency, serialNumber, cardinality );
+	public boolean equalTo( Injection other ) {
+		return dependency.equalTo( other.dependency ) && target.equalTo( other.target );
 	}
 
 	@Override
 	public String toString() {
-		return serialNumber + " " + dependency;
+		return "(" + dependency + "->" + target + ")";
 	}
 }
