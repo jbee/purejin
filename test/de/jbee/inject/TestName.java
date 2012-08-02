@@ -14,7 +14,7 @@ public class TestName {
 
 	@Test
 	public void wildcardShouldBeApplicableToAnyName() {
-		assertTrue( named( "foo" ).isApplicableFor( named( "*" ) ) );
+		assertTrue( named( "foo" ).isApplicableFor( Name.ANY ) );
 	}
 
 	@Test
@@ -35,6 +35,11 @@ public class TestName {
 	@Test
 	public void defaultShouldBeApplicableToAnyName() {
 		assertTrue( Name.DEFAULT.isApplicableFor( Name.ANY ) );
+	}
+
+	@Test
+	public void anyShouldBeApplicableToDefaultName() {
+		assertTrue( Name.ANY.isApplicableFor( Name.DEFAULT ) );
 	}
 
 	@Test

@@ -279,7 +279,7 @@ public class SuppliedBy {
 		@Override
 		public Provider<?> supply( Dependency<? super Provider<?>> dependency,
 				DependencyResolver context ) {
-			return newProvider( dependency.onTypeParameter(), context );
+			return newProvider( dependency.onTypeParameter().named( dependency.getName() ), context );
 		}
 
 		private <T> Provider<T> newProvider( Dependency<T> dependency, DependencyResolver context ) {

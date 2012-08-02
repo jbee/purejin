@@ -50,7 +50,8 @@ public final class Target
 			return true;
 		}
 		Instance<?> target = dependency.target();
-		return target.getName().isApplicableFor( instance.getName() ) //TODO could be other way around 
+		//FIXME interface type ? --> means is it implementing the type
+		return instance.getName().isApplicableFor( target.getName() )
 				&& instance.getType().equalTo( target.getType() );
 	}
 

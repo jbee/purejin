@@ -23,18 +23,18 @@ public final class Name
 	public static Name prefixed( String prefix ) {
 		return prefix == null || prefix.trim().isEmpty()
 			? ANY
-			: new Name( prefix + "*" );
+			: new Name( prefix.toLowerCase() + "*" );
 	}
 
 	public static Name named( String name ) {
 		return name == null || name.trim().isEmpty()
 			? DEFAULT
-			: new Name( name );
+			: new Name( name.toLowerCase() );
 	}
 
 	private Name( String value ) {
 		super();
-		this.value = value;
+		this.value = value.intern();
 	}
 
 	@Override
@@ -47,14 +47,8 @@ public final class Name
 		return value.hashCode();
 	}
 
-	public Name or( Name other ) {
-		return value.equals( other.value )
-			? this
-			: new Name( value + "|" + other.value );
-	}
-
 	public boolean equalTo( Name other ) {
-		return value.equalsIgnoreCase( other.value );
+		return value == other.value;
 	}
 
 	@Override
@@ -82,20 +76,12 @@ public final class Name
 		if ( thisIsAny || otherIsAny ) {
 			return !thisIsAny;
 		}
-		//TODO or multi-names
-		return value.startsWith( other.value ) && value.length() > other.value.length();
+		return value.length() > other.value.length() && value.startsWith( other.value );
 	}
 
 	public boolean isApplicableFor( Name other ) {
-		if ( other.value.indexOf( '|' ) > 0 ) {
-			for ( String name : other.value.split( "\\|" ) ) {
-				if ( isApplicableFor( named( name ) ) ) {
-					return true;
-				}
-			}
-		}
-		return isAny() || other.value.equalsIgnoreCase( value )
-				|| value.matches( other.value.replace( "*", ".*" ) );
+		return isAny() || other.isAny() || other.value == value
+				|| ( value.matches( other.value.replace( "*", ".*" ) ) );
 	}
 
 }

@@ -62,7 +62,7 @@ public class TestInstanceBinds {
 
 	@Test
 	public void thatProviderIsAvailableForAnyNamedBoundType() {
-		assertInjectsProviderFor( 42, raw( Integer.class ), named( "foo" ) );
+		assertInjectsProviderFor( 846, raw( Integer.class ), named( "foo" ) );
 	}
 
 	@Test
@@ -121,7 +121,7 @@ public class TestInstanceBinds {
 			Name name ) {
 		Type<Provider> type = raw( Provider.class ).parametized( dependencyType );
 		Provider<?> provider = injector.resolve( dependency( type ).named( name ) );
-		assertEquals( provider.provide(), expected );
+		assertEquals( expected, provider.provide() );
 	}
 
 	private <T> void assertInjects( T expected, Type<? extends T> dependencyType ) {
