@@ -1,6 +1,6 @@
 package de.jbee.inject;
 
-public class Resolution<T> {
+public final class Resolution<T> {
 
 	private final Resource<T> resource;
 	private final int serialNumber;

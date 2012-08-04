@@ -16,7 +16,8 @@ public final class Injection {
 	}
 
 	public boolean equalTo( Injection other ) {
-		return dependency.equalTo( other.dependency ) && target.equalTo( other.target );
+		return this == other || dependency.equalTo( other.dependency )
+				&& target.equalTo( other.target );
 	}
 
 	@Override

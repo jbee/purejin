@@ -167,6 +167,9 @@ public final class Type<T>
 	}
 
 	public boolean equalTo( Type<?> other ) {
+		if ( this == other ) {
+			return true;
+		}
 		if ( rawType != other.rawType ) {
 			return false;
 		}

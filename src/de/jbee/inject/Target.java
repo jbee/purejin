@@ -102,6 +102,7 @@ public final class Target
 	}
 
 	public boolean equalTo( Target other ) {
-		return packages.equalTo( other.packages ) && instance.equalTo( other.instance );
+		return this == other || packages.equalTo( other.packages )
+				&& instance.equalTo( other.instance );
 	}
 }

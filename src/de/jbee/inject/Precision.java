@@ -2,7 +2,7 @@ package de.jbee.inject;
 
 import java.util.Comparator;
 
-public class Precision {
+public final class Precision {
 
 	public static <T extends PreciserThan<? super T>> Comparator<T> comparator() {
 		return new PreciserThanComparator<T>();

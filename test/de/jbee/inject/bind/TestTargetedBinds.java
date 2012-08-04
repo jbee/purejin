@@ -113,4 +113,6 @@ public class TestTargetedBinds {
 		Baz baz = injector.resolve( dependency( Baz.class ) );
 		assertThat( baz.bar, sameInstance( BAR_IN_SERIALIZABLE ) );
 	}
+
+	//TODO make sure that when a more precise match is available this is used and not the interface one
 }
