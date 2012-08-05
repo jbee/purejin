@@ -115,7 +115,6 @@ public class Binder
 	}
 
 	public <T> TypedBinder<T> bind( Name name, Class<T> type ) {
-		// also do a implicit bind to constructor ?!
 		return bind( name, Type.raw( type ) );
 	}
 
@@ -128,8 +127,19 @@ public class Binder
 	}
 
 	public <T> TypedBinder<T> bind( Class<T> type ) {
-		implicitBindToConstructor( defaultInstanceOf( raw( type ) ) );
 		return bind( Type.raw( type ) );
+	}
+
+	public void construct( Class<?> type ) {
+		construct( ( defaultInstanceOf( raw( type ) ) ) );
+	}
+
+	public void construct( Name name, Class<?> type ) {
+		construct( instance( name, raw( type ) ) );
+	}
+
+	public void construct( Instance<?> instance ) {
+		bind( instance ).toConstructor();
 	}
 
 	public <E> TypedElementBinder<E> bind( Class<E[]> type ) {
@@ -457,6 +467,8 @@ public class Binder
 		}
 
 		public <I extends T> void to( Class<I> impl ) {
+			//FIXME if impl type is also final this is an explicit constructor bind
+			//FIXME if impl is an interface and the same type as the resource (and default instance) this is an error because it cannot lead somewhere 
 			if ( resource.getType().getRawType() != impl || !resource.getName().isDefault() ) {
 				to( SuppliedBy.type( Type.raw( impl ) ) );
 			}

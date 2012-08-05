@@ -40,7 +40,7 @@ public class TestLoggerBinds {
 
 		@Override
 		protected void declare() {
-			bind( Foo.class );
+			construct( Foo.class );
 		}
 
 	}

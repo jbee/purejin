@@ -55,7 +55,7 @@ public class TestRobotLegsProblemBinds {
 
 		@Override
 		protected void declare() {
-			per( TARGET_INSTANCE ).bind( Foot.class );
+			per( TARGET_INSTANCE ).construct( Foot.class );
 			bind( left, Leg.class ).toConstructor();
 			bind( right, Leg.class ).toConstructor();
 		}

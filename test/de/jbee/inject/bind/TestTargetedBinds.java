@@ -35,16 +35,16 @@ public class TestTargetedBinds {
 
 		@Override
 		protected void declare() {
-			bind( Foo.class ).to( Foo.class );
+			construct( Foo.class );
 			injectingInto( Foo.class ).bind( Bar.class ).to( BAR_IN_FOO );
 			bind( Bar.class ).to( BAR_EVERYWHERE_ELSE );
 			Name special = named( "special" );
-			bind( special, Foo.class ).toConstructor(); // if we would use a type bind like to(Foo.class) it wouldn't work since we use a Foo that is not created as special Foo so it got the other Bar 
+			construct( special, Foo.class ); // if we would use a type bind like to(Foo.class) it wouldn't work since we use a Foo that is not created as special Foo so it got the other Bar 
 			injectingInto( special, Foo.class ).bind( Bar.class ).to( BAR_EVERYWHERE_ELSE );
 			Name awesome = named( "awesome" );
-			bind( awesome, Foo.class ).toConstructor();
+			construct( awesome, Foo.class );
 			injectingInto( awesome, Foo.class ).bind( Bar.class ).to( BAR_IN_AWESOME_FOO );
-			bind( Baz.class );
+			construct( Baz.class );
 			injectingInto( Serializable.class ).bind( Bar.class ).to( BAR_IN_SERIALIZABLE );
 		}
 	}

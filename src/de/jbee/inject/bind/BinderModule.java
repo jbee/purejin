@@ -100,6 +100,18 @@ public abstract class BinderModule
 		return binder.bind( type );
 	}
 
+	public void construct( Class<?> type ) {
+		binder.construct( type );
+	}
+
+	public void construct( Name name, Class<?> type ) {
+		binder.construct( name, type );
+	}
+
+	public void construct( Instance<?> instance ) {
+		binder.construct( instance );
+	}
+
 	public <T> TypedBinder<T> starbind( Class<T> type ) {
 		return binder.starbind( type );
 	}

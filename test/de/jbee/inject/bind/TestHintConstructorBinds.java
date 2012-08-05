@@ -51,11 +51,11 @@ public class TestHintConstructorBinds {
 
 		@Override
 		protected void declare() {
+			Instance<String> y = instance( named( "y" ), raw( String.class ) );
 			bind( named( "x" ), String.class ).to( "x" );
-			bind( named( "y" ), String.class ).to( "y" );
+			bind( y ).to( "y" );
 			bind( Integer.class ).to( 42 );
 			bind( Foo.class ).toConstructorHaving( String.class );
-			Instance<String> y = instance( named( "y" ), raw( String.class ) );
 			bind( Bar.class ).toConstructorHaving( raw( Integer.class ), y );
 			bind( Baz.class ).toConstructorHaving( y, y );
 		}
