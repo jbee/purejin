@@ -10,16 +10,28 @@ public final class Argument<T>
 		implements Parameter<T> {
 
 	public static <T> Argument<T> argumentFor( Parameter<T> parameter ) {
+		if ( parameter instanceof Argument<?> ) {
+			return (Argument<T>) parameter;
+		}
 		if ( parameter instanceof Instance<?> ) {
 			return new Argument<T>( (Instance<T>) parameter );
-		} else if ( parameter instanceof Type<?> ) {
-			return new Argument<T>( Instance.anyOf( (Type<T>) parameter ) );
-		} else if ( parameter instanceof Dependency<?> ) {
-			return new Argument<T>( (Dependency<T>) parameter );
-		} else {
-			//TODO add asType and constant parameters
-			throw new IllegalArgumentException( "Unknown parameter type:" + parameter );
 		}
+		if ( parameter instanceof Type<?> ) {
+			return new Argument<T>( Instance.anyOf( (Type<T>) parameter ) );
+		}
+		if ( parameter instanceof Dependency<?> ) {
+			return new Argument<T>( (Dependency<T>) parameter );
+		}
+		throw new IllegalArgumentException( "Unknown parameter type:" + parameter );
+	}
+
+	public static <T> Parameter<T> constant( Type<T> type, T constant ) {
+		return new Argument<T>( constant, type, null, null );
+	}
+
+	public static <S, T extends S> Parameter<S> asType( Type<S> supertype, Parameter<T> parameter ) {
+		Argument<T> arg = argumentFor( parameter );
+		return new Argument<S>( arg.constant, supertype, arg.instance, arg.dependency );
 	}
 
 	private final T constant;
