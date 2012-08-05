@@ -3,21 +3,29 @@ package de.jbee.inject.util;
 import de.jbee.inject.Dependency;
 import de.jbee.inject.DependencyResolver;
 import de.jbee.inject.Instance;
+import de.jbee.inject.Parameter;
+import de.jbee.inject.Type;
 
 public abstract class Argument<T> {
 
 	public abstract T resolve( Dependency<?> parent, DependencyResolver context );
 
-	public static <T> Argument<T> arg( Instance<T> instance ) {
-		return new InstanceArgument<T>( instance );
+	public static <T> Argument<T> argumentFor( Parameter<T> parameter ) {
+		if ( parameter instanceof Instance<?> ) {
+			return new InstanceArgument<T>( (Instance<T>) parameter );
+		} else if ( parameter instanceof Type<?> ) {
+			return new InstanceArgument<T>( Instance.anyOf( (Type<T>) parameter ) );
+		} else if ( parameter instanceof Dependency<?> ) {
+			return new DependencyArgument<T>( (Dependency<T>) parameter );
+		} else {
+			//TODO add asType and constant parameters
+			throw new IllegalArgumentException( "Unknown parameter type:" + parameter );
+		}
 	}
 
-	public static <T> Argument<T> arg( T constant ) {
-		return new ConstantArgument<T>( constant );
-	}
+	public static <T> Parameter<T> parameter( T constant, Type<T> type ) {
 
-	public static <T> Argument<T> arg( Dependency<? extends T> dependency ) {
-		return new DependencyArgument<T>( dependency );
+		return null;
 	}
 
 	private Argument() {
@@ -47,6 +55,7 @@ public abstract class Argument<T> {
 
 		private final T constant;
 
+		@SuppressWarnings ( "synthetic-access" )
 		ConstantArgument( T constant ) {
 			super();
 			this.constant = constant;
@@ -64,6 +73,7 @@ public abstract class Argument<T> {
 
 		private final Dependency<? extends T> dependency;
 
+		@SuppressWarnings ( "synthetic-access" )
 		DependencyArgument( Dependency<? extends T> dependency ) {
 			super();
 			this.dependency = dependency;

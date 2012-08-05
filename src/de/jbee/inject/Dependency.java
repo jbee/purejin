@@ -11,7 +11,7 @@ import java.util.Arrays;
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
 public final class Dependency<T>
-		implements Typed<T>, Named, Parameter {
+		implements Typed<T>, Named, Parameter<T> {
 
 	private static final Injection[] UNTARGETED = new Injection[0];
 

@@ -1,5 +1,7 @@
 package de.jbee.inject.util;
 
+import static de.jbee.inject.util.Argument.argumentFor;
+
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -63,37 +65,29 @@ public final class SuppliedBy {
 		return costructor( constructor, new Parameter[0] );
 	}
 
-	public static <T> Supplier<T> costructor( Constructor<T> constructor, Parameter... parameters ) {
+	public static <T> Supplier<T> costructor( Constructor<T> constructor,
+			Parameter<?>... parameters ) {
 		Type<?>[] types = Type.parameterTypes( constructor );
 		Argument<?>[] arguments = new Argument<?>[types.length];
-		for ( Parameter param : parameters ) {
+		for ( Parameter<?> parameter : parameters ) {
 			int i = 0;
 			boolean found = false;
 			while ( i < types.length && !found ) {
 				if ( arguments[i] == null ) {
-					found = param.isAssignableTo( types[i] );
+					found = parameter.isAssignableTo( types[i] );
 					if ( found ) {
-						if ( param instanceof Instance<?> ) {
-							arguments[i] = Argument.arg( (Instance<?>) param );
-						} else if ( param instanceof Type<?> ) {
-							arguments[i] = Argument.arg( Instance.anyOf( (Type<?>) param ) );
-						} else if ( param instanceof Dependency<?> ) {
-							arguments[i] = Argument.arg( (Dependency<?>) param );
-						} else {
-							//TODO add asType and constant parameters
-							throw new IllegalArgumentException( "Unknown parameter type:" + param );
-						}
+						arguments[i] = argumentFor( parameter );
 					}
 				}
 				i++;
 			}
 			if ( !found ) {
-				throw new IllegalArgumentException( "Couldn't understand parameter: " + param );
+				throw new IllegalArgumentException( "Couldn't understand parameter: " + parameter );
 			}
 		}
 		for ( int i = 0; i < arguments.length; i++ ) {
 			if ( arguments[i] == null ) {
-				arguments[i] = Argument.arg( Instance.anyOf( types[i] ) );
+				arguments[i] = argumentFor( types[i] );
 			}
 		}
 		return new ConstructorSupplier<T>( constructor, arguments );

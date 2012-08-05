@@ -26,7 +26,7 @@ import java.lang.reflect.Constructor;
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
-public interface Parameter {
+public interface Parameter<T> {
 
 	boolean isAssignableTo( Type<?> type );
 }
