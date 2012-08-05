@@ -14,6 +14,7 @@ import de.jbee.inject.InjectionStrategy;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Name;
 import de.jbee.inject.Packages;
+import de.jbee.inject.Parameter;
 import de.jbee.inject.Resource;
 import de.jbee.inject.Scope;
 import de.jbee.inject.Source;
@@ -216,6 +217,7 @@ public class Binder
 		}
 		Constructor<I> constructor = strategy().constructorFor( impl );
 		if ( constructor != null ) {
+			//OPEN maybe using ANY is to much - could define something outside the expected availability.
 			implicit().with( Target.ANY ).bind( instance ).to( constructor );
 		}
 	}
@@ -223,7 +225,8 @@ public class Binder
 	protected final boolean notConstructable( Class<?> type ) {
 		return type.isInterface() || type.isEnum() || type.isPrimitive() || type.isArray()
 				|| Modifier.isAbstract( type.getModifiers() ) || type == String.class
-				|| Number.class.isAssignableFrom( type );
+				|| Number.class.isAssignableFrom( type ) || type == Boolean.class
+				|| type == Void.class || type == void.class;
 	}
 
 	protected final Binder implicit() {
@@ -424,18 +427,19 @@ public class Binder
 			to( SuppliedBy.costructor( constructor ) );
 		}
 
-		public void to( Constructor<? extends T> constructor, Object... hints ) {
-			to( SuppliedBy.costructor( constructor, hints ) );
+		public void to( Constructor<? extends T> constructor, Parameter... parameters ) {
+			to( SuppliedBy.costructor( constructor, parameters ) );
 		}
 
-		public void toClassHaving( Class<? extends T> type, Object... hints ) {
-			//OPEN the constructor given through the strategy might not match the hints but another one could possibly. If we don't search for a matching constructor (I guess its better to keep magic low here too) than a Class is a useless hint and can be removed. 
-			//FIXME the type might be a nonConstructable type
-			to( SuppliedBy.costructor( binder.strategy().constructorFor( type ), hints ) );
+		public void toClassHaving( Class<? extends T> type, Parameter... parameters ) {
+			if ( binder.notConstructable( type ) ) {
+				throw new IllegalArgumentException( "Not a constructable type: " + type );
+			}
+			to( SuppliedBy.costructor( binder.strategy().constructorFor( type ), parameters ) );
 		}
 
-		public void toConstructorHaving( Object... hints ) {
-			toClassHaving( resource.getType().getRawType(), hints );
+		public void toConstructorHaving( Parameter... parameters ) {
+			toClassHaving( resource.getType().getRawType(), parameters );
 		}
 
 		public void to( T constant ) {
@@ -467,6 +471,7 @@ public class Binder
 		}
 
 		public <I extends T> void to( Class<I> impl ) {
+			//TODO move all this to the to(Instance) method -to have just one place
 			//FIXME if impl type is also final this is an explicit constructor bind
 			//FIXME if impl is an interface and the same type as the resource (and default instance) this is an error because it cannot lead somewhere 
 			if ( resource.getType().getRawType() != impl || !resource.getName().isDefault() ) {

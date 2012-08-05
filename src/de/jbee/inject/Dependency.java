@@ -11,7 +11,7 @@ import java.util.Arrays;
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
 public final class Dependency<T>
-		implements Typed<T>, Named, Hint {
+		implements Typed<T>, Named, Parameter {
 
 	private static final Injection[] UNTARGETED = new Injection[0];
 
@@ -140,5 +140,10 @@ public final class Dependency<T>
 				throw new DependencyCycleException( this, injection.getTarget() );
 			}
 		}
+	}
+
+	@Override
+	public boolean isAssignableTo( Type<?> type ) {
+		return getType().isAssignableTo( type );
 	}
 }

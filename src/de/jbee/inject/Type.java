@@ -14,7 +14,7 @@ import java.util.List;
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
 public final class Type<T>
-		implements PreciserThan<Type<?>>, Hint {
+		implements PreciserThan<Type<?>>, Parameter {
 
 	public static final Type<? extends Object> WILDCARD = raw( Object.class ).asLowerBound();
 
@@ -212,6 +212,7 @@ public final class Type<T>
 		return params;
 	}
 
+	@Override
 	public boolean isAssignableTo( Type<?> other ) {
 		if ( !other.rawType.isAssignableFrom( rawType ) ) {
 			return false;

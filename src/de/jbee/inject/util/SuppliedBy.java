@@ -11,18 +11,17 @@ import java.util.logging.Logger;
 
 import de.jbee.inject.Dependency;
 import de.jbee.inject.DependencyResolver;
-import de.jbee.inject.Hint;
 import de.jbee.inject.Instance;
+import de.jbee.inject.Parameter;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.Type;
-import de.jbee.inject.Typed;
 
-public class SuppliedBy {
+public final class SuppliedBy {
 
 	public static final Supplier<Provider<?>> PROVIDER_BRIDGE = new ProviderSupplier();
 	public static final Supplier<List<?>> LIST_BRIDGE = new ArrayToListBridgeSupplier();
 	public static final Supplier<Set<?>> SET_BRIDGE = new ArrayToSetBridgeSupplier();
-	public static final Factory<Logger> LOGGER = new LoggerSupplier();
+	public static final Factory<Logger> LOGGER = new LoggerFactory();
 
 	public static <T> Supplier<T> provider( Provider<T> provider ) {
 		return new ProviderAsSupplier<T>( provider );
@@ -61,45 +60,51 @@ public class SuppliedBy {
 		if ( params.length == 0 ) {
 			return new NoArgsConstructorSupplier<T>( constructor );
 		}
-		return new ConstructorSupplier<T>( constructor, new Object[params.length] );
+		return costructor( constructor, new Parameter[0] );
 	}
 
-	public static <T> Supplier<T> costructor( Constructor<T> constructor, Object... hints ) {
-		if ( hints.length == 0 ) {
-			return costructor( constructor );
-		}
+	public static <T> Supplier<T> costructor( Constructor<T> constructor, Parameter... parameters ) {
 		Type<?>[] types = Type.parameterTypes( constructor );
-		Object[] matchingHints = new Object[constructor.getParameterTypes().length];
-		for ( Object hint : hints ) {
+		Argument<?>[] arguments = new Argument<?>[types.length];
+		for ( Parameter param : parameters ) {
 			int i = 0;
 			boolean found = false;
 			while ( i < types.length && !found ) {
-				if ( matchingHints[i] == null ) {
-					final Type<?> paramType = types[i];
-					if ( hint instanceof Class<?> ) {
-						found = Type.raw( (Class<?>) hint ).isAssignableTo( paramType );
-					} else if ( hint instanceof Type<?> ) {
-						found = ( (Type<?>) hint ).isAssignableTo( paramType );
-					} else if ( hint instanceof Typed<?> ) {
-						found = ( (Typed<?>) hint ).getType().isAssignableTo( paramType );
-					} else {
-						found = Type.raw( hint.getClass() ).isAssignableTo( paramType );
-					}
+				if ( arguments[i] == null ) {
+					found = param.isAssignableTo( types[i] );
 					if ( found ) {
-						matchingHints[i] = hint;
+						if ( param instanceof Instance<?> ) {
+							arguments[i] = Argument.arg( (Instance<?>) param );
+						} else if ( param instanceof Type<?> ) {
+							arguments[i] = Argument.arg( Instance.anyOf( (Type<?>) param ) );
+						} else if ( param instanceof Dependency<?> ) {
+							arguments[i] = Argument.arg( (Dependency<?>) param );
+						} else {
+							//TODO add asType and constant parameters
+							throw new IllegalArgumentException( "Unknown parameter type:" + param );
+						}
 					}
 				}
 				i++;
 			}
 			if ( !found ) {
-				throw new IllegalArgumentException( "Couldn't understand hint: " + hint );
+				throw new IllegalArgumentException( "Couldn't understand parameter: " + param );
 			}
 		}
-		return new ConstructorSupplier<T>( constructor, matchingHints );
+		for ( int i = 0; i < arguments.length; i++ ) {
+			if ( arguments[i] == null ) {
+				arguments[i] = Argument.arg( Instance.anyOf( types[i] ) );
+			}
+		}
+		return new ConstructorSupplier<T>( constructor, arguments );
 	}
 
 	public static <T> Supplier<T> factory( Factory<T> factory ) {
 		return new FactorySupplier<T>( factory );
+	}
+
+	private SuppliedBy() {
+		throw new UnsupportedOperationException( "util" );
 	}
 
 	private static abstract class ArrayBridgeSupplier<T>
@@ -350,6 +355,7 @@ public class SuppliedBy {
 			super();
 			TypeReflector.makeAccessible( noArgsConstructor );
 			this.noArgsConstructor = noArgsConstructor;
+			// TODO when all hints are already actual arguments (objects) we can directly invoke the constructor with the argument array --> change this class to deal with no-args as a special case of already "resolved" args 
 		}
 
 		@Override
@@ -363,47 +369,30 @@ public class SuppliedBy {
 			implements Supplier<T> {
 
 		private final Constructor<T> constructor;
-		private final Type<?>[] types;
-		private final Object[] hints;
+		private final Argument<?>[] arguments;
 
-		ConstructorSupplier( Constructor<T> constructor, Object[] hints ) {
+		ConstructorSupplier( Constructor<T> constructor, Argument<?>[] arguments ) {
 			super();
 			TypeReflector.makeAccessible( constructor );
 			this.constructor = constructor;
-			this.hints = hints;
-			this.types = Type.parameterTypes( constructor );
-			// TODO when all hints are already actual arguments we can directly invoke the constructor with the hints --> maybe we use the no-args constructor for that and make it a fixed args constructor 
+			this.arguments = arguments;
 		}
 
 		@Override
 		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
-			Object[] args = hints.clone();
-			for ( int i = 0; i < types.length; i++ ) {
-				final Object hint = hints[i];
-				final Type<?> type = types[i];
-				if ( hint == null ) {
-					args[i] = context.resolve( dependency.anyTyped( type ) );
-				} else if ( hint instanceof Class<?> ) {
-					args[i] = context.resolve( dependency.anyTyped( (Class<?>) hint ) );
-				} else if ( hint instanceof Hint ) {
-					if ( hint instanceof Instance<?> ) {
-						args[i] = context.resolve( dependency.instanced( (Instance<?>) hint ) );
-					} else if ( hint instanceof Type<?> ) {
-						args[i] = context.resolve( dependency.anyTyped( (Type<?>) hint ) );
-					} else if ( hint instanceof Dependency<?> ) {
-						args[i] = context.resolve( (Dependency<?>) hint );
-					}
-				}
+			Object[] args = new Object[arguments.length];
+			for ( int i = 0; i < arguments.length; i++ ) {
+				args[i] = arguments[i].resolve( dependency, context );
 			}
 			return TypeReflector.construct( constructor, args );
 		}
 
 	}
 
-	private static class LoggerSupplier
+	private static class LoggerFactory
 			implements Factory<Logger> {
 
-		LoggerSupplier() {
+		LoggerFactory() {
 			// make visible
 		}
 

@@ -1,5 +1,6 @@
 package de.jbee.inject.bind;
 
+import static de.jbee.inject.Type.raw;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -101,8 +102,8 @@ public class TestBootstrapper {
 
 		@Override
 		protected void declare() {
-			bind( Foo.class ).toConstructorHaving( Bar.class );
-			bind( Bar.class ).toConstructorHaving( Foo.class );
+			bind( Foo.class ).toConstructorHaving( raw( Bar.class ) );
+			bind( Bar.class ).toConstructorHaving( raw( Foo.class ) );
 		}
 
 	}
@@ -112,9 +113,9 @@ public class TestBootstrapper {
 
 		@Override
 		protected void declare() {
-			bind( A.class ).toConstructorHaving( B.class );
-			bind( B.class ).toConstructorHaving( C.class );
-			bind( C.class ).toConstructorHaving( A.class );
+			bind( A.class ).toConstructorHaving( raw( B.class ) );
+			bind( B.class ).toConstructorHaving( raw( C.class ) );
+			bind( C.class ).toConstructorHaving( raw( A.class ) );
 		}
 
 	}
