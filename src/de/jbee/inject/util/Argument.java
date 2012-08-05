@@ -6,83 +6,57 @@ import de.jbee.inject.Instance;
 import de.jbee.inject.Parameter;
 import de.jbee.inject.Type;
 
-public abstract class Argument<T> {
-
-	public abstract T resolve( Dependency<?> parent, DependencyResolver context );
+public final class Argument<T>
+		implements Parameter<T> {
 
 	public static <T> Argument<T> argumentFor( Parameter<T> parameter ) {
 		if ( parameter instanceof Instance<?> ) {
-			return new InstanceArgument<T>( (Instance<T>) parameter );
+			return new Argument<T>( (Instance<T>) parameter );
 		} else if ( parameter instanceof Type<?> ) {
-			return new InstanceArgument<T>( Instance.anyOf( (Type<T>) parameter ) );
+			return new Argument<T>( Instance.anyOf( (Type<T>) parameter ) );
 		} else if ( parameter instanceof Dependency<?> ) {
-			return new DependencyArgument<T>( (Dependency<T>) parameter );
+			return new Argument<T>( (Dependency<T>) parameter );
 		} else {
 			//TODO add asType and constant parameters
 			throw new IllegalArgumentException( "Unknown parameter type:" + parameter );
 		}
 	}
 
-	public static <T> Parameter<T> parameter( T constant, Type<T> type ) {
+	private final T constant;
+	private final Type<? super T> asType;
+	private final Instance<? extends T> instance;
+	private final Dependency<? extends T> dependency;
 
-		return null;
+	private Argument( Instance<T> instance ) {
+		this( null, instance.getType(), instance, null );
 	}
 
-	private Argument() {
-		// not allow further extending outside of this class
+	private Argument( Dependency<T> dependency ) {
+		this( null, dependency.getType(), null, dependency );
 	}
 
-	private static final class InstanceArgument<T>
-			extends Argument<T> {
-
-		private final Instance<T> instance;
-
-		@SuppressWarnings ( "synthetic-access" )
-		InstanceArgument( Instance<T> instance ) {
-			super();
-			this.instance = instance;
-		}
-
-		@Override
-		public T resolve( Dependency<?> parent, DependencyResolver context ) {
-			return context.resolve( parent.instanced( instance ) );
-		}
-
+	private Argument( T constant, Type<? super T> asType, Instance<? extends T> instance,
+			Dependency<? extends T> dependency ) {
+		super();
+		this.constant = constant;
+		this.asType = asType;
+		this.instance = instance;
+		this.dependency = dependency;
 	}
 
-	private static final class ConstantArgument<T>
-			extends Argument<T> {
-
-		private final T constant;
-
-		@SuppressWarnings ( "synthetic-access" )
-		ConstantArgument( T constant ) {
-			super();
-			this.constant = constant;
-		}
-
-		@Override
-		public T resolve( Dependency<?> parent, DependencyResolver context ) {
+	public T resolve( Dependency<?> constructed, DependencyResolver context ) {
+		if ( constant != null ) {
 			return constant;
 		}
-
-	}
-
-	private static final class DependencyArgument<T>
-			extends Argument<T> {
-
-		private final Dependency<? extends T> dependency;
-
-		@SuppressWarnings ( "synthetic-access" )
-		DependencyArgument( Dependency<? extends T> dependency ) {
-			super();
-			this.dependency = dependency;
-		}
-
-		@Override
-		public T resolve( Dependency<?> parent, DependencyResolver context ) {
+		if ( dependency != null ) {
 			return context.resolve( dependency );
 		}
-
+		return context.resolve( constructed.instanced( instance ) );
 	}
+
+	@Override
+	public boolean isAssignableTo( Type<?> type ) {
+		return asType.isAssignableTo( type );
+	}
+
 }
