@@ -1,5 +1,6 @@
 package de.jbee.inject.util;
 
+import static de.jbee.inject.Type.raw;
 import de.jbee.inject.Dependency;
 import de.jbee.inject.DependencyResolver;
 import de.jbee.inject.Instance;
@@ -25,8 +26,16 @@ public final class Argument<T>
 		throw new IllegalArgumentException( "Unknown parameter type:" + parameter );
 	}
 
+	public static <T> Parameter<T> constant( Class<T> type, T constant ) {
+		return constant( raw( type ), constant );
+	}
+
 	public static <T> Parameter<T> constant( Type<T> type, T constant ) {
 		return new Argument<T>( constant, type, null, null );
+	}
+
+	public static <S, T extends S> Parameter<S> asType( Class<S> supertype, Parameter<T> parameter ) {
+		return asType( raw( supertype ), parameter );
 	}
 
 	public static <S, T extends S> Parameter<S> asType( Type<S> supertype, Parameter<T> parameter ) {
@@ -69,6 +78,18 @@ public final class Argument<T>
 	@Override
 	public boolean isAssignableTo( Type<?> type ) {
 		return asType.isAssignableTo( type );
+	}
+
+	@Override
+	public String toString() {
+		String as = " as " + asType.toString();
+		if ( constant != null ) {
+			return constant.toString() + as;
+		}
+		if ( dependency != null ) {
+			return dependency.toString() + as;
+		}
+		return instance.toString() + as;
 	}
 
 }

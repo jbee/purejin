@@ -102,8 +102,8 @@ public class TestBootstrapper {
 
 		@Override
 		protected void declare() {
-			bind( Foo.class ).toConstructorHaving( raw( Bar.class ) );
-			bind( Bar.class ).toConstructorHaving( raw( Foo.class ) );
+			bind( Foo.class ).toConstructor( raw( Bar.class ) );
+			bind( Bar.class ).toConstructor( raw( Foo.class ) );
 		}
 
 	}
@@ -113,9 +113,9 @@ public class TestBootstrapper {
 
 		@Override
 		protected void declare() {
-			bind( A.class ).toConstructorHaving( raw( B.class ) );
-			bind( B.class ).toConstructorHaving( raw( C.class ) );
-			bind( C.class ).toConstructorHaving( raw( A.class ) );
+			bind( A.class ).toConstructor( raw( B.class ) );
+			bind( B.class ).toConstructor( raw( C.class ) );
+			bind( C.class ).toConstructor( raw( A.class ) );
 		}
 
 	}

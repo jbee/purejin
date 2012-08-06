@@ -4,16 +4,21 @@ import static de.jbee.inject.Dependency.dependency;
 import static de.jbee.inject.Instance.instance;
 import static de.jbee.inject.Name.named;
 import static de.jbee.inject.Type.raw;
+import static de.jbee.inject.util.Argument.asType;
+import static de.jbee.inject.util.Argument.constant;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+
+import java.io.Serializable;
 
 import org.junit.Test;
 
 import de.jbee.inject.DependencyResolver;
 import de.jbee.inject.Instance;
 
-public class TestHintConstructorBinds {
+public class TestParameterConstructorBinds {
 
 	private static class Foo {
 
@@ -46,7 +51,19 @@ public class TestHintConstructorBinds {
 		}
 	}
 
-	private static class HintConstructorBindsModule
+	private static class Qux {
+
+		final Serializable value;
+		final CharSequence sequence;
+
+		@SuppressWarnings ( "unused" )
+		Qux( Serializable value, CharSequence sequence ) {
+			this.value = value;
+			this.sequence = sequence;
+		}
+	}
+
+	private static class ParameterConstructorBindsModule
 			extends BinderModule {
 
 		@Override
@@ -55,36 +72,38 @@ public class TestHintConstructorBinds {
 			bind( named( "x" ), String.class ).to( "x" );
 			bind( y ).to( "y" );
 			bind( Integer.class ).to( 42 );
-			bind( Foo.class ).toConstructorHaving( raw( String.class ) );
-			bind( Bar.class ).toConstructorHaving( raw( Integer.class ), y );
-			bind( Baz.class ).toConstructorHaving( y, y );
+			bind( Foo.class ).toConstructor( raw( String.class ) );
+			bind( Bar.class ).toConstructor( raw( Integer.class ), y );
+			bind( Baz.class ).toConstructor( y, y );
+			bind( Qux.class ).toConstructor( asType( CharSequence.class, y ),
+					constant( Number.class, 1980 ) );
 		}
 	}
 
-	private static class WrongHintConstructorBindsModule
+	private static class WrongParameterConstructorBindsModule
 			extends BinderModule {
 
 		@Override
 		protected void declare() {
-			bind( Bar.class ).toConstructorHaving( raw( Float.class ) );
+			bind( Bar.class ).toConstructor( raw( Float.class ) );
 		}
 
 	}
 
-	private final DependencyResolver injector = Bootstrap.injector( HintConstructorBindsModule.class );
+	private final DependencyResolver injector = Bootstrap.injector( ParameterConstructorBindsModule.class );
 
 	@Test
-	public void thatClassHintIsUnderstood() {
+	public void thatClassParameterIsUnderstood() {
 		assertThat( injector.resolve( dependency( Foo.class ) ), notNullValue() );
 	}
 
 	@Test
-	public void thatTypeHintIsUnderstood() {
+	public void thatTypeParameterIsUnderstood() {
 		assertThat( injector.resolve( dependency( Bar.class ) ), notNullValue() );
 	}
 
 	@Test
-	public void thatInstanceHintIsUnderstood() {
+	public void thatInstanceParameterIsUnderstood() {
 		Bar bar = injector.resolve( dependency( Bar.class ) );
 		assertThat( bar.foo, is( "y" ) );
 	}
@@ -97,7 +116,14 @@ public class TestHintConstructorBinds {
 	}
 
 	@Test ( expected = IllegalArgumentException.class )
-	public void thatHintNotUnderstoodThrowsException() {
-		Bootstrap.injector( WrongHintConstructorBindsModule.class );
+	public void thatParameterNotUnderstoodThrowsException() {
+		Bootstrap.injector( WrongParameterConstructorBindsModule.class );
+	}
+
+	@Test
+	public void thatAsTypeParameterIsUnderstood() {
+		Qux qux = injector.resolve( dependency( Qux.class ) );
+		assertEquals( 1980, qux.value );
+		assertEquals( "y", qux.sequence );
 	}
 }

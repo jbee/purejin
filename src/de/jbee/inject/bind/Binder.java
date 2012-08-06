@@ -431,15 +431,15 @@ public class Binder
 			to( SuppliedBy.costructor( constructor, parameters ) );
 		}
 
-		public void toClassHaving( Class<? extends T> type, Parameter<?>... parameters ) {
+		public void toClassConstructor( Class<? extends T> type, Parameter<?>... parameters ) {
 			if ( binder.notConstructable( type ) ) {
 				throw new IllegalArgumentException( "Not a constructable type: " + type );
 			}
 			to( SuppliedBy.costructor( binder.strategy().constructorFor( type ), parameters ) );
 		}
 
-		public void toConstructorHaving( Parameter<?>... parameters ) {
-			toClassHaving( resource.getType().getRawType(), parameters );
+		public void toConstructor( Parameter<?>... parameters ) {
+			toClassConstructor( resource.getType().getRawType(), parameters );
 		}
 
 		public void to( T constant ) {
