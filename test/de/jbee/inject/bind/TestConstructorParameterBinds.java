@@ -12,13 +12,29 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
 
 import org.junit.Test;
 
 import de.jbee.inject.DependencyResolver;
 import de.jbee.inject.Instance;
+import de.jbee.inject.Parameter;
+import de.jbee.inject.util.Argument;
 
-public class TestParameterConstructorBinds {
+/**
+ * The test illustrates how to use {@link Parameter}s to give hints which resources should be
+ * injected as constructor arguments.
+ * 
+ * Thereby it is important to notice that the list of {@linkplain Parameter}s does *not* describe
+ * which {@link Constructor} to use! Hence the sequence does *not* has to match the parameter
+ * sequence in the constructor definition. As long as types are not assignable a
+ * {@linkplain Parameter} is tried to used as the next constructor parameter. The first assignable
+ * is used.
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * 
+ */
+public class TestConstructorParameterBinds {
 
 	private static class Foo {
 
@@ -69,14 +85,15 @@ public class TestParameterConstructorBinds {
 		@Override
 		protected void declare() {
 			Instance<String> y = instance( named( "y" ), raw( String.class ) );
+			bind( String.class ).to( "should not be resolved" );
 			bind( named( "x" ), String.class ).to( "x" );
 			bind( y ).to( "y" );
 			bind( Integer.class ).to( 42 );
 			bind( Foo.class ).toConstructor( raw( String.class ) );
 			bind( Bar.class ).toConstructor( raw( Integer.class ), y );
 			bind( Baz.class ).toConstructor( y, y );
-			bind( CharSequence.class ).to( "should not be resolved" );
-			bind( Serializable.class ).to( Integer.class );
+			bind( CharSequence.class ).to( String.class ); // should not be used
+			bind( Serializable.class ).to( Integer.class ); // should not be used
 			bind( Qux.class ).toConstructor( asType( CharSequence.class, y ),
 					constant( Number.class, 1980 ) );
 		}
@@ -110,6 +127,28 @@ public class TestParameterConstructorBinds {
 		assertThat( bar.foo, is( "y" ) );
 	}
 
+	/**
+	 * We can see that {@link Argument#asType(Class, Parameter)} works because the instance y would
+	 * also been assignable to the 1st parameter of type {@link Serializable} (in {@link Qux}) but
+	 * since we typed it as a {@link CharSequence} it no longer is assignable to 1st argument and
+	 * will be used as 2nd argument where the as well {@link Serializable} {@link Number} constant
+	 * used as 2nd {@link Parameter} is used for as the 1st argument.
+	 */
+	@Test
+	public void thatParameterAsAnotherTypeIsUnderstood() {
+		Qux qux = injector.resolve( dependency( Qux.class ) );
+		assertEquals( "y", qux.sequence );
+	}
+
+	/**
+	 * @see #thatParameterAsAnotherTypeIsUnderstood()
+	 */
+	@Test
+	public void thatConstantParameterIsUnderstood() {
+		Qux qux = injector.resolve( dependency( Qux.class ) );
+		assertEquals( 1980, qux.value );
+	}
+
 	@Test
 	public void thatReoccuringTypesAreUnderstoodAsOccuringAfterAnother() {
 		Baz baz = injector.resolve( dependency( Baz.class ) );
@@ -122,10 +161,4 @@ public class TestParameterConstructorBinds {
 		Bootstrap.injector( WrongParameterConstructorBindsModule.class );
 	}
 
-	@Test
-	public void thatAsTypeAndConstantParameterIsUnderstood() {
-		Qux qux = injector.resolve( dependency( Qux.class ) );
-		assertEquals( 1980, qux.value );
-		assertEquals( "y", qux.sequence );
-	}
 }

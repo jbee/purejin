@@ -10,7 +10,8 @@ import org.junit.runners.Suite.SuiteClasses;
 		TestSupplierBinds.class, TestTypeBinds.class, TestBootstrapper.class,
 		TestPackageLocalisedBinds.class, TestEditionFeatureBinds.class,
 		TestConstantModularBinds.class, TestTargetedBinds.class, TestLoggerBinds.class,
-		TestRobotLegsProblemBinds.class, TestParameterConstructorBinds.class } )
+		TestRobotLegsProblemBinds.class, TestConstructorParameterBinds.class,
+		TestDependencyParameterBinds.class } )
 public class SuiteBind {
 	// all tests in the bind package
 }
