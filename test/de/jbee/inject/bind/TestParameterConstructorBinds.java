@@ -75,6 +75,8 @@ public class TestParameterConstructorBinds {
 			bind( Foo.class ).toConstructor( raw( String.class ) );
 			bind( Bar.class ).toConstructor( raw( Integer.class ), y );
 			bind( Baz.class ).toConstructor( y, y );
+			bind( CharSequence.class ).to( "should not be resolved" );
+			bind( Serializable.class ).to( Integer.class );
 			bind( Qux.class ).toConstructor( asType( CharSequence.class, y ),
 					constant( Number.class, 1980 ) );
 		}
@@ -121,7 +123,7 @@ public class TestParameterConstructorBinds {
 	}
 
 	@Test
-	public void thatAsTypeParameterIsUnderstood() {
+	public void thatAsTypeAndConstantParameterIsUnderstood() {
 		Qux qux = injector.resolve( dependency( Qux.class ) );
 		assertEquals( 1980, qux.value );
 		assertEquals( "y", qux.sequence );
