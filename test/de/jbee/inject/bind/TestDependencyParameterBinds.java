@@ -8,8 +8,23 @@ import java.util.logging.Logger;
 
 import org.junit.Test;
 
+import de.jbee.inject.Dependency;
 import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Instance;
+import de.jbee.inject.Parameter;
 
+/**
+ * This test demonstrates the most powerful {@link Parameter} hint: a {@link Dependency}.
+ * 
+ * It allows to also describe what {@link Instance} should be used dependent on its parent(s) it
+ * would be {@link Dependency#injectingInto(Class)}. Though this we can tell to inject the
+ * {@link Logger} that would be injected into the {@link BinderModule} class into our test object
+ * {@link LoggerInspector}.
+ * 
+ * @see TestConstructorParameterBinds
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ */
 public class TestDependencyParameterBinds {
 
 	private static class DependencyParameterBindsBundle

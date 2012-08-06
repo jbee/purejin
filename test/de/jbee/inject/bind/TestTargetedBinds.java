@@ -25,6 +25,10 @@ import de.jbee.inject.bind.BasicBinder.ScopedBasicBinder;
  */
 public class TestTargetedBinds {
 
+	/**
+	 * We use different {@link Bar} constants to check if the different {@link Foo}s got their
+	 * desired {@linkplain Bar}.
+	 */
 	static final Bar BAR_IN_FOO = new Bar();
 	static final Bar BAR_EVERYWHERE_ELSE = new Bar();
 	static final Bar BAR_IN_AWESOME_FOO = new Bar();

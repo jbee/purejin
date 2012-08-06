@@ -48,7 +48,7 @@ public class TestRobotLegsProblemBinds {
 	}
 
 	/**
-	 * Or generally there should be one {@link Foot} for each {@link Instance} one is injected to.
+	 * Or generally there should be one {@link Foot} for each {@link Instance} one is injected into.
 	 */
 	private static class RobotLegsProblemScopeBindsModule
 			extends BinderModule {
@@ -63,15 +63,15 @@ public class TestRobotLegsProblemBinds {
 
 	@Test
 	public void thatRobotHasDifferentLegsWhenUsingInjectingIntoClause() {
-		assertRobotHasDifferentLegs( Bootstrap.injector( RobotLegsProblemBindsModule.class ) );
+		assertRobotHasDifferentLegsWithDifferentFoots( Bootstrap.injector( RobotLegsProblemBindsModule.class ) );
 	}
 
 	@Test
 	public void thatRobotHasDifferentLegsWhenUsingTargetInstanceScopedFeets() {
-		assertRobotHasDifferentLegs( Bootstrap.injector( RobotLegsProblemScopeBindsModule.class ) );
+		assertRobotHasDifferentLegsWithDifferentFoots( Bootstrap.injector( RobotLegsProblemScopeBindsModule.class ) );
 	}
 
-	private void assertRobotHasDifferentLegs( DependencyResolver injector ) {
+	private void assertRobotHasDifferentLegsWithDifferentFoots( DependencyResolver injector ) {
 		Leg leftLeg = injector.resolve( dependency( Leg.class ).named( left ) );
 		Leg rightLeg = injector.resolve( dependency( Leg.class ).named( right ) );
 		assertThat( "same leg", leftLeg, not( sameInstance( rightLeg ) ) );

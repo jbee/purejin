@@ -14,6 +14,16 @@ import de.jbee.inject.service.ServiceMethod;
 import de.jbee.inject.service.ServiceModule;
 import de.jbee.inject.service.ServiceProvider;
 
+/**
+ * This test demonstrates that it is possible to have different higher level 'service' on top of
+ * {@link ServiceMethod}s.
+ * 
+ * While the {@link TestServiceBinds} shows how do build a generic service this test shows a simpler
+ * version {@link Command} of such generic service having a fix return type. Thereby it is very well
+ * possible to use different higher level services in the same time.
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ */
 public class TestCommandBinds {
 
 	private static interface Command<P> {

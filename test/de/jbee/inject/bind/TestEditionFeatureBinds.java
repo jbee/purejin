@@ -26,14 +26,14 @@ import de.jbee.inject.bind.Bootstrapper.ModularBootstrapper;
  */
 public class TestEditionFeatureBinds {
 
-	public static enum MyFeature
-			implements Feature<MyFeature> {
+	public static enum AnnotatedFeature
+			implements Feature<AnnotatedFeature> {
 		FOO,
 		BAR,
 		BAZ;
 
 		@Override
-		public MyFeature featureOf( Class<?> bundleOrModule ) {
+		public AnnotatedFeature featureOf( Class<?> bundleOrModule ) {
 			Featured featured = bundleOrModule.getAnnotation( Featured.class );
 			return featured == null
 				? null
@@ -45,7 +45,7 @@ public class TestEditionFeatureBinds {
 	@Retention ( RetentionPolicy.RUNTIME )
 	public static @interface Featured {
 
-		MyFeature value();
+		AnnotatedFeature value();
 	}
 
 	private static class RootBundle
@@ -60,7 +60,7 @@ public class TestEditionFeatureBinds {
 
 	}
 
-	@Featured ( MyFeature.FOO )
+	@Featured ( AnnotatedFeature.FOO )
 	private static class FeaturedBundle
 			extends BootstrapperBundle {
 
@@ -80,7 +80,7 @@ public class TestEditionFeatureBinds {
 
 	}
 
-	@Featured ( MyFeature.BAR )
+	@Featured ( AnnotatedFeature.BAR )
 	private static class FeaturedModule
 			extends BinderModule {
 
@@ -91,7 +91,7 @@ public class TestEditionFeatureBinds {
 
 	}
 
-	@Featured ( MyFeature.BAZ )
+	@Featured ( AnnotatedFeature.BAZ )
 	private static enum FeaturedModularBundle
 			implements ModularBundle<FeaturedModularBundle> {
 		QUX;
@@ -115,22 +115,22 @@ public class TestEditionFeatureBinds {
 
 	@Test
 	public void thatJustTheFeaturedBundleIsInstalled() {
-		assertEditionInstalls( Bootstrap.edition( MyFeature.FOO ), 42 );
+		assertEditionInstalls( Bootstrap.edition( AnnotatedFeature.FOO ), 42 );
 	}
 
 	@Test
 	public void thatJustTheFeaturedModuleIsInstalled() {
-		assertEditionInstalls( Bootstrap.edition( MyFeature.BAR ), 8 );
+		assertEditionInstalls( Bootstrap.edition( AnnotatedFeature.BAR ), 8 );
 	}
 
 	@Test
 	public void thatJustTheFeaturedModularBundleIsInstalled() {
-		assertEditionInstalls( Bootstrap.edition( MyFeature.BAZ ), 128 );
+		assertEditionInstalls( Bootstrap.edition( AnnotatedFeature.BAZ ), 128 );
 	}
 
 	@Test
 	public void thatTheFeaturedBundlesAndModulesAreInstalled() {
-		assertEditionInstalls( Bootstrap.edition( MyFeature.BAR, MyFeature.BAZ ), 8, 128 );
+		assertEditionInstalls( Bootstrap.edition( AnnotatedFeature.BAR, AnnotatedFeature.BAZ ), 8, 128 );
 	}
 
 	private void assertEditionInstalls( Edition edition, Integer... values ) {

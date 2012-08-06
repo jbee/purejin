@@ -10,12 +10,15 @@ import de.jbee.inject.DependencyResolver;
 
 /**
  * The test demonstrates how to use {@link Constants} and {@link Const} types to allow different
- * bootstrapping depended on a setting that can be determined before bootstrapping and is constant
- * from that moment on. In this example it is the machine the application is running on.
+ * bootstrapping depended on a setting that can be determined before the bootstrapping and that is
+ * constant from that moment on. In this example it is the machine the application is running on.
  * 
  * Again this technique should avoid if-statements in the {@link Bundle}s and {@link Module}s itself
  * to get manageable and predictable sets of configurations that can be composed easily using
  * arguments to the bootstrapping process itself.
+ * 
+ * In this example we use {@link Binder#multibind(Class)}s to show that just one of them has been
+ * bootstrapped depending on the value we defined in the {@link Constants} before bootstrapping.
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
@@ -37,6 +40,10 @@ public class TestConstantModularBinds {
 
 	}
 
+	/**
+	 * The {@link GenericMachineBundle} will be used when no {@link Machine} {@link Const} has been
+	 * defined in the {@link Constants} so that it is actually <code>null</code>.
+	 */
 	private static class MachineBundle
 			extends ModularBootstrapperBundle<Machine> {
 
