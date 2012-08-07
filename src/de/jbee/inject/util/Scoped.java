@@ -69,8 +69,8 @@ public class Scoped { //OPEN what about Scoping ?
 		}
 
 		@Override
-		public <T> T serve( Resolving<T> injection, Injectable<T> injectable ) {
-			return injectable.instanceFor( injection );
+		public <T> T serve( Resolving<T> resolving, Injectable<T> injectable ) {
+			return injectable.instanceFor( resolving );
 		}
 
 		@Override
@@ -93,14 +93,14 @@ public class Scoped { //OPEN what about Scoping ?
 		}
 
 		@Override
-		public <T> T serve( Resolving<T> injection, Injectable<T> injectable ) {
+		public <T> T serve( Resolving<T> resolving, Injectable<T> injectable ) {
 			Repository repository = threadRepository.get();
 			if ( repository == null ) {
 				// since each thread is just accessing its own repo there cannot be a repo set for the running thread after we checked for null
 				repository = repositoryScope.init();
 				threadRepository.set( repository );
 			}
-			return repository.serve( injection, injectable );
+			return repository.serve( resolving, injectable );
 		}
 
 		@Override
@@ -137,9 +137,9 @@ public class Scoped { //OPEN what about Scoping ?
 		}
 
 		@Override
-		public <T> T serve( Resolving<T> injection, Injectable<T> injectable ) {
+		public <T> T serve( Resolving<T> resolving, Injectable<T> injectable ) {
 			//FIXME at some point the dest repo is outdated - do we ask the src again in that case ? I'm note sure 
-			return dest.serve( injection, new SnapshotingInjectable<T>( injectable, src ) );
+			return dest.serve( resolving, new SnapshotingInjectable<T>( injectable, src ) );
 		}
 
 		private static final class SnapshotingInjectable<T>
@@ -238,8 +238,8 @@ public class Scoped { //OPEN what about Scoping ?
 
 		@Override
 		@SuppressWarnings ( "unchecked" )
-		public <T> T serve( Resolving<T> injection, Injectable<T> injectable ) {
-			final String key = injectionKey.deduceKey( injection );
+		public <T> T serve( Resolving<T> resolving, Injectable<T> injectable ) {
+			final String key = injectionKey.deduceKey( resolving );
 			T instance = (T) instances.get( key );
 			if ( instance != null ) {
 				return instance;
@@ -247,7 +247,7 @@ public class Scoped { //OPEN what about Scoping ?
 			synchronized ( instances ) {
 				instance = (T) instances.get( key );
 				if ( instance == null ) {
-					instance = injectable.instanceFor( injection );
+					instance = injectable.instanceFor( resolving );
 					instances.put( key, instance );
 				}
 			}
@@ -297,20 +297,20 @@ public class Scoped { //OPEN what about Scoping ?
 
 		@Override
 		@SuppressWarnings ( "unchecked" )
-		public <T> T serve( Resolving<T> injection, Injectable<T> injectable ) {
+		public <T> T serve( Resolving<T> resolving, Injectable<T> injectable ) {
 			if ( instances == null ) {
-				instances = new Object[injection.cardinality()];
+				instances = new Object[resolving.cardinality()];
 			}
-			T res = (T) instances[injection.serialNumber()];
+			T res = (T) instances[resolving.serialNumber()];
 			if ( res != null ) {
 				return res;
 			}
 			// just sync the (later) unexpected path that is executed once
 			synchronized ( instances ) {
-				res = (T) instances[injection.serialNumber()];
+				res = (T) instances[resolving.serialNumber()];
 				if ( res == null ) { // we need to ask again since the instance could have been initialized before we got entrance to the sync block
-					res = injectable.instanceFor( injection );
-					instances[injection.serialNumber()] = res;
+					res = injectable.instanceFor( resolving );
+					instances[resolving.serialNumber()] = res;
 				}
 			}
 			return res;
