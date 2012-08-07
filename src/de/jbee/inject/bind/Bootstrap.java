@@ -99,22 +99,22 @@ public final class Bootstrap {
 
 		@Override
 		public Suppliable<?>[] install( Class<? extends Bundle> root ) {
-			return bind( cleanedUp( declarationsFrom( root, edition ) ) );
+			return install( cleanedUp( bindingsFrom( root, edition ) ) );
 		}
 
-		private Suppliable<?>[] bind( BindDeclaration<?>[] declarations ) {
-			Map<Scope, Repository> repositories = buildRepositories( declarations );
-			Suppliable<?>[] bindings = new Suppliable<?>[declarations.length];
-			for ( int i = 0; i < declarations.length; i++ ) {
-				BindDeclaration<?> instruction = declarations[i];
-				bindings[i] = instruction.toBinding( repositories.get( instruction.scope() ) );
+		private Suppliable<?>[] install( Binding<?>[] bindings ) {
+			Map<Scope, Repository> repositories = buildRepositories( bindings );
+			Suppliable<?>[] suppliables = new Suppliable<?>[bindings.length];
+			for ( int i = 0; i < bindings.length; i++ ) {
+				Binding<?> binding = bindings[i];
+				suppliables[i] = binding.suppliableIn( repositories.get( binding.scope() ) );
 			}
-			return bindings;
+			return suppliables;
 		}
 
-		private Map<Scope, Repository> buildRepositories( BindDeclaration<?>[] declarations ) {
+		private Map<Scope, Repository> buildRepositories( Binding<?>[] bindings ) {
 			Map<Scope, Repository> repositories = new IdentityHashMap<Scope, Repository>();
-			for ( BindDeclaration<?> i : declarations ) {
+			for ( Binding<?> i : bindings ) {
 				Repository repository = repositories.get( i.scope() );
 				if ( repository == null ) {
 					repositories.put( i.scope(), i.scope().init() );
@@ -123,17 +123,17 @@ public final class Bootstrap {
 			return repositories;
 		}
 
-		private BindDeclaration<?>[] cleanedUp( BindDeclaration<?>[] declarations ) {
-			if ( declarations.length <= 1 ) {
-				return declarations;
+		private Binding<?>[] cleanedUp( Binding<?>[] bindings ) {
+			if ( bindings.length <= 1 ) {
+				return bindings;
 			}
-			List<BindDeclaration<?>> res = new ArrayList<BindDeclaration<?>>( declarations.length );
-			Arrays.sort( declarations );
-			res.add( declarations[0] );
+			List<Binding<?>> res = new ArrayList<Binding<?>>( bindings.length );
+			Arrays.sort( bindings );
+			res.add( bindings[0] );
 			int lastIndependend = 0;
-			for ( int i = 1; i < declarations.length; i++ ) {
-				BindDeclaration<?> one = declarations[lastIndependend];
-				BindDeclaration<?> other = declarations[i];
+			for ( int i = 1; i < bindings.length; i++ ) {
+				Binding<?> one = bindings[lastIndependend];
+				Binding<?> other = bindings[i];
 				boolean equalResource = one.resource().equalTo( other.resource() );
 				if ( !equalResource
 						|| !other.source().getType().replacedBy( one.source().getType() ) ) {
@@ -143,48 +143,48 @@ public final class Bootstrap {
 					throw new IllegalStateException( "Duplicate binds:" + one + "," + other );
 				}
 			}
-			return res.toArray( new BindDeclaration[res.size()] );
+			return res.toArray( new Binding[res.size()] );
 		}
 
-		private BindDeclaration<?>[] declarationsFrom( Class<? extends Bundle> root, Edition edition ) {
+		private Binding<?>[] bindingsFrom( Class<? extends Bundle> root, Edition edition ) {
 			BuildinBootstrapper bootstrapper = new BuildinBootstrapper( edition, constants );
 			bootstrapper.install( root );
 			ListBindings bindings = new ListBindings();
 			for ( Module m : bootstrapper.installed( root ) ) {
 				m.declare( bindings );
 			}
-			return bindings.declarations.toArray( new BindDeclaration<?>[0] );
+			return bindings.list.toArray( new Binding<?>[0] );
 		}
 
 	}
 
-	static class ListBindings
+	private static class ListBindings
 			implements Bindings {
 
-		final List<BindDeclaration<?>> declarations = new LinkedList<BindDeclaration<?>>();
+		final List<Binding<?>> list = new LinkedList<Binding<?>>();
+
+		ListBindings() {
+			// make visible
+		}
 
 		@Override
 		public <T> void add( Resource<T> resource, Supplier<? extends T> supplier, Scope scope,
 				Source source ) {
-			declarations.add( new BindDeclaration<T>( declarations.size(), resource, supplier,
-					scope, source ) );
+			list.add( new Binding<T>( resource, supplier, scope, source ) );
 		}
 
 	}
 
-	private static final class BindDeclaration<T>
-			implements Comparable<BindDeclaration<?>> {
+	private static final class Binding<T>
+			implements Comparable<Binding<?>> {
 
-		private final int nr;
 		private final Resource<T> resource;
 		private final Supplier<? extends T> supplier;
 		private final Scope scope;
 		private final Source source;
 
-		BindDeclaration( int nr, Resource<T> resource, Supplier<? extends T> supplier, Scope scope,
-				Source source ) {
+		Binding( Resource<T> resource, Supplier<? extends T> supplier, Scope scope, Source source ) {
 			super();
-			this.nr = nr;
 			this.resource = resource;
 			this.supplier = supplier;
 			this.scope = scope;
@@ -192,7 +192,7 @@ public final class Bootstrap {
 		}
 
 		@Override
-		public int compareTo( BindDeclaration<?> other ) {
+		public int compareTo( Binding<?> other ) {
 			int res = Precision.comparePrecision( resource.getInstance(),
 					other.resource.getInstance() );
 			if ( res != 0 ) {
@@ -203,7 +203,7 @@ public final class Bootstrap {
 			if ( res != 0 ) {
 				return res;
 			}
-			return Integer.valueOf( nr ).compareTo( other.nr );
+			return -1; // keep order
 		}
 
 		@Override
@@ -223,7 +223,7 @@ public final class Bootstrap {
 			return source;
 		}
 
-		Suppliable<T> toBinding( Repository repository ) {
+		Suppliable<T> suppliableIn( Repository repository ) {
 			return new Suppliable<T>( resource, supplier, repository, source );
 		}
 
