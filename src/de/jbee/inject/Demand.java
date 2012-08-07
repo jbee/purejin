@@ -1,13 +1,13 @@
 package de.jbee.inject;
 
-public final class Resolving<T> {
+public final class Demand<T> {
 
 	private final Resource<T> resource;
+	private final Dependency<? super T> dependency;
 	private final int serialNumber;
 	private final int cardinality;
-	private final Dependency<? super T> dependency;
 
-	public Resolving( Resource<T> resource, Dependency<? super T> dependency, int serialNumber,
+	public Demand( Resource<T> resource, Dependency<? super T> dependency, int serialNumber,
 			int cardinality ) {
 		super();
 		this.resource = resource;
@@ -38,8 +38,8 @@ public final class Resolving<T> {
 		return cardinality;
 	}
 
-	public Resolving<T> on( Dependency<? super T> dependency ) {
-		return new Resolving<T>( resource, dependency, serialNumber, cardinality );
+	public Demand<T> on( Dependency<? super T> dependency ) {
+		return new Demand<T>( resource, dependency, serialNumber, cardinality );
 	}
 
 	@Override

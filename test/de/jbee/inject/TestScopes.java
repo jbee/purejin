@@ -22,7 +22,7 @@ public class TestScopes {
 		}
 
 		@Override
-		public T instanceFor( Resolving<T> resolving ) {
+		public T instanceFor( Demand<T> demand ) {
 			return instance;
 		}
 	}
@@ -38,8 +38,8 @@ public class TestScopes {
 	@Test
 	public void thatDependencyTypeScopeEnsuresSingletonPerExactGenericType() {
 		Repository r = Scoped.DEPENDENCY_TYPE.init();
-		Resolving<A> ai = new Resolving<A>( resource( A.class ), dependency( A.class ), 1, 2 );
-		Resolving<B> bi = new Resolving<B>( resource( B.class ), dependency( B.class ), 2, 2 );
+		Demand<A> ai = new Demand<A>( resource( A.class ), dependency( A.class ), 1, 2 );
+		Demand<B> bi = new Demand<B>( resource( B.class ), dependency( B.class ), 2, 2 );
 		A a = new A();
 		B b = new B();
 		Injectable<A> ia = new ConstantInjectable<A>( a );

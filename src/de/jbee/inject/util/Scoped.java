@@ -5,7 +5,7 @@ import java.util.Map;
 
 import de.jbee.inject.Dependency;
 import de.jbee.inject.Injectable;
-import de.jbee.inject.Resolving;
+import de.jbee.inject.Demand;
 import de.jbee.inject.Repository;
 import de.jbee.inject.Scope;
 
@@ -13,7 +13,7 @@ public class Scoped { //OPEN what about Scoping ?
 
 	interface KeyDeduction {
 
-		<T> String deduceKey( Resolving<T> injection );
+		<T> String deduceKey( Demand<T> demand );
 	}
 
 	public static final KeyDeduction DEPENDENCY_TYPE_KEY = new DependencyTypeAsKey();
@@ -69,8 +69,8 @@ public class Scoped { //OPEN what about Scoping ?
 		}
 
 		@Override
-		public <T> T serve( Resolving<T> resolving, Injectable<T> injectable ) {
-			return injectable.instanceFor( resolving );
+		public <T> T serve( Demand<T> demand, Injectable<T> injectable ) {
+			return injectable.instanceFor( demand );
 		}
 
 		@Override
@@ -93,14 +93,14 @@ public class Scoped { //OPEN what about Scoping ?
 		}
 
 		@Override
-		public <T> T serve( Resolving<T> resolving, Injectable<T> injectable ) {
+		public <T> T serve( Demand<T> demand, Injectable<T> injectable ) {
 			Repository repository = threadRepository.get();
 			if ( repository == null ) {
 				// since each thread is just accessing its own repo there cannot be a repo set for the running thread after we checked for null
 				repository = repositoryScope.init();
 				threadRepository.set( repository );
 			}
-			return repository.serve( resolving, injectable );
+			return repository.serve( demand, injectable );
 		}
 
 		@Override
@@ -137,9 +137,9 @@ public class Scoped { //OPEN what about Scoping ?
 		}
 
 		@Override
-		public <T> T serve( Resolving<T> resolving, Injectable<T> injectable ) {
+		public <T> T serve( Demand<T> demand, Injectable<T> injectable ) {
 			//FIXME at some point the dest repo is outdated - do we ask the src again in that case ? I'm note sure 
-			return dest.serve( resolving, new SnapshotingInjectable<T>( injectable, src ) );
+			return dest.serve( demand, new SnapshotingInjectable<T>( injectable, src ) );
 		}
 
 		private static final class SnapshotingInjectable<T>
@@ -155,8 +155,8 @@ public class Scoped { //OPEN what about Scoping ?
 			}
 
 			@Override
-			public T instanceFor( Resolving<T> resolving ) {
-				return src.serve( resolving, supplier );
+			public T instanceFor( Demand<T> demand ) {
+				return src.serve( demand, supplier );
 			}
 
 		}
@@ -193,7 +193,7 @@ public class Scoped { //OPEN what about Scoping ?
 		}
 
 		@Override
-		public <T> String deduceKey( Resolving<T> injection ) {
+		public <T> String deduceKey( Demand<T> injection ) {
 			return injection.dependency().target( 1 ).toString();
 		}
 
@@ -212,8 +212,8 @@ public class Scoped { //OPEN what about Scoping ?
 		}
 
 		@Override
-		public <T> String deduceKey( Resolving<T> injection ) {
-			return injection.dependency().getType().toString();
+		public <T> String deduceKey( Demand<T> demand ) {
+			return demand.dependency().getType().toString();
 		}
 
 		@Override
@@ -238,8 +238,8 @@ public class Scoped { //OPEN what about Scoping ?
 
 		@Override
 		@SuppressWarnings ( "unchecked" )
-		public <T> T serve( Resolving<T> resolving, Injectable<T> injectable ) {
-			final String key = injectionKey.deduceKey( resolving );
+		public <T> T serve( Demand<T> demand, Injectable<T> injectable ) {
+			final String key = injectionKey.deduceKey( demand );
 			T instance = (T) instances.get( key );
 			if ( instance != null ) {
 				return instance;
@@ -247,7 +247,7 @@ public class Scoped { //OPEN what about Scoping ?
 			synchronized ( instances ) {
 				instance = (T) instances.get( key );
 				if ( instance == null ) {
-					instance = injectable.instanceFor( resolving );
+					instance = injectable.instanceFor( demand );
 					instances.put( key, instance );
 				}
 			}
@@ -297,20 +297,20 @@ public class Scoped { //OPEN what about Scoping ?
 
 		@Override
 		@SuppressWarnings ( "unchecked" )
-		public <T> T serve( Resolving<T> resolving, Injectable<T> injectable ) {
+		public <T> T serve( Demand<T> demand, Injectable<T> injectable ) {
 			if ( instances == null ) {
-				instances = new Object[resolving.cardinality()];
+				instances = new Object[demand.cardinality()];
 			}
-			T res = (T) instances[resolving.serialNumber()];
+			T res = (T) instances[demand.serialNumber()];
 			if ( res != null ) {
 				return res;
 			}
 			// just sync the (later) unexpected path that is executed once
 			synchronized ( instances ) {
-				res = (T) instances[resolving.serialNumber()];
+				res = (T) instances[demand.serialNumber()];
 				if ( res == null ) { // we need to ask again since the instance could have been initialized before we got entrance to the sync block
-					res = injectable.instanceFor( resolving );
-					instances[resolving.serialNumber()] = res;
+					res = injectable.instanceFor( demand );
+					instances[demand.serialNumber()] = res;
 				}
 			}
 			return res;

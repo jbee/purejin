@@ -33,8 +33,8 @@ public class Injectorizer {
 		}
 
 		@Override
-		public T instanceFor( Resolving<T> resolving ) {
-			return supplier.supply( resolving.dependency(), context );
+		public T instanceFor( Demand<T> demand ) {
+			return supplier.supply( demand.dependency(), context );
 		}
 	}
 
@@ -90,7 +90,7 @@ public class Injectorizer {
 		for ( int i = 0; i < length; i++ ) {
 			@SuppressWarnings ( "unchecked" )
 			Suppliable<T> b = (Suppliable<T>) suppliables[i + first];
-			res[i] = new InjectronImpl<T>( b.resource, b.source, new Resolving<T>( b.resource,
+			res[i] = new InjectronImpl<T>( b.resource, b.source, new Demand<T>( b.resource,
 					dependency( b.resource.getInstance() ), i + first, suppliables.length ),
 					b.repository, asInjectable( b.supplier, resolver ) );
 		}
@@ -102,16 +102,16 @@ public class Injectorizer {
 
 		final Resource<T> resource;
 		final Source source;
-		final Resolving<T> resolving;
+		final Demand<T> demand;
 		final Repository repository;
 		final Injectable<T> injectable;
 
-		InjectronImpl( Resource<T> resource, Source source, Resolving<T> resolving,
+		InjectronImpl( Resource<T> resource, Source source, Demand<T> demand,
 				Repository repository, Injectable<T> injectable ) {
 			super();
 			this.resource = resource;
 			this.source = source;
-			this.resolving = resolving;
+			this.demand = demand;
 			this.repository = repository;
 			this.injectable = injectable;
 		}
@@ -129,12 +129,12 @@ public class Injectorizer {
 		@Override
 		public T instanceFor( Dependency<? super T> dependency ) {
 			return repository.serve(
-					resolving.on( dependency.injectingInto( resource.getInstance() ) ), injectable );
+					demand.on( dependency.injectingInto( resource.getInstance() ) ), injectable );
 		}
 
 		@Override
 		public String toString() {
-			String res = resolving.toString();
+			String res = demand.toString();
 			return res.substring( 0, res.length() - 2 ).concat( resource.getTarget().toString() );
 		}
 	}
