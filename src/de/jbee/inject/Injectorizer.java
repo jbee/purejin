@@ -129,7 +129,7 @@ public class Injectorizer {
 		@Override
 		public T instanceFor( Dependency<? super T> dependency ) {
 			return repository.serve(
-					demand.on( dependency.injectingInto( resource.getInstance() ) ), injectable );
+					demand.from( dependency.injectingInto( resource.getInstance() ) ), injectable );
 		}
 
 		@Override

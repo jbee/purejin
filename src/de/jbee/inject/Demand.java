@@ -27,18 +27,18 @@ public final class Demand<T> {
 	/**
 	 * @return the number of the {@link Injectron} being injected.
 	 */
-	public final int serialNumber() {
+	public final int envSerialNumber() {
 		return serialNumber;
 	}
 
 	/**
-	 * @return the total amount of {@link Injectron} in the same context (injector).
+	 * @return the total amount of {@link Injectron}s in the same environment (injector).
 	 */
-	public final int cardinality() {
+	public final int envCardinality() {
 		return cardinality;
 	}
 
-	public Demand<T> on( Dependency<? super T> dependency ) {
+	public Demand<T> from( Dependency<? super T> dependency ) {
 		return new Demand<T>( resource, dependency, serialNumber, cardinality );
 	}
 

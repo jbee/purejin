@@ -38,15 +38,15 @@ public class TestScopes {
 	@Test
 	public void thatDependencyTypeScopeEnsuresSingletonPerExactGenericType() {
 		Repository r = Scoped.DEPENDENCY_TYPE.init();
-		Demand<A> ai = new Demand<A>( resource( A.class ), dependency( A.class ), 1, 2 );
-		Demand<B> bi = new Demand<B>( resource( B.class ), dependency( B.class ), 2, 2 );
+		Demand<A> da = new Demand<A>( resource( A.class ), dependency( A.class ), 1, 2 );
+		Demand<B> db = new Demand<B>( resource( B.class ), dependency( B.class ), 2, 2 );
 		A a = new A();
 		B b = new B();
 		Injectable<A> ia = new ConstantInjectable<A>( a );
 		Injectable<B> ib = new ConstantInjectable<B>( b );
-		assertThat( r.serve( ai, ia ), sameInstance( a ) );
-		assertThat( r.serve( ai, null ), sameInstance( a ) );
-		assertThat( r.serve( bi, ib ), sameInstance( b ) );
-		assertThat( r.serve( bi, null ), sameInstance( b ) );
+		assertThat( r.serve( da, ia ), sameInstance( a ) );
+		assertThat( r.serve( da, null ), sameInstance( a ) ); // the null Injectable shouldn't be called now 
+		assertThat( r.serve( db, ib ), sameInstance( b ) );
+		assertThat( r.serve( db, null ), sameInstance( b ) ); // the null Injectable shouldn't be called now
 	}
 }
