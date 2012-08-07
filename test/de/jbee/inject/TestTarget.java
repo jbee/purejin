@@ -12,10 +12,10 @@ import org.junit.Test;
 public class TestTarget {
 
 	@Test
-	public void test() {
-		Target t = targeting( List.class );
-		Dependency<String> d = dependency( String.class );
-		assertFalse( t.isApplicableFor( d ) );
-		assertTrue( t.isAccessibleFor( d.injectingInto( List.class ) ) );
+	public void thatTargetInstancesNeedsToBeMatchedByDependencies() {
+		Target target = targeting( List.class );
+		Dependency<String> dependency = dependency( String.class );
+		assertFalse( target.isApplicableFor( dependency ) );
+		assertTrue( target.isAccessibleFor( dependency.injectingInto( List.class ) ) );
 	}
 }

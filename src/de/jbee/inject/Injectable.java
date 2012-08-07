@@ -1,7 +1,7 @@
 package de.jbee.inject;
 
 /**
- * Knows how to resolve a specific instance for the given dependency.
+ * Knows how to resolve a specific instance for the given {@link Resolving}.
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  * 
@@ -9,5 +9,5 @@ package de.jbee.inject;
  */
 public interface Injectable<T> {
 
-	T instanceFor( Resolution<T> resolution );
+	T instanceFor( Resolving<T> resolving );
 }

@@ -14,7 +14,7 @@ import org.junit.Test;
 
 public class TestType {
 
-	List<String> aStringListField;
+	private List<String> aStringListField;
 
 	@Test
 	public void testToString()

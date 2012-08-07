@@ -5,7 +5,7 @@ import java.util.Map;
 
 import de.jbee.inject.Dependency;
 import de.jbee.inject.Injectable;
-import de.jbee.inject.Resolution;
+import de.jbee.inject.Resolving;
 import de.jbee.inject.Repository;
 import de.jbee.inject.Scope;
 
@@ -13,7 +13,7 @@ public class Scoped { //OPEN what about Scoping ?
 
 	interface KeyDeduction {
 
-		<T> String deduceKey( Resolution<T> injection );
+		<T> String deduceKey( Resolving<T> injection );
 	}
 
 	public static final KeyDeduction DEPENDENCY_TYPE_KEY = new DependencyTypeAsKey();
@@ -69,7 +69,7 @@ public class Scoped { //OPEN what about Scoping ?
 		}
 
 		@Override
-		public <T> T serve( Resolution<T> injection, Injectable<T> injectable ) {
+		public <T> T serve( Resolving<T> injection, Injectable<T> injectable ) {
 			return injectable.instanceFor( injection );
 		}
 
@@ -93,7 +93,7 @@ public class Scoped { //OPEN what about Scoping ?
 		}
 
 		@Override
-		public <T> T serve( Resolution<T> injection, Injectable<T> injectable ) {
+		public <T> T serve( Resolving<T> injection, Injectable<T> injectable ) {
 			Repository repository = threadRepository.get();
 			if ( repository == null ) {
 				// since each thread is just accessing its own repo there cannot be a repo set for the running thread after we checked for null
@@ -137,7 +137,7 @@ public class Scoped { //OPEN what about Scoping ?
 		}
 
 		@Override
-		public <T> T serve( Resolution<T> injection, Injectable<T> injectable ) {
+		public <T> T serve( Resolving<T> injection, Injectable<T> injectable ) {
 			//FIXME at some point the dest repo is outdated - do we ask the src again in that case ? I'm note sure 
 			return dest.serve( injection, new SnapshotingInjectable<T>( injectable, src ) );
 		}
@@ -155,8 +155,8 @@ public class Scoped { //OPEN what about Scoping ?
 			}
 
 			@Override
-			public T instanceFor( Resolution<T> resolution ) {
-				return src.serve( resolution, supplier );
+			public T instanceFor( Resolving<T> resolving ) {
+				return src.serve( resolving, supplier );
 			}
 
 		}
@@ -193,7 +193,7 @@ public class Scoped { //OPEN what about Scoping ?
 		}
 
 		@Override
-		public <T> String deduceKey( Resolution<T> injection ) {
+		public <T> String deduceKey( Resolving<T> injection ) {
 			return injection.dependency().target( 1 ).toString();
 		}
 
@@ -212,7 +212,7 @@ public class Scoped { //OPEN what about Scoping ?
 		}
 
 		@Override
-		public <T> String deduceKey( Resolution<T> injection ) {
+		public <T> String deduceKey( Resolving<T> injection ) {
 			return injection.dependency().getType().toString();
 		}
 
@@ -238,7 +238,7 @@ public class Scoped { //OPEN what about Scoping ?
 
 		@Override
 		@SuppressWarnings ( "unchecked" )
-		public <T> T serve( Resolution<T> injection, Injectable<T> injectable ) {
+		public <T> T serve( Resolving<T> injection, Injectable<T> injectable ) {
 			final String key = injectionKey.deduceKey( injection );
 			T instance = (T) instances.get( key );
 			if ( instance != null ) {
@@ -297,7 +297,7 @@ public class Scoped { //OPEN what about Scoping ?
 
 		@Override
 		@SuppressWarnings ( "unchecked" )
-		public <T> T serve( Resolution<T> injection, Injectable<T> injectable ) {
+		public <T> T serve( Resolving<T> injection, Injectable<T> injectable ) {
 			if ( instances == null ) {
 				instances = new Object[injection.cardinality()];
 			}

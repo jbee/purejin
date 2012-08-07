@@ -1,7 +1,7 @@
 package de.jbee.inject;
 
 /**
- * Knows how to *resolve* the instance for a given {@link Dependency}.
+ * Knows how to *resolve* an instance for a given {@link Dependency}.
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */

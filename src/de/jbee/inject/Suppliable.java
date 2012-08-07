@@ -1,10 +1,11 @@
 package de.jbee.inject;
 
 /**
- * Description of WHAT is supplied, HOW to supply it and WHERE it came from.
+ * Describing data of something that can be supplied.
+ * 
+ * It describes WHAT is supplied, HOW to supply it and WHERE it came from.
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
- * 
  */
 public final class Suppliable<T> {
 

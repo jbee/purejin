@@ -11,5 +11,5 @@ package de.jbee.inject;
  */
 public interface Repository {
 
-	<T> T serve( Resolution<T> injection, Injectable<T> injectable );
+	<T> T serve( Resolving<T> injection, Injectable<T> injectable );
 }
