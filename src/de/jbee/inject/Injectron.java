@@ -1,7 +1,7 @@
 package de.jbee.inject;
 
 /**
- * A kind of singleton for a {@link Resource} inside a {@link Injector}.
+ * A kind of singleton for a {@link Resource} inside a {@link SuppliableInjector}.
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */

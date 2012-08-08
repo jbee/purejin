@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 
 import org.junit.Test;
 
-import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Injector;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.util.Factory;
 import de.jbee.inject.util.SuppliedBy;
@@ -57,7 +57,7 @@ public class TestLoggerBinds {
 
 	@Test
 	public void thatEachClassGetsTheLoggerWithItsCanonicalName() {
-		DependencyResolver injector = Bootstrap.injector( LoggerBindsBundle.class );
+		Injector injector = Bootstrap.injector( LoggerBindsBundle.class );
 		Foo foo = injector.resolve( dependency( Foo.class ) );
 		assertThat( foo.logger, sameInstance( Logger.getLogger( Foo.class.getCanonicalName() ) ) );
 	}

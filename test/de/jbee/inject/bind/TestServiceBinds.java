@@ -8,7 +8,7 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 import de.jbee.inject.Dependency;
-import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Injector;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.Type;
 import de.jbee.inject.service.ServiceMethod;
@@ -37,8 +37,7 @@ public class TestServiceBinds {
 			implements Supplier<Service<?, ?>> {
 
 		@Override
-		public Service<?, ?> supply( Dependency<? super Service<?, ?>> dependency,
-				DependencyResolver context ) {
+		public Service<?, ?> supply( Dependency<? super Service<?, ?>> dependency, Injector context ) {
 			ServiceProvider provider = context.resolve( dependency( ServiceProvider.class ) );
 			Type<?>[] parameters = dependency.getType().getParameters();
 			return newService( provider.provide( parameters[0], parameters[1] ) );
@@ -87,7 +86,7 @@ public class TestServiceBinds {
 
 	@Test
 	public void thatServiceCanBeResolvedWhenHavingGenericsInSameOrder() {
-		DependencyResolver injector = Bootstrap.injector( ServiceBindsModule.class );
+		Injector injector = Bootstrap.injector( ServiceBindsModule.class );
 		Dependency<Service> dependency = dependency( raw( Service.class ).parametized(
 				Integer.class, Long.class ) );
 		Service<Integer, Long> square = injector.resolve( dependency );

@@ -16,7 +16,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 import de.jbee.inject.Dependency;
-import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Injector;
 import de.jbee.inject.Name;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.Type;
@@ -104,7 +104,7 @@ public abstract class ServiceModule
 
 		@Override
 		public ServiceProvider supply( Dependency<? super ServiceProvider> dependency,
-				DependencyResolver context ) {
+				Injector context ) {
 			return new ServiceMethodProvider( context );
 		}
 
@@ -124,11 +124,11 @@ public abstract class ServiceModule
 		 */
 		private final Map<String, Method> methodCache = new HashMap<String, Method>();
 
-		private final DependencyResolver context;
+		private final Injector context;
 		private final Class<?>[] serviceClasses;
 		private final ServiceStrategy strategy;
 
-		ServiceMethodProvider( DependencyResolver context ) {
+		ServiceMethodProvider( Injector context ) {
 			super();
 			this.context = context;
 			this.serviceClasses = resolveServiceClasses( context );
@@ -136,7 +136,7 @@ public abstract class ServiceModule
 					ServiceMethodProvider.class ) );
 		}
 
-		private static Class<?>[] resolveServiceClasses( DependencyResolver context ) {
+		private static Class<?>[] resolveServiceClasses( Injector context ) {
 			Dependency<Class[]> serviceClassesDependency = dependency(
 					raw( Class[].class ).parametizedAsLowerBounds() ).named(
 					Name.prefixed( SERVICE_NAME_PREFIX ) ).injectingInto(
@@ -151,7 +151,7 @@ public abstract class ServiceModule
 		}
 
 		private <P, T> ServiceMethod<P, T> create( Method service, Class<P> parameterType,
-				Class<T> returnType, DependencyResolver context ) {
+				Class<T> returnType, Injector context ) {
 			return new LazyServiceMethod<P, T>(
 					TypeReflector.newInstance( service.getDeclaringClass() ), service,
 					parameterType, returnType, context );
@@ -213,7 +213,7 @@ public abstract class ServiceModule
 
 		@Override
 		public ServiceMethod<?, ?> supply( Dependency<? super ServiceMethod<?, ?>> dependency,
-				DependencyResolver context ) {
+				Injector context ) {
 			ServiceProvider serviceResolver = context.resolve( dependency.anyTyped( ServiceProvider.class ) );
 			Type<?>[] parameters = dependency.getType().getParameters();
 			return serviceResolver.provide( parameters[0], parameters[1] );
@@ -227,11 +227,11 @@ public abstract class ServiceModule
 		private final Method method;
 		private final Class<P> parameterType;
 		private final Class<T> returnType;
-		private final DependencyResolver context;
+		private final Injector context;
 		private final Type<?>[] parameterTypes;
 
 		LazyServiceMethod( Object object, Method service, Class<P> parameterType,
-				Class<T> returnType, DependencyResolver context ) {
+				Class<T> returnType, Injector context ) {
 			super();
 			this.object = object;
 			this.method = service;

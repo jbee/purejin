@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.Test;
 
 import de.jbee.inject.Dependency;
-import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Injector;
 import de.jbee.inject.bind.BasicBinder.TargetedBasicBinder;
 import de.jbee.inject.bind.Binder.TargetedBinder;
 
@@ -39,7 +39,7 @@ public class TestPackageLocalisedBinds {
 
 	private static final Dependency<String> stringGlobal = dependency( String.class );
 
-	private final DependencyResolver injector = Bootstrap.injector( PackageLocalisedBindsModule.class );
+	private final Injector injector = Bootstrap.injector( PackageLocalisedBindsModule.class );
 
 	@Test
 	public void thatDepedencyWithoutTargetResolvedToGlobalBind() {

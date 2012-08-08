@@ -19,7 +19,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import de.jbee.inject.Dependency;
-import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Injector;
 import de.jbee.inject.Injectron;
 import de.jbee.inject.Name;
 import de.jbee.inject.Type;
@@ -52,7 +52,7 @@ public class TestInstanceBinds {
 
 	}
 
-	private final DependencyResolver injector = Bootstrap.injector( InstanceBindsBundle.class );
+	private final Injector injector = Bootstrap.injector( InstanceBindsBundle.class );
 
 	@Test
 	public void thatProviderIsAvailableForAnyBoundType() {

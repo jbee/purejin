@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import de.jbee.inject.DependencyResolver;
 import de.jbee.inject.Injector;
+import de.jbee.inject.SuppliableInjector;
 import de.jbee.inject.Precision;
 import de.jbee.inject.Repository;
 import de.jbee.inject.Resource;
@@ -25,21 +25,21 @@ import de.jbee.inject.util.TypeReflector;
 
 public final class Bootstrap {
 
-	public static DependencyResolver injector( Class<? extends Bundle> root ) {
+	public static Injector injector( Class<? extends Bundle> root ) {
 		return injector( root, Edition.FULL );
 	}
 
-	public static DependencyResolver injector( Class<? extends Bundle> root, Edition edition ) {
+	public static Injector injector( Class<? extends Bundle> root, Edition edition ) {
 		return injector( root, edition, Constants.NONE );
 	}
 
-	public static DependencyResolver injector( Class<? extends Bundle> root, Edition edition,
+	public static Injector injector( Class<? extends Bundle> root, Edition edition,
 			Constants constants ) {
 		return injector( root, new BuildinInstaller( edition, constants ) );
 	}
 
-	public static DependencyResolver injector( Class<? extends Bundle> root, Installer installer ) {
-		return Injector.create( installer.install( root ) );
+	public static Injector injector( Class<? extends Bundle> root, Installer installer ) {
+		return SuppliableInjector.create( installer.install( root ) );
 	}
 
 	private Bootstrap() {
@@ -104,7 +104,7 @@ public final class Bootstrap {
 		}
 
 		private Suppliable<?>[] install( Binding<?>[] bindings ) {
-			Map<Scope, Repository> repositories = buildRepositories( bindings );
+			Map<Scope, Repository> repositories = initRepositories( bindings );
 			Suppliable<?>[] suppliables = new Suppliable<?>[bindings.length];
 			Expiration expiration = Expiration.NEVER;
 			for ( int i = 0; i < bindings.length; i++ ) {
@@ -115,7 +115,7 @@ public final class Bootstrap {
 			return suppliables;
 		}
 
-		private Map<Scope, Repository> buildRepositories( Binding<?>[] bindings ) {
+		private Map<Scope, Repository> initRepositories( Binding<?>[] bindings ) {
 			Map<Scope, Repository> repositories = new IdentityHashMap<Scope, Repository>();
 			for ( Binding<?> i : bindings ) {
 				Repository repository = repositories.get( i.scope() );

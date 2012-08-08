@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 
 import org.junit.Test;
 
-import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Injector;
 import de.jbee.inject.bind.Bootstrapper.ModularBootstrapper;
 
 /**
@@ -130,11 +130,12 @@ public class TestEditionFeatureBinds {
 
 	@Test
 	public void thatTheFeaturedBundlesAndModulesAreInstalled() {
-		assertEditionInstalls( Bootstrap.edition( AnnotatedFeature.BAR, AnnotatedFeature.BAZ ), 8, 128 );
+		assertEditionInstalls( Bootstrap.edition( AnnotatedFeature.BAR, AnnotatedFeature.BAZ ), 8,
+				128 );
 	}
 
 	private void assertEditionInstalls( Edition edition, Integer... values ) {
-		DependencyResolver injector = Bootstrap.injector( RootBundle.class, edition );
+		Injector injector = Bootstrap.injector( RootBundle.class, edition );
 		assertThat( injector.resolve( dependency( Integer[].class ) ), is( values ) );
 	}
 

@@ -7,7 +7,7 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 import de.jbee.inject.Dependency;
-import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Injector;
 import de.jbee.inject.Supplier;
 
 public class TestSupplierBinds {
@@ -22,7 +22,7 @@ public class TestSupplierBinds {
 		}
 
 		@Override
-		public String supply( Dependency<? super String> dependency, DependencyResolver context ) {
+		public String supply( Dependency<? super String> dependency, Injector context ) {
 			return "foobar";
 		}
 
@@ -30,7 +30,7 @@ public class TestSupplierBinds {
 
 	@Test
 	public void test() {
-		DependencyResolver injector = Bootstrap.injector( SupplierBindsModule.class );
+		Injector injector = Bootstrap.injector( SupplierBindsModule.class );
 		String value = injector.resolve( dependency( String.class ) );
 		assertThat( value, is( "foobar" ) );
 	}

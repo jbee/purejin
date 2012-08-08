@@ -2,7 +2,7 @@ package de.jbee.inject.util;
 
 import static de.jbee.inject.Type.raw;
 import de.jbee.inject.Dependency;
-import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Injector;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Parameter;
 import de.jbee.inject.Type;
@@ -65,7 +65,7 @@ public final class Argument<T>
 		this.dependency = dependency;
 	}
 
-	public T resolve( Dependency<?> constructed, DependencyResolver context ) {
+	public T resolve( Dependency<?> constructed, Injector context ) {
 		if ( constant != null ) {
 			return constant;
 		}

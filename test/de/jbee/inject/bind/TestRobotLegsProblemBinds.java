@@ -8,7 +8,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Injector;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Name;
 
@@ -71,7 +71,7 @@ public class TestRobotLegsProblemBinds {
 		assertRobotHasDifferentLegsWithDifferentFoots( Bootstrap.injector( RobotLegsProblemScopeBindsModule.class ) );
 	}
 
-	private void assertRobotHasDifferentLegsWithDifferentFoots( DependencyResolver injector ) {
+	private void assertRobotHasDifferentLegsWithDifferentFoots( Injector injector ) {
 		Leg leftLeg = injector.resolve( dependency( Leg.class ).named( left ) );
 		Leg rightLeg = injector.resolve( dependency( Leg.class ).named( right ) );
 		assertThat( "same leg", leftLeg, not( sameInstance( rightLeg ) ) );

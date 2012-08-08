@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import de.jbee.inject.Dependency;
-import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Injector;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Parameter;
 import de.jbee.inject.Supplier;
@@ -109,12 +109,12 @@ public final class SuppliedBy {
 		}
 
 		@Override
-		public final T supply( Dependency<? super T> dependency, DependencyResolver context ) {
+		public final T supply( Dependency<? super T> dependency, Injector context ) {
 			Type<?> elementType = dependency.getType().getParameters()[0];
 			return bridge( supplyArray( dependency.anyTyped( elementType.getArrayType() ), context ) );
 		}
 
-		private <E> E[] supplyArray( Dependency<E[]> elementType, DependencyResolver resolver ) {
+		private <E> E[] supplyArray( Dependency<E[]> elementType, Injector resolver ) {
 			return resolver.resolve( elementType );
 		}
 
@@ -169,7 +169,7 @@ public final class SuppliedBy {
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
+		public T supply( Dependency<? super T> dependency, Injector context ) {
 			return instance;
 		}
 
@@ -200,7 +200,7 @@ public final class SuppliedBy {
 
 		@SuppressWarnings ( "unchecked" )
 		@Override
-		public E[] supply( Dependency<? super E[]> dependency, DependencyResolver context ) {
+		public E[] supply( Dependency<? super E[]> dependency, Injector context ) {
 			E[] res = (E[]) Array.newInstance( arrayType.getComponentType(), elements.length );
 			int i = 0;
 			final Dependency<E> elementDependency = (Dependency<E>) dependency.typed( Type.raw(
@@ -224,7 +224,7 @@ public final class SuppliedBy {
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
+		public T supply( Dependency<? super T> dependency, Injector context ) {
 			final Supplier<? extends T> supplier = context.resolve( dependency.anyTyped( type ) );
 			return supplier.supply( dependency, context );
 		}
@@ -241,7 +241,7 @@ public final class SuppliedBy {
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
+		public T supply( Dependency<? super T> dependency, Injector context ) {
 			return context.resolve( dependency.instanced( instance ) );
 		}
 
@@ -262,7 +262,7 @@ public final class SuppliedBy {
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
+		public T supply( Dependency<? super T> dependency, Injector context ) {
 			return provider.provide();
 		}
 
@@ -276,8 +276,7 @@ public final class SuppliedBy {
 		}
 
 		@Override
-		public Provider<?> supply( Dependency<? super Provider<?>> dependency,
-				DependencyResolver context ) {
+		public Provider<?> supply( Dependency<? super Provider<?>> dependency, Injector context ) {
 			Dependency<?> providedType = dependency.onTypeParameter();
 			if ( !dependency.getName().isDefault() ) {
 				providedType = providedType.named( dependency.getName() );
@@ -285,7 +284,7 @@ public final class SuppliedBy {
 			return newProvider( providedType, context );
 		}
 
-		private <T> Provider<T> newProvider( Dependency<T> dependency, DependencyResolver context ) {
+		private <T> Provider<T> newProvider( Dependency<T> dependency, Injector context ) {
 			return new LazyResolvedDependencyProvider<T>( dependency, context );
 		}
 	}
@@ -294,9 +293,9 @@ public final class SuppliedBy {
 			implements Provider<T> {
 
 		private final Dependency<T> dependency;
-		private final DependencyResolver resolver;
+		private final Injector resolver;
 
-		LazyResolvedDependencyProvider( Dependency<T> dependency, DependencyResolver resolver ) {
+		LazyResolvedDependencyProvider( Dependency<T> dependency, Injector resolver ) {
 			super();
 			this.dependency = dependency;
 			this.resolver = resolver;
@@ -314,8 +313,8 @@ public final class SuppliedBy {
 	}
 
 	/**
-	 * Adapter to a simpler API that will not need any {@link DependencyResolver} to supply it's
-	 * value in any case.
+	 * Adapter to a simpler API that will not need any {@link Injector} to supply it's value in any
+	 * case.
 	 * 
 	 * @author Jan Bernitt (jan.bernitt@gmx.de)
 	 * 
@@ -331,7 +330,7 @@ public final class SuppliedBy {
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
+		public T supply( Dependency<? super T> dependency, Injector context ) {
 			return factory.produce( dependency.getInstance(), dependency.target( 1 ) );
 		}
 
@@ -353,7 +352,7 @@ public final class SuppliedBy {
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
+		public T supply( Dependency<? super T> dependency, Injector context ) {
 			return TypeReflector.construct( noArgsConstructor );
 		}
 
@@ -373,7 +372,7 @@ public final class SuppliedBy {
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, DependencyResolver context ) {
+		public T supply( Dependency<? super T> dependency, Injector context ) {
 			Object[] args = new Object[arguments.length];
 			for ( int i = 0; i < arguments.length; i++ ) {
 				args[i] = arguments[i].resolve( dependency, context );

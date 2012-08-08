@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import de.jbee.inject.Dependency;
 import de.jbee.inject.DependencyCycleException;
-import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Injector;
 import de.jbee.inject.Name;
 import de.jbee.inject.Resource;
 
@@ -125,7 +125,7 @@ public class TestBootstrapper {
 	 */
 	@Test
 	public void thatBundlesAreNotBootstrappedMultipleTimesEvenWhenTheyAreMutual() {
-		DependencyResolver injector = Bootstrap.injector( OneMutualDependentBundle.class );
+		Injector injector = Bootstrap.injector( OneMutualDependentBundle.class );
 		assertThat( injector, notNullValue() );
 	}
 
@@ -136,14 +136,14 @@ public class TestBootstrapper {
 
 	@Test ( expected = DependencyCycleException.class )
 	public void thatDependencyCyclesAreDetected() {
-		DependencyResolver injector = Bootstrap.injector( CyclicBindsModule.class );
+		Injector injector = Bootstrap.injector( CyclicBindsModule.class );
 		Foo foo = injector.resolve( Dependency.dependency( Foo.class ) );
 		fail( "foo should not be resolvable but was: " + foo );
 	}
 
 	@Test ( expected = DependencyCycleException.class )
 	public void thatDependencyCyclesInCirclesAreDetected() {
-		DependencyResolver injector = Bootstrap.injector( CircleBindsModule.class );
+		Injector injector = Bootstrap.injector( CircleBindsModule.class );
 		A a = injector.resolve( Dependency.dependency( A.class ) );
 		fail( "A should not be resolvable but was: " + a );
 	}

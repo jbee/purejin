@@ -15,8 +15,7 @@ import java.util.Map;
  */
 public class Injectorizer {
 
-	public static <T> Injectable<T> asInjectable( Supplier<? extends T> supplier,
-			DependencyResolver context ) {
+	public static <T> Injectable<T> asInjectable( Supplier<? extends T> supplier, Injector context ) {
 		return new SupplierToInjectable<T>( supplier, context );
 	}
 
@@ -24,9 +23,9 @@ public class Injectorizer {
 			implements Injectable<T> {
 
 		private final Supplier<? extends T> supplier;
-		private final DependencyResolver context;
+		private final Injector context;
 
-		SupplierToInjectable( Supplier<? extends T> supplier, DependencyResolver context ) {
+		SupplierToInjectable( Supplier<? extends T> supplier, Injector context ) {
 			super();
 			this.supplier = supplier;
 			this.context = context;
@@ -39,7 +38,7 @@ public class Injectorizer {
 	}
 
 	public static Map<Class<?>, Injectron<?>[]> injectrons( Suppliable<?>[] suppliables,
-			DependencyResolver resolver ) {
+			Injector resolver ) {
 		final int total = suppliables.length;
 		Map<Class<?>, Injectron<?>[]> res = new IdentityHashMap<Class<?>, Injectron<?>[]>( total );
 		if ( total == 0 ) {
@@ -83,7 +82,7 @@ public class Injectorizer {
 	}
 
 	private static <T> Injectron<T>[] createTypeInjectrons( int first, int last,
-			Suppliable<?>[] suppliables, DependencyResolver resolver ) {
+			Suppliable<?>[] suppliables, Injector resolver ) {
 		final int length = last - first + 1;
 		@SuppressWarnings ( "unchecked" )
 		Injectron<T>[] res = new Injectron[length];

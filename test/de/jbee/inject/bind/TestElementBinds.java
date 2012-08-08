@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Injector;
 import de.jbee.inject.bind.Binder.TypedElementBinder;
 
 /**
@@ -35,7 +35,7 @@ public class TestElementBinds {
 		}
 	}
 
-	private final DependencyResolver injector = Bootstrap.injector( ElementBindsModule.class );
+	private final Injector injector = Bootstrap.injector( ElementBindsModule.class );
 
 	@Test
 	public void thatInstancesAreBoundAsElements() {

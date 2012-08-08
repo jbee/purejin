@@ -12,7 +12,7 @@ import java.io.Serializable;
 import org.junit.Test;
 
 import de.jbee.inject.Dependency;
-import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Injector;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Name;
 import de.jbee.inject.bind.BasicBinder.ScopedBasicBinder;
@@ -82,7 +82,7 @@ public class TestTargetedBinds {
 		}
 	}
 
-	private final DependencyResolver injector = Bootstrap.injector( TargetedBindsModule.class );
+	private final Injector injector = Bootstrap.injector( TargetedBindsModule.class );
 
 	@Test
 	public void thatBindWithTargetIsUsedWhenInjectingIntoIt() {

@@ -16,7 +16,7 @@ import java.lang.reflect.Constructor;
 
 import org.junit.Test;
 
-import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Injector;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Parameter;
 import de.jbee.inject.util.Argument;
@@ -111,7 +111,7 @@ public class TestConstructorParameterBinds {
 
 	}
 
-	private final DependencyResolver injector = Bootstrap.injector( ParameterConstructorBindsModule.class );
+	private final Injector injector = Bootstrap.injector( ParameterConstructorBindsModule.class );
 
 	@Test
 	public void thatClassParameterIsUnderstood() {

@@ -8,7 +8,7 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 import de.jbee.inject.Dependency;
-import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Injector;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.service.ServiceMethod;
 import de.jbee.inject.service.ServiceModule;
@@ -35,8 +35,7 @@ public class TestCommandBinds {
 			implements Supplier<Command<?>> {
 
 		@Override
-		public Command<?> supply( Dependency<? super Command<?>> dependency,
-				DependencyResolver context ) {
+		public Command<?> supply( Dependency<? super Command<?>> dependency, Injector context ) {
 			ServiceProvider provider = context.resolve( dependency( ServiceProvider.class ) );
 			return newCommand( provider.provide( dependency.getType().getParameters()[0],
 					raw( Long.class ) ) );
@@ -84,7 +83,7 @@ public class TestCommandBinds {
 
 	@Test
 	public void thatServiceCanBeResolvedWhenHavingJustOneGeneric() {
-		DependencyResolver injector = Bootstrap.injector( CommandBindsModule.class );
+		Injector injector = Bootstrap.injector( CommandBindsModule.class );
 		Dependency<Command> dependency = dependency( raw( Command.class ).parametized(
 				Integer.class ) );
 		Command<Integer> square = injector.resolve( dependency );

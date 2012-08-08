@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 import org.junit.Test;
 
 import de.jbee.inject.Dependency;
-import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Injector;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Parameter;
 
@@ -61,7 +61,7 @@ public class TestDependencyParameterBinds {
 
 	@Test
 	public void thatDependencyParameterIsUnderstood() {
-		DependencyResolver resolver = Bootstrap.injector( DependencyParameterBindsBundle.class );
+		Injector resolver = Bootstrap.injector( DependencyParameterBindsBundle.class );
 		LoggerInspector inspector = resolver.resolve( dependency( LoggerInspector.class ) );
 		assertThat( inspector.logger,
 				sameInstance( Logger.getLogger( BinderModule.class.getCanonicalName() ) ) );

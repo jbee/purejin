@@ -7,7 +7,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Injector;
 
 /**
  * The test demonstrates binds that are 'linked' by type.
@@ -29,7 +29,7 @@ public class TestTypeBinds {
 
 	@Test
 	public void thatNumberDependencyIsResolvedToIntegerBoundSupplier() {
-		DependencyResolver injector = Bootstrap.injector( TypeBindsModule.class );
+		Injector injector = Bootstrap.injector( TypeBindsModule.class );
 		Number number = injector.resolve( dependency( Number.class ) );
 		assertThat( number, instanceOf( Integer.class ) );
 		assertThat( number.intValue(), is( 42 ) );

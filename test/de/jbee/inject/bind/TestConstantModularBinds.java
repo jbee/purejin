@@ -6,7 +6,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import de.jbee.inject.DependencyResolver;
+import de.jbee.inject.Injector;
 
 /**
  * The test demonstrates how to use {@link Constants} and {@link Const} types to allow different
@@ -98,8 +98,8 @@ public class TestConstantModularBinds {
 
 	private void assertResolved( Machine actualConstant, String expected ) {
 		Constants constants = Constants.NONE.def( actualConstant );
-		DependencyResolver injector = Bootstrap.injector( ConstantModularBindsBundle.class,
-				Edition.FULL, constants );
+		Injector injector = Bootstrap.injector( ConstantModularBindsBundle.class, Edition.FULL,
+				constants );
 		String[] actual = injector.resolve( dependency( String[].class ) );
 		assertThat( actual, is( new String[] { expected } ) );
 	}
