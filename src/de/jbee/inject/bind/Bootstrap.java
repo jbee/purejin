@@ -18,7 +18,7 @@ import de.jbee.inject.Repository;
 import de.jbee.inject.Resource;
 import de.jbee.inject.Scope;
 import de.jbee.inject.Source;
-import de.jbee.inject.Stability;
+import de.jbee.inject.Expiration;
 import de.jbee.inject.Suppliable;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.util.TypeReflector;
@@ -106,11 +106,11 @@ public final class Bootstrap {
 		private Suppliable<?>[] install( Binding<?>[] bindings ) {
 			Map<Scope, Repository> repositories = buildRepositories( bindings );
 			Suppliable<?>[] suppliables = new Suppliable<?>[bindings.length];
-			Stability stability = Stability.STABLE;
+			Expiration expiration = Expiration.NEVER;
 			for ( int i = 0; i < bindings.length; i++ ) {
 				Binding<?> binding = bindings[i];
 				suppliables[i] = binding.suppliableIn( repositories.get( binding.scope() ),
-						stability );
+						expiration );
 			}
 			return suppliables;
 		}
@@ -226,8 +226,8 @@ public final class Bootstrap {
 			return source;
 		}
 
-		Suppliable<T> suppliableIn( Repository repository, Stability stability ) {
-			return new Suppliable<T>( resource, supplier, repository, stability, source );
+		Suppliable<T> suppliableIn( Repository repository, Expiration expiration ) {
+			return new Suppliable<T>( resource, supplier, repository, expiration, source );
 		}
 
 	}

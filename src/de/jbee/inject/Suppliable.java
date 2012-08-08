@@ -13,15 +13,15 @@ public final class Suppliable<T> {
 	public final Supplier<? extends T> supplier;
 	public final Repository repository;
 	public final Source source;
-	public final Stability stability;
+	public final Expiration expiration;
 
 	public Suppliable( Resource<T> resource, Supplier<? extends T> supplier, Repository repository,
-			Stability stability, Source source ) {
+			Expiration expiration, Source source ) {
 		super();
 		this.resource = resource;
 		this.supplier = supplier;
 		this.repository = repository;
-		this.stability = stability;
+		this.expiration = expiration;
 		this.source = source;
 	}
 
