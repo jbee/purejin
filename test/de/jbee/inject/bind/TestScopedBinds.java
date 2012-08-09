@@ -6,6 +6,7 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 import de.jbee.inject.Injector;
+import de.jbee.inject.MoreFrequentExpiryException;
 import de.jbee.inject.util.Scoped;
 
 public class TestScopedBinds {
@@ -31,7 +32,7 @@ public class TestScopedBinds {
 		}
 	}
 
-	@Test ( expected = IllegalStateException.class )
+	@Test ( expected = MoreFrequentExpiryException.class )
 	public void thatInjectingAnInjectionScopedInstanceIntoAppScopedInstanceThrowsAnException() {
 		Injector injector = Bootstrap.injector( ScopedBindsModule.class );
 		Foo foo = injector.resolve( dependency( Foo.class ) );

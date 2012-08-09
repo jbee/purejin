@@ -19,17 +19,11 @@ public final class Expiry {
 		this.frequency = frequency;
 	}
 
-	public Expiry mostUnstable( Expiry other ) {
-		return frequency > other.frequency
-			? this
-			: other;
-	}
-
 	public boolean equalTo( Expiry other ) {
 		return frequency == other.frequency;
 	}
 
-	public boolean before( Expiry other ) {
+	public boolean moreFrequent( Expiry other ) {
 		return frequency > other.frequency;
 	}
 

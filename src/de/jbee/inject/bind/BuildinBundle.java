@@ -1,12 +1,14 @@
 package de.jbee.inject.bind;
 
+import static de.jbee.inject.util.Scoped.DEPENDENCY_TYPE;
+import static de.jbee.inject.util.Scoped.TARGET_INSTANCE;
+
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
 import de.jbee.inject.bind.Bootstrapper.ModularBootstrapper;
 import de.jbee.inject.util.Provider;
-import de.jbee.inject.util.Scoped;
 import de.jbee.inject.util.SuppliedBy;
 
 /**
@@ -32,7 +34,7 @@ public enum BuildinBundle
 
 		@Override
 		protected void declare() {
-			per( Scoped.TARGET_INSTANCE ).starbind( Logger.class ).to( SuppliedBy.LOGGER );
+			per( TARGET_INSTANCE ).starbind( Logger.class ).to( SuppliedBy.LOGGER );
 		}
 
 	}
@@ -42,7 +44,7 @@ public enum BuildinBundle
 
 		@Override
 		protected void declare() {
-			per( Scoped.DEPENDENCY_TYPE ).starbind( Provider.class ).to( SuppliedBy.PROVIDER_BRIDGE );
+			per( DEPENDENCY_TYPE ).starbind( Provider.class ).to( SuppliedBy.PROVIDER_BRIDGE );
 		}
 
 	}
@@ -52,7 +54,7 @@ public enum BuildinBundle
 
 		@Override
 		protected void declare() {
-			per( Scoped.DEPENDENCY_TYPE ).starbind( List.class ).to( SuppliedBy.LIST_BRIDGE );
+			per( DEPENDENCY_TYPE ).starbind( List.class ).to( SuppliedBy.LIST_BRIDGE );
 		}
 
 	}
@@ -62,7 +64,7 @@ public enum BuildinBundle
 
 		@Override
 		protected void declare() {
-			per( Scoped.DEPENDENCY_TYPE ).starbind( Set.class ).to( SuppliedBy.SET_BRIDGE );
+			per( DEPENDENCY_TYPE ).starbind( Set.class ).to( SuppliedBy.SET_BRIDGE );
 		}
 
 	}

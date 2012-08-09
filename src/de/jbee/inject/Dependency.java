@@ -131,7 +131,7 @@ public final class Dependency<T>
 		if ( injectionHierarchy.length == 0 ) {
 			return new Dependency<T>( instance, new Injection[] { injection } );
 		}
-		ensureStableExpiry( injection );
+		ensureNotMoreFrequentExpiry( injection );
 		ensureNoCycle( injection );
 		Injection[] hierarchy = Arrays.copyOf( injectionHierarchy, injectionHierarchy.length + 1 );
 		hierarchy[injectionHierarchy.length] = injection;
@@ -148,13 +148,12 @@ public final class Dependency<T>
 		}
 	}
 
-	private void ensureStableExpiry( Injection injection ) {
+	private void ensureNotMoreFrequentExpiry( Injection injection ) {
 		final Expiry expiry = injection.getTarget().getExpiry();
 		for ( int i = 0; i < injectionHierarchy.length; i++ ) {
 			Injection parent = injectionHierarchy[i];
-			if ( expiry.before( parent.getTarget().getExpiry() ) ) {
-				throw new IllegalStateException( "Cannot inject " + injection.getTarget()
-						+ " into " + parent.getTarget() );
+			if ( expiry.moreFrequent( parent.getTarget().getExpiry() ) ) {
+				throw new MoreFrequentExpiryException( parent, injection );
 			}
 		}
 	}
