@@ -11,16 +11,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.jbee.inject.Expiry;
 import de.jbee.inject.Injector;
-import de.jbee.inject.SuppliableInjector;
 import de.jbee.inject.Precision;
 import de.jbee.inject.Repository;
 import de.jbee.inject.Resource;
 import de.jbee.inject.Scope;
 import de.jbee.inject.Source;
-import de.jbee.inject.Expiration;
 import de.jbee.inject.Suppliable;
+import de.jbee.inject.SuppliableInjector;
 import de.jbee.inject.Supplier;
+import de.jbee.inject.util.Scoped;
 import de.jbee.inject.util.TypeReflector;
 
 public final class Bootstrap {
@@ -106,11 +107,15 @@ public final class Bootstrap {
 		private Suppliable<?>[] install( Binding<?>[] bindings ) {
 			Map<Scope, Repository> repositories = initRepositories( bindings );
 			Suppliable<?>[] suppliables = new Suppliable<?>[bindings.length];
-			Expiration expiration = Expiration.NEVER;
+			//TODO
+			Expiry expiration = Expiry.NEVER;
 			for ( int i = 0; i < bindings.length; i++ ) {
 				Binding<?> binding = bindings[i];
-				suppliables[i] = binding.suppliableIn( repositories.get( binding.scope() ),
-						expiration );
+				Scope scope = binding.scope();
+				suppliables[i] = binding.suppliableIn( repositories.get( scope ),
+						Expiry.expires( scope == Scoped.INJECTION
+							? 1
+							: 0 ) );
 			}
 			return suppliables;
 		}
@@ -226,7 +231,7 @@ public final class Bootstrap {
 			return source;
 		}
 
-		Suppliable<T> suppliableIn( Repository repository, Expiration expiration ) {
+		Suppliable<T> suppliableIn( Repository repository, Expiry expiration ) {
 			return new Suppliable<T>( resource, supplier, repository, expiration, source );
 		}
 

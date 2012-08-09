@@ -1,6 +1,8 @@
 package de.jbee.inject;
 
+import static de.jbee.inject.Demand.demand;
 import static de.jbee.inject.Dependency.dependency;
+import static de.jbee.inject.Emergence.emergence;
 import static de.jbee.inject.Precision.comparePrecision;
 
 import java.util.Arrays;
@@ -86,31 +88,36 @@ public class Injectorizer {
 		final int length = last - first + 1;
 		@SuppressWarnings ( "unchecked" )
 		Injectron<T>[] res = new Injectron[length];
+		int len = suppliables.length;
 		for ( int i = 0; i < length; i++ ) {
 			@SuppressWarnings ( "unchecked" )
-			Suppliable<T> b = (Suppliable<T>) suppliables[i + first];
-			res[i] = new InjectronImpl<T>( b.resource, b.source, new Demand<T>( b.resource,
-					dependency( b.resource.getInstance() ), i + first, suppliables.length ),
-					b.repository, asInjectable( b.supplier, resolver ) );
+			Suppliable<T> s = (Suppliable<T>) suppliables[i + first];
+			Dependency<T> dependency = dependency( s.resource.getInstance() );
+			Demand<T> demand = demand( s.resource, dependency, i + first, len );
+			Injectable<T> injectable = asInjectable( s.supplier, resolver );
+			res[i] = new ResourceInjectron<T>( s.resource, s.source, demand, s.expiry,
+					s.repository, injectable );
 		}
 		return res;
 	}
 
-	private static class InjectronImpl<T>
+	private static class ResourceInjectron<T>
 			implements Injectron<T> {
 
-		final Resource<T> resource;
-		final Source source;
-		final Demand<T> demand;
-		final Repository repository;
-		final Injectable<T> injectable;
+		private final Resource<T> resource;
+		private final Source source;
+		private final Demand<T> demand;
+		private final Repository repository;
+		private final Injectable<T> injectable;
+		private final Expiry expiry;
 
-		InjectronImpl( Resource<T> resource, Source source, Demand<T> demand,
-				Repository repository, Injectable<T> injectable ) {
+		ResourceInjectron( Resource<T> resource, Source source, Demand<T> demand,
+				Expiry expiry, Repository repository, Injectable<T> injectable ) {
 			super();
 			this.resource = resource;
 			this.source = source;
 			this.demand = demand;
+			this.expiry = expiry;
 			this.repository = repository;
 			this.injectable = injectable;
 		}
@@ -127,8 +134,8 @@ public class Injectorizer {
 
 		@Override
 		public T instanceFor( Dependency<? super T> dependency ) {
-			return repository.serve(
-					demand.from( dependency.injectingInto( resource.getInstance() ) ), injectable );
+			return repository.serve( demand.from( dependency.injectingInto( emergence(
+					resource.getInstance(), expiry ) ) ), injectable );
 		}
 
 		@Override

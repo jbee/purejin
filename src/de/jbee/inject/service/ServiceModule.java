@@ -28,6 +28,7 @@ import de.jbee.inject.bind.Bundle;
 import de.jbee.inject.bind.Module;
 import de.jbee.inject.bind.Binder.RootBinder;
 import de.jbee.inject.bind.Binder.TypedBinder;
+import de.jbee.inject.util.Scoped;
 import de.jbee.inject.util.TypeReflector;
 
 /**
@@ -62,7 +63,7 @@ public abstract class ServiceModule
 	@Override
 	public final void declare( Bindings bindings ) {
 		nonnullThrowsReentranceException( binder );
-		binder = Binder.create( bindings, source( getClass() ) );
+		binder = Binder.create( bindings, source( getClass() ), Scoped.APPLICATION );
 		declare();
 	}
 

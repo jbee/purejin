@@ -132,4 +132,6 @@ public class TestInstanceBinds {
 	private <E> void assertInjectsItems( List<E> expected, Type<? extends List> dependencyType ) {
 		assertTrue( injector.resolve( dependency( dependencyType ) ).containsAll( expected ) );
 	}
+
+	//TODO test provider and scope 
 }

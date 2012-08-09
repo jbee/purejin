@@ -12,6 +12,7 @@ import de.jbee.inject.bind.Binder.ScopedBinder;
 import de.jbee.inject.bind.Binder.TargetedBinder;
 import de.jbee.inject.bind.Binder.TypedBinder;
 import de.jbee.inject.bind.Binder.TypedElementBinder;
+import de.jbee.inject.util.Scoped;
 
 public abstract class BinderModule
 		extends BootstrappingModule
@@ -19,10 +20,18 @@ public abstract class BinderModule
 
 	private RootBinder binder;
 
+	protected BinderModule() {
+		this( Scoped.APPLICATION );
+	}
+
+	protected BinderModule( Scope inital ) {
+		this.binder = Binder.create( null, source( BinderModule.class ), inital );
+	}
+
 	@Override
 	public final void declare( Bindings bindings ) {
-		nonnullThrowsReentranceException( binder );
-		this.binder = Binder.create( bindings, source( getClass() ) );
+		nonnullThrowsReentranceException( binder.bindings() );
+		this.binder = binder.into( bindings ).with( source( getClass() ) );
 		declare();
 	}
 

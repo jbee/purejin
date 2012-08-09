@@ -3,21 +3,21 @@ package de.jbee.inject;
 public final class Injection {
 
 	private final Instance<?> dependency;
-	private final Instance<?> target;
+	private final Emergence<?> target;
 
-	Injection( Instance<?> dependency, Instance<?> target ) {
+	Injection( Instance<?> dependency, Emergence<?> target ) {
 		super();
 		this.dependency = dependency;
 		this.target = target;
 	}
 
-	public Instance<?> getTarget() {
+	public Emergence<?> getTarget() {
 		return target;
 	}
 
 	public boolean equalTo( Injection other ) {
 		return this == other || dependency.equalTo( other.dependency )
-				&& target.equalTo( other.target );
+				&& target.getInstance().equalTo( other.target.getInstance() );
 	}
 
 	@Override

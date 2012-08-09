@@ -1,5 +1,6 @@
 package de.jbee.inject;
 
+import static de.jbee.inject.Emergence.emergence;
 import static de.jbee.inject.Instance.instance;
 import static de.jbee.inject.Type.raw;
 
@@ -107,7 +108,7 @@ public final class Dependency<T>
 	public Instance<?> target( int level ) {
 		return isUntargeted()
 			? Instance.ANY
-			: injectionHierarchy[injectionHierarchy.length - 1 - level].getTarget();
+			: injectionHierarchy[injectionHierarchy.length - 1 - level].getTarget().getInstance();
 	}
 
 	/**
@@ -122,10 +123,15 @@ public final class Dependency<T>
 	}
 
 	public Dependency<T> injectingInto( Instance<?> target ) {
+		return injectingInto( emergence( target, Expiry.NEVER ) );
+	}
+
+	public Dependency<T> injectingInto( Emergence<?> target ) {
 		Injection injection = new Injection( instance, target );
 		if ( injectionHierarchy.length == 0 ) {
 			return new Dependency<T>( instance, new Injection[] { injection } );
 		}
+		ensureStableExpiry( injection );
 		ensureNoCycle( injection );
 		Injection[] hierarchy = Arrays.copyOf( injectionHierarchy, injectionHierarchy.length + 1 );
 		hierarchy[injectionHierarchy.length] = injection;
@@ -137,7 +143,18 @@ public final class Dependency<T>
 		for ( int i = 0; i < injectionHierarchy.length; i++ ) {
 			Injection parent = injectionHierarchy[i];
 			if ( parent.equalTo( injection ) ) {
-				throw new DependencyCycleException( this, injection.getTarget() );
+				throw new DependencyCycleException( this, injection.getTarget().getInstance() );
+			}
+		}
+	}
+
+	private void ensureStableExpiry( Injection injection ) {
+		final Expiry expiry = injection.getTarget().getExpiry();
+		for ( int i = 0; i < injectionHierarchy.length; i++ ) {
+			Injection parent = injectionHierarchy[i];
+			if ( expiry.before( parent.getTarget().getExpiry() ) ) {
+				throw new IllegalStateException( "Cannot inject " + injection.getTarget()
+						+ " into " + parent.getTarget() );
 			}
 		}
 	}

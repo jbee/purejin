@@ -23,7 +23,6 @@ import de.jbee.inject.Target;
 import de.jbee.inject.Type;
 import de.jbee.inject.util.Factory;
 import de.jbee.inject.util.Provider;
-import de.jbee.inject.util.Scoped;
 import de.jbee.inject.util.SuppliedBy;
 import de.jbee.inject.util.TypeReflector;
 
@@ -83,12 +82,13 @@ public class Binder
 		return new AutobindBindings( delegate );
 	}
 
-	public static RootBinder create( Bindings bindings, Source source ) {
-		return create( bindings, DEFAULE_INJECTION_STRATEGY, source );
+	public static RootBinder create( Bindings bindings, Source source, Scope scope ) {
+		return create( bindings, DEFAULE_INJECTION_STRATEGY, source, scope );
 	}
 
-	public static RootBinder create( Bindings bindings, InjectionStrategy strategy, Source source ) {
-		return new RootBinder( bindings, strategy, source );
+	public static RootBinder create( Bindings bindings, InjectionStrategy strategy, Source source,
+			Scope scope ) {
+		return new RootBinder( bindings, strategy, source, scope );
 	}
 
 	private final Bindings bindings;
@@ -301,8 +301,8 @@ public class Binder
 			extends ScopedBinder
 			implements RootBasicBinder {
 
-		RootBinder( Bindings bindings, InjectionStrategy strategy, Source source ) {
-			super( bindings, strategy, source, Scoped.INJECTION );
+		RootBinder( Bindings bindings, InjectionStrategy strategy, Source source, Scope scope ) {
+			super( bindings, strategy, source, scope );
 		}
 
 		@Override
@@ -312,12 +312,12 @@ public class Binder
 
 		@Override
 		protected RootBinder with( Source source ) {
-			return new RootBinder( bindings(), strategy(), source );
+			return new RootBinder( bindings(), strategy(), source, scope() );
 		}
 
 		@Override
 		protected RootBinder into( Bindings bindings ) {
-			return new RootBinder( bindings, strategy(), source() );
+			return new RootBinder( bindings, strategy(), source(), scope() );
 		}
 
 		protected RootBinder asDefault() {

@@ -2,12 +2,17 @@ package de.jbee.inject;
 
 public final class Demand<T> {
 
+	public static <T> Demand<T> demand( Resource<T> resource, Dependency<? super T> dependency,
+			int serialNumber, int cardinality ) {
+		return new Demand<T>( resource, dependency, serialNumber, cardinality );
+	}
+
 	private final Resource<T> resource;
 	private final Dependency<? super T> dependency;
 	private final int serialNumber;
 	private final int cardinality;
 
-	public Demand( Resource<T> resource, Dependency<? super T> dependency, int serialNumber,
+	private Demand( Resource<T> resource, Dependency<? super T> dependency, int serialNumber,
 			int cardinality ) {
 		super();
 		this.resource = resource;
