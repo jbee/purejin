@@ -3,9 +3,9 @@ package de.jbee.inject.util;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.jbee.inject.Demand;
 import de.jbee.inject.Dependency;
 import de.jbee.inject.Injectable;
-import de.jbee.inject.Demand;
 import de.jbee.inject.Repository;
 import de.jbee.inject.Scope;
 
@@ -20,7 +20,8 @@ public class Scoped { //OPEN what about Scoping ?
 	public static final KeyDeduction TARGET_INSTANCE_KEY = new TargetInstanceAsKey();
 
 	/**
-	 * Often called the 'default'-scope. Asks the {@link Injectable} once per injection.
+	 * Often called the 'default' or 'prototype'-scope. Asks the {@link Injectable} once per
+	 * injection.
 	 */
 	public static final Scope INJECTION = new InjectionScope();
 	/**

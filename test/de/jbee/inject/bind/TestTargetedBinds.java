@@ -16,6 +16,7 @@ import de.jbee.inject.Injector;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Name;
 import de.jbee.inject.bind.BasicBinder.ScopedBasicBinder;
+import de.jbee.inject.bind.Binder.TargetedBinder;
 
 /**
  * A test that demonstrates how to inject a specific instance into another type using the
@@ -49,7 +50,8 @@ public class TestTargetedBinds {
 			construct( awesome, Foo.class );
 			injectingInto( awesome, Foo.class ).bind( Bar.class ).to( BAR_IN_AWESOME_FOO );
 			construct( Baz.class );
-			injectingInto( Serializable.class ).bind( Bar.class ).to( BAR_IN_SERIALIZABLE );
+			TargetedBinder binder = injectingInto( Serializable.class );
+			binder.bind( Bar.class ).to( BAR_IN_SERIALIZABLE );
 		}
 	}
 

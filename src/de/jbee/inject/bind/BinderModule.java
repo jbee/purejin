@@ -80,8 +80,8 @@ public abstract class BinderModule
 	}
 
 	@Override
-	public BasicBinder within( Packages packages ) {
-		return binder.within( packages );
+	public BasicBinder in( Packages packages ) {
+		return binder.in( packages );
 	}
 
 	public <T> TypedBinder<T> bind( Class<T> type ) {

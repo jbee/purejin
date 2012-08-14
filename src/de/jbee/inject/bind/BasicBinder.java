@@ -50,7 +50,7 @@ public interface BasicBinder {
 	interface TargetedBasicBinder
 			extends BasicBinder /* LocalisedBinder */{
 
-		BasicBinder within( Packages packages );
+		BasicBinder in( Packages packages );
 
 	}
 

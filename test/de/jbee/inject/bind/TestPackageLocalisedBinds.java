@@ -15,7 +15,7 @@ import de.jbee.inject.bind.Binder.TargetedBinder;
 
 /**
  * A test that demonstrates how to overlay general binds in specified packages and/or sub-packages
- * using {@link TargetedBasicBinder#within(de.jbee.inject.Packages)} or any of the utility methods
+ * using {@link TargetedBasicBinder#in(de.jbee.inject.Packages)} or any of the utility methods
  * on top of it: {@link TargetedBinder#inPackageOf(Class)},
  * {@link TargetedBinder#inSubPackagesOf(Class)},
  * {@link TargetedBinder#inPackageAndSubPackagesOf(Class)}.

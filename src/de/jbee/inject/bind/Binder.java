@@ -373,7 +373,7 @@ public class Binder
 		// instead of narrow explicit we could expose explicit and make binds as narrow as possible by default (classic interface to impl binds in same package)
 
 		@Override
-		public Binder within( Packages packages ) {
+		public Binder in( Packages packages ) {
 			return with( target().within( packages ) );
 		}
 
