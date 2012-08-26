@@ -1,4 +1,4 @@
-package de.jbee.inject.scope;
+package de.jbee.inject.draft;
 
 public interface Lifecycle {
 

@@ -1,4 +1,4 @@
-package de.jbee.inject.scope;
+package de.jbee.inject.draft;
 
 import de.jbee.inject.Dependency;
 

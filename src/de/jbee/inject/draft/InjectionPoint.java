@@ -1,4 +1,6 @@
-package de.jbee.inject;
+package de.jbee.inject.draft;
+
+import de.jbee.inject.Instance;
 
 /**
  * This about the HOW to inject (field, constructor/setter)
