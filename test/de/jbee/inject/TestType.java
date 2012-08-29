@@ -68,7 +68,7 @@ public class TestType {
 	@Test
 	public void testGenericArrays() {
 		Type<Class[]> classArray = Type.raw( Class[].class ).parametized( String.class );
-		assertThat( classArray.getElementType().toString(),
+		assertThat( classArray.elementType().toString(),
 				is( "java.lang.Class<java.lang.String>" ) );
 	}
 

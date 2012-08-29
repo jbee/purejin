@@ -10,6 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * A generic version of {@link Class} like {@link java.lang.reflect.Type} but without a complex
+ * hierarchy. Instead all cases are represented as a general model. The key difference is that this
+ * model just describes concrete types. So there is no representation for a {@link TypeVariable}.
+ * 
+ * There are some generic cases that are not supported right now because they haven't been needed.
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
@@ -66,7 +71,7 @@ public final class Type<T>
 
 	@SuppressWarnings ( "unchecked" )
 	public static <T> Type<T> elementType( Class<T[]> arrayType ) {
-		return (Type<T>) raw( arrayType ).getElementType();
+		return (Type<T>) raw( arrayType ).elementType();
 	}
 
 	public static <T> Type<T> raw( Class<T> type ) {
@@ -93,12 +98,6 @@ public final class Type<T>
 		throw notSupportedYet( type );
 	}
 
-	public static <T> Type<T> supertype( Type<? extends T> actualType, Class<T> rawSupertype,
-			java.lang.reflect.Type supertype ) {
-
-		return null;
-	}
-
 	private static UnsupportedOperationException notSupportedYet( java.lang.reflect.Type type ) {
 		return new UnsupportedOperationException( "Type has no support yet: " + type );
 	}
@@ -117,9 +116,6 @@ public final class Type<T>
 		}
 		if ( type instanceof ParameterizedType ) {
 			return parameterizedType( (ParameterizedType) type );
-		}
-		if ( type instanceof TypeVariable<?> ) {
-			// TODO
 		}
 		throw notSupportedYet( type );
 	}
@@ -184,14 +180,21 @@ public final class Type<T>
 		return true;
 	}
 
-	public Type<?> getElementType() {
-		Type<?> elemRawType = getElementRawType();
+	/**
+	 * @return in case of an array type the {@link Class#getComponentType()} with the same type
+	 *         parameters as this type or otherwise this type.
+	 */
+	public Type<?> elementType() {
+		Type<?> elemRawType = elementRawType();
 		return elemRawType == this
 			? this
 			: elemRawType.parametized( params );
 	}
 
-	private Type<?> getElementRawType() {
+	/**
+	 * @return in case of an array type the {@link Class#getComponentType()} otherwise this type.
+	 */
+	private Type<?> elementRawType() {
 		return asElementRawType( rawType.getComponentType() );
 	}
 
@@ -381,7 +384,7 @@ public final class Type<T>
 		TypeVariable<Class<T>>[] params = rawType.getTypeParameters();
 		if ( params.length != parameters.length ) {
 			if ( isUnidimensionalArray() ) {
-				getElementRawType().checkParameters( parameters );
+				elementRawType().checkParameters( parameters );
 				return;
 			}
 			//OPEN maybe we can allow to specify less than params - all not specified will be ?

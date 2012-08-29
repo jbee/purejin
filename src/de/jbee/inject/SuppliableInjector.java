@@ -39,7 +39,7 @@ public class SuppliableInjector
 			return injectron.instanceFor( dependency );
 		}
 		if ( type.isUnidimensionalArray() ) {
-			return resolveArray( dependency, type.getElementType() );
+			return resolveArray( dependency, type.elementType() );
 		}
 		if ( type.getRawType() == Injectron.class ) {
 			Injectron<?> i = applicableInjectron( dependency.onTypeParameter() );

@@ -204,7 +204,7 @@ public final class SuppliedBy {
 			E[] res = (E[]) Array.newInstance( arrayType.getComponentType(), elements.length );
 			int i = 0;
 			final Dependency<E> elementDependency = (Dependency<E>) dependency.typed( Type.raw(
-					arrayType ).getElementType() );
+					arrayType ).elementType() );
 			for ( Supplier<? extends E> e : elements ) {
 				res[i++] = e.supply( elementDependency, context );
 			}
