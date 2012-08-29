@@ -390,49 +390,13 @@ public final class Type<T>
 		// TODO check bounds fulfilled by arguments
 	}
 
-	public Type<? super T> asSupertype( Class<? super T> supertype ) {
-		if ( supertype == rawType ) {
-			return this;
-		}
-		if ( supertype.isInterface() ) {
-			return asSuperInterface( supertype );
-		}
-		return asSuperClass( supertype );
-	}
-
-	private Type<? super T> asSuperClass( Class<? super T> superclass ) {
-		Class<? super T> currentSuperclass = rawType.getSuperclass();
-		java.lang.reflect.Type genericSuperclass = rawType.getGenericSuperclass();
-		while ( currentSuperclass != null && currentSuperclass != superclass ) {
-			genericSuperclass = currentSuperclass.getGenericSuperclass();
-			currentSuperclass = currentSuperclass.getSuperclass();
-		}
-		if ( currentSuperclass == superclass ) {
-			return supertype( this, currentSuperclass, genericSuperclass );
-		}
-		throw new RuntimeException( "Couldn't find supertype " + superclass + " for type: " + this );
-	}
-
-	private Type<? super T> asSuperInterface( Class<? super T> superinterface ) {
-		@SuppressWarnings ( "unchecked" )
-		Class<? super T>[] interfaces = (Class<? super T>[]) rawType.getInterfaces();
-		java.lang.reflect.Type[] genericInterfaces = rawType.getGenericInterfaces();
-		for ( int i = 0; i < interfaces.length; i++ ) {
-			if ( interfaces[i] == superinterface ) {
-				return supertype( this, interfaces[i], genericInterfaces[i] );
-			}
-		}
-		throw new RuntimeException( "Couldn't find supertype " + superinterface + " for type: "
-				+ this );
-	}
-
 	/**
 	 * @return a list of all super-classes and super-interfaces of this type starting with the
 	 *         direct super-class followed by the direct super-interfaces continuing by going up the
 	 *         type hierarchy.
 	 */
 	@SuppressWarnings ( "unchecked" )
-	public Type<? super T>[] getSupertypes() {
+	public Type<? super T>[] supertypes() {
 		//FIXME no generics are supported here - add them
 		List<Type<? super T>> res = new ArrayList<Type<? super T>>();
 		Class<? super T> supertype = rawType;

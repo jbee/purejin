@@ -70,7 +70,7 @@ public class Binder
 				Source source ) {
 			delegate.add( resource, supplier, scope, source );
 			Type<T> type = resource.getType();
-			for ( Type<? super T> supertype : type.getSupertypes() ) {
+			for ( Type<? super T> supertype : type.supertypes() ) {
 				// Object is of cause a superclass of everything but not indented when doing auto-binds
 				if ( supertype.getRawType() != Object.class ) {
 					delegate.add( resource.typed( supertype ), supplier, scope, source );

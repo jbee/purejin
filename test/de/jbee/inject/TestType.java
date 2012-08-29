@@ -9,7 +9,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestType {
@@ -141,14 +140,6 @@ public class TestType {
 		Type<List> listOfIntegers = Type.raw( List.class ).parametized( Integer.class );
 		assertMorePrecise( arrayListOfIntegers, listOfIntegers );
 		//TODO this actually works because List and ArrayList just have the same geneic but if the subclass uses another index we will compare the wrong thing right now
-	}
-
-	@Test
-	@Ignore
-	public void testAsSupertype() {
-		Type<ArrayList> listOfStrings = Type.raw( ArrayList.class ).parametized( String.class );
-		assertThat( listOfStrings.asSupertype( List.class ).toString(),
-				is( "java.util.List<java.lang.String>" ) );
 	}
 
 	@Test
