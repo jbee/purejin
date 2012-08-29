@@ -33,10 +33,6 @@ public final class Source
 		return declarationType == DeclarationType.EXPLICIT;
 	}
 
-	public Source implicit() {
-		return new Source( ident, DeclarationType.IMPLICIT );
-	}
-
 	@Override
 	public String toString() {
 		String i = ident.toString();
@@ -48,10 +44,6 @@ public final class Source
 			: "(" + i + ")";
 	}
 
-	public Source multi() {
-		return new Source( ident, DeclarationType.MULTI );
-	}
-
 	@Override
 	public boolean morePreciseThan( Source other ) {
 		return declarationType.morePreciseThan( other.declarationType );
@@ -61,7 +53,9 @@ public final class Source
 		return declarationType == DeclarationType.IMPLICIT;
 	}
 
-	public Source asDefault() {
-		return new Source( ident, DeclarationType.DEFAULT );
+	public Source typed( DeclarationType type ) {
+		return declarationType == type
+			? this
+			: new Source( ident, type );
 	}
 }

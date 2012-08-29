@@ -12,15 +12,15 @@ import java.lang.reflect.Constructor;
  * 
  * <h3>How {@linkplain Parameter}s are understood:</h3>
  * <dl>
- * <dt>A {@link Class}</dt>
+ * <dt>A {@link Class} (via Type)</dt>
  * <dd>Use the default instance of the given {@linkplain Class}</dd>
  * <dt>A {@link Type}</dt>
  * <dd>Use the default instance of the given {@linkplain Type} (needed for generic classes)</dd>
- * <dt>A {@link Instance}</dt>
+ * <dt>An {@link Instance}</dt>
  * <dd>Use the instance identified by the given {@linkplain Instance}</dd>
  * <dt>A {@link Dependency}</dt>
  * <dd>Use the instance resolved by the given {@linkplain Dependency} (finest level of control)</dd>
- * <dt>A instance {@link Object}</dt>
+ * <dt>An instance {@link Object}</dt>
  * <dd>Use the given {@linkplain Object} (for the first parameter it is assignable to)</dd>
  * </dl>
  * 

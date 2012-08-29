@@ -21,11 +21,11 @@ public final class Demand<T> {
 		this.cardinality = cardinality;
 	}
 
-	public Dependency<? super T> dependency() {
+	public Dependency<? super T> getDependency() {
 		return dependency;
 	}
 
-	public Resource<T> resource() {
+	public Resource<T> getResource() {
 		return resource;
 	}
 

@@ -35,7 +35,7 @@ public class Injectorizer {
 
 		@Override
 		public T instanceFor( Demand<T> demand ) {
-			return supplier.supply( demand.dependency(), context );
+			return supplier.supply( demand.getDependency(), context );
 		}
 	}
 

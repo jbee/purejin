@@ -10,6 +10,7 @@ import static de.jbee.inject.util.SuppliedBy.provider;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 
+import de.jbee.inject.DeclarationType;
 import de.jbee.inject.InjectionStrategy;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Name;
@@ -156,7 +157,7 @@ public class Binder
 	}
 
 	public <T> TypedBinder<T> multibind( Instance<T> instance ) {
-		return with( source.multi() ).bind( instance );
+		return with( source.typed( DeclarationType.MULTI ) ).bind( instance );
 	}
 
 	public <T> TypedBinder<T> multibind( Type<T> type ) {
@@ -230,11 +231,11 @@ public class Binder
 	}
 
 	protected final Binder implicit() {
-		return with( source.implicit() );
+		return with( source.typed( DeclarationType.IMPLICIT ) );
 	}
 
 	protected final Binder multi() {
-		return with( source.multi() );
+		return with( source.typed( DeclarationType.MULTI ) );
 	}
 
 	protected Binder with( Source source ) {
@@ -321,7 +322,7 @@ public class Binder
 		}
 
 		protected RootBinder asDefault() {
-			return with( source().asDefault() );
+			return with( source().typed( DeclarationType.DEFAULT ) );
 		}
 	}
 

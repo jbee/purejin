@@ -195,7 +195,7 @@ public class Scoped { //OPEN what about Scoping ?
 
 		@Override
 		public <T> String deduceKey( Demand<T> injection ) {
-			return injection.dependency().target( 1 ).toString();
+			return injection.getDependency().target( 1 ).toString();
 		}
 
 		@Override
@@ -214,7 +214,7 @@ public class Scoped { //OPEN what about Scoping ?
 
 		@Override
 		public <T> String deduceKey( Demand<T> demand ) {
-			return demand.dependency().getType().toString();
+			return demand.getDependency().getType().toString();
 		}
 
 		@Override
