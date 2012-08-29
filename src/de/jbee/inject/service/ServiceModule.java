@@ -1,10 +1,8 @@
 package de.jbee.inject.service;
 
 import static de.jbee.inject.Dependency.dependency;
-import static de.jbee.inject.Name.named;
 import static de.jbee.inject.Source.source;
 import static de.jbee.inject.Type.parameterTypes;
-import static de.jbee.inject.Type.raw;
 import static de.jbee.inject.Type.returnType;
 import static de.jbee.inject.bind.Bootstrap.nonnullThrowsReentranceException;
 import static de.jbee.inject.util.Scoped.APPLICATION;
@@ -17,7 +15,6 @@ import java.util.Map;
 
 import de.jbee.inject.Dependency;
 import de.jbee.inject.Injector;
-import de.jbee.inject.Name;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.Type;
 import de.jbee.inject.bind.Binder;
@@ -25,9 +22,11 @@ import de.jbee.inject.bind.BinderModule;
 import de.jbee.inject.bind.Bindings;
 import de.jbee.inject.bind.Bootstrapper;
 import de.jbee.inject.bind.Bundle;
+import de.jbee.inject.bind.Extend;
 import de.jbee.inject.bind.Module;
 import de.jbee.inject.bind.Binder.RootBinder;
 import de.jbee.inject.bind.Binder.TypedBinder;
+import de.jbee.inject.service.ServiceMethod.ServiceMethodExtension;
 import de.jbee.inject.util.Scoped;
 import de.jbee.inject.util.TypeReflector;
 
@@ -41,11 +40,8 @@ import de.jbee.inject.util.TypeReflector;
 public abstract class ServiceModule
 		implements Module, Bundle {
 
-	private static final String SERVICE_NAME_PREFIX = "Service-";
-
 	protected final void bindServiceMethodsIn( Class<?> service ) {
-		String name = SERVICE_NAME_PREFIX + service.getCanonicalName();
-		binder.multibind( named( name ), Class.class ).to( service );
+		binder.extend( ServiceMethodExtension.class, service );
 	}
 
 	protected final <T> TypedBinder<T> starbind( Class<T> service ) {
@@ -132,17 +128,9 @@ public abstract class ServiceModule
 		ServiceMethodProvider( Injector context ) {
 			super();
 			this.context = context;
-			this.serviceClasses = resolveServiceClasses( context );
+			this.serviceClasses = context.resolve( Extend.dependency( ServiceMethodExtension.class ) );
 			this.strategy = context.resolve( dependency( ServiceStrategy.class ).injectingInto(
 					ServiceMethodProvider.class ) );
-		}
-
-		private static Class<?>[] resolveServiceClasses( Injector context ) {
-			Dependency<Class[]> serviceClassesDependency = dependency(
-					raw( Class[].class ).parametizedAsLowerBounds() ).named(
-					Name.prefixed( SERVICE_NAME_PREFIX ) ).injectingInto(
-					ServiceMethodProvider.class );
-			return context.resolve( serviceClassesDependency );
 		}
 
 		@Override

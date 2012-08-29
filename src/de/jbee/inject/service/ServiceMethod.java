@@ -1,5 +1,7 @@
 package de.jbee.inject.service;
 
+import de.jbee.inject.bind.Extension;
+
 /**
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
@@ -11,4 +13,7 @@ public interface ServiceMethod<P, R> {
 
 	R invoke( P params );
 
+	enum ServiceMethodExtension
+			implements Extension<ServiceMethodExtension, Object> {
+	}
 }
