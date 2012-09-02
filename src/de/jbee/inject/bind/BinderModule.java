@@ -152,4 +152,14 @@ public abstract class BinderModule
 	public <T> TypedBinder<T> multibind( Name name, Type<T> type ) {
 		return binder.multibind( name, type );
 	}
+
+	public <E extends Enum<E> & Extension<E, ? super T>, T> void extend( Class<E> extension,
+			Class<? extends T> type ) {
+		binder.extend( extension, type );
+	}
+
+	public <E extends Enum<E> & Extension<E, ? super T>, T> void extend( E extension,
+			Class<? extends T> type ) {
+		binder.extend( extension, type );
+	}
 }

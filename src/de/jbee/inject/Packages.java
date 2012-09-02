@@ -33,7 +33,9 @@ public final class Packages
 	}
 
 	private static String packageNameOf( Type<?> packageOf ) {
-		return packageNameOf( packageOf.getRawType() );
+		return packageOf.equalTo( Type.WILDCARD )
+			? "NONE"
+			: packageNameOf( packageOf.getRawType() );
 	}
 
 	private final String pattern;

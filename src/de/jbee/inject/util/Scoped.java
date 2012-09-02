@@ -9,9 +9,9 @@ import de.jbee.inject.Injectable;
 import de.jbee.inject.Repository;
 import de.jbee.inject.Scope;
 
-public class Scoped { //OPEN what about Scoping ?
+public class Scoped {
 
-	interface KeyDeduction {
+	public interface KeyDeduction {
 
 		<T> String deduceKey( Demand<T> demand );
 	}

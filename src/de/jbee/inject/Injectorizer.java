@@ -111,8 +111,8 @@ public class Injectorizer {
 		private final Injectable<T> injectable;
 		private final Expiry expiry;
 
-		ResourceInjectron( Resource<T> resource, Source source, Demand<T> demand,
-				Expiry expiry, Repository repository, Injectable<T> injectable ) {
+		ResourceInjectron( Resource<T> resource, Source source, Demand<T> demand, Expiry expiry,
+				Repository repository, Injectable<T> injectable ) {
 			super();
 			this.resource = resource;
 			this.source = source;
@@ -140,8 +140,7 @@ public class Injectorizer {
 
 		@Override
 		public String toString() {
-			String res = demand.toString();
-			return res.substring( 0, res.length() - 2 ).concat( resource.getTarget().toString() );
+			return demand.toString() + resource.getTarget().toString();
 		}
 	}
 }

@@ -176,12 +176,12 @@ public class Binder
 		return multibind( instance( name, type ) );
 	}
 
-	public <E extends Enum<E> & Extension<E, T>, T> void extend( Class<E> extension,
+	public <E extends Enum<E> & Extension<E, ? super T>, T> void extend( Class<E> extension,
 			Class<? extends T> type ) {
 		multibind( Extend.name( extension, type ), Class.class ).to( type );
 	}
 
-	public <E extends Enum<E> & Extension<E, T>, T> void extend( E extension,
+	public <E extends Enum<E> & Extension<E, ? super T>, T> void extend( E extension,
 			Class<? extends T> type ) {
 		multibind( Extend.name( extension, type ), Class.class ).to( type );
 	}

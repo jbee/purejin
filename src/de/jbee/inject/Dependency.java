@@ -61,7 +61,9 @@ public final class Dependency<T>
 
 	@Override
 	public String toString() {
-		return instance.toString() + " " + Arrays.toString( injectionHierarchy );
+		return instance.toString() + ( injectionHierarchy.length == 0
+			? ""
+			: " " + Arrays.toString( injectionHierarchy ) );
 	}
 
 	public Dependency<?> onTypeParameter() {

@@ -76,7 +76,7 @@ public final class Bootstrap {
 		}
 	}
 
-	static class BuildinInstaller
+	private static class BuildinInstaller
 			implements Installer {
 
 		// Find the initial set of bindings
@@ -111,7 +111,7 @@ public final class Bootstrap {
 			Expiry expiration = Expiry.NEVER;
 			for ( int i = 0; i < bindings.length; i++ ) {
 				Binding<?> binding = bindings[i];
-				Scope scope = binding.scope();
+				Scope scope = binding.scope;
 				suppliables[i] = binding.suppliableIn( repositories.get( scope ),
 						Expiry.expires( scope == Scoped.INJECTION
 							? 1
@@ -123,9 +123,9 @@ public final class Bootstrap {
 		private Map<Scope, Repository> initRepositories( Binding<?>[] bindings ) {
 			Map<Scope, Repository> repositories = new IdentityHashMap<Scope, Repository>();
 			for ( Binding<?> i : bindings ) {
-				Repository repository = repositories.get( i.scope() );
+				Repository repository = repositories.get( i.scope );
 				if ( repository == null ) {
-					repositories.put( i.scope(), i.scope().init() );
+					repositories.put( i.scope, i.scope.init() );
 				}
 			}
 			return repositories;
@@ -142,12 +142,11 @@ public final class Bootstrap {
 			for ( int i = 1; i < bindings.length; i++ ) {
 				Binding<?> one = bindings[lastIndependend];
 				Binding<?> other = bindings[i];
-				boolean equalResource = one.resource().equalTo( other.resource() );
-				if ( !equalResource
-						|| !other.source().getType().replacedBy( one.source().getType() ) ) {
+				boolean equalResource = one.resource.equalTo( other.resource );
+				if ( !equalResource || !other.source.getType().replacedBy( one.source.getType() ) ) {
 					res.add( other );
 					lastIndependend = i;
-				} else if ( one.source().getType().clashesWith( other.source().getType() ) ) {
+				} else if ( one.source.getType().clashesWith( other.source.getType() ) ) {
 					throw new IllegalStateException( "Duplicate binds:" + one + "," + other );
 				}
 			}
@@ -186,10 +185,10 @@ public final class Bootstrap {
 	private static final class Binding<T>
 			implements Comparable<Binding<?>> {
 
-		private final Resource<T> resource;
-		private final Supplier<? extends T> supplier;
-		private final Scope scope;
-		private final Source source;
+		final Resource<T> resource;
+		final Supplier<? extends T> supplier;
+		final Scope scope;
+		final Source source;
 
 		Binding( Resource<T> resource, Supplier<? extends T> supplier, Scope scope, Source source ) {
 			super();
@@ -219,18 +218,6 @@ public final class Bootstrap {
 			return source + " / " + resource + " / " + scope;
 		}
 
-		Resource<T> resource() {
-			return resource;
-		}
-
-		Scope scope() {
-			return scope;
-		}
-
-		Source source() {
-			return source;
-		}
-
 		Suppliable<T> suppliableIn( Repository repository, Expiry expiration ) {
 			return new Suppliable<T>( resource, supplier, repository, expiration, source );
 		}
@@ -238,7 +225,7 @@ public final class Bootstrap {
 	}
 
 	private static class BuildinBootstrapper
-			implements Bootstrapper {
+			implements Bootstrapper, ModuleTree {
 
 		private final Map<Class<? extends Bundle>, Set<Class<? extends Bundle>>> bundleChildren = new IdentityHashMap<Class<? extends Bundle>, Set<Class<? extends Bundle>>>();
 		private final Map<Class<? extends Bundle>, List<Module>> bundleModules = new IdentityHashMap<Class<? extends Bundle>, List<Module>>();
@@ -332,13 +319,14 @@ public final class Bootstrap {
 			modules.add( module );
 		}
 
-		public List<Module> installed( Class<? extends Bundle> root ) {
+		@Override
+		public Module[] installed( Class<? extends Bundle> root ) {
 			Set<Class<? extends Bundle>> installed = new LinkedHashSet<Class<? extends Bundle>>();
 			allInstalledIn( root, installed );
 			return modulesOf( installed );
 		}
 
-		public List<Module> modulesOf( Set<Class<? extends Bundle>> bundles ) {
+		private Module[] modulesOf( Set<Class<? extends Bundle>> bundles ) {
 			List<Module> installed = new ArrayList<Module>( bundles.size() );
 			for ( Class<? extends Bundle> b : bundles ) {
 				List<Module> modules = bundleModules.get( b );
@@ -346,7 +334,7 @@ public final class Bootstrap {
 					installed.addAll( modules );
 				}
 			}
-			return installed;
+			return installed.toArray( new Module[installed.size()] );
 		}
 
 		@Override
