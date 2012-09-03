@@ -33,8 +33,8 @@ public final class Packages
 	}
 
 	private static String packageNameOf( Type<?> packageOf ) {
-		return packageOf.equalTo( Type.WILDCARD )
-			? "NONE"
+		return packageOf.isLowerBound()
+			? "-NONE-"
 			: packageNameOf( packageOf.getRawType() );
 	}
 

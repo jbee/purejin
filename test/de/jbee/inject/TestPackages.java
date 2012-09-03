@@ -6,6 +6,8 @@ import static org.junit.Assert.assertFalse;
 
 import org.junit.Test;
 
+import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
+
 public class TestPackages {
 
 	@Test
@@ -44,7 +46,9 @@ public class TestPackages {
 	}
 
 	@Test
-	public void thatAnyTypeIsNotInPackageJavaLang() {
-		assertFalse( packageOf( String.class ).contains( Type.WILDCARD ) );
+	public void thatLowerBoundTypeIsNotInPackageJavaLang() {
+		Packages javaLang = packageOf( String.class );
+		assertFalse( javaLang.contains( Type.WILDCARD ) );
+		assertFalse( javaLang.contains( Type.raw( List.class ).asLowerBound() ) );
 	}
 }
