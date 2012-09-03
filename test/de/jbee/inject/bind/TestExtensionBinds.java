@@ -13,7 +13,7 @@ import org.junit.Test;
 
 import de.jbee.inject.Dependency;
 import de.jbee.inject.Injector;
-import de.jbee.inject.service.ServiceMethod.ServiceMethodExtension;
+import de.jbee.inject.service.ServiceMethod.ServiceClassExtension;
 
 public class TestExtensionBinds {
 
@@ -22,10 +22,10 @@ public class TestExtensionBinds {
 
 		@Override
 		protected void declare() {
-			extend( ServiceMethodExtension.class, TestExtensionService.class );
-			inPackageOf( Module.class ).extend( ServiceMethodExtension.class,
+			extend( ServiceClassExtension.class, TestExtensionService.class );
+			inPackageOf( Module.class ).extend( ServiceClassExtension.class,
 					TestExtensionPackageLocalService.class );
-			injectingInto( Serializable.class ).extend( ServiceMethodExtension.class,
+			injectingInto( Serializable.class ).extend( ServiceClassExtension.class,
 					TestExtensionInstanceOfService.class );
 		}
 	}
@@ -43,7 +43,7 @@ public class TestExtensionBinds {
 	}
 
 	private final Injector injector = Bootstrap.injector( TestExtensionModule.class );
-	private final Dependency<Class[]> dependency = Extend.dependency( ServiceMethodExtension.class );
+	private final Dependency<Class[]> dependency = Extend.dependency( ServiceClassExtension.class );
 
 	@Test
 	public void thatJustUntargetedExtensionsAreResolvedGlobally() {

@@ -13,7 +13,7 @@ public interface ServiceMethod<P, R> {
 
 	R invoke( P params );
 
-	enum ServiceMethodExtension
-			implements Extension<ServiceMethodExtension, Object> {
+	enum ServiceClassExtension
+			implements Extension<ServiceClassExtension, Object> {
 	}
 }

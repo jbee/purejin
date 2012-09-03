@@ -26,7 +26,7 @@ import de.jbee.inject.bind.Extend;
 import de.jbee.inject.bind.Module;
 import de.jbee.inject.bind.Binder.RootBinder;
 import de.jbee.inject.bind.Binder.TypedBinder;
-import de.jbee.inject.service.ServiceMethod.ServiceMethodExtension;
+import de.jbee.inject.service.ServiceMethod.ServiceClassExtension;
 import de.jbee.inject.util.Scoped;
 import de.jbee.inject.util.TypeReflector;
 
@@ -41,7 +41,7 @@ public abstract class ServiceModule
 		implements Module, Bundle {
 
 	protected final void bindServiceMethodsIn( Class<?> service ) {
-		binder.extend( ServiceMethodExtension.class, service );
+		binder.extend( ServiceClassExtension.class, service );
 	}
 
 	protected final <T> TypedBinder<T> starbind( Class<T> service ) {
@@ -128,7 +128,7 @@ public abstract class ServiceModule
 		ServiceMethodProvider( Injector context ) {
 			super();
 			this.context = context;
-			this.serviceClasses = context.resolve( Extend.dependency( ServiceMethodExtension.class ) );
+			this.serviceClasses = context.resolve( Extend.dependency( ServiceClassExtension.class ) );
 			this.strategy = context.resolve( dependency( ServiceStrategy.class ).injectingInto(
 					ServiceMethodProvider.class ) );
 		}
