@@ -36,11 +36,11 @@ public final class Bootstrap {
 
 	public static Injector injector( Class<? extends Bundle> root, Edition edition,
 			Constants constants ) {
-		return injector( root, new BuildinInstaller( edition, constants ) );
+		return injector( install( root, edition, constants ), new BuildinInstaller() );
 	}
 
-	public static Injector injector( Class<? extends Bundle> root, Installer installer ) {
-		return SuppliableInjector.create( installer.install( root ) );
+	public static Injector injector( Module[] modules, Modulizer installer ) {
+		return SuppliableInjector.create( installer.install( modules ) );
 	}
 
 	private Bootstrap() {
@@ -77,7 +77,7 @@ public final class Bootstrap {
 	}
 
 	private static class BuildinInstaller
-			implements Installer {
+			implements Modulizer {
 
 		// Find the initial set of bindings
 		// 0. create BindInstruction
@@ -90,18 +90,13 @@ public final class Bootstrap {
 		// 	 b. init one repository for each scope
 		// 	 c. apply snapshots wrapper to repository instances
 
-		private final Edition edition;
-		private final Constants constants;
-
-		BuildinInstaller( Edition edition, Constants constants ) {
+		BuildinInstaller() {
 			super();
-			this.edition = edition;
-			this.constants = constants;
 		}
 
 		@Override
-		public Suppliable<?>[] install( Class<? extends Bundle> root ) {
-			return install( cleanedUp( bindingsFrom( root, edition ) ) );
+		public Suppliable<?>[] install( Module[] modules ) {
+			return install( cleanedUp( bindingsFrom( modules ) ) );
 		}
 
 		private Suppliable<?>[] install( Binding<?>[] bindings ) {
@@ -153,11 +148,9 @@ public final class Bootstrap {
 			return res.toArray( new Binding[res.size()] );
 		}
 
-		private Binding<?>[] bindingsFrom( Class<? extends Bundle> root, Edition edition ) {
-			BuildinBootstrapper bootstrapper = new BuildinBootstrapper( edition, constants );
-			bootstrapper.install( root );
+		private Binding<?>[] bindingsFrom( Module[] modules ) {
 			ListBindings bindings = new ListBindings();
-			for ( Module m : bootstrapper.installed( root ) ) {
+			for ( Module m : modules ) {
 				m.declare( bindings );
 			}
 			return bindings.list.toArray( new Binding<?>[0] );
@@ -168,7 +161,7 @@ public final class Bootstrap {
 	private static class ListBindings
 			implements Bindings {
 
-		final List<Binding<?>> list = new LinkedList<Binding<?>>();
+		final List<Binding<?>> list = new ArrayList<Binding<?>>( 100 );
 
 		ListBindings() {
 			// make visible
@@ -222,6 +215,13 @@ public final class Bootstrap {
 			return new Suppliable<T>( resource, supplier, repository, expiration, source );
 		}
 
+	}
+
+	public static Module[] install( Class<? extends Bundle> root, Edition edition,
+			Constants constants ) {
+		BuildinBootstrapper bootstrapper = new BuildinBootstrapper( edition, constants );
+		bootstrapper.install( root );
+		return bootstrapper.installed( root );
 	}
 
 	private static class BuildinBootstrapper
