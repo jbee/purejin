@@ -26,11 +26,11 @@ public final class Bootstrap {
 
 	public static Injector injector( Class<? extends Bundle> root, Edition edition,
 			Constants constants ) {
-		return injector( install( root, edition, constants ), Modularize.BUILDIN );
+		return injector( install( root, edition, constants ), Assemble.BUILDIN );
 	}
 
-	public static Injector injector( Module[] modules, Modulizer installer ) {
-		return SuppliableInjector.create( installer.install( modules ) );
+	public static Injector injector( Module[] modules, Assembler installer ) {
+		return SuppliableInjector.create( installer.assemble( modules ) );
 	}
 
 	private Bootstrap() {

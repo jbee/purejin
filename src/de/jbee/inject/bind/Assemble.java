@@ -16,16 +16,16 @@ import de.jbee.inject.Suppliable;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.util.Scoped;
 
-public final class Modularize {
+public final class Assemble {
 
-	private Modularize() {
+	private Assemble() {
 		throw new UnsupportedOperationException( "util" );
 	}
 
-	public static final Modulizer BUILDIN = new BindingModulizer();
+	public static final Assembler BUILDIN = new BindingAssembler();
 
-	private static class BindingModulizer
-			implements Modulizer {
+	private static class BindingAssembler
+			implements Assembler {
 
 		// Find the initial set of bindings
 		// 0. create BindInstruction
@@ -38,12 +38,12 @@ public final class Modularize {
 		// 	 b. init one repository for each scope
 		// 	 c. apply snapshots wrapper to repository instances
 
-		BindingModulizer() {
+		BindingAssembler() {
 			super();
 		}
 
 		@Override
-		public Suppliable<?>[] install( Module[] modules ) {
+		public Suppliable<?>[] assemble( Module[] modules ) {
 			return install( cleanedUp( bindingsFrom( modules ) ) );
 		}
 

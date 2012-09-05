@@ -405,7 +405,7 @@ public class Binder
 			implements BasicBinder.TypedBasicBinder<T> {
 
 		/**
-		 * The binder instance who's {@link RichBasicBinder#install(Instance)} method had been
+		 * The binder instance who's {@link RichBasicBinder#assemble(Instance)} method had been
 		 * called to get to this {@link TypedBasicBinder}.
 		 */
 		private final Binder binder;
