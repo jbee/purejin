@@ -73,10 +73,10 @@ public class SuppliableInjector
 	}
 
 	private <T, E> T resolveArray( Dependency<T> dependency, Type<E> elementType ) {
-		Injectron<E>[] elementInjectrons = typeInjectrons( elementType );
 		if ( elementType.getRawType() == Injectron.class ) {
-			//TODO
+			return resolveInjectronArray( dependency, elementType, elementType.getParameters()[0] );
 		}
+		Injectron<E>[] elementInjectrons = typeInjectrons( elementType );
 		if ( elementInjectrons != null ) {
 			List<E> elements = new ArrayList<E>( elementInjectrons.length );
 			addAllApplicable( elements, dependency, elementType, elementInjectrons );
@@ -95,7 +95,22 @@ public class SuppliableInjector
 				return toArray( elements, elementType );
 			}
 		}
+		// FIXME it is a difference if all available didn't fit or there hasn't been some. just throw exception in the latter case 
 		throw new RuntimeException( "No injectron for array type: " + dependency.getType() );
+	}
+
+	private <T, E, I> T resolveInjectronArray( Dependency<T> dependency, Type<E> elementType,
+			Type<I> injectronType ) {
+		Injectron<I>[] res = typeInjectrons( injectronType );
+		List<Injectron<I>> elements = new ArrayList<Injectron<I>>( res.length );
+		Dependency<I> injectornDependency = dependency.typed( injectronType );
+		for ( Injectron<I> i : res ) {
+			if ( i.getResource().isAdequateFor( injectornDependency )
+					&& i.getResource().isAssignableTo( injectornDependency ) ) {
+				elements.add( i );
+			}
+		}
+		return (T) elements.toArray( new Injectron<?>[elements.size()] );
 	}
 
 	private <E, T> void addAllApplicable( List<E> elements, Dependency<T> dependency,

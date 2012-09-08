@@ -6,7 +6,6 @@ import static de.jbee.inject.Type.raw;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -18,9 +17,7 @@ import java.util.Set;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import de.jbee.inject.Dependency;
 import de.jbee.inject.Injector;
-import de.jbee.inject.Injectron;
 import de.jbee.inject.Name;
 import de.jbee.inject.Type;
 import de.jbee.inject.util.Provider;
@@ -96,15 +93,6 @@ public class TestInstanceBinds {
 	public void thatProviderIsAvailableAlsoForSetType() {
 		Set<String> set = singleton( "foobar" );
 		assertInjectsProviderFor( set, raw( Set.class ).parametized( String.class ) );
-	}
-
-	@Test
-	public void thatSingleInjectronIsAvailableForAnyBoundResource() {
-		Dependency<Injectron> dependency = dependency( raw( Injectron.class ).parametized(
-				String.class ) );
-		Injectron<String> injectron = injector.resolve( dependency );
-		assertThat( injectron, notNullValue() );
-		assertThat( injectron.instanceFor( dependency( String.class ) ), is( "foobar" ) );
 	}
 
 	@Test
