@@ -25,35 +25,9 @@ import de.jbee.inject.Type;
 import de.jbee.inject.util.Factory;
 import de.jbee.inject.util.Provider;
 import de.jbee.inject.util.SuppliedBy;
-import de.jbee.inject.util.TypeReflector;
 
 public class Binder
 		implements BasicBinder {
-
-	public static final InjectionStrategy DEFAULE_INJECTION_STRATEGY = new BuildinInjectionStrategy();
-
-	private static class BuildinInjectionStrategy
-			implements InjectionStrategy {
-
-		BuildinInjectionStrategy() {
-			// make visible
-		}
-
-		@Override
-		public <T> Constructor<T> constructorFor( Class<T> type ) {
-			try {
-				return TypeReflector.defaultConstructor( type );
-			} catch ( RuntimeException e ) {
-				return null;
-			}
-		}
-
-		@Override
-		public <T> Instance<?>[] parametersFor( Constructor<T> constructor ) {
-			return Instance.anyOf( Type.parameterTypes( constructor ) );
-		}
-
-	}
 
 	private static class AutobindBindings
 			implements Bindings {
@@ -81,10 +55,6 @@ public class Binder
 
 	public static Bindings autobinding( Bindings delegate ) {
 		return new AutobindBindings( delegate );
-	}
-
-	public static RootBinder create( Bindings bindings, Source source, Scope scope ) {
-		return create( bindings, DEFAULE_INJECTION_STRATEGY, source, scope );
 	}
 
 	public static RootBinder create( Bindings bindings, InjectionStrategy strategy, Source source,
@@ -329,6 +299,10 @@ public class Binder
 		@Override
 		protected RootBinder into( Bindings bindings ) {
 			return new RootBinder( bindings, strategy(), source(), scope() );
+		}
+
+		protected RootBinder using( InjectionStrategy strategy ) {
+			return new RootBinder( bindings(), strategy, source(), scope() );
 		}
 
 		protected RootBinder asDefault() {

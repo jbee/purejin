@@ -14,6 +14,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 import de.jbee.inject.Dependency;
+import de.jbee.inject.InjectionStrategy;
 import de.jbee.inject.Injector;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.Type;
@@ -57,9 +58,9 @@ public abstract class ServiceModule
 	}
 
 	@Override
-	public final void declare( Bindings bindings ) {
+	public void declare( Bindings bindings, InjectionStrategy strategy ) {
 		nonnullThrowsReentranceException( binder );
-		binder = Binder.create( bindings, source( getClass() ), Scoped.APPLICATION );
+		binder = Binder.create( bindings, strategy, source( getClass() ), Scoped.APPLICATION );
 		declare();
 	}
 

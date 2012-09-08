@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.jbee.inject.InjectionStrategy;
 import de.jbee.inject.Injector;
 import de.jbee.inject.SuppliableInjector;
 import de.jbee.inject.util.TypeReflector;
@@ -26,11 +27,13 @@ public final class Bootstrap {
 
 	public static Injector injector( Class<? extends Bundle> root, Edition edition,
 			Constants constants ) {
-		return injector( install( root, edition, constants ), Assemble.BUILDIN );
+		return injector( install( root, edition, constants ), Assemble.DEFAULE_INJECTION_STRATEGY,
+				Assemble.BUILDIN );
 	}
 
-	public static Injector injector( Module[] modules, Assembler installer ) {
-		return SuppliableInjector.create( installer.assemble( modules ) );
+	public static Injector injector( Module[] modules, InjectionStrategy strategy,
+			Assembler installer ) {
+		return SuppliableInjector.create( installer.assemble( modules, strategy ) );
 	}
 
 	private Bootstrap() {

@@ -1,5 +1,6 @@
 package de.jbee.inject.bind;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.IdentityHashMap;
@@ -7,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import de.jbee.inject.Expiry;
+import de.jbee.inject.InjectionStrategy;
+import de.jbee.inject.Instance;
 import de.jbee.inject.Precision;
 import de.jbee.inject.Repository;
 import de.jbee.inject.Resource;
@@ -14,7 +17,9 @@ import de.jbee.inject.Scope;
 import de.jbee.inject.Source;
 import de.jbee.inject.Suppliable;
 import de.jbee.inject.Supplier;
+import de.jbee.inject.Type;
 import de.jbee.inject.util.Scoped;
+import de.jbee.inject.util.TypeReflector;
 
 public final class Assemble {
 
@@ -23,6 +28,30 @@ public final class Assemble {
 	}
 
 	public static final Assembler BUILDIN = new BindingAssembler();
+	public static final InjectionStrategy DEFAULE_INJECTION_STRATEGY = new BuildinInjectionStrategy();
+
+	private static class BuildinInjectionStrategy
+			implements InjectionStrategy {
+
+		BuildinInjectionStrategy() {
+			// make visible
+		}
+
+		@Override
+		public <T> Constructor<T> constructorFor( Class<T> type ) {
+			try {
+				return TypeReflector.defaultConstructor( type );
+			} catch ( RuntimeException e ) {
+				return null;
+			}
+		}
+
+		@Override
+		public <T> Instance<?>[] parametersFor( Constructor<T> constructor ) {
+			return Instance.anyOf( Type.parameterTypes( constructor ) );
+		}
+
+	}
 
 	private static class BindingAssembler
 			implements Assembler {
@@ -43,8 +72,8 @@ public final class Assemble {
 		}
 
 		@Override
-		public Suppliable<?>[] assemble( Module[] modules ) {
-			return install( cleanedUp( bindingsFrom( modules ) ) );
+		public Suppliable<?>[] assemble( Module[] modules, InjectionStrategy strategy ) {
+			return install( cleanedUp( bindingsFrom( modules, strategy ) ) );
 		}
 
 		private Suppliable<?>[] install( Binding<?>[] bindings ) {
@@ -96,10 +125,10 @@ public final class Assemble {
 			return res.toArray( new Binding[res.size()] );
 		}
 
-		private Binding<?>[] bindingsFrom( Module[] modules ) {
+		private Binding<?>[] bindingsFrom( Module[] modules, InjectionStrategy strategy ) {
 			ListBindings bindings = new ListBindings();
 			for ( Module m : modules ) {
-				m.declare( bindings );
+				m.declare( bindings, strategy );
 			}
 			return bindings.list.toArray( new Binding<?>[0] );
 		}

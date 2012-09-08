@@ -2,6 +2,7 @@ package de.jbee.inject.bind;
 
 import static de.jbee.inject.Source.source;
 import static de.jbee.inject.bind.Bootstrap.nonnullThrowsReentranceException;
+import de.jbee.inject.InjectionStrategy;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Name;
 import de.jbee.inject.Packages;
@@ -25,13 +26,14 @@ public abstract class BinderModule
 	}
 
 	protected BinderModule( Scope inital ) {
-		this.binder = Binder.create( null, source( BinderModule.class ), inital );
+		this.binder = Binder.create( null, Assemble.DEFAULE_INJECTION_STRATEGY,
+				source( BinderModule.class ), inital );
 	}
 
 	@Override
-	public final void declare( Bindings bindings ) {
+	public void declare( Bindings bindings, InjectionStrategy strategy ) {
 		nonnullThrowsReentranceException( binder.bindings() );
-		this.binder = binder.into( bindings ).with( source( getClass() ) );
+		this.binder = binder.into( bindings ).using( strategy ).with( source( getClass() ) );
 		declare();
 	}
 
