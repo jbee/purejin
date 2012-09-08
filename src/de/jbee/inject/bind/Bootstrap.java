@@ -70,11 +70,11 @@ public final class Bootstrap {
 			Constants constants ) {
 		BuildinBootstrapper bootstrapper = new BuildinBootstrapper( edition, constants );
 		bootstrapper.install( root );
-		return bootstrapper.installed( root );
+		return bootstrapper.modularise( root );
 	}
 
 	private static class BuildinBootstrapper
-			implements Bootstrapper, ModuleTree {
+			implements Bootstrapper, Bundler, Modulariser {
 
 		private final Map<Class<? extends Bundle>, Set<Class<? extends Bundle>>> bundleChildren = new IdentityHashMap<Class<? extends Bundle>, Set<Class<? extends Bundle>>>();
 		private final Map<Class<? extends Bundle>, List<Module>> bundleModules = new IdentityHashMap<Class<? extends Bundle>, List<Module>>();
@@ -169,14 +169,20 @@ public final class Bootstrap {
 		}
 
 		@Override
-		public Module[] installed( Class<? extends Bundle> root ) {
-			Set<Class<? extends Bundle>> installed = new LinkedHashSet<Class<? extends Bundle>>();
-			allInstalledIn( root, installed );
-			return modulesOf( installed );
+		public Module[] modularise( Class<? extends Bundle> root ) {
+			return modulesOf( bundle( root ) );
 		}
 
-		private Module[] modulesOf( Set<Class<? extends Bundle>> bundles ) {
-			List<Module> installed = new ArrayList<Module>( bundles.size() );
+		@SuppressWarnings ( "unchecked" )
+		@Override
+		public Class<? extends Bundle>[] bundle( Class<? extends Bundle> root ) {
+			Set<Class<? extends Bundle>> installed = new LinkedHashSet<Class<? extends Bundle>>();
+			allInstalledIn( root, installed );
+			return (Class<? extends Bundle>[]) installed.toArray( new Class<?>[installed.size()] );
+		}
+
+		private Module[] modulesOf( Class<? extends Bundle>[] bundles ) {
+			List<Module> installed = new ArrayList<Module>( bundles.length );
 			for ( Class<? extends Bundle> b : bundles ) {
 				List<Module> modules = bundleModules.get( b );
 				if ( modules != null ) {
