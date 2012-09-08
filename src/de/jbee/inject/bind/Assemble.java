@@ -56,17 +56,6 @@ public final class Assemble {
 	private static class BindingAssembler
 			implements Assembler {
 
-		// Find the initial set of bindings
-		// 0. create BindInstruction
-		// 2. sort declarations
-		// 3. remove duplicates (implicit will be sorted after explicit)
-		// 4. detect ambiguous bindings (two explicit bindings that have same type and target)
-
-		// 1. Create Scope-Repositories
-		//   a. sort scopes from most stable to most fragile
-		// 	 b. init one repository for each scope
-		// 	 c. apply snapshots wrapper to repository instances
-
 		BindingAssembler() {
 			super();
 		}
@@ -79,7 +68,7 @@ public final class Assemble {
 		private Suppliable<?>[] install( Binding<?>[] bindings ) {
 			Map<Scope, Repository> repositories = initRepositories( bindings );
 			Suppliable<?>[] suppliables = new Suppliable<?>[bindings.length];
-			//TODO
+			//TODO use real expiry data
 			Expiry expiration = Expiry.NEVER;
 			for ( int i = 0; i < bindings.length; i++ ) {
 				Binding<?> binding = bindings[i];
@@ -100,6 +89,7 @@ public final class Assemble {
 					repositories.put( i.scope, i.scope.init() );
 				}
 			}
+			// TODO snapshot wrappers  
 			return repositories;
 		}
 

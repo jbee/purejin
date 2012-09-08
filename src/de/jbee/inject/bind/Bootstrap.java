@@ -180,7 +180,7 @@ public final class Bootstrap {
 		@Override
 		public Class<? extends Bundle>[] bundle( Class<? extends Bundle> root ) {
 			Set<Class<? extends Bundle>> installed = new LinkedHashSet<Class<? extends Bundle>>();
-			allInstalledIn( root, installed );
+			addAllInstalledIn( root, installed );
 			return (Class<? extends Bundle>[]) installed.toArray( new Class<?>[installed.size()] );
 		}
 
@@ -224,7 +224,7 @@ public final class Bootstrap {
 			}
 		}
 
-		private void allInstalledIn( Class<? extends Bundle> bundle,
+		private void addAllInstalledIn( Class<? extends Bundle> bundle,
 				Set<Class<? extends Bundle>> accu ) {
 			accu.add( bundle );
 			Set<Class<? extends Bundle>> children = bundleChildren.get( bundle );
@@ -233,7 +233,7 @@ public final class Bootstrap {
 			}
 			for ( Class<? extends Bundle> c : children ) {
 				if ( !accu.contains( c ) ) {
-					allInstalledIn( c, accu );
+					addAllInstalledIn( c, accu );
 				}
 			}
 		}
