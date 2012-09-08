@@ -15,5 +15,6 @@ public interface ServiceMethod<P, R> {
 
 	enum ServiceClassExtension
 			implements Extension<ServiceClassExtension, Object> {
+		// no different options
 	}
 }

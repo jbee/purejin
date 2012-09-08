@@ -28,8 +28,9 @@ public class SuppliableInjector
 	@Override
 	public <T> T resolve( Dependency<T> dependency ) {
 		// OPEN is it true, that the dependency passed to the injectron can/should get the type/name added ? 
-		Type<T> type = dependency.getType();
-		if ( !type.isUnidimensionalArray() && type.isLowerBound() ) {
+		final Type<T> type = dependency.getType();
+		final boolean array = type.isUnidimensionalArray();
+		if ( !array && type.isLowerBound() ) {
 			//TODO return best match from wildcard dependencies (not mapped by raw-type since it doesn't help)
 			throw new UnsupportedOperationException(
 					"Wildcard-dependencies are not supported yet: " + type );
@@ -38,7 +39,7 @@ public class SuppliableInjector
 		if ( injectron != null ) {
 			return injectron.instanceFor( dependency );
 		}
-		if ( type.isUnidimensionalArray() ) {
+		if ( array ) {
 			return resolveArray( dependency, type.elementType() );
 		}
 		if ( type.getRawType() == Injectron.class ) {
@@ -73,6 +74,9 @@ public class SuppliableInjector
 
 	private <T, E> T resolveArray( Dependency<T> dependency, Type<E> elementType ) {
 		Injectron<E>[] elementInjectrons = typeInjectrons( elementType );
+		if ( elementType.getRawType() == Injectron.class ) {
+			//TODO
+		}
 		if ( elementInjectrons != null ) {
 			List<E> elements = new ArrayList<E>( elementInjectrons.length );
 			addAllApplicable( elements, dependency, elementType, elementInjectrons );
@@ -91,7 +95,6 @@ public class SuppliableInjector
 				return toArray( elements, elementType );
 			}
 		}
-		//TODO support asking for Injectron[] 
 		throw new RuntimeException( "No injectron for array type: " + dependency.getType() );
 	}
 
