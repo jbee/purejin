@@ -55,18 +55,19 @@ public class Binder
 		return new AutobindBindings( delegate );
 	}
 
-	public static RootBinder create( Bindings bindings, ConstructionStrategy strategy, Source source,
-			Scope scope ) {
+	public static RootBinder create( Bindings bindings, ConstructionStrategy strategy,
+			Source source, Scope scope ) {
 		return new RootBinder( bindings, strategy, source, scope );
 	}
 
-	private final Bindings bindings;
-	private final ConstructionStrategy strategy;
-	private final Source source;
-	private final Scope scope;
-	private final Target target;
+	final Bindings bindings;
+	final ConstructionStrategy strategy;
+	final Source source;
+	final Scope scope;
+	final Target target;
 
-	Binder( Bindings bindings, ConstructionStrategy strategy, Source source, Scope scope, Target target ) {
+	Binder( Bindings bindings, ConstructionStrategy strategy, Source source, Scope scope,
+			Target target ) {
 		super();
 		this.bindings = bindings;
 		this.strategy = strategy;
@@ -154,35 +155,8 @@ public class Binder
 		multibind( Extend.name( extension, type ), Class.class ).to( type );
 	}
 
-	final Target target() {
-		return target;
-	}
-
-	final Source source() {
-		return source;
-	}
-
-	final Scope scope() {
-		return scope;
-	}
-
-	//OPEN maybe Binder implements bindings and delegates instead of exposing it here
-	final Bindings bindings() {
-		return bindings;
-	}
-
-	final ConstructionStrategy strategy() {
-		return strategy;
-	}
-
 	protected final <T> void bind( Resource<T> resource, Supplier<? extends T> supplier ) {
 		bindings.add( resource, supplier, scope, source );
-	}
-
-	protected final void implicitBindToConstructor( Class<?>... impls ) {
-		for ( Class<?> impl : impls ) {
-			implicitBindToConstructor( impl );
-		}
 	}
 
 	protected final <I> void implicitBindToConstructor( Class<I> impl ) {
@@ -194,9 +168,8 @@ public class Binder
 		if ( notConstructable( impl ) ) {
 			return;
 		}
-		Constructor<I> constructor = strategy().constructorFor( impl );
+		Constructor<I> constructor = strategy.constructorFor( impl );
 		if ( constructor != null ) {
-			//OPEN maybe using ANY is to much - could define something outside the expected availability.
 			implicit().with( Target.ANY ).bind( instance ).to( constructor );
 		}
 	}
@@ -263,14 +236,28 @@ public class Binder
 		}
 
 		public void toElements( Class<? extends E> impl1, Class<? extends E> impl2 ) {
-			to( SuppliedBy.type( impl1 ), SuppliedBy.type( impl2 ) );
-			implicitBindToConstructor( impl1, impl2 );
+			to( supply( impl1 ), supply( impl2 ) );
 		}
 
 		public void toElements( Class<? extends E> impl1, Class<? extends E> impl2,
 				Class<? extends E> impl3 ) {
-			to( SuppliedBy.type( impl1 ), SuppliedBy.type( impl2 ), SuppliedBy.type( impl3 ) );
-			implicitBindToConstructor( impl1, impl2, impl3 );
+			to( supply( impl1 ), supply( impl2 ), supply( impl3 ) );
+		}
+
+		@SuppressWarnings ( "unchecked" )
+		public void toElements( Class<? extends E> impl1, Class<? extends E> impl2,
+				Class<? extends E> impl3, Class<? extends E> impl4 ) {
+			to( (Supplier<? extends E>[]) new Supplier<?>[] { supply( impl1 ), supply( impl2 ),
+					supply( impl3 ), supply( impl4 ) } );
+		}
+
+		@SuppressWarnings ( "unchecked" )
+		public void toElements( Class<? extends E>... impls ) {
+			Supplier<? extends E>[] suppliers = (Supplier<? extends E>[]) new Supplier<?>[impls.length];
+			for ( int i = 0; i < impls.length; i++ ) {
+				suppliers[i] = supply( impls[i] );
+			}
+			to( suppliers );
 		}
 
 		// and so on.... will avoid generic array warning here 
@@ -286,25 +273,25 @@ public class Binder
 
 		@Override
 		public ScopedBinder per( Scope scope ) {
-			return new ScopedBinder( bindings(), strategy(), source(), scope );
+			return new ScopedBinder( bindings, strategy, source, scope );
 		}
 
 		@Override
 		protected RootBinder with( Source source ) {
-			return new RootBinder( bindings(), strategy(), source, scope() );
+			return new RootBinder( bindings, strategy, source, scope );
 		}
 
 		@Override
 		protected RootBinder into( Bindings bindings ) {
-			return new RootBinder( bindings, strategy(), source(), scope() );
+			return new RootBinder( bindings, strategy, source, scope );
 		}
 
 		protected RootBinder using( ConstructionStrategy strategy ) {
-			return new RootBinder( bindings(), strategy, source(), scope() );
+			return new RootBinder( bindings, strategy, source, scope );
 		}
 
 		protected RootBinder asDefault() {
-			return with( source().typed( DeclarationType.DEFAULT ) );
+			return with( source.typed( DeclarationType.DEFAULT ) );
 		}
 	}
 
@@ -334,7 +321,7 @@ public class Binder
 
 		@Override
 		public TargetedBinder injectingInto( Instance<?> target ) {
-			return new TargetedBinder( bindings(), strategy(), source(), scope(), target );
+			return new TargetedBinder( bindings, strategy, source, scope, target );
 		}
 
 	}
@@ -347,29 +334,26 @@ public class Binder
 			super( bindings, strategy, source, scope, Target.ANY );
 		}
 
-		TargetedBinder( Bindings bindings, ConstructionStrategy strategy, Source source, Scope scope,
-				Instance<?> target ) {
+		TargetedBinder( Bindings bindings, ConstructionStrategy strategy, Source source,
+				Scope scope, Instance<?> target ) {
 			super( bindings, strategy, source, scope, Target.targeting( target ) );
 		}
 
-		//TODO improve this since from a dependency point of view it is good to localize all binds somehow
-		// instead of narrow explicit we could expose explicit and make binds as narrow as possible by default (classic interface to impl binds in same package)
-
 		@Override
 		public Binder in( Packages packages ) {
-			return with( target().within( packages ) );
+			return with( target.within( packages ) );
 		}
 
 		public Binder inPackageOf( Class<?> type ) {
-			return with( target().inPackageOf( type ) );
+			return with( target.inPackageOf( type ) );
 		}
 
 		public Binder inSubPackagesOf( Class<?> type ) {
-			return with( target().inSubPackagesOf( type ) );
+			return with( target.inSubPackagesOf( type ) );
 		}
 
 		public Binder inPackageAndSubPackagesOf( Class<?> type ) {
-			return with( target().inPackageAndSubPackagesOf( type ) );
+			return with( target.inPackageAndSubPackagesOf( type ) );
 		}
 	}
 
@@ -384,7 +368,7 @@ public class Binder
 		private final Resource<T> resource;
 
 		TypedBinder( Binder binder, Instance<T> instance ) {
-			this( binder, new Resource<T>( instance, binder.target() ) );
+			this( binder, new Resource<T>( instance, binder.target ) );
 		}
 
 		TypedBinder( Binder binder, Resource<T> resource ) {
@@ -414,15 +398,15 @@ public class Binder
 			to( SuppliedBy.costructor( constructor, parameters ) );
 		}
 
-		public void toClassConstructor( Class<? extends T> type, Parameter<?>... parameters ) {
-			if ( binder.notConstructable( type ) ) {
-				throw new IllegalArgumentException( "Not a constructable type: " + type );
+		public void toConstructor( Class<? extends T> impl, Parameter<?>... parameters ) {
+			if ( binder.notConstructable( impl ) ) {
+				throw new IllegalArgumentException( "Not a constructable type: " + impl );
 			}
-			to( SuppliedBy.costructor( binder.strategy().constructorFor( type ), parameters ) );
+			to( SuppliedBy.costructor( binder.strategy.constructorFor( impl ), parameters ) );
 		}
 
 		public void toConstructor( Parameter<?>... parameters ) {
-			toClassConstructor( resource.getType().getRawType(), parameters );
+			toConstructor( resource.getType().getRawType(), parameters );
 		}
 
 		public void to( T constant ) {
@@ -440,7 +424,7 @@ public class Binder
 
 		public <I extends Supplier<? extends T>> void toSupplier( Class<I> impl ) {
 			to( SuppliedBy.reference( impl ) );
-			implicitBindToConstructor( impl );
+			implicitBindToConstructor( defaultInstanceOf( raw( impl ) ) );
 		}
 
 		public void to( Provider<? extends T> provider ) {
@@ -457,17 +441,11 @@ public class Binder
 		}
 
 		public void toConstructor() {
-			to( binder.strategy().constructorFor( resource.getType().getRawType() ) );
+			to( binder.strategy.constructorFor( resource.getType().getRawType() ) );
 		}
 
 		public <I extends T> void to( Class<I> impl ) {
-			//TODO move all this to the to(Instance) method -to have just one place
-			//FIXME if impl type is also final this is an explicit constructor bind
-			//FIXME if impl is an interface and the same type as the resource (and default instance) this is an error because it cannot lead somewhere 
-			if ( resource.getType().getRawType() != impl || !resource.getName().isDefault() ) {
-				to( SuppliedBy.type( Type.raw( impl ) ) );
-			}
-			implicitBindToConstructor( impl );
+			to( Instance.anyOf( raw( impl ) ) );
 		}
 
 		public <I extends T> void to( Name name, Type<I> type ) {
@@ -479,17 +457,23 @@ public class Binder
 		}
 
 		public <I extends T> void to( Instance<I> instance ) {
-			//FIXME don#t do the below when this is exactly the same instance as the resource - would describe a loop
-			to( SuppliedBy.instance( instance ) );
-			implicitBindToConstructor( instance );
+			to( supply( instance ) );
 		}
 
-		void implicitBindToConstructor( Class<?>... impls ) {
-			binder.implicitBindToConstructor( impls );
+		<I> Supplier<I> supply( Class<I> impl ) {
+			return supply( Instance.anyOf( raw( impl ) ) );
 		}
 
-		<I> void implicitBindToConstructor( Class<I> impl ) {
-			binder.implicitBindToConstructor( impl );
+		<I> Supplier<I> supply( Instance<I> instance ) {
+			if ( !resource.getInstance().equalTo( instance ) ) {
+				implicitBindToConstructor( instance );
+				return SuppliedBy.instance( instance );
+			}
+			if ( instance.getType().getRawType().isInterface() ) {
+				throw new IllegalArgumentException( "Interface type linked in a loop: "
+						+ resource.getInstance() + " > " + instance );
+			}
+			return SuppliedBy.costructor( binder.strategy.constructorFor( instance.getType().getRawType() ) );
 		}
 
 		<I> void implicitBindToConstructor( Instance<I> instance ) {

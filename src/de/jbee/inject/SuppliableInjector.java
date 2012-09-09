@@ -25,6 +25,7 @@ public final class SuppliableInjector
 		this.injectrons = Injectorizer.injectrons( suppliables, this );
 	}
 
+	@SuppressWarnings ( "unchecked" )
 	@Override
 	public <T> T resolve( Dependency<T> dependency ) {
 		// OPEN is it true, that the dependency passed to the injectron can/should get the type/name added ? 

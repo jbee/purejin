@@ -41,14 +41,6 @@ public final class SuppliedBy {
 		return new ReferencingSupplier<T>( type );
 	}
 
-	public static <T> Supplier<T> type( Class<T> type ) {
-		return type( Type.raw( type ) );
-	}
-
-	public static <T> Supplier<T> type( Type<T> type ) {
-		return instance( Instance.anyOf( type ) );
-	}
-
 	public static <T> Supplier<T> instance( Instance<T> instance ) {
 		return new InstanceSupplier<T>( instance );
 	}

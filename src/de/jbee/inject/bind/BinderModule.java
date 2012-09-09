@@ -31,7 +31,7 @@ public abstract class BinderModule
 
 	@Override
 	public void declare( Bindings bindings, ConstructionStrategy strategy ) {
-		nonnullThrowsReentranceException( binder.bindings() );
+		nonnullThrowsReentranceException( binder.bindings );
 		this.binder = binder.into( bindings ).using( strategy ).with( source( getClass() ) );
 		declare();
 	}
