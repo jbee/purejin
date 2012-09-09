@@ -453,9 +453,11 @@ public final class Type<T>
 		for ( int i = 0; i < interfaces.length; i++ ) {
 			Type<? super T> interfaceType = Type.type( interfaces[i], genericInterfaces[i],
 					actualTypeArguments );
-			res.add( interfaceType );
-			addTypeParametersTo( interfaceType, actualTypeArguments );
-			addSuperInterfaces( res, interfaces[i], actualTypeArguments );
+			if ( !res.contains( interfaceType ) ) {
+				res.add( interfaceType );
+				addTypeParametersTo( interfaceType, actualTypeArguments );
+				addSuperInterfaces( res, interfaces[i], actualTypeArguments );
+			}
 		}
 	}
 
