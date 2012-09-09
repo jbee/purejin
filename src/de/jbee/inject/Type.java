@@ -6,11 +6,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.TypeVariable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A generic version of {@link Class} like {@link java.lang.reflect.Type} but without a complex
@@ -94,9 +95,6 @@ public final class Type<T>
 						+ " is not the raw type of the given type: " + type );
 			}
 			return new Type<T>( rawType, types( pt.getActualTypeArguments(), actualTypeArguments ) );
-		}
-		if ( type instanceof TypeVariable<?> ) {
-
 		}
 		throw notSupportedYet( type );
 	}
@@ -188,6 +186,16 @@ public final class Type<T>
 			}
 		}
 		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return rawType.hashCode();
+	}
+
+	@Override
+	public boolean equals( Object obj ) {
+		return obj instanceof Type<?> && equalTo( (Type<?>) obj );
 	}
 
 	/**
@@ -410,38 +418,42 @@ public final class Type<T>
 	 */
 	@SuppressWarnings ( "unchecked" )
 	public Type<? super T>[] supertypes() {
-		List<Type<? super T>> res = new ArrayList<Type<? super T>>();
+		Set<Type<? super T>> res = new LinkedHashSet<Type<? super T>>();
 		Class<? super T> supertype = rawType;
 		java.lang.reflect.Type genericSupertype = null;
+		Type<? super T> type = this;
 		Map<String, Type<?>> actualTypeArguments = new HashMap<String, Type<?>>();
 		while ( supertype != null ) {
 			if ( genericSupertype != null ) {
-				res.add( type( supertype, genericSupertype, actualTypeArguments ) );
+				type = type( supertype, genericSupertype, actualTypeArguments );
+				res.add( type );
 			}
-			addTypeParametersTo( actualTypeArguments );
+			addTypeParametersTo( type, actualTypeArguments );
 			addSuperInterfaces( res, supertype, actualTypeArguments );
 			genericSupertype = supertype.getGenericSuperclass();
 			supertype = supertype.getSuperclass();
 		}
-		//TODO avoid duplicates (could be same interface)
 		return (Type<? super T>[]) res.toArray( new Type<?>[res.size()] );
 	}
 
-	private void addTypeParametersTo( Map<String, Type<?>> actualTypeArguments ) {
-		TypeVariable<Class<T>>[] typeParameters = rawType.getTypeParameters();
+	private <V> void addTypeParametersTo( Type<V> type, Map<String, Type<?>> actualTypeArguments ) {
+		TypeVariable<Class<V>>[] typeParameters = type.rawType.getTypeParameters();
 		for ( int i = 0; i < typeParameters.length; i++ ) {
 			actualTypeArguments.put( typeParameters[i].getName(), isParameterized()
-				? params[i]
+				? type.params[i]
 				: WILDCARD ); //TODO use bounds in that case ?
 		}
 	}
 
-	private void addSuperInterfaces( List<Type<? super T>> res, Class<? super T> type,
+	private void addSuperInterfaces( Set<Type<? super T>> res, Class<? super T> type,
 			Map<String, Type<?>> actualTypeArguments ) {
 		Class<? super T>[] interfaces = (Class<? super T>[]) type.getInterfaces();
 		java.lang.reflect.Type[] genericInterfaces = type.getGenericInterfaces();
 		for ( int i = 0; i < interfaces.length; i++ ) {
-			res.add( Type.type( interfaces[i], genericInterfaces[i], actualTypeArguments ) );
+			Type<? super T> interfaceType = Type.type( interfaces[i], genericInterfaces[i],
+					actualTypeArguments );
+			res.add( interfaceType );
+			addTypeParametersTo( interfaceType, actualTypeArguments );
 			addSuperInterfaces( res, interfaces[i], actualTypeArguments );
 		}
 	}
