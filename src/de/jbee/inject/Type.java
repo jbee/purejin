@@ -7,7 +7,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A generic version of {@link Class} like {@link java.lang.reflect.Type} but without a complex
@@ -76,6 +79,11 @@ public final class Type<T>
 	}
 
 	public static <T> Type<T> type( Class<T> rawType, java.lang.reflect.Type type ) {
+		return type( rawType, type, Collections.<String, Type<?>> emptyMap() );
+	}
+
+	private static <T> Type<T> type( Class<T> rawType, java.lang.reflect.Type type,
+			Map<String, Type<?>> actualTypeArguments ) {
 		if ( type == rawType ) {
 			return raw( rawType );
 		}
@@ -85,7 +93,10 @@ public final class Type<T>
 				throw new IllegalArgumentException( "The given raw type " + rawType
 						+ " is not the raw type of the given type: " + type );
 			}
-			return new Type<T>( rawType, types( pt.getActualTypeArguments() ) );
+			return new Type<T>( rawType, types( pt.getActualTypeArguments(), actualTypeArguments ) );
+		}
+		if ( type instanceof TypeVariable<?> ) {
+
 		}
 		throw notSupportedYet( type );
 	}
@@ -94,28 +105,34 @@ public final class Type<T>
 		return new UnsupportedOperationException( "Type has no support yet: " + type );
 	}
 
-	private static Type<?>[] types( java.lang.reflect.Type[] parameters ) {
+	private static Type<?>[] types( java.lang.reflect.Type[] parameters,
+			Map<String, Type<?>> actualTypeArguments ) {
 		Type<?>[] args = new Type<?>[parameters.length];
 		for ( int i = 0; i < parameters.length; i++ ) {
-			args[i] = type( parameters[i] );
+			args[i] = type( parameters[i], actualTypeArguments );
 		}
 		return args;
 	}
 
-	private static Type<?> type( java.lang.reflect.Type type ) {
+	private static Type<?> type( java.lang.reflect.Type type,
+			Map<String, Type<?>> actualTypeArguments ) {
 		if ( type instanceof Class<?> ) {
 			return raw( (Class<?>) type );
 		}
 		if ( type instanceof ParameterizedType ) {
-			return parameterizedType( (ParameterizedType) type );
+			return parameterizedType( (ParameterizedType) type, actualTypeArguments );
+		}
+		if ( type instanceof TypeVariable<?> ) {
+			return actualTypeArguments.get( ( (TypeVariable<?>) type ).getName() );
 		}
 		throw notSupportedYet( type );
 	}
 
-	private static <T> Type<?> parameterizedType( ParameterizedType type ) {
+	private static <T> Type<?> parameterizedType( ParameterizedType type,
+			Map<String, Type<?>> actualTypeArguments ) {
 		@SuppressWarnings ( "unchecked" )
 		Class<T> rawType = (Class<T>) type.getRawType();
-		return new Type<T>( rawType, types( type.getActualTypeArguments() ) );
+		return new Type<T>( rawType, types( type.getActualTypeArguments(), actualTypeArguments ) );
 	}
 
 	private final Class<T> rawType;
@@ -127,6 +144,7 @@ public final class Type<T>
 	private final boolean lowerBound;
 
 	private Type( boolean lowerBound, Class<T> rawType, Type<?>[] parameters ) {
+		assert ( rawType != null );
 		this.rawType = rawType;
 		this.params = parameters;
 		this.lowerBound = lowerBound;
@@ -144,7 +162,7 @@ public final class Type<T>
 		return new Type<T>( true, rawType, params );
 	}
 
-	public Type<? extends T> exact() {
+	public Type<? extends T> asExactType() {
 		return new Type<T>( false, rawType, params );
 	}
 
@@ -239,7 +257,7 @@ public final class Type<T>
 		if ( rawType == other.rawType ) {
 			return !isParameterized() || allParametersAreAssignableTo( other );
 		}
-		return other.isLowerBound() && isAssignableTo( other.exact() );
+		return other.isLowerBound() && isAssignableTo( other.asExactType() );
 	}
 
 	public boolean isInterface() {
@@ -392,20 +410,40 @@ public final class Type<T>
 	 */
 	@SuppressWarnings ( "unchecked" )
 	public Type<? super T>[] supertypes() {
-		//FIXME no generics are supported here - add them
 		List<Type<? super T>> res = new ArrayList<Type<? super T>>();
 		Class<? super T> supertype = rawType;
+		java.lang.reflect.Type genericSupertype = null;
+		Map<String, Type<?>> actualTypeArguments = new HashMap<String, Type<?>>();
 		while ( supertype != null ) {
-			res.add( raw( supertype ) );
-			Class<?>[] interfaces = supertype.getInterfaces();
-			java.lang.reflect.Type[] genericInterfaces = supertype.getGenericInterfaces();
-			for ( int i = 0; i < interfaces.length; i++ ) {
-				res.add( (Type<? super T>) Type.type( interfaces[i], genericInterfaces[i] ) );
+			if ( genericSupertype != null ) {
+				res.add( type( supertype, genericSupertype, actualTypeArguments ) );
 			}
+			addTypeParametersTo( actualTypeArguments );
+			addSuperInterfaces( res, supertype, actualTypeArguments );
+			genericSupertype = supertype.getGenericSuperclass();
 			supertype = supertype.getSuperclass();
 		}
-		res.remove( 0 ); // that is this raw type itself
+		//TODO avoid duplicates (could be same interface)
 		return (Type<? super T>[]) res.toArray( new Type<?>[res.size()] );
+	}
+
+	private void addTypeParametersTo( Map<String, Type<?>> actualTypeArguments ) {
+		TypeVariable<Class<T>>[] typeParameters = rawType.getTypeParameters();
+		for ( int i = 0; i < typeParameters.length; i++ ) {
+			actualTypeArguments.put( typeParameters[i].getName(), isParameterized()
+				? params[i]
+				: WILDCARD ); //TODO use bounds in that case ?
+		}
+	}
+
+	private void addSuperInterfaces( List<Type<? super T>> res, Class<? super T> type,
+			Map<String, Type<?>> actualTypeArguments ) {
+		Class<? super T>[] interfaces = (Class<? super T>[]) type.getInterfaces();
+		java.lang.reflect.Type[] genericInterfaces = type.getGenericInterfaces();
+		for ( int i = 0; i < interfaces.length; i++ ) {
+			res.add( Type.type( interfaces[i], genericInterfaces[i], actualTypeArguments ) );
+			addSuperInterfaces( res, interfaces[i], actualTypeArguments );
+		}
 	}
 
 	public Type<? super T> supertype( Class<? super T> superclass ) {

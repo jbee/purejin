@@ -7,6 +7,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -36,6 +38,8 @@ public class TestAutobindBinds {
 		@Override
 		protected void declare() {
 			autobind( Integer.class ).to( 42 );
+			autobind( raw( List.class ).parametized( String.class ) ).to(
+					Arrays.asList( new String[] {} ) );
 		}
 
 	}

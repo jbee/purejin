@@ -7,8 +7,11 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.lang.reflect.Field;
+import java.util.AbstractCollection;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
@@ -154,6 +157,38 @@ public class TestType {
 		Type<? super Integer>[] intergerSupertypes = Type.raw( Integer.class ).supertypes();
 		assertContains( intergerSupertypes,
 				Type.raw( Comparable.class ).parametized( Integer.class ) );
+	}
+
+	@Test
+	public void thatTypeVariableSuperInterfacesAreAvailableAsSupertype() {
+		Type<? super List>[] supertypes = Type.raw( List.class ).parametized( String.class ).supertypes();
+		assertContains( supertypes, Type.raw( Collection.class ).parametized( String.class ) );
+	}
+
+	@Test
+	public void thatTypeVariableSuperSuperInterfacesAreAvailableAsSupertype() {
+		Type<? super List>[] supertypes = Type.raw( List.class ).parametized( String.class ).supertypes();
+		assertContains( supertypes, Type.raw( Iterable.class ).parametized( String.class ) );
+	}
+
+	@Test
+	public void thatTypeVariableSuperInterfacesUseWildcardDefaultAsSupertype() {
+		Type<? super List>[] supertypes = Type.raw( List.class ).supertypes();
+		assertContains( supertypes, Type.raw( Collection.class ).parametized( Type.WILDCARD ) );
+	}
+
+	@Test
+	public void thatTypeVariableSuperClassIsAvailableAsSupertype() {
+		Type<? super ArrayList>[] supertypes = Type.raw( ArrayList.class ).parametized(
+				String.class ).supertypes();
+		assertContains( supertypes, Type.raw( AbstractList.class ).parametized( String.class ) );
+	}
+
+	@Test
+	public void thatTypeVariableSuperSuperClassIsAvailableAsSupertype() {
+		Type<? super ArrayList>[] supertypes = Type.raw( ArrayList.class ).parametized(
+				String.class ).supertypes();
+		assertContains( supertypes, Type.raw( AbstractCollection.class ).parametized( String.class ) );
 	}
 
 	private void assertContains( Type<?>[] actual, Type<?> expected ) {
