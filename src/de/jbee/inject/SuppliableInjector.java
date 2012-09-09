@@ -7,11 +7,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * A {@link Injector} that uses {@link Suppliable}s as the starting base.
+ * The default {@link Injector} that uses {@link Suppliable}s as its base data.
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
-public class SuppliableInjector
+public final class SuppliableInjector
 		implements Injector {
 
 	public static SuppliableInjector create( Suppliable<?>[] suppliables ) {
@@ -82,6 +82,7 @@ public class SuppliableInjector
 			addAllApplicable( elements, dependency, elementType, elementInjectrons );
 			return toArray( elements, elementType );
 		}
+		// if there hasn't been binds to that specific wildcard Type  
 		if ( elementType.isLowerBound() ) { // wildcard dependency:
 			List<E> elements = new ArrayList<E>();
 			for ( Entry<Class<?>, Injectron<?>[]> e : injectrons.entrySet() ) {
