@@ -18,6 +18,32 @@ import org.junit.Test;
 
 public class TestType {
 
+	private static interface Baz<T> {
+		// needed to check supertypes() method
+	}
+
+	@SuppressWarnings ( "synthetic-access" )
+	private static class Bar<A, B>
+			extends Foo<B, String>
+			implements Baz<A> {
+		// needed to check supertypes() method
+	}
+
+	@SuppressWarnings ( "synthetic-access" )
+	private static class Foo<A, B>
+			extends Qux<A> {
+		// needed to check supertypes() method
+	}
+
+	private static class Qux<R>
+			implements QuxQux<R> {
+		// needed to check supertypes() method
+	}
+
+	private static interface QuxQux<T> {
+		// needed to check supertypes() method
+	}
+
 	private List<String> aStringListField;
 
 	@Test
@@ -189,6 +215,15 @@ public class TestType {
 		Type<? super ArrayList>[] supertypes = Type.raw( ArrayList.class ).parametized(
 				String.class ).supertypes();
 		assertContains( supertypes, Type.raw( AbstractCollection.class ).parametized( String.class ) );
+	}
+
+	@Test
+	public void thatTypeVariablesResolvedCorrectlyForSupertypes() {
+		Type<Bar> type = Type.raw( Bar.class ).parametized( Integer.class, Float.class );
+		Type<? super Bar>[] supertypes = type.supertypes();
+		assertContains( supertypes, Type.raw( Foo.class ).parametized( Float.class, String.class ) );
+		assertContains( supertypes, Type.raw( Baz.class ).parametized( Integer.class ) );
+		assertContains( supertypes, Type.raw( QuxQux.class ).parametized( Float.class ) );
 	}
 
 	private void assertContains( Type<?>[] actual, Type<?> expected ) {

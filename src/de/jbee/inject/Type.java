@@ -447,6 +447,7 @@ public final class Type<T>
 
 	private void addSuperInterfaces( Set<Type<? super T>> res, Class<? super T> type,
 			Map<String, Type<?>> actualTypeArguments ) {
+		@SuppressWarnings ( "unchecked" )
 		Class<? super T>[] interfaces = (Class<? super T>[]) type.getInterfaces();
 		java.lang.reflect.Type[] genericInterfaces = type.getGenericInterfaces();
 		for ( int i = 0; i < interfaces.length; i++ ) {
