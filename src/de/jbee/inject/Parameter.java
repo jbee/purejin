@@ -2,6 +2,8 @@ package de.jbee.inject;
 
 import java.lang.reflect.Constructor;
 
+import de.jbee.inject.bind.ConstructionStrategy;
+
 /**
  * {@linkplain Parameter}s are *not* about to find/identify the {@link Constructor} to use! This
  * would get far to complex to understand (yet simple to implement) using different constructors

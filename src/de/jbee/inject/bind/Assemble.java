@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import de.jbee.inject.Expiry;
-import de.jbee.inject.ConstructionStrategy;
 import de.jbee.inject.Precision;
 import de.jbee.inject.Repository;
 import de.jbee.inject.Resource;

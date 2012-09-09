@@ -2,7 +2,6 @@ package de.jbee.inject.bind;
 
 import static de.jbee.inject.Source.source;
 import static de.jbee.inject.bind.Bootstrap.nonnullThrowsReentranceException;
-import de.jbee.inject.ConstructionStrategy;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Name;
 import de.jbee.inject.Packages;

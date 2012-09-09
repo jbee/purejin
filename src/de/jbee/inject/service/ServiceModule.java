@@ -14,7 +14,6 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 import de.jbee.inject.Dependency;
-import de.jbee.inject.ConstructionStrategy;
 import de.jbee.inject.Injector;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.Type;
@@ -23,6 +22,7 @@ import de.jbee.inject.bind.BinderModule;
 import de.jbee.inject.bind.Bindings;
 import de.jbee.inject.bind.Bootstrapper;
 import de.jbee.inject.bind.Bundle;
+import de.jbee.inject.bind.ConstructionStrategy;
 import de.jbee.inject.bind.Extend;
 import de.jbee.inject.bind.Module;
 import de.jbee.inject.bind.Binder.RootBinder;

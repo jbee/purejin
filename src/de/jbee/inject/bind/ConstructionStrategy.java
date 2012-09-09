@@ -1,4 +1,4 @@
-package de.jbee.inject;
+package de.jbee.inject.bind;
 
 import java.lang.reflect.Constructor;
 
