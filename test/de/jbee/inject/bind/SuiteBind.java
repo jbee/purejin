@@ -12,7 +12,7 @@ import org.junit.runners.Suite.SuiteClasses;
 		TestConstantModularBinds.class, TestTargetedBinds.class, TestLoggerBinds.class,
 		TestRobotLegsProblemBinds.class, TestConstructorParameterBinds.class,
 		TestDependencyParameterBinds.class, TestScopedBinds.class, TestExtensionBinds.class,
-		TestInjectronBinds.class } )
+		TestInjectronBinds.class, TestProviderBinds.class } )
 public class SuiteBind {
 	// all tests in the bind package
 }

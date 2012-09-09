@@ -78,8 +78,12 @@ public final class Type<T>
 		return new Type<T>( type );
 	}
 
-	@SuppressWarnings ( "unchecked" )
 	public static <T> Type<? extends List<T>> listOf( Class<T> elementType ) {
+		return listOf( raw( elementType ) );
+	}
+
+	@SuppressWarnings ( "unchecked" )
+	public static <T> Type<? extends List<T>> listOf( Type<T> elementType ) {
 		return (Type<? extends List<T>>) raw( List.class ).parametized( elementType );
 	}
 
