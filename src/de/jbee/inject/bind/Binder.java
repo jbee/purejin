@@ -2,7 +2,6 @@ package de.jbee.inject.bind;
 
 import static de.jbee.inject.Instance.defaultInstanceOf;
 import static de.jbee.inject.Instance.instance;
-import static de.jbee.inject.Type.instanceType;
 import static de.jbee.inject.Type.raw;
 import static de.jbee.inject.util.SuppliedBy.constant;
 import static de.jbee.inject.util.SuppliedBy.provider;
@@ -447,7 +446,14 @@ public class Binder
 
 		public void to( Provider<? extends T> provider ) {
 			to( provider( provider ) );
-			binder.implicit().bind( defaultInstanceOf( instanceType( Provider.class, provider ) ) ).to(
+			implicitProvider( provider );
+		}
+
+		@SuppressWarnings ( "unchecked" )
+		private <P> void implicitProvider( Provider<P> provider ) {
+			Type<Provider<P>> providerType = (Type<Provider<P>>) raw( provider.getClass() ).supertype(
+					Provider.class );
+			binder.implicit().bind( defaultInstanceOf( providerType ) ).to(
 					SuppliedBy.constant( provider ) );
 		}
 

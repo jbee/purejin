@@ -4,9 +4,11 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
@@ -68,8 +70,7 @@ public class TestType {
 	@Test
 	public void testGenericArrays() {
 		Type<Class[]> classArray = Type.raw( Class[].class ).parametized( String.class );
-		assertThat( classArray.elementType().toString(),
-				is( "java.lang.Class<java.lang.String>" ) );
+		assertThat( classArray.elementType().toString(), is( "java.lang.Class<java.lang.String>" ) );
 	}
 
 	@Test
@@ -146,5 +147,21 @@ public class TestType {
 	public void testArrayType() {
 		Type<? extends Number> t = Type.raw( Number.class ).asLowerBound();
 		assertThat( t.getArrayType().toString(), is( "? extends java.lang.Number[]" ) );
+	}
+
+	@Test
+	public void thatGenericSuperInterfacesAreAvailableAsSupertype() {
+		Type<? super Integer>[] intergerSupertypes = Type.raw( Integer.class ).supertypes();
+		assertContains( intergerSupertypes,
+				Type.raw( Comparable.class ).parametized( Integer.class ) );
+	}
+
+	private void assertContains( Type<?>[] actual, Type<?> expected ) {
+		for ( Type<?> type : actual ) {
+			if ( type.equalTo( expected ) ) {
+				return;
+			}
+		}
+		fail( Arrays.toString( actual ) + " should have contained: " + expected );
 	}
 }

@@ -2,14 +2,14 @@ package de.jbee.inject.bind;
 
 import static de.jbee.inject.Dependency.dependency;
 import static de.jbee.inject.Name.named;
-import static de.jbee.inject.Type.listOf;
+import static de.jbee.inject.Type.listTypeOf;
 import static de.jbee.inject.Type.raw;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Ignore;
@@ -59,19 +59,20 @@ public class TestInstanceBinds {
 
 	@Test
 	public void testListIsAvailableForBoundType() {
-		assertInjects( singletonList( "foobar" ), listOf( String.class ) );
-		assertInjects( Arrays.asList( new Integer[] { 42, 846 } ), listOf( Integer.class ) );
+		assertInjects( singletonList( "foobar" ), listTypeOf( String.class ) );
+		assertInjects( asList( new Integer[] { 42, 846 } ), listTypeOf( Integer.class ) );
 	}
 
 	@Test
 	public void thatListAsLowerBoundIsAvailable() {
-		Type<? extends List<Number>> wildcardListType = listOf( Number.class ).parametizedAsLowerBounds();
+		Type<? extends List<Number>> wildcardListType = listTypeOf( Number.class ).parametizedAsLowerBounds();
 		assertInjectsItems( new Number[] { 846, 42, 42.0f }, wildcardListType );
 	}
 
 	@Test
 	public void thatListOfListsOfBoundTypesAreAvailable() {
-		assertInjects( singletonList( singletonList( "foobar" ) ), listOf( listOf( String.class ) ) );
+		assertInjects( singletonList( singletonList( "foobar" ) ),
+				listTypeOf( listTypeOf( String.class ) ) );
 	}
 
 	@Test
@@ -85,7 +86,7 @@ public class TestInstanceBinds {
 	}
 
 	private <E> void assertInjectsItems( E[] expected, Type<? extends List<?>> dependencyType ) {
-		assertInjectsItems( Arrays.asList( expected ), dependencyType );
+		assertInjectsItems( asList( expected ), dependencyType );
 	}
 
 	@SuppressWarnings ( "unchecked" )

@@ -57,18 +57,6 @@ public final class Type<T>
 		return res;
 	}
 
-	public static <T> Type<T> instanceType( Class<T> rawType, T instance ) {
-		Class<?> type = instance.getClass();
-		if ( type == rawType ) { // there will be no generic type arguments
-			return new Type<T>( rawType );
-		}
-		java.lang.reflect.Type superclass = type.getGenericSuperclass();
-		// TODO check if this is or has the raw type
-		java.lang.reflect.Type[] interfaces = type.getGenericInterfaces();
-		// TODO check if one of them is or has the raw type
-		return null;
-	}
-
 	@SuppressWarnings ( "unchecked" )
 	public static <T> Type<T> elementType( Class<T[]> arrayType ) {
 		return (Type<T>) raw( arrayType ).elementType();
@@ -78,12 +66,12 @@ public final class Type<T>
 		return new Type<T>( type );
 	}
 
-	public static <T> Type<? extends List<T>> listOf( Class<T> elementType ) {
-		return listOf( raw( elementType ) );
+	public static <T> Type<? extends List<T>> listTypeOf( Class<T> elementType ) {
+		return listTypeOf( raw( elementType ) );
 	}
 
 	@SuppressWarnings ( "unchecked" )
-	public static <T> Type<? extends List<T>> listOf( Type<T> elementType ) {
+	public static <T> Type<? extends List<T>> listTypeOf( Type<T> elementType ) {
 		return (Type<? extends List<T>>) raw( List.class ).parametized( elementType );
 	}
 
@@ -409,13 +397,24 @@ public final class Type<T>
 		Class<? super T> supertype = rawType;
 		while ( supertype != null ) {
 			res.add( raw( supertype ) );
-			for ( Class<?> si : supertype.getInterfaces() ) {
-				res.add( (Type<? super T>) Type.raw( si ) );
+			Class<?>[] interfaces = supertype.getInterfaces();
+			java.lang.reflect.Type[] genericInterfaces = supertype.getGenericInterfaces();
+			for ( int i = 0; i < interfaces.length; i++ ) {
+				res.add( (Type<? super T>) Type.type( interfaces[i], genericInterfaces[i] ) );
 			}
 			supertype = supertype.getSuperclass();
 		}
 		res.remove( 0 ); // that is this raw type itself
 		return (Type<? super T>[]) res.toArray( new Type<?>[res.size()] );
+	}
+
+	public Type<? super T> supertype( Class<? super T> superclass ) {
+		for ( Type<? super T> type : supertypes() ) {
+			if ( type.getRawType() == superclass ) {
+				return type;
+			}
+		}
+		throw notSupportedYet( superclass );
 	}
 
 }
