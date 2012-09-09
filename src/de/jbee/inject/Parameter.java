@@ -8,7 +8,7 @@ import java.lang.reflect.Constructor;
  * depending on the {@linkplain Parameter}s.
  * 
  * {@linkplain Parameter}s identify the {@link Instance} to use for the constructor specified or
- * given by {@link InjectionStrategy}!
+ * given by {@link ConstructionStrategy}!
  * 
  * <h3>How {@linkplain Parameter}s are understood:</h3>
  * <dl>

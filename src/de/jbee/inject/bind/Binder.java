@@ -10,7 +10,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 
 import de.jbee.inject.DeclarationType;
-import de.jbee.inject.InjectionStrategy;
+import de.jbee.inject.ConstructionStrategy;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Name;
 import de.jbee.inject.Packages;
@@ -56,18 +56,18 @@ public class Binder
 		return new AutobindBindings( delegate );
 	}
 
-	public static RootBinder create( Bindings bindings, InjectionStrategy strategy, Source source,
+	public static RootBinder create( Bindings bindings, ConstructionStrategy strategy, Source source,
 			Scope scope ) {
 		return new RootBinder( bindings, strategy, source, scope );
 	}
 
 	private final Bindings bindings;
-	private final InjectionStrategy strategy;
+	private final ConstructionStrategy strategy;
 	private final Source source;
 	private final Scope scope;
 	private final Target target;
 
-	Binder( Bindings bindings, InjectionStrategy strategy, Source source, Scope scope, Target target ) {
+	Binder( Bindings bindings, ConstructionStrategy strategy, Source source, Scope scope, Target target ) {
 		super();
 		this.bindings = bindings;
 		this.strategy = strategy;
@@ -172,7 +172,7 @@ public class Binder
 		return bindings;
 	}
 
-	final InjectionStrategy strategy() {
+	final ConstructionStrategy strategy() {
 		return strategy;
 	}
 
@@ -281,7 +281,7 @@ public class Binder
 			extends ScopedBinder
 			implements RootBasicBinder {
 
-		RootBinder( Bindings bindings, InjectionStrategy strategy, Source source, Scope scope ) {
+		RootBinder( Bindings bindings, ConstructionStrategy strategy, Source source, Scope scope ) {
 			super( bindings, strategy, source, scope );
 		}
 
@@ -300,7 +300,7 @@ public class Binder
 			return new RootBinder( bindings, strategy(), source(), scope() );
 		}
 
-		protected RootBinder using( InjectionStrategy strategy ) {
+		protected RootBinder using( ConstructionStrategy strategy ) {
 			return new RootBinder( bindings(), strategy, source(), scope() );
 		}
 
@@ -313,7 +313,7 @@ public class Binder
 			extends TargetedBinder
 			implements ScopedBasicBinder {
 
-		ScopedBinder( Bindings bindings, InjectionStrategy strategy, Source source, Scope scope ) {
+		ScopedBinder( Bindings bindings, ConstructionStrategy strategy, Source source, Scope scope ) {
 			super( bindings, strategy, source, scope );
 		}
 
@@ -344,11 +344,11 @@ public class Binder
 			extends Binder
 			implements TargetedBasicBinder {
 
-		TargetedBinder( Bindings bindings, InjectionStrategy strategy, Source source, Scope scope ) {
+		TargetedBinder( Bindings bindings, ConstructionStrategy strategy, Source source, Scope scope ) {
 			super( bindings, strategy, source, scope, Target.ANY );
 		}
 
-		TargetedBinder( Bindings bindings, InjectionStrategy strategy, Source source, Scope scope,
+		TargetedBinder( Bindings bindings, ConstructionStrategy strategy, Source source, Scope scope,
 				Instance<?> target ) {
 			super( bindings, strategy, source, scope, Target.targeting( target ) );
 		}

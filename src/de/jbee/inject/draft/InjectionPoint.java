@@ -7,12 +7,15 @@ import de.jbee.inject.Instance;
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  * 
- * @deprecated Not used
  */
-@Deprecated
 public interface InjectionPoint<T> {
 
 	void inject( T instance );
 
 	Instance<T> getInstance();
+
+	interface InjectionPointStrategy {
+
+		<T> InjectionPoint<?>[] injectionPointsFor( Class<T> type );
+	}
 }

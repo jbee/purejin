@@ -1,9 +1,9 @@
 package de.jbee.inject.bind;
 
-import de.jbee.inject.InjectionStrategy;
+import de.jbee.inject.ConstructionStrategy;
 
 public interface Module {
 
-	void declare( Bindings bindings, InjectionStrategy strategy );
+	void declare( Bindings bindings, ConstructionStrategy strategy );
 
 }
