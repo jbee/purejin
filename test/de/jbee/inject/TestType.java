@@ -226,6 +226,12 @@ public class TestType {
 		assertContains( supertypes, Type.raw( QuxQux.class ).parametized( Float.class ) );
 	}
 
+	@Test
+	public void thatCompareableSupertypeOfIntegerIsCompareableInteger() {
+		assertTrue( Type.supertype( Comparable.class, Type.raw( Integer.class ) ).equalTo(
+				Type.raw( Comparable.class ).parametized( Integer.class ) ) );
+	}
+
 	private void assertContains( Type<?>[] actual, Type<?> expected ) {
 		for ( Type<?> type : actual ) {
 			if ( type.equalTo( expected ) ) {

@@ -422,13 +422,13 @@ public final class Type<T>
 		Class<? super T> supertype = rawType;
 		java.lang.reflect.Type genericSupertype = null;
 		Type<? super T> type = this;
-		Map<String, Type<?>> actualTypeArguments = new HashMap<String, Type<?>>();
+		Map<String, Type<?>> actualTypeArguments = actualTypeArguments( type );
 		while ( supertype != null ) {
 			if ( genericSupertype != null ) {
 				type = type( supertype, genericSupertype, actualTypeArguments );
 				res.add( type );
 			}
-			addTypeParametersTo( type, actualTypeArguments );
+			actualTypeArguments = actualTypeArguments( type );
 			addSuperInterfaces( res, supertype, actualTypeArguments );
 			genericSupertype = supertype.getGenericSuperclass();
 			supertype = supertype.getSuperclass();
@@ -436,13 +436,15 @@ public final class Type<T>
 		return (Type<? super T>[]) res.toArray( new Type<?>[res.size()] );
 	}
 
-	private <V> void addTypeParametersTo( Type<V> type, Map<String, Type<?>> actualTypeArguments ) {
+	private <V> Map<String, Type<?>> actualTypeArguments( Type<V> type ) {
+		Map<String, Type<?>> actualTypeArguments = new HashMap<String, Type<?>>();
 		TypeVariable<Class<V>>[] typeParameters = type.rawType.getTypeParameters();
 		for ( int i = 0; i < typeParameters.length; i++ ) {
 			actualTypeArguments.put( typeParameters[i].getName(), isParameterized()
 				? type.params[i]
 				: WILDCARD ); //TODO use bounds in that case ?
 		}
+		return actualTypeArguments;
 	}
 
 	private void addSuperInterfaces( Set<Type<? super T>> res, Class<? super T> type,
@@ -455,19 +457,19 @@ public final class Type<T>
 					actualTypeArguments );
 			if ( !res.contains( interfaceType ) ) {
 				res.add( interfaceType );
-				addTypeParametersTo( interfaceType, actualTypeArguments );
-				addSuperInterfaces( res, interfaces[i], actualTypeArguments );
+				addSuperInterfaces( res, interfaces[i], actualTypeArguments( interfaceType ) );
 			}
 		}
 	}
 
-	public Type<? super T> supertype( Class<? super T> superclass ) {
-		for ( Type<? super T> type : supertypes() ) {
-			if ( type.getRawType() == superclass ) {
-				return type;
+	@SuppressWarnings ( "unchecked" )
+	public static <S> Type<? extends S> supertype( Class<S> supertype, Type<? extends S> type ) {
+		for ( Type<?> s : type.supertypes() ) {
+			if ( s.getRawType() == supertype ) {
+				return (Type<? extends S>) s;
 			}
 		}
-		throw notSupportedYet( superclass );
+		throw notSupportedYet( supertype );
 	}
 
 }

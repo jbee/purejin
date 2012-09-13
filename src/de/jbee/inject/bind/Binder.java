@@ -434,8 +434,8 @@ public class Binder
 
 		@SuppressWarnings ( "unchecked" )
 		private <P> void implicitProvider( Provider<P> provider ) {
-			Type<Provider<P>> providerType = (Type<Provider<P>>) raw( provider.getClass() ).supertype(
-					Provider.class );
+			Type<Provider<P>> providerType = (Type<Provider<P>>) Type.supertype( Provider.class,
+					raw( provider.getClass() ) );
 			binder.implicit().bind( defaultInstanceOf( providerType ) ).to(
 					SuppliedBy.constant( provider ) );
 		}
