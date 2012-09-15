@@ -1,5 +1,6 @@
 package de.jbee.inject.util;
 
+import static de.jbee.inject.Type.parameterTypes;
 import static de.jbee.inject.util.Argument.argumentFor;
 
 import java.lang.reflect.Array;
@@ -19,6 +20,8 @@ import de.jbee.inject.Supplier;
 import de.jbee.inject.Type;
 
 public final class SuppliedBy {
+
+	private static final Object[] NO_ARGS = new Object[0];
 
 	public static final Supplier<Provider<?>> PROVIDER_BRIDGE = new ProviderSupplier();
 	public static final Supplier<List<?>> LIST_BRIDGE = new ArrayToListBridgeSupplier();
@@ -52,14 +55,14 @@ public final class SuppliedBy {
 	public static <T> Supplier<T> costructor( Constructor<T> constructor ) {
 		final Class<?>[] params = constructor.getParameterTypes();
 		if ( params.length == 0 ) {
-			return new NoArgsConstructorSupplier<T>( constructor );
+			return new StaticConstructorSupplier<T>( constructor, NO_ARGS );
 		}
 		return costructor( constructor, new Parameter[0] );
 	}
 
 	public static <T> Supplier<T> costructor( Constructor<T> constructor,
 			Parameter<?>... parameters ) {
-		Type<?>[] types = Type.parameterTypes( constructor );
+		Type<?>[] types = parameterTypes( constructor );
 		Argument<?>[] arguments = new Argument<?>[types.length];
 		for ( Parameter<?> parameter : parameters ) {
 			int i = 0;
@@ -81,6 +84,10 @@ public final class SuppliedBy {
 			if ( arguments[i] == null ) {
 				arguments[i] = argumentFor( types[i] );
 			}
+		}
+		if ( arguments.length == types.length && Argument.allConstants( arguments ) ) {
+			return new StaticConstructorSupplier<T>( constructor,
+					Argument.constantsFrom( arguments ) );
 		}
 		return new ConstructorSupplier<T>( constructor, arguments );
 	}
@@ -329,23 +336,24 @@ public final class SuppliedBy {
 	}
 
 	/**
-	 * A simple version for all the no-args constructors hopefully used in large numbers.
+	 * A simple version for all the constructors where we know all arguments as constants.
 	 */
-	private static final class NoArgsConstructorSupplier<T>
+	private static final class StaticConstructorSupplier<T>
 			implements Supplier<T> {
 
-		private final Constructor<T> noArgsConstructor;
+		private final Constructor<T> constructor;
+		private final Object[] arguments;
 
-		NoArgsConstructorSupplier( Constructor<T> noArgsConstructor ) {
+		StaticConstructorSupplier( Constructor<T> constructor, Object[] arguments ) {
 			super();
-			TypeReflector.makeAccessible( noArgsConstructor );
-			this.noArgsConstructor = noArgsConstructor;
-			// TODO when all hints are already actual arguments (objects) we can directly invoke the constructor with the argument array --> change this class to deal with no-args as a special case of already "resolved" args 
+			TypeReflector.makeAccessible( constructor );
+			this.constructor = constructor;
+			this.arguments = arguments;
 		}
 
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector context ) {
-			return TypeReflector.construct( noArgsConstructor );
+			return TypeReflector.construct( constructor, arguments );
 		}
 
 	}

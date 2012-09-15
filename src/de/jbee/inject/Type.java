@@ -304,6 +304,7 @@ public final class Type<T>
 				|| ( !isLowerBound() && other.isLowerBound() ) ) {
 			return true;
 		}
+		// FIXME the below code assumes that generics are at the same index 
 		if ( params.length == 1 ) {
 			return params[0].morePreciseThan( other.params[0] );
 		}

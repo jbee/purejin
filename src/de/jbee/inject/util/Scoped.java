@@ -139,7 +139,6 @@ public class Scoped {
 
 		@Override
 		public <T> T serve( Demand<T> demand, Injectable<T> injectable ) {
-			//FIXME at some point the dest repo is outdated - do we ask the src again in that case ? I'm note sure 
 			return dest.serve( demand, new SnapshotingInjectable<T>( injectable, src ) );
 		}
 

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.jbee.inject.Injector;
+import de.jbee.inject.Suppliable;
 import de.jbee.inject.SuppliableInjector;
 import de.jbee.inject.util.TypeReflector;
 
@@ -26,13 +27,23 @@ public final class Bootstrap {
 
 	public static Injector injector( Class<? extends Bundle> root, Edition edition,
 			Constants constants ) {
-		return injector( install( root, edition, constants ), Assemble.DEFAULE_CONSTRUCTION_STRATEGY,
-				Assemble.BUILDIN );
+		return injector( install( root, edition, constants ),
+				Assemble.DEFAULE_CONSTRUCTION_STRATEGY, Assemble.BUILDIN );
 	}
 
 	public static Injector injector( Module[] modules, ConstructionStrategy strategy,
 			Assembler installer ) {
-		return SuppliableInjector.create( installer.assemble( modules, strategy ) );
+		return SuppliableInjector.create( suppliables( installer, modules, strategy ) );
+	}
+
+	public static Suppliable<?>[] suppliables( Class<? extends Bundle> root ) {
+		return suppliables( Assemble.BUILDIN, install( root, Edition.FULL, Constants.NONE ),
+				Assemble.DEFAULE_CONSTRUCTION_STRATEGY );
+	}
+
+	public static Suppliable<?>[] suppliables( Assembler installer, Module[] modules,
+			ConstructionStrategy strategy ) {
+		return installer.assemble( modules, strategy );
 	}
 
 	private Bootstrap() {

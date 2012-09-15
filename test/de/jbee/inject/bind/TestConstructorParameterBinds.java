@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
@@ -19,6 +20,7 @@ import org.junit.Test;
 import de.jbee.inject.Injector;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Parameter;
+import de.jbee.inject.Suppliable;
 import de.jbee.inject.util.Argument;
 
 /**
@@ -101,6 +103,18 @@ public class TestConstructorParameterBinds {
 		}
 	}
 
+	private static class ConsatntParameterConstructorBindsModule
+			extends BinderModule {
+
+		@Override
+		protected void declare() {
+			bind( named( "const" ), Baz.class ).toConstructor(
+					Argument.constant( String.class, "1st" ),
+					Argument.constant( String.class, "2nd" ) );
+		}
+
+	}
+
 	private static class WrongParameterConstructorBindsModule
 			extends BinderModule {
 
@@ -163,4 +177,10 @@ public class TestConstructorParameterBinds {
 		Bootstrap.injector( WrongParameterConstructorBindsModule.class );
 	}
 
+	@Test
+	public void thatConstantsJustAreUsedAsConstructorArgumentsWhenPossible() {
+		Suppliable<?>[] suppliables = Bootstrap.suppliables( ConsatntParameterConstructorBindsModule.class );
+		assertThat( suppliables.length, is( 1 ) );
+		assertTrue( suppliables[0].supplier.getClass().getSimpleName().contains( "Static" ) ); // don't want to expose class so we check for name with a string
+	}
 }

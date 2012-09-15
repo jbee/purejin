@@ -43,6 +43,23 @@ public final class Argument<T>
 		return new Argument<S>( arg.constant, supertype, arg.instance, arg.dependency );
 	}
 
+	public static boolean allConstants( Argument<?>[] args ) {
+		for ( Argument<?> arg : args ) {
+			if ( !arg.isConstant() ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public static Object[] constantsFrom( Argument<?>[] args ) {
+		Object[] consts = new Object[args.length];
+		for ( int i = 0; i < args.length; i++ ) {
+			consts[i] = args[i].constant;
+		}
+		return consts;
+	}
+
 	private final T constant;
 	private final Type<? super T> asType;
 	private final Instance<? extends T> instance;
@@ -75,6 +92,10 @@ public final class Argument<T>
 		return context.resolve( constructed.instanced( instance ) );
 	}
 
+	public boolean isConstant() {
+		return constant != null;
+	}
+
 	@Override
 	public boolean isAssignableTo( Type<?> type ) {
 		return asType.isAssignableTo( type );
@@ -83,7 +104,7 @@ public final class Argument<T>
 	@Override
 	public String toString() {
 		String as = " as " + asType.toString();
-		if ( constant != null ) {
+		if ( isConstant() ) {
 			return constant.toString() + as;
 		}
 		if ( dependency != null ) {
