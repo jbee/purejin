@@ -43,7 +43,7 @@ public interface BasicBinder {
 
 	/**
 	 * Bindings have been restricted and are just effective within a special scope defined before
-	 * using {@link ScopedBasicBinder#injectingInto(Class)}-clauses.
+	 * using {@link ScopedBasicBinder#injectingInto(Instance)}-clauses.
 	 * 
 	 * @author Jan Bernitt (jan.bernitt@gmx.de)
 	 */

@@ -133,6 +133,11 @@ public class Injectorizer {
 		}
 
 		@Override
+		public Expiry getExpiry() {
+			return expiry;
+		}
+
+		@Override
 		public T instanceFor( Dependency<? super T> dependency ) {
 			return repository.serve( demand.from( dependency.injectingInto( emergence(
 					resource.getInstance(), expiry ) ) ), injectable );

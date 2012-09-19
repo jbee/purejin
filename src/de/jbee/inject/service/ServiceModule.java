@@ -3,6 +3,7 @@ package de.jbee.inject.service;
 import static de.jbee.inject.Dependency.dependency;
 import static de.jbee.inject.Source.source;
 import static de.jbee.inject.Type.parameterTypes;
+import static de.jbee.inject.Type.raw;
 import static de.jbee.inject.Type.returnType;
 import static de.jbee.inject.bind.Bootstrap.nonnullThrowsReentranceException;
 import static de.jbee.inject.util.Scoped.APPLICATION;
@@ -15,6 +16,7 @@ import java.util.Map;
 
 import de.jbee.inject.Dependency;
 import de.jbee.inject.Injector;
+import de.jbee.inject.Injectron;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.Type;
 import de.jbee.inject.bind.Binder;
@@ -27,6 +29,7 @@ import de.jbee.inject.bind.Extend;
 import de.jbee.inject.bind.Module;
 import de.jbee.inject.bind.Binder.RootBinder;
 import de.jbee.inject.bind.Binder.TypedBinder;
+import de.jbee.inject.service.ServiceInvocation.ServiceInvocationExtension;
 import de.jbee.inject.service.ServiceMethod.ServiceClassExtension;
 import de.jbee.inject.util.Scoped;
 import de.jbee.inject.util.TypeReflector;
@@ -43,6 +46,12 @@ public abstract class ServiceModule
 
 	protected final void bindServiceMethodsIn( Class<?> service ) {
 		binder.extend( ServiceClassExtension.class, service );
+	}
+
+	protected final void extend( ServiceInvocationExtension type,
+			Class<? extends ServiceInvocation<?>> invocation ) {
+		//TODO we need a special binder for this
+		binder.extend( type, invocation );
 	}
 
 	protected final <T> TypedBinder<T> starbind( Class<T> service ) {
@@ -204,13 +213,13 @@ public abstract class ServiceModule
 		@Override
 		public ServiceMethod<?, ?> supply( Dependency<? super ServiceMethod<?, ?>> dependency,
 				Injector context ) {
-			ServiceProvider serviceResolver = context.resolve( dependency.anyTyped( ServiceProvider.class ) );
+			ServiceProvider serviceProvider = context.resolve( dependency.anyTyped( ServiceProvider.class ) );
 			Type<?>[] parameters = dependency.getType().getParameters();
-			return serviceResolver.provide( parameters[0], parameters[1] );
+			return serviceProvider.provide( parameters[0], parameters[1] );
 		}
 	}
 
-	static class LazyServiceMethod<P, T>
+	private static class LazyServiceMethod<P, T>
 			implements ServiceMethod<P, T> {
 
 		private final Object object;
@@ -219,42 +228,76 @@ public abstract class ServiceModule
 		private final Class<T> returnType;
 		private final Injector context;
 		private final Type<?>[] parameterTypes;
+		private final Injectron<?>[] argumentInjectrons;
+		private final Object[] argumentTemplate;
 
 		LazyServiceMethod( Object object, Method service, Class<P> parameterType,
 				Class<T> returnType, Injector context ) {
 			super();
 			this.object = object;
 			this.method = service;
+			TypeReflector.makeAccessible( method );
 			this.parameterType = parameterType;
 			this.returnType = returnType;
 			this.context = context;
 			this.parameterTypes = parameterTypes( service );
+			this.argumentInjectrons = argumentInjectrons();
+			this.argumentTemplate = argumentTemplate();
+		}
+
+		private Object[] argumentTemplate() {
+			Object[] template = new Object[parameterTypes.length];
+			for ( int i = 0; i < template.length; i++ ) {
+				Injectron<?> injectron = argumentInjectrons[i];
+				if ( injectron != null && injectron.getExpiry().isNever() ) {
+					template[i] = instance( injectron, dependency( parameterTypes[i] ) );
+				}
+			}
+			return template;
 		}
 
 		@Override
 		public T invoke( P params ) {
 			Object[] args = actualArguments( params );
 			try {
-				method.setAccessible( true ); //TODO just do it once
 				return returnType.cast( method.invoke( object, args ) );
 			} catch ( Exception e ) {
 				throw new RuntimeException( "Failed to invoke service:\n" + e.getMessage(), e );
 			}
 		}
 
+		private Injectron<?>[] argumentInjectrons() {
+			Injectron<?>[] res = new Injectron<?>[parameterTypes.length];
+			for ( int i = 0; i < res.length; i++ ) {
+				Type<?> paramType = parameterTypes[i];
+				res[i] = paramType.getRawType() == parameterType
+					? null
+					: context.resolve( dependency( raw( Injectron.class ).parametized( paramType ) ) );
+			}
+			return res;
+		}
+
 		private Object[] actualArguments( P params ) {
-			Object[] args = new Object[parameterTypes.length];
+			Object[] args = argumentTemplate.clone();
 			for ( int i = 0; i < args.length; i++ ) {
 				Type<?> paramType = parameterTypes[i];
 				if ( paramType.getRawType() == parameterType ) {
 					args[i] = params;
-				} else {
-					// TODO add information from method (like annotations ?)
-					args[i] = context.resolve( dependency( paramType ) );
+				} else if ( args[i] == null ) {
+					args[i] = instance( argumentInjectrons[i], dependency( paramType ) );
 				}
 			}
 			return args;
 		}
 
+		private static <I> I instance( Injectron<I> injectron, Dependency<?> dependency ) {
+			return injectron.instanceFor( (Dependency<? super I>) dependency );
+		}
+
+		@Override
+		public String toString() {
+			return method.getDeclaringClass().getSimpleName() + ": " + returnType.getSimpleName()
+					+ " " + method.getName() + "(" + parameterType.getSimpleName() + ")";
+		}
 	}
 }

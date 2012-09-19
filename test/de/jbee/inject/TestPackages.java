@@ -4,9 +4,9 @@ import static de.jbee.inject.Packages.packageOf;
 import static de.jbee.inject.Packages.packages;
 import static org.junit.Assert.assertFalse;
 
-import org.junit.Test;
+import java.util.List;
 
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
+import org.junit.Test;
 
 public class TestPackages {
 

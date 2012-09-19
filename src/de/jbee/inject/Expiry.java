@@ -42,4 +42,8 @@ public final class Expiry {
 		return frequency;
 	}
 
+	public boolean isNever() {
+		return frequency == 0;
+	}
+
 }

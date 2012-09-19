@@ -13,4 +13,6 @@ public interface Injectron<T> {
 
 	T instanceFor( Dependency<? super T> dependency );
 
+	Expiry getExpiry();
+
 }

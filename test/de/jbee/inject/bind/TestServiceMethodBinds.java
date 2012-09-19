@@ -57,5 +57,6 @@ public class TestServiceMethodBinds {
 		ServiceMethod<Number, Integer> negate = injector.resolve( dependency2 );
 		assertNotNull( mul2 );
 		assertThat( negate.invoke( 3 ), is( -3 ) );
+		assertThat( mul2.invoke( 4 ), is( 11 ) );
 	}
 }
