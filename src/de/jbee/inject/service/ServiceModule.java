@@ -33,6 +33,7 @@ import de.jbee.inject.service.ServiceInvocation.ServiceInvocationExtension;
 import de.jbee.inject.service.ServiceMethod.ServiceClassExtension;
 import de.jbee.inject.util.Scoped;
 import de.jbee.inject.util.TypeReflector;
+import de.jbee.inject.util.Value;
 
 /**
  * When binding {@link ServiceMethod}s this {@link Module} can be extended.
@@ -146,12 +147,12 @@ public abstract class ServiceModule
 		@Override
 		public <P, R> ServiceMethod<P, R> provide( Type<P> parameterType, Type<R> returnType ) {
 			Method service = serviceMethod( parameterType, returnType );
-			return create( service, parameterType.getRawType(), returnType.getRawType(), context );
+			return create( service, parameterType, returnType, context );
 		}
 
-		private <P, T> ServiceMethod<P, T> create( Method service, Class<P> parameterType,
-				Class<T> returnType, Injector context ) {
-			return new LazyServiceMethod<P, T>(
+		private <P, T> ServiceMethod<P, T> create( Method service, Type<P> parameterType,
+				Type<T> returnType, Injector context ) {
+			return new PreresolvingServiceMethod<P, T>(
 					TypeReflector.newInstance( service.getDeclaringClass() ), service,
 					parameterType, returnType, context );
 		}
@@ -219,20 +220,21 @@ public abstract class ServiceModule
 		}
 	}
 
-	private static class LazyServiceMethod<P, T>
+	private static class PreresolvingServiceMethod<P, T>
 			implements ServiceMethod<P, T> {
 
 		private final Object object;
 		private final Method method;
-		private final Class<P> parameterType;
-		private final Class<T> returnType;
+		private final Type<P> parameterType;
+		private final Type<T> returnType;
 		private final Injector context;
 		private final Type<?>[] parameterTypes;
 		private final Injectron<?>[] argumentInjectrons;
 		private final Object[] argumentTemplate;
+		private final ServiceInvocation<?>[] invocations;
 
-		LazyServiceMethod( Object object, Method service, Class<P> parameterType,
-				Class<T> returnType, Injector context ) {
+		PreresolvingServiceMethod( Object object, Method service, Type<P> parameterType,
+				Type<T> returnType, Injector context ) {
 			super();
 			this.object = object;
 			this.method = service;
@@ -243,6 +245,7 @@ public abstract class ServiceModule
 			this.parameterTypes = parameterTypes( service );
 			this.argumentInjectrons = argumentInjectrons();
 			this.argumentTemplate = argumentTemplate();
+			this.invocations = new ServiceInvocation<?>[0];
 		}
 
 		private Object[] argumentTemplate() {
@@ -259,18 +262,59 @@ public abstract class ServiceModule
 		@Override
 		public T invoke( P params ) {
 			Object[] args = actualArguments( params );
+			Object[] state = before( params );
+			T res = null;
 			try {
-				return returnType.cast( method.invoke( object, args ) );
+				res = returnType.getRawType().cast( method.invoke( object, args ) );
 			} catch ( Exception e ) {
 				throw new RuntimeException( "Failed to invoke service:\n" + e.getMessage(), e );
 			}
+			after( params, res, state );
+			return res;
+		}
+
+		private Object[] before( P params ) {
+			if ( invocations.length == 0 ) {
+				return null;
+			}
+			Object[] invokeState = new Object[invocations.length];
+			Value<P> v = Value.value( parameterType, params );
+			for ( int i = 0; i < invocations.length; i++ ) {
+				try {
+					invokeState[i] = invocations[i].before( v, returnType );
+				} catch ( RuntimeException e ) {
+					// warn that invocation before had thrown an exception
+				}
+			}
+			return invokeState;
+		}
+
+		private void after( P param, T res, Object[] states ) {
+			if ( invocations.length == 0 ) {
+				return;
+			}
+			final Value<P> paramValue = Value.value( parameterType, param );
+			final Value<T> resValue = Value.value( returnType, res );
+			for ( int i = 0; i < invocations.length; i++ ) {
+				try {
+					after( invocations[i], states[i], paramValue, resValue );
+				} catch ( RuntimeException e ) {
+					// warn that invocation before had thrown an exception
+				}
+			}
+		}
+
+		@SuppressWarnings ( "unchecked" )
+		private static <I, P, T> void after( ServiceInvocation<I> inv, Object state,
+				Value<P> param, Value<T> result ) {
+			inv.after( param, result, (I) state );
 		}
 
 		private Injectron<?>[] argumentInjectrons() {
 			Injectron<?>[] res = new Injectron<?>[parameterTypes.length];
 			for ( int i = 0; i < res.length; i++ ) {
 				Type<?> paramType = parameterTypes[i];
-				res[i] = paramType.getRawType() == parameterType
+				res[i] = paramType.equalTo( parameterType )
 					? null
 					: context.resolve( dependency( raw( Injectron.class ).parametized( paramType ) ) );
 			}
@@ -281,7 +325,7 @@ public abstract class ServiceModule
 			Object[] args = argumentTemplate.clone();
 			for ( int i = 0; i < args.length; i++ ) {
 				Type<?> paramType = parameterTypes[i];
-				if ( paramType.getRawType() == parameterType ) {
+				if ( paramType.equalTo( parameterType ) ) {
 					args[i] = params;
 				} else if ( args[i] == null ) {
 					args[i] = instance( argumentInjectrons[i], dependency( paramType ) );
@@ -296,8 +340,8 @@ public abstract class ServiceModule
 
 		@Override
 		public String toString() {
-			return method.getDeclaringClass().getSimpleName() + ": " + returnType.getSimpleName()
-					+ " " + method.getName() + "(" + parameterType.getSimpleName() + ")";
+			return method.getDeclaringClass().getSimpleName() + ": " + returnType + " "
+					+ method.getName() + "(" + parameterType + ")";
 		}
 	}
 }
