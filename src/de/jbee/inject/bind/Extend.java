@@ -14,7 +14,7 @@ public final class Extend {
 
 	public static <E extends Enum<E> & Extension<E, ? super T>, T> Name name( E extension,
 			Class<? extends T> type ) {
-		return named( extension.getClass().getCanonicalName() + "#" + extension.name() + ":"
+		return named( extension.getClass().getCanonicalName() + ":" + extension.name() + ":"
 				+ type.getCanonicalName() );
 	}
 

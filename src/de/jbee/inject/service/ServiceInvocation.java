@@ -27,6 +27,8 @@ public interface ServiceInvocation<T> {
 
 	<P, R> void after( Value<P> parameter, Value<R> result, T before );
 
+	<P, R> void afterException( Value<P> parameter, Type<R> result, Exception e, T before );
+
 	/**
 	 * Used to hook up a {@link ServiceInvocation} to {@link ServiceMethod}s.
 	 * 

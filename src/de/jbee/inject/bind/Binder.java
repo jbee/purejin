@@ -148,11 +148,13 @@ public class Binder
 	public <E extends Enum<E> & Extension<E, ? super T>, T> void extend( Class<E> extension,
 			Class<? extends T> type ) {
 		multibind( Extend.name( extension, type ), Class.class ).to( type );
+		implicitBindToConstructor( type );
 	}
 
 	public <E extends Enum<E> & Extension<E, ? super T>, T> void extend( E extension,
 			Class<? extends T> type ) {
 		multibind( Extend.name( extension, type ), Class.class ).to( type );
+		implicitBindToConstructor( type );
 	}
 
 	protected final <T> void bind( Resource<T> resource, Supplier<? extends T> supplier ) {

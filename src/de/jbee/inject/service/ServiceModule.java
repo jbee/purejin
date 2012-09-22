@@ -9,6 +9,7 @@ import static de.jbee.inject.bind.Bootstrap.nonnullThrowsReentranceException;
 import static de.jbee.inject.util.Scoped.APPLICATION;
 import static de.jbee.inject.util.Scoped.DEPENDENCY_TYPE;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
@@ -245,7 +246,16 @@ public abstract class ServiceModule
 			this.parameterTypes = parameterTypes( service );
 			this.argumentInjectrons = argumentInjectrons();
 			this.argumentTemplate = argumentTemplate();
-			this.invocations = new ServiceInvocation<?>[0];
+			this.invocations = resolveInvocations( context );
+		}
+
+		private ServiceInvocation<?>[] resolveInvocations( Injector context ) {
+			Class<? extends ServiceInvocation<?>>[] classes = context.resolve( Extend.dependency( ServiceInvocationExtension.class ) );
+			ServiceInvocation<?>[] res = new ServiceInvocation<?>[classes.length];
+			for ( int i = 0; i < res.length; i++ ) {
+				res[i] = context.resolve( Dependency.dependency( classes[i] ) );
+			}
+			return res;
 		}
 
 		private Object[] argumentTemplate() {
@@ -267,10 +277,32 @@ public abstract class ServiceModule
 			try {
 				res = returnType.getRawType().cast( method.invoke( object, args ) );
 			} catch ( Exception e ) {
-				throw new RuntimeException( "Failed to invoke service:\n" + e.getMessage(), e );
+				if ( e instanceof InvocationTargetException ) {
+					Throwable t = ( (InvocationTargetException) e ).getTargetException();
+					if ( t instanceof Exception ) {
+						e = (Exception) t;
+					}
+				}
+				afterException( params, e, state );
+				throw new RuntimeException( "Failed to invoke service: " + this + " \n"
+						+ e.getMessage(), e );
 			}
 			after( params, res, state );
 			return res;
+		}
+
+		private void afterException( P params, Exception e, Object[] states ) {
+			if ( invocations.length == 0 ) {
+				return;
+			}
+			final Value<P> paramValue = Value.value( parameterType, params );
+			for ( int i = 0; i < invocations.length; i++ ) {
+				try {
+					afterException( invocations[i], states[i], paramValue, returnType, e );
+				} catch ( RuntimeException re ) {
+					// warn that invocation before had thrown an exception
+				}
+			}
 		}
 
 		private Object[] before( P params ) {
@@ -308,6 +340,12 @@ public abstract class ServiceModule
 		private static <I, P, T> void after( ServiceInvocation<I> inv, Object state,
 				Value<P> param, Value<T> result ) {
 			inv.after( param, result, (I) state );
+		}
+
+		@SuppressWarnings ( "unchecked" )
+		private static <I, P, T> void afterException( ServiceInvocation<I> inv, Object state,
+				Value<P> param, Type<T> result, Exception e ) {
+			inv.afterException( param, result, e, (I) state );
 		}
 
 		private Injectron<?>[] argumentInjectrons() {

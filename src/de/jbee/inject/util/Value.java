@@ -24,4 +24,9 @@ public final class Value<T> {
 	public T getValue() {
 		return value;
 	}
+
+	@Override
+	public String toString() {
+		return type + " " + value;
+	}
 }
