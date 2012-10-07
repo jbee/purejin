@@ -12,7 +12,7 @@ import java.util.Set;
 
 import de.jbee.inject.Injector;
 import de.jbee.inject.Suppliable;
-import de.jbee.inject.SuppliableInjector;
+import de.jbee.inject.util.SuppliableInjector;
 import de.jbee.inject.util.TypeReflector;
 
 public final class Bootstrap {
@@ -51,12 +51,6 @@ public final class Bootstrap {
 
 	private Bootstrap() {
 		throw new UnsupportedOperationException( "util" );
-	}
-
-	public static void nonnullThrowsReentranceException( Object field ) {
-		if ( field != null ) {
-			throw new IllegalStateException( "Reentrance not allowed!" );
-		}
 	}
 
 	public static <T extends Enum<T> & Feature<T>> Edition edition( T... featured ) {

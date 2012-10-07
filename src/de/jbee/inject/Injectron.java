@@ -1,5 +1,7 @@
 package de.jbee.inject;
 
+import de.jbee.inject.util.SuppliableInjector;
+
 /**
  * A kind of singleton for a {@link Resource} inside a {@link SuppliableInjector}.
  * 

@@ -1,4 +1,4 @@
-package de.jbee.inject;
+package de.jbee.inject.util;
 
 import static de.jbee.inject.Demand.demand;
 import static de.jbee.inject.Dependency.dependency;
@@ -9,6 +9,18 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.IdentityHashMap;
 import java.util.Map;
+
+import de.jbee.inject.Demand;
+import de.jbee.inject.Dependency;
+import de.jbee.inject.Expiry;
+import de.jbee.inject.Injectable;
+import de.jbee.inject.Injector;
+import de.jbee.inject.Injectron;
+import de.jbee.inject.Repository;
+import de.jbee.inject.Resource;
+import de.jbee.inject.Source;
+import de.jbee.inject.Suppliable;
+import de.jbee.inject.Supplier;
 
 /**
  * A util to create {@link Injectable}s and {@link Injectron}s from {@link Suppliable}s.

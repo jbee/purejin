@@ -1,6 +1,5 @@
 package de.jbee.inject.bind;
 
-import static de.jbee.inject.bind.Bootstrap.nonnullThrowsReentranceException;
 import de.jbee.inject.bind.Bootstrapper.ModularBootstrapper;
 
 public abstract class ModularBootstrapperBundle<M>
@@ -10,7 +9,7 @@ public abstract class ModularBootstrapperBundle<M>
 
 	@Override
 	public void bootstrap( ModularBootstrapper<M> bootstrap ) {
-		nonnullThrowsReentranceException( this.bootstrap );
+		BootstrappingModule.nonnullThrowsReentranceException( this.bootstrap );
 		this.bootstrap = bootstrap;
 		bootstrap();
 	}

@@ -7,4 +7,10 @@ public abstract class BootstrappingModule
 	public final void bootstrap( Bootstrapper bootstrap ) {
 		bootstrap.install( this );
 	}
+
+	public static void nonnullThrowsReentranceException( Object field ) {
+		if ( field != null ) {
+			throw new IllegalStateException( "Reentrance not allowed!" );
+		}
+	}
 }

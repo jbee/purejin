@@ -1,7 +1,6 @@
 package de.jbee.inject.bind;
 
 import static de.jbee.inject.Source.source;
-import static de.jbee.inject.bind.Bootstrap.nonnullThrowsReentranceException;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Name;
 import de.jbee.inject.Packages;
@@ -31,7 +30,7 @@ public abstract class BinderModule
 
 	@Override
 	public void declare( Bindings bindings, ConstructionStrategy strategy ) {
-		nonnullThrowsReentranceException( binder.bindings );
+		BootstrappingModule.nonnullThrowsReentranceException( binder.bindings );
 		this.binder = binder.into( bindings ).using( strategy ).with( source( getClass() ) );
 		declare();
 	}

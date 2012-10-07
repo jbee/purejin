@@ -1,10 +1,16 @@
-package de.jbee.inject;
+package de.jbee.inject.util;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import de.jbee.inject.Dependency;
+import de.jbee.inject.Injector;
+import de.jbee.inject.Injectron;
+import de.jbee.inject.Suppliable;
+import de.jbee.inject.Type;
 
 /**
  * The default {@link Injector} that uses {@link Suppliable}s as its base data.

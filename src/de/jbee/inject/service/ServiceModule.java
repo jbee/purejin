@@ -5,7 +5,6 @@ import static de.jbee.inject.Source.source;
 import static de.jbee.inject.Type.parameterTypes;
 import static de.jbee.inject.Type.raw;
 import static de.jbee.inject.Type.returnType;
-import static de.jbee.inject.bind.Bootstrap.nonnullThrowsReentranceException;
 import static de.jbee.inject.util.Scoped.APPLICATION;
 import static de.jbee.inject.util.Scoped.DEPENDENCY_TYPE;
 
@@ -24,6 +23,7 @@ import de.jbee.inject.bind.Binder;
 import de.jbee.inject.bind.BinderModule;
 import de.jbee.inject.bind.Bindings;
 import de.jbee.inject.bind.Bootstrapper;
+import de.jbee.inject.bind.BootstrappingModule;
 import de.jbee.inject.bind.Bundle;
 import de.jbee.inject.bind.ConstructionStrategy;
 import de.jbee.inject.bind.Extend;
@@ -70,7 +70,7 @@ public abstract class ServiceModule
 
 	@Override
 	public void declare( Bindings bindings, ConstructionStrategy strategy ) {
-		nonnullThrowsReentranceException( binder );
+		BootstrappingModule.nonnullThrowsReentranceException( binder );
 		binder = Binder.create( bindings, strategy, source( getClass() ), Scoped.APPLICATION );
 		declare();
 	}

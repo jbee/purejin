@@ -71,10 +71,6 @@ public final class Instance<T>
 		return name;
 	}
 
-	public Resource<T> toResource() {
-		return new Resource<T>( this );
-	}
-
 	@Override
 	public String toString() {
 		return ( name + " " + type ).trim();
