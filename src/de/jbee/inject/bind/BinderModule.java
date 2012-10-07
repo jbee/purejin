@@ -25,7 +25,7 @@ public abstract class BinderModule
 	}
 
 	protected BinderModule( Scope inital ) {
-		this.binder = Binder.create( null, Assemble.DEFAULE_CONSTRUCTION_STRATEGY,
+		this.binder = Binder.create( null, Link.DEFAULE_CONSTRUCTION_STRATEGY,
 				source( BinderModule.class ), inital );
 	}
 

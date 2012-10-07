@@ -27,27 +27,30 @@ public final class Bootstrap {
 
 	public static Injector injector( Class<? extends Bundle> root, Edition edition,
 			Constants constants ) {
-		return injector( install( root, edition, constants ),
-				Assemble.DEFAULE_CONSTRUCTION_STRATEGY, Assemble.BUILDIN );
+		return injector( modulariser( edition, constants ).modularise( root ),
+				Link.DEFAULE_CONSTRUCTION_STRATEGY, Link.BUILDIN );
 	}
 
 	public static Injector injector( Module[] modules, ConstructionStrategy strategy,
-			Assembler installer ) {
-		return SuppliableInjector.create( suppliables( installer, modules, strategy ) );
+			Linker<Suppliable<?>> linker ) {
+		return SuppliableInjector.create( linker.link( strategy, modules ) );
+	}
+
+	public static Modulariser modulariser( Edition edition, Constants constants ) {
+		return new BuildinBootstrapper( edition, constants );
+	}
+
+	public static Bundler bundler( Edition edition, Constants constants ) {
+		return new BuildinBootstrapper( edition, constants );
 	}
 
 	public static Suppliable<?>[] suppliables( Class<? extends Bundle> root ) {
-		return suppliables( Assemble.BUILDIN, install( root, Edition.FULL, Constants.NONE ),
-				Assemble.DEFAULE_CONSTRUCTION_STRATEGY );
-	}
-
-	public static Suppliable<?>[] suppliables( Assembler installer, Module[] modules,
-			ConstructionStrategy strategy ) {
-		return installer.assemble( modules, strategy );
+		return Link.BUILDIN.link( Link.DEFAULE_CONSTRUCTION_STRATEGY, // 
+				modulariser( Edition.FULL, Constants.NONE ).modularise( root ) );
 	}
 
 	private Bootstrap() {
-		// util class
+		throw new UnsupportedOperationException( "util" );
 	}
 
 	public static void nonnullThrowsReentranceException( Object field ) {
@@ -77,13 +80,6 @@ public final class Bootstrap {
 			T f = feature.featureOf( bundleOrModule );
 			return f == null || featured.contains( f );
 		}
-	}
-
-	public static Module[] install( Class<? extends Bundle> root, Edition edition,
-			Constants constants ) {
-		BuildinBootstrapper bootstrapper = new BuildinBootstrapper( edition, constants );
-		bootstrapper.install( root );
-		return bootstrapper.modularise( root );
 	}
 
 	private static class BuildinBootstrapper
@@ -189,6 +185,9 @@ public final class Bootstrap {
 		@SuppressWarnings ( "unchecked" )
 		@Override
 		public Class<? extends Bundle>[] bundle( Class<? extends Bundle> root ) {
+			if ( !installed.contains( root ) ) {
+				install( root );
+			}
 			Set<Class<? extends Bundle>> installed = new LinkedHashSet<Class<? extends Bundle>>();
 			addAllInstalledIn( root, installed );
 			return (Class<? extends Bundle>[]) installed.toArray( new Class<?>[installed.size()] );

@@ -18,14 +18,28 @@ import de.jbee.inject.Supplier;
 import de.jbee.inject.util.Scoped;
 import de.jbee.inject.util.TypeReflector;
 
-public final class Assemble {
+public final class Link {
 
-	private Assemble() {
-		throw new UnsupportedOperationException( "util" );
+	public static final ConstructionStrategy DEFAULE_CONSTRUCTION_STRATEGY = new BuildinConstructionStrategy();
+	public static final Linker<Suppliable<?>> BUILDIN = linker( defaultExpiration() );
+
+	private static Linker<Suppliable<?>> linker( Map<Scope, Expiry> expiryByScope ) {
+		return new SuppliableLinker( expiryByScope );
 	}
 
-	public static final Assembler BUILDIN = new BindingAssembler();
-	public static final ConstructionStrategy DEFAULE_CONSTRUCTION_STRATEGY = new BuildinConstructionStrategy();
+	private static IdentityHashMap<Scope, Expiry> defaultExpiration() {
+		IdentityHashMap<Scope, Expiry> map = new IdentityHashMap<Scope, Expiry>();
+		map.put( Scoped.APPLICATION, Expiry.NEVER );
+		map.put( Scoped.INJECTION, Expiry.expires( 1000 ) );
+		map.put( Scoped.THREAD, Expiry.expires( 500 ) );
+		map.put( Scoped.DEPENDENCY_TYPE, Expiry.NEVER );
+		map.put( Scoped.TARGET_INSTANCE, Expiry.NEVER );
+		return map;
+	}
+
+	private Link() {
+		throw new UnsupportedOperationException( "util" );
+	}
 
 	private static class BuildinConstructionStrategy
 			implements ConstructionStrategy {
@@ -45,30 +59,32 @@ public final class Assemble {
 
 	}
 
-	private static class BindingAssembler
-			implements Assembler {
+	private static class SuppliableLinker
+			implements Linker<Suppliable<?>> {
 
-		BindingAssembler() {
+		private final Map<Scope, Expiry> expiryByScope;
+
+		SuppliableLinker( Map<Scope, Expiry> expiryByScope ) {
 			super();
+			this.expiryByScope = expiryByScope;
 		}
 
 		@Override
-		public Suppliable<?>[] assemble( Module[] modules, ConstructionStrategy strategy ) {
-			return install( cleanedUp( bindingsFrom( modules, strategy ) ) );
+		public Suppliable<?>[] link( ConstructionStrategy strategy, Module... modules ) {
+			return link( cleanedUp( bindingsFrom( modules, strategy ) ) );
 		}
 
-		private Suppliable<?>[] install( Binding<?>[] bindings ) {
+		private Suppliable<?>[] link( Binding<?>[] bindings ) {
 			Map<Scope, Repository> repositories = initRepositories( bindings );
 			Suppliable<?>[] suppliables = new Suppliable<?>[bindings.length];
-			//TODO use real expiry data
-			Expiry expiration = Expiry.NEVER;
 			for ( int i = 0; i < bindings.length; i++ ) {
 				Binding<?> binding = bindings[i];
 				Scope scope = binding.scope;
-				suppliables[i] = binding.suppliableIn( repositories.get( scope ),
-						Expiry.expires( scope == Scoped.INJECTION
-							? 1
-							: 0 ) );
+				Expiry expiry = expiryByScope.get( scope );
+				if ( expiry == null ) {
+					expiry = Expiry.NEVER;
+				}
+				suppliables[i] = binding.suppliableIn( repositories.get( scope ), expiry );
 			}
 			return suppliables;
 		}

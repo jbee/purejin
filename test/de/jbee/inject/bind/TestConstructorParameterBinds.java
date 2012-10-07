@@ -173,12 +173,12 @@ public class TestConstructorParameterBinds {
 	}
 
 	@Test ( expected = IllegalArgumentException.class )
-	public void thatParameterNotUnderstoodThrowsException() {
+	public void thatParametersNotUnderstoodThrowsException() {
 		Bootstrap.injector( WrongParameterConstructorBindsModule.class );
 	}
 
 	@Test
-	public void thatConstantsJustAreUsedAsConstructorArgumentsWhenPossible() {
+	public void thatConstantsAreJustUsedAsConstructorArgumentsWhenPossible() {
 		Suppliable<?>[] suppliables = Bootstrap.suppliables( ConsatntParameterConstructorBindsModule.class );
 		assertThat( suppliables.length, is( 1 ) );
 		assertTrue( suppliables[0].supplier.getClass().getSimpleName().contains( "Static" ) ); // don't want to expose class so we check for name with a string
