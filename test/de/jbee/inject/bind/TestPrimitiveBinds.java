@@ -21,8 +21,23 @@ public class TestPrimitiveBinds {
 			bind( long.class ).to( 132L );
 			bind( named( "pi" ), float.class ).to( 3.1415f );
 			bind( named( "e" ), double.class ).to( 2.71828d );
+			bind( PrimitiveBindsBean.class ).toConstructor();
 		}
 
+	}
+
+	private static class PrimitiveBindsBean {
+
+		final int i;
+		final float f;
+		final boolean b;
+
+		PrimitiveBindsBean( int i, float f, boolean b ) {
+			this.i = i;
+			this.f = f;
+			this.b = b;
+
+		}
 	}
 
 	private final Injector injector = Bootstrap.injector( PrimitiveBindsModule.class );
@@ -57,5 +72,11 @@ public class TestPrimitiveBinds {
 		assertThat( injector.resolve( dependency( double.class ).named( "e" ) ), is( 2.71828d ) );
 	}
 
-	//TODO test that primitives work as constructor argument just to be safe
+	@Test
+	public void thatPrimitivesWorkAsWrapperClassesWhenInjected() {
+		PrimitiveBindsBean bean = injector.resolve( dependency( PrimitiveBindsBean.class ) );
+		assertThat( bean.i, is( 42 ) );
+		assertThat( bean.f, is( 3.1415f ) );
+		assertThat( bean.b, is( true ) );
+	}
 }
