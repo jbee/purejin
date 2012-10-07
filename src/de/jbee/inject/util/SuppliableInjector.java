@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 import de.jbee.inject.Dependency;
 import de.jbee.inject.Injector;
 import de.jbee.inject.Injectron;
-import de.jbee.inject.Suppliable;
 import de.jbee.inject.Type;
 
 /**

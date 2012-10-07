@@ -20,8 +20,8 @@ import org.junit.Test;
 import de.jbee.inject.Injector;
 import de.jbee.inject.Instance;
 import de.jbee.inject.Parameter;
-import de.jbee.inject.Suppliable;
 import de.jbee.inject.util.Argument;
+import de.jbee.inject.util.Suppliable;
 
 /**
  * The test illustrates how to use {@link Parameter}s to give hints which resources should be

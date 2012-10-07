@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.jbee.inject.Injector;
-import de.jbee.inject.Suppliable;
+import de.jbee.inject.util.Suppliable;
 import de.jbee.inject.util.SuppliableInjector;
 import de.jbee.inject.util.TypeReflector;
 

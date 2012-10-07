@@ -1,4 +1,10 @@
-package de.jbee.inject;
+package de.jbee.inject.util;
+
+import de.jbee.inject.Expiry;
+import de.jbee.inject.Repository;
+import de.jbee.inject.Resource;
+import de.jbee.inject.Source;
+import de.jbee.inject.Supplier;
 
 /**
  * Describing data of something that can be supplied.

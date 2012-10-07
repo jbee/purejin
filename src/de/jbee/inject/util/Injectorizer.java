@@ -19,7 +19,6 @@ import de.jbee.inject.Injectron;
 import de.jbee.inject.Repository;
 import de.jbee.inject.Resource;
 import de.jbee.inject.Source;
-import de.jbee.inject.Suppliable;
 import de.jbee.inject.Supplier;
 
 /**
