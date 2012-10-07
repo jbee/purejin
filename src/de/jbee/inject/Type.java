@@ -143,7 +143,7 @@ public final class Type<T>
 
 	private Type( boolean lowerBound, Class<T> rawType, Type<?>[] parameters ) {
 		assert ( rawType != null );
-		this.rawType = rawType;
+		this.rawType = primitiveAsWrapper( rawType );
 		this.params = parameters;
 		this.lowerBound = lowerBound;
 	}
@@ -461,6 +461,42 @@ public final class Type<T>
 				addSuperInterfaces( res, interfaces[i], actualTypeArguments( interfaceType ) );
 			}
 		}
+	}
+
+	@SuppressWarnings ( "unchecked" )
+	public static <T> Class<T> primitiveAsWrapper( Class<T> primitive ) {
+		if ( !primitive.isPrimitive() ) {
+			return primitive;
+		}
+		if ( primitive == int.class ) {
+			return (Class<T>) Integer.class;
+		}
+		if ( primitive == boolean.class ) {
+			return (Class<T>) Boolean.class;
+		}
+		if ( primitive == long.class ) {
+			return (Class<T>) Long.class;
+		}
+		if ( primitive == char.class ) {
+			return (Class<T>) Character.class;
+		}
+		if ( primitive == void.class ) {
+			return (Class<T>) Void.class;
+		}
+		if ( primitive == float.class ) {
+			return (Class<T>) Float.class;
+		}
+		if ( primitive == double.class ) {
+			return (Class<T>) Double.class;
+		}
+		if ( primitive == byte.class ) {
+			return (Class<T>) Byte.class;
+		}
+		if ( primitive == short.class ) {
+			return (Class<T>) Short.class;
+		}
+		throw new UnsupportedOperationException( "The primitive " + primitive
+				+ " cannot be wrapped yet!" );
 	}
 
 	@SuppressWarnings ( "unchecked" )

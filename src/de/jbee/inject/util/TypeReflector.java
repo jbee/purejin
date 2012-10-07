@@ -3,7 +3,11 @@ package de.jbee.inject.util;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 
-public class TypeReflector {
+public final class TypeReflector {
+
+	private TypeReflector() {
+		throw new UnsupportedOperationException( "util" );
+	}
 
 	public static <T> Constructor<T> accessibleNoArgsConstructor( Class<T> declaringClass ) {
 		if ( declaringClass.isInterface() ) {
