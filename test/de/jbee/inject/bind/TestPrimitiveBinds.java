@@ -31,13 +31,20 @@ public class TestPrimitiveBinds {
 		final int i;
 		final float f;
 		final boolean b;
+		final Integer bigI;
+		final Float bigF;
+		final Boolean bigB;
 
-		PrimitiveBindsBean( int i, float f, boolean b ) {
+		PrimitiveBindsBean( int i, float f, boolean b, Integer bigI, Float bigF, Boolean bigB ) {
+			super();
 			this.i = i;
 			this.f = f;
 			this.b = b;
-
+			this.bigI = bigI;
+			this.bigF = bigF;
+			this.bigB = bigB;
 		}
+
 	}
 
 	private final Injector injector = Bootstrap.injector( PrimitiveBindsModule.class );
@@ -73,10 +80,13 @@ public class TestPrimitiveBinds {
 	}
 
 	@Test
-	public void thatPrimitivesWorkAsWrapperClassesWhenInjected() {
+	public void thatPrimitivesWorkAsPrimitiveOrWrapperClassesWhenInjected() {
 		PrimitiveBindsBean bean = injector.resolve( dependency( PrimitiveBindsBean.class ) );
 		assertThat( bean.i, is( 42 ) );
 		assertThat( bean.f, is( 3.1415f ) );
 		assertThat( bean.b, is( true ) );
+		assertThat( bean.bigI, is( 42 ) );
+		assertThat( bean.bigF, is( 3.1415f ) );
+		assertThat( bean.bigB, is( true ) );
 	}
 }
