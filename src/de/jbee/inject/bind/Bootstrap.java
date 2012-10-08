@@ -11,9 +11,9 @@ import java.util.Map;
 import java.util.Set;
 
 import de.jbee.inject.Injector;
+import de.jbee.inject.util.Inject;
 import de.jbee.inject.util.Injectorizer;
 import de.jbee.inject.util.Suppliable;
-import de.jbee.inject.util.SourcedInjector;
 import de.jbee.inject.util.TypeReflector;
 
 public final class Bootstrap {
@@ -34,7 +34,7 @@ public final class Bootstrap {
 
 	public static Injector injector( Module[] modules, ConstructionStrategy strategy,
 			Linker<Suppliable<?>> linker ) {
-		return SourcedInjector.create( Injectorizer.source( linker.link( strategy, modules ) ) );
+		return Inject.injector( Injectorizer.source( linker.link( strategy, modules ) ) );
 	}
 
 	public static Modulariser modulariser( Edition edition, Constants constants ) {
