@@ -5,6 +5,7 @@ import static de.jbee.inject.Name.named;
 import static de.jbee.inject.Type.raw;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 
 import java.util.List;
@@ -57,4 +58,9 @@ public class TestInjectronBinds {
 		assertThat( injectrons[0].instanceFor( dependency( String.class ) ), is( "special" ) );
 	}
 
+	@Test
+	public void thatInjectorIsAvailableByDefault() {
+		Injector resolved = injector.resolve( dependency( Injector.class ) );
+		assertThat( resolved, sameInstance( injector ) );
+	}
 }

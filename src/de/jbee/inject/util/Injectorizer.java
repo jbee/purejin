@@ -3,12 +3,8 @@ package de.jbee.inject.util;
 import static de.jbee.inject.Demand.demand;
 import static de.jbee.inject.Dependency.dependency;
 import static de.jbee.inject.Emergence.emergence;
-import static de.jbee.inject.Precision.comparePrecision;
 
 import java.util.Arrays;
-import java.util.Comparator;
-import java.util.IdentityHashMap;
-import java.util.Map;
 
 import de.jbee.inject.Demand;
 import de.jbee.inject.Dependency;
@@ -16,6 +12,7 @@ import de.jbee.inject.Expiry;
 import de.jbee.inject.Injectable;
 import de.jbee.inject.Injector;
 import de.jbee.inject.Injectron;
+import de.jbee.inject.Precision;
 import de.jbee.inject.Repository;
 import de.jbee.inject.Resource;
 import de.jbee.inject.Source;
@@ -26,10 +23,15 @@ import de.jbee.inject.Supplier;
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
-public class Injectorizer {
+public class Injectorizer
+		implements InjectronSource {
 
-	public static <T> Injectable<T> asInjectable( Supplier<? extends T> supplier, Injector context ) {
-		return new SupplierToInjectable<T>( supplier, context );
+	public static <T> Injectable<T> asInjectable( Supplier<? extends T> supplier, Injector injector ) {
+		return new SupplierToInjectable<T>( supplier, injector );
+	}
+
+	public static InjectronSource source( Suppliable<?>[] suppliables ) {
+		return new Injectorizer( suppliables );
 	}
 
 	private static class SupplierToInjectable<T>
@@ -50,69 +52,42 @@ public class Injectorizer {
 		}
 	}
 
-	public static Map<Class<?>, Injectron<?>[]> injectrons( Suppliable<?>[] suppliables,
-			Injector resolver ) {
+	private final Suppliable<?>[] suppliables;
+
+	private Injectorizer( Suppliable<?>[] suppliables ) {
+		super();
+		this.suppliables = suppliables;
+	}
+
+	@Override
+	public Injectron<?>[] exportTo( Injector injector ) {
+		return injectrons( suppliables, injector );
+	}
+
+	public static Injectron<?>[] injectrons( Suppliable<?>[] suppliables, Injector injector ) {
 		final int total = suppliables.length;
-		Map<Class<?>, Injectron<?>[]> res = new IdentityHashMap<Class<?>, Injectron<?>[]>( total );
 		if ( total == 0 ) {
-			return res;
+			return new Injectron<?>[0];
 		}
-		Arrays.sort( suppliables, new Comparator<Suppliable<?>>() {
-
-			@Override
-			public int compare( Suppliable<?> one, Suppliable<?> other ) {
-				Resource<?> rOne = one.resource;
-				Resource<?> rOther = other.resource;
-				Class<?> rawOne = rOne.getType().getRawType();
-				Class<?> rawOther = rOther.getType().getRawType();
-				if ( rawOne != rawOther ) {
-					return rawOne.getCanonicalName().compareTo( rawOther.getCanonicalName() );
-				}
-				return comparePrecision( rOne, rOther );
-			}
-		} );
-		final int end = total - 1;
-		int start = 0;
-		Class<?> lastRawType = suppliables[0].resource.getType().getRawType();
+		Arrays.sort( suppliables, Precision.RESOURCE_COMPARATOR );
+		Injectron<?>[] res = new Injectron<?>[total];
 		for ( int i = 0; i < total; i++ ) {
-			Resource<?> r = suppliables[i].resource;
-			Class<?> rawType = r.getType().getRawType();
-			if ( i == end ) {
-				if ( rawType != lastRawType ) {
-					res.put( lastRawType,
-							createTypeInjectrons( start, i - 1, suppliables, resolver ) );
-					res.put( rawType, createTypeInjectrons( end, end, suppliables, resolver ) );
-				} else {
-					res.put( rawType, createTypeInjectrons( start, end, suppliables, resolver ) );
-				}
-			} else if ( rawType != lastRawType ) {
-				res.put( lastRawType, createTypeInjectrons( start, i - 1, suppliables, resolver ) );
-				start = i;
-			}
-			lastRawType = rawType;
+			res[i] = injectron( suppliables[i], injector, total, i );
 		}
 		return res;
 	}
 
-	private static <T> Injectron<T>[] createTypeInjectrons( int first, int last,
-			Suppliable<?>[] suppliables, Injector resolver ) {
-		final int length = last - first + 1;
-		@SuppressWarnings ( "unchecked" )
-		Injectron<T>[] res = new Injectron[length];
-		int len = suppliables.length;
-		for ( int i = 0; i < length; i++ ) {
-			@SuppressWarnings ( "unchecked" )
-			Suppliable<T> s = (Suppliable<T>) suppliables[i + first];
-			Dependency<T> dependency = dependency( s.resource.getInstance() );
-			Demand<T> demand = demand( s.resource, dependency, i + first, len );
-			Injectable<T> injectable = asInjectable( s.supplier, resolver );
-			res[i] = new ResourceInjectron<T>( s.resource, s.source, demand, s.expiry,
-					s.repository, injectable );
-		}
-		return res;
+	private static <T> Injectron<T> injectron( Suppliable<T> s, Injector injector, int cardinality,
+			int serialNumber ) {
+		Dependency<T> dependency = dependency( s.resource.getInstance() );
+		Demand<T> demand = demand( s.resource, dependency, serialNumber, cardinality );
+		Injectable<T> injectable = asInjectable( s.supplier, injector );
+		StaticInjectron<T> injectron = new StaticInjectron<T>( s.resource, s.source, demand,
+				s.expiry, s.repository, injectable );
+		return injectron;
 	}
 
-	private static class ResourceInjectron<T>
+	private static class StaticInjectron<T>
 			implements Injectron<T> {
 
 		private final Resource<T> resource;
@@ -122,7 +97,7 @@ public class Injectorizer {
 		private final Injectable<T> injectable;
 		private final Expiry expiry;
 
-		ResourceInjectron( Resource<T> resource, Source source, Demand<T> demand, Expiry expiry,
+		StaticInjectron( Resource<T> resource, Source source, Demand<T> demand, Expiry expiry,
 				Repository repository, Injectable<T> injectable ) {
 			super();
 			this.resource = resource;

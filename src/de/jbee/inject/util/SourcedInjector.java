@@ -2,6 +2,8 @@ package de.jbee.inject.util;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -9,31 +11,54 @@ import java.util.Map.Entry;
 import de.jbee.inject.Dependency;
 import de.jbee.inject.Injector;
 import de.jbee.inject.Injectron;
+import de.jbee.inject.Precision;
 import de.jbee.inject.Type;
 
 /**
- * The default {@link Injector} that uses {@link Suppliable}s as its base data.
+ * The default {@link Injector} that gets the initial {@link Injectron}s from a
+ * {@link InjectronSource}.
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
-public final class SuppliableInjector
+public final class SourcedInjector
 		implements Injector {
 
-	public static SuppliableInjector create( Suppliable<?>[] suppliables ) {
-		return new SuppliableInjector( suppliables );
+	public static Injector create( InjectronSource source ) {
+		return new SourcedInjector( source );
 	}
 
 	private final Map<Class<?>, Injectron<?>[]> injectrons;
 
-	private SuppliableInjector( Suppliable<?>[] suppliables ) {
+	private SourcedInjector( InjectronSource source ) {
 		super();
-		this.injectrons = Injectorizer.injectrons( suppliables, this );
+		this.injectrons = initFrom( source );
+	}
+
+	private Map<Class<?>, Injectron<?>[]> initFrom( InjectronSource source ) {
+		Injectron<?>[] injectrons = source.exportTo( this );
+		Arrays.sort( injectrons, Precision.RESOURCE_COMPARATOR );
+		Map<Class<?>, Injectron<?>[]> map = new IdentityHashMap<Class<?>, Injectron<?>[]>(
+				injectrons.length );
+		if ( injectrons.length == 0 ) {
+			return map;
+		}
+		Class<?> lastRawType = injectrons[0].getResource().getType().getRawType();
+		int start = 0;
+		for ( int i = 0; i < injectrons.length; i++ ) {
+			Class<?> rawType = injectrons[i].getResource().getType().getRawType();
+			if ( rawType != lastRawType ) {
+				map.put( lastRawType, Arrays.copyOfRange( injectrons, start, i ) );
+				start = i;
+			}
+			lastRawType = rawType;
+		}
+		map.put( lastRawType, Arrays.copyOfRange( injectrons, start, injectrons.length ) );
+		return map;
 	}
 
 	@SuppressWarnings ( "unchecked" )
 	@Override
 	public <T> T resolve( Dependency<T> dependency ) {
-		// OPEN is it true, that the dependency passed to the injectron can/should get the type/name added ? 
 		final Type<T> type = dependency.getType();
 		final boolean array = type.isUnidimensionalArray();
 		if ( !array && type.isLowerBound() ) {
@@ -53,6 +78,9 @@ public final class SuppliableInjector
 			if ( i != null ) {
 				return (T) i;
 			}
+		}
+		if ( type.getRawType() == Injector.class ) {
+			return (T) this;
 		}
 		throw noInjectronFor( dependency );
 	}

@@ -4,6 +4,8 @@ import java.util.Comparator;
 
 public final class Precision {
 
+	public static final Comparator<Resourcing<?>> RESOURCE_COMPARATOR = new ResourcingComparator();
+
 	public static <T extends PreciserThan<? super T>> Comparator<T> comparator() {
 		return new PreciserThanComparator<T>();
 	}
@@ -36,5 +38,25 @@ public final class Precision {
 			return Precision.comparePrecision( one, other );
 		}
 
+	}
+
+	private static final class ResourcingComparator
+			implements Comparator<Resourcing<?>> {
+
+		ResourcingComparator() {
+			// make visible
+		}
+
+		@Override
+		public int compare( Resourcing<?> one, Resourcing<?> other ) {
+			Resource<?> rOne = one.getResource();
+			Resource<?> rOther = other.getResource();
+			Class<?> rawOne = rOne.getType().getRawType();
+			Class<?> rawOther = rOther.getType().getRawType();
+			if ( rawOne != rawOther ) {
+				return rawOne.getCanonicalName().compareTo( rawOther.getCanonicalName() );
+			}
+			return comparePrecision( rOne, rOther );
+		}
 	}
 }

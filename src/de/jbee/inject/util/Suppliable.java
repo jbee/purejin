@@ -3,6 +3,7 @@ package de.jbee.inject.util;
 import de.jbee.inject.Expiry;
 import de.jbee.inject.Repository;
 import de.jbee.inject.Resource;
+import de.jbee.inject.Resourcing;
 import de.jbee.inject.Source;
 import de.jbee.inject.Supplier;
 
@@ -13,7 +14,8 @@ import de.jbee.inject.Supplier;
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
-public final class Suppliable<T> {
+public final class Suppliable<T>
+		implements Resourcing<T> {
 
 	public final Resource<T> resource;
 	public final Supplier<? extends T> supplier;
@@ -34,5 +36,10 @@ public final class Suppliable<T> {
 	@Override
 	public String toString() {
 		return source + " / " + resource + " / " + supplier;
+	}
+
+	@Override
+	public Resource<T> getResource() {
+		return resource;
 	}
 }
