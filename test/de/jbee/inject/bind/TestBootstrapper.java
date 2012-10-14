@@ -8,10 +8,10 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 import de.jbee.inject.Dependency;
-import de.jbee.inject.DependencyCycleException;
 import de.jbee.inject.Injector;
 import de.jbee.inject.Name;
 import de.jbee.inject.Resource;
+import de.jbee.inject.DIRuntimeException.DependencyCycleException;
 
 /**
  * The tests shows an example of cyclic depended {@link Bundle}s. It shows that a {@link Bundle}

@@ -1,5 +1,9 @@
 package de.jbee.inject;
 
+import de.jbee.inject.DIRuntimeException.DependencyCycleException;
+import de.jbee.inject.DIRuntimeException.MoreFrequentExpiryException;
+import de.jbee.inject.DIRuntimeException.NoSuchResourceException;
+
 /**
  * Knows how to *resolve* an instance for a given {@link Dependency}.
  * 
@@ -18,6 +22,16 @@ public interface Injector {
 	 * @return Resolves the instance appropriate for the given {@link Dependency}. In case no such
 	 *         instance is known an exception is thrown. The <code>null</code>-reference will never
 	 *         be returned.
+	 * @throws NoSuchResourceException
+	 *             In case no {@link Resource} in this injector's context matches the given
+	 *             dependency.
+	 * @throws MoreFrequentExpiryException
+	 *             In case the resolution would cause the injection of a instance into another that
+	 *             has a higher {@link Expiry}.
+	 * @throws DependencyCycleException
+	 *             In case the resolution caused a situation of cyclic dependent instances so that
+	 *             they cannot be injected.
 	 */
-	<T> T resolve( Dependency<T> dependency );
+	<T> T resolve( Dependency<T> dependency )
+			throws NoSuchResourceException, MoreFrequentExpiryException, DependencyCycleException;
 }

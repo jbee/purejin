@@ -6,7 +6,7 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 import de.jbee.inject.Injector;
-import de.jbee.inject.MoreFrequentExpiryException;
+import de.jbee.inject.DIRuntimeException.MoreFrequentExpiryException;
 import de.jbee.inject.util.Scoped;
 
 public class TestScopedBinds {

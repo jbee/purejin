@@ -6,6 +6,9 @@ import static de.jbee.inject.Type.raw;
 
 import java.util.Arrays;
 
+import de.jbee.inject.DIRuntimeException.DependencyCycleException;
+import de.jbee.inject.DIRuntimeException.MoreFrequentExpiryException;
+
 /**
  * Describes what is wanted/needed as parameter to construct a instance of T.
  * 

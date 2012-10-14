@@ -22,6 +22,7 @@ import de.jbee.inject.Resource;
 import de.jbee.inject.Source;
 import de.jbee.inject.Supplier;
 import de.jbee.inject.Type;
+import de.jbee.inject.DIRuntimeException.NoSuchResourceException;
 
 public final class Inject {
 
@@ -144,8 +145,8 @@ public final class Inject {
 			return null;
 		}
 
-		private <T> RuntimeException noInjectronFor( Dependency<T> dependency ) {
-			return new RuntimeException( "No injectron for type: " + dependency );
+		private <T> NoSuchResourceException noInjectronFor( Dependency<T> dependency ) {
+			return new NoSuchResourceException( dependency, typeInjectrons( dependency.getType() ) );
 		}
 
 		private <T, E> T resolveArray( Dependency<T> dependency, Type<E> elementType ) {
@@ -174,7 +175,7 @@ public final class Inject {
 				}
 			}
 			// FIXME it is a difference if all available didn't fit or there hasn't been some. just throw exception in the latter case 
-			throw new RuntimeException( "No injectron for array type: " + dependency.getType() );
+			throw noInjectronFor( dependency );
 		}
 
 		private <T, E, I> T resolveInjectronArray( Dependency<T> dependency, Type<E> elementType,
