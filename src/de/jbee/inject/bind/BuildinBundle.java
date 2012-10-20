@@ -20,12 +20,14 @@ public enum BuildinBundle
 	PROVIDER,
 	LIST,
 	SET,
+	COLLECTION,
 	LOGGER;
 
 	@Override
 	public void bootstrap( ModularBootstrapper<BuildinBundle> bootstrap ) {
 		bootstrap.install( ListBridgeModule.class, LIST );
 		bootstrap.install( SetBridgeModule.class, SET );
+		bootstrap.install( CollectionBridgeModule.class, COLLECTION );
 		bootstrap.install( ProviderBridgeModule.class, PROVIDER );
 		bootstrap.install( LoggerModule.class, LOGGER );
 	}
@@ -56,8 +58,6 @@ public enum BuildinBundle
 		@Override
 		protected void declare() {
 			per( DEPENDENCY_TYPE ).starbind( List.class ).to( SuppliedBy.LIST_BRIDGE );
-			asDefault().per( DEPENDENCY_TYPE ).starbind( Collection.class ).toParametrized(
-					List.class );
 		}
 
 	}
@@ -68,10 +68,18 @@ public enum BuildinBundle
 		@Override
 		protected void declare() {
 			per( DEPENDENCY_TYPE ).starbind( Set.class ).to( SuppliedBy.SET_BRIDGE );
-			asDefault().per( DEPENDENCY_TYPE ).starbind( Collection.class ).toParametrized(
-					Set.class );
 		}
 
+	}
+
+	private static class CollectionBridgeModule
+			extends BinderModule {
+
+		@Override
+		protected void declare() {
+			asDefault().per( DEPENDENCY_TYPE ).starbind( Collection.class ).toParametrized(
+					List.class );
+		}
 	}
 
 }

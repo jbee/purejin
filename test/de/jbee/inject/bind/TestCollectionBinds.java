@@ -50,18 +50,7 @@ public class TestCollectionBinds {
 
 		@Override
 		protected void bootstrap() {
-			install( BuildinBundle.LIST );
-			install( CollectionBindsModule.class );
-		}
-
-	}
-
-	private static class CollectionBindsJustSetBundle
-			extends BootstrapperBundle {
-
-		@Override
-		protected void bootstrap() {
-			install( BuildinBundle.SET );
+			install( BuildinBundle.LIST, BuildinBundle.COLLECTION );
 			install( CollectionBindsModule.class );
 		}
 
@@ -116,13 +105,6 @@ public class TestCollectionBinds {
 	public void thatListOfListsOfBoundTypesAreAvailable() {
 		ai.assertInjects( singletonList( singletonList( "foobar" ) ),
 				listTypeOf( listTypeOf( String.class ) ) );
-	}
-
-	@Test
-	public void thatCollectionIsAvailableWhenJustSetIsInstalled() {
-		Injector injector = Bootstrap.injector( CollectionBindsJustSetBundle.class );
-		Type<? extends Collection<?>> collectionType = collectionTypeOf( Integer.class );
-		new AssertInjects( injector ).assertInjectsItems( new Integer[] { 846, 42 }, collectionType );
 	}
 
 	@Test
