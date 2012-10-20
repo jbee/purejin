@@ -1,5 +1,7 @@
 package de.jbee.inject;
 
+import java.util.Arrays;
+
 public class DIRuntimeException
 		extends RuntimeException {
 
@@ -15,13 +17,8 @@ public class DIRuntimeException
 	public static final class DependencyCycleException
 			extends DIRuntimeException {
 
-		private final Dependency<?> dependency;
-		private final Instance<?> cycleTarget;
-
 		public DependencyCycleException( Dependency<?> dependency, Instance<?> cycleTarget ) {
 			super( "Cycle detected: " + injectionStack( dependency ) + cycleTarget );
-			this.dependency = dependency;
-			this.cycleTarget = cycleTarget;
 		}
 
 	}
@@ -53,13 +50,18 @@ public class DIRuntimeException
 	public static final class NoSuchResourceException
 			extends DIRuntimeException {
 
-		private final Dependency<?> dependency;
-
 		public <T> NoSuchResourceException( Dependency<T> dependency, Injectron<T>[] available ) {
-			super( "No resource found that matches dependency: " + injectionStack( dependency )
+			super( "No resource for dependency: " + injectionStack( dependency )
 					+ dependency.getInstance() );
-			this.dependency = dependency;
 		}
 
+	}
+
+	public static final class NoSuchMethodException
+			extends DIRuntimeException {
+
+		public NoSuchMethodException( Type<?> returnType, Type<?>... parameterTypes ) {
+			super( returnType + ":" + Arrays.toString( parameterTypes ) );
+		}
 	}
 }

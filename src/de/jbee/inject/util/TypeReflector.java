@@ -2,6 +2,10 @@ package de.jbee.inject.util;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import de.jbee.inject.Type;
 
 public final class TypeReflector {
 
@@ -60,6 +64,30 @@ public final class TypeReflector {
 		} catch ( Exception e ) {
 			throw new RuntimeException( e );
 		}
+	}
+
+	public static Object invoke( Method method, Object owner, Object... args ) {
+		try {
+			return method.invoke( owner, args );
+		} catch ( Exception e ) {
+			if ( e instanceof InvocationTargetException ) {
+				Throwable t = ( (InvocationTargetException) e ).getTargetException();
+				if ( t instanceof Exception ) {
+					e = (Exception) t;
+				}
+			}
+			throw new RuntimeException( "Failed to invoke method: " + method + " \n"
+					+ e.getMessage(), e );
+		}
+	}
+
+	public static <T> Method methodReturns( Type<T> returnType, Class<?> implementor ) {
+		for ( Method m : implementor.getDeclaredMethods() ) {
+			if ( Type.returnType( m ).isAssignableTo( returnType ) ) {
+				return m;
+			}
+		}
+		return null;
 	}
 
 }

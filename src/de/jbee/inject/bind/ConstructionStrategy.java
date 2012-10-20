@@ -1,6 +1,9 @@
 package de.jbee.inject.bind;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+
+import de.jbee.inject.Type;
 
 /**
  * A {@link ConstructionStrategy} picks the {@link Constructor} to use to construct objects of a
@@ -17,4 +20,5 @@ public interface ConstructionStrategy {
 	 */
 	<T> Constructor<T> constructorFor( Class<T> type );
 
+	<T> Method factoryFor( Type<T> returnType, Class<?> implementor ); //OPEN add name given in bind() ?
 }

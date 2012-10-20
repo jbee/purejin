@@ -60,6 +60,15 @@ public final class Argument<T>
 		return consts;
 	}
 
+	public static <T> Object[] resolve( Dependency<? super T> dependency, Injector context,
+			Argument<?>[] arguments ) {
+		Object[] args = new Object[arguments.length];
+		for ( int i = 0; i < arguments.length; i++ ) {
+			args[i] = arguments[i].resolve( dependency, context );
+		}
+		return args;
+	}
+
 	private final T constant;
 	private final Type<? super T> asType;
 	private final Instance<? extends T> instance;
@@ -111,6 +120,32 @@ public final class Argument<T>
 			return dependency.toString() + as;
 		}
 		return instance.toString() + as;
+	}
+
+	public static Argument<?>[] arguments( Type<?>[] types, Parameter<?>... parameters ) {
+		Argument<?>[] arguments = new Argument<?>[types.length];
+		for ( Parameter<?> parameter : parameters ) {
+			int i = 0;
+			boolean found = false;
+			while ( i < types.length && !found ) {
+				if ( arguments[i] == null ) {
+					found = parameter.isAssignableTo( types[i] );
+					if ( found ) {
+						arguments[i] = argumentFor( parameter );
+					}
+				}
+				i++;
+			}
+			if ( !found ) {
+				throw new IllegalArgumentException( "Couldn't understand parameter: " + parameter );
+			}
+		}
+		for ( int i = 0; i < arguments.length; i++ ) {
+			if ( arguments[i] == null ) {
+				arguments[i] = argumentFor( types[i] );
+			}
+		}
+		return arguments;
 	}
 
 }

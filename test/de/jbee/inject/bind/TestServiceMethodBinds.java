@@ -35,11 +35,11 @@ public class TestServiceMethodBinds {
 
 	static class MyOtherService {
 
-		public Integer mul2( Integer value, ServiceMethod<Float, Integer> service ) {
+		public int mul2( int value, ServiceMethod<Float, Integer> service ) {
 			return value * 2 + service.invoke( 2.8f );
 		}
 
-		public Integer round( Float value ) {
+		public int round( float value ) {
 			return Math.round( value );
 		}
 	}

@@ -8,6 +8,7 @@ import static de.jbee.inject.util.SuppliedBy.parametrizedInstance;
 import static de.jbee.inject.util.SuppliedBy.provider;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import de.jbee.inject.DeclarationType;
@@ -465,6 +466,15 @@ public class Binder
 
 		public <I extends T> void to( Instance<I> instance ) {
 			to( supply( instance ) );
+		}
+
+		public void to( Method factory, Parameter<?>... parameters ) {
+			to( SuppliedBy.method( resource.getType(), factory, parameters ) );
+		}
+
+		public void toMethod( Class<?> implementor, Parameter<?>... parameters ) {
+			to( binder.strategy.factoryFor( resource.getType(), implementor ), parameters );
+			implicitBindToConstructor( Instance.anyOf( raw( implementor ) ) );
 		}
 
 		<I> Supplier<I> supply( Class<I> impl ) {

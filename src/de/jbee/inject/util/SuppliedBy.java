@@ -1,10 +1,12 @@
 package de.jbee.inject.util;
 
+import static de.jbee.inject.Dependency.dependency;
 import static de.jbee.inject.Type.parameterTypes;
-import static de.jbee.inject.util.Argument.argumentFor;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -56,6 +58,16 @@ public final class SuppliedBy {
 		return new ElementsSupplier<E>( arrayType, elements );
 	}
 
+	public static <T> Supplier<T> method( Type<T> returnType, Method factory,
+			Parameter<?>... parameters ) {
+		if ( !Type.returnType( factory ).isAssignableTo( returnType ) ) {
+			throw new IllegalArgumentException( "The factory methods methods return type `"
+					+ Type.returnType( factory ) + "` is not assignable to: " + returnType );
+		}
+		Argument<?>[] arguments = Argument.arguments( Type.parameterTypes( factory ), parameters );
+		return new FactoryMethodSupplier<T>( returnType, factory, arguments );
+	}
+
 	public static <T> Supplier<T> costructor( Constructor<T> constructor ) {
 		final Class<?>[] params = constructor.getParameterTypes();
 		if ( params.length == 0 ) {
@@ -66,34 +78,10 @@ public final class SuppliedBy {
 
 	public static <T> Supplier<T> costructor( Constructor<T> constructor,
 			Parameter<?>... parameters ) {
-		Type<?>[] types = parameterTypes( constructor );
-		Argument<?>[] arguments = new Argument<?>[types.length];
-		for ( Parameter<?> parameter : parameters ) {
-			int i = 0;
-			boolean found = false;
-			while ( i < types.length && !found ) {
-				if ( arguments[i] == null ) {
-					found = parameter.isAssignableTo( types[i] );
-					if ( found ) {
-						arguments[i] = argumentFor( parameter );
-					}
-				}
-				i++;
-			}
-			if ( !found ) {
-				throw new IllegalArgumentException( "Couldn't understand parameter: " + parameter );
-			}
-		}
-		for ( int i = 0; i < arguments.length; i++ ) {
-			if ( arguments[i] == null ) {
-				arguments[i] = argumentFor( types[i] );
-			}
-		}
-		if ( arguments.length == types.length && Argument.allConstants( arguments ) ) {
-			return new StaticConstructorSupplier<T>( constructor,
-					Argument.constantsFrom( arguments ) );
-		}
-		return new ConstructorSupplier<T>( constructor, arguments );
+		Argument<?>[] arguments = Argument.arguments( parameterTypes( constructor ), parameters );
+		return Argument.allConstants( arguments )
+			? new StaticConstructorSupplier<T>( constructor, Argument.constantsFrom( arguments ) )
+			: new ConstructorSupplier<T>( constructor, arguments );
 	}
 
 	public static <T> Supplier<T> factory( Factory<T> factory ) {
@@ -404,11 +392,37 @@ public final class SuppliedBy {
 
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector context ) {
-			Object[] args = new Object[arguments.length];
-			for ( int i = 0; i < arguments.length; i++ ) {
-				args[i] = arguments[i].resolve( dependency, context );
+			return TypeReflector.construct( constructor, Argument.resolve( dependency, context,
+					arguments ) );
+		}
+
+	}
+
+	private static final class FactoryMethodSupplier<T>
+			implements Supplier<T> {
+
+		private final Type<T> returnType;
+		private final Method factory;
+		private final Argument<?>[] arguments;
+		private final boolean instanceMethod;
+
+		FactoryMethodSupplier( Type<T> returnType, Method factory, Argument<?>[] arguments ) {
+			super();
+			TypeReflector.makeAccessible( factory );
+			this.returnType = returnType;
+			this.factory = factory;
+			this.arguments = arguments;
+			this.instanceMethod = !Modifier.isStatic( factory.getModifiers() );
+		}
+
+		@Override
+		public T supply( Dependency<? super T> dependency, Injector context ) {
+			Object owner = null;
+			if ( instanceMethod ) {
+				owner = context.resolve( dependency( factory.getDeclaringClass() ) );
 			}
-			return TypeReflector.construct( constructor, args );
+			final Object[] args = Argument.resolve( dependency, context, arguments );
+			return returnType.getRawType().cast( TypeReflector.invoke( factory, owner, args ) );
 		}
 
 	}

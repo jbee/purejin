@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
+import de.jbee.inject.DIRuntimeException;
 import de.jbee.inject.Dependency;
 import de.jbee.inject.Injector;
 import de.jbee.inject.Injectron;
@@ -187,8 +188,7 @@ public abstract class ServiceModule
 					}
 				}
 			}
-			//FIXME primitives types aren't covered...but ... they can be used as parameter for Type 
-			return null;
+			throw new DIRuntimeException.NoSuchMethodException( returnType, parameterType );
 		}
 
 		private Method[] serviceClassMethods( Class<?> service ) {
