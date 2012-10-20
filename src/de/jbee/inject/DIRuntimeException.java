@@ -19,10 +19,19 @@ public class DIRuntimeException
 		private final Instance<?> cycleTarget;
 
 		public DependencyCycleException( Dependency<?> dependency, Instance<?> cycleTarget ) {
-			super( cycleTarget + " into " + dependency );
+			super( "Cycle detected: " + injectionStack( dependency ) + cycleTarget );
 			this.dependency = dependency;
 			this.cycleTarget = cycleTarget;
 		}
+
+	}
+
+	static String injectionStack( Dependency<?> dependency ) {
+		StringBuilder b = new StringBuilder();
+		for ( Injection i : dependency ) {
+			b.append( i.getTarget().getInstance() ).append( " -> " );
+		}
+		return b.toString();
 	}
 
 	public static final class MoreFrequentExpiryException
@@ -47,7 +56,8 @@ public class DIRuntimeException
 		private final Dependency<?> dependency;
 
 		public <T> NoSuchResourceException( Dependency<T> dependency, Injectron<T>[] available ) {
-			super( "No resource found that matches dependency: " + dependency );
+			super( "No resource found that matches dependency: " + injectionStack( dependency )
+					+ dependency.getInstance() );
 			this.dependency = dependency;
 		}
 

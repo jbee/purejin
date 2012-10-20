@@ -13,7 +13,7 @@ import org.junit.runners.Suite.SuiteClasses;
 		TestRobotLegsProblemBinds.class, TestConstructorParameterBinds.class,
 		TestDependencyParameterBinds.class, TestScopedBinds.class, TestExtensionBinds.class,
 		TestInjectronBinds.class, TestProviderBinds.class, TestServiceInvocationBinds.class,
-		TestPrimitiveBinds.class, TestInjectorExceptions.class } )
+		TestPrimitiveBinds.class, TestInjectorExceptions.class, TestCollectionBinds.class } )
 public class SuiteBind {
 	// all tests in the bind package
 }

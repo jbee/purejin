@@ -79,6 +79,15 @@ public final class Type<T>
 		return (Type<? extends List<T>>) raw( List.class ).parametized( elementType );
 	}
 
+	public static <T> Type<? extends Set<T>> setTypeOf( Class<T> elementType ) {
+		return setTypeOf( raw( elementType ) );
+	}
+
+	@SuppressWarnings ( "unchecked" )
+	public static <T> Type<? extends Set<T>> setTypeOf( Type<T> elementType ) {
+		return (Type<? extends Set<T>>) raw( Set.class ).parametized( elementType );
+	}
+
 	public static <T> Type<T> type( Class<T> rawType, java.lang.reflect.Type type ) {
 		return type( rawType, type, Collections.<String, Type<?>> emptyMap() );
 	}
@@ -157,7 +166,11 @@ public final class Type<T>
 	}
 
 	public Type<? extends T> asLowerBound() {
-		return new Type<T>( true, rawType, params );
+		return lowerBound( true );
+	}
+
+	public Type<? extends T> lowerBound( boolean lowerBound ) {
+		return new Type<T>( lowerBound, rawType, params );
 	}
 
 	public Type<? extends T> asExactType() {

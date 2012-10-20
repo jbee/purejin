@@ -5,6 +5,7 @@ import static de.jbee.inject.Instance.instance;
 import static de.jbee.inject.Type.raw;
 
 import java.util.Arrays;
+import java.util.Iterator;
 
 import de.jbee.inject.DIRuntimeException.DependencyCycleException;
 import de.jbee.inject.DIRuntimeException.MoreFrequentExpiryException;
@@ -15,7 +16,7 @@ import de.jbee.inject.DIRuntimeException.MoreFrequentExpiryException;
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
 public final class Dependency<T>
-		implements Typed<T>, Named, Parameter<T> {
+		implements Typed<T>, Named, Parameter<T>, Iterable<Injection> {
 
 	private static final Injection[] UNTARGETED = new Injection[0];
 
@@ -166,5 +167,10 @@ public final class Dependency<T>
 	@Override
 	public boolean isAssignableTo( Type<?> type ) {
 		return getType().isAssignableTo( type );
+	}
+
+	@Override
+	public Iterator<Injection> iterator() {
+		return Arrays.asList( injectionHierarchy ).iterator();
 	}
 }

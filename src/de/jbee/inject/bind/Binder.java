@@ -4,6 +4,7 @@ import static de.jbee.inject.Instance.defaultInstanceOf;
 import static de.jbee.inject.Instance.instance;
 import static de.jbee.inject.Type.raw;
 import static de.jbee.inject.util.SuppliedBy.constant;
+import static de.jbee.inject.util.SuppliedBy.parametrizedInstance;
 import static de.jbee.inject.util.SuppliedBy.provider;
 
 import java.lang.reflect.Constructor;
@@ -448,6 +449,10 @@ public class Binder
 
 		public <I extends T> void to( Class<I> impl ) {
 			to( Instance.anyOf( raw( impl ) ) );
+		}
+
+		public <I extends T> void toParametrized( Class<I> impl ) {
+			to( parametrizedInstance( Instance.anyOf( raw( impl ) ) ) );
 		}
 
 		public <I extends T> void to( Name name, Type<I> type ) {

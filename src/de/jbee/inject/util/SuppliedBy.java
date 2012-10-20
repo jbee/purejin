@@ -41,11 +41,15 @@ public final class SuppliedBy {
 	}
 
 	public static <T> Supplier<T> reference( Class<? extends Supplier<? extends T>> type ) {
-		return new ReferencingSupplier<T>( type );
+		return new ReferenceSupplier<T>( type );
 	}
 
 	public static <T> Supplier<T> instance( Instance<T> instance ) {
 		return new InstanceSupplier<T>( instance );
+	}
+
+	public static <T> Supplier<T> parametrizedInstance( Instance<T> instance ) {
+		return new ParametrizedInstanceSupplier<T>( instance );
 	}
 
 	public static <E> Supplier<E[]> elements( Class<E[]> arrayType, Supplier<? extends E>[] elements ) {
@@ -109,7 +113,9 @@ public final class SuppliedBy {
 
 		@Override
 		public final T supply( Dependency<? super T> dependency, Injector context ) {
-			Type<?> elementType = dependency.getType().getParameters()[0];
+			Type<?> elementType = !dependency.getType().isParameterized()
+				? Type.WILDCARD
+				: dependency.getType().getParameters()[0];
 			return bridge( supplyArray( dependency.anyTyped( elementType.getArrayType() ), context ) );
 		}
 
@@ -212,12 +218,12 @@ public final class SuppliedBy {
 
 	}
 
-	private static final class ReferencingSupplier<T>
+	private static final class ReferenceSupplier<T>
 			implements Supplier<T> {
 
 		private final Class<? extends Supplier<? extends T>> type;
 
-		ReferencingSupplier( Class<? extends Supplier<? extends T>> type ) {
+		ReferenceSupplier( Class<? extends Supplier<? extends T>> type ) {
 			super();
 			this.type = type;
 		}
@@ -227,6 +233,31 @@ public final class SuppliedBy {
 			final Supplier<? extends T> supplier = context.resolve( dependency.anyTyped( type ) );
 			return supplier.supply( dependency, context );
 		}
+	}
+
+	private static final class ParametrizedInstanceSupplier<T>
+			implements Supplier<T> {
+
+		private final Instance<? extends T> instance;
+
+		ParametrizedInstanceSupplier( Instance<? extends T> instance ) {
+			super();
+			this.instance = instance;
+		}
+
+		@Override
+		public T supply( Dependency<? super T> dependency, Injector context ) {
+			Type<? super T> type = dependency.getType();
+			Instance<? extends T> parametrized = instance.typed( instance.getType().parametized(
+					type.getParameters() ).lowerBound( dependency.getType().isLowerBound() ) );
+			return context.resolve( dependency.instanced( parametrized ) );
+		}
+
+		@Override
+		public String toString() {
+			return instance.toString();
+		}
+
 	}
 
 	private static final class InstanceSupplier<T>
