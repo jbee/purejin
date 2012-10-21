@@ -249,6 +249,7 @@ public abstract class ServiceModule
 		}
 
 		private ServiceInvocation<?>[] resolveInvocations( Injector context ) {
+			@SuppressWarnings ( "unchecked" )
 			Class<? extends ServiceInvocation<?>>[] classes = context.resolve( Extend.dependency( ServiceInvocationExtension.class ) );
 			ServiceInvocation<?>[] res = new ServiceInvocation<?>[classes.length];
 			for ( int i = 0; i < res.length; i++ ) {
@@ -371,6 +372,7 @@ public abstract class ServiceModule
 			return args;
 		}
 
+		@SuppressWarnings ( "unchecked" )
 		private static <I> I instance( Injectron<I> injectron, Dependency<?> dependency ) {
 			return injectron.instanceFor( (Dependency<? super I>) dependency );
 		}

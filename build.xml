@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="compile" name="silk">
+
+	<property environment="env" />
+	<property name="target" value="1.6" />
+	<property name="source" value="1.6" />
+
+	<property name="target.dir" value="bin" />
+	<property name="src.dir" value="src" />
+	<property name="test.dir" value="test" />
+
+	<path id="silk.classpath">
+		<pathelement location="${target.dir}" />
+	</path>
+
+	<target name="init">
+		<mkdir dir="${target.dir}" />
+		<copy includeemptydirs="false" todir="${target.dir}">
+			<fileset dir="src">
+				<exclude name="**/*.launch" />
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+		<copy includeemptydirs="false" todir="${target.dir}">
+			<fileset dir="test">
+				<exclude name="**/*.launch" />
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="clean">
+		<delete dir="${target.dir}" />
+	</target>
+
+	<target name="compile" depends="init">
+		<javac debug="true" debuglevel="${debuglevel}" destdir="${target.dir}" source="${source}" target="${target}" includeantruntime="false">
+			<src path="${src.dir}" />
+			<classpath refid="silk.classpath" />
+			<compilerarg value="-Xlint:unchecked"/>
+		</javac>
+	</target>
+	
+	<target name="jar">
+		<jar destfile="silk-snapshot.jar" basedir="${target.dir}"></jar>
+	</target>
+
+	<target name="test-compile" depends="compile">
+		<javac debug="true" debuglevel="${debuglevel}" destdir="${target.dir}" source="${source}" target="${target}">
+			<src path="${test.dir}" />
+			<classpath refid="silk.classpath" />
+		</javac>
+	</target>
+
+	<target name="test" depends="test-compile">
+		<mkdir dir="${junit.output.dir}" />
+		<junit fork="yes" printsummary="withOutAndErr">
+			<formatter type="xml" />
+			<test name="de.jbee.inject.SuiteSilk" todir="${junit.output.dir}" />
+			<classpath refid="silk.classpath" />
+		</junit>
+	</target>
+
+	<target name="junitreport">
+		<junitreport todir="${junit.output.dir}">
+			<fileset dir="${junit.output.dir}">
+				<include name="TEST-*.xml" />
+			</fileset>
+			<report format="frames" todir="${junit.output.dir}" />
+		</junitreport>
+	</target>
+</project>

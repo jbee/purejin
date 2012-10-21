@@ -9,6 +9,13 @@ import java.util.Set;
 import de.jbee.inject.Injectron;
 import de.jbee.inject.Type;
 
+/**
+ * 
+ * Implementation Note: storing the the raw type in a var before returning the generic type is a
+ * workaround to make this compile with javac (cast works within eclipse).
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ */
 public final class Typecast {
 
 	public static <T> Type<? extends List<T>> listTypeOf( Class<T> elementType ) {
@@ -17,7 +24,8 @@ public final class Typecast {
 
 	@SuppressWarnings ( "unchecked" )
 	public static <T> Type<? extends List<T>> listTypeOf( Type<T> elementType ) {
-		return (Type<? extends List<T>>) raw( List.class ).parametized( elementType );
+		Type raw = raw( List.class ).parametized( elementType );
+		return raw;
 	}
 
 	public static <T> Type<? extends Set<T>> setTypeOf( Class<T> elementType ) {
@@ -26,7 +34,8 @@ public final class Typecast {
 
 	@SuppressWarnings ( "unchecked" )
 	public static <T> Type<? extends Set<T>> setTypeOf( Type<T> elementType ) {
-		return (Type<? extends Set<T>>) raw( Set.class ).parametized( elementType );
+		Type raw = raw( Set.class ).parametized( elementType );
+		return raw;
 	}
 
 	public static <T> Type<? extends Collection<T>> collectionTypeOf( Class<T> elementType ) {
@@ -35,7 +44,8 @@ public final class Typecast {
 
 	@SuppressWarnings ( "unchecked" )
 	public static <T> Type<? extends Collection<T>> collectionTypeOf( Type<T> elementType ) {
-		return (Type<? extends Collection<T>>) raw( Collection.class ).parametized( elementType );
+		Type raw = raw( Collection.class ).parametized( elementType );
+		return raw;
 	}
 
 	public static <T> Type<? extends Provider<T>> providerTypeOf( Class<T> providedType ) {
@@ -44,7 +54,8 @@ public final class Typecast {
 
 	@SuppressWarnings ( "unchecked" )
 	public static <T> Type<? extends Provider<T>> providerTypeOf( Type<T> providedType ) {
-		return (Type<? extends Provider<T>>) raw( Provider.class ).parametized( providedType );
+		Type raw = raw( Provider.class ).parametized( providedType );
+		return raw;
 	}
 
 	public static <T> Type<? extends Factory<T>> factoryTypeOf( Class<T> providedType ) {
@@ -53,7 +64,8 @@ public final class Typecast {
 
 	@SuppressWarnings ( "unchecked" )
 	public static <T> Type<? extends Factory<T>> factoryTypeOf( Type<T> providedType ) {
-		return (Type<? extends Factory<T>>) raw( Factory.class ).parametized( providedType );
+		Type raw = raw( Factory.class ).parametized( providedType );
+		return raw;
 	}
 
 	public static <T> Type<? extends Injectron<T>> injectronTypeOf( Class<T> providedType ) {
@@ -62,7 +74,8 @@ public final class Typecast {
 
 	@SuppressWarnings ( "unchecked" )
 	public static <T> Type<? extends Injectron<T>> injectronTypeOf( Type<T> providedType ) {
-		return (Type<? extends Injectron<T>>) raw( Injectron.class ).parametized( providedType );
+		Type raw = raw( Injectron.class ).parametized( providedType );
+		return raw;
 	}
 
 	public static <T> Type<? extends Injectron<T>[]> injectronsTypeOf( Class<T> providedType ) {
@@ -71,6 +84,7 @@ public final class Typecast {
 
 	@SuppressWarnings ( "unchecked" )
 	public static <T> Type<? extends Injectron<T>[]> injectronsTypeOf( Type<T> providedType ) {
-		return (Type<? extends Injectron<T>[]>) raw( Injectron[].class ).parametized( providedType );
+		Type raw = raw( Injectron[].class ).parametized( providedType );
+		return raw;
 	}
 }
