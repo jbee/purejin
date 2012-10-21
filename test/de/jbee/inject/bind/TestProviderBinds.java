@@ -16,7 +16,9 @@ import org.junit.Test;
 import de.jbee.inject.Injector;
 import de.jbee.inject.Name;
 import de.jbee.inject.Type;
+import de.jbee.inject.DIRuntimeException.MoreFrequentExpiryException;
 import de.jbee.inject.util.Provider;
+import de.jbee.inject.util.Scoped;
 
 public class TestProviderBinds {
 
@@ -30,6 +32,9 @@ public class TestProviderBinds {
 			bind( Integer.class ).to( 42 );
 			bind( named( "foo" ), Integer.class ).to( 846 );
 			bind( Float.class ).to( 42.0f );
+			per( Scoped.INJECTION ).bind( DynamicState.class ).toConstructor();
+			construct( FaultyStateConsumer.class );
+			construct( WorkingStateConsumer.class );
 		}
 
 	}
@@ -43,6 +48,26 @@ public class TestProviderBinds {
 			install( ProviderBindsModule.class );
 		}
 
+	}
+
+	private static class DynamicState {
+		// this is constructed per injection so it is "changing over time"
+	}
+
+	private static class FaultyStateConsumer {
+
+		@SuppressWarnings ( "unused" )
+		FaultyStateConsumer( DynamicState state ) {
+			// using the state directly is faulty since the state changes.
+		}
+	}
+
+	private static class WorkingStateConsumer {
+
+		@SuppressWarnings ( "unused" )
+		WorkingStateConsumer( Provider<DynamicState> state ) {
+			// using a provider allows to inject the changing object into the static one.
+		}
 	}
 
 	private final Injector injector = Bootstrap.injector( ProviderBindsBundle.class );
@@ -70,6 +95,16 @@ public class TestProviderBinds {
 		assertInjectsProviderFor( set, raw( Set.class ).parametized( String.class ) );
 	}
 
+	@Test
+	public void thatProviderMakesPerInjectionInjectableIntoPerApplication() {
+		injector.resolve( dependency( WorkingStateConsumer.class ) );
+	}
+
+	@Test ( expected = MoreFrequentExpiryException.class )
+	public void thatNoProviderCausesExceptionWhenPerInjectionInjectedIntoPerApplication() {
+		injector.resolve( dependency( FaultyStateConsumer.class ) );
+	}
+
 	private <T> void assertInjectsProviderFor( T expected, Type<? extends T> dependencyType ) {
 		assertInjectsProviderFor( expected, dependencyType, Name.ANY );
 	}
@@ -80,6 +115,4 @@ public class TestProviderBinds {
 		Provider<?> provider = injector.resolve( dependency( type ).named( name ) );
 		assertEquals( expected, provider.provide() );
 	}
-
-	//TODO test provider and scope 
 }

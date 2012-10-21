@@ -92,7 +92,6 @@ public final class Packages
 		if ( includesOneSpecific() ) {
 			return other.pattern.equals( pattern + "*" );
 		}
-		//TODO I guess the containsOneSpecific is not needed - test
 		return !other.includesOneSpecific() && other.isSubPackage( this );
 	}
 

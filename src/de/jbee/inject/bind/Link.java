@@ -180,7 +180,10 @@ public final class Link {
 			if ( res != 0 ) {
 				return res;
 			}
-			//TODO what about the Availability ? 
+			res = Precision.comparePrecision( resource.getTarget(), other.resource.getTarget() );
+			if ( res != 0 ) {
+				return res;
+			}
 			res = Precision.comparePrecision( source, other.source );
 			if ( res != 0 ) {
 				return res;

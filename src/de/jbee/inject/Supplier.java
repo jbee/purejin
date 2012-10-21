@@ -1,6 +1,10 @@
 package de.jbee.inject;
 
 /**
+ * A {@link Supplier} is asked to supply the instance that should be used for a particular
+ * {@link Dependency}.
+ * 
+ * The {@link Injector} should be used to resolve dependencies during object creation.
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  * 
@@ -9,7 +13,6 @@ package de.jbee.inject;
  */
 public interface Supplier<T> {
 
-	T supply( Dependency<? super T> dependency, Injector context );
+	T supply( Dependency<? super T> dependency, Injector injector );
 
-	// TODO some way to validate the source - is the constructor available etc.
 }

@@ -161,15 +161,13 @@ public final class Inject {
 				for ( Entry<Class<?>, Injectron<?>[]> e : injectrons.entrySet() ) {
 					if ( Type.raw( e.getKey() ).isAssignableTo( elementType ) ) {
 						//FIXME some of the injectrons are just bridges and such - no real values - recursion causes errors here
-						addAllApplicable( elements, dependency, elementType,
-								(Injectron<? extends E>[]) e.getValue() );
+						@SuppressWarnings ( "unchecked" )
+						Injectron<? extends E>[] value = (Injectron<? extends E>[]) e.getValue();
+						addAllApplicable( elements, dependency, elementType, value );
 					}
 				}
-				if ( elements.size() > 0 ) {
-					return toArray( elements, elementType );
-				}
+				return toArray( elements, elementType );
 			}
-			// FIXME it is a difference if all available didn't fit or there hasn't been some. just throw exception in the latter case 
 			throw noInjectronFor( dependency );
 		}
 

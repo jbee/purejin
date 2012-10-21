@@ -57,5 +57,4 @@ public interface Bootstrapper {
 		void install( Class<? extends Bundle> bundle, M module );
 	}
 
-	//OPEN beside Bundle and Module there should be a Config. That is basically a module that provides constants that are kind of configuration. Should that be a separate core concept or just a class/type of Module ?
 }

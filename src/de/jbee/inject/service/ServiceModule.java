@@ -114,8 +114,8 @@ public abstract class ServiceModule
 
 		@Override
 		public ServiceProvider supply( Dependency<? super ServiceProvider> dependency,
-				Injector context ) {
-			return new ServiceMethodProvider( context );
+				Injector injector ) {
+			return new ServiceMethodProvider( injector );
 		}
 
 	}
@@ -208,14 +208,13 @@ public abstract class ServiceModule
 
 	}
 
-	//OPEN move this to test-code since it is more of an example using the SM directly as the service interface
 	private static class ServiceSupplier
 			implements Supplier<ServiceMethod<?, ?>> {
 
 		@Override
 		public ServiceMethod<?, ?> supply( Dependency<? super ServiceMethod<?, ?>> dependency,
-				Injector context ) {
-			ServiceProvider serviceProvider = context.resolve( dependency.anyTyped( ServiceProvider.class ) );
+				Injector injector ) {
+			ServiceProvider serviceProvider = injector.resolve( dependency.anyTyped( ServiceProvider.class ) );
 			Type<?>[] parameters = dependency.getType().getParameters();
 			return serviceProvider.provide( parameters[0], parameters[1] );
 		}

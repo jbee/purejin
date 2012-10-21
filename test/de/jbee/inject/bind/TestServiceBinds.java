@@ -37,8 +37,8 @@ public class TestServiceBinds {
 			implements Supplier<Service<?, ?>> {
 
 		@Override
-		public Service<?, ?> supply( Dependency<? super Service<?, ?>> dependency, Injector context ) {
-			ServiceProvider provider = context.resolve( dependency( ServiceProvider.class ) );
+		public Service<?, ?> supply( Dependency<? super Service<?, ?>> dependency, Injector injector ) {
+			ServiceProvider provider = injector.resolve( dependency( ServiceProvider.class ) );
 			Type<?>[] parameters = dependency.getType().getParameters();
 			return newService( provider.provide( parameters[0], parameters[1] ) );
 		}

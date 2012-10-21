@@ -22,7 +22,7 @@ public class TestSupplierBinds {
 		}
 
 		@Override
-		public String supply( Dependency<? super String> dependency, Injector context ) {
+		public String supply( Dependency<? super String> dependency, Injector injector ) {
 			return "foobar";
 		}
 

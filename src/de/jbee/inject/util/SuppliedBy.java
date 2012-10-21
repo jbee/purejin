@@ -100,11 +100,11 @@ public final class SuppliedBy {
 		}
 
 		@Override
-		public final T supply( Dependency<? super T> dependency, Injector context ) {
+		public final T supply( Dependency<? super T> dependency, Injector injector ) {
 			Type<?> elementType = !dependency.getType().isParameterized()
 				? Type.WILDCARD
 				: dependency.getType().getParameters()[0];
-			return bridge( supplyArray( dependency.anyTyped( elementType.getArrayType() ), context ) );
+			return bridge( supplyArray( dependency.anyTyped( elementType.getArrayType() ), injector ) );
 		}
 
 		private <E> E[] supplyArray( Dependency<E[]> elementType, Injector resolver ) {
@@ -162,7 +162,7 @@ public final class SuppliedBy {
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, Injector context ) {
+		public T supply( Dependency<? super T> dependency, Injector injector ) {
 			return instance;
 		}
 
@@ -193,13 +193,13 @@ public final class SuppliedBy {
 
 		@SuppressWarnings ( "unchecked" )
 		@Override
-		public E[] supply( Dependency<? super E[]> dependency, Injector context ) {
+		public E[] supply( Dependency<? super E[]> dependency, Injector injector ) {
 			E[] res = (E[]) Array.newInstance( arrayType.getComponentType(), elements.length );
 			int i = 0;
 			final Dependency<E> elementDependency = (Dependency<E>) dependency.typed( Type.raw(
 					arrayType ).elementType() );
 			for ( Supplier<? extends E> e : elements ) {
-				res[i++] = e.supply( elementDependency, context );
+				res[i++] = e.supply( elementDependency, injector );
 			}
 			return res;
 		}
@@ -217,9 +217,9 @@ public final class SuppliedBy {
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, Injector context ) {
-			final Supplier<? extends T> supplier = context.resolve( dependency.anyTyped( type ) );
-			return supplier.supply( dependency, context );
+		public T supply( Dependency<? super T> dependency, Injector injector ) {
+			final Supplier<? extends T> supplier = injector.resolve( dependency.anyTyped( type ) );
+			return supplier.supply( dependency, injector );
 		}
 	}
 
@@ -234,11 +234,11 @@ public final class SuppliedBy {
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, Injector context ) {
+		public T supply( Dependency<? super T> dependency, Injector injector ) {
 			Type<? super T> type = dependency.getType();
 			Instance<? extends T> parametrized = instance.typed( instance.getType().parametized(
 					type.getParameters() ).lowerBound( dependency.getType().isLowerBound() ) );
-			return context.resolve( dependency.instanced( parametrized ) );
+			return injector.resolve( dependency.instanced( parametrized ) );
 		}
 
 		@Override
@@ -259,8 +259,8 @@ public final class SuppliedBy {
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, Injector context ) {
-			return context.resolve( dependency.instanced( instance ) );
+		public T supply( Dependency<? super T> dependency, Injector injector ) {
+			return injector.resolve( dependency.instanced( instance ) );
 		}
 
 		@Override
@@ -280,7 +280,7 @@ public final class SuppliedBy {
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, Injector context ) {
+		public T supply( Dependency<? super T> dependency, Injector injector ) {
 			return provider.provide();
 		}
 
@@ -294,12 +294,12 @@ public final class SuppliedBy {
 		}
 
 		@Override
-		public Provider<?> supply( Dependency<? super Provider<?>> dependency, Injector context ) {
+		public Provider<?> supply( Dependency<? super Provider<?>> dependency, Injector injector ) {
 			Dependency<?> providedType = dependency.onTypeParameter();
 			if ( !dependency.getName().isDefault() ) {
 				providedType = providedType.named( dependency.getName() );
 			}
-			return newProvider( providedType, context );
+			return newProvider( providedType, injector );
 		}
 
 		private <T> Provider<T> newProvider( Dependency<T> dependency, Injector context ) {
@@ -348,7 +348,7 @@ public final class SuppliedBy {
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, Injector context ) {
+		public T supply( Dependency<? super T> dependency, Injector injector ) {
 			return factory.produce( dependency.getInstance(), dependency.target( 1 ) );
 		}
 
@@ -371,7 +371,7 @@ public final class SuppliedBy {
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, Injector context ) {
+		public T supply( Dependency<? super T> dependency, Injector injector ) {
 			return TypeReflector.construct( constructor, arguments );
 		}
 
@@ -391,8 +391,8 @@ public final class SuppliedBy {
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, Injector context ) {
-			return TypeReflector.construct( constructor, Argument.resolve( dependency, context,
+		public T supply( Dependency<? super T> dependency, Injector injector ) {
+			return TypeReflector.construct( constructor, Argument.resolve( dependency, injector,
 					arguments ) );
 		}
 
@@ -416,12 +416,12 @@ public final class SuppliedBy {
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, Injector context ) {
+		public T supply( Dependency<? super T> dependency, Injector injector ) {
 			Object owner = null;
 			if ( instanceMethod ) {
-				owner = context.resolve( dependency( factory.getDeclaringClass() ) );
+				owner = injector.resolve( dependency( factory.getDeclaringClass() ) );
 			}
-			final Object[] args = Argument.resolve( dependency, context, arguments );
+			final Object[] args = Argument.resolve( dependency, injector, arguments );
 			return returnType.getRawType().cast( TypeReflector.invoke( factory, owner, args ) );
 		}
 

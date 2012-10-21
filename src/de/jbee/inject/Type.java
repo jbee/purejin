@@ -400,7 +400,6 @@ public final class Type<T>
 				elementRawType().checkParameters( parameters );
 				return;
 			}
-			//OPEN maybe we can allow to specify less than params - all not specified will be ?
 			throw new IllegalArgumentException( "Invalid nuber of type arguments" );
 		}
 		// TODO check bounds fulfilled by arguments
