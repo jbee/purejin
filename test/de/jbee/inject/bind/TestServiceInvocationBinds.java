@@ -40,13 +40,14 @@ public class TestServiceInvocationBinds {
 
 	}
 
+	@SuppressWarnings ( "unused" )
 	private static class ServiceInvocationBindsService {
 
-		public Integer hashCode( String s ) {
+		public int hashCode( String s ) {
 			return s.hashCode();
 		}
 
-		public Void fail( String text ) {
+		public void fail( String text ) {
 			throw new IllegalStateException( text );
 		}
 	}

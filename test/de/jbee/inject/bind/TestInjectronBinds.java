@@ -2,7 +2,8 @@ package de.jbee.inject.bind;
 
 import static de.jbee.inject.Dependency.dependency;
 import static de.jbee.inject.Name.named;
-import static de.jbee.inject.Type.raw;
+import static de.jbee.inject.util.Typecast.injectronTypeOf;
+import static de.jbee.inject.util.Typecast.injectronsTypeOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -34,8 +35,7 @@ public class TestInjectronBinds {
 
 	@Test
 	public void thatInjectronIsAvailableForEveryBoundResource() {
-		Dependency<Injectron> dependency = dependency( raw( Injectron.class ).parametized(
-				String.class ) );
+		Dependency<? extends Injectron<String>> dependency = dependency( injectronTypeOf( String.class ) );
 		Injectron<String> injectron = injector.resolve( dependency );
 		assertThat( injectron, notNullValue() );
 		assertThat( injectron.instanceFor( dependency( String.class ) ), is( "foobar" ) );
@@ -43,16 +43,15 @@ public class TestInjectronBinds {
 
 	@Test
 	public void thatInjectronArrayIsAvailableForEveryBoundResource() {
-		Dependency<Injectron[]> dependency = dependency( raw( Injectron[].class ).parametized(
-				String.class ) );
+		Dependency<? extends Injectron<String>[]> dependency = dependency( injectronsTypeOf( String.class ) );
 		Injectron<String>[] injectrons = injector.resolve( dependency );
 		assertThat( injectrons.length, is( 3 ) );
 	}
 
 	@Test
 	public void thatInjectronArrayFiltersByName() {
-		Dependency<Injectron[]> dependency = dependency(
-				raw( Injectron[].class ).parametized( String.class ) ).named( "special" );
+		Dependency<? extends Injectron<String>[]> dependency = dependency(
+				injectronsTypeOf( String.class ) ).named( "special" );
 		Injectron<String>[] injectrons = injector.resolve( dependency );
 		assertThat( injectrons.length, is( 1 ) );
 		assertThat( injectrons[0].instanceFor( dependency( String.class ) ), is( "special" ) );

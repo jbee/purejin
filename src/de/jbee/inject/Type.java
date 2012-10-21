@@ -9,7 +9,6 @@ import java.lang.reflect.TypeVariable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -68,24 +67,6 @@ public final class Type<T>
 
 	public static <T> Type<T> raw( Class<T> type ) {
 		return new Type<T>( type );
-	}
-
-	public static <T> Type<? extends List<T>> listTypeOf( Class<T> elementType ) {
-		return listTypeOf( raw( elementType ) );
-	}
-
-	@SuppressWarnings ( "unchecked" )
-	public static <T> Type<? extends List<T>> listTypeOf( Type<T> elementType ) {
-		return (Type<? extends List<T>>) raw( List.class ).parametized( elementType );
-	}
-
-	public static <T> Type<? extends Set<T>> setTypeOf( Class<T> elementType ) {
-		return setTypeOf( raw( elementType ) );
-	}
-
-	@SuppressWarnings ( "unchecked" )
-	public static <T> Type<? extends Set<T>> setTypeOf( Type<T> elementType ) {
-		return (Type<? extends Set<T>>) raw( Set.class ).parametized( elementType );
 	}
 
 	public static <T> Type<T> type( Class<T> rawType, java.lang.reflect.Type type ) {

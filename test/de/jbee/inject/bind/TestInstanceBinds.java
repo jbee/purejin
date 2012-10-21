@@ -5,7 +5,6 @@ import static de.jbee.inject.Type.raw;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import de.jbee.inject.Injector;
@@ -44,12 +43,6 @@ public class TestInstanceBinds {
 		assertInjects( "bar", raw( CharSequence.class ) );
 		assertInjects( "foobar", raw( String.class ) );
 		assertInjects( 42, raw( Integer.class ) );
-	}
-
-	@Test
-	@Ignore
-	public void thatLowerBoundsCanBeUsedToGetAnAvailableResource() {
-		injector.resolve( dependency( Type.raw( Number.class ).asLowerBound() ).named( "foo" ) );
 	}
 
 	private <T> void assertInjects( T expected, Type<? extends T> dependencyType ) {

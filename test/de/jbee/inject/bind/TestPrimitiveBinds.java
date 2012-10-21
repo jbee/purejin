@@ -35,6 +35,7 @@ public class TestPrimitiveBinds {
 		final Float bigF;
 		final Boolean bigB;
 
+		@SuppressWarnings ( "unused" )
 		PrimitiveBindsBean( int i, float f, boolean b, Integer bigI, Float bigF, Boolean bigB ) {
 			super();
 			this.i = i;

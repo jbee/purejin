@@ -15,6 +15,7 @@ public class TestScopedBinds {
 
 		@SuppressWarnings ( "unused" )
 		Foo( Bar bar ) {
+			// it is just about the instances
 		}
 	}
 

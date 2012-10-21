@@ -1,9 +1,10 @@
 package de.jbee.inject.bind;
 
 import static de.jbee.inject.Name.named;
-import static de.jbee.inject.Type.listTypeOf;
 import static de.jbee.inject.Type.raw;
-import static de.jbee.inject.Type.setTypeOf;
+import static de.jbee.inject.util.Typecast.collectionTypeOf;
+import static de.jbee.inject.util.Typecast.listTypeOf;
+import static de.jbee.inject.util.Typecast.setTypeOf;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
@@ -17,6 +18,7 @@ import org.junit.Test;
 
 import de.jbee.inject.Injector;
 import de.jbee.inject.Type;
+import de.jbee.inject.util.Typecast;
 
 public class TestCollectionBinds {
 
@@ -79,7 +81,7 @@ public class TestCollectionBinds {
 
 	@Test
 	public void thatCollectionIsAvailable() {
-		Type<? extends Collection<?>> collectionType = collectionTypeOf( Integer.class );
+		Type<? extends Collection<?>> collectionType = Typecast.collectionTypeOf( Integer.class );
 		ai.assertInjectsItems( new Integer[] { 846, 42 }, collectionType );
 	}
 
@@ -112,12 +114,5 @@ public class TestCollectionBinds {
 		Injector injector = Bootstrap.injector( CollectionBindsJustListBundle.class );
 		Type<? extends Collection<?>> collectionType = collectionTypeOf( Integer.class );
 		new AssertInjects( injector ).assertInjectsItems( new Integer[] { 846, 42 }, collectionType );
-	}
-
-	private static <T> Type<? extends Collection<T>> collectionTypeOf( Class<T> elementType ) {
-		@SuppressWarnings ( "unchecked" )
-		Type<? extends Collection<T>> collectionType = (Type<? extends Collection<T>>) raw(
-				Collection.class ).parametized( elementType );
-		return collectionType;
 	}
 }

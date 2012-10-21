@@ -104,11 +104,6 @@ public final class Inject {
 		public <T> T resolve( Dependency<T> dependency ) {
 			final Type<T> type = dependency.getType();
 			final boolean array = type.isUnidimensionalArray();
-			if ( !array && type.isLowerBound() ) {
-				//TODO return best match from wildcard dependencies (not mapped by raw-type since it doesn't help)
-				throw new UnsupportedOperationException(
-						"Wildcard-dependencies are not supported yet: " + type );
-			}
 			Injectron<T> injectron = applicableInjectron( dependency );
 			if ( injectron != null ) {
 				return injectron.instanceFor( dependency );
@@ -189,7 +184,9 @@ public final class Inject {
 					elements.add( i );
 				}
 			}
-			return (T) elements.toArray( new Injectron<?>[elements.size()] );
+			@SuppressWarnings ( "unchecked" )
+			T array = (T) elements.toArray( new Injectron<?>[elements.size()] );
+			return array;
 		}
 
 		private <E, T> void addAllApplicable( List<E> elements, Dependency<T> dependency,

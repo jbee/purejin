@@ -34,6 +34,7 @@ public class TestTargetedBinds {
 	static final Bar BAR_EVERYWHERE_ELSE = new Bar();
 	static final Bar BAR_IN_AWESOME_FOO = new Bar();
 	static final Bar BAR_IN_SERIALIZABLE = new Bar();
+	static final Bar BAR_IN_QUX = new Bar();
 
 	private static class TargetedBindsModule
 			extends BinderModule {
@@ -52,6 +53,8 @@ public class TestTargetedBinds {
 			construct( Baz.class );
 			TargetedBinder binder = injectingInto( Serializable.class );
 			binder.bind( Bar.class ).to( BAR_IN_SERIALIZABLE );
+			construct( Qux.class );
+			injectingInto( Qux.class ).bind( Bar.class ).to( BAR_IN_QUX );
 		}
 	}
 
@@ -80,6 +83,17 @@ public class TestTargetedBinds {
 
 		@SuppressWarnings ( "unused" )
 		Baz( Bar bar ) {
+			this.bar = bar;
+		}
+	}
+
+	private static class Qux
+			implements Serializable {
+
+		final Bar bar;
+
+		@SuppressWarnings ( "unused" )
+		Qux( Bar bar ) {
 			this.bar = bar;
 		}
 	}
@@ -120,5 +134,9 @@ public class TestTargetedBinds {
 		assertThat( baz.bar, sameInstance( BAR_IN_SERIALIZABLE ) );
 	}
 
-	//TODO make sure that when a more precise match is available this is used and not the interface one
+	@Test
+	public void thatBindWithExactClassTargetIsUsedWhenInjectingIntoClassHavingThatClassButAlsoAnInterfaceMatching() {
+		Qux qux = injector.resolve( dependency( Qux.class ) );
+		assertThat( qux.bar, sameInstance( BAR_IN_QUX ) );
+	}
 }

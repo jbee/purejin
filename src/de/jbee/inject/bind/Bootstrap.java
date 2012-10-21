@@ -27,8 +27,13 @@ public final class Bootstrap {
 
 	public static Injector injector( Class<? extends Bundle> root, Edition edition,
 			Constants constants ) {
-		return injector( modulariser( edition, constants ).modularise( root ),
-				Link.DEFAULE_CONSTRUCTION_STRATEGY, Link.BUILDIN );
+		return injector( root, edition, constants, Link.DEFAULE_CONSTRUCTION_STRATEGY );
+	}
+
+	public static Injector injector( Class<? extends Bundle> root, Edition edition,
+			Constants constants, ConstructionStrategy strategy ) {
+		return injector( modulariser( edition, constants ).modularise( root ), strategy,
+				Link.BUILDIN );
 	}
 
 	public static Injector injector( Module[] modules, ConstructionStrategy strategy,

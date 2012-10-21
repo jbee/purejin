@@ -17,10 +17,25 @@ import de.jbee.inject.util.SuppliedBy;
  */
 public enum BuildinBundle
 		implements ModularBundle<BuildinBundle> {
+	/**
+	 * Adds: {@link Provider}s can be injected for all bound types.
+	 */
 	PROVIDER,
+	/**
+	 * Adds: {@link List}s can be injected for all bound types (via array bridge)
+	 */
 	LIST,
+	/**
+	 * Adds: {@link Set} can be injected for all bound types (via array bridge)
+	 */
 	SET,
+	/**
+	 * Adds: {@link Collection} can be injected instead of {@link List} (needs explicit List bind).
+	 */
 	COLLECTION,
+	/**
+	 * Adds: {@link Logger}s can be injected per receiving class.
+	 */
 	LOGGER;
 
 	@Override

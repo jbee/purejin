@@ -3,6 +3,7 @@ package de.jbee.inject.bind;
 import static de.jbee.inject.Dependency.dependency;
 import static de.jbee.inject.Name.named;
 import static de.jbee.inject.Type.raw;
+import static de.jbee.inject.util.Typecast.providerTypeOf;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
@@ -75,7 +76,7 @@ public class TestProviderBinds {
 
 	private <T> void assertInjectsProviderFor( T expected, Type<? extends T> dependencyType,
 			Name name ) {
-		Type<Provider> type = raw( Provider.class ).parametized( dependencyType );
+		Type<? extends Provider<? extends T>> type = providerTypeOf( dependencyType );
 		Provider<?> provider = injector.resolve( dependency( type ).named( name ) );
 		assertEquals( expected, provider.provide() );
 	}

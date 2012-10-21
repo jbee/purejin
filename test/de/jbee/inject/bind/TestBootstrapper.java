@@ -74,26 +74,31 @@ public class TestBootstrapper {
 	private static class Bar {
 
 		public Bar( Foo foo ) {
-			// something
+			// ...
 		}
 	}
 
+	@SuppressWarnings ( "unused" )
 	private static class A {
 
 		A( B b ) {
-
+			// ...
 		}
 	}
 
+	@SuppressWarnings ( "unused" )
 	private static class B {
 
 		B( C c ) {
+			// ...
 		}
 	}
 
+	@SuppressWarnings ( "unused" )
 	private static class C {
 
 		C( A a ) {
+			// ...
 		}
 	}
 
