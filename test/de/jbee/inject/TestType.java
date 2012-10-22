@@ -44,6 +44,11 @@ public class TestType {
 		// needed to check supertypes() method
 	}
 
+	private static interface XList<X, E>
+			extends List<E> {
+		// needed to check supertypes() and isAssignableTo methods
+	}
+
 	private List<String> aStringListField;
 
 	@Test
@@ -230,6 +235,15 @@ public class TestType {
 	public void thatCompareableSupertypeOfIntegerIsCompareableInteger() {
 		assertTrue( Type.supertype( Comparable.class, Type.raw( Integer.class ) ).equalTo(
 				Type.raw( Comparable.class ).parametized( Integer.class ) ) );
+	}
+
+	@Test
+	public void thatTypeComparisonIsDoneBasedOnTheCommonType() {
+		Type<List> stringList = Type.raw( List.class ).parametized( String.class );
+		assertTrue( Type.raw( XList.class ).parametized( Integer.class, String.class ).isAssignableTo(
+				stringList ) );
+		assertFalse( Type.raw( XList.class ).parametized( String.class, Integer.class ).isAssignableTo(
+				stringList ) );
 	}
 
 	private void assertContains( Type<?>[] actual, Type<?> expected ) {

@@ -235,15 +235,13 @@ public final class Type<T>
 		if ( !isParameterized() ) {
 			return true; //raw type is ok - no parameters to check
 		}
-
 		if ( other.rawType == rawType ) { // both have the same rawType
 			return allParametersAreAssignableTo( other );
 		}
-
-		// this raw type is extending the rawType passed - check if it is implemented direct or passed
-
-		// there is another trivial case: type has ? extends object for all parameters - that means will allow all 
-		return true;
+		@SuppressWarnings ( "unchecked" )
+		Class<? super T> commonRawType = (Class<? super T>) other.getRawType();
+		Type<?> asOther = supertype( commonRawType, this );
+		return asOther.allParametersAreAssignableTo( other );
 	}
 
 	public boolean allParametersAreAssignableTo( Type<?> other ) {
@@ -289,7 +287,6 @@ public final class Type<T>
 		if ( !rawType.isAssignableFrom( other.rawType ) ) {
 			return true;
 		}
-		//FIXME before generics can be compared we need to make sure we compare the same rawtype- otherwise those generics might mean different things
 		if ( ( hasTypeParameter() && !isParameterized() )
 				|| ( isLowerBound() && !other.isLowerBound() ) ) {
 			return false; // equal or other is a subtype of this
@@ -298,7 +295,15 @@ public final class Type<T>
 				|| ( !isLowerBound() && other.isLowerBound() ) ) {
 			return true;
 		}
-		// FIXME the below code assumes that generics are at the same index 
+		if ( rawType == other.rawType ) {
+			return morePreciseParametersThan( other );
+		}
+		@SuppressWarnings ( "unchecked" )
+		Type<?> asOther = supertype( rawType, (Type<? extends T>) other );
+		return morePreciseParametersThan( asOther );
+	}
+
+	private boolean morePreciseParametersThan( Type<?> other ) {
 		if ( params.length == 1 ) {
 			return params[0].morePreciseThan( other.params[0] );
 		}
@@ -405,6 +410,17 @@ public final class Type<T>
 		// TODO check bounds fulfilled by arguments
 	}
 
+	@SuppressWarnings ( "unchecked" )
+	public static <S> Type<? extends S> supertype( Class<S> supertype, Type<? extends S> type ) {
+		for ( Type<?> s : type.supertypes() ) {
+			if ( s.getRawType() == supertype ) {
+				return (Type<? extends S>) s;
+			}
+		}
+		throw new IllegalArgumentException( "`" + supertype + "` is not a supertype of: `" + type
+				+ "`" );
+	}
+
 	/**
 	 * @return a list of all super-classes and super-interfaces of this type starting with the
 	 *         direct super-class followed by the direct super-interfaces continuing by going up the
@@ -490,16 +506,6 @@ public final class Type<T>
 		}
 		throw new UnsupportedOperationException( "The primitive " + primitive
 				+ " cannot be wrapped yet!" );
-	}
-
-	@SuppressWarnings ( "unchecked" )
-	public static <S> Type<? extends S> supertype( Class<S> supertype, Type<? extends S> type ) {
-		for ( Type<?> s : type.supertypes() ) {
-			if ( s.getRawType() == supertype ) {
-				return (Type<? extends S>) s;
-			}
-		}
-		throw notSupportedYet( supertype );
 	}
 
 }
