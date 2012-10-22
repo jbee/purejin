@@ -463,7 +463,7 @@ public final class Type<T>
 		for ( int i = 0; i < typeParameters.length; i++ ) {
 			actualTypeArguments.put( typeParameters[i].getName(), isParameterized()
 				? type.params[i]
-				: WILDCARD ); //TODO use bounds in that case ?
+				: WILDCARD ); // it would be correct to use the joint type of the bounds but since it is not possible to create a type with illegal parameters it is ok to just use Object since there is no way to model a joint type
 		}
 		return actualTypeArguments;
 	}

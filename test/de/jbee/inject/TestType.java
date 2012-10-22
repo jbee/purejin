@@ -175,7 +175,6 @@ public class TestType {
 				Integer.class );
 		Type<List> listOfIntegers = Type.raw( List.class ).parametized( Integer.class );
 		assertMorePrecise( arrayListOfIntegers, listOfIntegers );
-		//TODO this actually works because List and ArrayList just have the same geneic but if the subclass uses another index we will compare the wrong thing right now
 	}
 
 	@Test

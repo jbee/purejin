@@ -473,7 +473,8 @@ public class Binder
 		}
 
 		public void toMethod( Class<?> implementor, Parameter<?>... parameters ) {
-			to( binder.strategy.factoryFor( resource.getType(), implementor ), parameters );
+			to( binder.strategy.factoryFor( resource.getType(), resource.getName(), implementor ),
+					parameters );
 			implicitBindToConstructor( Instance.anyOf( raw( implementor ) ) );
 		}
 

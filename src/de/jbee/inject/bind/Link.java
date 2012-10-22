@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.jbee.inject.Expiry;
+import de.jbee.inject.Name;
 import de.jbee.inject.Precision;
 import de.jbee.inject.Repository;
 import de.jbee.inject.Resource;
@@ -60,7 +61,7 @@ public final class Link {
 		}
 
 		@Override
-		public <T> Method factoryFor( Type<T> returnType, Class<?> implementor ) {
+		public <T> Method factoryFor( Type<T> returnType, Name name, Class<?> implementor ) {
 			return TypeReflector.methodReturns( returnType, implementor );
 		}
 
