@@ -6,6 +6,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.AbstractCollection;
 import java.util.AbstractList;
@@ -44,7 +45,7 @@ public class TestType {
 		// needed to check supertypes() method
 	}
 
-	private static interface XList<X, E>
+	private static interface XList<X extends Serializable, E>
 			extends List<E> {
 		// needed to check supertypes() and isAssignableTo methods
 	}
@@ -244,6 +245,11 @@ public class TestType {
 				stringList ) );
 		assertFalse( Type.raw( XList.class ).parametized( String.class, Integer.class ).isAssignableTo(
 				stringList ) );
+	}
+
+	@Test ( expected = IllegalArgumentException.class )
+	public void thatUpperBoundOfParameterizedTypesIsChecked() {
+		Type.raw( XList.class ).parametized( Object.class, Object.class );
 	}
 
 	private void assertContains( Type<?>[] actual, Type<?> expected ) {

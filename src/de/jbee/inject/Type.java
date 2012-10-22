@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.TypeVariable;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -320,7 +321,7 @@ public final class Type<T>
 	 * @return A {@link Type} having all its type arguments {@link #asLowerBound()}s. Use this to
 	 *         model &lt;?&gt; wildcard generic.
 	 */
-	public Type<T> parametizedAsLowerBounds() { //TODO recursive version or one with a depth ?
+	public Type<T> parametizedAsLowerBounds() {
 		if ( !isParameterized() ) {
 			if ( isRawType() ) {
 				return parametized( wildcards( rawType.getTypeParameters() ) );
@@ -399,15 +400,25 @@ public final class Type<T>
 		if ( parameters.length == 0 ) {
 			return; // its treated as raw-type
 		}
-		TypeVariable<Class<T>>[] params = rawType.getTypeParameters();
-		if ( params.length != parameters.length ) {
-			if ( isUnidimensionalArray() ) {
-				elementRawType().checkParameters( parameters );
-				return;
-			}
-			throw new IllegalArgumentException( "Invalid nuber of type arguments" );
+		if ( isUnidimensionalArray() ) {
+			elementRawType().checkParameters( parameters );
+			return;
 		}
-		// TODO check bounds fulfilled by arguments
+		TypeVariable<Class<T>>[] vars = rawType.getTypeParameters();
+		if ( vars.length != parameters.length ) {
+			throw new IllegalArgumentException( "Invalid nuber of type arguments - " + rawType
+					+ " has type variables " + Arrays.toString( vars ) + " but got:"
+					+ Arrays.toString( parameters ) );
+		}
+		for ( int i = 0; i < vars.length; i++ ) {
+			for ( java.lang.reflect.Type t : vars[i].getBounds() ) {
+				Type<?> vt = type( t, new HashMap<String, Type<?>>() );
+				if ( t != Object.class && !parameters[i].isAssignableTo( vt ) ) {
+					throw new IllegalArgumentException( parameters[i]
+							+ " is not assignable to the type variable: " + vt );
+				}
+			}
+		}
 	}
 
 	@SuppressWarnings ( "unchecked" )
