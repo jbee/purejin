@@ -5,9 +5,16 @@
 	<property name="target" value="1.6" />
 	<property name="source" value="1.6" />
 
-	<property name="target.dir" value="bin" />
+	<property name="app.name" value="Silk DI" />
+	<property name="app.version" value="0.1" />
+	<property name="snapshot.version" value="${app.version}.2" />
+	<property name="release.version" value="${app.version}.3" />
+
+	<property name="target.dir" value="target" />
 	<property name="src.dir" value="src" />
 	<property name="test.dir" value="test" />
+	<property name="javadoc.dir" value="${target.dir}/javadoc" />
+	<property name="dist.dir" value="dist" />
 
 	<path id="silk.classpath">
 		<pathelement location="${target.dir}" />
@@ -29,20 +36,122 @@
 		</copy>
 	</target>
 
+	<target name="license" depends="javadoc" description="Write the license headers">
+		<echo file="${dist.dir}/javaheader.txt">/*
+ *  Copyright (c) 2012, Jan Bernitt 
+ *			
+ *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
+ */</echo>
+
+		<loadfile property="javaheader" srcFile="${dist.dir}/javaheader.txt" />
+		<replaceregexp match="\A(/\*.*?\*/.*?)??^package " flags="sm" replace="${javaheader}${line.separator}package ">
+			<!-- This is the danger zone !!!!!!!!!!!!
+			<fileset dir="src">
+				<include name="**/*.java" />
+			</fileset>
+			-->
+		</replaceregexp>
+
+		<echo file="${dist.dir}/htmlheader.txt">&lt;!-- 
+  Copyright (c) 2012, Jan Bernitt
+  
+  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
+--&gt;</echo>
+		<loadfile property="htmlheader" srcFile="${dist.dir}/htmlheader.txt" />
+		<replaceregexp match="^.!--NewPage--." flags="sm" replace="&lt;!--NewPage--&gt;${line.separator}${htmlheader}">
+			<fileset dir="${javadoc.dir}">
+				<include name="**/*.html" />
+			</fileset>
+		</replaceregexp>
+	</target>
+
 	<target name="clean">
 		<delete dir="${target.dir}" />
+		<delete dir="${dist.dir}" />
 	</target>
 
 	<target name="compile" depends="init">
 		<javac debug="true" debuglevel="${debuglevel}" destdir="${target.dir}" source="${source}" target="${target}" includeantruntime="false">
 			<src path="${src.dir}" />
 			<classpath refid="silk.classpath" />
-			<compilerarg value="-Xlint:unchecked"/>
+			<compilerarg value="-Xlint:unchecked" />
 		</javac>
 	</target>
-	
+
 	<target name="jar">
-		<jar destfile="silk-snapshot.jar" basedir="${target.dir}"></jar>
+		<tstamp>
+			<format property="current.time" pattern="yyMMddHHmmss" />
+		</tstamp>
+		<antcall target="-jar">
+			<param name="archive-version" value="${snapshot.version}.${current.time}" />
+		</antcall>
+	</target>
+
+	<target name="dist">
+		<antcall target="-jar">
+			<param name="archive-version" value="${release.version}" />
+		</antcall>
+	</target>
+
+	<target name="-jar" depends="compile, javadoc, license">
+		<jar destfile="${dist.dir}/silk-${archive-version}.jar"  >
+			<fileset dir="." file="LICENSE" />
+			<fileset dir="${target.dir}" includes="**/*.class" excludes="**/draft/*" />
+			<manifest>
+				<attribute name='Specification-Version' value='${app.version}'/> 
+				<attribute name='Specification-Title' value='${app.name}' />
+				<attribute name='Implementation-Version' value='${app.version}'/> 
+				<attribute name='Implementation-Title' value='${app.name}' />
+				<attribute name='Bundle-License' value='Apache 2.0' />
+				<attribute name='Package' value='de.jbee.inject' />
+			</manifest>
+		</jar>
+		<jar destfile="${dist.dir}/silk-${archive-version}-sources.jar">
+			<fileset dir="." file="LICENSE" />
+			<fileset dir="${src.dir}" includes="**/*.java" />
+			<manifest>
+				<attribute name='Specification-Version' value='${app.version}'/> 
+				<attribute name='Specification-Title' value='${app.name}' />
+				<attribute name='Implementation-Version' value='${app.version}'/> 
+				<attribute name='Implementation-Title' value='${app.name}' />
+				<attribute name='Bundle-License' value='Apache 2.0' />
+				<attribute name='Package' value='de.jbee.inject' />
+			</manifest>
+		</jar>
+		<jar destfile="${dist.dir}/silk-${archive-version}-javadoc.jar">
+			<fileset dir="." file="LICENSE" />
+			<fileset dir="${javadoc.dir}" includes="**/*" />
+			<manifest>
+				<attribute name='Specification-Version' value='${app.version}'/> 
+				<attribute name='Specification-Title' value='${app.name}' />
+				<attribute name='Implementation-Version' value='${app.version}'/> 
+				<attribute name='Implementation-Title' value='${app.name}' />
+				<attribute name='Bundle-License' value='Apache 2.0' />
+				<attribute name='Package' value='de.jbee.inject' />
+			</manifest>
+		</jar>
+		<zip destfile="${dist.dir}/silk-${archive-version}.zip">
+			<fileset dir="." file="LICENSE" />
+			<fileset dir="${dist.dir}" includes="silk-${archive-version}*.jar" />
+		</zip>
+	</target>
+
+	<target name='javadoc' depends="compile" description='Generate javadoc.'>
+		<delete dir="${javadoc.dir}" quiet="true" />
+		<javadoc use='true' author='true' version='true' 
+			access='package' destdir='${javadoc.dir}' 
+			windowtitle='${app.name} ${app.version}' 
+			noqualifier='java.*:javax.*:com.sun.*' linksource='false'>
+			
+			<packageset dir="${src.dir}" defaultexcludes="yes">
+				<exclude name="de/jbee/inject/draft/**" />
+				<exclude name="org/junit/**" />
+			</packageset>
+
+			<classpath refid='silk.classpath' />
+			<link href='http://jbee.github.com/silk/assets/javadoc/' />
+			<header><![CDATA[<h1><em>${app.name} ${app.version}</em></h1>]]></header>
+		</javadoc>
 	</target>
 
 	<target name="test-compile" depends="compile">
@@ -60,7 +169,7 @@
 			<classpath refid="silk.classpath" />
 		</junit>
 	</target>
-
+	
 	<target name="junitreport">
 		<junitreport todir="${junit.output.dir}">
 			<fileset dir="${junit.output.dir}">
