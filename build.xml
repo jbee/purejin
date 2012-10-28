@@ -23,46 +23,17 @@
 	<target name="init">
 		<mkdir dir="${target.dir}" />
 		<copy includeemptydirs="false" todir="${target.dir}">
-			<fileset dir="src">
+			<fileset dir="${src.dir}">
 				<exclude name="**/*.launch" />
 				<exclude name="**/*.java" />
 			</fileset>
 		</copy>
 		<copy includeemptydirs="false" todir="${target.dir}">
-			<fileset dir="test">
+			<fileset dir="${test.dir}">
 				<exclude name="**/*.launch" />
 				<exclude name="**/*.java" />
 			</fileset>
 		</copy>
-	</target>
-
-	<target name="license" depends="javadoc" description="Write the license headers">
-		<echo file="${dist.dir}/javaheader.txt">/*
- *  Copyright (c) 2012, Jan Bernitt 
- *			
- *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
- */</echo>
-
-		<loadfile property="javaheader" srcFile="${dist.dir}/javaheader.txt" />
-		<replaceregexp match="\A(/\*.*?\*/.*?)??^package " flags="sm" replace="${javaheader}${line.separator}package ">
-			<!-- This is the danger zone !!!!!!!!!!!!
-			<fileset dir="src">
-				<include name="**/*.java" />
-			</fileset>
-			-->
-		</replaceregexp>
-
-		<echo file="${dist.dir}/htmlheader.txt">&lt;!-- 
-  Copyright (c) 2012, Jan Bernitt
-  
-  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
---&gt;</echo>
-		<loadfile property="htmlheader" srcFile="${dist.dir}/htmlheader.txt" />
-		<replaceregexp match="^.!--NewPage--." flags="sm" replace="&lt;!--NewPage--&gt;${line.separator}${htmlheader}">
-			<fileset dir="${javadoc.dir}">
-				<include name="**/*.html" />
-			</fileset>
-		</replaceregexp>
 	</target>
 
 	<target name="clean">
@@ -178,4 +149,32 @@
 			<report format="frames" todir="${junit.output.dir}" />
 		</junitreport>
 	</target>
+	
+	<target name="license" depends="javadoc" description="Write the license headers">
+		<echo file="${dist.dir}/javaheader.txt">/*
+ *  Copyright (c) 2012, Jan Bernitt 
+ *			
+ *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
+ */</echo>
+
+		<loadfile property="javaheader" srcFile="${dist.dir}/javaheader.txt" />
+		<replaceregexp match="\A(/\*.*?\*/.*?)??^package " flags="sm" replace="${javaheader}${line.separator}package ">
+			<fileset dir="${src.dir}">
+				<include name="**/*.java" />
+			</fileset>
+		</replaceregexp>
+
+		<echo file="${dist.dir}/htmlheader.txt">&lt;!-- 
+  Copyright (c) 2012, Jan Bernitt
+  
+  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
+--&gt;</echo>
+		<loadfile property="htmlheader" srcFile="${dist.dir}/htmlheader.txt" />
+		<replaceregexp match="^.!--NewPage--." flags="sm" replace="&lt;!--NewPage--&gt;${line.separator}${htmlheader}">
+			<fileset dir="${javadoc.dir}">
+				<include name="**/*.html" />
+			</fileset>
+		</replaceregexp>
+	</target>
+	
 </project>
