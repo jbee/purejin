@@ -102,7 +102,7 @@ public final class Suppliable<T>
 			Dependency<T> dependency = dependency( resource.getInstance() );
 			Demand<T> demand = demand( resource, dependency, serialNumber, cardinality );
 			Injectable<T> injectable = Inject.asInjectable( s.supplier, injector );
-			return Inject.injectorn( injectable, resource, demand, s.expiry, s.repository, s.source );
+			return Inject.injectron( injectable, resource, demand, s.expiry, s.repository, s.source );
 		}
 
 	}

@@ -39,7 +39,7 @@ public final class Inject {
 		return new SupplierToInjectable<T>( supplier, injector );
 	}
 
-	public static <T> Injectron<T> injectorn( Injectable<T> injectable, Resource<T> resource,
+	public static <T> Injectron<T> injectron( Injectable<T> injectable, Resource<T> resource,
 			Demand<T> demand, Expiry expiry, Repository repository, Source source ) {
 		return new StaticInjectron<T>( resource, source, demand, expiry, repository, injectable );
 	}
