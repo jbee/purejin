@@ -1,16 +1,16 @@
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
-import static de.jbee.inject.Dependency.dependency;
-import static de.jbee.inject.util.Scoped.TARGET_INSTANCE;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.util.Scoped.TARGET_INSTANCE;
 
 import org.junit.Test;
 
-import de.jbee.inject.Injector;
-import de.jbee.inject.Instance;
-import de.jbee.inject.Name;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Instance;
+import se.jbee.inject.Name;
 
 public class TestRobotLegsProblemBinds {
 

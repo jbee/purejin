@@ -3,7 +3,7 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.jbee.inject;
+package se.jbee.inject;
 
 /**
  * A {@link Supplier} is asked to supply the instance that should be used for a particular

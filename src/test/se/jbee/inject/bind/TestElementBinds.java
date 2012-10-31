@@ -1,10 +1,10 @@
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
-import static de.jbee.inject.Dependency.dependency;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertThat;
+import static se.jbee.inject.Dependency.dependency;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -12,8 +12,8 @@ import java.util.List;
 
 import org.junit.Test;
 
-import de.jbee.inject.Injector;
-import de.jbee.inject.bind.Binder.TypedElementBinder;
+import se.jbee.inject.Injector;
+import se.jbee.inject.bind.Binder.TypedElementBinder;
 
 /**
  * Tests that demonstrates how to overlay the default behavior of 1-dimensional array types by

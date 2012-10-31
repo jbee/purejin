@@ -12,28 +12,45 @@
 
 	<property name="target.dir" value="target" />
 	<property name="src.dir" value="src" />
-	<property name="test.dir" value="test" />
-	<property name="javadoc.dir" value="${target.dir}/javadoc" />
+	
+	<property name="core.src.dir" value="${src.dir}/core" />
+	<property name="test.src.dir" value="${src.dir}/test" />
+	<property name="draft.src.dir" value="${src.dir}/draft" />
+	
+	<property name="core.target.dir" value="${target.dir}/core" />
+	<property name="draft.target.dir" value="${target.dir}/draft" />
+	<property name="test.target.dir" value="${target.dir}/test" />
+	<property name="javadoc.target.dir" value="${target.dir}/javadoc" />
+
 	<property name="dist.dir" value="dist" />
 
 	<path id="silk.classpath">
-		<pathelement location="${target.dir}" />
+		<pathelement location="${core.target.dir}" />
 	</path>
 
 	<target name="init">
 		<mkdir dir="${target.dir}" />
-		<copy includeemptydirs="false" todir="${target.dir}">
-			<fileset dir="${src.dir}">
+		<mkdir dir="${core.target.dir}" />
+		<mkdir dir="${test.target.dir}" />
+		<mkdir dir="${draft.target.dir}" />
+		<copy includeemptydirs="false" todir="${core.target.dir}">
+			<fileset dir="${core.src.dir}">
 				<exclude name="**/*.launch" />
 				<exclude name="**/*.java" />
 			</fileset>
 		</copy>
-		<copy includeemptydirs="false" todir="${target.dir}">
-			<fileset dir="${test.dir}">
+		<copy includeemptydirs="false" todir="${test.target.dir}">
+			<fileset dir="${test.src.dir}">
 				<exclude name="**/*.launch" />
 				<exclude name="**/*.java" />
 			</fileset>
 		</copy>
+		<copy includeemptydirs="false" todir="${draft.target.dir}">
+			<fileset dir="${draft.src.dir}">
+				<exclude name="**/*.launch" />
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>		
 	</target>
 
 	<target name="clean">
@@ -42,8 +59,13 @@
 	</target>
 
 	<target name="compile" depends="init">
-		<javac debug="true" debuglevel="${debuglevel}" destdir="${target.dir}" source="${source}" target="${target}" includeantruntime="false">
-			<src path="${src.dir}" />
+		<javac debug="true" debuglevel="${debuglevel}" destdir="${core.target.dir}" source="${source}" target="${target}" includeantruntime="false">
+			<src path="${core.src.dir}" />
+			<classpath refid="silk.classpath" />
+			<compilerarg value="-Xlint:unchecked" />
+		</javac>
+		<javac debug="true" debuglevel="${debuglevel}" destdir="${draft.target.dir}" source="${source}" target="${target}" includeantruntime="false">
+			<src path="${draft.src.dir}" />
 			<classpath refid="silk.classpath" />
 			<compilerarg value="-Xlint:unchecked" />
 		</javac>
@@ -67,38 +89,38 @@
 	<target name="-jar" depends="compile, javadoc, license">
 		<jar destfile="${dist.dir}/silk-${archive-version}.jar"  >
 			<fileset dir="." file="LICENSE" />
-			<fileset dir="${target.dir}" includes="**/*.class" excludes="**/draft/*" />
+			<fileset dir="${core.target.dir}" includes="**/*.class" />
 			<manifest>
 				<attribute name='Specification-Version' value='${app.version}'/> 
 				<attribute name='Specification-Title' value='${app.name}' />
 				<attribute name='Implementation-Version' value='${app.version}'/> 
 				<attribute name='Implementation-Title' value='${app.name}' />
 				<attribute name='Bundle-License' value='Apache 2.0' />
-				<attribute name='Package' value='de.jbee.inject' />
+				<attribute name='Package' value='se.jbee.inject' />
 			</manifest>
 		</jar>
 		<jar destfile="${dist.dir}/silk-${archive-version}-sources.jar">
 			<fileset dir="." file="LICENSE" />
-			<fileset dir="${src.dir}" includes="**/*.java" />
+			<fileset dir="${core.src.dir}" includes="**/*.java" />
 			<manifest>
 				<attribute name='Specification-Version' value='${app.version}'/> 
 				<attribute name='Specification-Title' value='${app.name}' />
 				<attribute name='Implementation-Version' value='${app.version}'/> 
 				<attribute name='Implementation-Title' value='${app.name}' />
 				<attribute name='Bundle-License' value='Apache 2.0' />
-				<attribute name='Package' value='de.jbee.inject' />
+				<attribute name='Package' value='se.jbee.inject' />
 			</manifest>
 		</jar>
 		<jar destfile="${dist.dir}/silk-${archive-version}-javadoc.jar">
 			<fileset dir="." file="LICENSE" />
-			<fileset dir="${javadoc.dir}" includes="**/*" />
+			<fileset dir="${javadoc.target.dir}" includes="**/*" />
 			<manifest>
 				<attribute name='Specification-Version' value='${app.version}'/> 
 				<attribute name='Specification-Title' value='${app.name}' />
 				<attribute name='Implementation-Version' value='${app.version}'/> 
 				<attribute name='Implementation-Title' value='${app.name}' />
 				<attribute name='Bundle-License' value='Apache 2.0' />
-				<attribute name='Package' value='de.jbee.inject' />
+				<attribute name='Package' value='se.jbee.inject' />
 			</manifest>
 		</jar>
 		<zip destfile="${dist.dir}/silk-${archive-version}.zip">
@@ -108,14 +130,13 @@
 	</target>
 
 	<target name='javadoc' depends="compile" description='Generate javadoc.'>
-		<delete dir="${javadoc.dir}" quiet="true" />
+		<delete dir="${javadoc.target.dir}" quiet="true" />
 		<javadoc use='true' author='true' version='true' 
-			access='package' destdir='${javadoc.dir}' 
+			access='package' destdir='${javadoc.target.dir}' 
 			windowtitle='${app.name} ${app.version}' 
 			noqualifier='java.*:javax.*:com.sun.*' linksource='false'>
 			
-			<packageset dir="${src.dir}" defaultexcludes="yes">
-				<exclude name="de/jbee/inject/draft/**" />
+			<packageset dir="${core.src.dir}" defaultexcludes="yes">
 				<exclude name="org/junit/**" />
 			</packageset>
 
@@ -127,7 +148,8 @@
 
 	<target name="test-compile" depends="compile">
 		<javac debug="true" debuglevel="${debuglevel}" destdir="${target.dir}" source="${source}" target="${target}">
-			<src path="${test.dir}" />
+			<src path="${test.src.dir}" />
+			<src path="${draft.src.dir}" />
 			<classpath refid="silk.classpath" />
 		</javac>
 	</target>
@@ -136,7 +158,7 @@
 		<mkdir dir="${junit.output.dir}" />
 		<junit fork="yes" printsummary="withOutAndErr">
 			<formatter type="xml" />
-			<test name="de.jbee.inject.SuiteSilk" todir="${junit.output.dir}" />
+			<test name="se.jbee.inject.SuiteSilk" todir="${junit.output.dir}" />
 			<classpath refid="silk.classpath" />
 		</junit>
 	</target>
@@ -159,7 +181,7 @@
 
 		<loadfile property="javaheader" srcFile="${dist.dir}/javaheader.txt" />
 		<replaceregexp match="\A(/\*.*?\*/.*?)??^package " flags="sm" replace="${javaheader}${line.separator}package ">
-			<fileset dir="${src.dir}">
+			<fileset dir="${core.src.dir}">
 				<include name="**/*.java" />
 			</fileset>
 		</replaceregexp>
@@ -171,7 +193,7 @@
 --&gt;</echo>
 		<loadfile property="htmlheader" srcFile="${dist.dir}/htmlheader.txt" />
 		<replaceregexp match="^.!--NewPage--." flags="sm" replace="&lt;!--NewPage--&gt;${line.separator}${htmlheader}">
-			<fileset dir="${javadoc.dir}">
+			<fileset dir="${javadoc.target.dir}">
 				<include name="**/*.html" />
 			</fileset>
 		</replaceregexp>

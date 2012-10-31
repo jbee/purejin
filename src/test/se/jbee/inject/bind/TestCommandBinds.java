@@ -1,18 +1,18 @@
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
-import static de.jbee.inject.Dependency.dependency;
-import static de.jbee.inject.Type.raw;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Type.raw;
 
 import org.junit.Test;
 
-import de.jbee.inject.Dependency;
-import de.jbee.inject.Injector;
-import de.jbee.inject.Supplier;
-import de.jbee.inject.service.ServiceMethod;
-import de.jbee.inject.service.ServiceModule;
-import de.jbee.inject.service.ServiceProvider;
+import se.jbee.inject.Dependency;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Supplier;
+import se.jbee.inject.service.ServiceMethod;
+import se.jbee.inject.service.ServiceModule;
+import se.jbee.inject.service.ServiceProvider;
 
 /**
  * This test demonstrates that it is possible to have different higher level 'service' on top of

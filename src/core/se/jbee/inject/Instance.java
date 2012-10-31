@@ -3,9 +3,9 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.jbee.inject;
+package se.jbee.inject;
 
-import static de.jbee.inject.Precision.morePreciseThan2;
+import static se.jbee.inject.Precision.morePreciseThan2;
 
 /**
  * Used to tell that we don#t want just one singleton at a time but multiple distinguished by the

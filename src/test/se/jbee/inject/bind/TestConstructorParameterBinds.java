@@ -1,27 +1,27 @@
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
-import static de.jbee.inject.Dependency.dependency;
-import static de.jbee.inject.Instance.instance;
-import static de.jbee.inject.Name.named;
-import static de.jbee.inject.Type.raw;
-import static de.jbee.inject.util.Argument.asType;
-import static de.jbee.inject.util.Argument.constant;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Instance.instance;
+import static se.jbee.inject.Name.named;
+import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.util.Argument.asType;
+import static se.jbee.inject.util.Argument.constant;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 
 import org.junit.Test;
 
-import de.jbee.inject.Injector;
-import de.jbee.inject.Instance;
-import de.jbee.inject.Parameter;
-import de.jbee.inject.util.Argument;
-import de.jbee.inject.util.Suppliable;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Instance;
+import se.jbee.inject.Parameter;
+import se.jbee.inject.util.Argument;
+import se.jbee.inject.util.Suppliable;
 
 /**
  * The test illustrates how to use {@link Parameter}s to give hints which resources should be

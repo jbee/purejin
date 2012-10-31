@@ -1,13 +1,13 @@
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
-import static de.jbee.inject.Name.named;
-import static de.jbee.inject.Type.raw;
-import static de.jbee.inject.util.Typecast.collectionTypeOf;
-import static de.jbee.inject.util.Typecast.listTypeOf;
-import static de.jbee.inject.util.Typecast.setTypeOf;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
+import static se.jbee.inject.Name.named;
+import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.util.Typecast.collectionTypeOf;
+import static se.jbee.inject.util.Typecast.listTypeOf;
+import static se.jbee.inject.util.Typecast.setTypeOf;
 
 import java.util.Collection;
 import java.util.List;
@@ -16,9 +16,9 @@ import java.util.TreeSet;
 
 import org.junit.Test;
 
-import de.jbee.inject.Injector;
-import de.jbee.inject.Type;
-import de.jbee.inject.util.Typecast;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Type;
+import se.jbee.inject.util.Typecast;
 
 public class TestCollectionBinds {
 

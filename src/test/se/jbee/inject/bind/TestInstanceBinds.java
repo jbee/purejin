@@ -1,14 +1,14 @@
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
-import static de.jbee.inject.Dependency.dependency;
-import static de.jbee.inject.Type.raw;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Type.raw;
 
 import org.junit.Test;
 
-import de.jbee.inject.Injector;
-import de.jbee.inject.Type;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Type;
 
 public class TestInstanceBinds {
 

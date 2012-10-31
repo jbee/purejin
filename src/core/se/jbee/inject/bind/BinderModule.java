@@ -3,20 +3,20 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
-import static de.jbee.inject.Source.source;
-import de.jbee.inject.Instance;
-import de.jbee.inject.Name;
-import de.jbee.inject.Packages;
-import de.jbee.inject.Scope;
-import de.jbee.inject.Type;
-import de.jbee.inject.bind.Binder.RootBinder;
-import de.jbee.inject.bind.Binder.ScopedBinder;
-import de.jbee.inject.bind.Binder.TargetedBinder;
-import de.jbee.inject.bind.Binder.TypedBinder;
-import de.jbee.inject.bind.Binder.TypedElementBinder;
-import de.jbee.inject.util.Scoped;
+import static se.jbee.inject.Source.source;
+import se.jbee.inject.Instance;
+import se.jbee.inject.Name;
+import se.jbee.inject.Packages;
+import se.jbee.inject.Scope;
+import se.jbee.inject.Type;
+import se.jbee.inject.bind.Binder.RootBinder;
+import se.jbee.inject.bind.Binder.ScopedBinder;
+import se.jbee.inject.bind.Binder.TargetedBinder;
+import se.jbee.inject.bind.Binder.TypedBinder;
+import se.jbee.inject.bind.Binder.TypedElementBinder;
+import se.jbee.inject.util.Scoped;
 
 public abstract class BinderModule
 		extends BootstrappingModule

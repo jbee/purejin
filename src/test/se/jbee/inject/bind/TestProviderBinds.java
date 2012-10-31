@@ -1,24 +1,24 @@
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
-import static de.jbee.inject.Dependency.dependency;
-import static de.jbee.inject.Name.named;
-import static de.jbee.inject.Type.raw;
-import static de.jbee.inject.util.Typecast.providerTypeOf;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
+import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Name.named;
+import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.util.Typecast.providerTypeOf;
 
 import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
 
-import de.jbee.inject.Injector;
-import de.jbee.inject.Name;
-import de.jbee.inject.Type;
-import de.jbee.inject.DIRuntimeException.MoreFrequentExpiryException;
-import de.jbee.inject.util.Provider;
-import de.jbee.inject.util.Scoped;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Name;
+import se.jbee.inject.Type;
+import se.jbee.inject.DIRuntimeException.MoreFrequentExpiryException;
+import se.jbee.inject.util.Provider;
+import se.jbee.inject.util.Scoped;
 
 public class TestProviderBinds {
 

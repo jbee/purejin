@@ -3,7 +3,7 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import de.jbee.inject.Injector;
-import de.jbee.inject.util.Inject;
-import de.jbee.inject.util.Suppliable;
-import de.jbee.inject.util.TypeReflector;
+import se.jbee.inject.Injector;
+import se.jbee.inject.util.Inject;
+import se.jbee.inject.util.Suppliable;
+import se.jbee.inject.util.TypeReflector;
 
 public final class Bootstrap {
 

@@ -1,13 +1,13 @@
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
-import static de.jbee.inject.Dependency.dependency;
 import static org.junit.Assert.fail;
+import static se.jbee.inject.Dependency.dependency;
 
 import org.junit.Test;
 
-import de.jbee.inject.Injector;
-import de.jbee.inject.DIRuntimeException.MoreFrequentExpiryException;
-import de.jbee.inject.util.Scoped;
+import se.jbee.inject.Injector;
+import se.jbee.inject.DIRuntimeException.MoreFrequentExpiryException;
+import se.jbee.inject.util.Scoped;
 
 public class TestScopedBinds {
 

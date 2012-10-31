@@ -3,19 +3,19 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
-import static de.jbee.inject.util.Scoped.DEPENDENCY_TYPE;
-import static de.jbee.inject.util.Scoped.TARGET_INSTANCE;
+import static se.jbee.inject.util.Scoped.DEPENDENCY_TYPE;
+import static se.jbee.inject.util.Scoped.TARGET_INSTANCE;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import de.jbee.inject.bind.Bootstrapper.ModularBootstrapper;
-import de.jbee.inject.util.Provider;
-import de.jbee.inject.util.SuppliedBy;
+import se.jbee.inject.bind.Bootstrapper.ModularBootstrapper;
+import se.jbee.inject.util.Provider;
+import se.jbee.inject.util.SuppliedBy;
 
 /**
  * Installs all the build-in functionality by using the core API.

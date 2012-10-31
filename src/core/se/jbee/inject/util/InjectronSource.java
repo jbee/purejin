@@ -3,10 +3,10 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.jbee.inject.util;
+package se.jbee.inject.util;
 
-import de.jbee.inject.Injector;
-import de.jbee.inject.Injectron;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Injectron;
 
 /**
  * A factory like origin for {@link Injectron}s.

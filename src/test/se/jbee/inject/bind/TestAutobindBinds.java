@@ -1,10 +1,10 @@
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
-import static de.jbee.inject.Dependency.dependency;
-import static de.jbee.inject.Type.raw;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Type.raw;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -12,9 +12,9 @@ import java.util.List;
 
 import org.junit.Test;
 
-import de.jbee.inject.Dependency;
-import de.jbee.inject.Injector;
-import de.jbee.inject.Supplier;
+import se.jbee.inject.Dependency;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Supplier;
 
 /**
  * The tests demonstrates the meaning of a {@link Binder#autobind(Class)} call. That will create

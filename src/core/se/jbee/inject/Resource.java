@@ -3,10 +3,10 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.jbee.inject;
+package se.jbee.inject;
 
-import static de.jbee.inject.Precision.morePreciseThan2;
-import static de.jbee.inject.Type.raw;
+import static se.jbee.inject.Precision.morePreciseThan2;
+import static se.jbee.inject.Type.raw;
 
 /**
  * Describes WHAT can be injected and WHERE it can be injected.

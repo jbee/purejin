@@ -3,15 +3,15 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.jbee.inject.service;
+package se.jbee.inject.service;
 
-import static de.jbee.inject.Dependency.dependency;
-import static de.jbee.inject.Source.source;
-import static de.jbee.inject.Type.parameterTypes;
-import static de.jbee.inject.Type.raw;
-import static de.jbee.inject.Type.returnType;
-import static de.jbee.inject.util.Scoped.APPLICATION;
-import static de.jbee.inject.util.Scoped.DEPENDENCY_TYPE;
+import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Source.source;
+import static se.jbee.inject.Type.parameterTypes;
+import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.Type.returnType;
+import static se.jbee.inject.util.Scoped.APPLICATION;
+import static se.jbee.inject.util.Scoped.DEPENDENCY_TYPE;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -19,28 +19,28 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-import de.jbee.inject.DIRuntimeException;
-import de.jbee.inject.Dependency;
-import de.jbee.inject.Injector;
-import de.jbee.inject.Injectron;
-import de.jbee.inject.Supplier;
-import de.jbee.inject.Type;
-import de.jbee.inject.bind.Binder;
-import de.jbee.inject.bind.BinderModule;
-import de.jbee.inject.bind.Bindings;
-import de.jbee.inject.bind.Bootstrapper;
-import de.jbee.inject.bind.BootstrappingModule;
-import de.jbee.inject.bind.Bundle;
-import de.jbee.inject.bind.ConstructionStrategy;
-import de.jbee.inject.bind.Extend;
-import de.jbee.inject.bind.Module;
-import de.jbee.inject.bind.Binder.RootBinder;
-import de.jbee.inject.bind.Binder.TypedBinder;
-import de.jbee.inject.service.ServiceInvocation.ServiceInvocationExtension;
-import de.jbee.inject.service.ServiceMethod.ServiceClassExtension;
-import de.jbee.inject.util.Scoped;
-import de.jbee.inject.util.TypeReflector;
-import de.jbee.inject.util.Value;
+import se.jbee.inject.DIRuntimeException;
+import se.jbee.inject.Dependency;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Injectron;
+import se.jbee.inject.Supplier;
+import se.jbee.inject.Type;
+import se.jbee.inject.bind.Binder;
+import se.jbee.inject.bind.BinderModule;
+import se.jbee.inject.bind.Bindings;
+import se.jbee.inject.bind.Bootstrapper;
+import se.jbee.inject.bind.BootstrappingModule;
+import se.jbee.inject.bind.Bundle;
+import se.jbee.inject.bind.ConstructionStrategy;
+import se.jbee.inject.bind.Extend;
+import se.jbee.inject.bind.Module;
+import se.jbee.inject.bind.Binder.RootBinder;
+import se.jbee.inject.bind.Binder.TypedBinder;
+import se.jbee.inject.service.ServiceInvocation.ServiceInvocationExtension;
+import se.jbee.inject.service.ServiceMethod.ServiceClassExtension;
+import se.jbee.inject.util.Scoped;
+import se.jbee.inject.util.TypeReflector;
+import se.jbee.inject.util.Value;
 
 /**
  * When binding {@link ServiceMethod}s this {@link Module} can be extended.
@@ -146,7 +146,7 @@ public abstract class ServiceModule
 		ServiceMethodProvider( Injector context ) {
 			super();
 			this.context = context;
-			this.serviceClasses = context.resolve( Extend.dependency( ServiceClassExtension.class ) );
+			this.serviceClasses = context.resolve( Extend.extensionDependency( ServiceClassExtension.class ) );
 			this.strategy = context.resolve( dependency( ServiceStrategy.class ).injectingInto(
 					ServiceMethodProvider.class ) );
 		}
@@ -255,7 +255,7 @@ public abstract class ServiceModule
 
 		private ServiceInvocation<?>[] resolveInvocations( Injector context ) {
 			@SuppressWarnings ( "unchecked" )
-			Class<? extends ServiceInvocation<?>>[] classes = context.resolve( Extend.dependency( ServiceInvocationExtension.class ) );
+			Class<? extends ServiceInvocation<?>>[] classes = context.resolve( Extend.extensionDependency( ServiceInvocationExtension.class ) );
 			ServiceInvocation<?>[] res = new ServiceInvocation<?>[classes.length];
 			for ( int i = 0; i < res.length; i++ ) {
 				res[i] = context.resolve( Dependency.dependency( classes[i] ) );

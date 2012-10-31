@@ -1,13 +1,13 @@
-package de.jbee.inject;
+package se.jbee.inject;
 
-import static de.jbee.inject.Instance.defaultInstanceOf;
-import static de.jbee.inject.Instance.instance;
-import static de.jbee.inject.Name.named;
-import static de.jbee.inject.Type.raw;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static se.jbee.inject.Instance.defaultInstanceOf;
+import static se.jbee.inject.Instance.instance;
+import static se.jbee.inject.Name.named;
+import static se.jbee.inject.Type.raw;
 
 import java.util.Arrays;
 

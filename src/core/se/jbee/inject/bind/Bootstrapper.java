@@ -3,7 +3,7 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
 /**
  * The basic idea is to split the binding process into 2 steps: installing modules and do bindings

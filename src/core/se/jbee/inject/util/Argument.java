@@ -3,14 +3,14 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.jbee.inject.util;
+package se.jbee.inject.util;
 
-import static de.jbee.inject.Type.raw;
-import de.jbee.inject.Dependency;
-import de.jbee.inject.Injector;
-import de.jbee.inject.Instance;
-import de.jbee.inject.Parameter;
-import de.jbee.inject.Type;
+import static se.jbee.inject.Type.raw;
+import se.jbee.inject.Dependency;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Instance;
+import se.jbee.inject.Parameter;
+import se.jbee.inject.Type;
 
 public final class Argument<T>
 		implements Parameter<T> {

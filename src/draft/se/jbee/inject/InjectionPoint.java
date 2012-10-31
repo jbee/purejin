@@ -3,9 +3,9 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.jbee.inject.draft;
+package se.jbee.inject;
 
-import de.jbee.inject.Instance;
+import se.jbee.inject.Instance;
 
 /**
  * This about the HOW to inject (field, constructor/setter)

@@ -1,8 +1,8 @@
-package de.jbee.inject;
+package se.jbee.inject;
 
-import static de.jbee.inject.Packages.packageOf;
-import static de.jbee.inject.Packages.packages;
 import static org.junit.Assert.assertFalse;
+import static se.jbee.inject.Packages.packageOf;
+import static se.jbee.inject.Packages.packages;
 
 import java.util.List;
 

@@ -1,10 +1,10 @@
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
 import org.junit.Test;
 
-import de.jbee.inject.Dependency;
-import de.jbee.inject.Injector;
-import de.jbee.inject.DIRuntimeException.NoSuchResourceException;
+import se.jbee.inject.Dependency;
+import se.jbee.inject.Injector;
+import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
 
 public class TestInjectorExceptions {
 

@@ -1,7 +1,7 @@
-package de.jbee.inject;
+package se.jbee.inject;
 
-import static de.jbee.inject.Name.named;
 import static org.junit.Assert.assertTrue;
+import static se.jbee.inject.Name.named;
 
 import org.junit.Test;
 

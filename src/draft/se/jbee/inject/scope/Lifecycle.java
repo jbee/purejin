@@ -3,7 +3,7 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.jbee.inject.draft;
+package se.jbee.inject.scope;
 
 public interface Lifecycle {
 

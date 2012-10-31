@@ -3,13 +3,13 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-import de.jbee.inject.Name;
-import de.jbee.inject.Type;
+import se.jbee.inject.Name;
+import se.jbee.inject.Type;
 
 /**
  * A {@link ConstructionStrategy} picks the {@link Constructor} to use to construct objects of a

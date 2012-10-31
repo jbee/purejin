@@ -1,11 +1,11 @@
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
-import static de.jbee.inject.Dependency.dependency;
 import static org.junit.Assert.assertEquals;
+import static se.jbee.inject.Dependency.dependency;
 
 import org.junit.Test;
 
-import de.jbee.inject.Injector;
+import se.jbee.inject.Injector;
 
 public class TestFactoryMethodBinds {
 

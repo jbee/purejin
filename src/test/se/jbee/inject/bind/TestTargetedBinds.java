@@ -1,26 +1,26 @@
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
-import static de.jbee.inject.Dependency.dependency;
-import static de.jbee.inject.Instance.instance;
-import static de.jbee.inject.Name.named;
-import static de.jbee.inject.Type.raw;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Instance.instance;
+import static se.jbee.inject.Name.named;
+import static se.jbee.inject.Type.raw;
 
 import java.io.Serializable;
 
 import org.junit.Test;
 
-import de.jbee.inject.Dependency;
-import de.jbee.inject.Injector;
-import de.jbee.inject.Instance;
-import de.jbee.inject.Name;
-import de.jbee.inject.bind.BasicBinder.ScopedBasicBinder;
-import de.jbee.inject.bind.Binder.TargetedBinder;
+import se.jbee.inject.Dependency;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Instance;
+import se.jbee.inject.Name;
+import se.jbee.inject.bind.BasicBinder.ScopedBasicBinder;
+import se.jbee.inject.bind.Binder.TargetedBinder;
 
 /**
  * A test that demonstrates how to inject a specific instance into another type using the
- * {@link ScopedBasicBinder#injectingInto(de.jbee.inject.Instance)} method.
+ * {@link ScopedBasicBinder#injectingInto(se.jbee.inject.Instance)} method.
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */

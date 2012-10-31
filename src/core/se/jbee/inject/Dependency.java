@@ -3,17 +3,17 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.jbee.inject;
+package se.jbee.inject;
 
-import static de.jbee.inject.Emergence.emergence;
-import static de.jbee.inject.Instance.instance;
-import static de.jbee.inject.Type.raw;
+import static se.jbee.inject.Emergence.emergence;
+import static se.jbee.inject.Instance.instance;
+import static se.jbee.inject.Type.raw;
 
 import java.util.Arrays;
 import java.util.Iterator;
 
-import de.jbee.inject.DIRuntimeException.DependencyCycleException;
-import de.jbee.inject.DIRuntimeException.MoreFrequentExpiryException;
+import se.jbee.inject.DIRuntimeException.DependencyCycleException;
+import se.jbee.inject.DIRuntimeException.MoreFrequentExpiryException;
 
 /**
  * Describes what is wanted/needed as parameter to construct a instance of T.

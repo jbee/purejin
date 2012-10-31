@@ -1,4 +1,4 @@
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
 import static junit.framework.Assert.assertEquals;
 import static org.hamcrest.CoreMatchers.is;
@@ -11,9 +11,9 @@ import java.util.HashSet;
 
 import org.junit.Test;
 
-import de.jbee.inject.Dependency;
-import de.jbee.inject.Injector;
-import de.jbee.inject.service.ServiceMethod.ServiceClassExtension;
+import se.jbee.inject.Dependency;
+import se.jbee.inject.Injector;
+import se.jbee.inject.service.ServiceMethod.ServiceClassExtension;
 
 public class TestExtensionBinds {
 
@@ -43,7 +43,7 @@ public class TestExtensionBinds {
 	}
 
 	private final Injector injector = Bootstrap.injector( TestExtensionModule.class );
-	private final Dependency<Class[]> dependency = Extend.dependency( ServiceClassExtension.class );
+	private final Dependency<Class[]> dependency = Extend.extensionDependency( ServiceClassExtension.class );
 
 	@Test
 	public void thatJustUntargetedExtensionsAreResolvedGlobally() {

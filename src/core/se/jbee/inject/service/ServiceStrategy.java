@@ -3,7 +3,7 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.jbee.inject.service;
+package se.jbee.inject.service;
 
 import java.lang.reflect.Method;
 

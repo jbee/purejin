@@ -3,11 +3,11 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.jbee.inject.service;
+package se.jbee.inject.service;
 
-import de.jbee.inject.Type;
-import de.jbee.inject.bind.Extension;
-import de.jbee.inject.util.Value;
+import se.jbee.inject.Type;
+import se.jbee.inject.bind.Extension;
+import se.jbee.inject.util.Value;
 
 /**
  * Frames the invocation of {@link ServiceMethod}s with further functionality that can be executed

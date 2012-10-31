@@ -3,11 +3,11 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.jbee.inject;
+package se.jbee.inject;
 
 import java.lang.reflect.Constructor;
 
-import de.jbee.inject.bind.ConstructionStrategy;
+import se.jbee.inject.bind.ConstructionStrategy;
 
 /**
  * {@linkplain Parameter}s are *not* about to find/identify the {@link Constructor} to use! This

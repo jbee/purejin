@@ -1,9 +1,9 @@
-package de.jbee.inject;
+package se.jbee.inject;
 
-import static de.jbee.inject.Dependency.dependency;
-import static de.jbee.inject.Target.targeting;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Target.targeting;
 
 import java.util.List;
 

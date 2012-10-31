@@ -3,16 +3,16 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.jbee.inject.util;
+package se.jbee.inject.util;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import de.jbee.inject.Demand;
-import de.jbee.inject.Dependency;
-import de.jbee.inject.Injectable;
-import de.jbee.inject.Repository;
-import de.jbee.inject.Scope;
+import se.jbee.inject.Demand;
+import se.jbee.inject.Dependency;
+import se.jbee.inject.Injectable;
+import se.jbee.inject.Repository;
+import se.jbee.inject.Scope;
 
 public class Scoped {
 

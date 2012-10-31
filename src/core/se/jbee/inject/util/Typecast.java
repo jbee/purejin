@@ -3,16 +3,16 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.jbee.inject.util;
+package se.jbee.inject.util;
 
-import static de.jbee.inject.Type.raw;
+import static se.jbee.inject.Type.raw;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import de.jbee.inject.Injectron;
-import de.jbee.inject.Type;
+import se.jbee.inject.Injectron;
+import se.jbee.inject.Type;
 
 /**
  * 

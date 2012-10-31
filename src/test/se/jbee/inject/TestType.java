@@ -1,4 +1,4 @@
-package de.jbee.inject;
+package se.jbee.inject;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertFalse;

@@ -1,17 +1,17 @@
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
-import static de.jbee.inject.Dependency.dependency;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static se.jbee.inject.Dependency.dependency;
 
 import java.util.logging.Logger;
 
 import org.junit.Test;
 
-import de.jbee.inject.Injector;
-import de.jbee.inject.Supplier;
-import de.jbee.inject.util.Factory;
-import de.jbee.inject.util.SuppliedBy;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Supplier;
+import se.jbee.inject.util.Factory;
+import se.jbee.inject.util.SuppliedBy;
 
 /**
  * A test that demonstrates how to extend the DI so that e.g. a class gets its class-specific-

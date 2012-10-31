@@ -3,9 +3,9 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.jbee.inject.util;
+package se.jbee.inject.util;
 
-import static de.jbee.inject.Emergence.emergence;
+import static se.jbee.inject.Emergence.emergence;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -15,19 +15,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import de.jbee.inject.Demand;
-import de.jbee.inject.Dependency;
-import de.jbee.inject.Expiry;
-import de.jbee.inject.Injectable;
-import de.jbee.inject.Injector;
-import de.jbee.inject.Injectron;
-import de.jbee.inject.Precision;
-import de.jbee.inject.Repository;
-import de.jbee.inject.Resource;
-import de.jbee.inject.Source;
-import de.jbee.inject.Supplier;
-import de.jbee.inject.Type;
-import de.jbee.inject.DIRuntimeException.NoSuchResourceException;
+import se.jbee.inject.Demand;
+import se.jbee.inject.Dependency;
+import se.jbee.inject.Expiry;
+import se.jbee.inject.Injectable;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Injectron;
+import se.jbee.inject.Precision;
+import se.jbee.inject.Repository;
+import se.jbee.inject.Resource;
+import se.jbee.inject.Source;
+import se.jbee.inject.Supplier;
+import se.jbee.inject.Type;
+import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
 
 public final class Inject {
 

@@ -1,21 +1,21 @@
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
-import static de.jbee.inject.Dependency.dependency;
-import static de.jbee.inject.Name.named;
-import static de.jbee.inject.util.Typecast.injectronTypeOf;
-import static de.jbee.inject.util.Typecast.injectronsTypeOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Name.named;
+import static se.jbee.inject.util.Typecast.injectronTypeOf;
+import static se.jbee.inject.util.Typecast.injectronsTypeOf;
 
 import java.util.List;
 
 import org.junit.Test;
 
-import de.jbee.inject.Dependency;
-import de.jbee.inject.Injector;
-import de.jbee.inject.Injectron;
+import se.jbee.inject.Dependency;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Injectron;
 
 public class TestInjectronBinds {
 

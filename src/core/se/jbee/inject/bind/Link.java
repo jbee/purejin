@@ -3,7 +3,7 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -13,18 +13,18 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.jbee.inject.Expiry;
-import de.jbee.inject.Name;
-import de.jbee.inject.Precision;
-import de.jbee.inject.Repository;
-import de.jbee.inject.Resource;
-import de.jbee.inject.Scope;
-import de.jbee.inject.Source;
-import de.jbee.inject.Supplier;
-import de.jbee.inject.Type;
-import de.jbee.inject.util.Scoped;
-import de.jbee.inject.util.Suppliable;
-import de.jbee.inject.util.TypeReflector;
+import se.jbee.inject.Expiry;
+import se.jbee.inject.Name;
+import se.jbee.inject.Precision;
+import se.jbee.inject.Repository;
+import se.jbee.inject.Resource;
+import se.jbee.inject.Scope;
+import se.jbee.inject.Source;
+import se.jbee.inject.Supplier;
+import se.jbee.inject.Type;
+import se.jbee.inject.util.Scoped;
+import se.jbee.inject.util.Suppliable;
+import se.jbee.inject.util.TypeReflector;
 
 public final class Link {
 

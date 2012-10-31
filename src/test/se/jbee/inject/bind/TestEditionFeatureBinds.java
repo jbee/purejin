@@ -1,8 +1,8 @@
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
-import static de.jbee.inject.Dependency.dependency;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static se.jbee.inject.Dependency.dependency;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
@@ -12,8 +12,8 @@ import java.lang.annotation.Target;
 
 import org.junit.Test;
 
-import de.jbee.inject.Injector;
-import de.jbee.inject.bind.Bootstrapper.ModularBootstrapper;
+import se.jbee.inject.Injector;
+import se.jbee.inject.bind.Bootstrapper.ModularBootstrapper;
 
 /**
  * A test that demonstrates how to use {@link Feature}s and {@link Edition}s to allow composition of

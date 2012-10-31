@@ -3,10 +3,10 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.jbee.inject.util;
+package se.jbee.inject.util;
 
-import static de.jbee.inject.Dependency.dependency;
-import static de.jbee.inject.Type.parameterTypes;
+import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Type.parameterTypes;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -19,12 +19,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import de.jbee.inject.Dependency;
-import de.jbee.inject.Injector;
-import de.jbee.inject.Instance;
-import de.jbee.inject.Parameter;
-import de.jbee.inject.Supplier;
-import de.jbee.inject.Type;
+import se.jbee.inject.Dependency;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Instance;
+import se.jbee.inject.Parameter;
+import se.jbee.inject.Supplier;
+import se.jbee.inject.Type;
 
 public final class SuppliedBy {
 

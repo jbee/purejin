@@ -1,12 +1,12 @@
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
-import static de.jbee.inject.Dependency.dependency;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static se.jbee.inject.Dependency.dependency;
 
 import org.junit.Test;
 
-import de.jbee.inject.Injector;
+import se.jbee.inject.Injector;
 
 /**
  * The test demonstrates how to use {@link Constants} and {@link Const} types to allow different

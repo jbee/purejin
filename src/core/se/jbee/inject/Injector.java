@@ -3,11 +3,11 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.jbee.inject;
+package se.jbee.inject;
 
-import de.jbee.inject.DIRuntimeException.DependencyCycleException;
-import de.jbee.inject.DIRuntimeException.MoreFrequentExpiryException;
-import de.jbee.inject.DIRuntimeException.NoSuchResourceException;
+import se.jbee.inject.DIRuntimeException.DependencyCycleException;
+import se.jbee.inject.DIRuntimeException.MoreFrequentExpiryException;
+import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
 
 /**
  * Knows how to *resolve* an instance for a given {@link Dependency}.

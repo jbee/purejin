@@ -1,21 +1,21 @@
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
-import static de.jbee.inject.Dependency.dependency;
-import static de.jbee.inject.Type.raw;
 import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Type.raw;
 
 import org.junit.Test;
 
-import de.jbee.inject.Dependency;
-import de.jbee.inject.Injector;
-import de.jbee.inject.Type;
-import de.jbee.inject.service.ServiceInvocation;
-import de.jbee.inject.service.ServiceMethod;
-import de.jbee.inject.service.ServiceModule;
-import de.jbee.inject.service.ServiceInvocation.ServiceInvocationExtension;
-import de.jbee.inject.util.Value;
+import se.jbee.inject.Dependency;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Type;
+import se.jbee.inject.service.ServiceInvocation;
+import se.jbee.inject.service.ServiceMethod;
+import se.jbee.inject.service.ServiceModule;
+import se.jbee.inject.service.ServiceInvocation.ServiceInvocationExtension;
+import se.jbee.inject.util.Value;
 
 public class TestServiceInvocationBinds {
 

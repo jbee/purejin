@@ -3,33 +3,33 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
-import static de.jbee.inject.Instance.defaultInstanceOf;
-import static de.jbee.inject.Instance.instance;
-import static de.jbee.inject.Type.raw;
-import static de.jbee.inject.util.SuppliedBy.constant;
-import static de.jbee.inject.util.SuppliedBy.parametrizedInstance;
-import static de.jbee.inject.util.SuppliedBy.provider;
+import static se.jbee.inject.Instance.defaultInstanceOf;
+import static se.jbee.inject.Instance.instance;
+import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.util.SuppliedBy.constant;
+import static se.jbee.inject.util.SuppliedBy.parametrizedInstance;
+import static se.jbee.inject.util.SuppliedBy.provider;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import de.jbee.inject.DeclarationType;
-import de.jbee.inject.Instance;
-import de.jbee.inject.Name;
-import de.jbee.inject.Packages;
-import de.jbee.inject.Parameter;
-import de.jbee.inject.Resource;
-import de.jbee.inject.Scope;
-import de.jbee.inject.Source;
-import de.jbee.inject.Supplier;
-import de.jbee.inject.Target;
-import de.jbee.inject.Type;
-import de.jbee.inject.util.Factory;
-import de.jbee.inject.util.Provider;
-import de.jbee.inject.util.SuppliedBy;
+import se.jbee.inject.DeclarationType;
+import se.jbee.inject.Instance;
+import se.jbee.inject.Name;
+import se.jbee.inject.Packages;
+import se.jbee.inject.Parameter;
+import se.jbee.inject.Resource;
+import se.jbee.inject.Scope;
+import se.jbee.inject.Source;
+import se.jbee.inject.Supplier;
+import se.jbee.inject.Target;
+import se.jbee.inject.Type;
+import se.jbee.inject.util.Factory;
+import se.jbee.inject.util.Provider;
+import se.jbee.inject.util.SuppliedBy;
 
 public class Binder
 		implements BasicBinder {
@@ -154,13 +154,13 @@ public class Binder
 
 	public <E extends Enum<E> & Extension<E, ? super T>, T> void extend( Class<E> extension,
 			Class<? extends T> type ) {
-		multibind( Extend.name( extension, type ), Class.class ).to( type );
+		multibind( Extend.extensionName( extension, type ), Class.class ).to( type );
 		implicitBindToConstructor( type );
 	}
 
 	public <E extends Enum<E> & Extension<E, ? super T>, T> void extend( E extension,
 			Class<? extends T> type ) {
-		multibind( Extend.name( extension, type ), Class.class ).to( type );
+		multibind( Extend.extensionName( extension, type ), Class.class ).to( type );
 		implicitBindToConstructor( type );
 	}
 

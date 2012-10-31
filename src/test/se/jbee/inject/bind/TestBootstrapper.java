@@ -1,17 +1,17 @@
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
-import static de.jbee.inject.Type.raw;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static se.jbee.inject.Type.raw;
 
 import org.junit.Test;
 
-import de.jbee.inject.Dependency;
-import de.jbee.inject.Injector;
-import de.jbee.inject.Name;
-import de.jbee.inject.Resource;
-import de.jbee.inject.DIRuntimeException.DependencyCycleException;
+import se.jbee.inject.Dependency;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Name;
+import se.jbee.inject.Resource;
+import se.jbee.inject.DIRuntimeException.DependencyCycleException;
 
 /**
  * The tests shows an example of cyclic depended {@link Bundle}s. It shows that a {@link Bundle}

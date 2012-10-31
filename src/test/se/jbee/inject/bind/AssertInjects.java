@@ -1,15 +1,15 @@
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
-import static de.jbee.inject.Dependency.dependency;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static se.jbee.inject.Dependency.dependency;
 
 import java.util.Collection;
 
-import de.jbee.inject.Injector;
-import de.jbee.inject.Type;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Type;
 
 public class AssertInjects {
 

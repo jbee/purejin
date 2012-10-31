@@ -3,12 +3,12 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.jbee.inject.bind;
+package se.jbee.inject.bind;
 
-import de.jbee.inject.Instance;
-import de.jbee.inject.Packages;
-import de.jbee.inject.Scope;
-import de.jbee.inject.Supplier;
+import se.jbee.inject.Instance;
+import se.jbee.inject.Packages;
+import se.jbee.inject.Scope;
+import se.jbee.inject.Supplier;
 
 public interface BasicBinder {
 

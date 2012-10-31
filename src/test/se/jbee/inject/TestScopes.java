@@ -1,14 +1,14 @@
-package de.jbee.inject;
+package se.jbee.inject;
 
-import static de.jbee.inject.Demand.demand;
-import static de.jbee.inject.Dependency.dependency;
-import static de.jbee.inject.Resource.resource;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static se.jbee.inject.Demand.demand;
+import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Resource.resource;
 
 import org.junit.Test;
 
-import de.jbee.inject.util.Scoped;
+import se.jbee.inject.util.Scoped;
 
 public class TestScopes {
 
