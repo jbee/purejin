@@ -8,6 +8,7 @@ package se.jbee.inject;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.TypeVariable;
@@ -33,27 +34,25 @@ public final class Type<T>
 	public static final Type<? extends Object> WILDCARD = raw( Object.class ).asLowerBound();
 
 	public static Type<?> fieldType( Field field ) {
-		return type( field.getType(), field.getGenericType() );
+		return type( field.getGenericType() );
 	}
 
 	public static Type<?> returnType( Method method ) {
-		return type( method.getReturnType(), method.getGenericReturnType() );
+		return type( method.getGenericReturnType() );
 	}
 
 	public static Type<?>[] parameterTypes( Constructor<?> constructor ) {
-		return parameterTypes( constructor.getParameterTypes(),
-				constructor.getGenericParameterTypes() );
+		return parameterTypes( constructor.getGenericParameterTypes() );
 	}
 
 	public static Type<?>[] parameterTypes( Method method ) {
-		return parameterTypes( method.getParameterTypes(), method.getGenericParameterTypes() );
+		return parameterTypes( method.getGenericParameterTypes() );
 	}
 
-	private static Type<?>[] parameterTypes( Class<?>[] parameterTypes,
-			java.lang.reflect.Type[] genericParameterTypes ) {
-		Type<?>[] res = new Type<?>[parameterTypes.length];
+	private static Type<?>[] parameterTypes( java.lang.reflect.Type[] genericParameterTypes ) {
+		Type<?>[] res = new Type<?>[genericParameterTypes.length];
 		for ( int i = 0; i < res.length; i++ ) {
-			res[i] = type( parameterTypes[i], genericParameterTypes[i] );
+			res[i] = type( genericParameterTypes[i] );
 		}
 		return res;
 	}
@@ -75,26 +74,6 @@ public final class Type<T>
 		return new Type<T>( type );
 	}
 
-	public static <T> Type<T> type( Class<T> rawType, java.lang.reflect.Type type ) {
-		return type( rawType, type, Collections.<String, Type<?>> emptyMap() );
-	}
-
-	private static <T> Type<T> type( Class<T> rawType, java.lang.reflect.Type type,
-			Map<String, Type<?>> actualTypeArguments ) {
-		if ( type == rawType ) {
-			return raw( rawType );
-		}
-		if ( type instanceof ParameterizedType ) {
-			ParameterizedType pt = (ParameterizedType) type;
-			if ( pt.getRawType() != rawType ) {
-				throw new IllegalArgumentException( "The given raw type " + rawType
-						+ " is not the raw type of the given type: " + type );
-			}
-			return new Type<T>( rawType, types( pt.getActualTypeArguments(), actualTypeArguments ) );
-		}
-		throw notSupportedYet( type );
-	}
-
 	private static UnsupportedOperationException notSupportedYet( java.lang.reflect.Type type ) {
 		return new UnsupportedOperationException( "Type has no support yet: " + type );
 	}
@@ -108,6 +87,10 @@ public final class Type<T>
 		return args;
 	}
 
+	private static Type<?> type( java.lang.reflect.Type type ) {
+		return type( type, Collections.<String, Type<?>> emptyMap() );
+	}
+
 	private static Type<?> type( java.lang.reflect.Type type,
 			Map<String, Type<?>> actualTypeArguments ) {
 		if ( type instanceof Class<?> ) {
@@ -119,10 +102,14 @@ public final class Type<T>
 		if ( type instanceof TypeVariable<?> ) {
 			return actualTypeArguments.get( ( (TypeVariable<?>) type ).getName() );
 		}
+		if ( type instanceof GenericArrayType ) {
+			GenericArrayType gat = (GenericArrayType) type;
+			return type( gat.getGenericComponentType() ).getArrayType();
+		}
 		throw notSupportedYet( type );
 	}
 
-	private static <T> Type<?> parameterizedType( ParameterizedType type,
+	private static <T> Type<T> parameterizedType( ParameterizedType type,
 			Map<String, Type<?>> actualTypeArguments ) {
 		@SuppressWarnings ( "unchecked" )
 		Class<T> rawType = (Class<T>) type.getRawType();
@@ -408,7 +395,10 @@ public final class Type<T>
 			}
 			b.append( "? extends " );
 		}
-		b.append( rawType.getCanonicalName() );
+		String canonicalName = rawType.getCanonicalName();
+		b.append( rawType.isArray()
+			? canonicalName.substring( 0, canonicalName.indexOf( '[' ) )
+			: canonicalName );
 		if ( isParameterized() ) {
 			b.append( '<' );
 			params[0].toString( b );
@@ -417,6 +407,9 @@ public final class Type<T>
 				params[i].toString( b );
 			}
 			b.append( '>' );
+		}
+		if ( rawType.isArray() ) {
+			b.append( canonicalName.substring( canonicalName.indexOf( '[' ) ) );
 		}
 	}
 
@@ -470,7 +463,7 @@ public final class Type<T>
 		Map<String, Type<?>> actualTypeArguments = actualTypeArguments( type );
 		while ( supertype != null ) {
 			if ( genericSupertype != null ) {
-				type = type( supertype, genericSupertype, actualTypeArguments );
+				type = (Type<? super T>) type( genericSupertype, actualTypeArguments );
 				res.add( type );
 			}
 			actualTypeArguments = actualTypeArguments( type );
@@ -498,7 +491,7 @@ public final class Type<T>
 		Class<? super T>[] interfaces = (Class<? super T>[]) type.getInterfaces();
 		java.lang.reflect.Type[] genericInterfaces = type.getGenericInterfaces();
 		for ( int i = 0; i < interfaces.length; i++ ) {
-			Type<? super T> interfaceType = Type.type( interfaces[i], genericInterfaces[i],
+			Type<? super T> interfaceType = (Type<? super T>) Type.type( genericInterfaces[i],
 					actualTypeArguments );
 			if ( !res.contains( interfaceType ) ) {
 				res.add( interfaceType );
