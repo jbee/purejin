@@ -5,7 +5,8 @@
  */
 package se.jbee.inject;
 
-public final class Demand<T> {
+public final class Demand<T>
+		implements Resourcing<T> {
 
 	public static <T> Demand<T> demand( Resource<T> resource, Dependency<? super T> dependency,
 			int serialNumber, int cardinality ) {
@@ -30,6 +31,7 @@ public final class Demand<T> {
 		return dependency;
 	}
 
+	@Override
 	public Resource<T> getResource() {
 		return resource;
 	}

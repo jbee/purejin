@@ -250,7 +250,7 @@ public final class Type<T>
 		return asOther.allParametersAreAssignableTo( other );
 	}
 
-	public boolean allParametersAreAssignableTo( Type<?> other ) {
+	private boolean allParametersAreAssignableTo( Type<?> other ) {
 		for ( int i = 0; i < params.length; i++ ) {
 			if ( !params[i].asParameterAssignableTo( other.params[i] ) ) {
 				return false;
@@ -271,16 +271,26 @@ public final class Type<T>
 	}
 
 	/**
-	 * @return true if this type describes the lower bound of the required types.
+	 * @return true if this type describes the lower bound of the required types (a wildcard
+	 *         generic).
 	 */
 	public boolean isLowerBound() {
 		return lowerBound;
 	}
 
+	/**
+	 * @see #hasTypeParameter() To check if the {@link Class} defines type parameter.
+	 * @return true if the type {@link #hasTypeParameter()} and parameters are given.
+	 */
 	public boolean isParameterized() {
 		return params.length > 0;
 	}
 
+	/**
+	 * @see #isParameterized() To check if actual type parameters are given.
+	 * 
+	 * @return true when the {@link Class} defines type parameters (generics).
+	 */
 	public boolean hasTypeParameter() {
 		return rawType.getTypeParameters().length > 0;
 	}
@@ -323,6 +333,12 @@ public final class Type<T>
 	}
 
 	/**
+	 * Example - <i>typeOf</i>
+	 * 
+	 * <pre>
+	 * Map&lt;String,String&gt; =&gt; Map&lt;? extends String, ? extends String&gt;
+	 * </pre>
+	 * 
 	 * @return A {@link Type} having all its type arguments {@link #asLowerBound()}s. Use this to
 	 *         model &lt;?&gt; wildcard generic.
 	 */
@@ -351,6 +367,9 @@ public final class Type<T>
 		return !isParameterized() && rawType.getTypeParameters().length > 0;
 	}
 
+	/**
+	 * @return True when all type parameters are lower bounds.
+	 */
 	public boolean allArgumentsAreLowerBounds() {
 		int c = 0;
 		for ( int i = 0; i < params.length; i++ ) {

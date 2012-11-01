@@ -12,5 +12,8 @@ package se.jbee.inject;
  */
 public interface Injectable<T> {
 
+	/**
+	 * @return The instance of the given {@link Demand}.
+	 */
 	T instanceFor( Demand<T> demand );
 }

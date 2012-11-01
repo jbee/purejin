@@ -29,6 +29,11 @@ import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
 
+/**
+ * Utility to create/use the core containers {@link Injector} and {@link Injectron}.
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ */
 public final class Inject {
 
 	public static Injector from( InjectronSource source ) {

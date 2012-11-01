@@ -31,6 +31,12 @@ import se.jbee.inject.util.Factory;
 import se.jbee.inject.util.Provider;
 import se.jbee.inject.util.SuppliedBy;
 
+/**
+ * The default implementation of the {@link BasicBinder} that provides a lot of utility methods to
+ * improve readability and keep binding compact.
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ */
 public class Binder
 		implements BasicBinder {
 

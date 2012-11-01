@@ -24,6 +24,10 @@ package se.jbee.inject.bind;
  */
 public interface Bootstrapper {
 
+	/**
+	 * @param bundle
+	 *            the {@link Bundle} to expand further
+	 */
 	void install( Class<? extends Bundle> bundle );
 
 	/**
@@ -42,15 +46,42 @@ public interface Bootstrapper {
 	 */
 	void uninstall( Class<? extends Bundle> bundle );
 
+	/**
+	 * @param module
+	 *            the {@link Module} to install (within the parent {@link Bundle} that is given
+	 *            implicit - the {@link Bootstrapper} keeps track of that)
+	 */
 	void install( Module module );
 
+	/**
+	 * @param modules
+	 *            The choices made to install.
+	 */
 	<M extends Enum<M> & ModularBundle<M>> void install( M... modules );
 
+	/**
+	 * @param modules
+	 *            The choices made to uninstall again.
+	 */
 	<M extends Enum<M> & ModularBundle<M>> void uninstall( M... modules );
 
+	/**
+	 * @see Constants
+	 * @param bundle
+	 *            the {@link Bundle} to install
+	 * @param property
+	 *            The property the installation is connected to.
+	 */
 	<C extends Enum<C> & Const> void install( Class<? extends ModularBundle<C>> bundle,
 			Class<C> property );
 
+	/**
+	 * 
+	 * @author Jan Bernitt (jan.bernitt@gmx.de)
+	 * 
+	 * @param <M>
+	 *            The type of choices possible
+	 */
 	interface ModularBootstrapper<M> {
 
 		/**

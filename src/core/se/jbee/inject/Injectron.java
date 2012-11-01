@@ -13,10 +13,20 @@ package se.jbee.inject;
 public interface Injectron<T>
 		extends Resourcing<T> {
 
+	/**
+	 * @return The {@link Source} that {@link Injection} had been created from (e.g. did define the
+	 *         bind).
+	 */
 	Source getSource();
 
+	/**
+	 * @return The instance created or resolved for the given {@link Dependency}.
+	 */
 	T instanceFor( Dependency<? super T> dependency );
 
+	/**
+	 * @return The frequency in which this injectron's {@link Resource} expires.
+	 */
 	Expiry getExpiry();
 
 }

@@ -5,6 +5,14 @@
  */
 package se.jbee.inject;
 
+/**
+ * A description of an {@link Instance} together with its duration of life ({@link Expiry}).
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * 
+ * @param <T>
+ *            The type of the instance
+ */
 public final class Emergence<T> {
 
 	public static <T> Emergence<T> emergence( Instance<T> instance, Expiry expiry ) {

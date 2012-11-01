@@ -15,9 +15,10 @@ import se.jbee.inject.Injectron;
 import se.jbee.inject.Type;
 
 /**
+ * Util to get rid of warnings for known generic {@link Type}s.
  * 
- * Implementation Note: storing the the raw type in a var before returning the generic type is a
- * workaround to make this compile with javac (cast works within eclipse).
+ * <b>Implementation Note:</b> storing the the raw type in a var before returning the generic type
+ * is a workaround to make this compile with javac (cast works with javaw).
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */

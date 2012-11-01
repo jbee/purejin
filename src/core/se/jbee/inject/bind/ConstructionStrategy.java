@@ -26,5 +26,11 @@ public interface ConstructionStrategy {
 	 */
 	<T> Constructor<T> constructorFor( Class<T> type );
 
+	/**
+	 * @param name
+	 *            Can be used as <i>hint</i> to decide between multiple existing assignable methods.
+	 * @return The {@link Method} that has been chosen as implementation for the given return
+	 *         {@link Type} within the given implementor {@link Class}.
+	 */
 	<T> Method factoryFor( Type<T> returnType, Name name, Class<?> implementor );
 }

@@ -26,6 +26,11 @@ import se.jbee.inject.Parameter;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 
+/**
+ * Utility as a factory to create different kinds of {@link Supplier}s.
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ */
 public final class SuppliedBy {
 
 	private static final Object[] NO_ARGS = new Object[0];

@@ -15,5 +15,9 @@ package se.jbee.inject.bind;
  */
 public interface Bundle {
 
+	/**
+	 * @param bootstrap
+	 *            The {@link Bootstrapper} this {@link Bundle} should install itself to.
+	 */
 	void bootstrap( Bootstrapper bootstrap );
 }

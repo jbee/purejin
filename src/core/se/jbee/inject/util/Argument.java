@@ -12,6 +12,14 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Type;
 
+/**
+ * A utility to supply {@link Parameter}s during the binding.
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * 
+ * @param <T>
+ *            Type of value/argument
+ */
 public final class Argument<T>
 		implements Parameter<T> {
 

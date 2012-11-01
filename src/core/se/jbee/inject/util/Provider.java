@@ -22,5 +22,8 @@ import se.jbee.inject.Supplier;
  */
 public interface Provider<T> {
 
+	/**
+	 * @return the current instance.
+	 */
 	T provide();
 }

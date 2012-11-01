@@ -7,6 +7,11 @@ package se.jbee.inject;
 
 import java.util.Comparator;
 
+/**
+ * A util to find out if one object is {@link PreciserThan} an other one.
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ */
 public final class Precision {
 
 	public static final Comparator<Resourcing<?>> RESOURCE_COMPARATOR = new ResourcingComparator();

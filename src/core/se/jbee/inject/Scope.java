@@ -5,6 +5,14 @@
  */
 package se.jbee.inject;
 
+/**
+ * A {@linkplain Scope} describes a particular lifecycle.
+ * 
+ * Thereby the {@linkplain Scope} itself acts as a factory for {@link Repository}s. Each
+ * {@link Injector} has a single {@linkplain Repository} for each {@linkplain Scope}.
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ */
 public interface Scope {
 
 	/**

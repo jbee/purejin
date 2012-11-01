@@ -7,6 +7,14 @@ package se.jbee.inject.bind;
 
 import java.util.IdentityHashMap;
 
+/**
+ * {@link Constants} are used to model configurations of the {@link Bootstrap}ping process through
+ * one enum for each configurable property.
+ * 
+ * {@linkplain Constants} are immutable! Use {@link #def(Enum)} to build up sets.
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ */
 public final class Constants {
 
 	public static final Constants NONE = new Constants(

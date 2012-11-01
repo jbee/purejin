@@ -7,15 +7,38 @@ package se.jbee.inject.bind;
 
 import se.jbee.inject.Instance;
 import se.jbee.inject.Packages;
+import se.jbee.inject.Resource;
 import se.jbee.inject.Scope;
 import se.jbee.inject.Supplier;
+import se.jbee.inject.Target;
+import se.jbee.inject.Type;
 
+/**
+ * The minimal {@link Binder} to bind should illustrate the stages.
+ * 
+ * @see Binder
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ */
 public interface BasicBinder {
 
+	/**
+	 * @return A binder that defines a binding for the given {@link Instance}.
+	 */
 	<T> TypedBasicBinder<T> bind( Instance<T> instance );
 
+	/**
+	 * The {@link Type} of the {@link Resource} defined is already given using
+	 * {@link BasicBinder#bind(Instance)}
+	 * 
+	 * @author Jan Bernitt (jan.bernitt@gmx.de)
+	 */
 	interface TypedBasicBinder<T> {
 
+		/**
+		 * @param supplier
+		 *            The <i>source</i> that will deliver instances when needed to inject.
+		 */
 		void to( Supplier<? extends T> supplier );
 
 	}
@@ -28,6 +51,9 @@ public interface BasicBinder {
 	public interface RootBasicBinder
 			extends ScopedBasicBinder {
 
+		/**
+		 * @return A binder that binds within the given {@link Scope}.
+		 */
 		ScopedBasicBinder per( Scope scope );
 
 	}
@@ -41,7 +67,7 @@ public interface BasicBinder {
 			extends TargetedBasicBinder {
 
 		/**
-		 * Means when the target type/instance is created and dependencies are injected into it.
+		 * @return a binder that has a the given {@link Target} for the bound {@link Resource}.
 		 */
 		TargetedBasicBinder injectingInto( Instance<?> target );
 	}
@@ -53,18 +79,12 @@ public interface BasicBinder {
 	 * @author Jan Bernitt (jan.bernitt@gmx.de)
 	 */
 	interface TargetedBasicBinder
-			extends BasicBinder /* LocalisedBinder */{
-
-		BasicBinder in( Packages packages );
-
-	}
-
-	interface LocalisedBasicBinder
 			extends BasicBinder {
 
-		LocalisedBasicBinder havingParent( Class<?> type );
-
-		LocalisedBasicBinder havingDirectParent( Class<?> type );
+		/**
+		 * @return a binder that whose binds just apply to the given {@link Packages}.
+		 */
+		BasicBinder in( Packages packages );
 
 	}
 

@@ -5,6 +5,11 @@
  */
 package se.jbee.inject;
 
+/**
+ * How frequently do instances expire (become garbage, are not used any longer).
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ */
 public final class Expiry {
 
 	public static final Expiry NEVER = new Expiry( 0 );

@@ -7,6 +7,11 @@ package se.jbee.inject.bind;
 
 import se.jbee.inject.bind.Bootstrapper.ModularBootstrapper;
 
+/**
+ * The default ustility base class for {@link ModularBundle}s.
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ */
 public abstract class ModularBootstrapperBundle<M>
 		implements ModularBundle<M>, ModularBootstrapper<M> {
 

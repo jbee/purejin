@@ -14,6 +14,11 @@ import se.jbee.inject.Injectable;
 import se.jbee.inject.Repository;
 import se.jbee.inject.Scope;
 
+/**
+ * Utility as a factory to create/use {@link Scope}s.
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ */
 public class Scoped {
 
 	public interface KeyDeduction {

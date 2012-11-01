@@ -8,13 +8,15 @@ package se.jbee.inject;
 /**
  * Manages the already created instances.
  * 
- * Existing instances are returned, non-existing are received from the given {@link Injectable} and
- * stocked forever.
- * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  * 
  */
 public interface Repository {
 
+	/**
+	 * @return Existing instances are returned, non-existing are received from the given
+	 *         {@link Injectable} and stocked in the scope of this {@link Repository} (forever if it
+	 *         is an application wide singleton).
+	 */
 	<T> T serve( Demand<T> demand, Injectable<T> injectable );
 }

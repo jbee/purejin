@@ -20,6 +20,14 @@ import se.jbee.inject.util.Inject;
 import se.jbee.inject.util.Suppliable;
 import se.jbee.inject.util.TypeReflector;
 
+/**
+ * Utility to create an {@link Injector} context from {@link Bundle}s and {@link Module}s.
+ * 
+ * It allos to use {@link Edition}s and {@link Feature}s to modularize or customize context
+ * configurations.
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ */
 public final class Bootstrap {
 
 	public static Injector injector( Class<? extends Bundle> root ) {

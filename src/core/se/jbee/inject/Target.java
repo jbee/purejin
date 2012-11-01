@@ -8,6 +8,14 @@ package se.jbee.inject;
 import static se.jbee.inject.Precision.morePreciseThan2;
 import static se.jbee.inject.Type.raw;
 
+/**
+ * Describes where a {@link Resource} is available for injection.
+ * 
+ * This can be restricted by the {@link Packages} the injected that is injected is defined in or the
+ * {@link Type} of the receiving instance.
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ */
 public final class Target
 		implements PreciserThan<Target> {
 

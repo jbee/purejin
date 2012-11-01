@@ -5,7 +5,15 @@
  */
 package se.jbee.inject;
 
+/**
+ * <i>Has a {@link Resource}</i>
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ */
 public interface Resourcing<T> {
 
+	/**
+	 * @return The {@link Resource} of this compound.
+	 */
 	Resource<T> getResource();
 }

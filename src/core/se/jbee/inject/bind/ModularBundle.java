@@ -7,7 +7,17 @@ package se.jbee.inject.bind;
 
 import se.jbee.inject.bind.Bootstrapper.ModularBootstrapper;
 
+/**
+ * A {@link Bundle} that does different installation for different options.
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * 
+ */
 public interface ModularBundle<M> {
 
+	/**
+	 * @param bootstrap
+	 *            the {@link ModularBootstrapper} this bundle should install itself in.
+	 */
 	void bootstrap( ModularBootstrapper<M> bootstrap );
 }

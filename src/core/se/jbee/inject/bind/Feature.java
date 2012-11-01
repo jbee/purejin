@@ -5,7 +5,21 @@
  */
 package se.jbee.inject.bind;
 
+/**
+ * {@link Feature}s can be used to model more fine grained {@link Edition} by using
+ * <code>enum</code>s as the options to chose from.
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * 
+ * @param <T>
+ *            The enum used as different features/options to chose from.
+ */
 public interface Feature<T extends Enum<T>> {
 
+	/**
+	 * @return The feature this given {@link Bundle} or {@link Module} class represents or
+	 *         <code>null</code> is it doesn't represent any special feature (so it will be install
+	 *         in any case).
+	 */
 	T featureOf( Class<?> bundleOrModule );
 }

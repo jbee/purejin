@@ -18,6 +18,11 @@ import se.jbee.inject.bind.Binder.TypedBinder;
 import se.jbee.inject.bind.Binder.TypedElementBinder;
 import se.jbee.inject.util.Scoped;
 
+/**
+ * The default utility {@link Module} almost always used.
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ */
 public abstract class BinderModule
 		extends BootstrappingModule
 		implements BasicBinder.RootBasicBinder {

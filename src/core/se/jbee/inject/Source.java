@@ -6,7 +6,7 @@
 package se.jbee.inject;
 
 /**
- * A VO to answer: Where does a bind came from ? Was is implicit or explicit ?
+ * Where does a bind came from and what type of declaration has it been.
  * 
  * @author Jan Bernitt (jan.bernitt@gmx.de)
  */
@@ -34,28 +34,20 @@ public final class Source
 		return declarationType;
 	}
 
-	public boolean isExplicit() {
-		return declarationType == DeclarationType.EXPLICIT;
-	}
-
 	@Override
 	public String toString() {
-		String i = ident.toString();
+		String id = ident.toString();
 		if ( ! ( ident instanceof Class<?> ) ) {
-			i = ident.getClass().getCanonicalName() + ":" + i;
+			id = ident.getClass().getCanonicalName() + ":" + id;
 		}
-		return isExplicit()
-			? i
-			: "(" + i + ")";
+		return declarationType == DeclarationType.IMPLICIT
+			? "(" + id + ")"
+			: id;
 	}
 
 	@Override
 	public boolean morePreciseThan( Source other ) {
 		return declarationType.morePreciseThan( other.declarationType );
-	}
-
-	public boolean isImplicit() {
-		return declarationType == DeclarationType.IMPLICIT;
 	}
 
 	public Source typed( DeclarationType type ) {

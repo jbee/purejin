@@ -5,6 +5,11 @@
  */
 package se.jbee.inject;
 
+/**
+ * Describes on "stack-frame" within the injection process.
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ */
 public final class Injection {
 
 	private final Instance<?> dependency;

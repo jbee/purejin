@@ -5,6 +5,11 @@
  */
 package se.jbee.inject.bind;
 
+/**
+ * @see Constants
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ */
 public interface Const {
 	// marker
 }

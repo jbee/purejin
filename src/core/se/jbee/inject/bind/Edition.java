@@ -5,8 +5,16 @@
  */
 package se.jbee.inject.bind;
 
+/**
+ * An {@link Edition} decides wich features are contained in a specific setup.
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ */
 public interface Edition {
 
+	/**
+	 * Default {@link Edition} that has all features.
+	 */
 	Edition FULL = new Edition() {
 
 		@Override
@@ -15,5 +23,10 @@ public interface Edition {
 		}
 	};
 
+	/**
+	 * @return true if the given {@link Class} of a {@link Module} or {@link Bundle} should be
+	 *         included in the context created (should be installed).
+	 */
 	boolean featured( Class<?> bundleOrModule );
+
 }

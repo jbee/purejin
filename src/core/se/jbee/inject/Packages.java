@@ -7,6 +7,11 @@ package se.jbee.inject;
 
 import java.util.regex.Pattern;
 
+/**
+ * A set of {@link Package}s described by a pattern.
+ * 
+ * @author Jan Bernitt (jan.bernitt@gmx.de)
+ */
 public final class Packages
 		implements PreciserThan<Packages> {
 
