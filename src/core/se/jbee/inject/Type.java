@@ -454,16 +454,15 @@ public final class Type<T>
 	 *         direct super-class followed by the direct super-interfaces continuing by going up the
 	 *         type hierarchy.
 	 */
-	@SuppressWarnings ( "unchecked" )
 	public Type<? super T>[] supertypes() {
-		Set<Type<? super T>> res = new LinkedHashSet<Type<? super T>>();
-		Class<? super T> supertype = rawType;
+		Set<Type<?>> res = new LinkedHashSet<Type<?>>();
+		Class<?> supertype = rawType;
 		java.lang.reflect.Type genericSupertype = null;
-		Type<? super T> type = this;
+		Type<?> type = this;
 		Map<String, Type<?>> actualTypeArguments = actualTypeArguments( type );
 		while ( supertype != null ) {
 			if ( genericSupertype != null ) {
-				type = (Type<? super T>) type( genericSupertype, actualTypeArguments );
+				type = type( genericSupertype, actualTypeArguments );
 				res.add( type );
 			}
 			actualTypeArguments = actualTypeArguments( type );
@@ -471,7 +470,9 @@ public final class Type<T>
 			genericSupertype = supertype.getGenericSuperclass();
 			supertype = supertype.getSuperclass();
 		}
-		return (Type<? super T>[]) res.toArray( new Type<?>[res.size()] );
+		@SuppressWarnings ( "unchecked" )
+		Type<? super T>[] supertypes = (Type<? super T>[]) res.toArray( new Type<?>[res.size()] );
+		return supertypes;
 	}
 
 	private <V> Map<String, Type<?>> actualTypeArguments( Type<V> type ) {
@@ -485,14 +486,12 @@ public final class Type<T>
 		return actualTypeArguments;
 	}
 
-	private void addSuperInterfaces( Set<Type<? super T>> res, Class<? super T> type,
+	private void addSuperInterfaces( Set<Type<?>> res, Class<?> type,
 			Map<String, Type<?>> actualTypeArguments ) {
-		@SuppressWarnings ( "unchecked" )
-		Class<? super T>[] interfaces = (Class<? super T>[]) type.getInterfaces();
+		Class<?>[] interfaces = type.getInterfaces();
 		java.lang.reflect.Type[] genericInterfaces = type.getGenericInterfaces();
 		for ( int i = 0; i < interfaces.length; i++ ) {
-			Type<? super T> interfaceType = (Type<? super T>) Type.type( genericInterfaces[i],
-					actualTypeArguments );
+			Type<?> interfaceType = Type.type( genericInterfaces[i], actualTypeArguments );
 			if ( !res.contains( interfaceType ) ) {
 				res.add( interfaceType );
 				addSuperInterfaces( res, interfaces[i], actualTypeArguments( interfaceType ) );
