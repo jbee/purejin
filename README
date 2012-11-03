@@ -1,0 +1,46 @@
+ *   Silk DI
+ *
+ *   Copyright (c) 2012 Jan Bernitt
+ *
+ *   Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
+ *   
+
+Docs: http://www.silkdi.com/
+Feedback: https://github.com/jbee/silk/issues
+Getting Started: http://www.silkdi.com/userguide/
+
+Installation:
+
+1) Manual
+	- Download from https://github.com/jbee/silk/downloads
+	- Add the jar file to your classpath
+
+2) Maven
+ 	<dependency>
+		<groupId>se.jbee</groupId>
+		<artifactId>silk-di</artifactId>
+		<version>0.1</version>
+	</dependency>
+
+3) Ivy
+	<dependency org="se.jbee" name="silk-di" rev="0.1"/>
+
+4) Gradle
+	'se.jbee:silk-di:0.1'
+
+5) Build from sources
+	- checkout https://github.com/jbee/silk.git
+	- run 'ant jar' to create jar files in sub-directory 'dist'
+  
+  
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE.
