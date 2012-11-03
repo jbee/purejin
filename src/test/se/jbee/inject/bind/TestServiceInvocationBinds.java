@@ -88,6 +88,7 @@ public class TestServiceInvocationBinds {
 	private final AssertInvocation inv = injector.resolve( dependency( AssertInvocation.class ) );
 
 	@Test
+	@SuppressWarnings ( "unchecked" )
 	public void thatInvocationIsInvokedBeforeAndAfterTheServiceMethodCall() {
 		Dependency<ServiceMethod> dependency = dependency( raw( ServiceMethod.class ).parametized(
 				String.class, Integer.class ) );
@@ -100,6 +101,7 @@ public class TestServiceInvocationBinds {
 	}
 
 	@Test
+	@SuppressWarnings ( "unchecked" )
 	public void thatInvocationIsInvokedAfterExceptionInTheServiceMethodCall() {
 		Dependency<ServiceMethod> dependency = dependency( raw( ServiceMethod.class ).parametized(
 				String.class, Void.class ) );

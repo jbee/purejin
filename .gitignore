@@ -2,3 +2,4 @@ bin/
 target/
 dist/
 src/doc/
+lib/

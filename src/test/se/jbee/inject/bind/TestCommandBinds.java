@@ -81,6 +81,7 @@ public class TestCommandBinds {
 		}
 	}
 
+	@SuppressWarnings ( "unchecked" )
 	@Test
 	public void thatServiceCanBeResolvedWhenHavingJustOneGeneric() {
 		Injector injector = Bootstrap.injector( CommandBindsModule.class );

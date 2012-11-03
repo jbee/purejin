@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project basedir="." default="compile" name="silk">
+<project basedir="." default="compile" name="silk" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
 	<property environment="env" />
 	<property name="target" value="1.6" />
@@ -12,21 +12,37 @@
 
 	<property name="target.dir" value="target" />
 	<property name="src.dir" value="src" />
+	<property name="lib.dir" value="lib" />
+	<property name="dist.dir" value="dist" />
 	
 	<property name="core.src.dir" value="${src.dir}/core" />
 	<property name="test.src.dir" value="${src.dir}/test" />
 	<property name="draft.src.dir" value="${src.dir}/draft" />
-	
+
 	<property name="core.target.dir" value="${target.dir}/core" />
 	<property name="draft.target.dir" value="${target.dir}/draft" />
 	<property name="test.target.dir" value="${target.dir}/test" />
 	<property name="javadoc.target.dir" value="${target.dir}/javadoc" />
+	<property name="junit.output.dir" value="${target.dir}/junit" />
 
-	<property name="dist.dir" value="dist" />
-
-	<path id="silk.classpath">
+	<property name="dist.jar" value="${dist.dir}/silk-${release.version}.jar" />
+	<property name="dist.sources.jar" value="${dist.dir}/silk-${release.version}-sources.jar" />
+	<property name="dist.javadoc.jar" value="${dist.dir}/silk-${release.version}-javadoc.jar" />
+	
+	<path id="classpath.core">
 		<pathelement location="${core.target.dir}" />
 	</path>
+	<path id="classpath.test">
+		<path refid="classpath.core"/>
+		<pathelement location="${draft.target.dir}" />
+		<fileset dir="${lib.dir}">
+		    <include name="*.jar"/>
+		</fileset>
+	</path>
+	<path id="classpath.junit">
+		<path refid="classpath.test"/>
+		<pathelement location="${test.target.dir}" />
+	</path>	
 
 	<target name="init">
 		<mkdir dir="${target.dir}" />
@@ -50,40 +66,40 @@
 				<exclude name="**/*.launch" />
 				<exclude name="**/*.java" />
 			</fileset>
-		</copy>		
+		</copy>
 	</target>
 
+	<target name="cleanall" depends="clean">
+		<delete dir="${lib.dir}"/>
+		<delete dir="${dist.dir}" />
+	</target>
+	
 	<target name="clean">
 		<delete dir="${target.dir}" />
-		<delete dir="${dist.dir}" />
 	</target>
 
 	<target name="compile" depends="init">
 		<javac debug="true" debuglevel="${debuglevel}" destdir="${core.target.dir}" source="${source}" target="${target}" includeantruntime="false">
 			<src path="${core.src.dir}" />
-			<classpath refid="silk.classpath" />
+			<classpath refid="classpath.core" />
 			<compilerarg value="-Xlint:unchecked" />
 		</javac>
 		<javac debug="true" debuglevel="${debuglevel}" destdir="${draft.target.dir}" source="${source}" target="${target}" includeantruntime="false">
 			<src path="${draft.src.dir}" />
-			<classpath refid="silk.classpath" />
+			<classpath refid="classpath.core" />
 			<compilerarg value="-Xlint:unchecked" />
 		</javac>
 	</target>
 
 	<target name="jar">
-		<tstamp>
-			<format property="current.time" pattern="yyMMddHHmmss" />
-		</tstamp>
-		<antcall target="-jar">
-			<param name="archive-version" value="${snapshot.version}.${current.time}" />
-		</antcall>
+		<tstamp><format property="current.time" pattern="yyMMddHHmmss" /></tstamp>
+		<delete dir="${dist.dir}" includes="*-${snapshot.version}*.jar,*-${snapshot.version}*.zip" />
+		<antcall target="-jar"><param name="archive-version" value="${snapshot.version}.${current.time}" /></antcall>
 	</target>
 
 	<target name="dist">
-		<antcall target="-jar">
-			<param name="archive-version" value="${release.version}" />
-		</antcall>
+		<delete dir="${dist.dir}" includes="*-${release.version}*.jar,*-${release.version}*.zip,,*-${release.version}*.asc" />
+		<antcall target="-jar">	<param name="archive-version" value="${release.version}" /></antcall>
 	</target>
 
 	<target name="-jar" depends="compile, javadoc, license">
@@ -91,9 +107,9 @@
 			<fileset dir="." file="LICENSE" />
 			<fileset dir="${core.target.dir}" includes="**/*.class" />
 			<manifest>
-				<attribute name='Specification-Version' value='${app.version}'/> 
+				<attribute name='Specification-Version' value='${app.version}'/>
 				<attribute name='Specification-Title' value='${app.name}' />
-				<attribute name='Implementation-Version' value='${app.version}'/> 
+				<attribute name='Implementation-Version' value='${app.version}'/>
 				<attribute name='Implementation-Title' value='${app.name}' />
 				<attribute name='Bundle-License' value='Apache 2.0' />
 				<attribute name='Package' value='se.jbee.inject' />
@@ -103,9 +119,9 @@
 			<fileset dir="." file="LICENSE" />
 			<fileset dir="${core.src.dir}" includes="**/*.java" />
 			<manifest>
-				<attribute name='Specification-Version' value='${app.version}'/> 
+				<attribute name='Specification-Version' value='${app.version}'/>
 				<attribute name='Specification-Title' value='${app.name}' />
-				<attribute name='Implementation-Version' value='${app.version}'/> 
+				<attribute name='Implementation-Version' value='${app.version}'/>
 				<attribute name='Implementation-Title' value='${app.name}' />
 				<attribute name='Bundle-License' value='Apache 2.0' />
 				<attribute name='Package' value='se.jbee.inject' />
@@ -115,9 +131,9 @@
 			<fileset dir="." file="LICENSE" />
 			<fileset dir="${javadoc.target.dir}" includes="**/*" />
 			<manifest>
-				<attribute name='Specification-Version' value='${app.version}'/> 
+				<attribute name='Specification-Version' value='${app.version}'/>
 				<attribute name='Specification-Title' value='${app.name}' />
-				<attribute name='Implementation-Version' value='${app.version}'/> 
+				<attribute name='Implementation-Version' value='${app.version}'/>
 				<attribute name='Implementation-Title' value='${app.name}' />
 				<attribute name='Bundle-License' value='Apache 2.0' />
 				<attribute name='Package' value='se.jbee.inject' />
@@ -130,40 +146,42 @@
 	</target>
 
 	<target name='javadoc' depends="compile" description='Generate javadoc.'>
-		<delete dir="${javadoc.target.dir}" quiet="true" />
 		<javadoc use='true' author='true' version='true' 
 			access='package' destdir='${javadoc.target.dir}' 
 			windowtitle='${app.name} ${app.version}' 
 			noqualifier='java.*:javax.*:com.sun.*' linksource='false'>
-			
-			<packageset dir="${core.src.dir}" defaultexcludes="yes">
-				<exclude name="org/junit/**" />
-			</packageset>
 
-			<classpath refid='silk.classpath' />
+			<packageset dir="${core.src.dir}" defaultexcludes="yes" />
+
+			<classpath refid="classpath.core" />
 			<link href='http://jbee.github.com/silk/assets/javadoc/' />
 			<header><![CDATA[<h1><em>${app.name} ${app.version}</em></h1>]]></header>
 		</javadoc>
 	</target>
 
-	<target name="test-compile" depends="compile">
-		<javac debug="true" debuglevel="${debuglevel}" destdir="${target.dir}" source="${source}" target="${target}">
+	<target name="test-init">
+		<mkdir dir="${lib.dir}"/>
+		<get src="http://search.maven.org/remotecontent?filepath=junit/junit/4.8.1/junit-4.8.1.jar" dest="${lib.dir}/junit-4.8.1.jar" usetimestamp="true" skipexisting="true" />
+	</target>
+	
+	<target name="test-compile" depends="compile, test-init">
+		<javac debug="true" debuglevel="${debuglevel}" destdir="${test.target.dir}" source="${source}" target="${target}" includeantruntime="false">
 			<src path="${test.src.dir}" />
-			<src path="${draft.src.dir}" />
-			<classpath refid="silk.classpath" />
+			<classpath refid="classpath.test" />
+			<compilerarg value="-Xlint:unchecked" />
 		</javac>
 	</target>
-
+	
 	<target name="test" depends="test-compile">
 		<mkdir dir="${junit.output.dir}" />
 		<junit fork="yes" printsummary="withOutAndErr">
 			<formatter type="xml" />
 			<test name="se.jbee.inject.SuiteSilk" todir="${junit.output.dir}" />
-			<classpath refid="silk.classpath" />
+			<classpath refid="classpath.junit" />
 		</junit>
 	</target>
 	
-	<target name="junitreport">
+	<target name="report">
 		<junitreport todir="${junit.output.dir}">
 			<fileset dir="${junit.output.dir}">
 				<include name="TEST-*.xml" />
@@ -171,9 +189,9 @@
 			<report format="frames" todir="${junit.output.dir}" />
 		</junitreport>
 	</target>
-	
+
 	<target name="license" depends="javadoc" description="Write the license headers">
-		<echo file="${dist.dir}/javaheader.txt">/*
+	<echo file="${dist.dir}/javaheader.txt">/*
  *  Copyright (c) 2012, Jan Bernitt 
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
@@ -186,7 +204,7 @@
 			</fileset>
 		</replaceregexp>
 
-		<echo file="${dist.dir}/htmlheader.txt">&lt;!-- 
+	<echo file="${dist.dir}/htmlheader.txt">&lt;!-- 
   Copyright (c) 2012, Jan Bernitt
   
   Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
@@ -199,4 +217,39 @@
 		</replaceregexp>
 	</target>
 	
+	<property name="maven-staging-repository-id" value="sonatype-nexus-staging" />
+	<property name="maven-staging-repository-url" value="https://oss.sonatype.org/service/local/staging/deploy/maven2/" />
+
+	<target name="publish" > 
+		
+		<artifact:mvn>
+			<arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
+			<arg value="-Durl=${maven-staging-repository-url}" />
+			<arg value="-DrepositoryId=${maven-staging-repository-id}" />
+			<arg value="-DpomFile=pom.xml" />
+			<arg value="-Dfile=${dist.jar}" />
+                        <arg value="-Pgpg" />
+		</artifact:mvn>
+
+		<artifact:mvn>
+			<arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
+			<arg value="-Durl=${maven-staging-repository-url}" />
+			<arg value="-DrepositoryId=${maven-staging-repository-id}" />
+			<arg value="-DpomFile=pom.xml" />
+			<arg value="-Dfile=${dist.sources.jar}" />
+			<arg value="-Dclassifier=sources" />
+                        <arg value="-Pgpg" />
+		</artifact:mvn>
+
+		<artifact:mvn>
+			<arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
+			<arg value="-Durl=${maven-staging-repository-url}" />
+			<arg value="-DrepositoryId=${maven-staging-repository-id}" />
+			<arg value="-DpomFile=pom.xml" />
+			<arg value="-Dfile=${dist.javadoc.jar}" />
+			<arg value="-Dclassifier=javadoc" />
+                        <arg value="-Pgpg" />
+		</artifact:mvn>		
+	</target>
+
 </project>
