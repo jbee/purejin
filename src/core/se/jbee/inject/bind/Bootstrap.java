@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.Set;
 
 import se.jbee.inject.Injector;
+import se.jbee.inject.Packages;
+import se.jbee.inject.Type;
 import se.jbee.inject.util.Inject;
 import se.jbee.inject.util.Suppliable;
 import se.jbee.inject.util.TypeReflector;
@@ -75,6 +77,10 @@ public final class Bootstrap {
 		return new FeatureEdition<T>( featured[0], EnumSet.of( featured[0], featured ) );
 	}
 
+	public static Edition edition( Packages included ) {
+		return new PackagesEdition( included );
+	}
+
 	private static class FeatureEdition<T extends Enum<T>>
 			implements Edition {
 
@@ -92,6 +98,23 @@ public final class Bootstrap {
 			T f = feature.featureOf( bundleOrModule );
 			return f == null || featured.contains( f );
 		}
+	}
+
+	private static class PackagesEdition
+			implements Edition {
+
+		private final Packages included;
+
+		PackagesEdition( Packages included ) {
+			super();
+			this.included = included;
+		}
+
+		@Override
+		public boolean featured( Class<?> bundleOrModule ) {
+			return included.contains( Type.raw( bundleOrModule ) );
+		}
+
 	}
 
 	private static class BuildinBootstrapper

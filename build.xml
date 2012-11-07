@@ -12,8 +12,9 @@ Copyright (c) 2012, Jan Bernitt
 
 	<property name="app.name" value="Silk DI" />
 	<property name="app.version" value="0.2" />
-	<property name="snapshot.version" value="${app.version}.2" />
-	<property name="release.version" value="${app.version}.3" />
+	<property name="beta.version" value="${app.version}.1" />
+	<property name="snapshot.version" value="${app.version}.1" />
+	<property name="release.version" value="${app.version}.2" />
 
 	<property name="target.dir" value="target" />
 	<property name="src.dir" value="src" />
@@ -103,7 +104,12 @@ Copyright (c) 2012, Jan Bernitt
 		<antcall target="-jar"><param name="archive-version" value="${snapshot.version}.${current.time}" /></antcall>
 	</target>
 
-	<target name="dist">
+	<target name="beta">
+		<delete dir="${dist.dir}" includes="*-${beta.version}*.jar,*-${beta.version}*.zip,,*-${beta.version}*.asc" />
+		<antcall target="-jar">	<param name="archive-version" value="${beta.version}" /></antcall>
+	</target>
+	
+	<target name="release">
 		<delete dir="${dist.dir}" includes="*-${release.version}*.jar,*-${release.version}*.zip,,*-${release.version}*.asc" />
 		<antcall target="-jar">	<param name="archive-version" value="${release.version}" /></antcall>
 	</target>
