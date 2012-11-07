@@ -11,7 +11,7 @@ Copyright (c) 2012, Jan Bernitt
 	<property name="source" value="1.6" />
 
 	<property name="app.name" value="Silk DI" />
-	<property name="app.version" value="0.2" />
+	<property name="app.version" value="0.3" />
 	<property name="beta.version" value="${app.version}.1" />
 	<property name="snapshot.version" value="${app.version}.1" />
 	<property name="release.version" value="${app.version}.2" />
@@ -236,7 +236,7 @@ Copyright (c) 2012, Jan Bernitt
 	<property name="maven-staging-repository-id" value="sonatype-nexus-staging" />
 	<property name="maven-staging-repository-url" value="https://oss.sonatype.org/service/local/staging/deploy/maven2/" />
 
-	<target name="publish" > 
+	<target name="publish" depends="pom" > 
 		
 		<artifact:mvn>
 			<arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
@@ -244,7 +244,7 @@ Copyright (c) 2012, Jan Bernitt
 			<arg value="-DrepositoryId=${maven-staging-repository-id}" />
 			<arg value="-DpomFile=pom.xml" />
 			<arg value="-Dfile=${dist.jar}" />
-                        <arg value="-Pgpg" />
+                  <arg value="-Pgpg" />
 		</artifact:mvn>
 
 		<artifact:mvn>
@@ -254,7 +254,7 @@ Copyright (c) 2012, Jan Bernitt
 			<arg value="-DpomFile=pom.xml" />
 			<arg value="-Dfile=${dist.sources.jar}" />
 			<arg value="-Dclassifier=sources" />
-                        <arg value="-Pgpg" />
+                  <arg value="-Pgpg" />
 		</artifact:mvn>
 
 		<artifact:mvn>
@@ -264,8 +264,40 @@ Copyright (c) 2012, Jan Bernitt
 			<arg value="-DpomFile=pom.xml" />
 			<arg value="-Dfile=${dist.javadoc.jar}" />
 			<arg value="-Dclassifier=javadoc" />
-                        <arg value="-Pgpg" />
+                  <arg value="-Pgpg" />
 		</artifact:mvn>		
 	</target>
 
+	<target name="pom">
+	<echoxml file="pom.xml">
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>se.jbee</groupId>
+  <artifactId>silk-di</artifactId>
+  <version>${app.version}</version>
+  <packaging>jar</packaging>
+  <name>Silk DI</name>
+  <description>Silk Java dependency injection framework</description>
+  <url>http://www.silkdi.com</url>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <url>https://github.com/jbee/silk</url>
+    <connection>https://github.com/jbee/silk.git</connection>
+  </scm>
+  <developers>
+    <developer>
+      <id>jan</id>
+      <name>Jan Bernitt</name>
+      <email>jan.bernitt@gmx.de</email>
+    </developer>
+  </developers>
+</project>	
+	</echoxml>
+	</target>
 </project>
