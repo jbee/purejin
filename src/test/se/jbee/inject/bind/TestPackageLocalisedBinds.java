@@ -3,7 +3,9 @@ package se.jbee.inject.bind;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Packages.subPackagesOf;
 
+import java.text.Format;
 import java.util.List;
 
 import org.junit.Test;
@@ -33,6 +35,8 @@ public class TestPackageLocalisedBinds {
 			inPackageOf( TestPackageLocalisedBinds.class ).bind( String.class ).to( "test" );
 			inSubPackagesOf( Object.class ).bind( String.class ).to( "java-lang.*" );
 			inPackageAndSubPackagesOf( List.class ).bind( String.class ).to( "java-util.*" );
+			in( subPackagesOf( String.class, Format.class ) ).bind( String.class ).to(
+					"java-lang.* & java-text.*" );
 		}
 
 	}
@@ -74,6 +78,12 @@ public class TestPackageLocalisedBinds {
 	public void thatDependencyWithTargetResolvedToRelevantSubPackageOfPackageAndSubPackagesBind() {
 		Dependency<String> stringInUtil = stringGlobal.injectingInto( java.util.concurrent.Callable.class );
 		assertThat( injector.resolve( stringInUtil ), is( "java-util.*" ) );
+	}
+
+	@Test
+	public void thatDependencyWithTargetResolvedToRelevantMultiSubPackagesBind() {
+		Dependency<String> stringInUtil = stringGlobal.injectingInto( java.text.spi.NumberFormatProvider.class );
+		assertThat( injector.resolve( stringInUtil ), is( "java-lang.* & java-text.*" ) );
 	}
 
 }

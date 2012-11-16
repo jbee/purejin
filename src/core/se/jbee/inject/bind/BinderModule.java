@@ -90,7 +90,7 @@ public abstract class BinderModule
 	}
 
 	@Override
-	public BasicBinder in( Packages packages ) {
+	public Binder in( Packages packages ) {
 		return binder.in( packages );
 	}
 
