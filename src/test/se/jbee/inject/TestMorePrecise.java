@@ -103,8 +103,8 @@ public class TestMorePrecise {
 	}
 
 	@Test
-	public void thatSpecificPackageIsNotMorePreciseThanSubPackagesUnderIt() {
-		assertEqualPrecise( Packages.packageOf( String.class ),
+	public void thatSpecificPackageIsMorePreciseThanSubPackagesUnderIt() {
+		assertMorePrecise( Packages.packageOf( String.class ),
 				Packages.subPackagesOf( String.class ) );
 	}
 
