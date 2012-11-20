@@ -47,7 +47,7 @@ public final class Target
 		this.packages = packages;
 	}
 
-	public Target havingParent( Instance<?> parent ) {
+	public Target within( Instance<?> parent ) {
 		return new Target( parents.push( parent ), instance, packages );
 	}
 

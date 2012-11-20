@@ -2,12 +2,10 @@ package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Dependency.dependency;
-import static se.jbee.inject.Instance.anyOf;
 
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
-import se.jbee.inject.Instance;
 import se.jbee.inject.util.Scoped;
 
 public class TestParentTargetBinds {
@@ -21,13 +19,11 @@ public class TestParentTargetBinds {
 			per( Scoped.TARGET_INSTANCE ).construct( Child.class );
 			injectingInto( Child.class ).bind( String.class ).to( "child" );
 			per( Scoped.TARGET_INSTANCE ).construct( Parent.class );
-			Instance<Parent> parent = anyOf( Parent.class );
-			injectingInto( Child.class ).havingParent( parent ).bind( String.class ).to(
-					"child-with-parent" );
+			injectingInto( Child.class ).within( Parent.class ) //
+			.bind( String.class ).to( "child-with-parent" );
 			construct( Grandparent.class );
-			Instance<Grandparent> grandparent = anyOf( Grandparent.class );
-			injectingInto( Child.class ).havingParent( parent ).havingParent( grandparent ).bind(
-					String.class ).to( "child-with-grandparent" );
+			injectingInto( Child.class ).within( Parent.class ).within( Grandparent.class ) //
+			.bind( String.class ).to( "child-with-grandparent" );
 		}
 	}
 

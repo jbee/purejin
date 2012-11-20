@@ -5,6 +5,7 @@
  */
 package se.jbee.inject.bind;
 
+import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Instance.defaultInstanceOf;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Type.raw;
@@ -350,9 +351,24 @@ public class Binder
 			super( bindings, strategy, source, scope, target );
 		}
 
-		public TargetedBinder havingParent( Instance<?> parent ) {
-			return new TargetedBinder( bindings, strategy, source, scope,
-					target.havingParent( parent ) );
+		public TargetedBinder within( Instance<?> parent ) {
+			return new TargetedBinder( bindings, strategy, source, scope, target.within( parent ) );
+		}
+
+		public TargetedBinder within( Name name, Class<?> parent ) {
+			return within( instance( name, raw( parent ) ) );
+		}
+
+		public TargetedBinder within( Name name, Type<?> parent ) {
+			return within( instance( name, parent ) );
+		}
+
+		public TargetedBinder within( Class<?> parent ) {
+			return within( raw( parent ) );
+		}
+
+		public TargetedBinder within( Type<?> parent ) {
+			return within( anyOf( parent ) );
 		}
 
 		@Override
