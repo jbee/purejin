@@ -18,7 +18,9 @@ public interface PreciserThan<T extends PreciserThan<T>> {
 
 	/**
 	 * @return Whether or not this object or more precise than the given one. Equal objects are not
-	 *         more precise!
+	 *         more precise! Also objects that have no common context or relationship are never more
+	 *         precise. An example would be that two {@link Type}s with no common super-type do not
+	 *         define one of them that is more precise.
 	 */
 	boolean morePreciseThan( T other );
 }

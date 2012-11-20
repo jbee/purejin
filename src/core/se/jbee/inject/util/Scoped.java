@@ -203,8 +203,13 @@ public class Scoped {
 		}
 
 		@Override
-		public <T> String deduceKey( Demand<T> injection ) {
-			return injection.getDependency().target( 1 ).toString();
+		public <T> String deduceKey( Demand<T> demand ) {
+			Dependency<? super T> dependency = demand.getDependency();
+			StringBuilder b = new StringBuilder();
+			for ( int i = dependency.injectionDepth() - 1; i >= 0; i-- ) {
+				b.append( dependency.target( i ) );
+			}
+			return b.toString();
 		}
 
 		@Override

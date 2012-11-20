@@ -32,8 +32,8 @@ public final class Precision {
 
 	public static <T extends PreciserThan<? super T>, T2 extends PreciserThan<? super T2>> boolean morePreciseThan2(
 			T one, T other, T2 sndOne, T2 sndOther ) {
-		return one.morePreciseThan( other ) || !other.morePreciseThan( one )
-				&& sndOne.morePreciseThan( sndOther );
+		return one.morePreciseThan( other ) // 
+				|| !other.morePreciseThan( one ) && sndOne.morePreciseThan( sndOther );
 	}
 
 	private static class PreciserThanComparator<T extends PreciserThan<? super T>>

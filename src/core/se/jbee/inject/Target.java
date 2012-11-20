@@ -5,6 +5,9 @@
  */
 package se.jbee.inject;
 
+import static se.jbee.inject.Packages.packageAndSubPackagesOf;
+import static se.jbee.inject.Packages.packageOf;
+import static se.jbee.inject.Packages.subPackagesOf;
 import static se.jbee.inject.Precision.morePreciseThan2;
 import static se.jbee.inject.Type.raw;
 
@@ -30,20 +33,30 @@ public final class Target
 	}
 
 	public static Target targeting( Instance<?> instance ) {
-		return new Target( instance, Packages.ALL );
+		return new Target( Instances.ANY, instance, Packages.ALL );
 	}
 
+	private final Instances parents;
 	private final Instance<?> instance;
 	private final Packages packages;
 
-	private Target( Instance<?> instance, Packages packages ) {
+	private Target( Instances parents, Instance<?> instance, Packages packages ) {
 		super();
+		this.parents = parents;
 		this.instance = instance;
 		this.packages = packages;
 	}
 
+	public Target havingParent( Instance<?> parent ) {
+		return new Target( parents.push( parent ), instance, packages );
+	}
+
 	public Target injectingInto( Instance<?> instance ) {
-		return new Target( instance, packages );
+		return new Target( parents, instance, packages );
+	}
+
+	public Target in( Packages packages ) {
+		return new Target( parents, instance, packages );
 	}
 
 	public Target injectingInto( Type<?> type ) {
@@ -59,17 +72,41 @@ public final class Target
 	}
 
 	public boolean isAdequateFor( Dependency<?> dependency ) {
+		if ( !areParentsAdequateFor( dependency ) ) {
+			return false;
+		}
 		if ( instance.isAny() ) {
 			return true;
 		}
 		final Instance<?> target = dependency.target();
-		if ( !instance.getName().isApplicableFor( target.getName() ) ) {
+		return instance.getName().isApplicableFor( target.getName() )
+				&& injectable( instance.getType(), target.getType() );
+	}
+
+	private boolean areParentsAdequateFor( Dependency<?> dependency ) {
+		if ( parents.isAny() ) {
+			return true;
+		}
+		int pl = parents.depth();
+		int il = dependency.injectionDepth() - 1;
+		if ( pl > il ) {
 			return false;
 		}
-		final Type<?> type = instance.getType();
-		return type.isInterface()
-			? target.getType().isAssignableTo( type )
-			: target.getType().equalTo( type );
+		int pi = 0;
+		while ( pl <= il && pl > 0 ) {
+			if ( injectable( parents.at( pi ).getType(), dependency.target( il ).getType() ) ) {
+				pl--;
+				pi++;
+			}
+			il--;
+		}
+		return pl == 0;
+	}
+
+	private static boolean injectable( Type<?> type, Type<?> targetType ) {
+		return type.isInterface() || type.isAbstract()
+			? targetType.isAssignableTo( type )
+			: targetType.equalTo( type );
 	}
 
 	public boolean isAccessibleFor( Dependency<?> dependency ) {
@@ -79,6 +116,7 @@ public final class Target
 	@Override
 	public String toString() {
 		String res = "[";
+		res += parents.toString() + " ";
 		res += instance.isAny()
 			? "anything"
 			: instance.toString();
@@ -90,32 +128,37 @@ public final class Target
 	}
 
 	public Target inPackageAndSubPackagesOf( Class<?> type ) {
-		return within( Packages.packageAndSubPackagesOf( type ) );
+		return in( packageAndSubPackagesOf( type ) );
 	}
 
 	public Target inPackageOf( Class<?> type ) {
-		return within( Packages.packageOf( type ) );
+		return in( packageOf( type ) );
 	}
 
 	public Target inSubPackagesOf( Class<?> type ) {
-		return within( Packages.subPackagesOf( type ) );
-	}
-
-	public boolean isSpecificInstance() {
-		return !instance.isAny();
+		return in( subPackagesOf( type ) );
 	}
 
 	@Override
 	public boolean morePreciseThan( Target other ) {
-		return morePreciseThan2( packages, other.packages, instance, other.instance );
-	}
-
-	public Target within( Packages packages ) {
-		return new Target( instance, packages );
+		final int ol = other.parents.depth();
+		final int l = parents.depth();
+		if ( ol != l ) {
+			return l > ol;
+		}
+		if ( l > 0 ) { // length is known to be equal
+			if ( parents.morePreciseThan( other.parents ) ) {
+				return true;
+			}
+			if ( other.parents.morePreciseThan( parents ) ) {
+				return false;
+			}
+		}
+		return morePreciseThan2( instance, other.instance, packages, other.packages );
 	}
 
 	public boolean equalTo( Target other ) {
 		return this == other || packages.equalTo( other.packages )
-				&& instance.equalTo( other.instance );
+				&& instance.equalTo( other.instance ) && parents.equalTo( other.parents );
 	}
 }

@@ -6,6 +6,7 @@
 package se.jbee.inject;
 
 import static se.jbee.inject.Precision.morePreciseThan2;
+import static se.jbee.inject.Type.raw;
 
 /**
  * Used to tell that we don#t want just one singleton at a time but multiple distinguished by the
@@ -26,6 +27,10 @@ public final class Instance<T>
 
 	public static <T> Instance<T> defaultInstanceOf( Type<T> type ) {
 		return instance( Name.DEFAULT, type );
+	}
+
+	public static <T> Instance<T> anyOf( Class<T> type ) {
+		return anyOf( raw( type ) );
 	}
 
 	public static <T> Instance<T> anyOf( Type<T> type ) {

@@ -179,7 +179,7 @@ public final class Packages
 		}
 		StringBuilder b = new StringBuilder();
 		for ( int i = 0; i < roots.length; i++ ) {
-			b.append( '/' ).append( toString( roots[i] ) );
+			b.append( '+' ).append( toString( roots[i] ) );
 		}
 		return b.substring( 1 );
 	}

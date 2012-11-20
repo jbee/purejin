@@ -10,6 +10,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
@@ -255,6 +256,10 @@ public final class Type<T>
 
 	public boolean isInterface() {
 		return rawType.isInterface();
+	}
+
+	public boolean isAbstract() {
+		return Modifier.isAbstract( rawType.getModifiers() );
 	}
 
 	/**

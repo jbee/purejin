@@ -315,7 +315,7 @@ public class Binder
 			implements ScopedBasicBinder {
 
 		ScopedBinder( Bindings bindings, ConstructionStrategy strategy, Source source, Scope scope ) {
-			super( bindings, strategy, source, scope );
+			super( bindings, strategy, source, scope, Target.ANY );
 		}
 
 		public TargetedBinder injectingInto( Class<?> target ) {
@@ -336,7 +336,7 @@ public class Binder
 
 		@Override
 		public TargetedBinder injectingInto( Instance<?> target ) {
-			return new TargetedBinder( bindings, strategy, source, scope, target );
+			return new TargetedBinder( bindings, strategy, source, scope, Target.targeting( target ) );
 		}
 
 	}
@@ -345,18 +345,19 @@ public class Binder
 			extends Binder
 			implements TargetedBasicBinder {
 
-		TargetedBinder( Bindings bindings, ConstructionStrategy strategy, Source source, Scope scope ) {
-			super( bindings, strategy, source, scope, Target.ANY );
+		TargetedBinder( Bindings bindings, ConstructionStrategy strategy, Source source,
+				Scope scope, Target target ) {
+			super( bindings, strategy, source, scope, target );
 		}
 
-		TargetedBinder( Bindings bindings, ConstructionStrategy strategy, Source source,
-				Scope scope, Instance<?> target ) {
-			super( bindings, strategy, source, scope, Target.targeting( target ) );
+		public TargetedBinder havingParent( Instance<?> parent ) {
+			return new TargetedBinder( bindings, strategy, source, scope,
+					target.havingParent( parent ) );
 		}
 
 		@Override
 		public Binder in( Packages packages ) {
-			return with( target.within( packages ) );
+			return with( target.in( packages ) );
 		}
 
 		public Binder inPackageOf( Class<?> type ) {

@@ -33,25 +33,24 @@ public final class Dependency<T>
 		return dependency( type, UNTARGETED );
 	}
 
-	private static <T> Dependency<T> dependency( Type<T> type, Injection[] injectionHierarchy ) {
-		return dependency( instance( Name.ANY, type ), injectionHierarchy );
+	private static <T> Dependency<T> dependency( Type<T> type, Injection[] hierarchy ) {
+		return dependency( instance( Name.ANY, type ), hierarchy );
 	}
 
 	public static <T> Dependency<T> dependency( Instance<T> instance ) {
 		return dependency( instance, UNTARGETED );
 	}
 
-	private static <T> Dependency<T> dependency( Instance<T> instance,
-			Injection[] injectionHierarchy ) {
-		return new Dependency<T>( instance, injectionHierarchy );
+	private static <T> Dependency<T> dependency( Instance<T> instance, Injection[] hierarchy ) {
+		return new Dependency<T>( instance, hierarchy );
 	}
 
-	private final Injection[] injectionHierarchy;
+	private final Injection[] hierarchy;
 	private final Instance<T> instance;
 
-	private Dependency( Instance<T> instance, Injection[] injectionHierarchy ) {
+	private Dependency( Instance<T> instance, Injection... hierarchy ) {
 		this.instance = instance;
-		this.injectionHierarchy = injectionHierarchy;
+		this.hierarchy = hierarchy;
 	}
 
 	public Instance<T> getInstance() {
@@ -70,26 +69,26 @@ public final class Dependency<T>
 
 	@Override
 	public String toString() {
-		return instance.toString() + ( injectionHierarchy.length == 0
+		return instance.toString() + ( hierarchy.length == 0
 			? ""
-			: " " + Arrays.toString( injectionHierarchy ) );
+			: " " + Arrays.toString( hierarchy ) );
 	}
 
 	public Dependency<?> onTypeParameter() {
-		return dependency( getType().getParameters()[0], injectionHierarchy );
+		return dependency( getType().getParameters()[0], hierarchy );
 	}
 
 	public <E> Dependency<E> instanced( Instance<E> instance ) {
-		return dependency( instance, injectionHierarchy );
+		return dependency( instance, hierarchy );
 	}
 
 	@Override
 	public <E> Dependency<E> typed( Type<E> type ) {
-		return dependency( instance( getName(), type ), injectionHierarchy );
+		return dependency( instance( getName(), type ), hierarchy );
 	}
 
 	public <E> Dependency<E> anyTyped( Type<E> type ) {
-		return dependency( instance( Name.ANY, type ), injectionHierarchy );
+		return dependency( instance( Name.ANY, type ), hierarchy );
 	}
 
 	public <E> Dependency<E> anyTyped( Class<E> type ) {
@@ -101,7 +100,7 @@ public final class Dependency<T>
 	}
 
 	public Dependency<T> named( Name name ) {
-		return dependency( instance( name, getType() ), injectionHierarchy );
+		return dependency( instance( name, getType() ), hierarchy );
 	}
 
 	public Dependency<T> untargeted() {
@@ -109,7 +108,7 @@ public final class Dependency<T>
 	}
 
 	public boolean isUntargeted() {
-		return injectionHierarchy.length == 0;
+		return hierarchy.length == 0;
 	}
 
 	public Instance<?> target() {
@@ -119,7 +118,11 @@ public final class Dependency<T>
 	public Instance<?> target( int level ) {
 		return isUntargeted()
 			? Instance.ANY
-			: injectionHierarchy[injectionHierarchy.length - 1 - level].getTarget().getInstance();
+			: hierarchy[hierarchy.length - 1 - level].getTarget().getInstance();
+	}
+
+	public int injectionDepth() {
+		return hierarchy.length;
 	}
 
 	/**
@@ -139,20 +142,20 @@ public final class Dependency<T>
 
 	public Dependency<T> injectingInto( Emergence<?> target ) {
 		Injection injection = new Injection( instance, target );
-		if ( injectionHierarchy.length == 0 ) {
-			return new Dependency<T>( instance, new Injection[] { injection } );
+		if ( hierarchy.length == 0 ) {
+			return new Dependency<T>( instance, injection );
 		}
 		ensureNotMoreFrequentExpiry( injection );
 		ensureNoCycle( injection );
-		Injection[] hierarchy = Arrays.copyOf( injectionHierarchy, injectionHierarchy.length + 1 );
-		hierarchy[injectionHierarchy.length] = injection;
-		return new Dependency<T>( instance, hierarchy );
+		Injection[] copy = Arrays.copyOf( hierarchy, hierarchy.length + 1 );
+		copy[hierarchy.length] = injection;
+		return new Dependency<T>( instance, copy );
 	}
 
 	private void ensureNoCycle( Injection injection )
 			throws DependencyCycleException {
-		for ( int i = 0; i < injectionHierarchy.length; i++ ) {
-			Injection parent = injectionHierarchy[i];
+		for ( int i = 0; i < hierarchy.length; i++ ) {
+			Injection parent = hierarchy[i];
 			if ( parent.equalTo( injection ) ) {
 				throw new DependencyCycleException( this, injection.getTarget().getInstance() );
 			}
@@ -161,8 +164,8 @@ public final class Dependency<T>
 
 	private void ensureNotMoreFrequentExpiry( Injection injection ) {
 		final Expiry expiry = injection.getTarget().getExpiry();
-		for ( int i = 0; i < injectionHierarchy.length; i++ ) {
-			Injection parent = injectionHierarchy[i];
+		for ( int i = 0; i < hierarchy.length; i++ ) {
+			Injection parent = hierarchy[i];
 			if ( expiry.moreFrequent( parent.getTarget().getExpiry() ) ) {
 				throw new MoreFrequentExpiryException( parent, injection );
 			}
@@ -176,6 +179,6 @@ public final class Dependency<T>
 
 	@Override
 	public Iterator<Injection> iterator() {
-		return Arrays.asList( injectionHierarchy ).iterator();
+		return Arrays.asList( hierarchy ).iterator();
 	}
 }
