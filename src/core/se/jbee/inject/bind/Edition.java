@@ -8,7 +8,7 @@ package se.jbee.inject.bind;
 /**
  * An {@link Edition} decides wich features are contained in a specific setup.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public interface Edition {
 

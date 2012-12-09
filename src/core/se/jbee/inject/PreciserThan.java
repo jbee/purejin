@@ -9,7 +9,7 @@ package se.jbee.inject;
  * When determining what {@link Resource} is used to inject a {@link Dependency} everything is
  * sorted by its {@link Precision}. The most precise matching will be used to inject.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  * 
  * @param <T>
  *            The type of objects that are compared

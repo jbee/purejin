@@ -1,3 +1,8 @@
+/*
+ *  Copyright (c) 2012, Jan Bernitt 
+ *			
+ *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
+ */
 package se.jbee.inject;
 
 import java.util.Arrays;
@@ -5,7 +10,7 @@ import java.util.Arrays;
 /**
  * A hierarchy of {@link Instance}s.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Instances
 		implements PreciserThan<Instances> {

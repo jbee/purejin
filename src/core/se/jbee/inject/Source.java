@@ -8,7 +8,7 @@ package se.jbee.inject;
 /**
  * Where does a bind came from and what type of declaration has it been.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Source
 		implements PreciserThan<Source> {

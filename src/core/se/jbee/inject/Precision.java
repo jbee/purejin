@@ -10,7 +10,7 @@ import java.util.Comparator;
 /**
  * A util to find out if one object is {@link PreciserThan} an other one.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Precision {
 

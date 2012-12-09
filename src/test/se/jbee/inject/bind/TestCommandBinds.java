@@ -22,7 +22,7 @@ import se.jbee.inject.service.ServiceProvider;
  * version {@link Command} of such generic service having a fix return type. Thereby it is very well
  * possible to use different higher level services in the same time.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestCommandBinds {
 

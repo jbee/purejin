@@ -21,7 +21,7 @@ import se.jbee.inject.util.Scoped;
 /**
  * The default utility {@link Module} almost always used.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public abstract class BinderModule
 		extends BootstrappingModule

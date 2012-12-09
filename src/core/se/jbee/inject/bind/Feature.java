@@ -9,7 +9,7 @@ package se.jbee.inject.bind;
  * {@link Feature}s can be used to model more fine grained {@link Edition} by using
  * <code>enum</code>s as the options to chose from.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  * 
  * @param <T>
  *            The enum used as different features/options to chose from.

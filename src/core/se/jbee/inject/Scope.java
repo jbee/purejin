@@ -11,7 +11,7 @@ package se.jbee.inject;
  * Thereby the {@linkplain Scope} itself acts as a factory for {@link Repository}s. Each
  * {@link Injector} has a single {@linkplain Repository} for each {@linkplain Scope}.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public interface Scope {
 

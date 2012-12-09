@@ -8,7 +8,7 @@ package se.jbee.inject;
 /**
  * A kind of singleton for a {@link Resource} inside a {@link Injector}.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public interface Injectron<T>
 		extends Resourcing<T> {

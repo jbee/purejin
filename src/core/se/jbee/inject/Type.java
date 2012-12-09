@@ -27,7 +27,7 @@ import java.util.Set;
  * 
  * There are some generic cases that are not supported right now because they haven't been needed.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Type<T>
 		implements PreciserThan<Type<?>>, Parameter<T> {

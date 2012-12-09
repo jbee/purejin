@@ -13,7 +13,7 @@ import java.util.IdentityHashMap;
  * 
  * {@linkplain Constants} are immutable! Use {@link #def(Enum)} to build up sets.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Constants {
 

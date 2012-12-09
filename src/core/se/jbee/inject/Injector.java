@@ -19,7 +19,7 @@ import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
  * {@link #resolve(Dependency)} always have the same result for the same {@linkplain Dependency}.
  * The only exception to this are scoping effects (expiring and parallel instances).
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public interface Injector {
 

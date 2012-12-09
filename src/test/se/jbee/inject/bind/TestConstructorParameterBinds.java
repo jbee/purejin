@@ -35,7 +35,7 @@ import se.jbee.inject.util.Suppliable;
  * 
  * @see TestDependencyParameterBinds
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  * 
  */
 public class TestConstructorParameterBinds {

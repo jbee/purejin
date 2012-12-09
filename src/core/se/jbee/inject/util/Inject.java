@@ -32,7 +32,7 @@ import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
 /**
  * Utility to create/use the core containers {@link Injector} and {@link Injectron}.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Inject {
 
@@ -75,7 +75,7 @@ public final class Inject {
 	 * The default {@link Injector} that gets the initial {@link Injectron}s from a
 	 * {@link InjectronSource}.
 	 * 
-	 * @author Jan Bernitt (jan.bernitt@gmx.de)
+	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	public static final class SourcedInjector
 			implements Injector {

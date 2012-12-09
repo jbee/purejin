@@ -9,7 +9,7 @@ package se.jbee.inject;
  * A {@link Name} is used as discriminator in cases where multiple {@link Instance}s are bound for
  * the same {@link Type}.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Name
 		implements PreciserThan<Name> {

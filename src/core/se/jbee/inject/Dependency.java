@@ -18,7 +18,7 @@ import se.jbee.inject.DIRuntimeException.MoreFrequentExpiryException;
 /**
  * Describes what is wanted/needed as parameter to construct a instance of T.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Dependency<T>
 		implements Typed<T>, Named, Parameter<T>, Iterable<Injection> {

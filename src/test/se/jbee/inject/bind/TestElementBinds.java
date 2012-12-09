@@ -20,7 +20,7 @@ import se.jbee.inject.bind.Binder.TypedElementBinder;
  * defining the elements of them explicitly using the
  * {@link TypedElementBinder#toElements(Class, Class)} methods.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestElementBinds {
 

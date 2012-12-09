@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
  * {@link ServiceMethod}s. This abstraction allows to customize what methods are bound as
  * {@link ServiceMethod}s.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public interface ServiceStrategy {
 

@@ -10,7 +10,7 @@ import se.jbee.inject.bind.Bootstrapper.ModularBootstrapper;
 /**
  * A {@link Bundle} that does different installation for different options.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  * 
  */
 public interface ModularBundle<M> {

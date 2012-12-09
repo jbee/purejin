@@ -8,7 +8,7 @@ package se.jbee.inject;
 /**
  * A {@link Supplier} is a source or factory for specific instances.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  * 
  * @param <T>
  *            The type of the instance being resolved

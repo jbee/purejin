@@ -20,7 +20,7 @@ import se.jbee.inject.util.Value;
  * with faulty {@linkplain ServiceInvocation}s in place. That includes catching all exceptions
  * thrown in {@link #before(Value, Type)} or {@link #after(Value, Value, Object)}.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  * 
  * @param <T>
  *            Type of the state transfered between {@link #before(Value, Type)} and

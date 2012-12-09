@@ -22,7 +22,7 @@ import se.jbee.inject.bind.Bootstrapper.ModularBootstrapper;
  * The example also shows how {@link Annotation}s like {@link Featured} can be used to mark
  * {@link Bundle}s or {@link Module}s as a specific {@link Feature}.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestEditionFeatureBinds {
 

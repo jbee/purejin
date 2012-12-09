@@ -8,7 +8,7 @@ package se.jbee.inject;
 /**
  * A description of an {@link Instance} together with its duration of life ({@link Expiry}).
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  * 
  * @param <T>
  *            The type of the instance

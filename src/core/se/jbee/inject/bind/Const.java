@@ -8,7 +8,7 @@ package se.jbee.inject.bind;
 /**
  * @see Constants
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public interface Const {
 	// marker

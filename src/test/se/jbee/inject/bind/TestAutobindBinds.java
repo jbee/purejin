@@ -28,7 +28,7 @@ import se.jbee.inject.Supplier;
  * setup. But in some cases an instance should serve as many different interfaces all implemented by
  * it (e.g. a class implementing a couple of single service interfaces).
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestAutobindBinds {
 

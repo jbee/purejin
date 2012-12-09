@@ -36,7 +36,7 @@ import se.jbee.inject.util.SuppliedBy;
  * The default implementation of the {@link BasicBinder} that provides a lot of utility methods to
  * improve readability and keep binding compact.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public class Binder
 		implements BasicBinder {
@@ -222,7 +222,7 @@ public class Binder
 	 * all known instances of the element type will no longer be used whenever the bind made
 	 * applies.
 	 * 
-	 * @author Jan Bernitt (jan.bernitt@gmx.de)
+	 * @author Jan Bernitt (jan@jbee.se)
 	 * 
 	 */
 	public static class TypedElementBinder<E>

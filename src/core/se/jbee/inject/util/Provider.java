@@ -18,7 +18,7 @@ import se.jbee.inject.Supplier;
  * But it is also very easy to use another similar provider interface by installing such a bridge
  * {@link Supplier}.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public interface Provider<T> {
 

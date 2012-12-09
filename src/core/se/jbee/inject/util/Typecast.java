@@ -20,7 +20,7 @@ import se.jbee.inject.Type;
  * <b>Implementation Note:</b> storing the the raw type in a var before returning the generic type
  * is a workaround to make this compile with javac (cast works with javaw).
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Typecast {
 

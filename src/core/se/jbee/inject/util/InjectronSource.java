@@ -13,7 +13,7 @@ import se.jbee.inject.Injectron;
  * 
  * This is a abstraction on a concrete setup.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  * 
  */
 public interface InjectronSource {

@@ -17,7 +17,7 @@ import se.jbee.inject.Scope;
 /**
  * Utility as a factory to create/use {@link Scope}s.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public class Scoped {
 
@@ -65,7 +65,7 @@ public class Scoped {
 	 * 
 	 * @see Scoped#INJECTION
 	 * 
-	 * @author Jan Bernitt (jan.bernitt@gmx.de)
+	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	private static final class InjectionScope
 			implements Scope, Repository {
@@ -133,7 +133,7 @@ public class Scoped {
 	 * Both repositories will remember the resolved instance whereby the repository considered as
 	 * the synchronous-repository will deliver a consistent image of the world as long as it exists.
 	 * 
-	 * @author Jan Bernitt (jan.bernitt@gmx.de)
+	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	private static final class SnapshotRepository
 			implements Repository {
@@ -274,7 +274,7 @@ public class Scoped {
 	/**
 	 * Will lead to instances that can be seen as application-wide-singletons.
 	 * 
-	 * @author Jan Bernitt (jan.bernitt@gmx.de)
+	 * @author Jan Bernitt (jan@jbee.se)
 	 * 
 	 */
 	private static final class ApplicationScope
@@ -299,7 +299,7 @@ public class Scoped {
 	 * Contains once instance per resource. Resources are never updated. This can be used to create
 	 * a thread or request {@link Scope}.
 	 * 
-	 * @author Jan Bernitt (jan.bernitt@gmx.de)
+	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	private static final class ResourceRepository
 			implements Repository {

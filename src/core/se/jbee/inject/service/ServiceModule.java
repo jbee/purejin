@@ -47,7 +47,7 @@ import se.jbee.inject.util.Value;
  * 
  * It provides service-related build methods.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public abstract class ServiceModule
 		implements Module, Bundle {

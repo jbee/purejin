@@ -18,7 +18,7 @@ import se.jbee.inject.DIRuntimeException.DependencyCycleException;
  * doesn't have to know or consider other bundles since it is valid to make cyclic references or
  * install the {@link Bundle}s multiple times.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestBootstrapper {
 

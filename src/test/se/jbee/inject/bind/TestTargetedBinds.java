@@ -22,7 +22,7 @@ import se.jbee.inject.bind.Binder.TargetedBinder;
  * A test that demonstrates how to inject a specific instance into another type using the
  * {@link ScopedBasicBinder#injectingInto(se.jbee.inject.Instance)} method.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestTargetedBinds {
 

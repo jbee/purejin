@@ -10,7 +10,7 @@ import se.jbee.inject.bind.Extension;
 /**
  * The low level representation of a service.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  * 
  * @param <R>
  *            The return type of the method wired to this service

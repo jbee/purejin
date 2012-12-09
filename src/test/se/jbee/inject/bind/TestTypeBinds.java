@@ -12,7 +12,7 @@ import se.jbee.inject.Injector;
 /**
  * The test demonstrates binds that are 'linked' by type.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestTypeBinds {
 

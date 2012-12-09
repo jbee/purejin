@@ -15,7 +15,7 @@ import se.jbee.inject.Type;
  * A {@link ConstructionStrategy} picks the {@link Constructor} to use to construct objects of a
  * given {@link Class}.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public interface ConstructionStrategy {
 

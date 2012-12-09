@@ -8,7 +8,7 @@ package se.jbee.inject.bind;
 /**
  * Determines / extracts the {@link Module} result from a root {@link Bundle}.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public interface Modulariser {
 

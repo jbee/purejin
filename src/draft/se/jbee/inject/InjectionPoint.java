@@ -10,7 +10,7 @@ import se.jbee.inject.Instance;
 /**
  * This about the HOW to inject (field, constructor/setter)
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  * 
  */
 public interface InjectionPoint<T> {

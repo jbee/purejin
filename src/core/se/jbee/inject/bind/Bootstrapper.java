@@ -19,7 +19,7 @@ package se.jbee.inject.bind;
  * 2. the installation can be the first step of the verification (in a unit-test). The binding can
  * be omitted so that overall test of a configuration can be very fast.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  * 
  */
 public interface Bootstrapper {
@@ -77,7 +77,7 @@ public interface Bootstrapper {
 
 	/**
 	 * 
-	 * @author Jan Bernitt (jan.bernitt@gmx.de)
+	 * @author Jan Bernitt (jan@jbee.se)
 	 * 
 	 * @param <M>
 	 *            The type of choices possible

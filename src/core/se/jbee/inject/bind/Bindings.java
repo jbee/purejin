@@ -14,7 +14,7 @@ import se.jbee.inject.Supplier;
  * The binding-builders are just utilities to construct calls to
  * {@link #add(Resource, Supplier, Scope, Source)}
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public interface Bindings {
 

@@ -29,7 +29,7 @@ import se.jbee.inject.Type;
 /**
  * Utility as a factory to create different kinds of {@link Supplier}s.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public final class SuppliedBy {
 
@@ -130,7 +130,7 @@ public final class SuppliedBy {
 	 * Basically we just resolve the array of the element type (generic of the list). Arrays itself
 	 * have build in support that will (if not redefined by a more precise binding) return all known
 	 * 
-	 * @author Jan Bernitt (jan.bernitt@gmx.de)
+	 * @author Jan Bernitt (jan@jbee.se)
 	 * 
 	 */
 	private static final class ArrayToListBridgeSupplier
@@ -187,7 +187,7 @@ public final class SuppliedBy {
 	 * A {@link Supplier} uses multiple different separate suppliers to provide the elements of a
 	 * array of the supplied type.
 	 * 
-	 * @author Jan Bernitt (jan.bernitt@gmx.de)
+	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	private static final class ElementsSupplier<E>
 			implements Supplier<E[]> {
@@ -344,7 +344,7 @@ public final class SuppliedBy {
 	 * Adapter to a simpler API that will not need any {@link Injector} to supply it's value in any
 	 * case.
 	 * 
-	 * @author Jan Bernitt (jan.bernitt@gmx.de)
+	 * @author Jan Bernitt (jan@jbee.se)
 	 * 
 	 */
 	private static final class FactorySupplier<T>

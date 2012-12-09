@@ -17,7 +17,7 @@ import static se.jbee.inject.Type.raw;
  * This can be restricted by the {@link Packages} the injected that is injected is defined in or the
  * {@link Type} of the receiving instance.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Target
 		implements PreciserThan<Target> {

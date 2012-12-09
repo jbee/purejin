@@ -10,7 +10,7 @@ import java.util.Arrays;
 /**
  * A set of {@link Package}s described by a pattern.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Packages
 		implements PreciserThan<Packages> {

@@ -23,7 +23,7 @@ import se.jbee.inject.Parameter;
  * 
  * @see TestConstructorParameterBinds
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestDependencyParameterBinds {
 

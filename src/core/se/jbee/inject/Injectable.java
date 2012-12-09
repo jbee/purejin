@@ -8,7 +8,7 @@ package se.jbee.inject;
 /**
  * Knows how to resolve a specific instance for the given {@link Demand}.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public interface Injectable<T> {
 

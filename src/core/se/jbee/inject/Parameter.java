@@ -31,7 +31,7 @@ import se.jbee.inject.bind.ConstructionStrategy;
  * <dd>Use the given {@linkplain Object} (for the first parameter it is assignable to)</dd>
  * </dl>
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public interface Parameter<T> {
 

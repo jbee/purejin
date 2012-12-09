@@ -8,7 +8,7 @@ package se.jbee.inject;
 /**
  * <i>Has a {@link Resource}</i>
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public interface Resourcing<T> {
 

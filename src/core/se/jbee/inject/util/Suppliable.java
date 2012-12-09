@@ -28,7 +28,7 @@ import se.jbee.inject.Supplier;
  * 
  * It describes WHAT is supplied, HOW to supply it and how stable it is and WHERE it came from.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Suppliable<T>
 		implements Resourcing<T> {
@@ -66,7 +66,7 @@ public final class Suppliable<T>
 	/**
 	 * A {@link InjectronSource} that creates {@link Injectron}s from {@link Suppliable}s.
 	 * 
-	 * @author Jan Bernitt (jan.bernitt@gmx.de)
+	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	private static class SuppliableSource
 			implements InjectronSource {

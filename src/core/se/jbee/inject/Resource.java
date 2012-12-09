@@ -13,7 +13,7 @@ import static se.jbee.inject.Type.raw;
  * 
  * It is an {@link Instance} with added information where the bind applies.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Resource<T>
 		implements Typed<T>, Named, PreciserThan<Resource<?>> {

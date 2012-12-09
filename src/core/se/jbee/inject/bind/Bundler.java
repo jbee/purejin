@@ -8,7 +8,7 @@ package se.jbee.inject.bind;
 /**
  * Determines all reachable {@link Bundle}s starting from a root {@link Bundle}.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public interface Bundler {
 

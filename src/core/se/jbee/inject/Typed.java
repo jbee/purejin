@@ -8,7 +8,7 @@ package se.jbee.inject;
 /**
  * <i>Has a {@link Type}, is typed</i>.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  * 
  * @param <T>
  *            The actual type ({@link Class})

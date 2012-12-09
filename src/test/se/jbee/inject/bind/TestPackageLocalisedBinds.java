@@ -22,7 +22,7 @@ import se.jbee.inject.bind.Binder.TargetedBinder;
  * {@link TargetedBinder#inSubPackagesOf(Class)},
  * {@link TargetedBinder#inPackageAndSubPackagesOf(Class)}.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestPackageLocalisedBinds {
 

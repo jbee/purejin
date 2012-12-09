@@ -20,7 +20,7 @@ import se.jbee.inject.Injector;
  * In this example we use {@link Binder#multibind(Class)}s to show that just one of them has been
  * bootstrapped depending on the value we defined in the {@link Constants} before bootstrapping.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestConstantModularBinds {
 

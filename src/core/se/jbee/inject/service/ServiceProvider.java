@@ -10,7 +10,7 @@ import se.jbee.inject.Type;
 /**
  * A {@link ServiceProvider} resolves {@link ServiceMethod}s by {@link Type}.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public interface ServiceProvider {
 

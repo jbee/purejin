@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
  * 
  * @see Bundle
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public interface Module {
 

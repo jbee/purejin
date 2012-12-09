@@ -8,7 +8,7 @@ package se.jbee.inject;
 /**
  * Describes on "stack-frame" within the injection process.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Injection {
 

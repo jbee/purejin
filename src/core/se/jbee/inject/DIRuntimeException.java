@@ -11,7 +11,7 @@ import java.util.Arrays;
  * Base {@link RuntimeException} for all exceptions cennected to the dependency injection process
  * itself.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public class DIRuntimeException
 		extends RuntimeException {
@@ -28,7 +28,7 @@ public class DIRuntimeException
 	/**
 	 * A dependency cycle so that injection is not possible. Remove the cycle to resolve.
 	 * 
-	 * @author Jan Bernitt (jan.bernitt@gmx.de)
+	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	public static final class DependencyCycleException
 			extends DIRuntimeException {
@@ -52,7 +52,7 @@ public class DIRuntimeException
 	 * the injected one. This is considered to be unintentional. Use a indirection like a provider
 	 * or services to resolve the problem.
 	 * 
-	 * @author Jan Bernitt (jan.bernitt@gmx.de)
+	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	public static final class MoreFrequentExpiryException
 			extends DIRuntimeException {
@@ -67,7 +67,7 @@ public class DIRuntimeException
 	 * An {@link Injector} couldn't find a {@link Resource} that matches a {@link Dependency} to
 	 * resolve.
 	 * 
-	 * @author Jan Bernitt (jan.bernitt@gmx.de)
+	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	public static final class NoSuchResourceException
 			extends DIRuntimeException {
@@ -84,7 +84,7 @@ public class DIRuntimeException
 	 * as factory or service) but such a method cannot be found. That usual means the defining class
 	 * hasn't been bound correctly or the signature has changed.
 	 * 
-	 * @author Jan Bernitt (jan.bernitt@gmx.de)
+	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	public static final class NoSuchMethodException
 			extends DIRuntimeException {

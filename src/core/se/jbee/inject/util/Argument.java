@@ -15,7 +15,7 @@ import se.jbee.inject.Type;
 /**
  * A utility to supply {@link Parameter}s during the binding.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  * 
  * @param <T>
  *            Type of value/argument

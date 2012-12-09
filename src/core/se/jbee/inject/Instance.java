@@ -12,7 +12,7 @@ import static se.jbee.inject.Type.raw;
  * Used to tell that we don#t want just one singleton at a time but multiple distinguished by the
  * {@link Name} used.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  * 
  */
 public final class Instance<T>

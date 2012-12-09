@@ -11,7 +11,7 @@ package se.jbee.inject.bind;
  * All {@link Bundle}s are real singletons. A bundle means you get X without a when or but. X all
  * the time.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public interface Bundle {
 

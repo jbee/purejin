@@ -28,7 +28,7 @@ import se.jbee.inject.util.TypeReflector;
  * It allos to use {@link Edition}s and {@link Feature}s to modularize or customize context
  * configurations.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Bootstrap {
 

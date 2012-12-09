@@ -15,7 +15,7 @@ import se.jbee.inject.Supplier;
  * @see Supplier
  * @see Provider
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  * 
  * @param <T>
  *            The type of value produced

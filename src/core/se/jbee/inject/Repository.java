@@ -8,7 +8,7 @@ package se.jbee.inject;
 /**
  * Manages the already created instances.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  * 
  */
 public interface Repository {

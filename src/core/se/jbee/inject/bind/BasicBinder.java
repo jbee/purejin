@@ -18,7 +18,7 @@ import se.jbee.inject.Type;
  * 
  * @see Binder
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public interface BasicBinder {
 
@@ -31,7 +31,7 @@ public interface BasicBinder {
 	 * The {@link Type} of the {@link Resource} defined is already given using
 	 * {@link BasicBinder#bind(Instance)}
 	 * 
-	 * @author Jan Bernitt (jan.bernitt@gmx.de)
+	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	interface TypedBasicBinder<T> {
 
@@ -46,7 +46,7 @@ public interface BasicBinder {
 	/**
 	 * The ROOT- {@link RootBasicBinder}.
 	 * 
-	 * @author Jan Bernitt (jan.bernitt@gmx.de)
+	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	public interface RootBasicBinder
 			extends ScopedBasicBinder {
@@ -61,7 +61,7 @@ public interface BasicBinder {
 	/**
 	 * A {@link Scope} had been defined.
 	 * 
-	 * @author Jan Bernitt (jan.bernitt@gmx.de)
+	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	interface ScopedBasicBinder
 			extends TargetedBasicBinder {
@@ -76,7 +76,7 @@ public interface BasicBinder {
 	 * Bindings have been restricted and are just effective within a special scope defined before
 	 * using {@link ScopedBasicBinder#injectingInto(Instance)}-clauses.
 	 * 
-	 * @author Jan Bernitt (jan.bernitt@gmx.de)
+	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	interface TargetedBasicBinder
 			extends BasicBinder {

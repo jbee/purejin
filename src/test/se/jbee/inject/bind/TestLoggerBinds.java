@@ -20,7 +20,7 @@ import se.jbee.inject.util.SuppliedBy;
  * You can use {@link Factory}s for simpler cases or {@link Supplier}s when more context information
  * are needed to provide the instance.
  * 
- * @author Jan Bernitt (jan.bernitt@gmx.de)
+ * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestLoggerBinds {
 
