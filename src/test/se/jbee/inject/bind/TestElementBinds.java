@@ -29,9 +29,9 @@ public class TestElementBinds {
 
 		@Override
 		protected void declare() {
-			bind( String[].class ).toElements( "foo", "bar" );
-			bind( Number[].class ).toElements( 2, 3f );
-			bind( List[].class ).toElements( ArrayList.class, LinkedList.class );
+			arraybind( String[].class ).toElements( "foo", "bar" );
+			arraybind( Number[].class ).toElements( 2, 3f );
+			arraybind( List[].class ).toElements( ArrayList.class, LinkedList.class );
 		}
 	}
 

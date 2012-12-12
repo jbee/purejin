@@ -127,7 +127,7 @@ public class Binder
 		bind( instance ).toConstructor();
 	}
 
-	public <E> TypedElementBinder<E> bind( Class<E[]> type ) {
+	public <E> TypedElementBinder<E> arraybind( Class<E[]> type ) {
 		return new TypedElementBinder<E>( this, defaultInstanceOf( raw( type ) ) );
 	}
 

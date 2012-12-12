@@ -1,13 +1,11 @@
 package se.jbee.inject.bind;
 
-import static junit.framework.Assert.assertEquals;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
+import static se.jbee.inject.bind.AssertInjects.assertEqualSets;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.HashSet;
 
 import org.junit.Test;
 
@@ -51,26 +49,20 @@ public class TestExtensionBinds {
 	public void thatJustUntargetedExtensionsAreResolvedGlobally() {
 		Class<?>[] classes = injector.resolve( dependency );
 		assertThat( classes.length, is( 1 ) );
-		assertSame( classes[0], TestExtensionService.class );
+		assertSame( TestExtensionService.class, classes[0] );
 	}
 
 	@Test
 	public void thatPackageLocalExtensionsAreResolvedWithAppropiateInjection() {
 		Class<?>[] classes = injector.resolve( dependency.injectingInto( Module.class ) );
-		assertSameElements( classes, new Class<?>[] { TestExtensionService.class,
-				TestExtensionPackageLocalService.class } );
+		assertEqualSets( new Class<?>[] { TestExtensionService.class,
+				TestExtensionPackageLocalService.class }, classes );
 	}
 
 	@Test
 	public void thatInstanceOfExtensionsAreResolvedWithAppropiateInjection() {
 		Class<?>[] classes = injector.resolve( dependency.injectingInto( String.class ) );
-		assertSameElements( classes, new Class<?>[] { TestExtensionService.class,
-				TestExtensionInstanceOfService.class } );
-	}
-
-	private <T> void assertSameElements( T[] expected, T[] actual ) {
-		assertEquals( expected.length, actual.length );
-		assertEquals( new HashSet<T>( Arrays.asList( expected ) ), new HashSet<T>(
-				Arrays.asList( actual ) ) );
+		assertEqualSets( new Class<?>[] { TestExtensionService.class,
+				TestExtensionInstanceOfService.class }, classes );
 	}
 }

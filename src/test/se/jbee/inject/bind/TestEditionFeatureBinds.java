@@ -1,8 +1,7 @@
 package se.jbee.inject.bind;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.bind.AssertInjects.assertEqualSets;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
@@ -134,9 +133,9 @@ public class TestEditionFeatureBinds {
 				128 );
 	}
 
-	private void assertEditionInstalls( Edition edition, Integer... values ) {
+	private void assertEditionInstalls( Edition edition, Integer... expected ) {
 		Injector injector = Bootstrap.injector( RootBundle.class, edition );
-		assertThat( injector.resolve( dependency( Integer[].class ) ), is( values ) );
+		assertEqualSets( expected, injector.resolve( dependency( Integer[].class ) ) );
 	}
 
 }

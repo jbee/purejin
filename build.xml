@@ -86,12 +86,12 @@ Copyright (c) 2012, Jan Bernitt
 	</target>
 
 	<target name="compile" depends="init">
-		<javac debug="true" debuglevel="${debuglevel}" destdir="${core.target.dir}" source="${source}" target="${target}" includeantruntime="false">
+		<javac debug="true"  destdir="${core.target.dir}" source="${source}" target="${target}" includeantruntime="false">
 			<src path="${core.src.dir}" />
 			<classpath refid="classpath.core" />
 			<compilerarg value="-Xlint:unchecked" />
 		</javac>
-		<javac debug="true" debuglevel="${debuglevel}" destdir="${draft.target.dir}" source="${source}" target="${target}" includeantruntime="false">
+		<javac debug="true"  destdir="${draft.target.dir}" source="${source}" target="${target}" includeantruntime="false">
 			<src path="${draft.src.dir}" />
 			<classpath refid="classpath.core" />
 			<compilerarg value="-Xlint:unchecked" />
@@ -181,7 +181,7 @@ Copyright (c) 2012, Jan Bernitt
 	</target>
 	
 	<target name="test-compile" depends="compile, test-init">
-		<javac debug="true" debuglevel="${debuglevel}" destdir="${test.target.dir}" source="${source}" target="${target}" includeantruntime="false">
+		<javac debug="true" destdir="${test.target.dir}" source="${source}" target="${target}" includeantruntime="false">
 			<src path="${test.src.dir}" />
 			<classpath refid="classpath.test" />
 			<compilerarg value="-Xlint:unchecked" />

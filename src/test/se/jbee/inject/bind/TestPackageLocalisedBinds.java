@@ -5,6 +5,7 @@ import static org.junit.Assert.assertThat;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Packages.subPackagesOf;
 
+import java.awt.Canvas;
 import java.text.Format;
 import java.util.List;
 
@@ -35,8 +36,8 @@ public class TestPackageLocalisedBinds {
 			inPackageOf( TestPackageLocalisedBinds.class ).bind( String.class ).to( "test" );
 			inSubPackagesOf( Object.class ).bind( String.class ).to( "java-lang.*" );
 			inPackageAndSubPackagesOf( List.class ).bind( String.class ).to( "java-util.*" );
-			in( subPackagesOf( String.class, Format.class ) ).bind( String.class ).to(
-					"java-lang.* & java-text.*" );
+			in( subPackagesOf( Canvas.class, Format.class ) ).bind( String.class ).to(
+					"java-awt.* & java-text.*" );
 		}
 
 	}
@@ -58,7 +59,7 @@ public class TestPackageLocalisedBinds {
 
 	@Test
 	public void thatDependencyWithTargetSomewhereElseResolvedToGlobalBind() {
-		Dependency<String> stringSomewhereElse = stringGlobal.injectingInto( java.awt.font.TextAttribute.class );
+		Dependency<String> stringSomewhereElse = stringGlobal.injectingInto( java.io.Closeable.class );
 		assertThat( injector.resolve( stringSomewhereElse ), is( "default" ) );
 	}
 
@@ -83,7 +84,7 @@ public class TestPackageLocalisedBinds {
 	@Test
 	public void thatDependencyWithTargetResolvedToRelevantMultiSubPackagesBind() {
 		Dependency<String> stringInUtil = stringGlobal.injectingInto( java.text.spi.NumberFormatProvider.class );
-		assertThat( injector.resolve( stringInUtil ), is( "java-lang.* & java-text.*" ) );
+		assertThat( injector.resolve( stringInUtil ), is( "java-awt.* & java-text.*" ) );
 	}
 
 }

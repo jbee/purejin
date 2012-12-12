@@ -98,8 +98,8 @@ public abstract class BinderModule
 		return binder.bind( type );
 	}
 
-	public <E> TypedElementBinder<E> bind( Class<E[]> type ) {
-		return binder.bind( type );
+	public <E> TypedElementBinder<E> arraybind( Class<E[]> type ) {
+		return binder.arraybind( type );
 	}
 
 	@Override
