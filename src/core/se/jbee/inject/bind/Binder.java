@@ -500,9 +500,31 @@ public class Binder
 			to( SuppliedBy.method( resource.getType(), factory, parameters ) );
 		}
 
+		public void toModuleMethod( Parameter<?>... parameters ) {
+			toMethod( binder.source.getIdent(), parameters );
+		}
+
+		@SuppressWarnings ( "unchecked" )
 		public void toMethod( Class<?> implementor, Parameter<?>... parameters ) {
-			to( binder.strategy.factoryFor( resource.getType(), resource.getName(), implementor ),
-					parameters );
+			Method factory = binder.strategy.factoryFor( resource.getType(), resource.getName(),
+					implementor );
+			if ( factory == null ) {
+				Type<Provider> providerType = Type.raw( Provider.class ).parametized(
+						resource.getType() );
+				factory = binder.strategy.factoryFor( providerType, resource.getName(), implementor );
+				if ( factory == null ) {
+					throw new IllegalArgumentException( new NoSuchMethodException( "Class "
+							+ implementor.getCanonicalName()
+							+ " neither defines a method returning " + resource.getType()
+							+ " not a method returning " + providerType ) );
+				}
+				binder.bind( providerType ).to(
+						SuppliedBy.method( providerType, factory, parameters ) );
+				binder.implicit().bind( resource,
+						SuppliedBy.unbox( (Type<? extends Provider<? extends T>>) providerType ) );
+			} else {
+				to( factory, parameters );
+			}
 			implicitBindToConstructor( Instance.anyOf( raw( implementor ) ) );
 		}
 

@@ -13,20 +13,20 @@ package se.jbee.inject;
 public final class Source
 		implements PreciserThan<Source> {
 
-	public static Source source( Object module ) {
+	public static Source source( Class<?> module ) {
 		return new Source( module, DeclarationType.EXPLICIT );
 	}
 
-	private final Object ident;
+	private final Class<?> ident;
 	private final DeclarationType declarationType;
 
-	private Source( Object ident, DeclarationType declarationType ) {
+	private Source( Class<?> ident, DeclarationType declarationType ) {
 		super();
 		this.ident = ident;
 		this.declarationType = declarationType;
 	}
 
-	public Object getIdent() {
+	public Class<?> getIdent() {
 		return ident;
 	}
 
@@ -36,10 +36,7 @@ public final class Source
 
 	@Override
 	public String toString() {
-		String id = ident.toString();
-		if ( ! ( ident instanceof Class<?> ) ) {
-			id = ident.getClass().getCanonicalName() + ":" + id;
-		}
+		String id = ident.getClass().getCanonicalName() + ":" + ident.toString();
 		return declarationType == DeclarationType.IMPLICIT
 			? "(" + id + ")"
 			: id;
