@@ -6,10 +6,6 @@
 package se.jbee.inject.bind;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-
-import se.jbee.inject.Name;
-import se.jbee.inject.Type;
 
 /**
  * A {@link ConstructionStrategy} picks the {@link Constructor} to use to construct objects of a
@@ -26,11 +22,4 @@ public interface ConstructionStrategy {
 	 */
 	<T> Constructor<T> constructorFor( Class<T> type );
 
-	/**
-	 * @param name
-	 *            Can be used as <i>hint</i> to decide between multiple existing assignable methods.
-	 * @return The {@link Method} that has been chosen as implementation for the given return
-	 *         {@link Type} within the given implementor {@link Class}.
-	 */
-	<T> Method factoryFor( Type<T> returnType, Name name, Class<?> implementor );
 }

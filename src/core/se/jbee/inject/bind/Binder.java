@@ -13,6 +13,7 @@ import static se.jbee.inject.util.SuppliedBy.constant;
 import static se.jbee.inject.util.SuppliedBy.parametrizedInstance;
 import static se.jbee.inject.util.SuppliedBy.provider;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -41,30 +42,6 @@ import se.jbee.inject.util.SuppliedBy;
 public class Binder
 		implements BasicBinder {
 
-	private static class AutobindBindings
-			implements Bindings {
-
-		private final Bindings delegate;
-
-		AutobindBindings( Bindings delegate ) {
-			super();
-			this.delegate = delegate;
-		}
-
-		@Override
-		public <T> void add( Resource<T> resource, Supplier<? extends T> supplier, Scope scope,
-				Source source ) {
-			delegate.add( resource, supplier, scope, source );
-			Type<T> type = resource.getType();
-			for ( Type<? super T> supertype : type.supertypes() ) {
-				// Object is of cause a superclass of everything but not indented when doing auto-binds
-				if ( supertype.getRawType() != Object.class ) {
-					delegate.add( resource.typed( supertype ), supplier, scope, source );
-				}
-			}
-		}
-	}
-
 	public static Bindings autobinding( Bindings delegate ) {
 		return new AutobindBindings( delegate );
 	}
@@ -72,6 +49,13 @@ public class Binder
 	public static RootBinder create( Bindings bindings, ConstructionStrategy strategy,
 			Source source, Scope scope ) {
 		return new RootBinder( bindings, strategy, source, scope );
+	}
+
+	static final boolean notConstructable( Class<?> type ) {
+		return type.isInterface() || type.isEnum() || type.isPrimitive() || type.isArray()
+				|| Modifier.isAbstract( type.getModifiers() ) || type == String.class
+				|| Number.class.isAssignableFrom( type ) || type == Boolean.class
+				|| type == Void.class || type == void.class;
 	}
 
 	final Bindings bindings;
@@ -90,8 +74,20 @@ public class Binder
 		this.target = target;
 	}
 
-	public <T> TypedBinder<T> starbind( Class<T> type ) {
-		return bind( Instance.anyOf( Type.raw( type ) ) );
+	public <E> TypedElementBinder<E> arraybind( Class<E[]> type ) {
+		return new TypedElementBinder<E>( this, defaultInstanceOf( raw( type ) ) );
+	}
+
+	public <T> TypedBinder<T> autobind( Class<T> type ) {
+		return autobind( Type.raw( type ) );
+	}
+
+	public <T> TypedBinder<T> autobind( Type<T> type ) {
+		return into( autobinding( bindings ) ).auto().bind( type );
+	}
+
+	public <T> TypedBinder<T> bind( Class<T> type ) {
+		return bind( Type.raw( type ) );
 	}
 
 	@Override
@@ -111,52 +107,16 @@ public class Binder
 		return bind( defaultInstanceOf( type ) );
 	}
 
-	public <T> TypedBinder<T> bind( Class<T> type ) {
-		return bind( Type.raw( type ) );
-	}
-
 	public void construct( Class<?> type ) {
 		construct( ( defaultInstanceOf( raw( type ) ) ) );
-	}
-
-	public void construct( Name name, Class<?> type ) {
-		construct( instance( name, raw( type ) ) );
 	}
 
 	public void construct( Instance<?> instance ) {
 		bind( instance ).toConstructor();
 	}
 
-	public <E> TypedElementBinder<E> arraybind( Class<E[]> type ) {
-		return new TypedElementBinder<E>( this, defaultInstanceOf( raw( type ) ) );
-	}
-
-	public <T> TypedBinder<T> autobind( Type<T> type ) {
-		return into( autobinding( bindings ) ).bind( type );
-	}
-
-	public <T> TypedBinder<T> autobind( Class<T> type ) {
-		return autobind( Type.raw( type ) );
-	}
-
-	public <T> TypedBinder<T> multibind( Instance<T> instance ) {
-		return with( source.typed( DeclarationType.MULTI ) ).bind( instance );
-	}
-
-	public <T> TypedBinder<T> multibind( Type<T> type ) {
-		return multibind( defaultInstanceOf( type ) );
-	}
-
-	public <T> TypedBinder<T> multibind( Class<T> type ) {
-		return multibind( Type.raw( type ) );
-	}
-
-	public <T> TypedBinder<T> multibind( Name name, Class<T> type ) {
-		return multibind( instance( name, Type.raw( type ) ) );
-	}
-
-	public <T> TypedBinder<T> multibind( Name name, Type<T> type ) {
-		return multibind( instance( name, type ) );
+	public void construct( Name name, Class<?> type ) {
+		construct( instance( name, raw( type ) ) );
 	}
 
 	public <E extends Enum<E> & Extension<E, ? super T>, T> void extend( Class<E> extension,
@@ -171,8 +131,36 @@ public class Binder
 		implicitBindToConstructor( type );
 	}
 
+	public <T> TypedBinder<T> multibind( Class<T> type ) {
+		return multibind( Type.raw( type ) );
+	}
+
+	public <T> TypedBinder<T> multibind( Instance<T> instance ) {
+		return multi().bind( instance );
+	}
+
+	public <T> TypedBinder<T> multibind( Name name, Class<T> type ) {
+		return multibind( instance( name, Type.raw( type ) ) );
+	}
+
+	public <T> TypedBinder<T> multibind( Name name, Type<T> type ) {
+		return multibind( instance( name, type ) );
+	}
+
+	public <T> TypedBinder<T> multibind( Type<T> type ) {
+		return multibind( defaultInstanceOf( type ) );
+	}
+
+	public <T> TypedBinder<T> starbind( Class<T> type ) {
+		return bind( Instance.anyOf( Type.raw( type ) ) );
+	}
+
 	protected final <T> void bind( Resource<T> resource, Supplier<? extends T> supplier ) {
 		bindings.add( resource, supplier, scope, source );
+	}
+
+	protected final Binder implicit() {
+		return with( source.typed( DeclarationType.IMPLICIT ) );
 	}
 
 	protected final <I> void implicitBindToConstructor( Class<I> impl ) {
@@ -190,19 +178,16 @@ public class Binder
 		}
 	}
 
-	protected final boolean notConstructable( Class<?> type ) {
-		return type.isInterface() || type.isEnum() || type.isPrimitive() || type.isArray()
-				|| Modifier.isAbstract( type.getModifiers() ) || type == String.class
-				|| Number.class.isAssignableFrom( type ) || type == Boolean.class
-				|| type == Void.class || type == void.class;
+	protected Binder into( Bindings bindings ) {
+		return new Binder( bindings, strategy, source, scope, target );
 	}
 
-	protected final Binder implicit() {
-		return with( source.typed( DeclarationType.IMPLICIT ) );
-	}
-
-	protected final Binder multi() {
+	protected Binder multi() {
 		return with( source.typed( DeclarationType.MULTI ) );
+	}
+
+	protected Binder auto() {
+		return with( source.typed( DeclarationType.AUTO ) );
 	}
 
 	protected Binder with( Source source ) {
@@ -213,70 +198,75 @@ public class Binder
 		return new Binder( bindings, strategy, source, scope, target );
 	}
 
-	protected Binder into( Bindings bindings ) {
-		return new Binder( bindings, strategy, source, scope, target );
-	}
+	public static class InspectBinder {
 
-	/**
-	 * This kind of bindings actually re-map the []-type so that the automatic behavior of returning
-	 * all known instances of the element type will no longer be used whenever the bind made
-	 * applies.
-	 * 
-	 * @author Jan Bernitt (jan@jbee.se)
-	 * 
-	 */
-	public static class TypedElementBinder<E>
-			extends TypedBinder<E[]> {
+		private final Inspector inspector;
+		private final RootBinder binder;
 
-		TypedElementBinder( Binder binder, Instance<E[]> instance ) {
-			super( binder.multi(), instance );
+		InspectBinder( Inspector inspector, RootBinder binder ) {
+			super();
+			this.inspector = inspector;
+			this.binder = binder.with( binder.source.typed( DeclarationType.AUTO ) );
 		}
 
-		public void to( Supplier<? extends E>[] elements ) {
-			to( SuppliedBy.elements( getType().getRawType(), elements ) );
+		public void in( Class<?> implementor ) {
+			in( implementor, new Parameter<?>[0] );
 		}
 
-		@SuppressWarnings ( "unchecked" )
-		public void to( Supplier<? extends E> supplier1, Supplier<? extends E> supplier2 ) {
-			to( (Supplier<? extends E>[]) new Supplier<?>[] { supplier1, supplier2 } );
-		}
-
-		@SuppressWarnings ( "unchecked" )
-		public void to( Supplier<? extends E> supplier1, Supplier<? extends E> supplier2,
-				Supplier<? extends E> supplier3 ) {
-			to( (Supplier<? extends E>[]) new Supplier<?>[] { supplier1, supplier2, supplier3 } );
-		}
-
-		public void toElements( E constant1, E constant2 ) {
-			to( constant( constant1 ), constant( constant2 ) );
-		}
-
-		public void toElements( Class<? extends E> impl1, Class<? extends E> impl2 ) {
-			to( supply( impl1 ), supply( impl2 ) );
-		}
-
-		public void toElements( Class<? extends E> impl1, Class<? extends E> impl2,
-				Class<? extends E> impl3 ) {
-			to( supply( impl1 ), supply( impl2 ), supply( impl3 ) );
-		}
-
-		@SuppressWarnings ( "unchecked" )
-		public void toElements( Class<? extends E> impl1, Class<? extends E> impl2,
-				Class<? extends E> impl3, Class<? extends E> impl4 ) {
-			to( (Supplier<? extends E>[]) new Supplier<?>[] { supply( impl1 ), supply( impl2 ),
-					supply( impl3 ), supply( impl4 ) } );
-		}
-
-		@SuppressWarnings ( "unchecked" )
-		public void toElements( Class<? extends E>... impls ) {
-			Supplier<? extends E>[] suppliers = (Supplier<? extends E>[]) new Supplier<?>[impls.length];
-			for ( int i = 0; i < impls.length; i++ ) {
-				suppliers[i] = supply( impls[i] );
+		public void in( Class<?> implementor, Parameter<?>... parameters ) {
+			boolean instanceMethods = false;
+			boolean constructors = false;
+			for ( AccessibleObject obj : inspector.inspect( implementor ) ) {
+				if ( parameters.length == 0 ) {
+					parameters = inspector.parametersFor( obj );
+				}
+				if ( obj instanceof Constructor<?> ) {
+					bind( (Constructor<?>) obj, parameters );
+					constructors = true;
+				} else if ( obj instanceof Method ) {
+					Method method = (Method) obj;
+					bind( Type.returnType( method ), method, parameters );
+					instanceMethods = instanceMethods || !Modifier.isStatic( method.getModifiers() );
+				} else {
+					throw new UnsupportedOperationException(
+							"No automatic binding is supported for object: " + obj );
+				}
 			}
-			to( suppliers );
+			if ( !constructors && instanceMethods ) {
+				binder.implicit().bind( implementor ).toConstructor();
+			}
 		}
 
-		// and so on.... will avoid generic array warning here 
+		private <T> void bind( Type<T> returnType, Method method, Parameter<?>... parameters ) {
+			binder.bind( inspector.nameFor( method ), returnType ).to(
+					SuppliedBy.method( returnType, method, parameters ) );
+		}
+
+		private <T> void bind( Constructor<T> constructor, Parameter<?>... parameters ) {
+			Name name = inspector.nameFor( constructor );
+			Class<T> implementation = constructor.getDeclaringClass();
+			if ( name.isDefault() ) {
+				binder.autobind( implementation ).to( constructor, parameters );
+			} else {
+				binder.bind( name, implementation ).to( constructor, parameters );
+				for ( Type<? super T> st : Type.raw( implementation ).supertypes() ) {
+					if ( st.isInterface() ) {
+						binder.implicit().bind( name, st ).to( name, implementation );
+					}
+				}
+			}
+		}
+
+		public void in( Class<?> implementor, Class<?>... implementors ) {
+			in( implementor );
+			for ( Class<?> i : implementors ) {
+				in( i );
+			}
+		}
+
+		public void inModule() {
+			in( binder.source.getIdent() );
+		}
 	}
 
 	public static class RootBinder
@@ -292,9 +282,12 @@ public class Binder
 			return new ScopedBinder( bindings, strategy, source, scope );
 		}
 
-		@Override
-		protected RootBinder with( Source source ) {
-			return new RootBinder( bindings, strategy, source, scope );
+		public InspectBinder bind( Inspector inspector ) {
+			return new InspectBinder( inspector, this );
+		}
+
+		public RootBinder asDefault() {
+			return with( source.typed( DeclarationType.DEFAULT ) );
 		}
 
 		@Override
@@ -306,8 +299,9 @@ public class Binder
 			return new RootBinder( bindings, strategy, source, scope );
 		}
 
-		protected RootBinder asDefault() {
-			return with( source.typed( DeclarationType.DEFAULT ) );
+		@Override
+		protected RootBinder with( Source source ) {
+			return new RootBinder( bindings, strategy, source, scope );
 		}
 	}
 
@@ -323,8 +317,9 @@ public class Binder
 			return injectingInto( raw( target ) );
 		}
 
-		public TargetedBinder injectingInto( Type<?> target ) {
-			return injectingInto( defaultInstanceOf( target ) );
+		@Override
+		public TargetedBinder injectingInto( Instance<?> target ) {
+			return new TargetedBinder( bindings, strategy, source, scope, Target.targeting( target ) );
 		}
 
 		public TargetedBinder injectingInto( Name name, Class<?> type ) {
@@ -335,9 +330,8 @@ public class Binder
 			return injectingInto( Instance.instance( name, type ) );
 		}
 
-		@Override
-		public TargetedBinder injectingInto( Instance<?> target ) {
-			return new TargetedBinder( bindings, strategy, source, scope, Target.targeting( target ) );
+		public TargetedBinder injectingInto( Type<?> target ) {
+			return injectingInto( defaultInstanceOf( target ) );
 		}
 
 	}
@@ -349,6 +343,27 @@ public class Binder
 		TargetedBinder( Bindings bindings, ConstructionStrategy strategy, Source source,
 				Scope scope, Target target ) {
 			super( bindings, strategy, source, scope, target );
+		}
+
+		@Override
+		public Binder in( Packages packages ) {
+			return with( target.in( packages ) );
+		}
+
+		public Binder inPackageAndSubPackagesOf( Class<?> type ) {
+			return with( target.inPackageAndSubPackagesOf( type ) );
+		}
+
+		public Binder inPackageOf( Class<?> type ) {
+			return with( target.inPackageOf( type ) );
+		}
+
+		public Binder inSubPackagesOf( Class<?> type ) {
+			return with( target.inSubPackagesOf( type ) );
+		}
+
+		public TargetedBinder within( Class<?> parent ) {
+			return within( raw( parent ) );
 		}
 
 		public TargetedBinder within( Instance<?> parent ) {
@@ -363,29 +378,8 @@ public class Binder
 			return within( instance( name, parent ) );
 		}
 
-		public TargetedBinder within( Class<?> parent ) {
-			return within( raw( parent ) );
-		}
-
 		public TargetedBinder within( Type<?> parent ) {
 			return within( anyOf( parent ) );
-		}
-
-		@Override
-		public Binder in( Packages packages ) {
-			return with( target.in( packages ) );
-		}
-
-		public Binder inPackageOf( Class<?> type ) {
-			return with( target.inPackageOf( type ) );
-		}
-
-		public Binder inSubPackagesOf( Class<?> type ) {
-			return with( target.inSubPackagesOf( type ) );
-		}
-
-		public Binder inPackageAndSubPackagesOf( Class<?> type ) {
-			return with( target.inPackageAndSubPackagesOf( type ) );
 		}
 	}
 
@@ -409,8 +403,33 @@ public class Binder
 			this.resource = resource;
 		}
 
-		protected final Type<T> getType() {
-			return resource.getType();
+		public <I extends T> void to( Class<I> impl ) {
+			to( Instance.anyOf( raw( impl ) ) );
+		}
+
+		public void to( Constructor<? extends T> constructor, Parameter<?>... parameters ) {
+			to( SuppliedBy.costructor( constructor, parameters ) );
+		}
+
+		public void to( Factory<? extends T> factory ) {
+			to( SuppliedBy.factory( factory ) );
+		}
+
+		public <I extends T> void to( Instance<I> instance ) {
+			to( supply( instance ) );
+		}
+
+		public <I extends T> void to( Name name, Class<I> type ) {
+			to( instance( name, raw( type ) ) );
+		}
+
+		public <I extends T> void to( Name name, Type<I> type ) {
+			to( instance( name, type ) );
+		}
+
+		public void to( Provider<? extends T> provider ) {
+			to( provider( provider ) );
+			implicitBindToConstant( provider );
 		}
 
 		@Override
@@ -418,20 +437,31 @@ public class Binder
 			binder.bind( resource, supplier );
 		}
 
-		public void to( Factory<? extends T> factory ) {
-			to( SuppliedBy.factory( factory ) );
+		public void to( T constant ) {
+			toConstant( constant );
 		}
 
-		public void to( Constructor<? extends T> constructor ) {
-			to( SuppliedBy.costructor( constructor ) );
+		public void to( T constant1, T constant2 ) {
+			multi().toConstant( constant1 ).toConstant( constant2 );
 		}
 
-		public void to( Constructor<? extends T> constructor, Parameter<?>... parameters ) {
-			to( SuppliedBy.costructor( constructor, parameters ) );
+		public void to( T constant1, T... constants ) {
+			TypedBinder<T> multibinder = multi().toConstant( constant1 );
+			for ( int i = 0; i < constants.length; i++ ) {
+				multibinder.toConstant( constants[i] );
+			}
+		}
+
+		public void to( T constant1, T constant2, T constant3 ) {
+			multi().toConstant( constant1 ).toConstant( constant2 ).toConstant( constant3 );
+		}
+
+		public void toConstructor() {
+			to( binder.strategy.constructorFor( resource.getType().getRawType() ) );
 		}
 
 		public void toConstructor( Class<? extends T> impl, Parameter<?>... parameters ) {
-			if ( binder.notConstructable( impl ) ) {
+			if ( notConstructable( impl ) ) {
 				throw new IllegalArgumentException( "Not a constructable type: " + impl );
 			}
 			to( SuppliedBy.costructor( binder.strategy.constructorFor( impl ), parameters ) );
@@ -441,17 +471,8 @@ public class Binder
 			toConstructor( resource.getType().getRawType(), parameters );
 		}
 
-		public void to( T constant ) {
-			toConstant( constant );
-		}
-
-		/**
-		 * This is to do multi-binds in the same module. The {@link Binder#multibind(Class)} methods
-		 * are use when a module just does one bind but that is meant to co-exist with others from
-		 * other modules.
-		 */
-		public void to( T constant1, T constant2 ) {
-			multi().toConstant( constant1 ).toConstant( constant2 );
+		public <I extends T> void toParametrized( Class<I> impl ) {
+			to( parametrizedInstance( Instance.anyOf( raw( impl ) ) ) );
 		}
 
 		public <I extends Supplier<? extends T>> void toSupplier( Class<I> impl ) {
@@ -459,73 +480,12 @@ public class Binder
 			implicitBindToConstructor( defaultInstanceOf( raw( impl ) ) );
 		}
 
-		public void to( Provider<? extends T> provider ) {
-			to( provider( provider ) );
-			implicitProvider( provider );
+		protected final Type<T> getType() {
+			return resource.getType();
 		}
 
-		@SuppressWarnings ( "unchecked" )
-		private <P> void implicitProvider( Provider<P> provider ) {
-			Type<Provider<P>> providerType = (Type<Provider<P>>) Type.supertype( Provider.class,
-					raw( provider.getClass() ) );
-			binder.implicit().bind( defaultInstanceOf( providerType ) ).to(
-					SuppliedBy.constant( provider ) );
-		}
-
-		public void toConstructor() {
-			to( binder.strategy.constructorFor( resource.getType().getRawType() ) );
-		}
-
-		public <I extends T> void to( Class<I> impl ) {
-			to( Instance.anyOf( raw( impl ) ) );
-		}
-
-		public <I extends T> void toParametrized( Class<I> impl ) {
-			to( parametrizedInstance( Instance.anyOf( raw( impl ) ) ) );
-		}
-
-		public <I extends T> void to( Name name, Type<I> type ) {
-			to( instance( name, type ) );
-		}
-
-		public <I extends T> void to( Name name, Class<I> type ) {
-			to( instance( name, raw( type ) ) );
-		}
-
-		public <I extends T> void to( Instance<I> instance ) {
-			to( supply( instance ) );
-		}
-
-		public void to( Method factory, Parameter<?>... parameters ) {
-			to( SuppliedBy.method( resource.getType(), factory, parameters ) );
-		}
-
-		public void toModuleMethod( Parameter<?>... parameters ) {
-			toMethod( binder.source.getIdent(), parameters );
-		}
-
-		@SuppressWarnings ( "unchecked" )
-		public void toMethod( Class<?> implementor, Parameter<?>... parameters ) {
-			Method factory = binder.strategy.factoryFor( resource.getType(), resource.getName(),
-					implementor );
-			if ( factory == null ) {
-				Type<Provider> providerType = Type.raw( Provider.class ).parametized(
-						resource.getType() );
-				factory = binder.strategy.factoryFor( providerType, resource.getName(), implementor );
-				if ( factory == null ) {
-					throw new IllegalArgumentException( new NoSuchMethodException( "Class "
-							+ implementor.getCanonicalName()
-							+ " neither defines a method returning " + resource.getType()
-							+ " not a method returning " + providerType ) );
-				}
-				binder.bind( providerType ).to(
-						SuppliedBy.method( providerType, factory, parameters ) );
-				binder.implicit().bind( resource,
-						SuppliedBy.unbox( (Type<? extends Provider<? extends T>>) providerType ) );
-			} else {
-				to( factory, parameters );
-			}
-			implicitBindToConstructor( Instance.anyOf( raw( implementor ) ) );
+		protected final TypedBinder<T> multi() {
+			return new TypedBinder<T>( binder.multi(), resource );
 		}
 
 		<I> Supplier<I> supply( Class<I> impl ) {
@@ -544,12 +504,16 @@ public class Binder
 			return SuppliedBy.costructor( binder.strategy.constructorFor( instance.getType().getRawType() ) );
 		}
 
-		<I> void implicitBindToConstructor( Instance<I> instance ) {
-			binder.implicitBindToConstructor( instance );
+		@SuppressWarnings ( "unchecked" )
+		private <P> void implicitBindToConstant( Provider<P> provider ) {
+			Type<Provider<P>> providerType = (Type<Provider<P>>) Type.supertype( Provider.class,
+					raw( provider.getClass() ) );
+			binder.implicit().bind( defaultInstanceOf( providerType ) ).to(
+					SuppliedBy.constant( provider ) );
 		}
 
-		protected final TypedBinder<T> multi() {
-			return new TypedBinder<T>( binder.multi(), resource );
+		private <I> void implicitBindToConstructor( Instance<I> instance ) {
+			binder.implicitBindToConstructor( instance );
 		}
 
 		private TypedBinder<T> toConstant( T constant ) {
@@ -557,5 +521,90 @@ public class Binder
 			return this;
 		}
 
+	}
+
+	/**
+	 * This kind of bindings actually re-map the []-type so that the automatic behavior of returning
+	 * all known instances of the element type will no longer be used whenever the bind made
+	 * applies.
+	 * 
+	 * @author Jan Bernitt (jan@jbee.se)
+	 * 
+	 */
+	public static class TypedElementBinder<E>
+			extends TypedBinder<E[]> {
+
+		TypedElementBinder( Binder binder, Instance<E[]> instance ) {
+			super( binder.multi(), instance );
+		}
+
+		@SuppressWarnings ( "unchecked" )
+		public void to( Supplier<? extends E> supplier1, Supplier<? extends E> supplier2 ) {
+			to( (Supplier<? extends E>[]) new Supplier<?>[] { supplier1, supplier2 } );
+		}
+
+		@SuppressWarnings ( "unchecked" )
+		public void to( Supplier<? extends E> supplier1, Supplier<? extends E> supplier2,
+				Supplier<? extends E> supplier3 ) {
+			to( (Supplier<? extends E>[]) new Supplier<?>[] { supplier1, supplier2, supplier3 } );
+		}
+
+		public void to( Supplier<? extends E>[] elements ) {
+			to( SuppliedBy.elements( getType().getRawType(), elements ) );
+		}
+
+		@SuppressWarnings ( "unchecked" )
+		public void toElements( Class<? extends E>... impls ) {
+			Supplier<? extends E>[] suppliers = (Supplier<? extends E>[]) new Supplier<?>[impls.length];
+			for ( int i = 0; i < impls.length; i++ ) {
+				suppliers[i] = supply( impls[i] );
+			}
+			to( suppliers );
+		}
+
+		public void toElements( Class<? extends E> impl1, Class<? extends E> impl2 ) {
+			to( supply( impl1 ), supply( impl2 ) );
+		}
+
+		public void toElements( Class<? extends E> impl1, Class<? extends E> impl2,
+				Class<? extends E> impl3 ) {
+			to( supply( impl1 ), supply( impl2 ), supply( impl3 ) );
+		}
+
+		@SuppressWarnings ( "unchecked" )
+		public void toElements( Class<? extends E> impl1, Class<? extends E> impl2,
+				Class<? extends E> impl3, Class<? extends E> impl4 ) {
+			to( (Supplier<? extends E>[]) new Supplier<?>[] { supply( impl1 ), supply( impl2 ),
+					supply( impl3 ), supply( impl4 ) } );
+		}
+
+		public void toElements( E constant1, E constant2 ) {
+			to( constant( constant1 ), constant( constant2 ) );
+		}
+
+	}
+
+	private static class AutobindBindings
+			implements Bindings {
+
+		private final Bindings delegate;
+
+		AutobindBindings( Bindings delegate ) {
+			super();
+			this.delegate = delegate;
+		}
+
+		@Override
+		public <T> void add( Resource<T> resource, Supplier<? extends T> supplier, Scope scope,
+				Source source ) {
+			delegate.add( resource, supplier, scope, source );
+			Type<T> type = resource.getType();
+			for ( Type<? super T> supertype : type.supertypes() ) {
+				// Object is of cause a superclass of everything but not indented when doing auto-binds
+				if ( supertype.getRawType() != Object.class ) {
+					delegate.add( resource.typed( supertype ), supplier, scope, source );
+				}
+			}
+		}
 	}
 }

@@ -7,13 +7,17 @@ package se.jbee.inject.service;
 
 import java.lang.reflect.Method;
 
+import se.jbee.inject.bind.Inspector;
+
 /**
  * The {@link ServiceStrategy} picks the {@link Method}s that are used to implement
  * {@link ServiceMethod}s. This abstraction allows to customize what methods are bound as
  * {@link ServiceMethod}s.
  * 
  * @author Jan Bernitt (jan@jbee.se)
+ * @deprecated Use a {@link Inspector} for this
  */
+@Deprecated
 public interface ServiceStrategy {
 
 	/**

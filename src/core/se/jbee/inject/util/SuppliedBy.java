@@ -82,16 +82,12 @@ public final class SuppliedBy {
 		return new FactoryMethodSupplier<T>( returnType, factory, arguments );
 	}
 
-	public static <T> Supplier<T> costructor( Constructor<T> constructor ) {
+	public static <T> Supplier<T> costructor( Constructor<T> constructor,
+			Parameter<?>... parameters ) {
 		final Class<?>[] params = constructor.getParameterTypes();
 		if ( params.length == 0 ) {
 			return new StaticConstructorSupplier<T>( constructor, NO_ARGS );
 		}
-		return costructor( constructor, new Parameter[0] );
-	}
-
-	public static <T> Supplier<T> costructor( Constructor<T> constructor,
-			Parameter<?>... parameters ) {
 		Argument<?>[] arguments = Argument.arguments( parameterTypes( constructor ), parameters );
 		return Argument.allConstants( arguments )
 			? new StaticConstructorSupplier<T>( constructor, Argument.constantsFrom( arguments ) )

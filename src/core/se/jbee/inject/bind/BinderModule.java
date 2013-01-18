@@ -11,6 +11,7 @@ import se.jbee.inject.Name;
 import se.jbee.inject.Packages;
 import se.jbee.inject.Scope;
 import se.jbee.inject.Type;
+import se.jbee.inject.bind.Binder.InspectBinder;
 import se.jbee.inject.bind.Binder.RootBinder;
 import se.jbee.inject.bind.Binder.ScopedBinder;
 import se.jbee.inject.bind.Binder.TargetedBinder;
@@ -100,6 +101,10 @@ public abstract class BinderModule
 
 	public <E> TypedElementBinder<E> arraybind( Class<E[]> type ) {
 		return binder.arraybind( type );
+	}
+
+	public InspectBinder bind( Inspector inspector ) {
+		return binder.bind( inspector );
 	}
 
 	@Override

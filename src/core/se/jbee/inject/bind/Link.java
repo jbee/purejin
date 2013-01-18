@@ -6,7 +6,6 @@
 package se.jbee.inject.bind;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.IdentityHashMap;
@@ -14,14 +13,12 @@ import java.util.List;
 import java.util.Map;
 
 import se.jbee.inject.Expiry;
-import se.jbee.inject.Name;
 import se.jbee.inject.Precision;
 import se.jbee.inject.Repository;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Scope;
 import se.jbee.inject.Source;
 import se.jbee.inject.Supplier;
-import se.jbee.inject.Type;
 import se.jbee.inject.util.Scoped;
 import se.jbee.inject.util.Suppliable;
 import se.jbee.inject.util.TypeReflector;
@@ -63,11 +60,6 @@ public final class Link {
 			} catch ( RuntimeException e ) {
 				return null;
 			}
-		}
-
-		@Override
-		public <T> Method factoryFor( Type<T> returnType, Name name, Class<?> implementor ) {
-			return TypeReflector.methodReturns( returnType, implementor );
 		}
 
 	}

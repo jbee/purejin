@@ -5,6 +5,8 @@
  */
 package se.jbee.inject.bind;
 
+import static se.jbee.inject.Dependency.dependency;
+
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -16,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 import se.jbee.inject.Injector;
+import se.jbee.inject.Injectron;
 import se.jbee.inject.Packages;
 import se.jbee.inject.Type;
 import se.jbee.inject.util.Inject;
@@ -79,6 +82,18 @@ public final class Bootstrap {
 
 	public static Edition edition( Packages included ) {
 		return new PackagesEdition( included );
+	}
+
+	public static void eagerSingletons( Injector injector ) {
+		for ( Injectron<?> i : injector.resolve( dependency( Injectron[].class ) ) ) {
+			if ( i.getExpiry().isNever() ) {
+				instance( i );
+			}
+		}
+	}
+
+	public static <T> T instance( Injectron<T> injectron ) {
+		return injectron.instanceFor( dependency( injectron.getResource().getInstance() ) );
 	}
 
 	private static class FeatureEdition<T extends Enum<T>>
