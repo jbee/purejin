@@ -17,7 +17,7 @@ public interface Inspector {
 	/**
 	 * @return The {@link Member}s that should be bound from the given implementor.
 	 */
-	AccessibleObject[] inspect( Class<?> implementor );
+	<T> AccessibleObject[] inspect( Class<T> implementor );
 
 	Name nameFor( AccessibleObject obj );
 

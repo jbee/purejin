@@ -2,7 +2,9 @@ package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.bind.Inspected.all;
 
+import org.hamcrest.Factory;
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
@@ -14,8 +16,8 @@ public class TestInspectorBinds {
 
 		@Override
 		protected void declare() {
-			bind( Inspected.METHODS ).inModule();
-			bind( Inspected.METHODS ).in( InspectorBindsImplementor.class );
+			bind( all().methods() ).inModule();
+			bind( all().methodsWith( Factory.class ) ).in( InspectorBindsImplementor.class );
 		}
 
 		static int staticFactoryMethod() {
@@ -29,14 +31,19 @@ public class TestInspectorBinds {
 
 	static class InspectorBindsImplementor {
 
+		@Factory
 		float instanceFactoryMethod() {
 			return 42f;
 		}
 
+		@Factory
 		double instanceFactoryMethodWithParameters( float factor ) {
 			return factor * 2d;
 		}
 
+		float shouldNotBeBoundSinceItIsNotAnnotated() {
+			return 0f;
+		}
 	}
 
 	private final Injector injector = Bootstrap.injector( FactoryMethodBindsModule.class );
