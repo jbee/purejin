@@ -14,35 +14,44 @@ import se.jbee.inject.Type;
 import se.jbee.inject.util.TypeReflector;
 
 /**
- * Utility class containing common {@link Inspector} implementations.
- * 
- * To 'inspect' means to use reflection or similar techniques to extract information from types.
+ * The basic {@link Inspector} implementations. It allows to chose {@link Constructor}s and
+ * {@link Method}s based on the {@link Annotation}s present, the {@link Type}s a method returns or
+ * the {@link Packages} they are defined in.
  * 
  * @author Jan Bernitt (jan@jbee.se)
- * 
  */
 public class Inspected
 		implements Inspector {
 
 	public static Inspected all() {
-		return new Inspected( true, true, null, null, Packages.ALL );
+		return new Inspected( false, true, true, Packages.ALL, Type.OBJECT, null, null, null );
 	}
 
+	public static Inspected onlyStatic() {
+		return new Inspected( true, true, false, Packages.ALL, Type.OBJECT, null, null, null );
+	}
+
+	private final boolean statics;
 	private final boolean methods;
 	private final boolean constructors;
+	private final Packages packages;
+	private final Type<?> assignable;
 	private final Class<? extends Annotation> methodWith;
 	private final Class<? extends Annotation> constructorWith;
-	private final Packages packages;
+	private final Class<? extends Annotation> namedWith;
 
-	private Inspected( boolean methods, boolean constructors,
-			Class<? extends Annotation> methodWith, Class<? extends Annotation> constructorWith,
-			Packages packages ) {
+	private Inspected( boolean statics, boolean methods, boolean constructors, Packages packages,
+			Type<?> assignable, Class<? extends Annotation> methodWith,
+			Class<? extends Annotation> constructorWith, Class<? extends Annotation> namedWith ) {
 		super();
 		this.methods = methods;
 		this.constructors = constructors;
+		this.statics = statics;
 		this.methodWith = methodWith;
 		this.constructorWith = constructorWith;
 		this.packages = packages;
+		this.namedWith = namedWith;
+		this.assignable = assignable;
 	}
 
 	@Override
@@ -52,7 +61,7 @@ public class Inspected
 
 	@Override
 	public Name nameFor( AccessibleObject obj ) {
-		return Name.DEFAULT;
+		return TypeReflector.nameFrom( obj, namedWith );
 	}
 
 	@Override
@@ -71,10 +80,8 @@ public class Inspected
 		}
 		if ( methods ) {
 			for ( Method m : implementor.getDeclaredMethods() ) {
-				if ( packages.contains( Type.returnType( m ) ) ) {
-					if ( methodWith == null || m.isAnnotationPresent( methodWith ) ) {
-						res.add( m );
-					}
+				if ( TypeReflector.methodMatches( m, statics, assignable, packages, methodWith ) ) {
+					res.add( m );
 				}
 			}
 		}
@@ -82,22 +89,48 @@ public class Inspected
 	}
 
 	public Inspected methods() {
-		return new Inspected( true, false, methodWith, constructorWith, packages );
+		return new Inspected( statics, true, false, packages, assignable, methodWith,
+				constructorWith, namedWith );
 	}
 
 	public Inspected constructors() {
-		return new Inspected( false, true, methodWith, constructorWith, packages );
+		return new Inspected( statics, false, true, packages, assignable, methodWith,
+				constructorWith, namedWith );
 	}
 
 	public Inspected methodsWith( Class<? extends Annotation> annotation ) {
-		return new Inspected( true, constructors, annotation, constructorWith, packages );
+		return new Inspected( statics, true, constructors, packages, assignable, annotation,
+				constructorWith, namedWith );
 	}
 
 	public Inspected constructorWith( Class<? extends Annotation> annotation ) {
-		return new Inspected( methods, true, methodWith, annotation, packages );
+		return new Inspected( statics, methods, true, packages, assignable, methodWith, annotation,
+				namedWith );
+	}
+
+	public Inspected annotatedWith( Class<? extends Annotation> constructorOrMethodAnnotation ) {
+		Inspected res = this;
+		if ( methods ) {
+			res = res.methodsWith( constructorOrMethodAnnotation );
+		}
+		if ( constructors ) {
+			res = res.constructorWith( constructorOrMethodAnnotation );
+		}
+		return res;
 	}
 
 	public Inspector returningTypeIn( Packages packages ) {
-		return new Inspected( methods, constructors, methodWith, constructorWith, packages );
+		return new Inspected( statics, methods, constructors, packages, assignable, methodWith,
+				constructorWith, namedWith );
+	}
+
+	public Inspected namedWith( Class<? extends Annotation> annotation ) {
+		return new Inspected( statics, methods, constructors, packages, assignable, methodWith,
+				constructorWith, annotation );
+	}
+
+	public Inspected assignableTo( Type<?> supertype ) {
+		return new Inspected( statics, methods, constructors, packages, supertype, methodWith,
+				constructorWith, namedWith );
 	}
 }

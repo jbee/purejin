@@ -32,7 +32,9 @@ import java.util.Set;
 public final class Type<T>
 		implements PreciserThan<Type<?>>, Parameter<T> {
 
-	public static final Type<? extends Object> WILDCARD = raw( Object.class ).asLowerBound();
+	public static final Type<Object> OBJECT = Type.raw( Object.class );
+	public static final Type<Void> VOID = raw( Void.class );
+	public static final Type<? extends Object> WILDCARD = OBJECT.asLowerBound();
 
 	public static Type<?> fieldType( Field field ) {
 		return type( field.getGenericType() );
@@ -226,7 +228,7 @@ public final class Type<T>
 		if ( !other.rawType.isAssignableFrom( rawType ) ) {
 			return false;
 		}
-		if ( !isParameterized() ) {
+		if ( !isParameterized() || other.isRawType() ) {
 			return true; //raw type is ok - no parameters to check
 		}
 		if ( other.rawType == rawType ) { // both have the same rawType
@@ -291,6 +293,7 @@ public final class Type<T>
 		return rawType.isArray() && !rawType.getComponentType().isArray();
 	}
 
+	@Override
 	public boolean morePreciseThan( Type<?> other ) {
 		if ( !rawType.isAssignableFrom( other.rawType ) ) {
 			return true;

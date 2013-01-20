@@ -5,11 +5,16 @@
  */
 package se.jbee.inject.util;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
+import se.jbee.inject.Name;
+import se.jbee.inject.Packages;
 import se.jbee.inject.Type;
 
 public final class TypeReflector {
@@ -93,6 +98,30 @@ public final class TypeReflector {
 			}
 		}
 		return null;
+	}
+
+	public static Name nameFrom( AnnotatedElement obj, Class<? extends Annotation> annotation ) {
+		if ( annotation != null && obj.isAnnotationPresent( annotation ) ) {
+			Annotation a = obj.getAnnotation( annotation );
+			for ( Method m : annotation.getDeclaredMethods() ) {
+				if ( String.class == m.getReturnType() ) {
+					String name = (String) invoke( m, a );
+					if ( name != null && !name.isEmpty() && !name.equals( m.getDefaultValue() ) ) {
+						return Name.named( name );
+					}
+				}
+			}
+		}
+		return Name.DEFAULT;
+	}
+
+	public static boolean methodMatches( Method m, boolean onlyStatic, Type<?> assignable,
+			Packages packages, Class<? extends Annotation> annotation ) {
+		Type<?> returnType = Type.returnType( m );
+		return !Type.VOID.equalTo( returnType ) && packages.contains( returnType )
+				&& returnType.isAssignableTo( assignable )
+				&& ( !onlyStatic || Modifier.isStatic( m.getModifiers() ) )
+				&& ( annotation == null || m.isAnnotationPresent( annotation ) );
 	}
 
 }
