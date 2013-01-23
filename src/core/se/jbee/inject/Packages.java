@@ -8,7 +8,8 @@ package se.jbee.inject;
 import java.util.Arrays;
 
 /**
- * A set of {@link Package}s described by a pattern.
+ * A set of {@link Package}s described one or more root packages (on the same hierarchy level/depth)
+ * with or without their sub-packages.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
@@ -84,6 +85,31 @@ public final class Packages
 		this.roots = roots;
 		this.includingSubpackages = includingSubpackages;
 		this.rootDepth = rootDepth( roots );
+	}
+
+	public Packages parents() {
+		if ( rootDepth == 0 ) {
+			return this;
+		}
+		if ( rootDepth == 1 ) {
+			return includingSubpackages
+				? ALL
+				: DEFAULT;
+		}
+		String[] parentRoots = new String[roots.length];
+		for ( int i = 0; i < roots.length; i++ ) {
+			parentRoots[i] = parent( roots[i] );
+		}
+		return new Packages( parentRoots, includingSubpackages );
+	}
+
+	private String parent( String root ) {
+		// foo.bar.baz -> foo.bar
+		// foo.bar. -> foo.
+		return root.substring( 0,
+				root.lastIndexOf( '.', root.length() - 1 ) + ( root.endsWith( "." )
+					? 1
+					: 0 ) );
 	}
 
 	private static void commonPackageDepth( Class<?> type, Class<?>[] types ) {

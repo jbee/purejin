@@ -5,7 +5,7 @@ import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Packages.packageAndSubPackagesOf;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.bind.Inspected.all;
+import static se.jbee.inject.bind.Inspect.all;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -27,8 +27,8 @@ import se.jbee.inject.util.Typecast;
  * This test demonstrates the use of an {@link Inspector} to semi-automatically bind
  * {@link Constructor}s and/or {@link Method}s as 'provider' of an instance.
  * 
- * The example uses the {@link Inspected#all()} util as {@link Inspector}. It allows to narrow what
- * is bound automatically. For example {@link Annotation}s can be specified that need to be present.
+ * The example uses the {@link Inspect#all()} util as {@link Inspector}. It allows to narrow what is
+ * bound automatically. For example {@link Annotation}s can be specified that need to be present.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
@@ -40,11 +40,11 @@ public class TestInspectorBinds {
 		@Override
 		protected void declare() {
 			bind( all().methods() ).inModule();
-			bind( all().methodsWith( Factory.class ).namedWith( Resource.class ) ).in(
+			bind( all().methods().annotatedWith( Factory.class ).namedBy( Resource.class ) ).in(
 					InspectorBindsImplementor1.class );
-			bind( all().methods().assignableTo( raw( Provider.class ) ) ).in(
+			bind( all().methods().returnTypeAssignableTo( raw( Provider.class ) ) ).in(
 					InspectorBindsImplementor2.class );
-			bind( all().methods().returningTypeIn( packageAndSubPackagesOf( Injector.class ) ) ).in(
+			bind( all().methods().returnTypeIn( packageAndSubPackagesOf( Injector.class ) ) ).in(
 					InspectorBindsImplementor3.class );
 		}
 
