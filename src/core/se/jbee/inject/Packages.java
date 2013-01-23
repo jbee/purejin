@@ -103,11 +103,15 @@ public final class Packages
 		return new Packages( parentRoots, includingSubpackages );
 	}
 
+	/**
+	 * <pre>
+	 * foo.bar.baz -> foo.bar 
+	 * foo.bar. -> foo.
+	 * </pre>
+	 */
 	private String parent( String root ) {
-		// foo.bar.baz -> foo.bar
-		// foo.bar. -> foo.
-		return root.substring( 0,
-				root.lastIndexOf( '.', root.length() - 1 ) + ( root.endsWith( "." )
+		return root.substring( 0, root.lastIndexOf( '.', root.length() - 2 )
+				+ ( root.endsWith( "." )
 					? 1
 					: 0 ) );
 	}

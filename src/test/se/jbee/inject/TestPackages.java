@@ -1,5 +1,6 @@
 package se.jbee.inject;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static se.jbee.inject.Packages.packageOf;
@@ -8,7 +9,9 @@ import static se.jbee.inject.Type.raw;
 import java.text.Format;
 import java.text.spi.DateFormatProvider;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
@@ -93,5 +96,25 @@ public class TestPackages {
 	@Test ( expected = IllegalArgumentException.class )
 	public void thatMultipleRootPackagesAndSubpackagesOfDifferentDepthCanNotBeCombined() {
 		Packages.packageAndSubPackagesOf( List.class, DateFormatProvider.class );
+	}
+
+	@Test
+	public void thatParentPackagesAreOfSameKindOfSet() {
+		assertEquals( Packages.subPackagesOf( Map.class ), Packages.subPackagesOf(
+				ConcurrentMap.class ).parents() );
+		assertEquals( Packages.packageOf( Map.class ),
+				Packages.packageOf( ConcurrentMap.class ).parents() );
+		assertEquals( Packages.packageAndSubPackagesOf( Map.class ),
+				Packages.packageAndSubPackagesOf( ConcurrentMap.class ).parents() );
+	}
+
+	@Test
+	public void thatParentOfAllPackagesIsAllPackages() {
+		assertEquals( Packages.ALL, Packages.ALL.parents() );
+	}
+
+	@Test
+	public void thatParentOfDefaultPackageIsDefaultPackage() {
+		assertEquals( Packages.DEFAULT, Packages.DEFAULT.parents() );
 	}
 }
