@@ -13,7 +13,6 @@ import static se.jbee.inject.util.SuppliedBy.constant;
 import static se.jbee.inject.util.SuppliedBy.parametrizedInstance;
 import static se.jbee.inject.util.SuppliedBy.provider;
 
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -215,25 +214,26 @@ public class Binder
 
 		public void in( Class<?> implementor, Parameter<?>... parameters ) {
 			boolean instanceMethods = false;
-			boolean constructors = false;
-			for ( AccessibleObject obj : inspector.inspect( implementor ) ) {
-				if ( parameters.length == 0 ) {
-					parameters = inspector.parametersFor( obj );
-				}
-				if ( obj instanceof Constructor<?> ) {
-					bind( (Constructor<?>) obj, parameters );
-					constructors = true;
-				} else if ( obj instanceof Method ) {
-					Method method = (Method) obj;
-					bind( Type.returnType( method ), method, parameters );
+			for ( Method method : inspector.methodsIn( implementor ) ) {
+				Type<?> returnType = Type.returnType( method );
+				if ( !Type.VOID.equalTo( returnType ) ) {
+					if ( parameters.length == 0 ) {
+						parameters = inspector.parametersFor( method );
+					}
+					bind( returnType, method, parameters );
 					instanceMethods = instanceMethods || !Modifier.isStatic( method.getModifiers() );
-				} else {
-					throw new UnsupportedOperationException(
-							"No automatic binding is supported for object: " + obj );
 				}
 			}
-			if ( !constructors && instanceMethods ) {
-				binder.implicit().bind( implementor ).toConstructor();
+			Constructor<?> c = inspector.constructorFor( implementor );
+			if ( c == null ) {
+				if ( instanceMethods ) {
+					binder.implicit().bind( implementor ).toConstructor();
+				}
+			} else {
+				if ( parameters.length == 0 ) {
+					parameters = inspector.parametersFor( c );
+				}
+				bind( (Constructor<?>) c, parameters );
 			}
 		}
 

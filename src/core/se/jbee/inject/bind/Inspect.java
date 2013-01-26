@@ -1,3 +1,8 @@
+/*
+ *  Copyright (c) 2012, Jan Bernitt 
+ *			
+ *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
+ */
 package se.jbee.inject.bind;
 
 import java.lang.annotation.Annotation;
@@ -26,6 +31,7 @@ public class Inspect
 		implements Inspector {
 
 	private static final Parameter<?>[] NO_PARAMETERS = new Parameter<?>[0];
+	private static final Method[] NO_METHODS = new Method[0];
 
 	/**
 	 * @return a {@link Inspector} that will result in all methods and a constructor for all given
@@ -33,14 +39,14 @@ public class Inspect
 	 *         the instance methods of {@link Inject}.
 	 */
 	public static Inspect all() {
-		return new Inspect( false, true, true, Packages.ALL, Type.OBJECT, null, null, null );
+		return new Inspect( false, true, true, Packages.ALL, Type.OBJECT, null, null );
 	}
 
 	/**
 	 * @return same as {@link #all()} but result is already restricted to just static methods.
 	 */
 	public static Inspect allStatic() {
-		return new Inspect( true, true, false, Packages.ALL, Type.OBJECT, null, null, null );
+		return new Inspect( true, true, false, Packages.ALL, Type.OBJECT, null, null );
 	}
 
 	private final boolean statics;
@@ -48,19 +54,17 @@ public class Inspect
 	private final boolean constructors;
 	private final Packages packages;
 	private final Type<?> assignable;
-	private final Class<? extends Annotation> methodWith;
-	private final Class<? extends Annotation> constructorWith;
+	private final Class<? extends Annotation> accessible;
 	private final Class<? extends Annotation> namedby;
 
 	private Inspect( boolean statics, boolean methods, boolean constructors, Packages packages,
-			Type<?> assignable, Class<? extends Annotation> methodWith,
-			Class<? extends Annotation> constructorWith, Class<? extends Annotation> namedBy ) {
+			Type<?> assignable, Class<? extends Annotation> accessible,
+			Class<? extends Annotation> namedBy ) {
 		super();
 		this.methods = methods;
 		this.constructors = constructors;
 		this.statics = statics;
-		this.methodWith = methodWith;
-		this.constructorWith = constructorWith;
+		this.accessible = accessible;
 		this.packages = packages;
 		this.namedby = namedBy;
 		this.assignable = assignable;
@@ -101,45 +105,53 @@ public class Inspect
 		return TypeReflector.nameFrom( namedby, obj );
 	}
 
+	@SuppressWarnings ( "unchecked" )
 	@Override
-	public <T> AccessibleObject[] inspect( Class<T> implementor ) {
-		List<AccessibleObject> res = new ArrayList<AccessibleObject>();
-		if ( constructors && packages.contains( Type.raw( implementor ) )
-				&& Type.raw( implementor ).isAssignableTo( assignable ) ) {
-			if ( constructorWith != null ) {
-				for ( Constructor<?> c : implementor.getDeclaredConstructors() ) {
-					if ( c.isAnnotationPresent( constructorWith ) ) {
-						res.add( c );
+	public <T> Constructor<T> constructorFor( Class<T> type ) {
+		if ( constructors && packages.contains( Type.raw( type ) )
+				&& Type.raw( type ).isAssignableTo( assignable ) ) {
+			if ( accessible != null ) {
+				for ( Constructor<?> c : type.getDeclaredConstructors() ) {
+					if ( c.isAnnotationPresent( accessible ) ) {
+						return (Constructor<T>) c;
 					}
 				}
-			} else {
-				res.add( TypeReflector.defaultConstructor( implementor ) );
+			}
+			try {
+				return TypeReflector.defaultConstructor( type );
+			} catch ( RuntimeException e ) {
+				return null;
 			}
 		}
-		if ( methods ) {
-			for ( Method m : implementor.getDeclaredMethods() ) {
-				if ( TypeReflector.methodMatches( m, statics, assignable, packages, methodWith ) ) {
-					res.add( m );
-				}
+		return null;
+	}
+
+	@Override
+	public <T> Method[] methodsIn( Class<T> implementor ) {
+		if ( !methods ) {
+			return NO_METHODS;
+		}
+		List<Method> res = new ArrayList<Method>();
+		for ( Method m : implementor.getDeclaredMethods() ) {
+			if ( TypeReflector.methodMatches( m, statics, assignable, packages, accessible ) ) {
+				res.add( m );
 			}
 		}
-		return res.toArray( new AccessibleObject[res.size()] );
+		return res.toArray( new Method[res.size()] );
 	}
 
 	/**
 	 * @return a {@link Inspector} restricted to inspect just methods (no constructors).
 	 */
 	public Inspect methods() {
-		return new Inspect( statics, true, false, packages, assignable, methodWith,
-				constructorWith, namedby );
+		return new Inspect( statics, true, false, packages, assignable, accessible, namedby );
 	}
 
 	/**
 	 * @return a {@link Inspector} restricted to inspect just constructors (no methods).
 	 */
 	public Inspect constructors() {
-		return new Inspect( statics, false, true, packages, assignable, methodWith,
-				constructorWith, namedby );
+		return new Inspect( statics, false, true, packages, assignable, accessible, namedby );
 	}
 
 	/**
@@ -149,14 +161,8 @@ public class Inspect
 	 *         given annotation is present.
 	 */
 	public Inspect annotatedWith( Class<? extends Annotation> annotation ) {
-		Inspect res = this;
-		if ( methods ) {
-			res = res.methodsWith( annotation );
-		}
-		if ( constructors ) {
-			res = res.constructorWith( annotation );
-		}
-		return res;
+		return new Inspect( statics, methods, constructors, packages, assignable, annotation,
+				namedby );
 	}
 
 	/**
@@ -166,8 +172,8 @@ public class Inspect
 	 * @return a {@link Inspector} that tries to extract an instance name from the given annotation.
 	 */
 	public Inspect namedBy( Class<? extends Annotation> annotation ) {
-		return new Inspect( statics, methods, constructors, packages, assignable, methodWith,
-				constructorWith, annotation );
+		return new Inspect( statics, methods, constructors, packages, assignable, accessible,
+				annotation );
 	}
 
 	/**
@@ -178,8 +184,8 @@ public class Inspect
 	 *         constructor of a type that is a member of the set given.
 	 */
 	public Inspect returnTypeIn( Packages packages ) {
-		return new Inspect( statics, methods, constructors, packages, assignable, methodWith,
-				constructorWith, namedby );
+		return new Inspect( statics, methods, constructors, packages, assignable, accessible,
+				namedby );
 	}
 
 	/**
@@ -189,17 +195,7 @@ public class Inspect
 	 *         {@link Type} that is assignable to the given super-type.
 	 */
 	public Inspect returnTypeAssignableTo( Type<?> supertype ) {
-		return new Inspect( statics, methods, constructors, packages, supertype, methodWith,
-				constructorWith, namedby );
-	}
-
-	private Inspect methodsWith( Class<? extends Annotation> annotation ) {
-		return new Inspect( statics, true, constructors, packages, assignable, annotation,
-				constructorWith, namedby );
-	}
-
-	private Inspect constructorWith( Class<? extends Annotation> annotation ) {
-		return new Inspect( statics, methods, true, packages, assignable, methodWith, annotation,
+		return new Inspect( statics, methods, constructors, packages, supertype, accessible,
 				namedby );
 	}
 }

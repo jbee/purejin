@@ -102,7 +102,6 @@ public final class Link {
 					repositories.put( i.scope, i.scope.init() );
 				}
 			}
-			// TODO snapshot wrappers  
 			return repositories;
 		}
 

@@ -6,6 +6,8 @@
 package se.jbee.inject.service;
 
 import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Instance.instance;
+import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Source.source;
 import static se.jbee.inject.Type.parameterTypes;
 import static se.jbee.inject.Type.raw;
@@ -23,6 +25,7 @@ import se.jbee.inject.DIRuntimeException;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Injectron;
+import se.jbee.inject.Instance;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 import se.jbee.inject.bind.Binder;
@@ -33,6 +36,8 @@ import se.jbee.inject.bind.BootstrappingModule;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.bind.ConstructionStrategy;
 import se.jbee.inject.bind.Extend;
+import se.jbee.inject.bind.Inspect;
+import se.jbee.inject.bind.Inspector;
 import se.jbee.inject.bind.Module;
 import se.jbee.inject.bind.Binder.RootBinder;
 import se.jbee.inject.bind.Binder.TypedBinder;
@@ -51,6 +56,15 @@ import se.jbee.inject.util.Value;
  */
 public abstract class ServiceModule
 		implements Module, Bundle {
+
+	/**
+	 * The {@link Inspector} picks the {@link Method}s that are used to implement
+	 * {@link ServiceMethod}s. This abstraction allows to customize what methods are bound as
+	 * {@link ServiceMethod}s. The {@link Inspector#inspect(Class)} should return all methods in the
+	 * given {@link Class} that should be used to implement a {@link ServiceMethod}.
+	 */
+	static final Instance<Inspector> SERVICE_INSPECTOR = instance( named( "service" ),
+			raw( Inspector.class ) );
 
 	protected final void bindServiceMethodsIn( Class<?> service ) {
 		binder.extend( ServiceClassExtension.class, service );
@@ -86,30 +100,13 @@ public abstract class ServiceModule
 	static class ServiceMethodModule
 			extends BinderModule {
 
-		static final ServiceStrategy DEFAULT_SERVICE_STRATEGY = new BuildinServiceStrategy();
-
 		@Override
 		public void declare() {
 			per( APPLICATION ).bind( ServiceProvider.class ).toSupplier(
 					ServiceProviderSupplier.class );
 			per( DEPENDENCY_TYPE ).starbind( ServiceMethod.class ).toSupplier(
 					ServiceSupplier.class );
-			asDefault().per( APPLICATION ).bind( ServiceStrategy.class ).to(
-					DEFAULT_SERVICE_STRATEGY );
-		}
-
-	}
-
-	private static final class BuildinServiceStrategy
-			implements ServiceStrategy {
-
-		BuildinServiceStrategy() {
-			// make visible
-		}
-
-		@Override
-		public Method[] serviceMethodsIn( Class<?> serviceClass ) {
-			return serviceClass.getDeclaredMethods();
+			asDefault().per( APPLICATION ).bind( SERVICE_INSPECTOR ).to( Inspect.all().methods() );
 		}
 
 	}
@@ -133,28 +130,38 @@ public abstract class ServiceModule
 		 */
 		private final Map<Class<?>, Method[]> methodsCache = new IdentityHashMap<Class<?>, Method[]>();
 		/**
-		 * All already created service methods identified by a unique function signature.
-		 * 
-		 * OPEN why not put the {@link ServiceMethod} in cache ?
+		 * All already created {@link ServiceMethod}s identified by a unique function signature.
 		 */
-		private final Map<String, Method> methodCache = new HashMap<String, Method>();
+		private final Map<String, ServiceMethod<?, ?>> serviceCache = new HashMap<String, ServiceMethod<?, ?>>();
 
 		private final Injector context;
+		private final Inspector inspect;
 		private final Class<?>[] serviceClasses;
-		private final ServiceStrategy strategy;
 
 		ServiceMethodProvider( Injector context ) {
 			super();
 			this.context = context;
 			this.serviceClasses = context.resolve( Extend.extensionDependency( ServiceClassExtension.class ) );
-			this.strategy = context.resolve( dependency( ServiceStrategy.class ).injectingInto(
+			this.inspect = context.resolve( dependency( SERVICE_INSPECTOR ).injectingInto(
 					ServiceMethodProvider.class ) );
 		}
 
+		@SuppressWarnings ( "unchecked" )
 		@Override
 		public <P, R> ServiceMethod<P, R> provide( Type<P> parameterType, Type<R> returnType ) {
-			Method service = serviceMethod( parameterType, returnType );
-			return create( service, parameterType, returnType, context );
+			String signatur = parameterType + "->" + returnType; // haskell like function signature
+			ServiceMethod<?, ?> service = serviceCache.get( signatur );
+			if ( service == null ) {
+				synchronized ( serviceCache ) {
+					service = serviceCache.get( signatur );
+					if ( service == null ) {
+						service = create( resolveServiceMethod( parameterType, returnType ),
+								parameterType, returnType, context );
+						serviceCache.put( signatur, service );
+					}
+				}
+			}
+			return (ServiceMethod<P, R>) service;
 		}
 
 		private <P, T> ServiceMethod<P, T> create( Method service, Type<P> parameterType,
@@ -162,22 +169,6 @@ public abstract class ServiceModule
 			return new PreresolvingServiceMethod<P, T>(
 					TypeReflector.newInstance( service.getDeclaringClass() ), service,
 					parameterType, returnType, context );
-		}
-
-		private <P, T> Method serviceMethod( Type<P> parameterType, Type<T> returnType ) {
-			String signatur = parameterType + "->" + returnType; // haskell like function signature
-			Method method = methodCache.get( signatur );
-			if ( method != null ) {
-				return method;
-			}
-			synchronized ( methodCache ) {
-				method = methodCache.get( signatur );
-				if ( method == null ) {
-					method = resolveServiceMethod( parameterType, returnType );
-					methodCache.put( signatur, method );
-				}
-			}
-			return method;
 		}
 
 		private <P, T> Method resolveServiceMethod( Type<P> parameterType, Type<T> returnType ) {
@@ -204,7 +195,7 @@ public abstract class ServiceModule
 			synchronized ( methodsCache ) {
 				methods = methodsCache.get( service );
 				if ( methods == null ) {
-					methods = strategy.serviceMethodsIn( service );
+					methods = inspect.methodsIn( service );
 					methodsCache.put( service, methods );
 				}
 			}

@@ -156,8 +156,7 @@ public final class Inject {
 
 		private <T, E> T resolveArray( Dependency<T> dependency, Type<E> elementType ) {
 			if ( elementType.getRawType() == Injectron.class ) {
-				return resolveInjectronArray( dependency, elementType,
-						elementType.getParameters()[0] );
+				return resolveInjectronArray( dependency, elementType.getParameters()[0] );
 			}
 			Injectron<E>[] elementInjectrons = typeInjectrons( elementType );
 			if ( elementInjectrons != null ) {
@@ -181,8 +180,7 @@ public final class Inject {
 			throw noInjectronFor( dependency );
 		}
 
-		private <T, E, I> T resolveInjectronArray( Dependency<T> dependency, Type<E> elementType,
-				Type<I> injectronType ) {
+		private <T, I> T resolveInjectronArray( Dependency<T> dependency, Type<I> injectronType ) {
 			Injectron<I>[] res = typeInjectrons( injectronType );
 			List<Injectron<I>> elements = new ArrayList<Injectron<I>>( res.length );
 			Dependency<I> injectornDependency = dependency.typed( injectronType );

@@ -108,11 +108,6 @@ public class TestMorePrecise {
 				Packages.subPackagesOf( String.class ) );
 	}
 
-	private <T extends PreciserThan<? super T>> void assertEqualPrecise( T one, T other ) {
-		assertFalse( one.morePreciseThan( other ) );
-		assertFalse( other.morePreciseThan( one ) );
-	}
-
 	private <T extends PreciserThan<? super T>> void assertMorePrecise( T morePrecise, T lessPrecise ) {
 		assertTrue( morePrecise.morePreciseThan( lessPrecise ) );
 		assertFalse( lessPrecise.morePreciseThan( morePrecise ) );

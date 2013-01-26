@@ -40,10 +40,6 @@ public final class SuppliedBy {
 	public static final Supplier<Set<?>> SET_BRIDGE = new ArrayToSetBridgeSupplier();
 	public static final Factory<Logger> LOGGER = new LoggerFactory();
 
-	public static <T> Supplier<T> unbox( Type<? extends Provider<? extends T>> provider ) {
-		return new ProviderUnboxSupplier<T>( provider );
-	}
-
 	public static <T> Supplier<T> provider( Provider<T> provider ) {
 		return new ProviderAsSupplier<T>( provider );
 	}
@@ -292,25 +288,6 @@ public final class SuppliedBy {
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
 			return provider.provide();
-		}
-
-	}
-
-	private static final class ProviderUnboxSupplier<T>
-			implements Supplier<T> {
-
-		private final Type<? extends Provider<? extends T>> provider;
-
-		ProviderUnboxSupplier( Type<? extends Provider<? extends T>> provider ) {
-			super();
-			this.provider = provider;
-		}
-
-		@Override
-		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			@SuppressWarnings ( "unchecked" )
-			Dependency<? extends Provider<? extends T>> provider = dependency.typed( this.provider );
-			return injector.resolve( provider ).provide();
 		}
 
 	}

@@ -28,11 +28,11 @@ public class TestScopes {
 		}
 	}
 
-	private static class A {
+	static class A {
 		// just for test
 	}
 
-	private static class B {
+	static class B {
 		// just for test
 	}
 

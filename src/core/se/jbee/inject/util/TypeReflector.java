@@ -130,8 +130,7 @@ public final class TypeReflector {
 	public static boolean methodMatches( Method m, boolean onlyStatic, Type<?> assignable,
 			Packages packages, Class<? extends Annotation> annotation ) {
 		Type<?> returnType = Type.returnType( m );
-		return !Type.VOID.equalTo( returnType ) && packages.contains( returnType )
-				&& returnType.isAssignableTo( assignable )
+		return packages.contains( returnType ) && returnType.isAssignableTo( assignable )
 				&& ( !onlyStatic || Modifier.isStatic( m.getModifiers() ) )
 				&& ( annotation == null || m.isAnnotationPresent( annotation ) );
 	}

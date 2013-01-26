@@ -50,6 +50,10 @@ public class TestType {
 		// needed to check supertypes() and isAssignableTo methods
 	}
 
+	/**
+	 * Reflection!!!
+	 */
+	@SuppressWarnings ( "unused" )
 	private List<String> aStringListField;
 
 	@Test
@@ -89,9 +93,6 @@ public class TestType {
 
 	@Test
 	public void testIsAssignableTo2Generics() {
-		List<Class<Integer>> l = null;
-		List<? extends Class<? extends Number>> l2 = l;
-
 		Type<List> listOfClassesOfIntegers = Type.raw( List.class ).parametized(
 				Type.raw( Class.class ).parametized( Integer.class ) );
 		Type<Class> classOfNumbers = Type.raw( Class.class ).parametized( Number.class );
