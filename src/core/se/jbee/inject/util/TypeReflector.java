@@ -100,15 +100,27 @@ public final class TypeReflector {
 		return null;
 	}
 
-	public static Name nameFrom( AnnotatedElement obj, Class<? extends Annotation> annotation ) {
-		if ( annotation != null && obj.isAnnotationPresent( annotation ) ) {
-			Annotation a = obj.getAnnotation( annotation );
-			for ( Method m : annotation.getDeclaredMethods() ) {
-				if ( String.class == m.getReturnType() ) {
-					String name = (String) invoke( m, a );
-					if ( name != null && !name.isEmpty() && !name.equals( m.getDefaultValue() ) ) {
-						return Name.named( name );
-					}
+	public static Name nameFrom( Class<? extends Annotation> annotation, AnnotatedElement obj ) {
+		return annotation == null || !obj.isAnnotationPresent( annotation )
+			? Name.DEFAULT
+			: nameFrom( annotation, obj.getAnnotation( annotation ) );
+	}
+
+	public static Name nameFrom( Class<? extends Annotation> annotation, Annotation... instances ) {
+		for ( Annotation i : instances ) {
+			if ( i.annotationType() == annotation ) {
+				return nameFrom( annotation, i );
+			}
+		}
+		return Name.DEFAULT;
+	}
+
+	private static Name nameFrom( Class<? extends Annotation> annotation, Annotation instance ) {
+		for ( Method m : annotation.getDeclaredMethods() ) {
+			if ( String.class == m.getReturnType() ) {
+				String name = (String) invoke( m, instance );
+				if ( name != null && !name.isEmpty() && !name.equals( m.getDefaultValue() ) ) {
+					return Name.named( name );
 				}
 			}
 		}

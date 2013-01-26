@@ -1,5 +1,8 @@
 package se.jbee.inject.bind;
 
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
@@ -8,18 +11,18 @@ import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.bind.Inspect.all;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-
-import javax.annotation.Resource;
 
 import org.hamcrest.Factory;
 import org.junit.Test;
 
-import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
+import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
 import se.jbee.inject.util.Provider;
 import se.jbee.inject.util.Typecast;
 
@@ -33,6 +36,13 @@ import se.jbee.inject.util.Typecast;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestInspectorBinds {
+
+	@Target ( { METHOD, PARAMETER } )
+	@Retention ( RUNTIME )
+	public static @interface Resource {
+
+		String value();
+	}
 
 	static class InspectorBindsModule
 			extends BinderModule {
@@ -65,8 +75,14 @@ public class TestInspectorBinds {
 		}
 
 		@Factory
-		@Resource ( name = "Foo" )
-		double instanceFactoryMethodWithParameters( float factor ) {
+		@Resource ( "twentyone" )
+		float instanceFactoryMethodWithName() {
+			return 21f;
+		}
+
+		@Factory
+		@Resource ( "Foo" )
+		double instanceFactoryMethodWithParameters( @Resource ( "twentyone" ) float factor ) {
 			return factor * 2d;
 		}
 
@@ -115,9 +131,13 @@ public class TestInspectorBinds {
 		assertEquals( 42, injector.resolve( dependency( int.class ) ).intValue() );
 	}
 
+	/**
+	 * Through the float parameter annotation {@link Resource} the double producing factory method
+	 * gets 21f injected instead of 42f.
+	 */
 	@Test
 	public void thatInstanceFactoryMethodWithParametersIsAvailable() {
-		assertEquals( 84d, injector.resolve( dependency( double.class ) ).doubleValue(), 0.01d );
+		assertEquals( 42d, injector.resolve( dependency( double.class ) ).doubleValue(), 0.01d );
 	}
 
 	@Test
@@ -133,7 +153,7 @@ public class TestInspectorBinds {
 	 */
 	@Test
 	public void thatNamedWithAnnotationCanBeUsedToGetNamedResources() {
-		assertEquals( 84d,
+		assertEquals( 42d,
 				injector.resolve( dependency( double.class ).named( "foo" ) ).doubleValue(), 0.01d );
 	}
 

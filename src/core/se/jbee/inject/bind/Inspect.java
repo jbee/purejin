@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Packages;
 import se.jbee.inject.Parameter;
@@ -23,6 +24,8 @@ import se.jbee.inject.util.TypeReflector;
  */
 public class Inspect
 		implements Inspector {
+
+	private static final Parameter<?>[] NO_PARAMETERS = new Parameter<?>[0];
 
 	/**
 	 * @return a {@link Inspector} that will result in all methods and a constructor for all given
@@ -65,12 +68,37 @@ public class Inspect
 
 	@Override
 	public Parameter<?>[] parametersFor( AccessibleObject obj ) {
-		return new Parameter<?>[0];
+		if ( namedby == null ) {
+			return NO_PARAMETERS;
+		}
+		if ( obj instanceof Method ) {
+			Method method = (Method) obj;
+			return parametersFor( Type.parameterTypes( method ), method.getParameterAnnotations() );
+		}
+		if ( obj instanceof Constructor<?> ) {
+			Constructor<?> constructor = (Constructor<?>) obj;
+			return parametersFor( Type.parameterTypes( constructor ),
+					constructor.getParameterAnnotations() );
+		}
+		return NO_PARAMETERS;
+	}
+
+	private Parameter<?>[] parametersFor( Type<?>[] types, Annotation[][] annotations ) {
+		List<Parameter<?>> res = new ArrayList<Parameter<?>>();
+		for ( int i = 0; i < annotations.length; i++ ) {
+			Name name = TypeReflector.nameFrom( namedby, annotations[i] );
+			if ( name != Name.DEFAULT ) {
+				res.add( Instance.instance( name, types[i] ) );
+			}
+		}
+		return res.size() == 0
+			? NO_PARAMETERS
+			: res.toArray( new Parameter<?>[res.size()] );
 	}
 
 	@Override
 	public Name nameFor( AccessibleObject obj ) {
-		return TypeReflector.nameFrom( obj, namedby );
+		return TypeReflector.nameFrom( namedby, obj );
 	}
 
 	@Override
