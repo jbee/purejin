@@ -45,18 +45,18 @@ public final class Bootstrap {
 
 	public static Injector injector( Class<? extends Bundle> root, Edition edition,
 			Constants constants ) {
-		return injector( root, edition, constants, Link.DEFAULE_CONSTRUCTION_STRATEGY );
+		return injector( root, edition, constants, Inspect.DEFAULT );
 	}
 
 	public static Injector injector( Class<? extends Bundle> root, Edition edition,
-			Constants constants, ConstructionStrategy strategy ) {
-		return injector( modulariser( edition, constants ).modularise( root ), strategy,
+			Constants constants, Inspector inspector ) {
+		return injector( modulariser( edition, constants ).modularise( root ), inspector,
 				Link.BUILDIN );
 	}
 
-	public static Injector injector( Module[] modules, ConstructionStrategy strategy,
+	public static Injector injector( Module[] modules, Inspector inspector,
 			Linker<Suppliable<?>> linker ) {
-		return Inject.from( Suppliable.source( linker.link( strategy, modules ) ) );
+		return Inject.from( Suppliable.source( linker.link( inspector, modules ) ) );
 	}
 
 	public static Modulariser modulariser( Edition edition, Constants constants ) {
@@ -68,7 +68,7 @@ public final class Bootstrap {
 	}
 
 	public static Suppliable<?>[] suppliables( Class<? extends Bundle> root ) {
-		return Link.BUILDIN.link( Link.DEFAULE_CONSTRUCTION_STRATEGY, // 
+		return Link.BUILDIN.link( Inspect.DEFAULT, // 
 				modulariser( Edition.FULL, Constants.NONE ).modularise( root ) );
 	}
 

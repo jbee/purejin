@@ -45,9 +45,9 @@ public class Binder
 		return new AutobindBindings( delegate );
 	}
 
-	public static RootBinder create( Bindings bindings, ConstructionStrategy strategy,
-			Source source, Scope scope ) {
-		return new RootBinder( bindings, strategy, source, scope );
+	public static RootBinder create( Bindings bindings, Inspector inspector, Source source,
+			Scope scope ) {
+		return new RootBinder( bindings, inspector, source, scope );
 	}
 
 	static final boolean notConstructable( Class<?> type ) {
@@ -58,16 +58,15 @@ public class Binder
 	}
 
 	final Bindings bindings;
-	final ConstructionStrategy strategy;
+	final Inspector inspector;
 	final Source source;
 	final Scope scope;
 	final Target target;
 
-	Binder( Bindings bindings, ConstructionStrategy strategy, Source source, Scope scope,
-			Target target ) {
+	Binder( Bindings bindings, Inspector inspector, Source source, Scope scope, Target target ) {
 		super();
 		this.bindings = bindings;
-		this.strategy = strategy;
+		this.inspector = inspector;
 		this.source = source;
 		this.scope = scope;
 		this.target = target;
@@ -171,14 +170,14 @@ public class Binder
 		if ( notConstructable( impl ) ) {
 			return;
 		}
-		Constructor<I> constructor = strategy.constructorFor( impl );
+		Constructor<I> constructor = inspector.constructorFor( impl );
 		if ( constructor != null ) {
 			implicit().with( Target.ANY ).bind( instance ).to( constructor );
 		}
 	}
 
 	protected Binder into( Bindings bindings ) {
-		return new Binder( bindings, strategy, source, scope, target );
+		return new Binder( bindings, inspector, source, scope, target );
 	}
 
 	protected Binder multi() {
@@ -190,11 +189,11 @@ public class Binder
 	}
 
 	protected Binder with( Source source ) {
-		return new Binder( bindings, strategy, source, scope, target );
+		return new Binder( bindings, inspector, source, scope, target );
 	}
 
 	protected Binder with( Target target ) {
-		return new Binder( bindings, strategy, source, scope, target );
+		return new Binder( bindings, inspector, source, scope, target );
 	}
 
 	public static class InspectBinder {
@@ -273,13 +272,13 @@ public class Binder
 			extends ScopedBinder
 			implements RootBasicBinder {
 
-		RootBinder( Bindings bindings, ConstructionStrategy strategy, Source source, Scope scope ) {
-			super( bindings, strategy, source, scope );
+		RootBinder( Bindings bindings, Inspector inspector, Source source, Scope scope ) {
+			super( bindings, inspector, source, scope );
 		}
 
 		@Override
 		public ScopedBinder per( Scope scope ) {
-			return new ScopedBinder( bindings, strategy, source, scope );
+			return new ScopedBinder( bindings, inspector, source, scope );
 		}
 
 		public InspectBinder bind( Inspector inspector ) {
@@ -292,16 +291,16 @@ public class Binder
 
 		@Override
 		protected RootBinder into( Bindings bindings ) {
-			return new RootBinder( bindings, strategy, source, scope );
+			return new RootBinder( bindings, inspector, source, scope );
 		}
 
-		protected RootBinder using( ConstructionStrategy strategy ) {
-			return new RootBinder( bindings, strategy, source, scope );
+		protected RootBinder using( Inspector inspector ) {
+			return new RootBinder( bindings, inspector, source, scope );
 		}
 
 		@Override
 		protected RootBinder with( Source source ) {
-			return new RootBinder( bindings, strategy, source, scope );
+			return new RootBinder( bindings, inspector, source, scope );
 		}
 	}
 
@@ -309,8 +308,8 @@ public class Binder
 			extends TargetedBinder
 			implements ScopedBasicBinder {
 
-		ScopedBinder( Bindings bindings, ConstructionStrategy strategy, Source source, Scope scope ) {
-			super( bindings, strategy, source, scope, Target.ANY );
+		ScopedBinder( Bindings bindings, Inspector inspector, Source source, Scope scope ) {
+			super( bindings, inspector, source, scope, Target.ANY );
 		}
 
 		public TargetedBinder injectingInto( Class<?> target ) {
@@ -319,7 +318,8 @@ public class Binder
 
 		@Override
 		public TargetedBinder injectingInto( Instance<?> target ) {
-			return new TargetedBinder( bindings, strategy, source, scope, Target.targeting( target ) );
+			return new TargetedBinder( bindings, inspector, source, scope,
+					Target.targeting( target ) );
 		}
 
 		public TargetedBinder injectingInto( Name name, Class<?> type ) {
@@ -340,9 +340,9 @@ public class Binder
 			extends Binder
 			implements TargetedBasicBinder {
 
-		TargetedBinder( Bindings bindings, ConstructionStrategy strategy, Source source,
-				Scope scope, Target target ) {
-			super( bindings, strategy, source, scope, target );
+		TargetedBinder( Bindings bindings, Inspector inspector, Source source, Scope scope,
+				Target target ) {
+			super( bindings, inspector, source, scope, target );
 		}
 
 		@Override
@@ -367,7 +367,7 @@ public class Binder
 		}
 
 		public TargetedBinder within( Instance<?> parent ) {
-			return new TargetedBinder( bindings, strategy, source, scope, target.within( parent ) );
+			return new TargetedBinder( bindings, inspector, source, scope, target.within( parent ) );
 		}
 
 		public TargetedBinder within( Name name, Class<?> parent ) {
@@ -457,14 +457,14 @@ public class Binder
 		}
 
 		public void toConstructor() {
-			to( binder.strategy.constructorFor( resource.getType().getRawType() ) );
+			to( binder.inspector.constructorFor( resource.getType().getRawType() ) );
 		}
 
 		public void toConstructor( Class<? extends T> impl, Parameter<?>... parameters ) {
 			if ( notConstructable( impl ) ) {
 				throw new IllegalArgumentException( "Not a constructable type: " + impl );
 			}
-			to( SuppliedBy.costructor( binder.strategy.constructorFor( impl ), parameters ) );
+			to( SuppliedBy.costructor( binder.inspector.constructorFor( impl ), parameters ) );
 		}
 
 		public void toConstructor( Parameter<?>... parameters ) {
@@ -501,7 +501,7 @@ public class Binder
 				throw new IllegalArgumentException( "Interface type linked in a loop: "
 						+ resource.getInstance() + " > " + instance );
 			}
-			return SuppliedBy.costructor( binder.strategy.constructorFor( instance.getType().getRawType() ) );
+			return SuppliedBy.costructor( binder.inspector.constructorFor( instance.getType().getRawType() ) );
 		}
 
 		@SuppressWarnings ( "unchecked" )

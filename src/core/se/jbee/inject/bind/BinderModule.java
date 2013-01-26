@@ -35,14 +35,13 @@ public abstract class BinderModule
 	}
 
 	protected BinderModule( Scope inital ) {
-		this.binder = Binder.create( null, Link.DEFAULE_CONSTRUCTION_STRATEGY,
-				source( BinderModule.class ), inital );
+		this.binder = Binder.create( null, Inspect.DEFAULT, source( BinderModule.class ), inital );
 	}
 
 	@Override
-	public void declare( Bindings bindings, ConstructionStrategy strategy ) {
+	public void declare( Bindings bindings, Inspector inspector ) {
 		BootstrappingModule.nonnullThrowsReentranceException( binder.bindings );
-		this.binder = binder.into( bindings ).using( strategy ).with( source( getClass() ) );
+		this.binder = binder.into( bindings ).using( inspector ).with( source( getClass() ) );
 		declare();
 	}
 

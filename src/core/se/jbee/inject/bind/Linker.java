@@ -7,5 +7,5 @@ package se.jbee.inject.bind;
 
 public interface Linker<T> {
 
-	T[] link( ConstructionStrategy strategy, Module... modules );
+	T[] link( Inspector inspector, Module... modules );
 }

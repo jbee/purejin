@@ -30,6 +30,8 @@ import se.jbee.inject.util.TypeReflector;
 public class Inspect
 		implements Inspector {
 
+	public static final Inspect DEFAULT = all().constructors();
+
 	private static final Parameter<?>[] NO_PARAMETERS = new Parameter<?>[0];
 	private static final Method[] NO_METHODS = new Method[0];
 

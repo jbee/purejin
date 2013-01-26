@@ -5,7 +5,6 @@
  */
 package se.jbee.inject.bind;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.IdentityHashMap;
@@ -21,11 +20,9 @@ import se.jbee.inject.Source;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.util.Scoped;
 import se.jbee.inject.util.Suppliable;
-import se.jbee.inject.util.TypeReflector;
 
 public final class Link {
 
-	public static final ConstructionStrategy DEFAULE_CONSTRUCTION_STRATEGY = new BuildinConstructionStrategy();
 	public static final Linker<Suppliable<?>> BUILDIN = linker( defaultExpiration() );
 
 	private static Linker<Suppliable<?>> linker( Map<Scope, Expiry> expiryByScope ) {
@@ -46,24 +43,6 @@ public final class Link {
 		throw new UnsupportedOperationException( "util" );
 	}
 
-	private static class BuildinConstructionStrategy
-			implements ConstructionStrategy {
-
-		BuildinConstructionStrategy() {
-			// make visible
-		}
-
-		@Override
-		public <T> Constructor<T> constructorFor( Class<T> type ) {
-			try {
-				return TypeReflector.defaultConstructor( type );
-			} catch ( RuntimeException e ) {
-				return null;
-			}
-		}
-
-	}
-
 	private static class SuppliableLinker
 			implements Linker<Suppliable<?>> {
 
@@ -75,8 +54,8 @@ public final class Link {
 		}
 
 		@Override
-		public Suppliable<?>[] link( ConstructionStrategy strategy, Module... modules ) {
-			return link( cleanedUp( bindingsFrom( modules, strategy ) ) );
+		public Suppliable<?>[] link( Inspector inspector, Module... modules ) {
+			return link( cleanedUp( bindingsFrom( modules, inspector ) ) );
 		}
 
 		private Suppliable<?>[] link( Binding<?>[] bindings ) {
@@ -127,10 +106,10 @@ public final class Link {
 			return res.toArray( new Binding[res.size()] );
 		}
 
-		private Binding<?>[] bindingsFrom( Module[] modules, ConstructionStrategy strategy ) {
+		private Binding<?>[] bindingsFrom( Module[] modules, Inspector inspector ) {
 			ListBindings bindings = new ListBindings();
 			for ( Module m : modules ) {
-				m.declare( bindings, strategy );
+				m.declare( bindings, inspector );
 			}
 			return bindings.list.toArray( new Binding<?>[0] );
 		}

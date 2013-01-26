@@ -34,7 +34,6 @@ import se.jbee.inject.bind.Bindings;
 import se.jbee.inject.bind.Bootstrapper;
 import se.jbee.inject.bind.BootstrappingModule;
 import se.jbee.inject.bind.Bundle;
-import se.jbee.inject.bind.ConstructionStrategy;
 import se.jbee.inject.bind.Extend;
 import se.jbee.inject.bind.Inspect;
 import se.jbee.inject.bind.Inspector;
@@ -89,9 +88,9 @@ public abstract class ServiceModule
 	}
 
 	@Override
-	public void declare( Bindings bindings, ConstructionStrategy strategy ) {
+	public void declare( Bindings bindings, Inspector inspector ) {
 		BootstrappingModule.nonnullThrowsReentranceException( binder );
-		binder = Binder.create( bindings, strategy, source( getClass() ), Scoped.APPLICATION );
+		binder = Binder.create( bindings, inspector, source( getClass() ), Scoped.APPLICATION );
 		declare();
 	}
 

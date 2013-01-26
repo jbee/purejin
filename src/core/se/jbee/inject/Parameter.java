@@ -7,15 +7,12 @@ package se.jbee.inject;
 
 import java.lang.reflect.Constructor;
 
-import se.jbee.inject.bind.ConstructionStrategy;
-
 /**
  * {@linkplain Parameter}s are *not* about to find/identify the {@link Constructor} to use! This
  * would get far to complex to understand (yet simple to implement) using different constructors
  * depending on the {@linkplain Parameter}s.
  * 
- * {@linkplain Parameter}s identify the {@link Instance} to use for the constructor specified or
- * given by {@link ConstructionStrategy}!
+ * {@linkplain Parameter}s identify the {@link Instance} to use for the constructor.
  * 
  * <h3>How {@linkplain Parameter}s are understood:</h3>
  * <dl>

@@ -6,6 +6,7 @@
 package se.jbee.inject.bind;
 
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
@@ -18,8 +19,17 @@ import se.jbee.inject.Parameter;
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
-public interface Inspector
-		extends ConstructionStrategy {
+public interface Inspector {
+
+	/**
+	 * A {@link ConstructionStrategy} picks the {@link Constructor} to use to construct objects of a
+	 * given {@link Class}.
+	 * 
+	 * @return The {@link Constructor} considered to be the reasonable or right way to construct a
+	 *         object of the given type. In case one with parameters is returned the process will
+	 *         try to resolve them.
+	 */
+	<T> Constructor<T> constructorFor( Class<T> type );
 
 	/**
 	 * @return The {@link Member}s that should be bound from the given implementor.

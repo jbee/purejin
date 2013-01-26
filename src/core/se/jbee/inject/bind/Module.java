@@ -22,10 +22,10 @@ public interface Module {
 	/**
 	 * @param bindings
 	 *            use to declare made bound within this {@link Module}.
-	 * @param strategy
-	 *            the chosen strategy to pick the use {@link Constructor}s and {@link Method} used
-	 *            to create instances.
+	 * @param inspector
+	 *            the chosen strategy to pick the {@link Constructor}s or {@link Method}s used to
+	 *            create instances.
 	 */
-	void declare( Bindings bindings, ConstructionStrategy strategy );
+	void declare( Bindings bindings, Inspector inspector );
 
 }
