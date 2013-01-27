@@ -91,15 +91,6 @@ public final class TypeReflector {
 		}
 	}
 
-	public static <T> Method methodReturns( Type<T> returnType, Class<?> implementor ) {
-		for ( Method m : implementor.getDeclaredMethods() ) {
-			if ( Type.returnType( m ).isAssignableTo( returnType ) ) {
-				return m;
-			}
-		}
-		return null;
-	}
-
 	public static Name nameFrom( Class<? extends Annotation> annotation, AnnotatedElement obj ) {
 		return annotation == null || !obj.isAnnotationPresent( annotation )
 			? Name.DEFAULT

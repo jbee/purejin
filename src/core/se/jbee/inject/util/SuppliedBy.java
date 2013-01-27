@@ -8,7 +8,6 @@ package se.jbee.inject.util;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.parameterTypes;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -19,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import se.jbee.inject.Array;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
@@ -107,9 +107,7 @@ public final class SuppliedBy {
 
 		@Override
 		public final T supply( Dependency<? super T> dependency, Injector injector ) {
-			Type<?> elementType = !dependency.getType().isParameterized()
-				? Type.WILDCARD
-				: dependency.getType().getParameters()[0];
+			Type<?> elementType = dependency.getType().parameter( 0 );
 			return bridge( supplyArray( dependency.anyTyped( elementType.getArrayType() ), injector ) );
 		}
 

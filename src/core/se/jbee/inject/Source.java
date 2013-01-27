@@ -36,10 +36,7 @@ public final class Source
 
 	@Override
 	public String toString() {
-		String id = ident.getClass().getCanonicalName() + ":" + ident.toString();
-		return declarationType == DeclarationType.IMPLICIT
-			? "(" + id + ")"
-			: id;
+		return declarationType.name() + " " + ident.getCanonicalName();
 	}
 
 	@Override

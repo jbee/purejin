@@ -5,7 +5,6 @@
  */
 package se.jbee.inject;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
@@ -61,11 +60,7 @@ public final class Type<T>
 	}
 
 	public static Type<?>[] wildcards( TypeVariable<?>... variables ) {
-		Type<?>[] res = new Type<?>[variables.length];
-		for ( int i = 0; i < res.length; i++ ) {
-			res[i] = WILDCARD;
-		}
-		return res;
+		return Array.fill( WILDCARD, variables.length );
 	}
 
 	@SuppressWarnings ( "unchecked" )
@@ -221,6 +216,16 @@ public final class Type<T>
 	 */
 	public Type<?>[] getParameters() {
 		return params;
+	}
+
+	public Type<?> parameter( int index ) {
+		if ( index < 0 || index >= rawType.getTypeParameters().length ) {
+			throw new IndexOutOfBoundsException( "The type " + this
+					+ " has no type parameter at index: " + index );
+		}
+		return isRawType()
+			? WILDCARD
+			: params[index];
 	}
 
 	@Override
@@ -448,6 +453,9 @@ public final class Type<T>
 
 	@SuppressWarnings ( "unchecked" )
 	public static <S> Type<? extends S> supertype( Class<S> supertype, Type<? extends S> type ) {
+		if ( supertype == Object.class ) {
+			return (Type<? extends S>) OBJECT;
+		}
 		for ( Type<?> s : type.supertypes() ) {
 			if ( s.getRawType() == supertype ) {
 				return (Type<? extends S>) s;

@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import se.jbee.inject.Array;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Packages;
@@ -97,9 +98,7 @@ public class Inspect
 				res.add( Instance.instance( name, types[i] ) );
 			}
 		}
-		return res.size() == 0
-			? NO_PARAMETERS
-			: res.toArray( new Parameter<?>[res.size()] );
+		return Array.of( res, NO_PARAMETERS );
 	}
 
 	@Override
@@ -139,7 +138,7 @@ public class Inspect
 				res.add( m );
 			}
 		}
-		return res.toArray( new Method[res.size()] );
+		return Array.of( res, NO_METHODS );
 	}
 
 	/**

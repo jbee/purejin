@@ -108,6 +108,21 @@ public class TestMorePrecise {
 				Packages.subPackagesOf( String.class ) );
 	}
 
+	@Test
+	public void thatPrecisionIsGivenByOrdinalStartingWithLowestPrecision() {
+		DeclarationType[] types = DeclarationType.values();
+		for ( int i = 1; i < types.length; i++ ) {
+			assertTrue( types[i].morePreciseThan( types[i - 1] ) );
+		}
+	}
+
+	@Test
+	public void thatExplicitSourceIsMorePreciseThanAutoSource() {
+		Source source = Source.source( TestMorePrecise.class );
+		assertMorePrecise( source.typed( DeclarationType.EXPLICIT ),
+				source.typed( DeclarationType.AUTO ) );
+	}
+
 	private <T extends PreciserThan<? super T>> void assertMorePrecise( T morePrecise, T lessPrecise ) {
 		assertTrue( morePrecise.morePreciseThan( lessPrecise ) );
 		assertFalse( lessPrecise.morePreciseThan( morePrecise ) );

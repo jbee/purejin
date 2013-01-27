@@ -11,4 +11,5 @@ public class TestDeclarationType {
 	public void thatExplicitIsReplacedByExplicit() {
 		assertTrue( EXPLICIT.replacedBy( EXPLICIT ) );
 	}
+
 }

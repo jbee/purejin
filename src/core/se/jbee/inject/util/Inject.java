@@ -6,8 +6,8 @@
 package se.jbee.inject.util;
 
 import static se.jbee.inject.Emergence.emergence;
+import static se.jbee.inject.Type.raw;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.IdentityHashMap;
@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import se.jbee.inject.Array;
 import se.jbee.inject.Demand;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Expiry;
@@ -122,6 +123,7 @@ public final class Inject {
 				return resolveArray( dependency, type.elementType() );
 			}
 			if ( type.getRawType() == Injectron.class ) {
+				//FIXME type parameter could not be specified -> use WILDCARD
 				Injectron<?> i = applicableInjectron( dependency.onTypeParameter() );
 				if ( i != null ) {
 					return (T) i;
@@ -156,7 +158,7 @@ public final class Inject {
 
 		private <T, E> T resolveArray( Dependency<T> dependency, Type<E> elementType ) {
 			if ( elementType.getRawType() == Injectron.class ) {
-				return resolveInjectronArray( dependency, elementType.getParameters()[0] );
+				return resolveInjectronArray( dependency, elementType.parameter( 0 ) );
 			}
 			Injectron<E>[] elementInjectrons = typeInjectrons( elementType );
 			if ( elementInjectrons != null ) {
@@ -180,19 +182,29 @@ public final class Inject {
 			throw noInjectronFor( dependency );
 		}
 
-		private <T, I> T resolveInjectronArray( Dependency<T> dependency, Type<I> injectronType ) {
-			Injectron<I>[] res = typeInjectrons( injectronType );
+		private <T, I> T resolveInjectronArray( Dependency<T> dependency, Type<I> instanceType ) {
+			Dependency<I> instanceDependency = dependency.typed( instanceType );
+			if ( instanceType.isLowerBound() ) {
+				List<Injectron<?>> res = new ArrayList<Injectron<?>>();
+				for ( Entry<Class<?>, Injectron<?>[]> e : injectrons.entrySet() ) {
+					if ( raw( e.getKey() ).isAssignableTo( instanceType ) ) {
+						for ( Injectron<? extends I> i : (Injectron<? extends I>[]) e.getValue() ) {
+							if ( i.getResource().isSuitableFor( instanceDependency ) ) {
+								res.add( i );
+							}
+						}
+					}
+				}
+				return toArray( res, raw( Injectron.class ) );
+			}
+			Injectron<I>[] res = typeInjectrons( instanceType );
 			List<Injectron<I>> elements = new ArrayList<Injectron<I>>( res.length );
-			Dependency<I> injectornDependency = dependency.typed( injectronType );
 			for ( Injectron<I> i : res ) {
-				if ( i.getResource().isAdequateFor( injectornDependency )
-						&& i.getResource().isAssignableTo( injectornDependency ) ) {
+				if ( i.getResource().isSuitableFor( instanceDependency ) ) {
 					elements.add( i );
 				}
 			}
-			@SuppressWarnings ( "unchecked" )
-			T array = (T) elements.toArray( new Injectron<?>[elements.size()] );
-			return array;
+			return toArray( elements, raw( Injectron.class ) );
 		}
 
 		private <E, T> void addAllApplicable( List<E> elements, Dependency<T> dependency,
@@ -207,9 +219,8 @@ public final class Inject {
 		}
 
 		@SuppressWarnings ( "unchecked" )
-		private <T, E> T toArray( List<E> elements, Type<E> elementType ) {
-			return (T) elements.toArray( (E[]) Array.newInstance( elementType.getRawType(),
-					elements.size() ) );
+		private <T, E> T toArray( List<? extends E> elements, Type<E> elementType ) {
+			return (T) Array.of( elements, elementType.getRawType() );
 		}
 
 		@SuppressWarnings ( "unchecked" )
@@ -274,7 +285,7 @@ public final class Inject {
 
 		@Override
 		public String toString() {
-			return demand.toString() + resource.getTarget().toString();
+			return demand.toString() + resource.getTarget().toString() + " " + source.toString();
 		}
 	}
 

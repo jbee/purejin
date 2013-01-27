@@ -37,7 +37,7 @@ public class TestCommandBinds {
 		@Override
 		public Command<?> supply( Dependency<? super Command<?>> dependency, Injector injector ) {
 			ServiceProvider provider = injector.resolve( dependency( ServiceProvider.class ) );
-			return newCommand( provider.provide( dependency.getType().getParameters()[0],
+			return newCommand( provider.provide( dependency.getType().parameter( 0 ),
 					raw( Long.class ) ) );
 		}
 

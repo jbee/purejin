@@ -62,4 +62,6 @@ public class TestInjectronBinds {
 		Injector resolved = injector.resolve( dependency( Injector.class ) );
 		assertThat( resolved, sameInstance( injector ) );
 	}
+
+	//TODO check that array of Injectrons is available 
 }

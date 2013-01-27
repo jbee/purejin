@@ -11,6 +11,8 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
+import se.jbee.inject.Array;
+import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Expiry;
 import se.jbee.inject.Precision;
 import se.jbee.inject.Repository;
@@ -55,7 +57,7 @@ public final class Link {
 
 		@Override
 		public Suppliable<?>[] link( Inspector inspector, Module... modules ) {
-			return link( cleanedUp( bindingsFrom( modules, inspector ) ) );
+			return link( disambiguate( bindingsFrom( modules, inspector ) ) );
 		}
 
 		private Suppliable<?>[] link( Binding<?>[] bindings ) {
@@ -84,7 +86,11 @@ public final class Link {
 			return repositories;
 		}
 
-		private Binding<?>[] cleanedUp( Binding<?>[] bindings ) {
+		/**
+		 * Removes those bindings that are ambiguous but also do not clash because of different
+		 * {@link DeclarationType}s that replace each other.
+		 */
+		private Binding<?>[] disambiguate( Binding<?>[] bindings ) {
 			if ( bindings.length <= 1 ) {
 				return bindings;
 			}
@@ -103,7 +109,7 @@ public final class Link {
 					throw new IllegalStateException( "Duplicate binds:" + one + "," + other );
 				}
 			}
-			return res.toArray( new Binding[res.size()] );
+			return Array.of( res, Binding.class );
 		}
 
 		private Binding<?>[] bindingsFrom( Module[] modules, Inspector inspector ) {
@@ -111,7 +117,7 @@ public final class Link {
 			for ( Module m : modules ) {
 				m.declare( bindings, inspector );
 			}
-			return bindings.list.toArray( new Binding<?>[0] );
+			return Array.of( bindings.list, Binding.class );
 		}
 
 	}
@@ -151,8 +157,12 @@ public final class Link {
 
 		@Override
 		public int compareTo( Binding<?> other ) {
-			int res = Precision.comparePrecision( resource.getInstance(),
-					other.resource.getInstance() );
+			int res = resource.getType().getRawType().getCanonicalName().compareTo(
+					other.resource.getType().getRawType().getCanonicalName() );
+			if ( res != 0 ) {
+				return res;
+			}
+			res = Precision.comparePrecision( resource.getInstance(), other.resource.getInstance() );
 			if ( res != 0 ) {
 				return res;
 			}
@@ -169,7 +179,7 @@ public final class Link {
 
 		@Override
 		public String toString() {
-			return source + " / " + resource + " / " + scope;
+			return resource + " / " + scope + " / " + source;
 		}
 
 		Suppliable<T> suppliableIn( Repository repository, Expiry expiration ) {

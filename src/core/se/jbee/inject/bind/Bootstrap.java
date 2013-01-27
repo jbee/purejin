@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import se.jbee.inject.Array;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Injectron;
 import se.jbee.inject.Packages;
@@ -240,7 +241,7 @@ public final class Bootstrap {
 			}
 			Set<Class<? extends Bundle>> installed = new LinkedHashSet<Class<? extends Bundle>>();
 			addAllInstalledIn( root, installed );
-			return (Class<? extends Bundle>[]) installed.toArray( new Class<?>[installed.size()] );
+			return Array.of( installed, Class.class );
 		}
 
 		private Module[] modulesOf( Class<? extends Bundle>[] bundles ) {
@@ -251,7 +252,7 @@ public final class Bootstrap {
 					installed.addAll( modules );
 				}
 			}
-			return installed.toArray( new Module[installed.size()] );
+			return Array.of( installed, Module.class );
 		}
 
 		@Override

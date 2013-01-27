@@ -59,8 +59,8 @@ public abstract class ServiceModule
 	/**
 	 * The {@link Inspector} picks the {@link Method}s that are used to implement
 	 * {@link ServiceMethod}s. This abstraction allows to customize what methods are bound as
-	 * {@link ServiceMethod}s. The {@link Inspector#inspect(Class)} should return all methods in the
-	 * given {@link Class} that should be used to implement a {@link ServiceMethod}.
+	 * {@link ServiceMethod}s. The {@link Inspector#methodsIn(Class)} should return all methods in
+	 * the given {@link Class} that should be used to implement a {@link ServiceMethod}.
 	 */
 	static final Instance<Inspector> SERVICE_INSPECTOR = instance( named( "service" ),
 			raw( Inspector.class ) );
@@ -210,8 +210,8 @@ public abstract class ServiceModule
 		public ServiceMethod<?, ?> supply( Dependency<? super ServiceMethod<?, ?>> dependency,
 				Injector injector ) {
 			ServiceProvider serviceProvider = injector.resolve( dependency.anyTyped( ServiceProvider.class ) );
-			Type<?>[] parameters = dependency.getType().getParameters();
-			return serviceProvider.provide( parameters[0], parameters[1] );
+			Type<? super ServiceMethod<?, ?>> type = dependency.getType();
+			return serviceProvider.provide( type.parameter( 0 ), type.parameter( 1 ) );
 		}
 	}
 

@@ -40,10 +40,7 @@ public final class Instances
 		if ( isAny() ) {
 			return new Instances( top );
 		}
-		Instance<?>[] copy = new Instance<?>[hierarchy.length + 1];
-		System.arraycopy( hierarchy, 0, copy, 1, hierarchy.length );
-		copy[0] = top;
-		return new Instances( copy );
+		return new Instances( Array.prepand( top, hierarchy ) );
 	}
 
 	public boolean equalTo( Instances other ) {

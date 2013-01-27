@@ -1,14 +1,17 @@
 package se.jbee.inject.bind;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.util.Typecast.injectronsTypeOf;
 
 import org.junit.Test;
 
-import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
+import se.jbee.inject.Injectron;
 import se.jbee.inject.Name;
 import se.jbee.inject.Resource;
 import se.jbee.inject.DIRuntimeException.DependencyCycleException;
@@ -58,6 +61,18 @@ public class TestBootstrapper {
 		protected void declare() {
 			bind( Integer.class ).to( 42 );
 			bind( Integer.class ).to( 8 );
+		}
+
+	}
+
+	private static class ReplacingBindsModule
+			extends BinderModule {
+
+		@Override
+		protected void declare() {
+			autobind( Integer.class ).to( 2 );
+			autobind( Float.class ).to( 4f );
+			bind( Number.class ).to( 6 );
 		}
 
 	}
@@ -113,7 +128,7 @@ public class TestBootstrapper {
 
 	}
 
-	private static class CircleBindsModule
+	private static class CircularBindsModule
 			extends BinderModule {
 
 		@Override
@@ -142,15 +157,31 @@ public class TestBootstrapper {
 	@Test ( expected = DependencyCycleException.class )
 	public void thatDependencyCyclesAreDetected() {
 		Injector injector = Bootstrap.injector( CyclicBindsModule.class );
-		Foo foo = injector.resolve( Dependency.dependency( Foo.class ) );
+		Foo foo = injector.resolve( dependency( Foo.class ) );
 		fail( "foo should not be resolvable but was: " + foo );
 	}
 
 	@Test ( expected = DependencyCycleException.class )
 	public void thatDependencyCyclesInCirclesAreDetected() {
-		Injector injector = Bootstrap.injector( CircleBindsModule.class );
-		A a = injector.resolve( Dependency.dependency( A.class ) );
+		Injector injector = Bootstrap.injector( CircularBindsModule.class );
+		A a = injector.resolve( dependency( A.class ) );
 		fail( "A should not be resolvable but was: " + a );
 	}
 
+	@Test
+	public void thatBindingsAreReplacedByMorePreciseOnes() {
+		Injector injector = Bootstrap.injector( ReplacingBindsModule.class );
+		assertEquals( 6, injector.resolve( dependency( Number.class ) ) );
+		Injectron<?>[] injectrons = injector.resolve( dependency( Injectron[].class ) );
+		assertEquals( 7, injectrons.length ); // 2x Serializable, 2x Comparable, Float, Integer and Number
+		Injectron<Number>[] numberInjectrons = injector.resolve( dependency( injectronsTypeOf( Number.class ) ) );
+		assertEquals( 1, numberInjectrons.length );
+	}
+
+	@Test
+	public void thatEagerSingeltonsAreCreated() {
+		//TODO use better module for test that uses suppliers that allow to check that the singletons got created and also a module that has non-singleton binds
+		Injector injector = Bootstrap.injector( ReplacingBindsModule.class );
+		Bootstrap.eagerSingletons( injector );
+	}
 }

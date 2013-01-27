@@ -41,6 +41,10 @@ public final class Resource<T>
 				&& isAssignableTo( dependency ); // most 'expensive' check so we do it last
 	}
 
+	public boolean isSuitableFor( Dependency<? super T> dependency ) {
+		return isAdequateFor( dependency ) && isAssignableTo( dependency );
+	}
+
 	/**
 	 * Does the {@link Type} of this a valid argument for the one of the {@link Dependency} given ?
 	 */

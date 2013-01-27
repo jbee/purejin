@@ -6,6 +6,7 @@
 package se.jbee.inject;
 
 import static se.jbee.inject.Emergence.emergence;
+import static se.jbee.inject.Instance.defaultInstanceOf;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Type.raw;
 
@@ -75,7 +76,7 @@ public final class Dependency<T>
 	}
 
 	public Dependency<?> onTypeParameter() {
-		return dependency( getType().getParameters()[0], hierarchy );
+		return dependency( getType().parameter( 0 ), hierarchy );
 	}
 
 	public <E> Dependency<E> instanced( Instance<E> instance ) {
@@ -133,7 +134,7 @@ public final class Dependency<T>
 	}
 
 	public Dependency<T> injectingInto( Type<?> target ) {
-		return injectingInto( Instance.defaultInstanceOf( target ) );
+		return injectingInto( defaultInstanceOf( target ) );
 	}
 
 	public Dependency<T> injectingInto( Instance<?> target ) {
@@ -147,9 +148,7 @@ public final class Dependency<T>
 		}
 		ensureNotMoreFrequentExpiry( injection );
 		ensureNoCycle( injection );
-		Injection[] copy = Arrays.copyOf( hierarchy, hierarchy.length + 1 );
-		copy[hierarchy.length] = injection;
-		return new Dependency<T>( instance, copy );
+		return new Dependency<T>( instance, Array.append( hierarchy, injection ) );
 	}
 
 	private void ensureNoCycle( Injection injection )
