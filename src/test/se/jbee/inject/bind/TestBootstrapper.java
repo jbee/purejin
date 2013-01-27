@@ -5,16 +5,20 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.util.Scoped.INJECTION;
 import static se.jbee.inject.util.Typecast.injectronsTypeOf;
 
 import org.junit.Test;
 
 import se.jbee.inject.DeclarationType;
+import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Injectron;
 import se.jbee.inject.Name;
 import se.jbee.inject.Resource;
+import se.jbee.inject.Supplier;
 import se.jbee.inject.DIRuntimeException.DependencyCycleException;
 
 /**
@@ -141,6 +145,30 @@ public class TestBootstrapper {
 
 	}
 
+	private static class EagerSingletonsBindsModule
+			extends BinderModule
+			implements Supplier<String> {
+
+		static int eagers = 0;
+
+		@Override
+		protected void declare() {
+			bind( named( "eager" ), String.class ).to( this );
+			per( INJECTION ).bind( named( "lazy" ), String.class ).to( this );
+		}
+
+		@Override
+		public String supply( Dependency<? super String> dependency, Injector injector ) {
+			if ( !dependency.getName().equalTo( named( "lazy" ) ) ) {
+				eagers++;
+				return "eager";
+			}
+			fail( "since it is lazy it should not be called" );
+			return "fail";
+		}
+
+	}
+
 	/**
 	 * The assert itself doesn't play such huge role here. we just want to reach this code.
 	 */
@@ -186,8 +214,9 @@ public class TestBootstrapper {
 
 	@Test
 	public void thatEagerSingeltonsCanBeCreated() {
-		//TODO use better module for test that uses suppliers that allow to check that the singletons got created and also a module that has non-singleton binds
-		Injector injector = Bootstrap.injector( ReplacingBindsModule.class );
+		Injector injector = Bootstrap.injector( EagerSingletonsBindsModule.class );
+		int before = EagerSingletonsBindsModule.eagers;
 		Bootstrap.eagerSingletons( injector );
+		assertEquals( before + 1, EagerSingletonsBindsModule.eagers );
 	}
 }
