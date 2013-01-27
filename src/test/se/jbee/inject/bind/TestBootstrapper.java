@@ -10,6 +10,7 @@ import static se.jbee.inject.util.Typecast.injectronsTypeOf;
 
 import org.junit.Test;
 
+import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Injectron;
 import se.jbee.inject.Name;
@@ -168,6 +169,11 @@ public class TestBootstrapper {
 		fail( "A should not be resolvable but was: " + a );
 	}
 
+	/**
+	 * In the example {@link Number} is {@link DeclarationType#AUTO} bound for {@link Integer} and
+	 * {@link Float} but an {@link DeclarationType#EXPLICIT} bind done overrides these automatic
+	 * binds. They are removed and no {@link Injectron} is created for them.
+	 */
 	@Test
 	public void thatBindingsAreReplacedByMorePreciseOnes() {
 		Injector injector = Bootstrap.injector( ReplacingBindsModule.class );
@@ -179,7 +185,7 @@ public class TestBootstrapper {
 	}
 
 	@Test
-	public void thatEagerSingeltonsAreCreated() {
+	public void thatEagerSingeltonsCanBeCreated() {
 		//TODO use better module for test that uses suppliers that allow to check that the singletons got created and also a module that has non-singleton binds
 		Injector injector = Bootstrap.injector( ReplacingBindsModule.class );
 		Bootstrap.eagerSingletons( injector );

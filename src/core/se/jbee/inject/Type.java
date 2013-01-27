@@ -453,8 +453,8 @@ public final class Type<T>
 
 	@SuppressWarnings ( "unchecked" )
 	public static <S> Type<? extends S> supertype( Class<S> supertype, Type<? extends S> type ) {
-		if ( supertype == Object.class ) {
-			return (Type<? extends S>) OBJECT;
+		if ( supertype.getTypeParameters().length == 0 ) {
+			return raw( supertype ); // just for better performance 
 		}
 		for ( Type<?> s : type.supertypes() ) {
 			if ( s.getRawType() == supertype ) {
@@ -476,6 +476,9 @@ public final class Type<T>
 		java.lang.reflect.Type genericSupertype = null;
 		Type<?> type = this;
 		Map<String, Type<?>> actualTypeArguments = actualTypeArguments( type );
+		if ( isInterface() ) {
+			res.add( OBJECT );
+		}
 		while ( supertype != null ) {
 			if ( genericSupertype != null ) {
 				type = type( genericSupertype, actualTypeArguments );
