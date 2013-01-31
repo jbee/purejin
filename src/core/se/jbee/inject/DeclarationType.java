@@ -41,7 +41,7 @@ public enum DeclarationType
 	}
 
 	public boolean clashesWith( DeclarationType other ) {
-		return this == EXPLICIT && other == EXPLICIT;
+		return ordinal() + other.ordinal() > MULTI.ordinal() * 2;
 	}
 
 	public boolean replacedBy( DeclarationType other ) {
