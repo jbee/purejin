@@ -75,6 +75,8 @@ public class TestBootstrapper {
 
 		@Override
 		protected void declare() {
+			asDefault().bind( Number.class ).to( 8 );
+			asDefault().bind( Integer.class ).to( 10 );
 			autobind( Integer.class ).to( 2 );
 			autobind( Float.class ).to( 4f );
 			bind( Number.class ).to( 6 );

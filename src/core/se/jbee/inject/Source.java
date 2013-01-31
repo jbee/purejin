@@ -6,7 +6,7 @@
 package se.jbee.inject;
 
 /**
- * Where does a bind came from and what type of declaration has it been.
+ * Where does a bind come from and what type of declaration has it been.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */

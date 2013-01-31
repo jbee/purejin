@@ -5,6 +5,20 @@
  */
 package se.jbee.inject;
 
+/**
+ * The {@link DeclarationType} is used to keep track of the origin of binding declarations. They
+ * describe how or why a binding has been made whereby they get different significance and meaning.
+ * 
+ * While binds consciously done by API calls through the programmer result in {@link #EXPLICIT} or
+ * {@link #MULTI} there are 3 weaker types for those binds that added indirectly. They provide a
+ * convenient fall-back behaviour that allows to omit simple self-evident binds but allow to
+ * override these fall-backs explicitly.
+ * 
+ * It is important to distinguish binds in that way since binds always have to be unambiguous. Two
+ * equivalent binds would {@link #clashesWith(DeclarationType)} each other.
+ * 
+ * @author Jan Bernitt (jan@jbee.se)
+ */
 public enum DeclarationType
 		implements PreciserThan<DeclarationType> {
 
@@ -27,7 +41,8 @@ public enum DeclarationType
 	 */
 	AUTO,
 	/**
-	 * A bind that is ment to co-exist with other that might have the same {@link Resource}.
+	 * A bind that is meant to co-exist with others that might have the same {@link Resource}. Those
+	 * have to be defined as {@link #MULTI} as well!
 	 */
 	MULTI,
 	/**
