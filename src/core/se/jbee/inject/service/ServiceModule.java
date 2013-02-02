@@ -69,6 +69,10 @@ public abstract class ServiceModule
 		binder.extend( ServiceClassExtension.class, service );
 	}
 
+	protected final void bindServiceInspectorTo( Inspector inspector ) {
+		binder.bind( SERVICE_INSPECTOR ).to( inspector );
+	}
+
 	protected final void extend( ServiceInvocationExtension type,
 			Class<? extends ServiceInvocation<?>> invocation ) {
 		//TODO we need a special binder for this
@@ -175,9 +179,15 @@ public abstract class ServiceModule
 				for ( Method sm : serviceClassMethods( service ) ) {
 					Type<?> rt = returnType( sm );
 					if ( rt.equalTo( returnType ) ) {
-						for ( Type<?> pt : parameterTypes( sm ) ) {
-							if ( pt.equalTo( parameterType ) ) {
+						if ( parameterType.equalTo( Type.VOID ) ) {
+							if ( sm.getParameterTypes().length == 0 ) {
 								return sm;
+							}
+						} else {
+							for ( Type<?> pt : parameterTypes( sm ) ) {
+								if ( pt.equalTo( parameterType ) ) {
+									return sm;
+								}
 							}
 						}
 					}
