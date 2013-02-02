@@ -62,7 +62,7 @@ public abstract class ServiceModule
 	 * {@link ServiceMethod}s. The {@link Inspector#methodsIn(Class)} should return all methods in
 	 * the given {@link Class} that should be used to implement a {@link ServiceMethod}.
 	 */
-	static final Instance<Inspector> SERVICE_INSPECTOR = instance( named( "service" ),
+	public static final Instance<Inspector> SERVICE_INSPECTOR = instance( named( "service" ),
 			raw( Inspector.class ) );
 
 	protected final void bindServiceMethodsIn( Class<?> service ) {
@@ -96,7 +96,7 @@ public abstract class ServiceModule
 
 	protected abstract void declare();
 
-	static class ServiceMethodModule
+	private static final class ServiceMethodModule
 			extends BinderModule {
 
 		@Override
@@ -133,16 +133,16 @@ public abstract class ServiceModule
 		 */
 		private final Map<String, ServiceMethod<?, ?>> serviceCache = new HashMap<String, ServiceMethod<?, ?>>();
 
-		private final Injector context;
+		private final Injector injector;
 		private final Inspector inspect;
 		private final Class<?>[] serviceClasses;
 
-		ServiceMethodProvider( Injector context ) {
+		ServiceMethodProvider( Injector injector ) {
 			super();
-			this.context = context;
-			this.serviceClasses = context.resolve( Extend.extensionDependency( ServiceClassExtension.class ) );
-			this.inspect = context.resolve( dependency( SERVICE_INSPECTOR ).injectingInto(
-					ServiceMethodProvider.class ) );
+			this.injector = injector;
+			this.serviceClasses = injector.resolve( Extend.extensionDependency( ServiceClassExtension.class ) );
+			this.inspect = injector.resolve( dependency( SERVICE_INSPECTOR ).injectingInto(
+					ServiceProvider.class ) );
 		}
 
 		@SuppressWarnings ( "unchecked" )
@@ -155,7 +155,7 @@ public abstract class ServiceModule
 					service = serviceCache.get( signatur );
 					if ( service == null ) {
 						service = create( resolveServiceMethod( parameterType, returnType ),
-								parameterType, returnType, context );
+								parameterType, returnType, injector );
 						serviceCache.put( signatur, service );
 					}
 				}
@@ -164,10 +164,10 @@ public abstract class ServiceModule
 		}
 
 		private <P, T> ServiceMethod<P, T> create( Method service, Type<P> parameterType,
-				Type<T> returnType, Injector context ) {
-			return new PreresolvingServiceMethod<P, T>(
-					TypeReflector.newInstance( service.getDeclaringClass() ), service,
-					parameterType, returnType, context );
+				Type<T> returnType, Injector injector ) {
+			Object implementor = injector.resolve( dependency( service.getDeclaringClass() ) );
+			return new PreresolvingServiceMethod<P, T>( implementor, service, parameterType,
+					returnType, injector );
 		}
 
 		private <P, T> Method resolveServiceMethod( Type<P> parameterType, Type<T> returnType ) {
@@ -203,7 +203,7 @@ public abstract class ServiceModule
 
 	}
 
-	private static class ServiceSupplier
+	private static final class ServiceSupplier
 			implements Supplier<ServiceMethod<?, ?>> {
 
 		@Override
@@ -215,32 +215,32 @@ public abstract class ServiceModule
 		}
 	}
 
-	private static class PreresolvingServiceMethod<P, T>
+	private static final class PreresolvingServiceMethod<P, T>
 			implements ServiceMethod<P, T> {
 
-		private final Object object;
+		private final Object implementor;
 		private final Method method;
 		private final Type<P> parameterType;
 		private final Type<T> returnType;
-		private final Injector context;
-		private final Type<?>[] parameterTypes;
+		private final Injector injector;
 		private final Injectron<?>[] argumentInjectrons;
+		private final Type<?>[] parameterTypes;
 		private final Object[] argumentTemplate;
 		private final ServiceInvocation<?>[] invocations;
 
-		PreresolvingServiceMethod( Object object, Method service, Type<P> parameterType,
-				Type<T> returnType, Injector context ) {
+		PreresolvingServiceMethod( Object implementor, Method service, Type<P> parameterType,
+				Type<T> returnType, Injector injector ) {
 			super();
-			this.object = object;
+			this.implementor = implementor;
 			this.method = service;
 			TypeReflector.makeAccessible( method );
 			this.parameterType = parameterType;
 			this.returnType = returnType;
-			this.context = context;
+			this.injector = injector;
 			this.parameterTypes = parameterTypes( service );
 			this.argumentInjectrons = argumentInjectrons();
 			this.argumentTemplate = argumentTemplate();
-			this.invocations = resolveInvocations( context );
+			this.invocations = resolveInvocations( injector );
 		}
 
 		private ServiceInvocation<?>[] resolveInvocations( Injector context ) {
@@ -270,7 +270,7 @@ public abstract class ServiceModule
 			Object[] state = before( params );
 			T res = null;
 			try {
-				res = returnType.getRawType().cast( method.invoke( object, args ) );
+				res = returnType.getRawType().cast( method.invoke( implementor, args ) );
 			} catch ( Exception e ) {
 				if ( e instanceof InvocationTargetException ) {
 					Throwable t = ( (InvocationTargetException) e ).getTargetException();
@@ -349,7 +349,7 @@ public abstract class ServiceModule
 				Type<?> paramType = parameterTypes[i];
 				res[i] = paramType.equalTo( parameterType )
 					? null
-					: context.resolve( dependency( raw( Injectron.class ).parametized( paramType ) ) );
+					: injector.resolve( dependency( raw( Injectron.class ).parametized( paramType ) ) );
 			}
 			return res;
 		}

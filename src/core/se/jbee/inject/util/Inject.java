@@ -123,7 +123,6 @@ public final class Inject {
 				return resolveArray( dependency, type.elementType() );
 			}
 			if ( type.getRawType() == Injectron.class ) {
-				//FIXME type parameter could not be specified -> use WILDCARD
 				Injectron<?> i = applicableInjectron( dependency.onTypeParameter() );
 				if ( i != null ) {
 					return (T) i;
@@ -188,7 +187,9 @@ public final class Inject {
 				List<Injectron<?>> res = new ArrayList<Injectron<?>>();
 				for ( Entry<Class<?>, Injectron<?>[]> e : injectrons.entrySet() ) {
 					if ( raw( e.getKey() ).isAssignableTo( instanceType ) ) {
-						for ( Injectron<? extends I> i : (Injectron<? extends I>[]) e.getValue() ) {
+						@SuppressWarnings ( "unchecked" )
+						Injectron<? extends I>[] typeInjectrons = (Injectron<? extends I>[]) e.getValue();
+						for ( Injectron<? extends I> i : typeInjectrons ) {
 							if ( i.getResource().isSuitableFor( instanceDependency ) ) {
 								res.add( i );
 							}
