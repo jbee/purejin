@@ -211,6 +211,8 @@ public class Binder
 			in( implementor, new Parameter<?>[0] );
 		}
 
+		//TODO impl. could also be an instance -> instance methods dependend on state in that instance 
+
 		public void in( Class<?> implementor, Parameter<?>... parameters ) {
 			boolean instanceMethods = false;
 			for ( Method method : inspector.methodsIn( implementor ) ) {

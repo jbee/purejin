@@ -35,7 +35,15 @@ public interface Inspector {
 	 */
 	<T> Method[] methodsIn( Class<T> implementor );
 
+	/**
+	 * @return The {@link Name} of the instance provided by the given object. Use
+	 *         {@link Name#DEFAULT} for no specific name.
+	 */
 	Name nameFor( AccessibleObject obj );
 
+	/**
+	 * @return The {@link Parameter} hints for the construction/invocation of the given object. Use
+	 *         a zero length array if there are no hits.
+	 */
 	Parameter<?>[] parametersFor( AccessibleObject obj );
 }

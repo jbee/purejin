@@ -8,29 +8,32 @@ import org.junit.Test;
 
 import se.jbee.inject.Injector;
 
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
+
 /**
- * The test demonstrates how to use {@link Constants} and {@link Const} types to allow different
- * bootstrapping depended on a setting that can be determined before the bootstrapping and that is
- * constant from that moment on. In this example it is the machine the application is running on.
+ * The test demonstrates how to use {@link Options} to allow different bootstrapping depended on a
+ * setting that can be determined before the bootstrapping and that is constant from that moment on.
+ * In this example it is the machine the application is running on.
  * 
  * Again this technique should avoid if-statements in the {@link Bundle}s and {@link Module}s itself
  * to get manageable and predictable sets of configurations that can be composed easily using
  * arguments to the bootstrapping process itself.
  * 
  * In this example we use {@link Binder#multibind(Class)}s to show that just one of them has been
- * bootstrapped depending on the value we defined in the {@link Constants} before bootstrapping.
+ * bootstrapped depending on the value we defined in the {@link Options} before bootstrapping.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
-public class TestConstantModularBinds {
+public class TestModularBinds {
 
-	private static enum Machine
-			implements Const {
+	private static enum Machine {
 		LOCALHOST,
 		WORKER_1
 	}
 
-	private static class ConstantModularBindsBundle
+	//TODO test with multiple chosen options
+
+	private static class ModularBindsBundle
 			extends BootstrapperBundle {
 
 		@Override
@@ -42,7 +45,7 @@ public class TestConstantModularBinds {
 
 	/**
 	 * The {@link GenericMachineBundle} will be used when no {@link Machine} {@link Const} has been
-	 * defined in the {@link Constants} so that it is actually <code>null</code>.
+	 * defined in the {@link Options} so that it is actually <code>null</code>.
 	 */
 	private static class MachineBundle
 			extends ModularBootstrapperBundle<Machine> {
@@ -87,19 +90,19 @@ public class TestConstantModularBinds {
 
 	@Test
 	public void thatBundleOfTheGivenConstGotBootstrappedAndOthersNot() {
-		assertResolved( Machine.LOCALHOST, "on-localhost" );
-		assertResolved( Machine.WORKER_1, "on-worker-1" );
+		assertOptionResolvedToValue( Machine.LOCALHOST, "on-localhost" );
+		assertOptionResolvedToValue( Machine.WORKER_1, "on-worker-1" );
 	}
 
 	@Test
 	public void thatBundleOfUndefinedConstGotBootstrappedAndOthersNot() {
-		assertResolved( null, "on-generic" );
+		assertOptionResolvedToValue( null, "on-generic" );
 	}
 
-	private void assertResolved( Machine actualConstant, String expected ) {
-		Constants constants = Constants.NONE.def( actualConstant );
-		Injector injector = Bootstrap.injector( ConstantModularBindsBundle.class, Edition.FULL,
-				constants );
+	private void assertOptionResolvedToValue( Machine actualOption, String expected ) {
+		Options options = Options.STANDARD.chosen( actualOption );
+		Injector injector = Bootstrap.injector( ModularBindsBundle.class, Edition.FULL,
+				Presets.NOTHING, options );
 		String[] actual = injector.resolve( dependency( String[].class ) );
 		assertThat( actual, is( new String[] { expected } ) );
 	}

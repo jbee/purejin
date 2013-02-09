@@ -53,6 +53,8 @@ public interface Bootstrapper {
 	 */
 	void install( Module module );
 
+	<T> void install( PresetModule<T> module );
+
 	/**
 	 * @param modules
 	 *            The choices made to install.
@@ -66,14 +68,13 @@ public interface Bootstrapper {
 	<M extends Enum<M> & ModularBundle<M>> void uninstall( M... modules );
 
 	/**
-	 * @see Constants
+	 * @see Options
 	 * @param bundle
 	 *            the {@link Bundle} to install
 	 * @param property
 	 *            The property the installation is connected to.
 	 */
-	<C extends Enum<C> & Const> void install( Class<? extends ModularBundle<C>> bundle,
-			Class<C> property );
+	<M extends Enum<M>> void install( Class<? extends ModularBundle<M>> bundle, Class<M> property );
 
 	/**
 	 * 

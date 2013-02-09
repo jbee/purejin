@@ -114,6 +114,7 @@ public final class Link {
 
 		private Binding<?>[] bindingsFrom( Module[] modules, Inspector inspector ) {
 			ListBindings bindings = new ListBindings();
+			//FIXME try to not declare same modules more than once
 			for ( Module m : modules ) {
 				m.declare( bindings, inspector );
 			}

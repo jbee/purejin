@@ -41,17 +41,17 @@ public final class Bootstrap {
 	}
 
 	public static Injector injector( Class<? extends Bundle> root, Edition edition ) {
-		return injector( root, edition, Constants.NONE );
+		return injector( root, edition, Presets.NOTHING, Options.STANDARD );
 	}
 
 	public static Injector injector( Class<? extends Bundle> root, Edition edition,
-			Constants constants ) {
-		return injector( root, edition, constants, Inspect.DEFAULT );
+			Presets presets, Options options ) {
+		return injector( root, edition, presets, options, Inspect.DEFAULT );
 	}
 
 	public static Injector injector( Class<? extends Bundle> root, Edition edition,
-			Constants constants, Inspector inspector ) {
-		return injector( modulariser( edition, constants ).modularise( root ), inspector,
+			Presets presets, Options options, Inspector inspector ) {
+		return injector( modulariser( edition, presets, options ).modularise( root ), inspector,
 				Link.BUILDIN );
 	}
 
@@ -60,17 +60,17 @@ public final class Bootstrap {
 		return Inject.from( Suppliable.source( linker.link( inspector, modules ) ) );
 	}
 
-	public static Modulariser modulariser( Edition edition, Constants constants ) {
-		return new BuildinBootstrapper( edition, constants );
+	public static Modulariser modulariser( Edition edition, Presets presets, Options options ) {
+		return new BuildinBootstrapper( edition, presets, options );
 	}
 
-	public static Bundler bundler( Edition edition, Constants constants ) {
-		return new BuildinBootstrapper( edition, constants );
+	public static Bundler bundler( Edition edition, Presets presets, Options options ) {
+		return new BuildinBootstrapper( edition, presets, options );
 	}
 
 	public static Suppliable<?>[] suppliables( Class<? extends Bundle> root ) {
 		return Link.BUILDIN.link( Inspect.DEFAULT, // 
-				modulariser( Edition.FULL, Constants.NONE ).modularise( root ) );
+				modulariser( Edition.FULL, Presets.NOTHING, Options.STANDARD ).modularise( root ) );
 	}
 
 	private Bootstrap() {
@@ -83,6 +83,10 @@ public final class Bootstrap {
 
 	public static Edition edition( Packages included ) {
 		return new PackagesEdition( included );
+	}
+
+	public static <T> Module module( PresetModule<T> module, Presets presets ) {
+		return new LazyPresetModule<T>( module, presets );
 	}
 
 	public static void eagerSingletons( Injector injector ) {
@@ -133,6 +137,27 @@ public final class Bootstrap {
 
 	}
 
+	private static final class LazyPresetModule<T>
+			implements Module {
+
+		private final PresetModule<T> module;
+		private final Presets presets;
+
+		LazyPresetModule( PresetModule<T> module, Presets presets ) {
+			super();
+			this.module = module;
+			this.presets = presets;
+		}
+
+		@Override
+		public void declare( Bindings bindings, Inspector inspector ) {
+			@SuppressWarnings ( "unchecked" )
+			final T value = (T) presets.value( Type.supertype( PresetModule.class,
+					Type.raw( module.getClass() ) ).parameter( 0 ) );
+			module.declare( bindings, inspector, value );
+		}
+	}
+
 	private static class BuildinBootstrapper
 			implements Bootstrapper, Bundler, Modulariser {
 
@@ -142,12 +167,14 @@ public final class Bootstrap {
 		private final Set<Class<? extends Bundle>> installed = new HashSet<Class<? extends Bundle>>();
 		private final LinkedList<Class<? extends Bundle>> stack = new LinkedList<Class<? extends Bundle>>();
 		private final Edition edition;
-		private final Constants constants;
+		private final Presets presets;
+		final Options options;
 
-		BuildinBootstrapper( Edition edition, Constants constants ) {
+		BuildinBootstrapper( Edition edition, Presets presets, Options options ) {
 			super();
 			this.edition = edition;
-			this.constants = constants;
+			this.presets = presets;
+			this.options = options;
 		}
 
 		@Override
@@ -177,17 +204,16 @@ public final class Bootstrap {
 		}
 
 		@Override
-		public <C extends Enum<C> & Const> void install( Class<? extends ModularBundle<C>> bundle,
-				Class<C> property ) {
+		public <C extends Enum<C>> void install( Class<? extends ModularBundle<C>> bundle,
+				final Class<C> property ) {
 			if ( !edition.featured( property ) ) {
 				return;
 			}
-			final C value = constants.value( property );
 			TypeReflector.newInstance( bundle ).bootstrap( new ModularBootstrapper<C>() {
 
 				@Override
 				public void install( Class<? extends Bundle> bundle, C module ) {
-					if ( module == value ) { // null is a valid value to define what happens when no configuration is present
+					if ( options.isChosen( property, module ) ) { // null is a valid value to define what happens when no configuration is present
 						BuildinBootstrapper.this.install( bundle );
 					}
 				}
@@ -226,6 +252,11 @@ public final class Bootstrap {
 				bundleModules.put( bundle, modules );
 			}
 			modules.add( module );
+		}
+
+		@Override
+		public <T> void install( PresetModule<T> module ) {
+			install( module( module, presets ) );
 		}
 
 		@Override

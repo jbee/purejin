@@ -8,7 +8,14 @@ import static se.jbee.inject.Name.named;
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
+import se.jbee.inject.Type;
 
+/**
+ * In Silk primitives and wrapper {@link Class}es are the same {@link Type}.
+ * 
+ * @author Jan Bernitt (jan@jbee.se)
+ * 
+ */
 public class TestPrimitiveBinds {
 
 	private static class PrimitiveBindsModule

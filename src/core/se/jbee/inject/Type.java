@@ -498,9 +498,8 @@ public final class Type<T>
 		Map<String, Type<?>> actualTypeArguments = new HashMap<String, Type<?>>();
 		TypeVariable<Class<V>>[] typeParameters = type.rawType.getTypeParameters();
 		for ( int i = 0; i < typeParameters.length; i++ ) {
-			actualTypeArguments.put( typeParameters[i].getName(), isParameterized()
-				? type.params[i]
-				: WILDCARD ); // it would be correct to use the joint type of the bounds but since it is not possible to create a type with illegal parameters it is ok to just use Object since there is no way to model a joint type
+			// it would be correct to use the joint type of the bounds but since it is not possible to create a type with illegal parameters it is ok to just use Object since there is no way to model a joint type
+			actualTypeArguments.put( typeParameters[i].getName(), type.parameter( i ) );
 		}
 		return actualTypeArguments;
 	}
