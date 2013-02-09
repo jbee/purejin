@@ -7,9 +7,11 @@ package se.jbee.inject.bind;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import se.jbee.inject.Array;
 import se.jbee.inject.DeclarationType;
@@ -22,6 +24,7 @@ import se.jbee.inject.Source;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.util.Scoped;
 import se.jbee.inject.util.Suppliable;
+import se.jbee.inject.util.Classification;
 
 public final class Link {
 
@@ -106,17 +109,28 @@ public final class Link {
 					res.add( other );
 					lastIndependend = i;
 				} else if ( one.source.getType().clashesWith( other.source.getType() ) ) {
-					throw new IllegalStateException( "Duplicate binds:" + one + "," + other );
+					throw new IllegalStateException( "Duplicate binds:\n" + one + "\n" + other );
 				}
 			}
 			return Array.of( res, Binding.class );
 		}
 
 		private Binding<?>[] bindingsFrom( Module[] modules, Inspector inspector ) {
+			Set<Class<?>> declared = new HashSet<Class<?>>();
+			Set<Class<?>> inhomogeneous = new HashSet<Class<?>>();
 			ListBindings bindings = new ListBindings();
-			//FIXME try to not declare same modules more than once
 			for ( Module m : modules ) {
-				m.declare( bindings, inspector );
+				Class<? extends Module> ns = m.getClass();
+				final boolean hasBeenDeclared = declared.contains( ns );
+				if ( hasBeenDeclared ) {
+					if ( !Classification.homogenous( ns ) ) {
+						inhomogeneous.add( ns );
+					}
+				}
+				if ( !hasBeenDeclared || inhomogeneous.contains( ns ) ) {
+					m.declare( bindings, inspector );
+					declared.add( ns );
+				}
 			}
 			return Array.of( bindings.list, Binding.class );
 		}
