@@ -12,6 +12,9 @@ import se.jbee.inject.util.Scoped;
 /**
  * The default utility {@link Module} almost always used.
  * 
+ * A {@link BinderModule} is also a {@link Bundle} so it should be used and installed as such. It
+ * will than {@link Bundle#bootstrap(Bootstrapper)} itself as a module.
+ * 
  * @author Jan Bernitt (jan@jbee.se)
  */
 public abstract class BinderModule
@@ -37,6 +40,9 @@ public abstract class BinderModule
 		declare();
 	}
 
+	/**
+	 * @see Module#declare(Bindings, Inspector)
+	 */
 	protected abstract void declare();
 
 	public <E extends Enum<E> & Extension<E, ? super T>, T> void extend( Class<E> extension,

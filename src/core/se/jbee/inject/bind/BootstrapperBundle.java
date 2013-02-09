@@ -18,7 +18,7 @@ public abstract class BootstrapperBundle
 
 	@Override
 	public final void bootstrap( Bootstrapper bootstrap ) {
-		BootstrappingModule.nonnullThrowsReentranceException( this.bootstrap );
+		Bootstrap.nonnullThrowsReentranceException( this.bootstrap );
 		this.bootstrap = bootstrap;
 		bootstrap();
 	}

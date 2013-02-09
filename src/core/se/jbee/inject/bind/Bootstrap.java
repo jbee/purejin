@@ -73,10 +73,6 @@ public final class Bootstrap {
 				modulariser( Edition.FULL, Presets.NOTHING, Options.STANDARD ).modularise( root ) );
 	}
 
-	private Bootstrap() {
-		throw new UnsupportedOperationException( "util" );
-	}
-
 	public static <T extends Enum<T> & Feature<T>> Edition edition( T... featured ) {
 		return new FeatureEdition<T>( featured[0], EnumSet.of( featured[0], featured ) );
 	}
@@ -99,6 +95,16 @@ public final class Bootstrap {
 
 	public static <T> T instance( Injectron<T> injectron ) {
 		return injectron.instanceFor( dependency( injectron.getResource().getInstance() ) );
+	}
+
+	public static void nonnullThrowsReentranceException( Object field ) {
+		if ( field != null ) {
+			throw new IllegalStateException( "Reentrance not allowed!" );
+		}
+	}
+
+	private Bootstrap() {
+		throw new UnsupportedOperationException( "util" );
 	}
 
 	private static class FeatureEdition<T extends Enum<T>>

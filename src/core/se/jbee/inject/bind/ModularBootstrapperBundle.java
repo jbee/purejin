@@ -19,7 +19,7 @@ public abstract class ModularBootstrapperBundle<M>
 
 	@Override
 	public void bootstrap( ModularBootstrapper<M> bootstrap ) {
-		BootstrappingModule.nonnullThrowsReentranceException( this.bootstrap );
+		Bootstrap.nonnullThrowsReentranceException( this.bootstrap );
 		this.bootstrap = bootstrap;
 		bootstrap();
 	}

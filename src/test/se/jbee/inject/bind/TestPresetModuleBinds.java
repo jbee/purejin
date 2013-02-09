@@ -14,7 +14,7 @@ import se.jbee.inject.Type;
 /**
  * This test demonstrates how to use {@link Presets} to pass input data to the {@link Bootstrap}
  * that can be accessed in any {@link PresetModule} class. The value passed into
- * {@link PresetBinderModule#declare(Object)} is determined by the type of the generic. This has to
+ * {@link BinderModuleWith#declare(Object)} is determined by the type of the generic. This has to
  * be the same {@link Type} as the one used when declaring the value via
  * {@link Presets#preset(Class, Object)}.
  * 
@@ -23,7 +23,7 @@ import se.jbee.inject.Type;
 public class TestPresetModuleBinds {
 
 	private static class PresetModuleBindsModule
-			extends PresetBinderModule<Properties> {
+			extends BinderModuleWith<Properties> {
 
 		@Override
 		protected void declare( Properties preset ) {

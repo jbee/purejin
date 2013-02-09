@@ -28,7 +28,7 @@ public abstract class AbstractBinderModule
 	}
 
 	protected void init( Bindings bindings, Inspector inspector ) {
-		BootstrappingModule.nonnullThrowsReentranceException( binder.bindings );
+		Bootstrap.nonnullThrowsReentranceException( binder.bindings );
 		this.binder = binder.into( bindings ).using( inspector ).with( source( getClass() ) );
 	}
 
