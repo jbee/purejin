@@ -117,17 +117,17 @@ public final class Link {
 
 		private Binding<?>[] bindingsFrom( Module[] modules, Inspector inspector ) {
 			Set<Class<?>> declared = new HashSet<Class<?>>();
-			Set<Class<?>> inhomogeneous = new HashSet<Class<?>>();
+			Set<Class<?>> multimodals = new HashSet<Class<?>>();
 			ListBindings bindings = new ListBindings();
 			for ( Module m : modules ) {
 				Class<? extends Module> ns = m.getClass();
 				final boolean hasBeenDeclared = declared.contains( ns );
 				if ( hasBeenDeclared ) {
-					if ( !Classification.homogenous( ns ) ) {
-						inhomogeneous.add( ns );
+					if ( !Classification.monomodal( ns ) ) {
+						multimodals.add( ns );
 					}
 				}
-				if ( !hasBeenDeclared || inhomogeneous.contains( ns ) ) {
+				if ( !hasBeenDeclared || multimodals.contains( ns ) ) {
 					m.declare( bindings, inspector );
 					declared.add( ns );
 				}

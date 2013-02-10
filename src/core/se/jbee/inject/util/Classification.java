@@ -6,7 +6,14 @@ import java.lang.reflect.Modifier;
 
 public final class Classification {
 
-	public static boolean homogenous( Class<?> type ) {
+	/**
+	 * A {@link Class} is monomodal if it there is just a single possible initial state. All newly
+	 * created instances can just have this similar initial state but due to internal state they
+	 * could develop (behave) different later on.
+	 * 
+	 * The opposite of monomodal is multimodal.
+	 */
+	public static boolean monomodal( Class<?> type ) {
 		if ( type.isInterface() || type == Object.class ) {
 			return true;
 		}
@@ -18,9 +25,11 @@ public final class Classification {
 		for ( Constructor<?> c : type.getDeclaredConstructors() ) {
 			if ( c.getParameterTypes().length > 0 ) {
 				// maybe args are passed to super-type so we check this
-				return homogenous( type.getSuperclass() );
+				return monomodal( type.getSuperclass() );
 			}
 		}
 		return true;
 	}
+
+	//monovalent
 }
