@@ -6,8 +6,6 @@
 package se.jbee.inject.bind;
 
 import se.jbee.inject.Scope;
-import se.jbee.inject.bind.Binder.ScopedBinder;
-import se.jbee.inject.util.Scoped;
 
 /**
  * The default utility {@link Module} almost always used.
@@ -44,19 +42,5 @@ public abstract class BinderModule
 	 * @see Module#declare(Bindings, Inspector)
 	 */
 	protected abstract void declare();
-
-	public <E extends Enum<E> & Extension<E, ? super T>, T> void extend( Class<E> extension,
-			Class<? extends T> type ) {
-		app().extend( extension, type );
-	}
-
-	public <E extends Enum<E> & Extension<E, ? super T>, T> void extend( E extension,
-			Class<? extends T> type ) {
-		app().extend( extension, type );
-	}
-
-	private ScopedBinder app() {
-		return per( Scoped.APPLICATION );
-	}
 
 }

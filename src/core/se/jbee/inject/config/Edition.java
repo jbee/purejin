@@ -3,7 +3,10 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject.bind;
+package se.jbee.inject.config;
+
+import se.jbee.inject.bind.Bundle;
+import se.jbee.inject.bind.Module;
 
 /**
  * An {@link Edition} decides wich features are contained in a specific setup.

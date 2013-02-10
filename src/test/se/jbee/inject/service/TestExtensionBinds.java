@@ -1,4 +1,4 @@
-package se.jbee.inject.bind;
+package se.jbee.inject.service;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertSame;
@@ -11,19 +11,21 @@ import org.junit.Test;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
+import se.jbee.inject.bind.Bootstrap;
+import se.jbee.inject.bind.Module;
 import se.jbee.inject.service.ServiceMethod.ServiceClassExtension;
 
 public class TestExtensionBinds {
 
 	private static class TestExtensionModule
-			extends BinderModule {
+			extends ExtensionModule {
 
 		@Override
 		protected void declare() {
-			extend( ServiceClassExtension.class, TestExtensionService.class );
-			inPackageOf( Module.class ).extend( ServiceClassExtension.class,
+			extend( asDefault(), ServiceClassExtension.class, TestExtensionService.class );
+			extend( inPackageOf( Module.class ), ServiceClassExtension.class,
 					TestExtensionPackageLocalService.class );
-			injectingInto( Serializable.class ).extend( ServiceClassExtension.class,
+			extend( injectingInto( Serializable.class ), ServiceClassExtension.class,
 					TestExtensionInstanceOfService.class );
 		}
 	}

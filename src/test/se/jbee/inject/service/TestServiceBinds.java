@@ -1,4 +1,4 @@
-package se.jbee.inject.bind;
+package se.jbee.inject.service;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -11,6 +11,7 @@ import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
+import se.jbee.inject.bind.Bootstrap;
 import se.jbee.inject.service.ServiceMethod;
 import se.jbee.inject.service.ServiceModule;
 import se.jbee.inject.service.ServiceProvider;

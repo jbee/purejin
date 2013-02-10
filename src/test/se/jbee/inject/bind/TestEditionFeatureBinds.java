@@ -13,6 +13,9 @@ import org.junit.Test;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.bind.Bootstrapper.ModularBootstrapper;
+import se.jbee.inject.config.Edition;
+import se.jbee.inject.config.Feature;
+import se.jbee.inject.config.Globals;
 
 /**
  * A test that demonstrates how to use {@link Feature}s and {@link Edition}s to allow composition of

@@ -1,4 +1,4 @@
-package se.jbee.inject.bind;
+package se.jbee.inject.service;
 
 import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Dependency.dependency;
@@ -9,6 +9,8 @@ import org.junit.Test;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
+import se.jbee.inject.bind.Bootstrap;
+import se.jbee.inject.bind.Inspect;
 import se.jbee.inject.service.ServiceMethod;
 import se.jbee.inject.service.ServiceModule;
 

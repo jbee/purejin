@@ -7,6 +7,8 @@ import static se.jbee.inject.Dependency.dependency;
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
+import se.jbee.inject.config.Globals;
+import se.jbee.inject.config.Options;
 
 import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 

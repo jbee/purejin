@@ -9,6 +9,7 @@ import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Instance.defaultInstanceOf;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.util.Metaclass.metaclass;
 import static se.jbee.inject.util.SuppliedBy.constant;
 import static se.jbee.inject.util.SuppliedBy.parametrizedInstance;
 import static se.jbee.inject.util.SuppliedBy.provider;
@@ -48,13 +49,6 @@ public class Binder
 	public static RootBinder create( Bindings bindings, Inspector inspector, Source source,
 			Scope scope ) {
 		return new RootBinder( bindings, inspector, source, scope );
-	}
-
-	static final boolean notConstructable( Class<?> type ) {
-		return type.isInterface() || type.isEnum() || type.isPrimitive() || type.isArray()
-				|| Modifier.isAbstract( type.getModifiers() ) || type == String.class
-				|| Number.class.isAssignableFrom( type ) || type == Boolean.class
-				|| type == Void.class || type == void.class;
 	}
 
 	final Bindings bindings;
@@ -117,18 +111,6 @@ public class Binder
 		construct( instance( name, raw( type ) ) );
 	}
 
-	public <E extends Enum<E> & Extension<E, ? super T>, T> void extend( Class<E> extension,
-			Class<? extends T> type ) {
-		multibind( Extend.extensionName( extension, type ), Class.class ).to( type );
-		implicitBindToConstructor( type );
-	}
-
-	public <E extends Enum<E> & Extension<E, ? super T>, T> void extend( E extension,
-			Class<? extends T> type ) {
-		multibind( Extend.extensionName( extension, type ), Class.class ).to( type );
-		implicitBindToConstructor( type );
-	}
-
 	public <T> TypedBinder<T> multibind( Class<T> type ) {
 		return multibind( Type.raw( type ) );
 	}
@@ -167,7 +149,7 @@ public class Binder
 
 	protected final <I> void implicitBindToConstructor( Instance<I> instance ) {
 		Class<I> impl = instance.getType().getRawType();
-		if ( notConstructable( impl ) ) {
+		if ( metaclass( impl ).undeterminable() ) {
 			return;
 		}
 		Constructor<I> constructor = inspector.constructorFor( impl );
@@ -463,7 +445,7 @@ public class Binder
 		}
 
 		public void toConstructor( Class<? extends T> impl, Parameter<?>... parameters ) {
-			if ( notConstructable( impl ) ) {
+			if ( metaclass( impl ).undeterminable() ) {
 				throw new IllegalArgumentException( "Not a constructable type: " + impl );
 			}
 			to( SuppliedBy.costructor( binder.inspector.constructorFor( impl ), parameters ) );

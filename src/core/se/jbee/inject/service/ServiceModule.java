@@ -34,7 +34,6 @@ import se.jbee.inject.bind.Bindings;
 import se.jbee.inject.bind.Bootstrap;
 import se.jbee.inject.bind.Bootstrapper;
 import se.jbee.inject.bind.Bundle;
-import se.jbee.inject.bind.Extend;
 import se.jbee.inject.bind.Inspect;
 import se.jbee.inject.bind.Inspector;
 import se.jbee.inject.bind.Module;
@@ -54,7 +53,7 @@ import se.jbee.inject.util.Value;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public abstract class ServiceModule
-		implements Module, Bundle {
+		implements Bundle, Module {
 
 	/**
 	 * The {@link Inspector} picks the {@link Method}s that are used to implement
@@ -66,7 +65,7 @@ public abstract class ServiceModule
 			raw( Inspector.class ) );
 
 	protected final void bindServiceMethodsIn( Class<?> service ) {
-		binder.extend( ServiceClassExtension.class, service );
+		ExtensionModule.extend( binder, ServiceClassExtension.class, service );
 	}
 
 	protected final void bindServiceInspectorTo( Inspector inspector ) {
@@ -75,8 +74,7 @@ public abstract class ServiceModule
 
 	protected final void extend( ServiceInvocationExtension type,
 			Class<? extends ServiceInvocation<?>> invocation ) {
-		//TODO we need a special binder for this
-		binder.extend( type, invocation );
+		ExtensionModule.extend( binder, type, invocation );
 	}
 
 	protected final <T> TypedBinder<T> starbind( Class<T> service ) {

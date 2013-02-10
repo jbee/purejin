@@ -24,7 +24,7 @@ public abstract class AbstractBinderModule
 	}
 
 	protected AbstractBinderModule( Scope inital ) {
-		this.binder = Binder.create( null, Inspect.DEFAULT, source( BinderModule.class ), inital );
+		this.binder = Binder.create( null, Inspect.DEFAULT, source( getClass() ), inital );
 	}
 
 	protected void init( Bindings bindings, Inspector inspector ) {

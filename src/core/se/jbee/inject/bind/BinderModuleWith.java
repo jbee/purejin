@@ -1,5 +1,7 @@
 package se.jbee.inject.bind;
 
+import se.jbee.inject.config.Presets;
+
 /**
  * The default utility {@link PresetModule}.
  * 

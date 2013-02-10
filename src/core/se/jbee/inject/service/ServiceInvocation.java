@@ -6,7 +6,6 @@
 package se.jbee.inject.service;
 
 import se.jbee.inject.Type;
-import se.jbee.inject.bind.Extension;
 import se.jbee.inject.util.Value;
 
 /**

@@ -5,7 +5,6 @@
  */
 package se.jbee.inject.service;
 
-import se.jbee.inject.bind.Extension;
 
 /**
  * The low level representation of a service.

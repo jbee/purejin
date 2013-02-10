@@ -3,10 +3,12 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject.bind;
+package se.jbee.inject.config;
 
 import java.util.EnumSet;
 import java.util.IdentityHashMap;
+
+import se.jbee.inject.bind.Bootstrap;
 
 /**
  * {@link Options} are used to model configurations of the {@link Bootstrap}ping process through one

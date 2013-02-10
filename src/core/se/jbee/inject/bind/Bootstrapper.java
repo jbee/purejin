@@ -5,6 +5,8 @@
  */
 package se.jbee.inject.bind;
 
+import se.jbee.inject.config.Options;
+
 /**
  * The basic idea is to split the binding process into 2 steps: installing modules and do bindings
  * in the installed modules.

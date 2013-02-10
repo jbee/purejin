@@ -12,6 +12,8 @@ import org.junit.Test;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
+import se.jbee.inject.config.Globals;
+import se.jbee.inject.config.Presets;
 import se.jbee.inject.util.Typecast;
 
 /**

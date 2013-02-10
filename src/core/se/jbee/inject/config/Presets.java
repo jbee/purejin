@@ -1,4 +1,4 @@
-package se.jbee.inject.bind;
+package se.jbee.inject.config;
 
 import java.util.IdentityHashMap;
 
