@@ -5,6 +5,8 @@
  */
 package se.jbee.inject.bind;
 
+import static se.jbee.inject.util.Metaclass.metaclass;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -24,7 +26,6 @@ import se.jbee.inject.Source;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.util.Scoped;
 import se.jbee.inject.util.Suppliable;
-import se.jbee.inject.util.Classification;
 
 public final class Link {
 
@@ -123,7 +124,7 @@ public final class Link {
 				Class<? extends Module> ns = m.getClass();
 				final boolean hasBeenDeclared = declared.contains( ns );
 				if ( hasBeenDeclared ) {
-					if ( !Classification.monomodal( ns ) ) {
+					if ( !metaclass( ns ).monomodal() ) {
 						multimodals.add( ns );
 					}
 				}
