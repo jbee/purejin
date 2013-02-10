@@ -114,27 +114,27 @@ public class TestEditionFeatureBinds {
 
 	@Test
 	public void thatJustTheFeaturedBundleIsInstalled() {
-		assertEditionInstalls( Bootstrap.edition( AnnotatedFeature.FOO ), 42 );
+		assertEditionInstalls( Globals.featureEdition( AnnotatedFeature.FOO ), 42 );
 	}
 
 	@Test
 	public void thatJustTheFeaturedModuleIsInstalled() {
-		assertEditionInstalls( Bootstrap.edition( AnnotatedFeature.BAR ), 8 );
+		assertEditionInstalls( Globals.featureEdition( AnnotatedFeature.BAR ), 8 );
 	}
 
 	@Test
 	public void thatJustTheFeaturedModularBundleIsInstalled() {
-		assertEditionInstalls( Bootstrap.edition( AnnotatedFeature.BAZ ), 128 );
+		assertEditionInstalls( Globals.featureEdition( AnnotatedFeature.BAZ ), 128 );
 	}
 
 	@Test
 	public void thatTheFeaturedBundlesAndModulesAreInstalled() {
-		assertEditionInstalls( Bootstrap.edition( AnnotatedFeature.BAR, AnnotatedFeature.BAZ ), 8,
-				128 );
+		assertEditionInstalls(
+				Globals.featureEdition( AnnotatedFeature.BAR, AnnotatedFeature.BAZ ), 8, 128 );
 	}
 
 	private void assertEditionInstalls( Edition edition, Integer... expected ) {
-		Injector injector = Bootstrap.injector( RootBundle.class, edition );
+		Injector injector = Bootstrap.injector( RootBundle.class, Globals.DEFAULT.edition( edition ) );
 		assertEqualSets( expected, injector.resolve( dependency( Integer[].class ) ) );
 	}
 

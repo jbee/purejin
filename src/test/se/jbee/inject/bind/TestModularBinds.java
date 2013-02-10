@@ -101,8 +101,8 @@ public class TestModularBinds {
 
 	private void assertOptionResolvedToValue( Machine actualOption, String expected ) {
 		Options options = Options.STANDARD.chosen( actualOption );
-		Injector injector = Bootstrap.injector( ModularBindsBundle.class, Edition.FULL,
-				Presets.NOTHING, options );
+		Injector injector = Bootstrap.injector( ModularBindsBundle.class,
+				Globals.DEFAULT.options( options ) );
 		String[] actual = injector.resolve( dependency( String[].class ) );
 		assertThat( actual, is( new String[] { expected } ) );
 	}

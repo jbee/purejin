@@ -20,7 +20,6 @@ import java.util.Set;
 import se.jbee.inject.Array;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Injectron;
-import se.jbee.inject.Packages;
 import se.jbee.inject.Type;
 import se.jbee.inject.util.Inject;
 import se.jbee.inject.util.Suppliable;
@@ -37,22 +36,16 @@ import se.jbee.inject.util.TypeReflector;
 public final class Bootstrap {
 
 	public static Injector injector( Class<? extends Bundle> root ) {
-		return injector( root, Edition.FULL );
+		return injector( root, Globals.DEFAULT );
 	}
 
-	public static Injector injector( Class<? extends Bundle> root, Edition edition ) {
-		return injector( root, edition, Presets.NOTHING, Options.STANDARD );
+	public static Injector injector( Class<? extends Bundle> root, Globals globals ) {
+		return injector( root, Inspect.DEFAULT, globals );
 	}
 
-	public static Injector injector( Class<? extends Bundle> root, Edition edition,
-			Presets presets, Options options ) {
-		return injector( root, edition, presets, options, Inspect.DEFAULT );
-	}
-
-	public static Injector injector( Class<? extends Bundle> root, Edition edition,
-			Presets presets, Options options, Inspector inspector ) {
-		return injector( modulariser( edition, presets, options ).modularise( root ), inspector,
-				Link.BUILDIN );
+	public static Injector injector( Class<? extends Bundle> root, Inspector inspector,
+			Globals globals ) {
+		return injector( modulariser( globals ).modularise( root ), inspector, Link.BUILDIN );
 	}
 
 	public static Injector injector( Module[] modules, Inspector inspector,
@@ -60,25 +53,16 @@ public final class Bootstrap {
 		return Inject.from( Suppliable.source( linker.link( inspector, modules ) ) );
 	}
 
-	public static Modulariser modulariser( Edition edition, Presets presets, Options options ) {
-		return new BuildinBootstrapper( edition, presets, options );
+	public static Modulariser modulariser( Globals globals ) {
+		return new BuildinBootstrapper( globals );
 	}
 
-	public static Bundler bundler( Edition edition, Presets presets, Options options ) {
-		return new BuildinBootstrapper( edition, presets, options );
+	public static Bundler bundler( Globals globals ) {
+		return new BuildinBootstrapper( globals );
 	}
 
 	public static Suppliable<?>[] suppliables( Class<? extends Bundle> root ) {
-		return Link.BUILDIN.link( Inspect.DEFAULT, // 
-				modulariser( Edition.FULL, Presets.NOTHING, Options.STANDARD ).modularise( root ) );
-	}
-
-	public static <T extends Enum<T> & Feature<T>> Edition edition( T... featured ) {
-		return new FeatureEdition<T>( featured[0], EnumSet.of( featured[0], featured ) );
-	}
-
-	public static Edition edition( Packages included ) {
-		return new PackagesEdition( included );
+		return Link.BUILDIN.link( Inspect.DEFAULT, modulariser( Globals.DEFAULT ).modularise( root ) );
 	}
 
 	public static <T> Module module( PresetModule<T> module, Presets presets ) {
@@ -105,42 +89,6 @@ public final class Bootstrap {
 
 	private Bootstrap() {
 		throw new UnsupportedOperationException( "util" );
-	}
-
-	private static class FeatureEdition<T extends Enum<T>>
-			implements Edition {
-
-		private final Feature<T> feature;
-		private final EnumSet<T> featured;
-
-		FeatureEdition( Feature<T> feature, EnumSet<T> featured ) {
-			super();
-			this.feature = feature;
-			this.featured = featured;
-		}
-
-		@Override
-		public boolean featured( Class<?> bundleOrModule ) {
-			T f = feature.featureOf( bundleOrModule );
-			return f == null || featured.contains( f );
-		}
-	}
-
-	private static class PackagesEdition
-			implements Edition {
-
-		private final Packages included;
-
-		PackagesEdition( Packages included ) {
-			super();
-			this.included = included;
-		}
-
-		@Override
-		public boolean featured( Class<?> bundleOrModule ) {
-			return included.contains( Type.raw( bundleOrModule ) );
-		}
-
 	}
 
 	private static final class LazyPresetModule<T>
@@ -172,15 +120,11 @@ public final class Bootstrap {
 		private final Set<Class<? extends Bundle>> uninstalled = new HashSet<Class<? extends Bundle>>();
 		private final Set<Class<? extends Bundle>> installed = new HashSet<Class<? extends Bundle>>();
 		private final LinkedList<Class<? extends Bundle>> stack = new LinkedList<Class<? extends Bundle>>();
-		private final Edition edition;
-		private final Presets presets;
-		final Options options;
+		private final Globals globals;
 
-		BuildinBootstrapper( Edition edition, Presets presets, Options options ) {
+		BuildinBootstrapper( Globals globals ) {
 			super();
-			this.edition = edition;
-			this.presets = presets;
-			this.options = options;
+			this.globals = globals;
 		}
 
 		@Override
@@ -188,7 +132,7 @@ public final class Bootstrap {
 			if ( uninstalled.contains( bundle ) || installed.contains( bundle ) ) {
 				return;
 			}
-			if ( !edition.featured( bundle ) ) {
+			if ( !globals.edition.featured( bundle ) ) {
 				uninstalled.add( bundle ); // this way we will never ask again - something not featured is finally not featured
 				return;
 			}
@@ -212,9 +156,10 @@ public final class Bootstrap {
 		@Override
 		public <C extends Enum<C>> void install( Class<? extends ModularBundle<C>> bundle,
 				final Class<C> property ) {
-			if ( !edition.featured( property ) ) {
+			if ( !globals.edition.featured( property ) ) {
 				return;
 			}
+			final Options options = globals.options;
 			TypeReflector.newInstance( bundle ).bootstrap( new ModularBootstrapper<C>() {
 
 				@Override
@@ -230,7 +175,7 @@ public final class Bootstrap {
 		public <M extends Enum<M> & ModularBundle<M>> void install( M... modules ) {
 			if ( modules.length > 0 ) {
 				final M bundle = modules[0];
-				if ( !edition.featured( bundle.getClass() ) ) {
+				if ( !globals.edition.featured( bundle.getClass() ) ) {
 					return;
 				}
 				final EnumSet<M> installing = EnumSet.of( bundle, modules );
@@ -249,7 +194,7 @@ public final class Bootstrap {
 		@Override
 		public void install( Module module ) {
 			Class<? extends Bundle> bundle = stack.peek();
-			if ( uninstalled.contains( bundle ) || !edition.featured( module.getClass() ) ) {
+			if ( uninstalled.contains( bundle ) || !globals.edition.featured( module.getClass() ) ) {
 				return;
 			}
 			List<Module> modules = bundleModules.get( bundle );
@@ -262,7 +207,7 @@ public final class Bootstrap {
 
 		@Override
 		public <T> void install( PresetModule<T> module ) {
-			install( module( module, presets ) );
+			install( module( module, globals.presets ) );
 		}
 
 		@Override
