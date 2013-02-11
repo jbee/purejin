@@ -8,7 +8,7 @@ package se.jbee.inject.bind;
 import se.jbee.inject.bind.Bootstrapper.ModularBootstrapper;
 
 /**
- * The default ustility base class for {@link ModularBundle}s.
+ * The default utility base class for {@link ModularBundle}s.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */

@@ -6,6 +6,7 @@
 package se.jbee.inject.util;
 
 import se.jbee.inject.Supplier;
+import se.jbee.inject.bind.Bundle;
 
 /**
  * A indirection that resolves the instance lazily when {@link #provide()} is invoked. This is
@@ -13,7 +14,7 @@ import se.jbee.inject.Supplier;
  * instance of a more stable scope.
  * 
  * In contrast to other DI-frameworks this is no core concept. To enable {@linkplain Provider}s
- * install the {@link SuppliedBy#PROVIDER_BRIDGE}.
+ * install the them through buildin-{@link Bundle}.
  * 
  * But it is also very easy to use another similar provider interface by installing such a bridge
  * {@link Supplier}.

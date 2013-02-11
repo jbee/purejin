@@ -41,8 +41,8 @@ import se.jbee.inject.bind.Binder.RootBinder;
 import se.jbee.inject.bind.Binder.TypedBinder;
 import se.jbee.inject.service.ServiceInvocation.ServiceInvocationExtension;
 import se.jbee.inject.service.ServiceMethod.ServiceClassExtension;
+import se.jbee.inject.util.Metaclass;
 import se.jbee.inject.util.Scoped;
-import se.jbee.inject.util.TypeReflector;
 import se.jbee.inject.util.Value;
 
 /**
@@ -240,12 +240,11 @@ public abstract class ServiceModule
 				Type<T> returnType, Injector injector ) {
 			super();
 			this.implementor = implementor;
-			this.method = service;
-			TypeReflector.makeAccessible( method );
+			this.method = Metaclass.accessible( service );
 			this.parameterType = parameterType;
 			this.returnType = returnType;
 			this.injector = injector;
-			this.parameterTypes = parameterTypes( service );
+			this.parameterTypes = parameterTypes( method );
 			this.argumentInjectrons = argumentInjectrons();
 			this.argumentTemplate = argumentTemplate();
 			this.invocations = resolveInvocations( injector );

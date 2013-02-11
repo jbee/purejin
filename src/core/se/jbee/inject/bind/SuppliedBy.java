@@ -3,7 +3,7 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject.util;
+package se.jbee.inject.bind;
 
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.parameterTypes;
@@ -25,6 +25,10 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
+import se.jbee.inject.util.Argument;
+import se.jbee.inject.util.Factory;
+import se.jbee.inject.util.Metaclass;
+import se.jbee.inject.util.Provider;
 
 /**
  * Utility as a factory to create different kinds of {@link Supplier}s.
@@ -369,14 +373,13 @@ public final class SuppliedBy {
 
 		StaticConstructorSupplier( Constructor<T> constructor, Object[] arguments ) {
 			super();
-			TypeReflector.makeAccessible( constructor );
-			this.constructor = constructor;
+			this.constructor = Metaclass.accessible( constructor );
 			this.arguments = arguments;
 		}
 
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			return TypeReflector.construct( constructor, arguments );
+			return Invoke.constructor( constructor, arguments );
 		}
 
 	}
@@ -389,14 +392,13 @@ public final class SuppliedBy {
 
 		ConstructorSupplier( Constructor<T> constructor, Argument<?>[] arguments ) {
 			super();
-			TypeReflector.makeAccessible( constructor );
-			this.constructor = constructor;
+			this.constructor = Metaclass.accessible( constructor );
 			this.arguments = arguments;
 		}
 
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			return TypeReflector.construct( constructor, Argument.resolve( dependency, injector,
+			return Invoke.constructor( constructor, Argument.resolve( dependency, injector,
 					arguments ) );
 		}
 
@@ -412,9 +414,8 @@ public final class SuppliedBy {
 
 		FactoryMethodSupplier( Type<T> returnType, Method factory, Argument<?>[] arguments ) {
 			super();
-			TypeReflector.makeAccessible( factory );
 			this.returnType = returnType;
-			this.factory = factory;
+			this.factory = Metaclass.accessible( factory );
 			this.arguments = arguments;
 			this.instanceMethod = !Modifier.isStatic( factory.getModifiers() );
 		}
@@ -426,7 +427,7 @@ public final class SuppliedBy {
 				owner = injector.resolve( dependency( factory.getDeclaringClass() ) );
 			}
 			final Object[] args = Argument.resolve( dependency, injector, arguments );
-			return returnType.getRawType().cast( TypeReflector.invoke( factory, owner, args ) );
+			return returnType.getRawType().cast( Invoke.method( factory, owner, args ) );
 		}
 
 	}

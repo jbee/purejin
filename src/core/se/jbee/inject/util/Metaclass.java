@@ -1,5 +1,6 @@
 package se.jbee.inject.util;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -56,6 +57,11 @@ public final class Metaclass {
 				|| Modifier.isAbstract( cls.getModifiers() ) || cls == String.class
 				|| Number.class.isAssignableFrom( cls ) || cls == Boolean.class
 				|| cls == Void.class || cls == void.class;
+	}
+
+	public static <T extends AccessibleObject> T accessible( T obj ) {
+		obj.setAccessible( true );
+		return obj;
 	}
 
 	//monovalent

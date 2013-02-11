@@ -11,7 +11,6 @@ import org.junit.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.util.Factory;
-import se.jbee.inject.util.SuppliedBy;
 
 /**
  * A test that demonstrates how to extend the DI so that e.g. a class gets its class-specific-

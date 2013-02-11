@@ -9,10 +9,10 @@ import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Instance.defaultInstanceOf;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.bind.SuppliedBy.constant;
+import static se.jbee.inject.bind.SuppliedBy.parametrizedInstance;
+import static se.jbee.inject.bind.SuppliedBy.provider;
 import static se.jbee.inject.util.Metaclass.metaclass;
-import static se.jbee.inject.util.SuppliedBy.constant;
-import static se.jbee.inject.util.SuppliedBy.parametrizedInstance;
-import static se.jbee.inject.util.SuppliedBy.provider;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -31,7 +31,6 @@ import se.jbee.inject.Target;
 import se.jbee.inject.Type;
 import se.jbee.inject.util.Factory;
 import se.jbee.inject.util.Provider;
-import se.jbee.inject.util.SuppliedBy;
 
 /**
  * The default implementation of the {@link BasicBinder} that provides a lot of utility methods to

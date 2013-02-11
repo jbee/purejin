@@ -27,8 +27,8 @@ import se.jbee.inject.config.Globals;
 import se.jbee.inject.config.Options;
 import se.jbee.inject.config.Presets;
 import se.jbee.inject.util.Inject;
+import se.jbee.inject.util.Metaclass;
 import se.jbee.inject.util.Suppliable;
-import se.jbee.inject.util.TypeReflector;
 
 /**
  * Utility to create an {@link Injector} context from {@link Bundle}s and {@link Module}s.
@@ -92,6 +92,10 @@ public final class Bootstrap {
 		}
 	}
 
+	public static <T> T instance( Class<T> type ) {
+		return Invoke.constructor( Metaclass.accessible( Inspect.noArgsConstructor( type ) ) );
+	}
+
 	private Bootstrap() {
 		throw new UnsupportedOperationException( "util" );
 	}
@@ -152,7 +156,7 @@ public final class Bootstrap {
 				children.add( bundle );
 			}
 			stack.push( bundle );
-			TypeReflector.newInstance( bundle ).bootstrap( this );
+			Bootstrap.instance( bundle ).bootstrap( this );
 			if ( stack.pop() != bundle ) {
 				throw new IllegalStateException( bundle.getCanonicalName() );
 			}
@@ -165,7 +169,7 @@ public final class Bootstrap {
 				return;
 			}
 			final Options options = globals.options;
-			TypeReflector.newInstance( bundle ).bootstrap( new ModularBootstrapper<C>() {
+			Bootstrap.instance( bundle ).bootstrap( new ModularBootstrapper<C>() {
 
 				@Override
 				public void install( Class<? extends Bundle> bundle, C module ) {

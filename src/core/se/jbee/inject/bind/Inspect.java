@@ -9,6 +9,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,6 @@ import se.jbee.inject.Packages;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Type;
 import se.jbee.inject.util.Inject;
-import se.jbee.inject.util.TypeReflector;
 
 /**
  * The basic {@link Inspector} implementations. It allows to chose {@link Constructor}s and
@@ -93,7 +93,7 @@ public class Inspect
 	private Parameter<?>[] parametersFor( Type<?>[] types, Annotation[][] annotations ) {
 		List<Parameter<?>> res = new ArrayList<Parameter<?>>();
 		for ( int i = 0; i < annotations.length; i++ ) {
-			Name name = TypeReflector.nameFrom( namedby, annotations[i] );
+			Name name = Name.from( namedby, annotations[i] );
 			if ( name != Name.DEFAULT ) {
 				res.add( Instance.instance( name, types[i] ) );
 			}
@@ -103,7 +103,7 @@ public class Inspect
 
 	@Override
 	public Name nameFor( AccessibleObject obj ) {
-		return TypeReflector.nameFrom( namedby, obj );
+		return Name.from( namedby, obj );
 	}
 
 	@SuppressWarnings ( "unchecked" )
@@ -119,7 +119,7 @@ public class Inspect
 				}
 			}
 			try {
-				return TypeReflector.defaultConstructor( type );
+				return Inspect.defaultConstructor( type );
 			} catch ( RuntimeException e ) {
 				return null;
 			}
@@ -134,7 +134,7 @@ public class Inspect
 		}
 		List<Method> res = new ArrayList<Method>();
 		for ( Method m : implementor.getDeclaredMethods() ) {
-			if ( TypeReflector.methodMatches( m, statics, assignable, packages, accessible ) ) {
+			if ( matches( m ) ) {
 				res.add( m );
 			}
 		}
@@ -198,5 +198,44 @@ public class Inspect
 	public Inspect returnTypeAssignableTo( Type<?> supertype ) {
 		return new Inspect( statics, methods, constructors, packages, supertype, accessible,
 				namedby );
+	}
+
+	public static <T> Constructor<T> defaultConstructor( Class<T> declaringClass ) {
+
+		Constructor<?>[] constructors = declaringClass.getDeclaredConstructors();
+		if ( constructors.length == 0 ) {
+			throw new RuntimeException( new NoSuchMethodException(
+					declaringClass.getCanonicalName() ) );
+		}
+		int noArgsIndex = 0;
+		for ( int i = 0; i < constructors.length; i++ ) {
+			if ( constructors[i].getParameterTypes().length == 0 ) {
+				noArgsIndex = i;
+			}
+		}
+		@SuppressWarnings ( "unchecked" )
+		Constructor<T> c = (Constructor<T>) constructors[noArgsIndex];
+		return c;
+	}
+
+	public static <T> Constructor<T> noArgsConstructor( Class<T> declaringClass ) {
+		if ( declaringClass.isInterface() ) {
+			throw new IllegalArgumentException( "Interfaces don't have constructors: "
+					+ declaringClass );
+		}
+		Constructor<T> c;
+		try {
+			c = declaringClass.getDeclaredConstructor( new Class<?>[0] );
+		} catch ( Exception e ) {
+			throw new RuntimeException( e );
+		}
+		return c;
+	}
+
+	private boolean matches( Method m ) {
+		Type<?> returnType = Type.returnType( m );
+		return packages.contains( returnType ) && returnType.isAssignableTo( assignable )
+				&& ( !statics || Modifier.isStatic( m.getModifiers() ) )
+				&& ( accessible == null || m.isAnnotationPresent( accessible ) );
 	}
 }

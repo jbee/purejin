@@ -5,6 +5,10 @@
  */
 package se.jbee.inject;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Method;
+
 /**
  * A {@link Name} is used as discriminator in cases where multiple {@link Instance}s are bound for
  * the same {@link Type}.
@@ -89,4 +93,35 @@ public final class Name
 				|| ( value.matches( other.value.replace( "*", ".*" ) ) );
 	}
 
+	public static Name from( Class<? extends Annotation> annotation, AnnotatedElement obj ) {
+		return annotation == null || !obj.isAnnotationPresent( annotation )
+			? Name.DEFAULT
+			: from( annotation, obj.getAnnotation( annotation ) );
+	}
+
+	public static Name from( Class<? extends Annotation> annotation, Annotation... instances ) {
+		for ( Annotation i : instances ) {
+			if ( i.annotationType() == annotation ) {
+				return from( annotation, i );
+			}
+		}
+		return Name.DEFAULT;
+	}
+
+	private static Name from( Class<? extends Annotation> annotation, Annotation instance ) {
+		for ( Method m : annotation.getDeclaredMethods() ) {
+			if ( String.class == m.getReturnType() ) {
+				String name = null;
+				try {
+					name = (String) m.invoke( instance );
+				} catch ( Exception e ) {
+					// try next...
+				}
+				if ( name != null && !name.isEmpty() && !name.equals( m.getDefaultValue() ) ) {
+					return Name.named( name );
+				}
+			}
+		}
+		return Name.DEFAULT;
+	}
 }
