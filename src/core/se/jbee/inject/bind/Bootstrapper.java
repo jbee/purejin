@@ -61,12 +61,14 @@ public interface Bootstrapper {
 	 * @param modules
 	 *            The choices made to install.
 	 */
+	@SuppressWarnings("unchecked")
 	<M extends Enum<M> & ModularBundle<M>> void install( M... modules );
 
 	/**
 	 * @param modules
 	 *            The choices made to uninstall again.
 	 */
+	@SuppressWarnings("unchecked")
 	<M extends Enum<M> & ModularBundle<M>> void uninstall( M... modules );
 
 	/**
