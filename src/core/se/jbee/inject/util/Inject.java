@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import se.jbee.inject.Array;
+import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
 import se.jbee.inject.Demand;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Expiry;
@@ -28,7 +29,6 @@ import se.jbee.inject.Resource;
 import se.jbee.inject.Source;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
-import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
 
 /**
  * Utility to create/use the core containers {@link Injector} and {@link Injectron}.
@@ -138,7 +138,8 @@ public final class Inject {
 			return mostPreciseOf( typeInjectrons( dependency.getType() ), dependency );
 		}
 
-		private <T> Injectron<T> mostPreciseOf( Injectron<T>[] injectrons, Dependency<T> dependency ) {
+		private static <T> Injectron<T> mostPreciseOf( Injectron<T>[] injectrons,
+				Dependency<T> dependency ) {
 			if ( injectrons == null ) {
 				return null;
 			}
@@ -208,7 +209,7 @@ public final class Inject {
 			return toArray( elements, raw( Injectron.class ) );
 		}
 
-		private <E, T> void addAllApplicable( List<E> elements, Dependency<T> dependency,
+		private static <E, T> void addAllApplicable( List<E> elements, Dependency<T> dependency,
 				Type<E> elementType, Injectron<? extends E>[] elementInjectrons ) {
 			Dependency<E> elementDependency = dependency.typed( elementType );
 			for ( int i = 0; i < elementInjectrons.length; i++ ) {
@@ -220,7 +221,7 @@ public final class Inject {
 		}
 
 		@SuppressWarnings ( "unchecked" )
-		private <T, E> T toArray( List<? extends E> elements, Type<E> elementType ) {
+		private static <T, E> T toArray( List<? extends E> elements, Type<E> elementType ) {
 			return (T) Array.of( elements, elementType.getRawType() );
 		}
 

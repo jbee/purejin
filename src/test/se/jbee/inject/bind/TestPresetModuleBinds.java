@@ -70,14 +70,14 @@ public class TestPresetModuleBinds {
 
 	private final Injector injector = injector();
 
-	private Injector injector() {
+	private static Injector injector() {
 		Presets presets = Presets.NOTHING.preset( Properties.class, exampleProperties() );
 		presets = presets.preset( Typecast.listTypeOf( String.class ), Arrays.asList( "a", "b" ) );
 		presets = presets.preset( Typecast.listTypeOf( Integer.class ), Arrays.asList( 1, 2 ) );
 		return Bootstrap.injector( PresetModuleBindsBundle.class, Globals.DEFAULT.presets( presets ) );
 	}
 
-	private Properties exampleProperties() {
+	private static Properties exampleProperties() {
 		Properties props = new Properties();
 		props.put( "foo.text", "bar" );
 		return props;

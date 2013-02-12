@@ -13,9 +13,6 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
 import se.jbee.inject.bind.Bootstrap;
 import se.jbee.inject.bind.BootstrapperBundle;
-import se.jbee.inject.service.ServiceInvocation;
-import se.jbee.inject.service.ServiceMethod;
-import se.jbee.inject.service.ServiceModule;
 import se.jbee.inject.service.ServiceInvocation.ServiceInvocationExtension;
 import se.jbee.inject.util.Value;
 
@@ -71,8 +68,8 @@ public class TestServiceInvocationBinds {
 		@Override
 		public <P, R> Long before( Value<P> parameter, Type<R> result ) {
 			beforeCount++;
-			assertTrue( "right type passed to before", parameter.getType().equalTo(
-					raw( String.class ) ) );
+			assertTrue( "right type passed to before",
+					parameter.getType().equalTo( raw( String.class ) ) );
 			assertEquals( "right value passed to before", parameter.getValue(), "Foo" );
 			return 42L;
 		}
@@ -90,10 +87,11 @@ public class TestServiceInvocationBinds {
 	private final AssertInvocation inv = injector.resolve( dependency( AssertInvocation.class ) );
 
 	@Test
-	@SuppressWarnings ( "unchecked" )
 	public void thatInvocationIsInvokedBeforeAndAfterTheServiceMethodCall() {
+		@SuppressWarnings ( "rawtypes" )
 		Dependency<ServiceMethod> dependency = dependency( raw( ServiceMethod.class ).parametized(
 				String.class, Integer.class ) );
+		@SuppressWarnings ( "unchecked" )
 		ServiceMethod<String, Integer> hashCode = injector.resolve( dependency );
 		int beforeCount = inv.beforeCount;
 		int afterCount = inv.afterCount;
@@ -103,10 +101,11 @@ public class TestServiceInvocationBinds {
 	}
 
 	@Test
-	@SuppressWarnings ( "unchecked" )
 	public void thatInvocationIsInvokedAfterExceptionInTheServiceMethodCall() {
+		@SuppressWarnings ( "rawtypes" )
 		Dependency<ServiceMethod> dependency = dependency( raw( ServiceMethod.class ).parametized(
 				String.class, Void.class ) );
+		@SuppressWarnings ( "unchecked" )
 		ServiceMethod<String, Void> fail = injector.resolve( dependency );
 		int afterExceptionCount = inv.afterExceptionCount;
 		try {

@@ -180,9 +180,8 @@ public final class Bootstrap {
 			} );
 		}
 
-		@SuppressWarnings("unchecked")
 		@Override
-		public <M extends Enum<M> & ModularBundle<M>> void install( M... modules ) {
+		public final <M extends Enum<M> & ModularBundle<M>> void install( M... modules ) {
 			if ( modules.length > 0 ) {
 				final M bundle = modules[0];
 				if ( !globals.edition.featured( bundle.getClass() ) ) {
@@ -260,9 +259,8 @@ public final class Bootstrap {
 			bundleModules.remove( bundle ); // we are sure we don't need its modules
 		}
 
-		@SuppressWarnings("unchecked")
 		@Override
-		public <M extends Enum<M> & ModularBundle<M>> void uninstall( M... modules ) {
+		public final <M extends Enum<M> & ModularBundle<M>> void uninstall( M... modules ) {
 			if ( modules.length > 0 ) {
 				final EnumSet<M> uninstalling = EnumSet.of( modules[0], modules );
 				modules[0].bootstrap( new ModularBootstrapper<M>() {

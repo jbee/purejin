@@ -71,7 +71,7 @@ public class TestRobotLegsProblemBinds {
 		assertRobotHasDifferentLegsWithDifferentFoots( Bootstrap.injector( RobotLegsProblemScopeBindsModule.class ) );
 	}
 
-	private void assertRobotHasDifferentLegsWithDifferentFoots( Injector injector ) {
+	private static void assertRobotHasDifferentLegsWithDifferentFoots( Injector injector ) {
 		Leg leftLeg = injector.resolve( dependency( Leg.class ).named( left ) );
 		Leg rightLeg = injector.resolve( dependency( Leg.class ).named( right ) );
 		assertThat( "same leg", leftLeg, not( sameInstance( rightLeg ) ) );

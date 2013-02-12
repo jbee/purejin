@@ -28,7 +28,7 @@ public final class Typecast {
 		return listTypeOf( raw( elementType ) );
 	}
 
-	@SuppressWarnings ( "unchecked" )
+	@SuppressWarnings ( { "unchecked", "rawtypes" } )
 	public static <T> Type<List<T>> listTypeOf( Type<T> elementType ) {
 		Type raw = raw( List.class ).parametized( elementType );
 		return raw;
@@ -38,7 +38,7 @@ public final class Typecast {
 		return setTypeOf( raw( elementType ) );
 	}
 
-	@SuppressWarnings ( "unchecked" )
+	@SuppressWarnings ( { "unchecked", "rawtypes" } )
 	public static <T> Type<Set<T>> setTypeOf( Type<T> elementType ) {
 		Type raw = raw( Set.class ).parametized( elementType );
 		return raw;
@@ -48,7 +48,7 @@ public final class Typecast {
 		return collectionTypeOf( raw( elementType ) );
 	}
 
-	@SuppressWarnings ( "unchecked" )
+	@SuppressWarnings ( { "unchecked", "rawtypes" } )
 	public static <T> Type<Collection<T>> collectionTypeOf( Type<T> elementType ) {
 		Type raw = raw( Collection.class ).parametized( elementType );
 		return raw;
@@ -58,7 +58,7 @@ public final class Typecast {
 		return providerTypeOf( raw( providedType ) );
 	}
 
-	@SuppressWarnings ( "unchecked" )
+	@SuppressWarnings ( { "unchecked", "rawtypes" } )
 	public static <T> Type<Provider<T>> providerTypeOf( Type<T> providedType ) {
 		Type raw = raw( Provider.class ).parametized( providedType );
 		return raw;
@@ -68,7 +68,7 @@ public final class Typecast {
 		return factoryTypeOf( raw( providedType ) );
 	}
 
-	@SuppressWarnings ( "unchecked" )
+	@SuppressWarnings ( { "unchecked", "rawtypes" } )
 	public static <T> Type<Factory<T>> factoryTypeOf( Type<T> providedType ) {
 		Type raw = raw( Factory.class ).parametized( providedType );
 		return raw;
@@ -78,7 +78,7 @@ public final class Typecast {
 		return injectronTypeOf( raw( providedType ) );
 	}
 
-	@SuppressWarnings ( "unchecked" )
+	@SuppressWarnings ( { "unchecked", "rawtypes" } )
 	public static <T> Type<Injectron<T>> injectronTypeOf( Type<T> providedType ) {
 		Type raw = raw( Injectron.class ).parametized( providedType );
 		return raw;
@@ -88,7 +88,7 @@ public final class Typecast {
 		return injectronsTypeOf( raw( providedType ) );
 	}
 
-	@SuppressWarnings ( "unchecked" )
+	@SuppressWarnings ( { "unchecked", "rawtypes" } )
 	public static <T> Type<Injectron<T>[]> injectronsTypeOf( Type<T> providedType ) {
 		Type raw = raw( Injectron[].class ).parametized( providedType );
 		return raw;

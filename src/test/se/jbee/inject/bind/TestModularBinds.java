@@ -101,7 +101,7 @@ public class TestModularBinds {
 		assertOptionResolvedToValue( null, "on-generic" );
 	}
 
-	private void assertOptionResolvedToValue( Machine actualOption, String expected ) {
+	private static void assertOptionResolvedToValue( Machine actualOption, String expected ) {
 		Options options = Options.STANDARD.chosen( actualOption );
 		Injector injector = Bootstrap.injector( ModularBindsBundle.class,
 				Globals.DEFAULT.options( options ) );

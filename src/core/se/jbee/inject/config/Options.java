@@ -49,8 +49,7 @@ public final class Options {
 		return new Options( clone );
 	}
 
-	@SuppressWarnings("unchecked")
-	public <C extends Enum<C>> Options chosen( C... options ) {
+	public final <C extends Enum<C>> Options chosen( C... options ) {
 		if ( options.length == 0 ) {
 			return this;
 		}

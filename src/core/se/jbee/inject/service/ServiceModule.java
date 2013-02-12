@@ -29,6 +29,8 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 import se.jbee.inject.bind.Binder;
+import se.jbee.inject.bind.Binder.RootBinder;
+import se.jbee.inject.bind.Binder.TypedBinder;
 import se.jbee.inject.bind.BinderModule;
 import se.jbee.inject.bind.Bindings;
 import se.jbee.inject.bind.Bootstrap;
@@ -37,8 +39,6 @@ import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.bind.Inspect;
 import se.jbee.inject.bind.Inspector;
 import se.jbee.inject.bind.Module;
-import se.jbee.inject.bind.Binder.RootBinder;
-import se.jbee.inject.bind.Binder.TypedBinder;
 import se.jbee.inject.service.ServiceInvocation.ServiceInvocationExtension;
 import se.jbee.inject.service.ServiceMethod.ServiceClassExtension;
 import se.jbee.inject.util.Metaclass;
@@ -165,7 +165,7 @@ public abstract class ServiceModule
 			return (ServiceMethod<P, R>) service;
 		}
 
-		private <P, T> ServiceMethod<P, T> create( Method service, Type<P> parameterType,
+		private static <P, T> ServiceMethod<P, T> create( Method service, Type<P> parameterType,
 				Type<T> returnType, Injector injector ) {
 			Object implementor = injector.resolve( dependency( service.getDeclaringClass() ) );
 			return new PreresolvingServiceMethod<P, T>( implementor, service, parameterType,
@@ -250,7 +250,7 @@ public abstract class ServiceModule
 			this.invocations = resolveInvocations( injector );
 		}
 
-		private ServiceInvocation<?>[] resolveInvocations( Injector context ) {
+		private static ServiceInvocation<?>[] resolveInvocations( Injector context ) {
 			@SuppressWarnings ( "unchecked" )
 			Class<? extends ServiceInvocation<?>>[] classes = context.resolve( Extend.extensionDependency( ServiceInvocationExtension.class ) );
 			ServiceInvocation<?>[] res = new ServiceInvocation<?>[classes.length];

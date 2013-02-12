@@ -123,12 +123,13 @@ public class TestMorePrecise {
 				source.typed( DeclarationType.AUTO ) );
 	}
 
-	private <T extends PreciserThan<? super T>> void assertMorePrecise( T morePrecise, T lessPrecise ) {
+	private static <T extends PreciserThan<? super T>> void assertMorePrecise( T morePrecise,
+			T lessPrecise ) {
 		assertTrue( morePrecise.morePreciseThan( lessPrecise ) );
 		assertFalse( lessPrecise.morePreciseThan( morePrecise ) );
 	}
 
-	private <T extends PreciserThan<? super T>> void assertNotMorePreciseThanItself( T type ) {
+	private static <T extends PreciserThan<? super T>> void assertNotMorePreciseThanItself( T type ) {
 		assertFalse( type.morePreciseThan( type ) );
 		assertThat( Precision.comparePrecision( type, type ), is( 0 ) );
 	}

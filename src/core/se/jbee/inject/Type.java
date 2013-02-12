@@ -494,7 +494,7 @@ public final class Type<T>
 		return supertypes;
 	}
 
-	private <V> Map<String, Type<?>> actualTypeArguments( Type<V> type ) {
+	private static <V> Map<String, Type<?>> actualTypeArguments( Type<V> type ) {
 		Map<String, Type<?>> actualTypeArguments = new HashMap<String, Type<?>>();
 		TypeVariable<Class<V>>[] typeParameters = type.rawType.getTypeParameters();
 		for ( int i = 0; i < typeParameters.length; i++ ) {

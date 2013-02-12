@@ -11,9 +11,6 @@ import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.bind.Bootstrap;
-import se.jbee.inject.service.ServiceMethod;
-import se.jbee.inject.service.ServiceModule;
-import se.jbee.inject.service.ServiceProvider;
 
 /**
  * This test demonstrates that it is possible to have different higher level 'service' on top of
@@ -42,7 +39,7 @@ public class TestCommandBinds {
 					raw( Long.class ) ) );
 		}
 
-		private <P> Command<P> newCommand( ServiceMethod<P, Long> service ) {
+		private static <P> Command<P> newCommand( ServiceMethod<P, Long> service ) {
 			return new CommandToServiceMethodAdapter<P>( service );
 		}
 
@@ -82,12 +79,13 @@ public class TestCommandBinds {
 		}
 	}
 
-	@SuppressWarnings ( "unchecked" )
 	@Test
 	public void thatServiceCanBeResolvedWhenHavingJustOneGeneric() {
 		Injector injector = Bootstrap.injector( CommandBindsModule.class );
+		@SuppressWarnings ( "rawtypes" )
 		Dependency<Command> dependency = dependency( raw( Command.class ).parametized(
 				Integer.class ) );
+		@SuppressWarnings ( "unchecked" )
 		Command<Integer> square = injector.resolve( dependency );
 		assertThat( square.calc( 3 ), is( 9L ) );
 	}

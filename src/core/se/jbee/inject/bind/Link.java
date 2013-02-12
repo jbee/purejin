@@ -79,7 +79,7 @@ public final class Link {
 			return suppliables;
 		}
 
-		private Map<Scope, Repository> initRepositories( Binding<?>[] bindings ) {
+		private static Map<Scope, Repository> initRepositories( Binding<?>[] bindings ) {
 			Map<Scope, Repository> repositories = new IdentityHashMap<Scope, Repository>();
 			for ( Binding<?> i : bindings ) {
 				Repository repository = repositories.get( i.scope );
@@ -94,7 +94,7 @@ public final class Link {
 		 * Removes those bindings that are ambiguous but also do not clash because of different
 		 * {@link DeclarationType}s that replace each other.
 		 */
-		private Binding<?>[] disambiguate( Binding<?>[] bindings ) {
+		private static Binding<?>[] disambiguate( Binding<?>[] bindings ) {
 			if ( bindings.length <= 1 ) {
 				return bindings;
 			}
@@ -116,7 +116,7 @@ public final class Link {
 			return Array.of( res, Binding.class );
 		}
 
-		private Binding<?>[] bindingsFrom( Module[] modules, Inspector inspector ) {
+		private static Binding<?>[] bindingsFrom( Module[] modules, Inspector inspector ) {
 			Set<Class<?>> declared = new HashSet<Class<?>>();
 			Set<Class<?>> multimodals = new HashSet<Class<?>>();
 			ListBindings bindings = new ListBindings();

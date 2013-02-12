@@ -428,8 +428,7 @@ public class Binder
 			multi().toConstant( constant1 ).toConstant( constant2 );
 		}
 
-		@SuppressWarnings("unchecked")
-		public void to( T constant1, T... constants ) {
+		public final void to( T constant1, T... constants ) {
 			TypedBinder<T> multibinder = multi().toConstant( constant1 );
 			for ( int i = 0; i < constants.length; i++ ) {
 				multibinder.toConstant( constants[i] );

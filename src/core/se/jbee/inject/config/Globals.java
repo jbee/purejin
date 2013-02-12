@@ -7,7 +7,6 @@ import se.jbee.inject.Type;
 
 public final class Globals {
 
-	@SuppressWarnings("unchecked")
 	public static <T extends Enum<T> & Feature<T>> Edition featureEdition( T... featured ) {
 		return new FeatureEdition<T>( featured[0], EnumSet.of( featured[0], featured ) );
 	}
@@ -38,7 +37,6 @@ public final class Globals {
 		return edition( packagesEdition( included ) );
 	}
 
-	@SuppressWarnings("unchecked")
 	public <T extends Enum<T> & Feature<T>> Globals edition( T... featured ) {
 		return edition( featureEdition( featured ) );
 	}

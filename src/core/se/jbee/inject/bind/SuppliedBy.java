@@ -115,7 +115,7 @@ public final class SuppliedBy {
 			return bridge( supplyArray( dependency.anyTyped( elementType.getArrayType() ), injector ) );
 		}
 
-		private <E> E[] supplyArray( Dependency<E[]> elementType, Injector resolver ) {
+		private static <E> E[] supplyArray( Dependency<E[]> elementType, Injector resolver ) {
 			return resolver.resolve( elementType );
 		}
 
@@ -310,7 +310,7 @@ public final class SuppliedBy {
 			return newProvider( providedType, injector );
 		}
 
-		private <T> Provider<T> newProvider( Dependency<T> dependency, Injector context ) {
+		private static <T> Provider<T> newProvider( Dependency<T> dependency, Injector context ) {
 			return new LazyResolvedDependencyProvider<T>( dependency, context );
 		}
 	}
@@ -398,8 +398,8 @@ public final class SuppliedBy {
 
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			return Invoke.constructor( constructor, Argument.resolve( dependency, injector,
-					arguments ) );
+			return Invoke.constructor( constructor,
+					Argument.resolve( dependency, injector, arguments ) );
 		}
 
 	}

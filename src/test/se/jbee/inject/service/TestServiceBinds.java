@@ -12,9 +12,6 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 import se.jbee.inject.bind.Bootstrap;
-import se.jbee.inject.service.ServiceMethod;
-import se.jbee.inject.service.ServiceModule;
-import se.jbee.inject.service.ServiceProvider;
 
 public class TestServiceBinds {
 
@@ -44,7 +41,7 @@ public class TestServiceBinds {
 			return newService( provider.provide( type.parameter( 0 ), type.parameter( 1 ) ) );
 		}
 
-		private <P, R> Service<P, R> newService( ServiceMethod<P, R> service ) {
+		private static <P, R> Service<P, R> newService( ServiceMethod<P, R> service ) {
 			return new ServiceToServiceMethodAdapter<P, R>( service );
 		}
 
@@ -86,11 +83,12 @@ public class TestServiceBinds {
 	}
 
 	@Test
-	@SuppressWarnings ( "unchecked" )
 	public void thatServiceCanBeResolvedWhenHavingGenericsInSameOrder() {
 		Injector injector = Bootstrap.injector( ServiceBindsModule.class );
+		@SuppressWarnings ( "rawtypes" )
 		Dependency<Service> dependency = dependency( raw( Service.class ).parametized(
 				Integer.class, Long.class ) );
+		@SuppressWarnings ( "unchecked" )
 		Service<Integer, Long> square = injector.resolve( dependency );
 		assertThat( square.calc( 2 ), is( 4L ) );
 	}

@@ -43,9 +43,8 @@ public abstract class BootstrapperBundle
 		bootstrap.uninstall( bundle );
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public <M extends Enum<M> & ModularBundle<M>> void install( M... modules ) {
+	public final <M extends Enum<M> & ModularBundle<M>> void install( M... modules ) {
 		bootstrap.install( modules );
 	}
 
@@ -55,9 +54,8 @@ public abstract class BootstrapperBundle
 		bootstrap.install( bundle, property );
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public <M extends Enum<M> & ModularBundle<M>> void uninstall( M... modules ) {
+	public final <M extends Enum<M> & ModularBundle<M>> void uninstall( M... modules ) {
 		bootstrap.uninstall( modules );
 	}
 

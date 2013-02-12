@@ -109,9 +109,9 @@ public final class Packages
 	 * foo.bar. -> foo.
 	 * </pre>
 	 */
-	private String parent( String root ) {
-		return root.substring( 0, root.lastIndexOf( '.', root.length() - 2 )
-				+ ( root.endsWith( "." )
+	private static String parent( String root ) {
+		return root.substring( 0,
+				root.lastIndexOf( '.', root.length() - 2 ) + ( root.endsWith( "." )
 					? 1
 					: 0 ) );
 	}

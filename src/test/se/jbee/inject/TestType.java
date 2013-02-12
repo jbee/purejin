@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+@SuppressWarnings ( "rawtypes" )
 public class TestType {
 
 	private static interface Baz<T> {
@@ -253,7 +254,7 @@ public class TestType {
 		Type.raw( XList.class ).parametized( Object.class, Object.class );
 	}
 
-	private void assertContains( Type<?>[] actual, Type<?> expected ) {
+	private static void assertContains( Type<?>[] actual, Type<?> expected ) {
 		for ( Type<?> type : actual ) {
 			if ( type.equalTo( expected ) ) {
 				return;
