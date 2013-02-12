@@ -180,6 +180,7 @@ public final class Bootstrap {
 			} );
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public <M extends Enum<M> & ModularBundle<M>> void install( M... modules ) {
 			if ( modules.length > 0 ) {
@@ -259,6 +260,7 @@ public final class Bootstrap {
 			bundleModules.remove( bundle ); // we are sure we don't need its modules
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public <M extends Enum<M> & ModularBundle<M>> void uninstall( M... modules ) {
 			if ( modules.length > 0 ) {

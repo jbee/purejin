@@ -38,6 +38,7 @@ public class Life {
 
 	}
 
+	@SuppressWarnings("unused")
 	private static final class ThreadLifespan
 			implements Lifespan<Thread> {
 
