@@ -19,8 +19,7 @@ import se.jbee.inject.bind.Binder.TypedBinder;
 import se.jbee.inject.bind.Binder.TypedElementBinder;
 import se.jbee.inject.util.Scoped;
 
-public abstract class AbstractBinderModule
-		implements BasicBinder.RootBasicBinder {
+public abstract class AbstractBinderModule {
 
 	private RootBinder binder;
 
@@ -37,7 +36,6 @@ public abstract class AbstractBinderModule
 		this.binder = binder.into( bindings ).using( inspector ).with( source( getClass() ) );
 	}
 
-	@Override
 	public ScopedBinder per( Scope scope ) {
 		return binder.per( scope );
 	}
@@ -62,7 +60,6 @@ public abstract class AbstractBinderModule
 		return binder.injectingInto( name, type );
 	}
 
-	@Override
 	public TargetedBinder injectingInto( Instance<?> target ) {
 		return binder.injectingInto( target );
 	}
@@ -79,7 +76,6 @@ public abstract class AbstractBinderModule
 		return binder.inPackageAndSubPackagesOf( type );
 	}
 
-	@Override
 	public Binder in( Packages packages ) {
 		return binder.in( packages );
 	}
@@ -96,7 +92,6 @@ public abstract class AbstractBinderModule
 		return binder.bind( inspector );
 	}
 
-	@Override
 	public <T> TypedBinder<T> bind( Instance<T> instance ) {
 		return binder.bind( instance );
 	}

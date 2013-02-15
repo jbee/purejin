@@ -13,14 +13,12 @@ import org.junit.Test;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
-import se.jbee.inject.bind.BasicBinder.TargetedBasicBinder;
 import se.jbee.inject.bind.Binder.TargetedBinder;
 
 /**
  * A test that demonstrates how to overlay general binds in specified packages and/or sub-packages
- * using {@link TargetedBasicBinder#in(se.jbee.inject.Packages)} or any of the utility methods on
- * top of it: {@link TargetedBinder#inPackageOf(Class)},
- * {@link TargetedBinder#inSubPackagesOf(Class)},
+ * using {@link TargetedBinder#in(se.jbee.inject.Packages)} or any of the utility methods on top of
+ * it: {@link TargetedBinder#inPackageOf(Class)}, {@link TargetedBinder#inSubPackagesOf(Class)},
  * {@link TargetedBinder#inPackageAndSubPackagesOf(Class)}.
  * 
  * @author Jan Bernitt (jan@jbee.se)

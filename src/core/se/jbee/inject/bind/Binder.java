@@ -33,13 +33,12 @@ import se.jbee.inject.util.Factory;
 import se.jbee.inject.util.Provider;
 
 /**
- * The default implementation of the {@link BasicBinder} that provides a lot of utility methods to
+ * The default implementation of a fluent binder interface that provides a lot of utility methods to
  * improve readability and keep binding compact.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
-public class Binder
-		implements BasicBinder {
+public class Binder {
 
 	public static Bindings autobinding( Bindings delegate ) {
 		return new AutobindBindings( delegate );
@@ -81,7 +80,6 @@ public class Binder
 		return bind( Type.raw( type ) );
 	}
 
-	@Override
 	public <T> TypedBinder<T> bind( Instance<T> instance ) {
 		return new TypedBinder<T>( this, instance );
 	}
@@ -252,14 +250,12 @@ public class Binder
 	}
 
 	public static class RootBinder
-			extends ScopedBinder
-			implements RootBasicBinder {
+			extends ScopedBinder {
 
 		RootBinder( Bindings bindings, Inspector inspector, Source source, Scope scope ) {
 			super( bindings, inspector, source, scope );
 		}
 
-		@Override
 		public ScopedBinder per( Scope scope ) {
 			return new ScopedBinder( bindings, inspector, source, scope );
 		}
@@ -288,8 +284,7 @@ public class Binder
 	}
 
 	public static class ScopedBinder
-			extends TargetedBinder
-			implements ScopedBasicBinder {
+			extends TargetedBinder {
 
 		ScopedBinder( Bindings bindings, Inspector inspector, Source source, Scope scope ) {
 			super( bindings, inspector, source, scope, Target.ANY );
@@ -299,7 +294,6 @@ public class Binder
 			return injectingInto( raw( target ) );
 		}
 
-		@Override
 		public TargetedBinder injectingInto( Instance<?> target ) {
 			return new TargetedBinder( bindings, inspector, source, scope,
 					Target.targeting( target ) );
@@ -320,15 +314,13 @@ public class Binder
 	}
 
 	public static class TargetedBinder
-			extends Binder
-			implements TargetedBasicBinder {
+			extends Binder {
 
 		TargetedBinder( Bindings bindings, Inspector inspector, Source source, Scope scope,
 				Target target ) {
 			super( bindings, inspector, source, scope, target );
 		}
 
-		@Override
 		public Binder in( Packages packages ) {
 			return with( target.in( packages ) );
 		}
@@ -366,12 +358,11 @@ public class Binder
 		}
 	}
 
-	public static class TypedBinder<T>
-			implements BasicBinder.TypedBasicBinder<T> {
+	public static class TypedBinder<T> {
 
 		/**
 		 * The binder instance who's {@link RichBasicBinder#assemble(Instance)} method had been
-		 * called to get to this {@link TypedBasicBinder}.
+		 * called to get to this {@link TypedBinder}.
 		 */
 		private final Binder binder;
 		private final Resource<T> resource;
@@ -415,7 +406,6 @@ public class Binder
 			implicitBindToConstant( provider );
 		}
 
-		@Override
 		public void to( Supplier<? extends T> supplier ) {
 			binder.bind( resource, supplier );
 		}

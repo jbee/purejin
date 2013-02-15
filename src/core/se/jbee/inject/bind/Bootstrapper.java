@@ -55,6 +55,13 @@ public interface Bootstrapper {
 	 */
 	void install( Module module );
 
+	/**
+	 * @param <T>
+	 *            Type of the preset value passed to the module
+	 * @param module
+	 *            the {@link PresetModule} to install (within the parent {@link Bundle} that is
+	 *            given implicitly - the {@link Bootstrapper} keeps track of that)
+	 */
 	<T> void install( PresetModule<T> module );
 
 	/**
