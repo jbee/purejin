@@ -1,4 +1,4 @@
-package se.jbee.inject;
+package se.jbee.inject.util;
 
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
@@ -8,6 +8,9 @@ import static se.jbee.inject.Resource.resource;
 
 import org.junit.Test;
 
+import se.jbee.inject.Demand;
+import se.jbee.inject.Injectable;
+import se.jbee.inject.Repository;
 import se.jbee.inject.util.Scoped;
 
 public class TestScopes {

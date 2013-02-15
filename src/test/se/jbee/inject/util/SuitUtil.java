@@ -5,7 +5,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith ( Suite.class )
-@SuiteClasses ( { TestTypecast.class } )
+@SuiteClasses ( { TestTypecast.class, TestScopes.class } )
 public class SuitUtil {
 	// tests of the util package
 }
