@@ -8,7 +8,7 @@ package se.jbee.inject.config;
 import java.util.EnumSet;
 import java.util.IdentityHashMap;
 
-import se.jbee.inject.bind.Bootstrap;
+import se.jbee.inject.bootstrap.Bootstrap;
 
 /**
  * {@link Options} are used to model configurations of the {@link Bootstrap}ping process through one

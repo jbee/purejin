@@ -13,7 +13,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import se.jbee.inject.bind.Bootstrapper.ModularBootstrapper;
+import se.jbee.inject.bootstrap.ModularBundle;
+import se.jbee.inject.bootstrap.Bootstrapper.ModularBootstrapper;
 import se.jbee.inject.util.Provider;
 
 /**

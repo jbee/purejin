@@ -20,6 +20,7 @@ import org.junit.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
+import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.util.Argument;
 import se.jbee.inject.util.Suppliable;
 

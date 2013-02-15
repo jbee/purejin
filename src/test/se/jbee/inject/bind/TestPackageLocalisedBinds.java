@@ -14,6 +14,7 @@ import org.junit.Test;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bind.Binder.TargetedBinder;
+import se.jbee.inject.bootstrap.Bootstrap;
 
 /**
  * A test that demonstrates how to overlay general binds in specified packages and/or sub-packages

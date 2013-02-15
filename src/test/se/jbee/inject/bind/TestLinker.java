@@ -6,6 +6,8 @@ import static se.jbee.inject.Dependency.dependency;
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
+import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.BootstrapperBundle;
 
 public class TestLinker {
 

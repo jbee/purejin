@@ -3,7 +3,7 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject.bind;
+package se.jbee.inject.bootstrap;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 
 import se.jbee.inject.Name;
 import se.jbee.inject.Parameter;
+import se.jbee.inject.bind.Binder;
 
 /**
  * A strategy to extract missing information from types that is used within the {@link Binder} to

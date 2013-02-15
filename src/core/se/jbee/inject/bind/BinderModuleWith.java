@@ -5,6 +5,11 @@
  */
 package se.jbee.inject.bind;
 
+import se.jbee.inject.bootstrap.Bindings;
+import se.jbee.inject.bootstrap.Bootstrapper;
+import se.jbee.inject.bootstrap.Bundle;
+import se.jbee.inject.bootstrap.Inspector;
+import se.jbee.inject.bootstrap.PresetModule;
 import se.jbee.inject.config.Presets;
 
 /**

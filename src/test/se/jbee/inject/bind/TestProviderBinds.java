@@ -17,6 +17,8 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Name;
 import se.jbee.inject.Type;
 import se.jbee.inject.DIRuntimeException.MoreFrequentExpiryException;
+import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.util.Provider;
 import se.jbee.inject.util.Scoped;
 

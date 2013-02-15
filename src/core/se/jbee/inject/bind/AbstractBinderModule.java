@@ -17,6 +17,10 @@ import se.jbee.inject.bind.Binder.ScopedBinder;
 import se.jbee.inject.bind.Binder.TargetedBinder;
 import se.jbee.inject.bind.Binder.TypedBinder;
 import se.jbee.inject.bind.Binder.TypedElementBinder;
+import se.jbee.inject.bootstrap.Bindings;
+import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.Inspect;
+import se.jbee.inject.bootstrap.Inspector;
 import se.jbee.inject.util.Scoped;
 
 public abstract class AbstractBinderModule {

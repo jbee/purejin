@@ -6,6 +6,11 @@
 package se.jbee.inject.bind;
 
 import se.jbee.inject.Scope;
+import se.jbee.inject.bootstrap.Bindings;
+import se.jbee.inject.bootstrap.Bootstrapper;
+import se.jbee.inject.bootstrap.Bundle;
+import se.jbee.inject.bootstrap.Inspector;
+import se.jbee.inject.bootstrap.Module;
 
 /**
  * The default utility {@link Module} almost always used.

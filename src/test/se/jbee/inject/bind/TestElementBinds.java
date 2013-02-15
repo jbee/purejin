@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.bind.Binder.TypedElementBinder;
+import se.jbee.inject.bootstrap.Bootstrap;
 
 /**
  * Tests that demonstrates how to overlay the default behavior of 1-dimensional array types by

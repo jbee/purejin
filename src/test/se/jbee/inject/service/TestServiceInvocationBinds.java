@@ -11,8 +11,8 @@ import org.junit.Test;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
-import se.jbee.inject.bind.Bootstrap;
-import se.jbee.inject.bind.BootstrapperBundle;
+import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.service.ServiceInvocation.ServiceInvocationExtension;
 import se.jbee.inject.util.Value;
 

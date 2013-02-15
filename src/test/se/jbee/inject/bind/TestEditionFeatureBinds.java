@@ -12,7 +12,12 @@ import java.lang.annotation.Target;
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
-import se.jbee.inject.bind.Bootstrapper.ModularBootstrapper;
+import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.BootstrapperBundle;
+import se.jbee.inject.bootstrap.Bundle;
+import se.jbee.inject.bootstrap.ModularBundle;
+import se.jbee.inject.bootstrap.Module;
+import se.jbee.inject.bootstrap.Bootstrapper.ModularBootstrapper;
 import se.jbee.inject.config.Edition;
 import se.jbee.inject.config.Feature;
 import se.jbee.inject.config.Globals;

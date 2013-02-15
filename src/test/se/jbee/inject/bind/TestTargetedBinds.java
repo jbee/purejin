@@ -17,6 +17,7 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.bind.BasicBinder.ScopedBasicBinder;
 import se.jbee.inject.bind.Binder.TargetedBinder;
+import se.jbee.inject.bootstrap.Bootstrap;
 
 /**
  * A test that demonstrates how to inject a specific instance into another type using the

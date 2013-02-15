@@ -6,7 +6,7 @@
 package se.jbee.inject.util;
 
 import se.jbee.inject.Supplier;
-import se.jbee.inject.bind.Bundle;
+import se.jbee.inject.bootstrap.Bundle;
 
 /**
  * A indirection that resolves the instance lazily when {@link #provide()} is invoked. This is

@@ -5,8 +5,8 @@
  */
 package se.jbee.inject.config;
 
-import se.jbee.inject.bind.Bundle;
-import se.jbee.inject.bind.Module;
+import se.jbee.inject.bootstrap.Bundle;
+import se.jbee.inject.bootstrap.Module;
 
 /**
  * An {@link Edition} decides wich features are contained in a specific setup.

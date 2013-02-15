@@ -9,7 +9,7 @@ import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Packages.packageAndSubPackagesOf;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.bind.Inspect.all;
+import static se.jbee.inject.bootstrap.Inspect.all;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
@@ -24,6 +24,9 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
+import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.Inspect;
+import se.jbee.inject.bootstrap.Inspector;
 import se.jbee.inject.util.Provider;
 import se.jbee.inject.util.Typecast;
 

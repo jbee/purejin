@@ -3,7 +3,7 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject.bind;
+package se.jbee.inject.bootstrap;
 
 /**
  * Determines all reachable {@link Bundle}s starting from a root {@link Bundle}.

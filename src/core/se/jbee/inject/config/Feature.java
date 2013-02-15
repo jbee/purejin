@@ -5,8 +5,8 @@
  */
 package se.jbee.inject.config;
 
-import se.jbee.inject.bind.Bundle;
-import se.jbee.inject.bind.Module;
+import se.jbee.inject.bootstrap.Bundle;
+import se.jbee.inject.bootstrap.Module;
 
 /**
  * {@link Feature}s can be used to model more fine grained {@link Edition} by using

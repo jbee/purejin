@@ -20,6 +20,9 @@ import se.jbee.inject.Name;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.DIRuntimeException.DependencyCycleException;
+import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.BootstrapperBundle;
+import se.jbee.inject.bootstrap.Bundle;
 
 /**
  * The tests shows an example of cyclic depended {@link Bundle}s. It shows that a {@link Bundle}

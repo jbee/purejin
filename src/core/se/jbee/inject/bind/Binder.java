@@ -29,6 +29,8 @@ import se.jbee.inject.Source;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Target;
 import se.jbee.inject.Type;
+import se.jbee.inject.bootstrap.Bindings;
+import se.jbee.inject.bootstrap.Inspector;
 import se.jbee.inject.util.Factory;
 import se.jbee.inject.util.Provider;
 

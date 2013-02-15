@@ -9,8 +9,8 @@ import org.junit.Test;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
-import se.jbee.inject.bind.Bootstrap;
-import se.jbee.inject.bind.Inspect;
+import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.Inspect;
 import se.jbee.inject.service.ServiceMethod;
 import se.jbee.inject.service.ServiceModule;
 

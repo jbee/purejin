@@ -18,6 +18,8 @@ import org.junit.Test;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
+import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.util.Typecast;
 
 public class TestCollectionBinds {

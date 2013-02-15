@@ -3,7 +3,7 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject.bind;
+package se.jbee.inject.bootstrap;
 
 /**
  * The default utility {@link Bundle} that is a {@link Bootstrap} as well so that bindings can be

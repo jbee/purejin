@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
+import se.jbee.inject.bootstrap.Bootstrap;
 
 /**
  * In Silk primitives and wrapper {@link Class}es are the same {@link Type}.

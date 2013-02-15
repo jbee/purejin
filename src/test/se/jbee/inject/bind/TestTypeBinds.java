@@ -8,6 +8,7 @@ import static se.jbee.inject.Dependency.dependency;
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
+import se.jbee.inject.bootstrap.Bootstrap;
 
 /**
  * The test demonstrates binds that are 'linked' by type.

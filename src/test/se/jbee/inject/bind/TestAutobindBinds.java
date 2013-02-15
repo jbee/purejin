@@ -15,6 +15,7 @@ import org.junit.Test;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Supplier;
+import se.jbee.inject.bootstrap.Bootstrap;
 
 /**
  * The tests demonstrates the meaning of a {@link Binder#autobind(Class)} call. That will create

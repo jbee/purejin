@@ -3,9 +3,9 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject.bind;
+package se.jbee.inject.bootstrap;
 
-import se.jbee.inject.bind.Bootstrapper.ModularBootstrapper;
+import se.jbee.inject.bootstrap.Bootstrapper.ModularBootstrapper;
 
 /**
  * The default utility base class for {@link ModularBundle}s.

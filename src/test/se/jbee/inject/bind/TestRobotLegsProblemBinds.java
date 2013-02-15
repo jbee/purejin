@@ -11,6 +11,7 @@ import org.junit.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
+import se.jbee.inject.bootstrap.Bootstrap;
 
 public class TestRobotLegsProblemBinds {
 

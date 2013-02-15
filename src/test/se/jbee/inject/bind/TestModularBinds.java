@@ -7,6 +7,11 @@ import static se.jbee.inject.Dependency.dependency;
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
+import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.BootstrapperBundle;
+import se.jbee.inject.bootstrap.Bundle;
+import se.jbee.inject.bootstrap.ModularBootstrapperBundle;
+import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.config.Globals;
 import se.jbee.inject.config.Options;
 

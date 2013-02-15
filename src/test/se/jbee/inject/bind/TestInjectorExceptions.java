@@ -5,6 +5,8 @@ import org.junit.Test;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
+import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.BootstrapperBundle;
 
 public class TestInjectorExceptions {
 

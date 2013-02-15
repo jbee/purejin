@@ -11,8 +11,8 @@ import org.junit.Test;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
-import se.jbee.inject.bind.Bootstrap;
-import se.jbee.inject.bind.Module;
+import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.service.ServiceMethod.ServiceClassExtension;
 
 public class TestExtensionBinds {

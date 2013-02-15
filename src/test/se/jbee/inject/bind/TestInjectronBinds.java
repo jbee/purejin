@@ -18,6 +18,7 @@ import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Injectron;
 import se.jbee.inject.Name;
+import se.jbee.inject.bootstrap.Bootstrap;
 
 public class TestInjectronBinds {
 
