@@ -4,6 +4,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Packages.packageAndSubPackagesOf;
@@ -44,6 +45,8 @@ public class TestInspectorBinds {
 		String value();
 	}
 
+	static final StringBuffer STATE = new StringBuffer();
+
 	static class InspectorBindsModule
 			extends BinderModule {
 
@@ -56,6 +59,7 @@ public class TestInspectorBinds {
 					InspectorBindsImplementor2.class );
 			bind( all().methods().returnTypeIn( packageAndSubPackagesOf( Injector.class ) ) ).in(
 					InspectorBindsImplementor3.class );
+			bind( all().methods() ).in( new InspectorBindsImplementor4( STATE ) );
 		}
 
 		static int staticFactoryMethod() {
@@ -119,6 +123,19 @@ public class TestInspectorBinds {
 		}
 	}
 
+	static class InspectorBindsImplementor4 {
+
+		final StringBuffer state;
+
+		InspectorBindsImplementor4( StringBuffer state ) {
+			this.state = state;
+		}
+
+		StringBuffer valueFromStatefullInspectedObject() {
+			return state;
+		}
+	}
+
 	private final Injector injector = Bootstrap.injector( InspectorBindsModule.class );
 
 	@Test
@@ -177,5 +194,10 @@ public class TestInspectorBinds {
 	@Test ( expected = NoSuchResourceException.class )
 	public void thatNoMethodsAreBoundThatAreNotInSpecifiedPackagesSet() {
 		injector.resolve( dependency( String.class ) );
+	}
+
+	@Test
+	public void thatMethodsAreBoundToSpecificInstance() {
+		assertSame( STATE, injector.resolve( dependency( StringBuffer.class ) ) );
 	}
 }

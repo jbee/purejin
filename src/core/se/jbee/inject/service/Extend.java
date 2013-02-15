@@ -23,7 +23,7 @@ public final class Extend {
 				+ type.getCanonicalName() );
 	}
 
-	@SuppressWarnings ( "rawtypes" )
+	@SuppressWarnings ( { "rawtypes", "unchecked" } )
 	public static <E extends Enum<E> & Extension<E, ? super T>, T> Dependency<Class[]> extensionDependency(
 			Class<E> extension ) {
 		return Dependency.dependency( raw( Class[].class ).parametizedAsLowerBounds() ).named(

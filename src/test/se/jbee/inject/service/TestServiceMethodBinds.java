@@ -43,20 +43,19 @@ public class TestServiceMethodBinds {
 		}
 	}
 
+	@SuppressWarnings ( "unchecked" )
 	@Test
 	public void test() {
 		Injector injector = Bootstrap.injector( ServiceBindsModule.class );
 		@SuppressWarnings ( "rawtypes" )
 		Dependency<ServiceMethod> dependency = dependency( raw( ServiceMethod.class ).parametized(
 				Integer.class, Integer.class ) );
-		@SuppressWarnings ( "unchecked" )
 		ServiceMethod<Integer, Integer> mul2 = injector.resolve( dependency );
 		assertNotNull( mul2 );
 		assertThat( mul2.invoke( 3 ), is( 9 ) );
 		@SuppressWarnings ( "rawtypes" )
 		Dependency<ServiceMethod> dependency2 = dependency( raw( ServiceMethod.class ).parametized(
 				Number.class, Integer.class ) );
-		@SuppressWarnings ( "unchecked" )
 		ServiceMethod<Number, Integer> negate = injector.resolve( dependency2 );
 		assertNotNull( mul2 );
 		assertThat( negate.invoke( 3 ), is( -3 ) );

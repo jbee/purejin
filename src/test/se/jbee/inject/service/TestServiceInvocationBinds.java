@@ -68,8 +68,8 @@ public class TestServiceInvocationBinds {
 		@Override
 		public <P, R> Long before( Value<P> parameter, Type<R> result ) {
 			beforeCount++;
-			assertTrue( "right type passed to before",
-					parameter.getType().equalTo( raw( String.class ) ) );
+			assertTrue( "right type passed to before", parameter.getType().equalTo(
+					raw( String.class ) ) );
 			assertEquals( "right value passed to before", parameter.getValue(), "Foo" );
 			return 42L;
 		}
@@ -86,12 +86,12 @@ public class TestServiceInvocationBinds {
 	private final Injector injector = Bootstrap.injector( ServiceInvocationBindsBundle.class );
 	private final AssertInvocation inv = injector.resolve( dependency( AssertInvocation.class ) );
 
+	@SuppressWarnings ( "unchecked" )
 	@Test
 	public void thatInvocationIsInvokedBeforeAndAfterTheServiceMethodCall() {
 		@SuppressWarnings ( "rawtypes" )
 		Dependency<ServiceMethod> dependency = dependency( raw( ServiceMethod.class ).parametized(
 				String.class, Integer.class ) );
-		@SuppressWarnings ( "unchecked" )
 		ServiceMethod<String, Integer> hashCode = injector.resolve( dependency );
 		int beforeCount = inv.beforeCount;
 		int afterCount = inv.afterCount;
@@ -100,12 +100,12 @@ public class TestServiceInvocationBinds {
 		assertEquals( afterCount + 1, inv.afterCount );
 	}
 
+	@SuppressWarnings ( "unchecked" )
 	@Test
 	public void thatInvocationIsInvokedAfterExceptionInTheServiceMethodCall() {
 		@SuppressWarnings ( "rawtypes" )
 		Dependency<ServiceMethod> dependency = dependency( raw( ServiceMethod.class ).parametized(
 				String.class, Void.class ) );
-		@SuppressWarnings ( "unchecked" )
 		ServiceMethod<String, Void> fail = injector.resolve( dependency );
 		int afterExceptionCount = inv.afterExceptionCount;
 		try {

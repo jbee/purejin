@@ -44,7 +44,7 @@ public class TestExtensionBinds {
 
 	private final Injector injector = Bootstrap.injector( TestExtensionModule.class );
 
-	@SuppressWarnings ( "rawtypes" )
+	@SuppressWarnings ( { "rawtypes", "unchecked" } )
 	private final Dependency<Class[]> dependency = Extend.extensionDependency( ServiceClassExtension.class );
 
 	@Test

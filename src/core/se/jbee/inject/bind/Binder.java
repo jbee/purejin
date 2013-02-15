@@ -190,20 +190,12 @@ public class Binder {
 			in( implementor, new Parameter<?>[0] );
 		}
 
-		//TODO impl. could also be an instance -> instance methods dependend on state in that instance 
+		public void in( Object implementingInstance, Parameter<?>... parameters ) {
+			bindMethodsIn( implementingInstance.getClass(), implementingInstance, parameters );
+		}
 
 		public void in( Class<?> implementor, Parameter<?>... parameters ) {
-			boolean instanceMethods = false;
-			for ( Method method : inspector.methodsIn( implementor ) ) {
-				Type<?> returnType = Type.returnType( method );
-				if ( !Type.VOID.equalTo( returnType ) ) {
-					if ( parameters.length == 0 ) {
-						parameters = inspector.parametersFor( method );
-					}
-					bind( returnType, method, parameters );
-					instanceMethods = instanceMethods || !Modifier.isStatic( method.getModifiers() );
-				}
-			}
+			boolean instanceMethods = bindMethodsIn( implementor, null, parameters );
 			Constructor<?> c = inspector.constructorFor( implementor );
 			if ( c == null ) {
 				if ( instanceMethods ) {
@@ -217,9 +209,26 @@ public class Binder {
 			}
 		}
 
-		private <T> void bind( Type<T> returnType, Method method, Parameter<?>... parameters ) {
+		private boolean bindMethodsIn( Class<?> implementor, Object instance,
+				Parameter<?>[] parameters ) {
+			boolean instanceMethods = false;
+			for ( Method method : inspector.methodsIn( implementor ) ) {
+				Type<?> returnType = Type.returnType( method );
+				if ( !Type.VOID.equalTo( returnType ) ) {
+					if ( parameters.length == 0 ) {
+						parameters = inspector.parametersFor( method );
+					}
+					bind( returnType, method, instance, parameters );
+					instanceMethods = instanceMethods || !Modifier.isStatic( method.getModifiers() );
+				}
+			}
+			return instanceMethods;
+		}
+
+		private <T> void bind( Type<T> returnType, Method method, Object instance,
+				Parameter<?>[] parameters ) {
 			binder.bind( inspector.nameFor( method ), returnType ).to(
-					SuppliedBy.method( returnType, method, parameters ) );
+					SuppliedBy.method( returnType, method, instance, parameters ) );
 		}
 
 		private <T> void bind( Constructor<T> constructor, Parameter<?>... parameters ) {

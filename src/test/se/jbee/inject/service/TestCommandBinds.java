@@ -79,13 +79,13 @@ public class TestCommandBinds {
 		}
 	}
 
+	@SuppressWarnings ( "unchecked" )
 	@Test
 	public void thatServiceCanBeResolvedWhenHavingJustOneGeneric() {
 		Injector injector = Bootstrap.injector( CommandBindsModule.class );
 		@SuppressWarnings ( "rawtypes" )
 		Dependency<Command> dependency = dependency( raw( Command.class ).parametized(
 				Integer.class ) );
-		@SuppressWarnings ( "unchecked" )
 		Command<Integer> square = injector.resolve( dependency );
 		assertThat( square.calc( 3 ), is( 9L ) );
 	}
