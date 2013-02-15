@@ -85,7 +85,7 @@ public class TestServiceBinds {
 	@Test
 	public void thatServiceCanBeResolvedWhenHavingGenericsInSameOrder() {
 		Injector injector = Bootstrap.injector( ServiceBindsModule.class );
-		@SuppressWarnings ( { "rawtypes", "unchecked" } )
+		@SuppressWarnings ( { "rawtypes" } )
 		Dependency<Service> dependency = dependency( raw( Service.class ).parametized(
 				Integer.class, Long.class ) );
 		@SuppressWarnings ( "unchecked" )

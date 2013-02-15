@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-@SuppressWarnings ( { "rawtypes", "unchecked" } )
+@SuppressWarnings ( { "rawtypes" } )
 public class TestType {
 
 	private static interface Baz<T> {
