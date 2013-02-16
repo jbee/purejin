@@ -99,10 +99,10 @@ public class DIRuntimeException
 	 * 
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	public static final class NoSuchMethodException
+	public static final class NoSuchFunctionException
 			extends DIRuntimeException {
 
-		public NoSuchMethodException( Type<?> returnType, Type<?>... parameterTypes ) {
+		public NoSuchFunctionException( Type<?> returnType, Type<?>... parameterTypes ) {
 			super( returnType + ":" + Arrays.toString( parameterTypes ) );
 		}
 	}

@@ -192,7 +192,7 @@ public abstract class ServiceModule
 					}
 				}
 			}
-			throw new DIRuntimeException.NoSuchMethodException( returnType, parameterType );
+			throw new DIRuntimeException.NoSuchFunctionException( returnType, parameterType );
 		}
 
 		private Method[] serviceClassMethods( Class<?> service ) {

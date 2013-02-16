@@ -31,6 +31,10 @@ import se.jbee.inject.util.Inject;
 public class Inspect
 		implements Inspector {
 
+	/**
+	 * By default just the constructor is inspected. The {@link Inspector} will pick the
+	 * {@link #defaultConstructor(Class)}.
+	 */
 	public static final Inspect DEFAULT = all().constructors();
 
 	private static final Parameter<?>[] NO_PARAMETERS = new Parameter<?>[0];
@@ -200,8 +204,16 @@ public class Inspect
 				namedby );
 	}
 
+	/**
+	 * Returns the constructor usually should be used.
+	 * 
+	 * @param declaringClass
+	 *            constructed type
+	 * @return The no-args constructor (if available) or the 1st in sequence of declaration.
+	 * @throws NoSuchMethodException
+	 *             in case the type is not constructible (has no constructors at all)
+	 */
 	public static <T> Constructor<T> defaultConstructor( Class<T> declaringClass ) {
-
 		Constructor<?>[] constructors = declaringClass.getDeclaredConstructors();
 		if ( constructors.length == 0 ) {
 			throw new RuntimeException( new NoSuchMethodException(
