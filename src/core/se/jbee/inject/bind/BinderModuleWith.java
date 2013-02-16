@@ -5,6 +5,7 @@
  */
 package se.jbee.inject.bind;
 
+import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrapper;
 import se.jbee.inject.bootstrap.Bundle;
@@ -33,6 +34,12 @@ public abstract class BinderModuleWith<T>
 	public final void declare( Bindings bindings, Inspector inspector, T preset ) {
 		init( bindings, inspector );
 		declare( preset );
+	}
+
+	@Override
+	public String toString() {
+		Type<?> preset = Type.supertype( PresetModule.class, Type.raw( getClass() ) ).parameter( 0 );
+		return "module " + getClass().getSimpleName() + "[" + preset + "]";
 	}
 
 	/**

@@ -5,6 +5,7 @@
  */
 package se.jbee.inject.bootstrap;
 
+import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Bootstrapper.ModularBootstrapper;
 
 /**
@@ -27,6 +28,12 @@ public abstract class ModularBootstrapperBundle<M>
 	@Override
 	public void install( Class<? extends Bundle> bundle, M module ) {
 		bootstrap.install( bundle, module );
+	}
+
+	@Override
+	public String toString() {
+		Type<?> module = Type.supertype( ModularBundle.class, Type.raw( getClass() ) ).parameter( 0 );
+		return "bundle " + getClass().getSimpleName() + "[" + module + "]";
 	}
 
 	protected abstract void bootstrap();

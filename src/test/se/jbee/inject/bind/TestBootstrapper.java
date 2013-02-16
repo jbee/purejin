@@ -10,8 +10,11 @@ import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.util.Scoped.INJECTION;
 import static se.jbee.inject.util.Typecast.injectronsTypeOf;
 
+import java.beans.ConstructorProperties;
+
 import org.junit.Test;
 
+import se.jbee.inject.DIRuntimeException.DependencyCycleException;
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
@@ -19,10 +22,10 @@ import se.jbee.inject.Injectron;
 import se.jbee.inject.Name;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Supplier;
-import se.jbee.inject.DIRuntimeException.DependencyCycleException;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bundle;
+import se.jbee.inject.bootstrap.Inspect;
 
 /**
  * The tests shows an example of cyclic depended {@link Bundle}s. It shows that a {@link Bundle}
@@ -174,6 +177,42 @@ public class TestBootstrapper {
 
 	}
 
+	private static class CustomInspectedBundle
+			extends BootstrapperBundle {
+
+		@Override
+		protected void bootstrap() {
+			install( CustomInspectedModule.class,
+					Inspect.all().constructors().annotatedWith( ConstructorProperties.class ) );
+		}
+	}
+
+	private static class CustomInspectedModule
+			extends BinderModule {
+
+		@Override
+		protected void declare() {
+			construct( D.class );
+			bind( String.class ).to( "will be passed to D" );
+		}
+	}
+
+	@SuppressWarnings ( "unused" )
+	private static class D {
+
+		final String s;
+
+		@ConstructorProperties ( {} )
+		D( String s ) {
+			this.s = s;
+
+		}
+
+		D() {
+			this( "would be picked normally" );
+		}
+	}
+
 	/**
 	 * The assert itself doesn't play such huge role here. we just want to reach this code.
 	 */
@@ -223,5 +262,11 @@ public class TestBootstrapper {
 		int before = EagerSingletonsBindsModule.eagers;
 		Bootstrap.eagerSingletons( injector );
 		assertEquals( before + 1, EagerSingletonsBindsModule.eagers );
+	}
+
+	@Test
+	public void thatCustomInspectorIsUsedToPickConstructor() {
+		Injector injector = Bootstrap.injector( CustomInspectedBundle.class );
+		assertEquals( "will be passed to D", injector.resolve( dependency( D.class ) ).s );
 	}
 }

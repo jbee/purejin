@@ -5,6 +5,8 @@
  */
 package se.jbee.inject.bootstrap;
 
+import se.jbee.inject.util.Metaclass;
+
 /**
  * The default utility {@link Bundle} that is a {@link Bootstrap} as well so that bindings can be
  * declared nicer.
@@ -67,5 +69,48 @@ public abstract class BootstrapperBundle
 		uninstall( modules.getEnumConstants() );
 	}
 
+	/**
+	 * Installs the given {@link Module} using the given {@link Inspector} when declaring binds.
+	 */
+	protected final void install( Module module, Inspector inspector ) {
+		install( new InspectorModule( module, inspector ) );
+	}
+
+	protected final void install( Class<? extends Module> module, Inspector inspector ) {
+		install( newInstance( module ), inspector );
+	}
+
+	protected static Module newInstance( Class<? extends Module> module ) {
+		return Invoke.constructor( Metaclass.accessible( Inspect.noArgsConstructor( module ) ) );
+	}
+
+	@Override
+	public String toString() {
+		return "bundle " + getClass().getSimpleName();
+	}
+
 	protected abstract void bootstrap();
+
+	private static final class InspectorModule
+			implements Module {
+
+		private final Module module;
+		private final Inspector inspector;
+
+		InspectorModule( Module module, Inspector inspector ) {
+			super();
+			this.module = module;
+			this.inspector = inspector;
+		}
+
+		@Override
+		public void declare( Bindings bindings, Inspector inspector ) {
+			module.declare( bindings, this.inspector );
+		}
+
+		@Override
+		public String toString() {
+			return module + "[" + inspector + "]";
+		}
+	}
 }

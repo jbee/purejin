@@ -43,6 +43,11 @@ public abstract class BinderModule
 		declare();
 	}
 
+	@Override
+	public String toString() {
+		return "module " + getClass().getSimpleName();
+	}
+
 	/**
 	 * @see Module#declare(Bindings, Inspector)
 	 */
