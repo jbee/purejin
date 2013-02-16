@@ -77,7 +77,8 @@ public class TestPresetModuleBinds {
 		Presets presets = Presets.EMPTY.preset( Properties.class, exampleProperties() );
 		presets = presets.preset( Typecast.listTypeOf( String.class ), Arrays.asList( "a", "b" ) );
 		presets = presets.preset( Typecast.listTypeOf( Integer.class ), Arrays.asList( 1, 2 ) );
-		return Bootstrap.injector( PresetModuleBindsBundle.class, Globals.STANDARD.presets( presets ) );
+		return Bootstrap.injector( PresetModuleBindsBundle.class,
+				Globals.STANDARD.presets( presets ) );
 	}
 
 	private static Properties exampleProperties() {

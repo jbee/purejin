@@ -100,8 +100,8 @@ public class TestPackages {
 
 	@Test
 	public void thatParentPackagesAreOfSameKindOfSet() {
-		assertEquals( Packages.subPackagesOf( Map.class ), Packages.subPackagesOf(
-				ConcurrentMap.class ).parents() );
+		assertEquals( Packages.subPackagesOf( Map.class ),
+				Packages.subPackagesOf( ConcurrentMap.class ).parents() );
 		assertEquals( Packages.packageOf( Map.class ),
 				Packages.packageOf( ConcurrentMap.class ).parents() );
 		assertEquals( Packages.packageAndSubPackagesOf( Map.class ),

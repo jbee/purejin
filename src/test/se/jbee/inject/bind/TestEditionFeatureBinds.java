@@ -142,7 +142,8 @@ public class TestEditionFeatureBinds {
 	}
 
 	private static void assertEditionInstalls( Edition edition, Integer... expected ) {
-		Injector injector = Bootstrap.injector( RootBundle.class, Globals.STANDARD.edition( edition ) );
+		Injector injector = Bootstrap.injector( RootBundle.class,
+				Globals.STANDARD.edition( edition ) );
 		assertEqualSets( expected, injector.resolve( dependency( Integer[].class ) ) );
 	}
 

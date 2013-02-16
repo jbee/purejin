@@ -64,8 +64,9 @@ public class TestAutobindBinds {
 
 	@Test
 	public void thatParametizedSuperinterfaceOfAutoboundTypeIsBound() {
-		assertEquals( injector.resolve( dependency( raw( Comparable.class ).parametized(
-				Integer.class ) ) ), 42 );
+		assertEquals(
+				injector.resolve( dependency( raw( Comparable.class ).parametized( Integer.class ) ) ),
+				42 );
 	}
 
 }

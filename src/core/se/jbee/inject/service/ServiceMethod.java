@@ -5,7 +5,6 @@
  */
 package se.jbee.inject.service;
 
-
 /**
  * The low level representation of a service.
  * 

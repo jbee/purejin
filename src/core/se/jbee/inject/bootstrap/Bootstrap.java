@@ -67,7 +67,8 @@ public final class Bootstrap {
 	}
 
 	public static Suppliable<?>[] suppliables( Class<? extends Bundle> root ) {
-		return Link.BUILDIN.link( Inspect.DEFAULT, modulariser( Globals.STANDARD ).modularise( root ) );
+		return Link.BUILDIN.link( Inspect.DEFAULT,
+				modulariser( Globals.STANDARD ).modularise( root ) );
 	}
 
 	public static <T> Module module( PresetModule<T> module, Presets presets ) {

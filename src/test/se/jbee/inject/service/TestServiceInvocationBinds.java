@@ -68,8 +68,8 @@ public class TestServiceInvocationBinds {
 		@Override
 		public <P, R> Long before( Value<P> parameter, Type<R> result ) {
 			beforeCount++;
-			assertTrue( "right type passed to before", parameter.getType().equalTo(
-					raw( String.class ) ) );
+			assertTrue( "right type passed to before",
+					parameter.getType().equalTo( raw( String.class ) ) );
 			assertEquals( "right value passed to before", parameter.getValue(), "Foo" );
 			return 42L;
 		}

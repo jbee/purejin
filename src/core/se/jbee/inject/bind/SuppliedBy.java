@@ -403,8 +403,8 @@ public final class SuppliedBy {
 
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			return Invoke.constructor( constructor, Argument.resolve( dependency, injector,
-					arguments ) );
+			return Invoke.constructor( constructor,
+					Argument.resolve( dependency, injector, arguments ) );
 		}
 
 	}
