@@ -93,22 +93,22 @@ public final class Name
 				|| ( value.matches( other.value.replace( "*", ".*" ) ) );
 	}
 
-	public static Name from( Class<? extends Annotation> annotation, AnnotatedElement obj ) {
+	public static Name namedBy( Class<? extends Annotation> annotation, AnnotatedElement obj ) {
 		return annotation == null || !obj.isAnnotationPresent( annotation )
 			? Name.DEFAULT
-			: from( annotation, obj.getAnnotation( annotation ) );
+			: namedBy( annotation, obj.getAnnotation( annotation ) );
 	}
 
-	public static Name from( Class<? extends Annotation> annotation, Annotation... instances ) {
+	public static Name namedBy( Class<? extends Annotation> annotation, Annotation... instances ) {
 		for ( Annotation i : instances ) {
 			if ( i.annotationType() == annotation ) {
-				return from( annotation, i );
+				return namedBy( annotation, i );
 			}
 		}
 		return Name.DEFAULT;
 	}
 
-	private static Name from( Class<? extends Annotation> annotation, Annotation instance ) {
+	private static Name namedBy( Class<? extends Annotation> annotation, Annotation instance ) {
 		for ( Method m : annotation.getDeclaredMethods() ) {
 			if ( String.class == m.getReturnType() ) {
 				String name = null;

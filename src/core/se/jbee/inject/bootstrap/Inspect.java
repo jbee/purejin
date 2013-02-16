@@ -93,7 +93,7 @@ public class Inspect
 	private Parameter<?>[] parametersFor( Type<?>[] types, Annotation[][] annotations ) {
 		List<Parameter<?>> res = new ArrayList<Parameter<?>>();
 		for ( int i = 0; i < annotations.length; i++ ) {
-			Name name = Name.from( namedby, annotations[i] );
+			Name name = Name.namedBy( namedby, annotations[i] );
 			if ( name != Name.DEFAULT ) {
 				res.add( Instance.instance( name, types[i] ) );
 			}
@@ -103,7 +103,7 @@ public class Inspect
 
 	@Override
 	public Name nameFor( AccessibleObject obj ) {
-		return Name.from( namedby, obj );
+		return Name.namedBy( namedby, obj );
 	}
 
 	@SuppressWarnings ( "unchecked" )
