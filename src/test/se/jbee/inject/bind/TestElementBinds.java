@@ -33,6 +33,8 @@ public class TestElementBinds {
 			arraybind( String[].class ).toElements( "foo", "bar" );
 			arraybind( Number[].class ).toElements( 2, 3f );
 			arraybind( List[].class ).toElements( ArrayList.class, LinkedList.class );
+			bind( ArrayList.class ).to( new ArrayList<Object>() );
+			bind( LinkedList.class ).to( new LinkedList<Object>() );
 		}
 	}
 

@@ -39,7 +39,7 @@ public class DIRuntimeException
 
 	}
 
-	static String injectionStack( Dependency<?> dependency ) {
+	public static String injectionStack( Dependency<?> dependency ) {
 		StringBuilder b = new StringBuilder();
 		for ( Injection i : dependency ) {
 			b.append( i.getTarget().getInstance() ).append( " -> " );
@@ -72,12 +72,24 @@ public class DIRuntimeException
 	public static final class NoSuchResourceException
 			extends DIRuntimeException {
 
-		public <T> NoSuchResourceException( Dependency<T> dependency,
-				@SuppressWarnings ( "unused" ) Injectron<T>[] available ) {
+		public <T> NoSuchResourceException( Dependency<T> dependency, Injectron<T>[] available ) {
 			super( "No resource for dependency: " + injectionStack( dependency )
-					+ dependency.getInstance() );
+					+ dependency.getInstance() + "\navailable are (for same raw type): "
+					+ describe( available ) );
 		}
 
+	}
+
+	public static String describe( Injectron<?>... injectrons ) {
+		if ( injectrons == null || injectrons.length == 0 ) {
+			return "none";
+		}
+		StringBuilder b = new StringBuilder();
+		for ( Injectron<?> i : injectrons ) {
+			b.append( '\n' ).append( i.getResource().toString() ).append( " defined " ).append(
+					i.getSource() );
+		}
+		return b.toString();
 	}
 
 	/**

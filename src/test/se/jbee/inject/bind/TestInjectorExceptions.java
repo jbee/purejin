@@ -1,21 +1,24 @@
 package se.jbee.inject.bind;
 
+import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Name.named;
+
 import org.junit.Test;
 
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Injector;
 import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Name;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.BootstrapperBundle;
 
 public class TestInjectorExceptions {
 
 	private static class TestInjectorBundle
-			extends BootstrapperBundle {
+			extends BinderModule {
 
 		@Override
-		protected void bootstrap() {
-			// we do no binds
+		protected void declare() {
+			bind( named( "foo" ), Integer.class ).to( 7 );
+			bind( named( "bar" ), Integer.class ).to( 8 );
 		}
 
 	}
@@ -24,6 +27,12 @@ public class TestInjectorExceptions {
 
 	@Test ( expected = NoSuchResourceException.class )
 	public void thatExceptionIsThrownWhenResolvingAnUnboundDependency() {
-		injector.resolve( Dependency.dependency( String.class ) );
+		injector.resolve( dependency( String.class ) );
 	}
+
+	@Test ( expected = NoSuchResourceException.class )
+	public void thatExceptionIsThrownWhenResolvingAnUnboundDependencyWithBoundRawType() {
+		injector.resolve( dependency( Integer.class ).named( Name.DEFAULT ) );
+	}
+
 }
