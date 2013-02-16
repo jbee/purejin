@@ -34,7 +34,7 @@ public abstract class BootstrapperBundle
 	}
 
 	@Override
-	public <T> void install( PresetModule<T> module ) {
+	public final <T> void install( PresetModule<T> module ) {
 		bootstrap.install( module );
 	}
 
@@ -49,7 +49,7 @@ public abstract class BootstrapperBundle
 	}
 
 	@Override
-	public <C extends Enum<C>> void install( Class<? extends ModularBundle<C>> bundle,
+	public final <C extends Enum<C>> void install( Class<? extends ModularBundle<C>> bundle,
 			Class<C> property ) {
 		bootstrap.install( bundle, property );
 	}

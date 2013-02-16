@@ -11,12 +11,27 @@ import se.jbee.inject.Source;
 import se.jbee.inject.Supplier;
 
 /**
- * The binding-builders are just utilities to construct calls to
+ * {@link Bindings} are an abstraction to a consumer of a binding described by a 4-tuple. They are
+ * usually accumulated within.
+ * 
+ * Any builder is just a utility to construct calls to
  * {@link #add(Resource, Supplier, Scope, Source)}
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
 public interface Bindings {
 
+	/**
+	 * Add (accumulate) a binding described by the 4-tuple given.
+	 * 
+	 * @param resource
+	 *            describes the identity of the resulting instance(s)
+	 * @param supplier
+	 *            creates this instance(s)
+	 * @param scope
+	 *            describes and controls the life-cycle of the instance(s)
+	 * @param source
+	 *            describes the origin of the binding (this call) and its meaning
+	 */
 	<T> void add( Resource<T> resource, Supplier<? extends T> supplier, Scope scope, Source source );
 }

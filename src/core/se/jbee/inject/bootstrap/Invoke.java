@@ -9,7 +9,12 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-
+/**
+ * A util to invoke {@link Constructor}s or {@link Method}s that converts checked {@link Exception}s
+ * into {@link RuntimeException}s.
+ * 
+ * @author Jan Bernitt (jan@jbee.se)
+ */
 public final class Invoke {
 
 	private Invoke() {

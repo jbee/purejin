@@ -5,6 +5,15 @@
  */
 package se.jbee.inject;
 
+/**
+ * A {@link Demand} is a {@link Dependency} resolved to a specific {@link Resource} in the context
+ * of a specific {@link Injector} (the {@link Repository} within it).
+ * 
+ * @author Jan Bernitt (jan@jbee.se)
+ * 
+ * @param <T>
+ *            Type of the value demanded
+ */
 public final class Demand<T>
 		implements Resourcing<T> {
 
@@ -44,7 +53,7 @@ public final class Demand<T>
 	}
 
 	/**
-	 * @return the total amount of {@link Injectron}s in the same environment (injector).
+	 * @return the total amount of {@link Injectron}s in the same environment ({@link Injector}).
 	 */
 	public final int envCardinality() {
 		return cardinality;

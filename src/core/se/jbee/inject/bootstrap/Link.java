@@ -18,7 +18,6 @@ import java.util.Set;
 import se.jbee.inject.Array;
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Expiry;
-import se.jbee.inject.Precision;
 import se.jbee.inject.Repository;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Scope;
@@ -27,6 +26,11 @@ import se.jbee.inject.Supplier;
 import se.jbee.inject.util.Scoped;
 import se.jbee.inject.util.Suppliable;
 
+/**
+ * Default implementation of the {@link Linker} that creates {@link Suppliable}s.
+ * 
+ * @author Jan Bernitt (jan@jbee.se)
+ */
 public final class Link {
 
 	public static final Linker<Suppliable<?>> BUILDIN = linker( defaultExpiration() );
@@ -74,9 +78,15 @@ public final class Link {
 				if ( expiry == null ) {
 					expiry = Expiry.NEVER;
 				}
-				suppliables[i] = binding.suppliableIn( repositories.get( scope ), expiry );
+				suppliables[i] = suppliableOf( binding, repositories.get( scope ), expiry );
 			}
 			return suppliables;
+		}
+
+		private static <T> Suppliable<T> suppliableOf( Binding<T> binding, Repository repository,
+				Expiry expiration ) {
+			return new Suppliable<T>( binding.resource, binding.supplier, repository, expiration,
+					binding.source );
 		}
 
 		private static Map<Scope, Repository> initRepositories( Binding<?>[] bindings ) {
@@ -151,55 +161,6 @@ public final class Link {
 		public <T> void add( Resource<T> resource, Supplier<? extends T> supplier, Scope scope,
 				Source source ) {
 			list.add( new Binding<T>( resource, supplier, scope, source ) );
-		}
-
-	}
-
-	private static final class Binding<T>
-			implements Comparable<Binding<?>> {
-
-		final Resource<T> resource;
-		final Supplier<? extends T> supplier;
-		final Scope scope;
-		final Source source;
-
-		Binding( Resource<T> resource, Supplier<? extends T> supplier, Scope scope, Source source ) {
-			super();
-			this.resource = resource;
-			this.supplier = supplier;
-			this.scope = scope;
-			this.source = source;
-		}
-
-		@Override
-		public int compareTo( Binding<?> other ) {
-			int res = resource.getType().getRawType().getCanonicalName().compareTo(
-					other.resource.getType().getRawType().getCanonicalName() );
-			if ( res != 0 ) {
-				return res;
-			}
-			res = Precision.comparePrecision( resource.getInstance(), other.resource.getInstance() );
-			if ( res != 0 ) {
-				return res;
-			}
-			res = Precision.comparePrecision( resource.getTarget(), other.resource.getTarget() );
-			if ( res != 0 ) {
-				return res;
-			}
-			res = Precision.comparePrecision( source, other.source );
-			if ( res != 0 ) {
-				return res;
-			}
-			return -1; // keep order
-		}
-
-		@Override
-		public String toString() {
-			return resource + " / " + scope + " / " + source;
-		}
-
-		Suppliable<T> suppliableIn( Repository repository, Expiry expiration ) {
-			return new Suppliable<T>( resource, supplier, repository, expiration, source );
 		}
 
 	}

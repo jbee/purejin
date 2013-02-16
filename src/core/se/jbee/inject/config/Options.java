@@ -8,11 +8,13 @@ package se.jbee.inject.config;
 import java.util.EnumSet;
 import java.util.IdentityHashMap;
 
-import se.jbee.inject.bootstrap.Bootstrap;
-
 /**
- * {@link Options} are used to model configurations of the {@link Bootstrap}ping process through one
- * enum for each configurable property.
+ * {@link Options} are used to model configurations of the bootstrapping process through one enum
+ * for each configurable property (each property is identified by the enum's {@link Class} object).
+ * 
+ * Each property can be used as a set or single associate value. So a option property can describe
+ * either alternatives where one should be chosen or options with multiple choice. It is up to the
+ * author of the module to decide and use correctly.
  * 
  * {@linkplain Options} are immutable! Use {@link #chosen(Enum)} to build up sets.
  * 

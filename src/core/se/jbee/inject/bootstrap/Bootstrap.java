@@ -41,7 +41,7 @@ import se.jbee.inject.util.Suppliable;
 public final class Bootstrap {
 
 	public static Injector injector( Class<? extends Bundle> root ) {
-		return injector( root, Globals.DEFAULT );
+		return injector( root, Globals.STANDARD );
 	}
 
 	public static Injector injector( Class<? extends Bundle> root, Globals globals ) {
@@ -67,7 +67,7 @@ public final class Bootstrap {
 	}
 
 	public static Suppliable<?>[] suppliables( Class<? extends Bundle> root ) {
-		return Link.BUILDIN.link( Inspect.DEFAULT, modulariser( Globals.DEFAULT ).modularise( root ) );
+		return Link.BUILDIN.link( Inspect.DEFAULT, modulariser( Globals.STANDARD ).modularise( root ) );
 	}
 
 	public static <T> Module module( PresetModule<T> module, Presets presets ) {

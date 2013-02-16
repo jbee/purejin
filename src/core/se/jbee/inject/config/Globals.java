@@ -10,6 +10,17 @@ import java.util.EnumSet;
 import se.jbee.inject.Packages;
 import se.jbee.inject.Type;
 
+/**
+ * A record containing all configuring data and strategies.
+ * 
+ * The is immutable! All methods create new instances that reflect the change.
+ * 
+ * @see Presets
+ * @see Options
+ * @see Edition
+ * 
+ * @author Jan Bernitt (jan@jbee.se)
+ */
 public final class Globals {
 
 	public static <T extends Enum<T> & Feature<T>> Edition featureEdition( T... featured ) {
@@ -20,8 +31,12 @@ public final class Globals {
 		return new PackagesEdition( included );
 	}
 
-	public static final Globals DEFAULT = new Globals( Edition.FULL, Options.STANDARD,
-			Presets.NOTHING );
+	/**
+	 * The standard configuration with no special {@link Options} or {@link Presets} including all
+	 * features.
+	 */
+	public static final Globals STANDARD = new Globals( Edition.FULL, Options.STANDARD,
+			Presets.EMPTY );
 
 	public final Edition edition;
 	public final Options options;

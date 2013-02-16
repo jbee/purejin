@@ -14,6 +14,7 @@ import java.lang.reflect.Method;
  * {@link Module}s as leafs.
  * 
  * @see Bundle
+ * @see PresetModule
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */

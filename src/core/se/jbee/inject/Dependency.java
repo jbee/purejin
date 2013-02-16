@@ -24,6 +24,10 @@ import se.jbee.inject.DIRuntimeException.MoreFrequentExpiryException;
 public final class Dependency<T>
 		implements Typed<T>, Named, Parameter<T>, Iterable<Injection> {
 
+	/**
+	 * A empty {@link Injection} hierarchy. It is used whenever the {@link Dependency} does not
+	 * depend on the actual hierarchy. This is the default.
+	 */
 	private static final Injection[] UNTARGETED = new Injection[0];
 
 	public static <T> Dependency<T> dependency( Class<T> type ) {
