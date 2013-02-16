@@ -12,6 +12,7 @@ import static se.jbee.inject.Source.source;
 import static se.jbee.inject.Type.parameterTypes;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Type.returnType;
+import static se.jbee.inject.service.ExtensionModule.extensionDependency;
 import static se.jbee.inject.util.Scoped.APPLICATION;
 import static se.jbee.inject.util.Scoped.DEPENDENCY_TYPE;
 
@@ -142,7 +143,7 @@ public abstract class ServiceModule
 		ServiceMethodProvider( Injector injector ) {
 			super();
 			this.injector = injector;
-			this.serviceClasses = injector.resolve( Extend.extensionDependency( ServiceClassExtension.class ) );
+			this.serviceClasses = injector.resolve( extensionDependency( ServiceClassExtension.class ) );
 			this.inspect = injector.resolve( dependency( SERVICE_INSPECTOR ).injectingInto(
 					ServiceProvider.class ) );
 		}
@@ -252,7 +253,7 @@ public abstract class ServiceModule
 
 		private static ServiceInvocation<?>[] resolveInvocations( Injector context ) {
 			@SuppressWarnings ( "unchecked" )
-			Class<? extends ServiceInvocation<?>>[] classes = context.resolve( Extend.extensionDependency( ServiceInvocationExtension.class ) );
+			Class<? extends ServiceInvocation<?>>[] classes = context.resolve( extensionDependency( ServiceInvocationExtension.class ) );
 			ServiceInvocation<?>[] res = new ServiceInvocation<?>[classes.length];
 			for ( int i = 0; i < res.length; i++ ) {
 				res[i] = context.resolve( Dependency.dependency( classes[i] ) );

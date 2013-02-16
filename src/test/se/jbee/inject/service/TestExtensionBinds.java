@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static se.jbee.inject.bind.AssertInjects.assertEqualSets;
+import static se.jbee.inject.service.ExtensionModule.extensionDependency;
 
 import java.io.Serializable;
 
@@ -45,7 +46,7 @@ public class TestExtensionBinds {
 	private final Injector injector = Bootstrap.injector( TestExtensionModule.class );
 
 	@SuppressWarnings ( { "rawtypes" } )
-	private final Dependency<Class[]> dependency = Extend.extensionDependency( ServiceClassExtension.class );
+	private final Dependency<Class[]> dependency = extensionDependency( ServiceClassExtension.class );
 
 	@Test
 	public void thatJustUntargetedExtensionsAreResolvedGlobally() {
