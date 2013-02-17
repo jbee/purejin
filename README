@@ -20,18 +20,18 @@ Installation:
  	<dependency>
 		<groupId>se.jbee</groupId>
 		<artifactId>silk-di</artifactId>
-		<version>0.3</version>
+		<version>0.4</version>
 	</dependency>
 
 3) Ivy
-	<dependency org="se.jbee" name="silk-di" rev="0.3"/>
+	<dependency org="se.jbee" name="silk-di" rev="0.4"/>
 
 4) Gradle
-	'se.jbee:silk-di:0.3'
+	'se.jbee:silk-di:0.4'
 
 5) Build from sources
 	- checkout https://github.com/jbee/silk.git
-	- run 'ant jar' to create jar files in sub-directory 'dist'
+	- run 'ant jar' to create snapshot jar files in sub-directory 'dist'
   
   
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
