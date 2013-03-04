@@ -40,10 +40,17 @@ public final class SuppliedBy {
 
 	private static final Object[] NO_ARGS = new Object[0];
 
+	private static final Supplier<?> REQUIRED = new RequiredSupplier<Object>();
+
 	public static final Supplier<Provider<?>> PROVIDER_BRIDGE = new ProviderSupplier();
 	public static final Supplier<List<?>> LIST_BRIDGE = new ArrayToListBridgeSupplier();
 	public static final Supplier<Set<?>> SET_BRIDGE = new ArrayToSetBridgeSupplier();
 	public static final Factory<Logger> LOGGER = new LoggerFactory();
+
+	@SuppressWarnings ( "unchecked" )
+	public static <T> Supplier<T> required() {
+		return (Supplier<T>) REQUIRED;
+	}
 
 	public static <T> Supplier<T> provider( Provider<T> provider ) {
 		return new ProviderAsSupplier<T>( provider );
@@ -436,6 +443,20 @@ public final class SuppliedBy {
 			}
 			final Object[] args = Argument.resolve( dependency, injector, arguments );
 			return returnType.getRawType().cast( Invoke.method( factory, owner, args ) );
+		}
+
+	}
+
+	private static class RequiredSupplier<T>
+			implements Supplier<T> {
+
+		RequiredSupplier() {
+			// make visible
+		}
+
+		@Override
+		public T supply( Dependency<? super T> dependency, Injector injector ) {
+			throw new UnsupportedOperationException( "Should never be called!" );
 		}
 
 	}

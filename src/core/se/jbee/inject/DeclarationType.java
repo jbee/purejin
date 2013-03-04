@@ -23,10 +23,18 @@ public enum DeclarationType
 		implements PreciserThan<DeclarationType> {
 
 	/**
+	 * A binding that is just expressing the instance needed but not how to supply it. This allows
+	 * to express needs in a module without knowing what will be the implementation and ensure
+	 * (during bootstrapping) that there will be a known implementation defined.
+	 */
+	REQUIRED,
+
+	/**
 	 * Has been added by the binder as a fall-back since some bind-calls can have ambiguous
 	 * intentions.
 	 */
 	IMPLICIT,
+
 	/**
 	 * Used to provide a default of required parts of a module that can be replaced *once* to
 	 * customize behavior.
@@ -60,7 +68,8 @@ public enum DeclarationType
 	}
 
 	public boolean replacedBy( DeclarationType other ) {
-		return other.ordinal() > ordinal() || clashesWith( other );
+		return other.ordinal() > ordinal() && this != REQUIRED && other != REQUIRED;
 	}
 
+	//OPEN what to do when multiple auto/default binds exist ? allowing to define exclusive or not ?
 }

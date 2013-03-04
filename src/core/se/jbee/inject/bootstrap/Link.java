@@ -5,18 +5,12 @@
  */
 package se.jbee.inject.bootstrap;
 
-import static se.jbee.inject.util.Metaclass.metaclass;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import se.jbee.inject.Array;
-import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Expiry;
 import se.jbee.inject.Repository;
 import se.jbee.inject.Resource;
@@ -65,7 +59,7 @@ public final class Link {
 
 		@Override
 		public Suppliable<?>[] link( Inspector inspector, Module... modules ) {
-			return link( disambiguate( bindingsFrom( modules, inspector ) ) );
+			return link( Binding.disambiguate( Binding.expand( inspector, modules ) ) );
 		}
 
 		private Suppliable<?>[] link( Binding<?>[] bindings ) {
@@ -100,55 +94,9 @@ public final class Link {
 			return repositories;
 		}
 
-		/**
-		 * Removes those bindings that are ambiguous but also do not clash because of different
-		 * {@link DeclarationType}s that replace each other.
-		 */
-		private static Binding<?>[] disambiguate( Binding<?>[] bindings ) {
-			if ( bindings.length <= 1 ) {
-				return bindings;
-			}
-			List<Binding<?>> res = new ArrayList<Binding<?>>( bindings.length );
-			Arrays.sort( bindings );
-			res.add( bindings[0] );
-			int lastIndependend = 0;
-			for ( int i = 1; i < bindings.length; i++ ) {
-				Binding<?> one = bindings[lastIndependend];
-				Binding<?> other = bindings[i];
-				boolean equalResource = one.resource.equalTo( other.resource );
-				if ( !equalResource || !other.source.getType().replacedBy( one.source.getType() ) ) {
-					res.add( other );
-					lastIndependend = i;
-				} else if ( one.source.getType().clashesWith( other.source.getType() ) ) {
-					throw new IllegalStateException( "Duplicate binds:\n" + one + "\n" + other );
-				}
-			}
-			return Array.of( res, Binding.class );
-		}
-
-		private static Binding<?>[] bindingsFrom( Module[] modules, Inspector inspector ) {
-			Set<Class<?>> declared = new HashSet<Class<?>>();
-			Set<Class<?>> multimodals = new HashSet<Class<?>>();
-			ListBindings bindings = new ListBindings();
-			for ( Module m : modules ) {
-				Class<? extends Module> ns = m.getClass();
-				final boolean hasBeenDeclared = declared.contains( ns );
-				if ( hasBeenDeclared ) {
-					if ( !metaclass( ns ).monomodal() ) {
-						multimodals.add( ns );
-					}
-				}
-				if ( !hasBeenDeclared || multimodals.contains( ns ) ) {
-					m.declare( bindings, inspector );
-					declared.add( ns );
-				}
-			}
-			return Array.of( bindings.list, Binding.class );
-		}
-
 	}
 
-	private static class ListBindings
+	static class ListBindings
 			implements Bindings {
 
 		final List<Binding<?>> list = new ArrayList<Binding<?>>( 100 );

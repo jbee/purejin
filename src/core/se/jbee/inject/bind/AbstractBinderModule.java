@@ -9,6 +9,7 @@ import static se.jbee.inject.Source.source;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Packages;
+import se.jbee.inject.Parameter;
 import se.jbee.inject.Scope;
 import se.jbee.inject.Type;
 import se.jbee.inject.bind.Binder.InspectBinder;
@@ -38,6 +39,20 @@ public abstract class AbstractBinderModule {
 	protected void init( Bindings bindings, Inspector inspector ) {
 		Bootstrap.nonnullThrowsReentranceException( binder.bindings );
 		this.binder = binder.into( bindings ).using( inspector ).with( source( getClass() ) );
+	}
+
+	//TODO also add provide with an instance
+
+	public <T> void provide( Class<T> implementation, Parameter<?>... parameters ) {
+		binder.provide( implementation, parameters );
+	}
+
+	public <T> void require( Class<T> dependency ) {
+		binder.require( dependency );
+	}
+
+	public <T> void require( Type<T> dependency ) {
+		binder.require( dependency );
 	}
 
 	public ScopedBinder per( Scope scope ) {

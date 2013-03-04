@@ -279,6 +279,22 @@ public class Binder {
 			return with( source.typed( DeclarationType.DEFAULT ) );
 		}
 
+		//TODO also allow naming for provided instances - this is used for value objects that become parameter
+
+		public <T> void provide( Class<T> implementation, Parameter<?>... parameters ) {
+			into( autobinding( bindings ) ).asDefault().bind( implementation ).toConstructor(
+					parameters );
+		}
+
+		public <T> void require( Class<T> dependency ) {
+			require( raw( dependency ) );
+		}
+
+		public <T> void require( Type<T> dependency ) {
+			with( source.typed( DeclarationType.REQUIRED ) ).bind( dependency ).to(
+					SuppliedBy.<T> required() );
+		}
+
 		@Override
 		protected RootBinder into( Bindings bindings ) {
 			return new RootBinder( bindings, inspector, source, scope );

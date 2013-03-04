@@ -1,19 +1,22 @@
 package se.jbee.inject;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static se.jbee.inject.DeclarationType.AUTO;
 import static se.jbee.inject.DeclarationType.DEFAULT;
 import static se.jbee.inject.DeclarationType.EXPLICIT;
 import static se.jbee.inject.DeclarationType.IMPLICIT;
 import static se.jbee.inject.DeclarationType.MULTI;
+import static se.jbee.inject.DeclarationType.REQUIRED;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestDeclarationType {
 
 	@Test
-	public void thatExplicitIsReplacedByExplicit() {
-		assertTrue( EXPLICIT.replacedBy( EXPLICIT ) );
+	public void thatExplicitIsNotReplacedByExplicit() {
+		assertFalse( EXPLICIT.replacedBy( EXPLICIT ) );
 	}
 
 	@Test
@@ -39,6 +42,32 @@ public class TestDeclarationType {
 		assertTrue( DEFAULT.replacedBy( AUTO ) );
 		assertTrue( DEFAULT.replacedBy( MULTI ) );
 		assertTrue( DEFAULT.replacedBy( EXPLICIT ) );
+	}
+
+	@Test
+	public void thatRequiredIsNotReplacedByAnyOtherType() {
+		for ( DeclarationType type : DeclarationType.values() ) {
+			if ( type != REQUIRED ) {
+				assertFalse( type.name(), REQUIRED.replacedBy( type ) );
+			}
+		}
+	}
+
+	@Test
+	public void thatRequiredNotClashesWithRequired() {
+		assertFalse( REQUIRED.clashesWith( REQUIRED ) );
+	}
+
+	@Test
+	@Ignore
+	public void thatDefaultClashesWithDefault() {
+		assertTrue( DEFAULT.clashesWith( DEFAULT ) );
+	}
+
+	@Test
+	@Ignore
+	public void thatAutoClashesWithAuto() {
+		assertTrue( AUTO.clashesWith( AUTO ) );
 	}
 
 }
