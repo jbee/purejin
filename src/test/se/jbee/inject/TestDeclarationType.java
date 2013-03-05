@@ -54,12 +54,16 @@ public class TestDeclarationType {
 	}
 
 	@Test
+	public void thatRequiredReplacedByRequired() {
+		assertTrue( REQUIRED.replacedBy( REQUIRED ) );
+	}
+
+	@Test
 	public void thatRequiredNotClashesWithRequired() {
 		assertFalse( REQUIRED.clashesWith( REQUIRED ) );
 	}
 
 	@Test
-	@Ignore
 	public void thatDefaultClashesWithDefault() {
 		assertTrue( DEFAULT.clashesWith( DEFAULT ) );
 	}

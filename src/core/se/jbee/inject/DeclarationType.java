@@ -35,6 +35,8 @@ public enum DeclarationType
 	 */
 	IMPLICIT,
 
+	PROVIDED,
+
 	/**
 	 * Used to provide a default of required parts of a module that can be replaced *once* to
 	 * customize behavior.
@@ -64,12 +66,16 @@ public enum DeclarationType
 	}
 
 	public boolean clashesWith( DeclarationType other ) {
-		return ordinal() + other.ordinal() > MULTI.ordinal() * 2;
+		return ordinal() + other.ordinal() > MULTI.ordinal() * 2
+				|| ( this == DEFAULT && other == DEFAULT );
 	}
 
 	public boolean replacedBy( DeclarationType other ) {
-		return other.ordinal() > ordinal() && this != REQUIRED && other != REQUIRED;
+		return ( other.ordinal() > ordinal() && this != REQUIRED ) || other == REQUIRED;
 	}
 
-	//OPEN what to do when multiple auto/default binds exist ? allowing to define exclusive or not ?
+	public boolean nullifiedBy( DeclarationType other ) {
+		return this == other && ( this == AUTO || this == PROVIDED );
+	}
+
 }

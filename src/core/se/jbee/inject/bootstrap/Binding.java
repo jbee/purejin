@@ -106,28 +106,34 @@ public final class Binding<T>
 		Arrays.sort( bindings );
 		res.add( bindings[0] );
 		int lastDistinctIndex = 0;
-		Set<Type<?>> provided = new HashSet<Type<?>>();
-		provided.add( bindings[0].resource.getType() );
 		Set<Type<?>> required = new HashSet<Type<?>>();
 		for ( int i = 1; i < bindings.length; i++ ) {
 			Binding<?> one = bindings[lastDistinctIndex];
 			Binding<?> other = bindings[i];
-			boolean equalResource = one.resource.equalTo( other.resource );
-			if ( equalResource && one.source.getType().clashesWith( other.source.getType() ) ) {
+			final boolean equalResource = one.resource.equalTo( other.resource );
+			DeclarationType oneType = one.source.getType();
+			DeclarationType otherType = other.source.getType();
+			if ( equalResource && oneType.clashesWith( otherType ) ) {
 				throw new IllegalStateException( "Duplicate binds:\n" + one + "\n" + other );
 			}
 			if ( other.source.getType() == DeclarationType.REQUIRED ) {
 				required.add( other.resource.getType() );
-			} else if ( !equalResource || !other.source.getType().replacedBy( one.source.getType() ) ) {
+			} else if ( equalResource && oneType.nullifiedBy( otherType ) ) {
+				if ( i - 1 == lastDistinctIndex ) {
+					res.remove( res.size() - 1 );
+				}
+			} else if ( !equalResource || !otherType.replacedBy( oneType ) ) {
 				res.add( other );
-				provided.add( other.resource.getType() );
 				lastDistinctIndex = i;
 			}
+		}
+		Set<Type<?>> provided = new HashSet<Type<?>>();
+		for ( Binding<?> b : res ) {
+			provided.add( b.resource.getType() );
 		}
 		if ( !provided.containsAll( required ) ) {
 			throw new IllegalStateException( "Missing required type(s)" );
 		}
 		return Array.of( res, Binding.class );
 	}
-
 }

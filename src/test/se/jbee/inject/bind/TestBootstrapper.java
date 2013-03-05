@@ -81,10 +81,11 @@ public class TestBootstrapper {
 
 		@Override
 		protected void declare() {
-			asDefault().bind( Number.class ).to( 8 );
-			asDefault().bind( Integer.class ).to( 10 );
+			asDefault().bind( Number.class ).to( 7 );
+			asDefault().bind( Integer.class ).to( 11 );
 			autobind( Integer.class ).to( 2 );
 			autobind( Float.class ).to( 4f );
+			autobind( Double.class ).to( 42d );
 			bind( Number.class ).to( 6 );
 		}
 
@@ -251,7 +252,7 @@ public class TestBootstrapper {
 		Injector injector = Bootstrap.injector( ReplacingBindsModule.class );
 		assertEquals( 6, injector.resolve( dependency( Number.class ) ) );
 		Injectron<?>[] injectrons = injector.resolve( dependency( Injectron[].class ) );
-		assertEquals( 7, injectrons.length ); // 2x Serializable, 2x Comparable, Float, Integer and Number
+		assertEquals( 7, injectrons.length ); // 3x Comparable, Float, Double, Integer and Number (3x Serializable has been nullified)
 		Injectron<Number>[] numberInjectrons = injector.resolve( dependency( injectronsTypeOf( Number.class ) ) );
 		assertEquals( 1, numberInjectrons.length );
 	}

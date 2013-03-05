@@ -282,8 +282,8 @@ public class Binder {
 		//TODO also allow naming for provided instances - this is used for value objects that become parameter
 
 		public <T> void provide( Class<T> implementation, Parameter<?>... parameters ) {
-			into( autobinding( bindings ) ).asDefault().bind( implementation ).toConstructor(
-					parameters );
+			into( autobinding( bindings ) ).with( source.typed( DeclarationType.PROVIDED ) ).bind(
+					implementation ).toConstructor( parameters );
 		}
 
 		public <T> void require( Class<T> dependency ) {
