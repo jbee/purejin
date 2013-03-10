@@ -23,18 +23,14 @@ public enum DeclarationType
 		implements PreciserThan<DeclarationType> {
 
 	/**
-	 * A binding that is just expressing the instance needed but not how to supply it. This allows
-	 * to express needs in a module without knowing what will be the implementation and ensure
-	 * (during bootstrapping) that there will be a known implementation defined.
-	 */
-	REQUIRED,
-
-	/**
 	 * Has been added by the binder as a fall-back since some bind-calls can have ambiguous
 	 * intentions.
 	 */
 	IMPLICIT,
 
+	/**
+	 * 
+	 */
 	PROVIDED,
 
 	/**
@@ -58,7 +54,14 @@ public enum DeclarationType
 	/**
 	 * The bind has been made explicitly by a module (should be a unique {@link Resource})
 	 */
-	EXPLICIT;
+	EXPLICIT,
+
+	/**
+	 * A binding that is just expressing the instance needed but not how to supply it. This allows
+	 * to express needs in a module without knowing what will be the implementation and ensure
+	 * (during bootstrapping) that there will be a known implementation defined.
+	 */
+	REQUIRED;
 
 	@Override
 	public boolean morePreciseThan( DeclarationType other ) {
@@ -66,12 +69,12 @@ public enum DeclarationType
 	}
 
 	public boolean clashesWith( DeclarationType other ) {
-		return ordinal() + other.ordinal() > MULTI.ordinal() * 2
+		return ordinal() + other.ordinal() > MULTI.ordinal() * 2 && this != REQUIRED
 				|| ( this == DEFAULT && other == DEFAULT );
 	}
 
 	public boolean replacedBy( DeclarationType other ) {
-		return ( other.ordinal() > ordinal() && this != REQUIRED ) || other == REQUIRED;
+		return other.ordinal() > ordinal();
 	}
 
 	public boolean nullifiedBy( DeclarationType other ) {

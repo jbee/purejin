@@ -255,6 +255,9 @@ public class TestBootstrapper {
 		assertEquals( 7, injectrons.length ); // 3x Comparable, Float, Double, Integer and Number (3x Serializable has been nullified)
 		Injectron<Number>[] numberInjectrons = injector.resolve( dependency( injectronsTypeOf( Number.class ) ) );
 		assertEquals( 1, numberInjectrons.length );
+		@SuppressWarnings ( "rawtypes" )
+		Injectron<Comparable>[] compareableInjectrons = injector.resolve( dependency( injectronsTypeOf( Comparable.class ) ) );
+		assertEquals( 3, compareableInjectrons.length );
 	}
 
 	@Test

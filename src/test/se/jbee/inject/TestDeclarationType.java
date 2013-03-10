@@ -9,7 +9,6 @@ import static se.jbee.inject.DeclarationType.IMPLICIT;
 import static se.jbee.inject.DeclarationType.MULTI;
 import static se.jbee.inject.DeclarationType.REQUIRED;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestDeclarationType {
@@ -54,11 +53,6 @@ public class TestDeclarationType {
 	}
 
 	@Test
-	public void thatRequiredReplacedByRequired() {
-		assertTrue( REQUIRED.replacedBy( REQUIRED ) );
-	}
-
-	@Test
 	public void thatRequiredNotClashesWithRequired() {
 		assertFalse( REQUIRED.clashesWith( REQUIRED ) );
 	}
@@ -69,9 +63,8 @@ public class TestDeclarationType {
 	}
 
 	@Test
-	@Ignore
-	public void thatAutoClashesWithAuto() {
-		assertTrue( AUTO.clashesWith( AUTO ) );
+	public void thatAutoNotClashesWithAuto() {
+		assertFalse( AUTO.clashesWith( AUTO ) );
 	}
 
 }

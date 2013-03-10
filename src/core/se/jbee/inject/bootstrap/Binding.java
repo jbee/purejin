@@ -102,11 +102,12 @@ public final class Binding<T>
 		if ( bindings.length <= 1 ) {
 			return bindings;
 		}
-		List<Binding<?>> res = new ArrayList<Binding<?>>( bindings.length );
+		List<Binding<?>> uniques = new ArrayList<Binding<?>>( bindings.length );
 		Arrays.sort( bindings );
-		res.add( bindings[0] );
+		uniques.add( bindings[0] );
 		int lastDistinctIndex = 0;
 		Set<Type<?>> required = new HashSet<Type<?>>();
+		Set<Type<?>> nullified = new HashSet<Type<?>>();
 		for ( int i = 1; i < bindings.length; i++ ) {
 			Binding<?> one = bindings[lastDistinctIndex];
 			Binding<?> other = bindings[i];
@@ -120,19 +121,38 @@ public final class Binding<T>
 				required.add( other.resource.getType() );
 			} else if ( equalResource && oneType.nullifiedBy( otherType ) ) {
 				if ( i - 1 == lastDistinctIndex ) {
-					res.remove( res.size() - 1 );
+					uniques.remove( uniques.size() - 1 );
+					nullified.add( one.resource.getType() );
 				}
 			} else if ( !equalResource || !otherType.replacedBy( oneType ) ) {
-				res.add( other );
+				uniques.add( other );
 				lastDistinctIndex = i;
 			}
 		}
-		Set<Type<?>> provided = new HashSet<Type<?>>();
-		for ( Binding<?> b : res ) {
-			provided.add( b.resource.getType() );
+		if ( required.isEmpty() ) {
+			return Array.of( uniques, Binding.class );
 		}
+		Set<Type<?>> bound = new HashSet<Type<?>>();
+		Set<Type<?>> provided = new HashSet<Type<?>>();
+		for ( Binding<?> b : uniques ) {
+			Type<?> type = b.resource.getType();
+			if ( b.source.getType() == DeclarationType.PROVIDED ) {
+				provided.add( type );
+			} else {
+				bound.add( type );
+			}
+		}
+		required.removeAll( bound );
 		if ( !provided.containsAll( required ) ) {
 			throw new IllegalStateException( "Missing required type(s)" );
+		}
+		List<Binding<?>> res = new ArrayList<Binding<?>>( uniques.size() );
+		for ( int i = 0; i < uniques.size(); i++ ) {
+			Binding<?> b = uniques.get( i );
+			if ( b.source.getType() != DeclarationType.PROVIDED
+					|| required.contains( b.resource.getType() ) ) {
+				res.add( b );
+			}
 		}
 		return Array.of( res, Binding.class );
 	}
