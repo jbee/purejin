@@ -164,6 +164,10 @@ public final class Inject {
 			if ( elementInjectrons != null ) {
 				List<E> elements = new ArrayList<E>( elementInjectrons.length );
 				addAllApplicable( elements, dependency, elementType, elementInjectrons );
+				if ( dependency.getType().getRawType().getComponentType().isPrimitive() ) {
+					throw new UnsupportedOperationException(
+							"Primitive arrays cannot be used to inject all instances of the wrapper type. Use the wrapper array instead." );
+				}
 				return toArray( elements, elementType );
 			}
 			// if there hasn't been binds to that specific wildcard Type  

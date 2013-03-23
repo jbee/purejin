@@ -1,6 +1,7 @@
 package se.jbee.inject.bind;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertThat;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
@@ -86,6 +87,22 @@ public class TestPrimitiveBinds {
 	public void thatDoublePrimitivesWorkAsWrapperClasses() {
 		assertThat( injector.resolve( dependency( Double.class ).named( "e" ) ), is( 2.71828d ) );
 		assertThat( injector.resolve( dependency( double.class ).named( "e" ) ), is( 2.71828d ) );
+	}
+
+	/**
+	 * To allow such a automatic conversion a bridge could be bound for each of the primitives. Such
+	 * a bind would look like this.
+	 * 
+	 * <pre>
+	 * bind( int[].class ).to( new IntToIntergerArrayBridgeSupplier() );
+	 * </pre>
+	 * 
+	 * The stated bridge class is not a part of Silk but easy to do. Still a loot of code for all
+	 * the primitives for a little benefit.
+	 */
+	@Test ( expected = UnsupportedOperationException.class )
+	public void thatPrimitveArrayNotWorksAsWrapperArrayClasses() {
+		assertArrayEquals( new int[42], injector.resolve( dependency( int[].class ) ) );
 	}
 
 	@Test
