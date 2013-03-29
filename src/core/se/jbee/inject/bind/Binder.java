@@ -180,9 +180,9 @@ public class Binder {
 	public static class InspectBinder {
 
 		private final Inspector inspector;
-		private final RootBinder binder;
+		private final ScopedBinder binder;
 
-		InspectBinder( Inspector inspector, RootBinder binder ) {
+		InspectBinder( Inspector inspector, ScopedBinder binder ) {
 			super();
 			this.inspector = inspector;
 			this.binder = binder.with( binder.source.typed( DeclarationType.AUTO ) );
@@ -271,10 +271,6 @@ public class Binder {
 			return new ScopedBinder( bindings, inspector, source, scope );
 		}
 
-		public InspectBinder bind( Inspector inspector ) {
-			return new InspectBinder( inspector, this );
-		}
-
 		public RootBinder asDefault() {
 			return with( source.typed( DeclarationType.DEFAULT ) );
 		}
@@ -338,6 +334,14 @@ public class Binder {
 			return injectingInto( defaultInstanceOf( target ) );
 		}
 
+		public InspectBinder bind( Inspector inspector ) {
+			return new InspectBinder( inspector, this );
+		}
+
+		@Override
+		protected ScopedBinder with( Source source ) {
+			return new ScopedBinder( bindings, inspector, source, scope );
+		}
 	}
 
 	public static class TargetedBinder
@@ -468,7 +472,11 @@ public class Binder {
 		}
 
 		public void toConstructor( Parameter<?>... parameters ) {
-			toConstructor( resource.getType().getRawType(), parameters );
+			toConstructor( getType().getRawType(), parameters );
+		}
+
+		public <C extends Enum<?>> void toConfiguration( Class<C> configuration ) {
+			to( SuppliedBy.configuration( getType(), configuration ) );
 		}
 
 		public <I extends T> void toParametrized( Class<I> impl ) {

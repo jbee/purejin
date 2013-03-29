@@ -6,6 +6,7 @@
 package se.jbee.inject.bind;
 
 import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.parameterTypes;
 
 import java.lang.reflect.Constructor;
@@ -110,6 +111,11 @@ public final class SuppliedBy {
 		return new FactorySupplier<T>( factory );
 	}
 
+	public static <T, C extends Enum<?>> Supplier<T> configuration( Type<T> type,
+			Class<C> configuration ) {
+		return new ConfigurationDependentSupplier<T, C>( type, configuration );
+	}
+
 	private SuppliedBy() {
 		throw new UnsupportedOperationException( "util" );
 	}
@@ -132,6 +138,26 @@ public final class SuppliedBy {
 		}
 
 		abstract <E> T bridge( E[] elements );
+	}
+
+	private static final class ConfigurationDependentSupplier<T, C extends Enum<?>>
+			implements Supplier<T> {
+
+		private final Type<T> type;
+		private final Class<C> configuration;
+
+		ConfigurationDependentSupplier( Type<T> type, Class<C> configuration ) {
+			super();
+			this.type = type;
+			this.configuration = configuration;
+		}
+
+		@Override
+		public T supply( Dependency<? super T> dependency, Injector injector ) {
+			C value = injector.resolve( dependency.anyTyped( configuration ) );
+			return injector.resolve( dependency.instanced( Instance.instance( named( value ), type ) ) );
+		}
+
 	}
 
 	/**
@@ -331,17 +357,17 @@ public final class SuppliedBy {
 			implements Provider<T> {
 
 		private final Dependency<T> dependency;
-		private final Injector resolver;
+		private final Injector injector;
 
-		LazyResolvedDependencyProvider( Dependency<T> dependency, Injector resolver ) {
+		LazyResolvedDependencyProvider( Dependency<T> dependency, Injector injector ) {
 			super();
-			this.dependency = dependency;
-			this.resolver = resolver;
+			this.dependency = dependency( dependency.getInstance() ); // simple remove of injection hierarchy
+			this.injector = injector;
 		}
 
 		@Override
 		public T provide() {
-			return resolver.resolve( dependency );
+			return injector.resolve( dependency );
 		}
 
 		@Override

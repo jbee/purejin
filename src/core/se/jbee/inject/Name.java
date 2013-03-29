@@ -41,6 +41,12 @@ public final class Name
 			: new Name( name.toLowerCase() );
 	}
 
+	public static Name named( Enum<?> name ) {
+		return name == null
+			? named( "-default-" )
+			: Name.named( name.name().toLowerCase().replace( '_', '-' ) );
+	}
+
 	private Name( String value ) {
 		super();
 		this.value = value.intern();
