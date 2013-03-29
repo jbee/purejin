@@ -54,4 +54,8 @@ public final class Array {
 		}
 		return of( list, (Class<T>) empty.getClass().getComponentType() );
 	}
+
+	public static <T> T[] copy( T[] list, int length ) {
+		return Arrays.copyOf( list, length );
+	}
 }

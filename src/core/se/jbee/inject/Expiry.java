@@ -13,11 +13,16 @@ package se.jbee.inject;
 public final class Expiry {
 
 	public static final Expiry NEVER = new Expiry( 0 );
+	public static final Expiry IGNORE = new Expiry( Integer.MAX_VALUE );
 
 	public static Expiry expires( int frequency ) {
 		if ( frequency < 0 ) {
 			throw new IllegalArgumentException( Expiry.class.getSimpleName()
 					+ " frequency cannot be negative but was: " + frequency );
+		}
+		if ( frequency == Integer.MAX_VALUE ) {
+			throw new IllegalArgumentException( Expiry.class.getSimpleName()
+					+ "frequency cannot be Imteger.MAX_VALUE. This is reserved for IGNORE" );
 		}
 		return new Expiry( frequency );
 	}
@@ -39,7 +44,11 @@ public final class Expiry {
 
 	@Override
 	public String toString() {
-		return String.valueOf( frequency );
+		return isIgnore()
+			? "x"
+			: isNever()
+				? "∞"
+				: String.valueOf( frequency );
 	}
 
 	@Override
@@ -54,6 +63,10 @@ public final class Expiry {
 
 	public boolean isNever() {
 		return frequency == 0;
+	}
+
+	public boolean isIgnore() {
+		return frequency == IGNORE.frequency;
 	}
 
 }

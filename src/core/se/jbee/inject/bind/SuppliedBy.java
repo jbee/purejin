@@ -361,7 +361,7 @@ public final class SuppliedBy {
 
 		LazyResolvedDependencyProvider( Dependency<T> dependency, Injector injector ) {
 			super();
-			this.dependency = dependency( dependency.getInstance() ); // simple remove of injection hierarchy
+			this.dependency = dependency.uninject().ignoredExpiry();
 			this.injector = injector;
 		}
 

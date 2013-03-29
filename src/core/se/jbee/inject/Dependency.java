@@ -112,6 +112,17 @@ public final class Dependency<T>
 		return dependency( instance, UNTARGETED );
 	}
 
+	public Dependency<T> ignoredExpiry() {
+		if ( hierarchy.length == 0 ) {
+			return this;
+		}
+		Injection[] ignored = new Injection[hierarchy.length];
+		for ( int i = 0; i < ignored.length; i++ ) {
+			ignored[i] = hierarchy[i].ignoredExpiry();
+		}
+		return dependency( instance, ignored );
+	}
+
 	public boolean isUntargeted() {
 		return hierarchy.length == 0;
 	}
@@ -153,6 +164,13 @@ public final class Dependency<T>
 		ensureNotMoreFrequentExpiry( injection );
 		ensureNoCycle( injection );
 		return new Dependency<T>( instance, Array.append( hierarchy, injection ) );
+	}
+
+	public Dependency<T> uninject() {
+		if ( hierarchy.length <= 1 ) {
+			return untargeted();
+		}
+		return new Dependency<T>( instance, Array.copy( hierarchy, hierarchy.length - 1 ) );
 	}
 
 	private void ensureNoCycle( Injection injection )

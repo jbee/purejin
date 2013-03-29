@@ -5,6 +5,8 @@
  */
 package se.jbee.inject;
 
+import static se.jbee.inject.Emergence.emergence;
+
 /**
  * Describes on "stack-frame" within the injection process.
  * 
@@ -33,5 +35,9 @@ public final class Injection {
 	@Override
 	public String toString() {
 		return "(" + dependency + "->" + target + ")";
+	}
+
+	public Injection ignoredExpiry() {
+		return new Injection( dependency, emergence( target.getInstance(), Expiry.IGNORE ) );
 	}
 }
