@@ -114,7 +114,7 @@ public final class SuppliedBy {
 		throw new UnsupportedOperationException( "util" );
 	}
 
-	private static abstract class ArrayBridgeSupplier<T>
+	public static abstract class ArrayBridgeSupplier<T>
 			implements Supplier<T> {
 
 		ArrayBridgeSupplier() {
