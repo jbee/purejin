@@ -52,14 +52,19 @@ public class Binder {
 		return new RootBinder( bindings, inspector, source, scope );
 	}
 
+	final RootBinder root;
 	final Bindings bindings;
 	final Inspector inspector;
 	final Source source;
 	final Scope scope;
 	final Target target;
 
-	Binder( Bindings bindings, Inspector inspector, Source source, Scope scope, Target target ) {
+	Binder( RootBinder root, Bindings bindings, Inspector inspector, Source source, Scope scope,
+			Target target ) {
 		super();
+		this.root = root == null
+			? (RootBinder) this
+			: root;
 		this.bindings = bindings;
 		this.inspector = inspector;
 		this.source = source;
@@ -135,12 +140,17 @@ public class Binder {
 		return bind( Instance.anyOf( Type.raw( type ) ) );
 	}
 
+	public <T, C> TypedBinder<T> configbind( Configured<C> configured, C value, Type<T> type ) {
+		root.per( Scoped.INJECTION ).implicit().bind( type ).to( configured );
+		return bind( configured.name( value ), type );
+	}
+
 	protected final <T> void bind( Resource<T> resource, Supplier<? extends T> supplier ) {
 		bindings.add( resource, supplier, scope, source );
 	}
 
 	protected final Binder implicit() {
-		return with( source.typed( DeclarationType.IMPLICIT ) );
+		return with( DeclarationType.IMPLICIT );
 	}
 
 	protected final <I> void implicitBindToConstructor( Class<I> impl ) {
@@ -159,23 +169,23 @@ public class Binder {
 	}
 
 	protected Binder into( Bindings bindings ) {
-		return new Binder( bindings, inspector, source, scope, target );
+		return new Binder( root, bindings, inspector, source, scope, target );
 	}
 
 	protected Binder multi() {
-		return with( source.typed( DeclarationType.MULTI ) );
+		return with( DeclarationType.MULTI );
 	}
 
 	protected Binder auto() {
-		return with( source.typed( DeclarationType.AUTO ) );
+		return with( DeclarationType.AUTO );
 	}
 
-	protected Binder with( Source source ) {
-		return new Binder( bindings, inspector, source, scope, target );
+	protected Binder with( DeclarationType type ) {
+		return new Binder( root, bindings, inspector, source.typed( type ), scope, target );
 	}
 
 	protected Binder with( Target target ) {
-		return new Binder( bindings, inspector, source, scope, target );
+		return new Binder( root, bindings, inspector, source, scope, target );
 	}
 
 	public static class InspectBinder {
@@ -183,10 +193,10 @@ public class Binder {
 		private final Inspector inspector;
 		private final ScopedBinder binder;
 
-		InspectBinder( Inspector inspector, ScopedBinder binder ) {
+		InspectBinder( Inspector inspector, RootBinder binder, Scope scope ) {
 			super();
 			this.inspector = inspector;
-			this.binder = binder.with( binder.source.typed( DeclarationType.AUTO ) );
+			this.binder = binder.with( binder.source.typed( DeclarationType.AUTO ) ).per( scope );
 		}
 
 		public void in( Class<?> implementor ) {
@@ -202,7 +212,7 @@ public class Binder {
 			Constructor<?> c = inspector.constructorFor( implementor );
 			if ( c == null ) {
 				if ( instanceMethods ) {
-					binder.with( Scoped.APPLICATION ).implicit().bind( implementor ).toConstructor();
+					binder.root.per( Scoped.APPLICATION ).implicit().construct( implementor );
 				}
 			} else {
 				if ( parameters.length == 0 ) {
@@ -265,22 +275,22 @@ public class Binder {
 			extends ScopedBinder {
 
 		RootBinder( Bindings bindings, Inspector inspector, Source source, Scope scope ) {
-			super( bindings, inspector, source, scope );
+			super( null, bindings, inspector, source, scope );
 		}
 
 		public ScopedBinder per( Scope scope ) {
-			return new ScopedBinder( bindings, inspector, source, scope );
+			return new ScopedBinder( root, bindings, inspector, source, scope );
 		}
 
 		public RootBinder asDefault() {
-			return with( source.typed( DeclarationType.DEFAULT ) );
+			return with( DeclarationType.DEFAULT );
 		}
 
 		//TODO also allow naming for provided instances - this is used for value objects that become parameter
 
 		public <T> void provide( Class<T> implementation, Parameter<?>... parameters ) {
-			into( autobinding( bindings ) ).with( source.typed( DeclarationType.PROVIDED ) ).bind(
-					implementation ).toConstructor( parameters );
+			into( autobinding( bindings ) ).with( DeclarationType.PROVIDED ).bind( implementation ).toConstructor(
+					parameters );
 		}
 
 		public <T> void require( Class<T> dependency ) {
@@ -288,8 +298,7 @@ public class Binder {
 		}
 
 		public <T> void require( Type<T> dependency ) {
-			with( source.typed( DeclarationType.REQUIRED ) ).bind( dependency ).to(
-					SuppliedBy.<T> required() );
+			with( DeclarationType.REQUIRED ).bind( dependency ).to( SuppliedBy.<T> required() );
 		}
 
 		@Override
@@ -301,17 +310,22 @@ public class Binder {
 			return new RootBinder( bindings, inspector, source, scope );
 		}
 
-		@Override
 		protected RootBinder with( Source source ) {
 			return new RootBinder( bindings, inspector, source, scope );
+		}
+
+		@Override
+		protected RootBinder with( DeclarationType type ) {
+			return with( source.typed( type ) );
 		}
 	}
 
 	public static class ScopedBinder
 			extends TargetedBinder {
 
-		ScopedBinder( Bindings bindings, Inspector inspector, Source source, Scope scope ) {
-			super( bindings, inspector, source, scope, Target.ANY );
+		ScopedBinder( RootBinder root, Bindings bindings, Inspector inspector, Source source,
+				Scope scope ) {
+			super( root, bindings, inspector, source, scope, Target.ANY );
 		}
 
 		public TargetedBinder injectingInto( Class<?> target ) {
@@ -319,7 +333,7 @@ public class Binder {
 		}
 
 		public TargetedBinder injectingInto( Instance<?> target ) {
-			return new TargetedBinder( bindings, inspector, source, scope,
+			return new TargetedBinder( root, bindings, inspector, source, scope,
 					Target.targeting( target ) );
 		}
 
@@ -336,25 +350,17 @@ public class Binder {
 		}
 
 		public InspectBinder bind( Inspector inspector ) {
-			return new InspectBinder( inspector, this );
+			return new InspectBinder( inspector, root, scope );
 		}
 
-		@Override
-		protected ScopedBinder with( Source source ) {
-			return new ScopedBinder( bindings, inspector, source, scope );
-		}
-
-		ScopedBinder with( Scope scope ) { // just for internal usage
-			return new ScopedBinder( bindings, inspector, source, scope );
-		}
 	}
 
 	public static class TargetedBinder
 			extends Binder {
 
-		TargetedBinder( Bindings bindings, Inspector inspector, Source source, Scope scope,
-				Target target ) {
-			super( bindings, inspector, source, scope, target );
+		TargetedBinder( RootBinder root, Bindings bindings, Inspector inspector, Source source,
+				Scope scope, Target target ) {
+			super( root, bindings, inspector, source, scope, target );
 		}
 
 		public Binder in( Packages packages ) {
@@ -378,7 +384,8 @@ public class Binder {
 		}
 
 		public TargetedBinder within( Instance<?> parent ) {
-			return new TargetedBinder( bindings, inspector, source, scope, target.within( parent ) );
+			return new TargetedBinder( root, bindings, inspector, source, scope,
+					target.within( parent ) );
 		}
 
 		public TargetedBinder within( Name name, Class<?> parent ) {
@@ -480,7 +487,7 @@ public class Binder {
 			toConstructor( getType().getRawType(), parameters );
 		}
 
-		public <C extends Enum<?>> void toConfiguration( Class<C> configuration ) {
+		public void to( Configured<?> configuration ) {
 			to( SuppliedBy.configuration( getType(), configuration ) );
 		}
 

@@ -6,7 +6,6 @@
 package se.jbee.inject.bind;
 
 import static se.jbee.inject.Dependency.dependency;
-import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.parameterTypes;
 
 import java.lang.reflect.Constructor;
@@ -111,8 +110,7 @@ public final class SuppliedBy {
 		return new FactorySupplier<T>( factory );
 	}
 
-	public static <T, C extends Enum<?>> Supplier<T> configuration( Type<T> type,
-			Class<C> configuration ) {
+	public static <T, C> Supplier<T> configuration( Type<T> type, Configured<C> configuration ) {
 		return new ConfigurationDependentSupplier<T, C>( type, configuration );
 	}
 
@@ -144,13 +142,20 @@ public final class SuppliedBy {
 		abstract <E> T bridge( E[] elements );
 	}
 
-	private static final class ConfigurationDependentSupplier<T, C extends Enum<?>>
+	/**
+	 * This is a indirection that resolves a {@link Type} dependent on another current
+	 * {@link Configured} value. This can be understand as a dynamic <i>name</i> switch so that a
+	 * call is resolved to different named instances.
+	 * 
+	 * @author Jan Bernitt (jan@jbee.se)
+	 */
+	private static final class ConfigurationDependentSupplier<T, C>
 			implements Supplier<T> {
 
 		private final Type<T> type;
-		private final Class<C> configuration;
+		private final Configured<C> configuration;
 
-		ConfigurationDependentSupplier( Type<T> type, Class<C> configuration ) {
+		ConfigurationDependentSupplier( Type<T> type, Configured<C> configuration ) {
 			super();
 			this.type = type;
 			this.configuration = configuration;
@@ -158,8 +163,9 @@ public final class SuppliedBy {
 
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			C value = injector.resolve( dependency.anyTyped( configuration ) );
-			return injector.resolve( dependency.instanced( Instance.instance( named( value ), type ) ) );
+			final C value = injector.resolve( dependency.instanced( configuration.getInstance() ) );
+			final Instance<T> current = Instance.instance( configuration.name( value ), type );
+			return injector.resolve( dependency.instanced( current ) );
 		}
 
 	}

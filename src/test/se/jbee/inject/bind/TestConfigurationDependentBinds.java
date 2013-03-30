@@ -3,8 +3,10 @@ package se.jbee.inject.bind;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.bind.Configured.configured;
 import static se.jbee.inject.bootstrap.Inspect.methodsReturn;
 import static se.jbee.inject.util.Typecast.providerTypeOf;
 
@@ -77,13 +79,16 @@ public class TestConfigurationDependentBinds {
 	 * Module and Bundle code to setup scenario
 	 */
 
+	/**
+	 * This module demonstrates CDI on a low level using general binds.
+	 */
 	private static class ConfigurationDependentBindsModule
 			extends BinderModule {
 
 		@Override
 		protected void declare() {
-			per( Scoped.INJECTION ).bind( Validator.class ).toConfiguration(
-					ValidationStrength.class );
+			per( Scoped.INJECTION ).bind( Validator.class ).to(
+					configured( anyOf( ValidationStrength.class ) ) );
 			bind( named( (ValidationStrength) null ), Validator.class ).to( Permissive.class );
 			bind( named( ValidationStrength.PERMISSIVE ), Validator.class ).to( Permissive.class );
 			bind( named( ValidationStrength.STRICT ), Validator.class ).to( Strict.class );
@@ -91,6 +96,21 @@ public class TestConfigurationDependentBinds {
 			per( Scoped.INJECTION ).bind( methodsReturn( raw( ValidationStrength.class ) ) ).in(
 					Configuration.class );
 		}
+	}
+
+	private static class ConfigurationDependentBindsModule2
+			extends BinderModule {
+
+		@Override
+		protected void declare() {
+			bind( named( (ValidationStrength) null ), Validator.class ).to( Permissive.class );
+			configbind( ValidationStrength.PERMISSIVE, Validator.class ).to( Permissive.class );
+			configbind( ValidationStrength.STRICT, Validator.class ).to( Strict.class );
+
+			per( Scoped.INJECTION ).bind( methodsReturn( raw( ValidationStrength.class ) ) ).in(
+					Configuration.class );
+		}
+
 	}
 
 	private static class ConfigurationDependentBindsBundle
@@ -107,6 +127,16 @@ public class TestConfigurationDependentBinds {
 	@Test
 	public void thatReconfigurationIsResolvedToAnotherImplementation() {
 		Injector injector = Bootstrap.injector( ConfigurationDependentBindsModule.class );
+		assertReconfigurationIsResolvedToAnotherImplementation( injector );
+	}
+
+	@Test
+	public void thatReconfigurationIsResolvedToAnotherImplementation2() {
+		Injector injector = Bootstrap.injector( ConfigurationDependentBindsModule2.class );
+		assertReconfigurationIsResolvedToAnotherImplementation( injector );
+	}
+
+	private static void assertReconfigurationIsResolvedToAnotherImplementation( Injector injector ) {
 		Dependency<Validator> dependency = dependency( Validator.class );
 		Configuration config = injector.resolve( dependency( Configuration.class ) );
 		Validator v = injector.resolve( dependency );

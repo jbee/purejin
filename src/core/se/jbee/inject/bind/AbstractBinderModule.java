@@ -5,7 +5,10 @@
  */
 package se.jbee.inject.bind;
 
+import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Source.source;
+import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.bind.Configured.configured;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Packages;
@@ -169,6 +172,20 @@ public abstract class AbstractBinderModule {
 
 	public <T> TypedBinder<T> multibind( Name name, Type<T> type ) {
 		return binder.multibind( name, type );
+	}
+
+	public <T, C extends Enum<C>> TypedBinder<T> configbind( C configured, Class<T> type ) {
+		return configbind(
+				configured( instance( Name.DEFAULT, raw( configured.getDeclaringClass() ) ) ),
+				configured, type );
+	}
+
+	public <T, C> TypedBinder<T> configbind( Configured<C> configured, C value, Class<T> type ) {
+		return configbind( configured, value, raw( type ) );
+	}
+
+	public <T, C> TypedBinder<T> configbind( Configured<C> configured, C value, Type<T> type ) {
+		return binder.configbind( configured, value, type );
 	}
 
 }
