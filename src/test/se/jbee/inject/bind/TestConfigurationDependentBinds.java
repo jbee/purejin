@@ -87,7 +87,7 @@ public class TestConfigurationDependentBinds {
 			bind( named( (ValidationStrength) null ), Validator.class ).to( Permissive.class );
 			bind( named( ValidationStrength.PERMISSIVE ), Validator.class ).to( Permissive.class );
 			bind( named( ValidationStrength.STRICT ), Validator.class ).to( Strict.class );
-			construct( Configuration.class );
+
 			per( Scoped.INJECTION ).bind( methodsReturn( raw( ValidationStrength.class ) ) ).in(
 					Configuration.class );
 		}

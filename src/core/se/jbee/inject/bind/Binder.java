@@ -33,6 +33,7 @@ import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Inspector;
 import se.jbee.inject.util.Factory;
 import se.jbee.inject.util.Provider;
+import se.jbee.inject.util.Scoped;
 
 /**
  * The default implementation of a fluent binder interface that provides a lot of utility methods to
@@ -201,7 +202,7 @@ public class Binder {
 			Constructor<?> c = inspector.constructorFor( implementor );
 			if ( c == null ) {
 				if ( instanceMethods ) {
-					binder.implicit().bind( implementor ).toConstructor();
+					binder.with( Scoped.APPLICATION ).implicit().bind( implementor ).toConstructor();
 				}
 			} else {
 				if ( parameters.length == 0 ) {
@@ -340,6 +341,10 @@ public class Binder {
 
 		@Override
 		protected ScopedBinder with( Source source ) {
+			return new ScopedBinder( bindings, inspector, source, scope );
+		}
+
+		ScopedBinder with( Scope scope ) { // just for internal usage
 			return new ScopedBinder( bindings, inspector, source, scope );
 		}
 	}
