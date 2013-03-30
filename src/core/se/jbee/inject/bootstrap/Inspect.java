@@ -56,6 +56,10 @@ public class Inspect
 		return new Inspect( true, true, false, Packages.ALL, Type.OBJECT, null, null );
 	}
 
+	public static Inspector methodsReturn( Type<?> returnType ) {
+		return all().methods().returnTypeAssignableTo( returnType );
+	}
+
 	private final boolean statics;
 	private final boolean methods;
 	private final boolean constructors;

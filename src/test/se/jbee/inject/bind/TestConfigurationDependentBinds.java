@@ -4,17 +4,16 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
+import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.bootstrap.Inspect.methodsReturn;
 import static se.jbee.inject.util.Typecast.providerTypeOf;
 
 import org.junit.Test;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
-import se.jbee.inject.bind.BinderModule;
-import se.jbee.inject.bind.BuildinBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.bootstrap.Inspect;
 import se.jbee.inject.util.Provider;
 import se.jbee.inject.util.Scoped;
 
@@ -89,7 +88,8 @@ public class TestConfigurationDependentBinds {
 			bind( named( ValidationStrength.PERMISSIVE ), Validator.class ).to( Permissive.class );
 			bind( named( ValidationStrength.STRICT ), Validator.class ).to( Strict.class );
 			construct( Configuration.class );
-			per( Scoped.INJECTION ).bind( Inspect.all().methods() ).in( Configuration.class );
+			per( Scoped.INJECTION ).bind( methodsReturn( raw( ValidationStrength.class ) ) ).in(
+					Configuration.class );
 		}
 	}
 
