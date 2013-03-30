@@ -13,6 +13,14 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.bootstrap.Bootstrap;
 
+/**
+ * This tests demonstrates 2 different ways to solve the <i>Robot legs problem</i> with Silk.
+ * 
+ * This problem is a simple example where 2 slightly different object trees needs to be created. In
+ * the case of the robot each of the robots legs should get its on instance of a feet.
+ * 
+ * @author Jan Bernitt (jan@jbee.se)
+ */
 public class TestRobotLegsProblemBinds {
 
 	private static class Foot {

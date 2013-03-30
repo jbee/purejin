@@ -32,8 +32,12 @@ public class TestLinker {
 
 	}
 
+	/**
+	 * A monomodal module has just one initial state (or no state). Therefore it can be determined
+	 * that installing it twice or more does not make sense.
+	 */
 	@Test
-	public void thatStatelessModulesCanBeInstalledTwice() {
+	public void thatMonomodalModulesCanBeInstalledTwice() {
 		Injector injector = Bootstrap.injector( LinkerBundle.class );
 		assertEquals( 42, injector.resolve( dependency( Integer.class ) ).intValue() );
 	}
