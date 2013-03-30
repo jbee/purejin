@@ -116,6 +116,10 @@ public final class SuppliedBy {
 		return new ConfigurationDependentSupplier<T, C>( type, configuration );
 	}
 
+	public static <T> Provider<T> lazyProvider( Dependency<T> dependency, Injector context ) {
+		return new LazyResolvedDependencyProvider<T>( dependency, context );
+	}
+
 	private SuppliedBy() {
 		throw new UnsupportedOperationException( "util" );
 	}
@@ -345,13 +349,9 @@ public final class SuppliedBy {
 			if ( !dependency.getName().isDefault() ) {
 				providedType = providedType.named( dependency.getName() );
 			}
-			return newProvider( providedType, injector );
+			return lazyProvider( providedType.uninject().ignoredExpiry(), injector );
 		}
 
-		private static <T> Provider<T> newProvider( Dependency<T> dependency, Injector context ) {
-			return new LazyResolvedDependencyProvider<T>( dependency.uninject().ignoredExpiry(),
-					context );
-		}
 	}
 
 	private static final class LazyResolvedDependencyProvider<T>

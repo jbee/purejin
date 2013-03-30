@@ -29,12 +29,12 @@ import se.jbee.inject.util.Scoped;
 
 public class TestProviderBinds {
 
-	static final DynamicState DYNAMIC_STATE_IN_OUTER_A = new DynamicState();
-	static final DynamicState DYNAMIC_STATE_IN_OUTER_B = new DynamicState();
+	static final DynamicState DYNAMIC_STATE_IN_A = new DynamicState();
+	static final DynamicState DYNAMIC_STATE_IN_B = new DynamicState();
 
-	static final Instance<WorkingStateConsumer> outerA = instance( named( "A" ),
+	static final Instance<WorkingStateConsumer> A = instance( named( "A" ),
 			raw( WorkingStateConsumer.class ) );
-	static final Instance<WorkingStateConsumer> outerB = instance( named( "B" ),
+	static final Instance<WorkingStateConsumer> B = instance( named( "B" ),
 			raw( WorkingStateConsumer.class ) );
 
 	private static class ProviderBindsModule
@@ -51,10 +51,10 @@ public class TestProviderBinds {
 			construct( FaultyStateConsumer.class );
 			construct( WorkingStateConsumer.class );
 
-			injectingInto( outerA ).bind( DynamicState.class ).to( DYNAMIC_STATE_IN_OUTER_A );
-			injectingInto( outerB ).bind( DynamicState.class ).to( DYNAMIC_STATE_IN_OUTER_B );
-			construct( outerA );
-			construct( outerB );
+			injectingInto( A ).bind( DynamicState.class ).to( DYNAMIC_STATE_IN_A );
+			injectingInto( B ).bind( DynamicState.class ).to( DYNAMIC_STATE_IN_B );
+			construct( A );
+			construct( B );
 		}
 
 	}
@@ -136,11 +136,11 @@ public class TestProviderBinds {
 
 	@Test
 	public void thatProviderKeepsHierarchySoProvidedDependencyIsResolvedAsIfResolvedDirectly() {
-		WorkingStateConsumer a = injector.resolve( dependency( outerA ) );
-		assertSame( DYNAMIC_STATE_IN_OUTER_A, a.state() );
-		WorkingStateConsumer b = injector.resolve( dependency( outerB ) );
+		WorkingStateConsumer a = injector.resolve( dependency( A ) );
+		assertSame( DYNAMIC_STATE_IN_A, a.state() );
+		WorkingStateConsumer b = injector.resolve( dependency( B ) );
 		assertNotSame( a, b );
-		assertSame( DYNAMIC_STATE_IN_OUTER_B, b.state() );
+		assertSame( DYNAMIC_STATE_IN_B, b.state() );
 	}
 
 	@Test
