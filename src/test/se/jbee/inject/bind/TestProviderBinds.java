@@ -4,7 +4,10 @@ import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
 import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.util.Typecast.providerTypeOf;
@@ -12,11 +15,11 @@ import static se.jbee.inject.util.Typecast.providerTypeOf;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import se.jbee.inject.DIRuntimeException.MoreFrequentExpiryException;
 import se.jbee.inject.Injector;
+import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -26,7 +29,13 @@ import se.jbee.inject.util.Scoped;
 
 public class TestProviderBinds {
 
-	static final DynamicState DYNAMIC_STATE_IN_OUTER = new DynamicState();
+	static final DynamicState DYNAMIC_STATE_IN_OUTER_A = new DynamicState();
+	static final DynamicState DYNAMIC_STATE_IN_OUTER_B = new DynamicState();
+
+	static final Instance<WorkingStateConsumer> outerA = instance( named( "A" ),
+			raw( WorkingStateConsumer.class ) );
+	static final Instance<WorkingStateConsumer> outerB = instance( named( "B" ),
+			raw( WorkingStateConsumer.class ) );
 
 	private static class ProviderBindsModule
 			extends BinderModule {
@@ -41,9 +50,11 @@ public class TestProviderBinds {
 			per( Scoped.INJECTION ).bind( DynamicState.class ).toConstructor();
 			construct( FaultyStateConsumer.class );
 			construct( WorkingStateConsumer.class );
-			injectingInto( WorkingStateConsumer.class ).within( OuterStateConsumer.class ).bind(
-					DynamicState.class ).to( DYNAMIC_STATE_IN_OUTER );
-			construct( OuterStateConsumer.class );
+
+			injectingInto( outerA ).bind( DynamicState.class ).to( DYNAMIC_STATE_IN_OUTER_A );
+			injectingInto( outerB ).bind( DynamicState.class ).to( DYNAMIC_STATE_IN_OUTER_B );
+			construct( outerA );
+			construct( outerB );
 		}
 
 	}
@@ -76,7 +87,7 @@ public class TestProviderBinds {
 
 	private static class WorkingStateConsumer {
 
-		private final Provider<DynamicState> state;
+		final Provider<DynamicState> state;
 
 		@SuppressWarnings ( "unused" )
 		WorkingStateConsumer( Provider<DynamicState> state ) {
@@ -85,20 +96,6 @@ public class TestProviderBinds {
 
 		DynamicState state() {
 			return state.provide();
-		}
-	}
-
-	private static class OuterStateConsumer {
-
-		private final WorkingStateConsumer consumer;
-
-		@SuppressWarnings ( "unused" )
-		OuterStateConsumer( WorkingStateConsumer consumer ) {
-			this.consumer = consumer;
-		}
-
-		WorkingStateConsumer consumer() {
-			return consumer;
 		}
 	}
 
@@ -139,8 +136,11 @@ public class TestProviderBinds {
 
 	@Test
 	public void thatProviderKeepsHierarchySoProvidedDependencyIsResolvedAsIfResolvedDirectly() {
-		OuterStateConsumer outer = injector.resolve( dependency( OuterStateConsumer.class ) );
-		Assert.assertSame( DYNAMIC_STATE_IN_OUTER, outer.consumer().state() );
+		WorkingStateConsumer a = injector.resolve( dependency( outerA ) );
+		assertSame( DYNAMIC_STATE_IN_OUTER_A, a.state() );
+		WorkingStateConsumer b = injector.resolve( dependency( outerB ) );
+		assertNotSame( a, b );
+		assertSame( DYNAMIC_STATE_IN_OUTER_B, b.state() );
 	}
 
 	@Test

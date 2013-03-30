@@ -28,6 +28,8 @@ public class Scoped {
 
 	public static final KeyDeduction DEPENDENCY_TYPE_KEY = new DependencyTypeAsKey();
 	public static final KeyDeduction TARGET_INSTANCE_KEY = new TargetInstanceAsKey();
+	public static final KeyDeduction TARGETED_DEPENDENCY_TYPE_KEY = new ConcatKeysDeduction(
+			DEPENDENCY_TYPE_KEY, TARGET_INSTANCE_KEY );
 
 	/**
 	 * Often called the 'default' or 'prototype'-scope. Asks the {@link Injectable} once per
@@ -47,6 +49,7 @@ public class Scoped {
 
 	public static final Scope DEPENDENCY_TYPE = uniqueBy( DEPENDENCY_TYPE_KEY );
 	public static final Scope TARGET_INSTANCE = uniqueBy( TARGET_INSTANCE_KEY );
+	public static final Scope DEPENDENCY = uniqueBy( TARGETED_DEPENDENCY_TYPE_KEY );
 
 	public static Scope uniqueBy( KeyDeduction keyDeduction ) {
 		return new KeyDeductionScope( keyDeduction );
@@ -191,6 +194,25 @@ public class Scoped {
 		@Override
 		public String toString() {
 			return "(per-" + keyDeduction + ")";
+		}
+
+	}
+
+	private static final class ConcatKeysDeduction
+			implements KeyDeduction {
+
+		private final KeyDeduction first;
+		private final KeyDeduction second;
+
+		ConcatKeysDeduction( KeyDeduction first, KeyDeduction second ) {
+			super();
+			this.first = first;
+			this.second = second;
+		}
+
+		@Override
+		public <T> String deduceKey( Demand<T> demand ) {
+			return first.deduceKey( demand ).concat( second.deduceKey( demand ) );
 		}
 
 	}

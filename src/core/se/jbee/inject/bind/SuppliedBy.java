@@ -349,7 +349,8 @@ public final class SuppliedBy {
 		}
 
 		private static <T> Provider<T> newProvider( Dependency<T> dependency, Injector context ) {
-			return new LazyResolvedDependencyProvider<T>( dependency, context );
+			return new LazyResolvedDependencyProvider<T>( dependency.uninject().ignoredExpiry(),
+					context );
 		}
 	}
 
@@ -361,7 +362,7 @@ public final class SuppliedBy {
 
 		LazyResolvedDependencyProvider( Dependency<T> dependency, Injector injector ) {
 			super();
-			this.dependency = dependency.uninject().ignoredExpiry();
+			this.dependency = dependency;
 			this.injector = injector;
 		}
 

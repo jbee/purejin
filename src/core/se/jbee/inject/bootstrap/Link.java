@@ -5,7 +5,6 @@
  */
 package se.jbee.inject.bootstrap;
 
-
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -40,6 +39,7 @@ public final class Link {
 		map.put( Scoped.THREAD, Expiry.expires( 500 ) );
 		map.put( Scoped.DEPENDENCY_TYPE, Expiry.NEVER );
 		map.put( Scoped.TARGET_INSTANCE, Expiry.NEVER );
+		map.put( Scoped.DEPENDENCY, Expiry.NEVER );
 		return map;
 	}
 

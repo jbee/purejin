@@ -5,6 +5,7 @@
  */
 package se.jbee.inject.bind;
 
+import static se.jbee.inject.util.Scoped.DEPENDENCY;
 import static se.jbee.inject.util.Scoped.DEPENDENCY_TYPE;
 import static se.jbee.inject.util.Scoped.TARGET_INSTANCE;
 
@@ -13,8 +14,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import se.jbee.inject.bootstrap.ModularBundle;
 import se.jbee.inject.bootstrap.Bootstrapper.ModularBootstrapper;
+import se.jbee.inject.bootstrap.ModularBundle;
 import se.jbee.inject.util.Provider;
 
 /**
@@ -67,7 +68,7 @@ public enum BuildinBundle
 
 		@Override
 		protected void declare() {
-			per( DEPENDENCY_TYPE ).starbind( Provider.class ).to( SuppliedBy.PROVIDER_BRIDGE );
+			per( DEPENDENCY ).starbind( Provider.class ).to( SuppliedBy.PROVIDER_BRIDGE );
 		}
 
 	}
