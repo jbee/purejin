@@ -63,7 +63,10 @@ public final class Packages
 	}
 
 	private static String packageNameOf( Class<?> packageOf ) {
-		return packageOf.getPackage().getName();
+		Package pkg = packageOf.getPackage();
+		return pkg == null
+			? "(default)"
+			: pkg.getName();
 	}
 
 	private static String packageNameOf( Type<?> packageOf ) {

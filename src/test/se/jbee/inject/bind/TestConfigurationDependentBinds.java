@@ -93,11 +93,20 @@ public class TestConfigurationDependentBinds {
 			bind( named( ValidationStrength.PERMISSIVE ), Validator.class ).to( Permissive.class );
 			bind( named( ValidationStrength.STRICT ), Validator.class ).to( Strict.class );
 
+			// the below is just *a* example - it is just important to provide the 'value' per injection
 			per( Scoped.INJECTION ).bind( methodsReturn( raw( ValidationStrength.class ) ) ).in(
 					Configuration.class );
 		}
 	}
 
+	/**
+	 * The same as above using {@link #configbind(Enum, Class)}s. The important difference is that
+	 * it is not required to manually bind to a {@link Configured} value. This is done implicitly
+	 * with each of the configbind calls. This also allow to use them in different modules without
+	 * causing clashes.
+	 * 
+	 * @author Jan Bernitt (jan@jbee.se)
+	 */
 	private static class ConfigurationDependentBindsModule2
 			extends BinderModule {
 
@@ -107,6 +116,7 @@ public class TestConfigurationDependentBinds {
 			configbind( ValidationStrength.PERMISSIVE, Validator.class ).to( Permissive.class );
 			configbind( ValidationStrength.STRICT, Validator.class ).to( Strict.class );
 
+			// the below is just *a* example - it is just important to provide the 'value' per injection
 			per( Scoped.INJECTION ).bind( methodsReturn( raw( ValidationStrength.class ) ) ).in(
 					Configuration.class );
 		}
