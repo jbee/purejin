@@ -21,7 +21,7 @@ import se.jbee.inject.bootstrap.Module;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public abstract class BinderModule
-		extends AbstractBinderModule
+		extends InitializedBinder
 		implements Bundle, Module {
 
 	protected BinderModule() {

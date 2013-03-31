@@ -22,7 +22,7 @@ import se.jbee.inject.config.Presets;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public abstract class BinderModuleWith<T>
-		extends AbstractBinderModule
+		extends InitializedBinder
 		implements Bundle, PresetModule<T> {
 
 	@Override

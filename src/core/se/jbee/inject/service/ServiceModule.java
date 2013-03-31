@@ -29,6 +29,7 @@ import se.jbee.inject.Injectron;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
+import se.jbee.inject.bind.Bind;
 import se.jbee.inject.bind.Binder;
 import se.jbee.inject.bind.Binder.RootBinder;
 import se.jbee.inject.bind.Binder.TypedBinder;
@@ -93,7 +94,8 @@ public abstract class ServiceModule
 	@Override
 	public void declare( Bindings bindings, Inspector inspector ) {
 		Bootstrap.nonnullThrowsReentranceException( binder );
-		binder = Binder.create( bindings, inspector, source( getClass() ), Scoped.APPLICATION );
+		binder = Binder.create( Bind.create( bindings, inspector, source( getClass() ),
+				Scoped.APPLICATION ) );
 		declare();
 	}
 
