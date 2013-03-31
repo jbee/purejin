@@ -184,16 +184,16 @@ public class Binder {
 			return binder.bind( configured.name( value ), type );
 		}
 
-		public <C extends Enum<C>> TypedBinder<T> on( Class<C> nullValue ) {
-			return on( Name.DEFAULT, null, nullValue, NamedBy.ENUM );
+		public <C extends Enum<C>> TypedBinder<T> onOther( Class<C> valueType ) {
+			return on( Name.DEFAULT, null, valueType, NamedBy.ENUM );
 		}
 
 		public <C extends Enum<C>> TypedBinder<T> on( C value ) {
 			return on( Name.DEFAULT, value, value.getDeclaringClass(), NamedBy.ENUM );
 		}
 
-		public <C> TypedBinder<T> on( Name name, Class<C> nullValue ) {
-			return on( name, null, nullValue, NamedBy.TO_STRING );
+		public <C> TypedBinder<T> onOther( Name name, Class<C> valueType ) {
+			return on( name, null, valueType, NamedBy.TO_STRING );
 		}
 
 		public <C> TypedBinder<T> on( Name name, C value ) {

@@ -127,9 +127,9 @@ public class TestConfigurationDependentBinds {
 
 		@Override
 		protected void declare() {
-			configbind( Validator.class ).on( ValidationStrength.class ).to( Permissive.class );
 			configbind( Validator.class ).on( ValidationStrength.PERMISSIVE ).to( Permissive.class );
 			configbind( Validator.class ).on( ValidationStrength.STRICT ).to( Strict.class );
+			configbind( Validator.class ).onOther( ValidationStrength.class ).to( Permissive.class );
 
 			// the below is just *a* example - it is just important to provide the 'value' per injection
 			per( Scoped.INJECTION ).bind( methodsReturn( raw( ValidationStrength.class ) ) ).in(
@@ -145,9 +145,9 @@ public class TestConfigurationDependentBinds {
 		protected void declare() {
 			Name answer = named( "answer" );
 			ConfigBinder<String> bind = configbind( String.class );
-			bind.on( answer, Integer.class ).to( "Default is undefined" );
 			bind.on( answer, 42 ).to( "Now it is 42" );
 			bind.on( answer, 7 ).to( "Now it is 7" );
+			bind.onOther( answer, Integer.class ).to( "Default is undefined" );
 
 			// the below is just *a* example - it is just important to provide the 'value' per injection
 			per( Scoped.INJECTION ).bind(
