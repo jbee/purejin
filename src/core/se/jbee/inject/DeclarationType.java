@@ -74,7 +74,7 @@ public enum DeclarationType
 	}
 
 	public boolean replacedBy( DeclarationType other ) {
-		return other.ordinal() > ordinal();
+		return other.ordinal() > ordinal() || ( this == IMPLICIT && other == IMPLICIT );
 	}
 
 	public boolean nullifiedBy( DeclarationType other ) {

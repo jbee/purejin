@@ -67,4 +67,9 @@ public class TestDeclarationType {
 		assertFalse( AUTO.clashesWith( AUTO ) );
 	}
 
+	@Test
+	public void thatImplicitReplacedByImplicit() {
+		assertTrue( IMPLICIT.replacedBy( IMPLICIT ) );
+	}
+
 }
