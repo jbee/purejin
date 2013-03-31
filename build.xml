@@ -11,8 +11,8 @@ Copyright (c) 2012, Jan Bernitt
 	<property name="source" value="1.6" />
 
 	<property name="app.name" value="Silk DI" />
-	<property name="app.version" value="0.4" />
-	<property name="beta.version" value="${app.version}.2" />
+	<property name="app.version" value="0.5" />
+	<property name="beta.version" value="${app.version}.1" />
 	<property name="snapshot.version" value="${app.version}.2" />
 	<property name="release.version" value="${app.version}.3" />
 

@@ -103,7 +103,7 @@ public class TestConfigurationDependentBinds {
 
 		@Override
 		protected void declare() {
-			bind( named( (ValidationStrength) null ), Validator.class ).to( Permissive.class );
+			configbind( ValidationStrength.class, Validator.class ).to( Permissive.class );
 			configbind( ValidationStrength.PERMISSIVE, Validator.class ).to( Permissive.class );
 			configbind( ValidationStrength.STRICT, Validator.class ).to( Strict.class );
 

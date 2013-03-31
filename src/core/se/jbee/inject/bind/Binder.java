@@ -133,6 +133,11 @@ public class Binder {
 		return bind( configured.name( value ), type );
 	}
 
+	public <T, C extends Enum<C>> TypedBinder<T> configbind( Class<C> configured, Class<T> type ) {
+		return configbind( configured( NamedBy.ENUM, instance( Name.DEFAULT, raw( configured ) ) ),
+				null, type );
+	}
+
 	public <T, C extends Enum<C>> TypedBinder<T> configbind( C configured, Class<T> type ) {
 		return configbind(
 				configured( instance( Name.DEFAULT, raw( configured.getDeclaringClass() ) ) ),
