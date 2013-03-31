@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
+import se.jbee.inject.Name;
 import se.jbee.inject.bind.TestInspectorBinds.Resource;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
@@ -114,9 +115,9 @@ public class TestConfigurationDependentBinds {
 	}
 
 	/**
-	 * The same as above using {@link #configbind(Enum, Class)}s. The important difference is that
-	 * it is not required to manually bind to a {@link Configured} value. This is done implicitly
-	 * with each of the configbind calls. This also allow to use them in different modules without
+	 * The same as above using {@link #configbind(Class)}s. The important difference is that it is
+	 * not required to manually bind to a {@link Configured} value. This is done implicitly with
+	 * each of the configbind calls. This also allow to use them in different modules without
 	 * causing clashes.
 	 * 
 	 * @author Jan Bernitt (jan@jbee.se)
@@ -126,9 +127,9 @@ public class TestConfigurationDependentBinds {
 
 		@Override
 		protected void declare() {
-			configbind( ValidationStrength.class, Validator.class ).to( Permissive.class );
-			configbind( ValidationStrength.PERMISSIVE, Validator.class ).to( Permissive.class );
-			configbind( ValidationStrength.STRICT, Validator.class ).to( Strict.class );
+			configbind( Validator.class ).on( ValidationStrength.class ).to( Permissive.class );
+			configbind( Validator.class ).on( ValidationStrength.PERMISSIVE ).to( Permissive.class );
+			configbind( Validator.class ).on( ValidationStrength.STRICT ).to( Strict.class );
 
 			// the below is just *a* example - it is just important to provide the 'value' per injection
 			per( Scoped.INJECTION ).bind( methodsReturn( raw( ValidationStrength.class ) ) ).in(
@@ -142,10 +143,11 @@ public class TestConfigurationDependentBinds {
 
 		@Override
 		protected void declare() {
-			configbind( named( "answer" ), Integer.class, raw( String.class ) ).to(
-					"Now it is undefined" );
-			configbind( named( "answer" ), 42, raw( String.class ) ).to( "Now it is 42" );
-			configbind( named( "answer" ), 7, raw( String.class ) ).to( "Now it is 7" );
+			Name answer = named( "answer" );
+			ConfigBinder<String> bind = configbind( String.class );
+			bind.on( answer, Integer.class ).to( "Default is undefined" );
+			bind.on( answer, 42 ).to( "Now it is 42" );
+			bind.on( answer, 7 ).to( "Now it is 7" );
 
 			// the below is just *a* example - it is just important to provide the 'value' per injection
 			per( Scoped.INJECTION ).bind(
@@ -207,15 +209,17 @@ public class TestConfigurationDependentBinds {
 
 	@Test
 	public void thatReconfigurationResolvedUsingNamedInstances() {
+		assertConfigNumberResolvedToStringEnding( null, "undefined" );
+		assertConfigNumberResolvedToStringEnding( 7, "7" );
+		assertConfigNumberResolvedToStringEnding( 42, "42" );
+		assertConfigNumberResolvedToStringEnding( 123, "undefined" ); // equal to null
+	}
+
+	private static void assertConfigNumberResolvedToStringEnding( Integer configValue, String ending ) {
 		Injector injector = Bootstrap.injector( ConfigurationDependentBindsModule3.class );
 		Configuration config = injector.resolve( dependency( Configuration.class ) );
+		config.setNumber( configValue );
 		String v = injector.resolve( dependency( String.class ) );
-		assertTrue( v.endsWith( "undefined" ) );
-		config.setNumber( 7 );
-		v = injector.resolve( dependency( String.class ) );
-		assertTrue( v.endsWith( "7" ) );
-		config.setNumber( 42 );
-		v = injector.resolve( dependency( String.class ) );
-		assertTrue( v.endsWith( "42" ) );
+		assertTrue( v.endsWith( ending ) );
 	}
 }

@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import se.jbee.inject.Array;
+import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
@@ -164,8 +165,16 @@ public final class SuppliedBy {
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
 			final C value = injector.resolve( dependency.instanced( configuration.getInstance() ) );
+			return supply( dependency, injector, value );
+		}
+
+		private T supply( Dependency<? super T> dependency, Injector injector, final C value ) {
 			final Instance<T> current = Instance.instance( configuration.name( value ), type );
-			return injector.resolve( dependency.instanced( current ) );
+			try {
+				return injector.resolve( dependency.instanced( current ) );
+			} catch ( NoSuchResourceException e ) {
+				return supply( dependency, injector, null );
+			}
 		}
 
 	}

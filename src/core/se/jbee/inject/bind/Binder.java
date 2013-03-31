@@ -128,37 +128,12 @@ public class Binder {
 		return bind( Instance.anyOf( Type.raw( type ) ) );
 	}
 
-	public <T, C> TypedBinder<T> configbind( Configured<C> configured, C value, Type<T> type ) {
-		root.per( Scoped.INJECTION ).implicit().bind( type ).to( configured );
-		return bind( configured.name( value ), type );
+	public <T, C> ConfigBinder<T> configbind( Class<T> type ) {
+		return configbind( raw( type ) );
 	}
 
-	public <T, C extends Enum<C>> TypedBinder<T> configbind( Class<C> configured, Class<T> type ) {
-		return configbind( configured( NamedBy.ENUM, instance( Name.DEFAULT, raw( configured ) ) ),
-				null, type );
-	}
-
-	public <T, C extends Enum<C>> TypedBinder<T> configbind( C configured, Class<T> type ) {
-		return configbind(
-				configured( instance( Name.DEFAULT, raw( configured.getDeclaringClass() ) ) ),
-				configured, type );
-	}
-
-	public <T, N extends Number> TypedBinder<T> configbind( Name name, Class<N> nullValue,
-			Type<T> type ) {
-		return configbind( configured( NamedBy.TO_STRING, instance( name, raw( nullValue ) ) ),
-				null, type );
-	}
-
-	public <T, N extends Number> TypedBinder<T> configbind( Name name, N value, Type<T> type ) {
-		@SuppressWarnings ( "unchecked" )
-		final Class<N> valueType = (Class<N>) value.getClass();
-		return configbind( configured( NamedBy.TO_STRING, instance( name, raw( valueType ) ) ),
-				value, type );
-	}
-
-	public <T, C> TypedBinder<T> configbind( Configured<C> configured, C value, Class<T> type ) {
-		return configbind( configured, value, raw( type ) );
+	public <T, C> ConfigBinder<T> configbind( Type<T> type ) {
+		return new ConfigBinder<T>( root, type );
 	}
 
 	protected final <T> void bind( Resource<T> resource, Supplier<? extends T> supplier ) {
@@ -191,6 +166,51 @@ public class Binder {
 
 	protected Binder with( Target target ) {
 		return new Binder( root, bind().with( target ) );
+	}
+
+	public static class ConfigBinder<T> {
+
+		private final RootBinder binder;
+		private final Type<T> type;
+
+		ConfigBinder( RootBinder binder, Type<T> type ) {
+			super();
+			this.binder = binder;
+			this.type = type;
+		}
+
+		public <C> TypedBinder<T> on( Configured<C> configured, C value ) {
+			binder.per( Scoped.INJECTION ).implicit().bind( type ).to( configured );
+			return binder.bind( configured.name( value ), type );
+		}
+
+		public <C extends Enum<C>> TypedBinder<T> on( Class<C> nullValue ) {
+			return on( Name.DEFAULT, null, nullValue, NamedBy.ENUM );
+		}
+
+		public <C extends Enum<C>> TypedBinder<T> on( C value ) {
+			return on( Name.DEFAULT, value, value.getDeclaringClass(), NamedBy.ENUM );
+		}
+
+		public <C> TypedBinder<T> on( Name name, Class<C> nullValue ) {
+			return on( name, null, nullValue, NamedBy.TO_STRING );
+		}
+
+		public <C> TypedBinder<T> on( Name name, C value ) {
+			return on( name, value, NamedBy.TO_STRING );
+		}
+
+		public <C> TypedBinder<T> on( Name name, C value, Naming<? super C> naming ) {
+			@SuppressWarnings ( "unchecked" )
+			final Class<C> valueType = (Class<C>) value.getClass();
+			return on( name, value, valueType, naming );
+		}
+
+		private <C> TypedBinder<T> on( Name name, C value, final Class<C> valueType,
+				Naming<? super C> naming ) {
+			return on( configured( naming, instance( name, raw( valueType ) ) ), value );
+		}
+
 	}
 
 	public static class InspectBinder {
