@@ -10,6 +10,7 @@ import se.jbee.inject.Name;
 public final class NamedBy {
 
 	public static final Naming<Enum<?>> ENUM = new EnumNaming<Enum<?>>();
+	public static final Naming<? super Object> TO_STRING = new ToStringNaming();
 
 	private NamedBy() {
 		throw new UnsupportedOperationException( "util" );
@@ -25,6 +26,20 @@ public final class NamedBy {
 		@Override
 		public Name name( E value ) {
 			return Name.named( value );
+		}
+
+	}
+
+	private static final class ToStringNaming
+			implements Naming<Object> {
+
+		ToStringNaming() {
+			//make visible
+		}
+
+		@Override
+		public Name name( Object value ) {
+			return Name.named( String.valueOf( value ) );
 		}
 
 	}

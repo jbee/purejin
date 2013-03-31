@@ -144,6 +144,19 @@ public class Binder {
 				configured, type );
 	}
 
+	public <T, N extends Number> TypedBinder<T> configbind( Name name, Class<N> nullValue,
+			Type<T> type ) {
+		return configbind( configured( NamedBy.TO_STRING, instance( name, raw( nullValue ) ) ),
+				null, type );
+	}
+
+	public <T, N extends Number> TypedBinder<T> configbind( Name name, N value, Type<T> type ) {
+		@SuppressWarnings ( "unchecked" )
+		final Class<N> valueType = (Class<N>) value.getClass();
+		return configbind( configured( NamedBy.TO_STRING, instance( name, raw( valueType ) ) ),
+				value, type );
+	}
+
 	public <T, C> TypedBinder<T> configbind( Configured<C> configured, C value, Class<T> type ) {
 		return configbind( configured, value, raw( type ) );
 	}

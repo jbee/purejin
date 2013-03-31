@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
+import se.jbee.inject.bind.TestInspectorBinds.Resource;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.util.Provider;
@@ -60,6 +61,7 @@ public class TestConfigurationDependentBinds {
 	private static class Configuration {
 
 		private ValidationStrength validationStrength;
+		private Integer number;
 
 		/**
 		 * Will be detected as service method and thereby used
@@ -71,6 +73,18 @@ public class TestConfigurationDependentBinds {
 
 		public void setValidationStrength( ValidationStrength validationStrength ) {
 			this.validationStrength = validationStrength;
+		}
+
+		/**
+		 * Will be detected as service method and thereby used
+		 */
+		@Resource ( "answer" )
+		public Integer getNumber() {
+			return number;
+		}
+
+		public void setNumber( Integer number ) {
+			this.number = number;
 		}
 
 	}
@@ -118,6 +132,24 @@ public class TestConfigurationDependentBinds {
 
 			// the below is just *a* example - it is just important to provide the 'value' per injection
 			per( Scoped.INJECTION ).bind( methodsReturn( raw( ValidationStrength.class ) ) ).in(
+					Configuration.class );
+		}
+
+	}
+
+	private static class ConfigurationDependentBindsModule3
+			extends BinderModule {
+
+		@Override
+		protected void declare() {
+			configbind( named( "answer" ), Integer.class, raw( String.class ) ).to(
+					"Now it is undefined" );
+			configbind( named( "answer" ), 42, raw( String.class ) ).to( "Now it is 42" );
+			configbind( named( "answer" ), 7, raw( String.class ) ).to( "Now it is 7" );
+
+			// the below is just *a* example - it is just important to provide the 'value' per injection
+			per( Scoped.INJECTION ).bind(
+					methodsReturn( raw( int.class ) ).namedBy( Resource.class ) ).in(
 					Configuration.class );
 		}
 
@@ -171,5 +203,19 @@ public class TestConfigurationDependentBinds {
 		assertFalse( v.provide().valid( input ) );
 		config.setValidationStrength( ValidationStrength.PERMISSIVE );
 		assertTrue( v.provide().valid( input ) );
+	}
+
+	@Test
+	public void thatReconfigurationResolvedUsingNamedInstances() {
+		Injector injector = Bootstrap.injector( ConfigurationDependentBindsModule3.class );
+		Configuration config = injector.resolve( dependency( Configuration.class ) );
+		String v = injector.resolve( dependency( String.class ) );
+		assertTrue( v.endsWith( "undefined" ) );
+		config.setNumber( 7 );
+		v = injector.resolve( dependency( String.class ) );
+		assertTrue( v.endsWith( "7" ) );
+		config.setNumber( 42 );
+		v = injector.resolve( dependency( String.class ) );
+		assertTrue( v.endsWith( "42" ) );
 	}
 }
