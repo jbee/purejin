@@ -5,7 +5,6 @@
  */
 package se.jbee.inject.bind;
 
-import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Name.namedInternal;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
@@ -51,7 +50,7 @@ public final class Configured<T>
 
 		@Override
 		public Name name( E value ) {
-			return named( value );
+			return namedInternal( value );
 		}
 
 	}

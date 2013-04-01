@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Name.named;
+import static se.jbee.inject.Name.namedInternal;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.bind.Configured.configured;
 import static se.jbee.inject.bootstrap.Inspect.methodsReturn;
@@ -104,9 +105,11 @@ public class TestConfigurationDependentBinds {
 		protected void declare() {
 			per( Scoped.INJECTION ).bind( Validator.class ).to(
 					configured( anyOf( ValidationStrength.class ) ) );
-			bind( named( (ValidationStrength) null ), Validator.class ).to( Permissive.class );
-			bind( named( ValidationStrength.PERMISSIVE ), Validator.class ).to( Permissive.class );
-			bind( named( ValidationStrength.STRICT ), Validator.class ).to( Strict.class );
+			bind( namedInternal( (ValidationStrength) null ), Validator.class ).to(
+					Permissive.class );
+			bind( namedInternal( ValidationStrength.PERMISSIVE ), Validator.class ).to(
+					Permissive.class );
+			bind( namedInternal( ValidationStrength.STRICT ), Validator.class ).to( Strict.class );
 
 			// the below is just *a* example - it is just important to provide the 'value' per injection
 			per( Scoped.INJECTION ).bind( methodsReturn( raw( ValidationStrength.class ) ) ).in(

@@ -20,10 +20,10 @@ import java.lang.reflect.Method;
 import org.hamcrest.Factory;
 import org.junit.Test;
 
+import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
-import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Inspect;
 import se.jbee.inject.bootstrap.Inspector;

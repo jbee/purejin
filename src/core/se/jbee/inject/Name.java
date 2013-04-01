@@ -36,6 +36,9 @@ public final class Name
 
 	private final String value;
 
+	/**
+	 * @see #namedInternal(String)
+	 */
 	public static Name named( String name ) {
 		if ( name == null || name.trim().isEmpty() ) {
 			return DEFAULT;
@@ -47,13 +50,21 @@ public final class Name
 		return new Name( name.toLowerCase() );
 	}
 
+	/**
+	 * Internal names use a special prefix to avoid name clashes with 'usual' user defined names.
+	 * They should be used for names that the user does not directly know about.
+	 * 
+	 * @param name
+	 *            A value having the {@link #INTERNAL} prefix {@value #INTERNAL} or not.
+	 * @return The name instance having the {@link #INTERNAL} prefix in any case.
+	 */
 	public static Name namedInternal( String name ) {
 		return isInternal( name )
 			? new Name( name )
 			: new Name( INTERNAL + name );
 	}
 
-	public static Name named( Enum<?> name ) {
+	public static Name namedInternal( Enum<?> name ) {
 		return name == null
 			? namedInternal( "-default-" )
 			: namedInternal( name.name().toLowerCase().replace( '_', INTERNAL ) );
