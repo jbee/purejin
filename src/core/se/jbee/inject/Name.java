@@ -55,7 +55,7 @@ public final class Name
 	 * They should be used for names that the user does not directly know about.
 	 * 
 	 * @param name
-	 *            A value having the {@link #INTERNAL} prefix {@value #INTERNAL} or not.
+	 *            A value having the {@link #INTERNAL} prefix '-' or not.
 	 * @return The name instance having the {@link #INTERNAL} prefix in any case.
 	 */
 	public static Name namedInternal( String name ) {

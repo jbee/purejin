@@ -170,7 +170,7 @@ Copyright (c) 2012, Jan Bernitt
 			<packageset dir="${core.src.dir}" defaultexcludes="yes" />
 
 			<classpath refid="classpath.core" />
-			<link href='http://jbee.github.com/silk/assets/javadoc/' />
+			<link href='http://jbee.github.com/silk/assets/javadoc/${app.version}/' />
 			<header><![CDATA[<h1><em>${app.name} ${app.version}</em></h1>]]></header>
 		</javadoc>
 	</target>
