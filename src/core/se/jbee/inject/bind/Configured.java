@@ -5,14 +5,19 @@
  */
 package se.jbee.inject.bind;
 
+import static se.jbee.inject.Name.named;
+import static se.jbee.inject.Name.namedInternal;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 
 public final class Configured<T>
 		implements Naming<T> {
 
+	public static final Naming<Enum<?>> ENUM = new EnumNaming<Enum<?>>();
+	public static final Naming<? super Object> TO_STRING = new ToStringNaming();
+
 	public static <T extends Enum<?>> Configured<T> configured( Instance<T> value ) {
-		return configured( NamedBy.ENUM, value );
+		return configured( ENUM, value );
 	}
 
 	public static <T> Configured<T> configured( Naming<? super T> naming, Instance<T> value ) {
@@ -35,5 +40,33 @@ public final class Configured<T>
 	@Override
 	public Name name( T value ) {
 		return naming.name( value );
+	}
+
+	private static final class EnumNaming<E extends Enum<?>>
+			implements Naming<E> {
+
+		EnumNaming() {
+			//make visible
+		}
+
+		@Override
+		public Name name( E value ) {
+			return named( value );
+		}
+
+	}
+
+	private static final class ToStringNaming
+			implements Naming<Object> {
+
+		ToStringNaming() {
+			//make visible
+		}
+
+		@Override
+		public Name name( Object value ) {
+			return namedInternal( String.valueOf( value ) );
+		}
+
 	}
 }

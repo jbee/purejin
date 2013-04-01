@@ -185,19 +185,19 @@ public class Binder {
 		}
 
 		public <C extends Enum<C>> TypedBinder<T> onOther( Class<C> valueType ) {
-			return on( Name.DEFAULT, null, valueType, NamedBy.ENUM );
+			return on( Name.DEFAULT, null, valueType, Configured.ENUM );
 		}
 
 		public <C extends Enum<C>> TypedBinder<T> on( C value ) {
-			return on( Name.DEFAULT, value, value.getDeclaringClass(), NamedBy.ENUM );
+			return on( Name.DEFAULT, value, value.getDeclaringClass(), Configured.ENUM );
 		}
 
 		public <C> TypedBinder<T> onOther( Name name, Class<C> valueType ) {
-			return on( name, null, valueType, NamedBy.TO_STRING );
+			return on( name, null, valueType, Configured.TO_STRING );
 		}
 
 		public <C> TypedBinder<T> on( Name name, C value ) {
-			return on( name, value, NamedBy.TO_STRING );
+			return on( name, value, Configured.TO_STRING );
 		}
 
 		public <C> TypedBinder<T> on( Name name, C value, Naming<? super C> naming ) {

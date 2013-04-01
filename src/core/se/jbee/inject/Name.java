@@ -18,6 +18,8 @@ import java.lang.reflect.Method;
 public final class Name
 		implements PreciserThan<Name> {
 
+	private static final char INTERNAL = '-';
+
 	/**
 	 * Character used as wildcard when matching names.
 	 */
@@ -38,7 +40,7 @@ public final class Name
 		if ( name == null || name.trim().isEmpty() ) {
 			return DEFAULT;
 		}
-		if ( name.charAt( 0 ) == '-' ) {
+		if ( isInternal( name ) ) {
 			throw new IllegalArgumentException(
 					"Names starting with a minus are considered to be internal names. If you meant to create such a name use method 'namedInternal' instead." );
 		}
@@ -46,15 +48,15 @@ public final class Name
 	}
 
 	public static Name namedInternal( String name ) {
-		return name.charAt( 0 ) == '-'
+		return isInternal( name )
 			? new Name( name )
-			: new Name( "-" + name );
+			: new Name( INTERNAL + name );
 	}
 
 	public static Name named( Enum<?> name ) {
 		return name == null
 			? namedInternal( "-default-" )
-			: namedInternal( name.name().toLowerCase().replace( '_', '-' ) );
+			: namedInternal( name.name().toLowerCase().replace( '_', INTERNAL ) );
 	}
 
 	private Name( String value ) {
@@ -90,7 +92,11 @@ public final class Name
 	}
 
 	public boolean isInternal() {
-		return value.length() > 0 && value.charAt( 0 ) == '-';
+		return isInternal( value );
+	}
+
+	private static boolean isInternal( String name ) {
+		return name.length() > 0 && name.charAt( 0 ) == INTERNAL;
 	}
 
 	@Override
