@@ -111,7 +111,7 @@ public final class SuppliedBy {
 		return new FactorySupplier<T>( factory );
 	}
 
-	public static <T, C> Supplier<T> configuration( Type<T> type, Configured<C> configuration ) {
+	public static <T, C> Supplier<T> configuration( Type<T> type, Configuring<C> configuration ) {
 		return new ConfigurationDependentSupplier<T, C>( type, configuration );
 	}
 
@@ -145,7 +145,7 @@ public final class SuppliedBy {
 
 	/**
 	 * This is a indirection that resolves a {@link Type} dependent on another current
-	 * {@link Configured} value. This can be understand as a dynamic <i>name</i> switch so that a
+	 * {@link Configuring} value. This can be understand as a dynamic <i>name</i> switch so that a
 	 * call is resolved to different named instances.
 	 * 
 	 * @author Jan Bernitt (jan@jbee.se)
@@ -154,9 +154,9 @@ public final class SuppliedBy {
 			implements Supplier<T> {
 
 		private final Type<T> type;
-		private final Configured<C> configuration;
+		private final Configuring<C> configuration;
 
-		ConfigurationDependentSupplier( Type<T> type, Configured<C> configuration ) {
+		ConfigurationDependentSupplier( Type<T> type, Configuring<C> configuration ) {
 			super();
 			this.type = type;
 			this.configuration = configuration;

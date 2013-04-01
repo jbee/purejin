@@ -6,27 +6,40 @@
 package se.jbee.inject.bind;
 
 import static se.jbee.inject.Name.namedInternal;
+import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 
-public final class Configured<T>
+/**
+ * A {@linkplain Configuring} value describes a value (bound within an {@link Injector}) that is used
+ * to control configuration dependent implementation/injection (CDI). When CDI is used a type is
+ * resolved to different named instances dependent on the {@linkplain Configuring} value. To derive
+ * the name a actual value is associated with a {@link Naming} strategy is specified together with
+ * the {@link Instance} of the controlling value.
+ * 
+ * @author Jan Bernitt (jan@jbee.se)
+ * 
+ * @param <T>
+ *            The type of the value that controlls the configuration
+ */
+public final class Configuring<T>
 		implements Naming<T> {
 
 	public static final Naming<Enum<?>> ENUM = new EnumNaming<Enum<?>>();
 	public static final Naming<? super Object> TO_STRING = new ToStringNaming();
 
-	public static <T extends Enum<?>> Configured<T> configured( Instance<T> value ) {
-		return configured( ENUM, value );
+	public static <T extends Enum<?>> Configuring<T> configuring( Instance<T> value ) {
+		return configuring( ENUM, value );
 	}
 
-	public static <T> Configured<T> configured( Naming<? super T> naming, Instance<T> value ) {
-		return new Configured<T>( value, naming );
+	public static <T> Configuring<T> configuring( Naming<? super T> naming, Instance<T> value ) {
+		return new Configuring<T>( value, naming );
 	}
 
 	private final Instance<T> value;
 	private final Naming<? super T> naming;
 
-	private Configured( Instance<T> value, Naming<? super T> naming ) {
+	private Configuring( Instance<T> value, Naming<? super T> naming ) {
 		super();
 		this.value = value;
 		this.naming = naming;

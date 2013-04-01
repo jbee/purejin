@@ -7,7 +7,7 @@ import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Name.namedInternal;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.bind.Configured.configured;
+import static se.jbee.inject.bind.Configuring.configuring;
 import static se.jbee.inject.bootstrap.Inspect.methodsReturn;
 import static se.jbee.inject.util.Typecast.providerTypeOf;
 
@@ -104,7 +104,7 @@ public class TestConfigurationDependentBinds {
 		@Override
 		protected void declare() {
 			per( Scoped.INJECTION ).bind( Validator.class ).to(
-					configured( anyOf( ValidationStrength.class ) ) );
+					configuring( anyOf( ValidationStrength.class ) ) );
 			bind( namedInternal( (ValidationStrength) null ), Validator.class ).to(
 					Permissive.class );
 			bind( namedInternal( ValidationStrength.PERMISSIVE ), Validator.class ).to(
@@ -119,7 +119,7 @@ public class TestConfigurationDependentBinds {
 
 	/**
 	 * The same as above using {@link #configbind(Class)}s. The important difference is that it is
-	 * not required to manually bind to a {@link Configured} value. This is done implicitly with
+	 * not required to manually bind to a {@link Configuring} value. This is done implicitly with
 	 * each of the configbind calls. This also allow to use them in different modules without
 	 * causing clashes.
 	 * 

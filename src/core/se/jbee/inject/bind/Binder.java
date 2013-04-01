@@ -9,7 +9,7 @@ import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Instance.defaultInstanceOf;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.bind.Configured.configured;
+import static se.jbee.inject.bind.Configuring.configuring;
 import static se.jbee.inject.bind.SuppliedBy.constant;
 import static se.jbee.inject.bind.SuppliedBy.parametrizedInstance;
 import static se.jbee.inject.bind.SuppliedBy.provider;
@@ -179,25 +179,25 @@ public class Binder {
 			this.type = type;
 		}
 
-		public <C> TypedBinder<T> on( Configured<C> configured, C value ) {
-			binder.per( Scoped.INJECTION ).implicit().bind( type ).to( configured );
-			return binder.bind( configured.name( value ), type );
+		public <C> TypedBinder<T> on( Configuring<C> configuring, C value ) {
+			binder.per( Scoped.INJECTION ).implicit().bind( type ).to( configuring );
+			return binder.bind( configuring.name( value ), type );
 		}
 
 		public <C extends Enum<C>> TypedBinder<T> onOther( Class<C> valueType ) {
-			return on( Name.DEFAULT, null, valueType, Configured.ENUM );
+			return on( Name.DEFAULT, null, valueType, Configuring.ENUM );
 		}
 
 		public <C extends Enum<C>> TypedBinder<T> on( C value ) {
-			return on( Name.DEFAULT, value, value.getDeclaringClass(), Configured.ENUM );
+			return on( Name.DEFAULT, value, value.getDeclaringClass(), Configuring.ENUM );
 		}
 
 		public <C> TypedBinder<T> onOther( Name name, Class<C> valueType ) {
-			return on( name, null, valueType, Configured.TO_STRING );
+			return on( name, null, valueType, Configuring.TO_STRING );
 		}
 
 		public <C> TypedBinder<T> on( Name name, C value ) {
-			return on( name, value, Configured.TO_STRING );
+			return on( name, value, Configuring.TO_STRING );
 		}
 
 		public <C> TypedBinder<T> on( Name name, C value, Naming<? super C> naming ) {
@@ -208,7 +208,7 @@ public class Binder {
 
 		private <C> TypedBinder<T> on( Name name, C value, final Class<C> valueType,
 				Naming<? super C> naming ) {
-			return on( configured( naming, instance( name, raw( valueType ) ) ), value );
+			return on( configuring( naming, instance( name, raw( valueType ) ) ), value );
 		}
 
 	}
@@ -497,7 +497,7 @@ public class Binder {
 			toConstructor( getType().getRawType(), parameters );
 		}
 
-		public void to( Configured<?> configuration ) {
+		public void to( Configuring<?> configuration ) {
 			to( SuppliedBy.configuration( getType(), configuration ) );
 		}
 
