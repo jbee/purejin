@@ -5,6 +5,8 @@
  */
 package se.jbee.inject.bind;
 
+import static se.jbee.inject.Name.named;
+import static se.jbee.inject.Name.namedInternal;
 import se.jbee.inject.Name;
 
 public final class NamedBy {
@@ -25,7 +27,7 @@ public final class NamedBy {
 
 		@Override
 		public Name name( E value ) {
-			return Name.named( value );
+			return named( value );
 		}
 
 	}
@@ -39,7 +41,7 @@ public final class NamedBy {
 
 		@Override
 		public Name name( Object value ) {
-			return Name.named( String.valueOf( value ) );
+			return namedInternal( String.valueOf( value ) );
 		}
 
 	}

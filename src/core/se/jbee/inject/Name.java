@@ -19,32 +19,42 @@ public final class Name
 		implements PreciserThan<Name> {
 
 	/**
+	 * Character used as wildcard when matching names.
+	 */
+	public static final String WILDCARD = "*";
+
+	/**
 	 * Used when no name is specified. It is the most precise name of all.
 	 */
 	public static final Name DEFAULT = new Name( "" );
 	/**
 	 * It is the least precise name of all.
 	 */
-	public static final Name ANY = new Name( "*" );
+	public static final Name ANY = new Name( WILDCARD );
 
 	private final String value;
 
-	public static Name prefixed( String prefix ) {
-		return prefix == null || prefix.trim().isEmpty()
-			? ANY
-			: new Name( prefix.toLowerCase() + "*" );
+	public static Name named( String name ) {
+		if ( name == null || name.trim().isEmpty() ) {
+			return DEFAULT;
+		}
+		if ( name.charAt( 0 ) == '-' ) {
+			throw new IllegalArgumentException(
+					"Names starting with a minus are considered to be internal names. If you meant to create such a name use method 'namedInternal' instead." );
+		}
+		return new Name( name.toLowerCase() );
 	}
 
-	public static Name named( String name ) {
-		return name == null || name.trim().isEmpty()
-			? DEFAULT
-			: new Name( name.toLowerCase() );
+	public static Name namedInternal( String name ) {
+		return name.charAt( 0 ) == '-'
+			? new Name( name )
+			: new Name( "-" + name );
 	}
 
 	public static Name named( Enum<?> name ) {
 		return name == null
-			? named( "-default-" )
-			: Name.named( name.name().toLowerCase().replace( '_', '-' ) );
+			? namedInternal( "-default-" )
+			: namedInternal( name.name().toLowerCase().replace( '_', '-' ) );
 	}
 
 	private Name( String value ) {
@@ -79,6 +89,10 @@ public final class Name
 		return value.isEmpty();
 	}
 
+	public boolean isInternal() {
+		return value.length() > 0 && value.charAt( 0 ) == '-';
+	}
+
 	@Override
 	public boolean morePreciseThan( Name other ) {
 		final boolean thisIsDefault = isDefault();
@@ -96,7 +110,7 @@ public final class Name
 
 	public boolean isApplicableFor( Name other ) {
 		return isAny() || other.isAny() || other.value == value
-				|| ( value.matches( other.value.replace( "*", ".*" ) ) );
+				|| ( value.matches( other.value.replace( WILDCARD, ".*" ) ) );
 	}
 
 	public static Name namedBy( Class<? extends Annotation> annotation, AnnotatedElement obj ) {

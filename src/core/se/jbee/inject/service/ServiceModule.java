@@ -7,7 +7,7 @@ package se.jbee.inject.service;
 
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
-import static se.jbee.inject.Name.named;
+import static se.jbee.inject.Name.namedInternal;
 import static se.jbee.inject.Source.source;
 import static se.jbee.inject.Type.parameterTypes;
 import static se.jbee.inject.Type.raw;
@@ -63,8 +63,8 @@ public abstract class ServiceModule
 	 * {@link ServiceMethod}s. The {@link Inspector#methodsIn(Class)} should return all methods in
 	 * the given {@link Class} that should be used to implement a {@link ServiceMethod}.
 	 */
-	public static final Instance<Inspector> SERVICE_INSPECTOR = instance( named( "service" ),
-			raw( Inspector.class ) );
+	public static final Instance<Inspector> SERVICE_INSPECTOR = instance(
+			namedInternal( "service" ), raw( Inspector.class ) );
 
 	protected final void bindServiceMethodsIn( Class<?> service ) {
 		ExtensionModule.extend( binder, ServiceClassExtension.class, service );
