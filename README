@@ -20,14 +20,14 @@ Installation:
  	<dependency>
 		<groupId>se.jbee</groupId>
 		<artifactId>silk-di</artifactId>
-		<version>0.4</version>
+		<version>0.5</version>
 	</dependency>
 
 3) Ivy
-	<dependency org="se.jbee" name="silk-di" rev="0.4"/>
+	<dependency org="se.jbee" name="silk-di" rev="0.5"/>
 
 4) Gradle
-	'se.jbee:silk-di:0.4'
+	'se.jbee:silk-di:0.5'
 
 5) Build from sources
 	- checkout https://github.com/jbee/silk.git
