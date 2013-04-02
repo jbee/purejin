@@ -15,8 +15,6 @@ import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.config.Globals;
 import se.jbee.inject.config.Options;
 
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
-
 /**
  * The test demonstrates how to use {@link Options} to allow different bootstrapping depended on a
  * setting that can be determined before the bootstrapping and that is constant from that moment on.
@@ -51,8 +49,8 @@ public class TestModularBinds {
 	}
 
 	/**
-	 * The {@link GenericMachineBundle} will be used when no {@link Machine} {@link Const} has been
-	 * defined in the {@link Options} so that it is actually <code>null</code>.
+	 * The {@link GenericMachineBundle} will be used when no {@link Machine} value has been defined
+	 * in the {@link Options} so that it is actually <code>null</code>.
 	 */
 	private static class MachineBundle
 			extends ModularBootstrapperBundle<Machine> {
