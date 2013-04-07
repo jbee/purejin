@@ -1,6 +1,7 @@
 package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static se.jbee.inject.Dependency.dependency;
 
@@ -20,6 +21,11 @@ public class TestRequiredProvidedBinds {
 	private static class ExampleServiceImpl
 			implements ExampleService {
 		// and its implementation
+	}
+
+	private static class ExplicitExampleService
+			implements ExampleService {
+		// this is bound explicit in one test and should replace the provided impl. above
 	}
 
 	private static class UnusedImpl {
@@ -58,6 +64,26 @@ public class TestRequiredProvidedBinds {
 		}
 	}
 
+	private static class ExplicitBindModule
+			extends BinderModule {
+
+		@Override
+		protected void declare() {
+			bind( ExampleService.class ).to( ExplicitExampleService.class );
+		}
+	}
+
+	private static class ExplicitBindBundle
+			extends BootstrapperBundle {
+
+		@Override
+		protected void bootstrap() {
+			install( RequiredProvidedBindsBundle.class );
+			install( ExplicitBindModule.class );
+		}
+
+	}
+
 	@Test ( expected = IllegalStateException.class )
 	public void thatNotProvidedRequiredBindThrowsException() {
 		Bootstrap.injector( RequirementModule.class );
@@ -80,5 +106,12 @@ public class TestRequiredProvidedBinds {
 		} catch ( Throwable e ) {
 			fail( "Expected another exception but got: " + e );
 		}
+	}
+
+	@Test
+	public void thatAnExplicitBindReplacesTheProvidedImplementation() {
+		Injector injector = Bootstrap.injector( ExplicitBindBundle.class );
+		ExampleService s = injector.resolve( dependency( ExampleService.class ) );
+		assertTrue( s instanceof ExplicitExampleService );
 	}
 }

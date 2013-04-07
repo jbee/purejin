@@ -28,6 +28,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Inspect;
 import se.jbee.inject.bootstrap.Inspector;
 import se.jbee.inject.util.Provider;
+import se.jbee.inject.util.Scoped;
 import se.jbee.inject.util.Typecast;
 
 /**
@@ -63,6 +64,7 @@ public class TestInspectorBinds {
 			bind( all().methods().returnTypeIn( packageAndSubPackagesOf( Injector.class ) ) ).in(
 					InspectorBindsImplementor3.class );
 			bind( all().methods() ).in( new InspectorBindsImplementor4( STATE ) );
+			per( Scoped.INJECTION ).bind( all().methods() ).in( FactoryImpl.class );
 		}
 
 		static int staticFactoryMethod() {
@@ -71,6 +73,15 @@ public class TestInspectorBinds {
 
 		static long staticFactoryMethodWithParameters( int factor ) {
 			return factor * 2L;
+		}
+	}
+
+	static class FactoryImpl {
+
+		byte i = 0;
+
+		byte throwAwayInstanceFactoryMethod() {
+			return i++;
 		}
 	}
 
@@ -202,5 +213,14 @@ public class TestInspectorBinds {
 	@Test
 	public void thatMethodsAreBoundToSpecificInstance() {
 		assertSame( STATE, injector.resolve( dependency( StringBuffer.class ) ) );
+	}
+
+	@Test
+	public void thatDeclaredScopeIsUsedForInspectedBindings() {
+		byte first = injector.resolve( dependency( byte.class ) );
+		byte second = injector.resolve( dependency( byte.class ) );
+		assertEquals( first + 1, second );
+		byte third = injector.resolve( dependency( byte.class ) );
+		assertEquals( second + 1, third );
 	}
 }

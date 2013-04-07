@@ -29,11 +29,6 @@ public enum DeclarationType
 	IMPLICIT,
 
 	/**
-	 * 
-	 */
-	PROVIDED,
-
-	/**
 	 * Used to provide a default of required parts of a module that can be replaced *once* to
 	 * customize behavior.
 	 * 
@@ -41,6 +36,12 @@ public enum DeclarationType
 	 * replacement for it.
 	 */
 	DEFAULT,
+
+	/**
+	 * 
+	 */
+	PROVIDED,
+
 	/**
 	 * A auto-bind has been used. That is binding a class or instance to the exact type as
 	 * {@link #EXPLICIT} and to all its super-classes and -interfaces as a {@link #AUTO} bound bind.
