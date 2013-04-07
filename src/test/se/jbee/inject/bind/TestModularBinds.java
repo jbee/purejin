@@ -36,8 +36,6 @@ public class TestModularBinds {
 		WORKER_1
 	}
 
-	//TODO test with multiple chosen options
-
 	private static class ModularBindsBundle
 			extends BootstrapperBundle {
 
