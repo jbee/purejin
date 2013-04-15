@@ -78,7 +78,7 @@ public enum BuildinBundle
 
 		@Override
 		protected void declare() {
-			per( DEPENDENCY_TYPE ).starbind( List.class ).to( SuppliedBy.LIST_BRIDGE );
+			per( DEPENDENCY ).starbind( List.class ).to( SuppliedBy.LIST_BRIDGE );
 		}
 
 	}
@@ -88,7 +88,7 @@ public enum BuildinBundle
 
 		@Override
 		protected void declare() {
-			per( DEPENDENCY_TYPE ).starbind( Set.class ).to( SuppliedBy.SET_BRIDGE );
+			per( DEPENDENCY ).starbind( Set.class ).to( SuppliedBy.SET_BRIDGE );
 		}
 
 	}

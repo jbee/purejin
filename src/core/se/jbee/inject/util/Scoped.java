@@ -27,9 +27,10 @@ public class Scoped {
 	}
 
 	public static final KeyDeduction DEPENDENCY_TYPE_KEY = new DependencyTypeAsKey();
+	public static final KeyDeduction DEPENDENCY_INSTANCE_KEY = new DependencyInstanceAsKey();
 	public static final KeyDeduction TARGET_INSTANCE_KEY = new TargetInstanceAsKey();
 	public static final KeyDeduction TARGETED_DEPENDENCY_TYPE_KEY = new ConcatKeysDeduction(
-			DEPENDENCY_TYPE_KEY, TARGET_INSTANCE_KEY );
+			DEPENDENCY_INSTANCE_KEY, TARGET_INSTANCE_KEY );
 
 	/**
 	 * Often called the 'default' or 'prototype'-scope. Asks the {@link Injectable} once per
@@ -48,6 +49,7 @@ public class Scoped {
 	public static final Scope THREAD = new ThreadScope( new ThreadLocal<Repository>(), APPLICATION );
 
 	public static final Scope DEPENDENCY_TYPE = uniqueBy( DEPENDENCY_TYPE_KEY );
+	public static final Scope DEPENDENCY_INSTANCE = uniqueBy( DEPENDENCY_INSTANCE_KEY );
 	public static final Scope TARGET_INSTANCE = uniqueBy( TARGET_INSTANCE_KEY );
 	public static final Scope DEPENDENCY = uniqueBy( TARGETED_DEPENDENCY_TYPE_KEY );
 
@@ -258,6 +260,25 @@ public class Scoped {
 			return "dependendy-type";
 		}
 
+	}
+
+	private static final class DependencyInstanceAsKey
+			implements KeyDeduction {
+
+		DependencyInstanceAsKey() {
+			// make visible
+		}
+
+		@Override
+		public <T> String deduceKey( Demand<T> demand ) {
+			return demand.getDependency().getName().toString() + "@"
+					+ demand.getDependency().getType().toString();
+		}
+
+		@Override
+		public String toString() {
+			return "dependendy-type";
+		}
 	}
 
 	// e.g. get receiver class from dependency -to be reusable the provider could offer a identity --> a wrapper class would be needed anyway so maybe best is to have quite similar impl. all using a identity hash-map

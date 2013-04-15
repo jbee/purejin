@@ -76,6 +76,8 @@ public class TestMultibindBinds {
 		Injector injector = Bootstrap.injector( MultibindBindsBundle.class );
 		List<Integer> foos = injector.resolve( dependency( listTypeOf( Integer.class ) ).named( foo ) );
 		assertEqualSets( new Integer[] { 2, 3 }, foos.toArray() );
+		List<Integer> bars = injector.resolve( dependency( listTypeOf( Integer.class ) ).named( bar ) );
+		assertEqualSets( new Integer[] { 4, 5 }, bars.toArray() );
 	}
 
 	@Test
@@ -83,6 +85,8 @@ public class TestMultibindBinds {
 		Injector injector = Bootstrap.injector( MultibindBindsBundle.class );
 		Set<Integer> foos = injector.resolve( dependency( setTypeOf( Integer.class ) ).named( foo ) );
 		assertEqualSets( new Integer[] { 2, 3 }, foos.toArray() );
+		Set<Integer> bars = injector.resolve( dependency( setTypeOf( Integer.class ) ).named( bar ) );
+		assertEqualSets( new Integer[] { 4, 5 }, bars.toArray() );
 	}
 
 }
