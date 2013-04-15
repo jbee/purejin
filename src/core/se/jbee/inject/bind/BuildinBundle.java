@@ -6,7 +6,6 @@
 package se.jbee.inject.bind;
 
 import static se.jbee.inject.util.Scoped.DEPENDENCY;
-import static se.jbee.inject.util.Scoped.DEPENDENCY_TYPE;
 import static se.jbee.inject.util.Scoped.TARGET_INSTANCE;
 
 import java.util.Collection;
@@ -98,8 +97,7 @@ public enum BuildinBundle
 
 		@Override
 		protected void declare() {
-			asDefault().per( DEPENDENCY_TYPE ).starbind( Collection.class ).toParametrized(
-					List.class );
+			asDefault().per( DEPENDENCY ).starbind( Collection.class ).toParametrized( List.class );
 		}
 	}
 
