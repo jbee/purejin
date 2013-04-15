@@ -133,7 +133,7 @@ public final class SuppliedBy {
 		@Override
 		public final T supply( Dependency<? super T> dependency, Injector injector ) {
 			Type<?> elementType = dependency.getType().parameter( 0 );
-			return bridge( supplyArray( dependency.anyTyped( elementType.getArrayType() ), injector ) );
+			return bridge( supplyArray( dependency.typed( elementType.getArrayType() ), injector ) );
 		}
 
 		private static <E> E[] supplyArray( Dependency<E[]> elementType, Injector resolver ) {
