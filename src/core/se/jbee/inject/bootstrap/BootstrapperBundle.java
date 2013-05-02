@@ -5,7 +5,6 @@
  */
 package se.jbee.inject.bootstrap;
 
-import se.jbee.inject.util.Metaclass;
 
 /**
  * The default utility {@link Bundle} that is a {@link Bootstrap} as well so that bindings can be
@@ -81,7 +80,7 @@ public abstract class BootstrapperBundle
 	}
 
 	protected static Module newInstance( Class<? extends Module> module ) {
-		return Invoke.constructor( Metaclass.accessible( Inspect.noArgsConstructor( module ) ) );
+		return Bootstrap.instance( module );
 	}
 
 	@Override

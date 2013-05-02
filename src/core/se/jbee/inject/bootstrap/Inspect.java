@@ -213,7 +213,7 @@ public class Inspect
 	 * 
 	 * @param declaringClass
 	 *            constructed type
-	 * @return The no-args constructor (if available) or the 1st in sequence of declaration.
+	 * @return The constructor with the most parameters.
 	 * @throws NoSuchMethodException
 	 *             in case the type is not constructible (has no constructors at all)
 	 */
@@ -223,14 +223,14 @@ public class Inspect
 			throw new RuntimeException( new NoSuchMethodException(
 					declaringClass.getCanonicalName() ) );
 		}
-		int noArgsIndex = 0;
+		Constructor<?> mostArgConstructor = constructors[0];
 		for ( int i = 0; i < constructors.length; i++ ) {
-			if ( constructors[i].getParameterTypes().length == 0 ) {
-				noArgsIndex = i;
+			if ( constructors[i].getParameterTypes().length > mostArgConstructor.getParameterTypes().length ) {
+				mostArgConstructor = constructors[i];
 			}
 		}
 		@SuppressWarnings ( "unchecked" )
-		Constructor<T> c = (Constructor<T>) constructors[noArgsIndex];
+		Constructor<T> c = (Constructor<T>) mostArgConstructor;
 		return c;
 	}
 
