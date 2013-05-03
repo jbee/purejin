@@ -7,6 +7,7 @@ package se.jbee.inject.bind;
 
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.parameterTypes;
+import static se.jbee.inject.Type.raw;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -53,14 +54,6 @@ public final class SuppliedBy {
 		return (Supplier<T>) REQUIRED;
 	}
 
-	public static <T> Supplier<T> provider( Provider<T> provider ) {
-		return new ProviderAsSupplier<T>( provider );
-	}
-
-	public static <T> Supplier<Provider<T>> constant( Provider<T> provider ) {
-		return new ConstantSupplier<Provider<T>>( provider );
-	}
-
 	public static <T> Supplier<T> constant( T constant ) {
 		return new ConstantSupplier<T>( constant );
 	}
@@ -69,16 +62,17 @@ public final class SuppliedBy {
 		return new ReferenceSupplier<T>( type );
 	}
 
+	public static <E> Supplier<E[]> references( Class<E[]> arrayType,
+			Supplier<? extends E>[] elements ) {
+		return new ReferencesSupplier<E>( arrayType, elements );
+	}
+
 	public static <T> Supplier<T> instance( Instance<T> instance ) {
 		return new InstanceSupplier<T>( instance );
 	}
 
 	public static <T> Supplier<T> parametrizedInstance( Instance<T> instance ) {
 		return new ParametrizedInstanceSupplier<T>( instance );
-	}
-
-	public static <E> Supplier<E[]> elements( Class<E[]> arrayType, Supplier<? extends E>[] elements ) {
-		return new ElementsSupplier<E>( arrayType, elements );
 	}
 
 	public static <T> Supplier<T> method( Type<T> returnType, Method factory, Object instance,
@@ -116,7 +110,7 @@ public final class SuppliedBy {
 	}
 
 	public static <T> Provider<T> lazyProvider( Dependency<T> dependency, Injector context ) {
-		return new LazyResolvedDependencyProvider<T>( dependency, context );
+		return new LazyProvider<T>( dependency, context );
 	}
 
 	private SuppliedBy() {
@@ -244,13 +238,13 @@ public final class SuppliedBy {
 	 * 
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	private static final class ElementsSupplier<E>
+	private static final class ReferencesSupplier<E>
 			implements Supplier<E[]> {
 
 		private final Class<E[]> arrayType;
 		private final Supplier<? extends E>[] elements;
 
-		ElementsSupplier( Class<E[]> arrayType, Supplier<? extends E>[] elements ) {
+		ReferencesSupplier( Class<E[]> arrayType, Supplier<? extends E>[] elements ) {
 			super();
 			this.arrayType = arrayType;
 			this.elements = elements;
@@ -261,7 +255,7 @@ public final class SuppliedBy {
 		public E[] supply( Dependency<? super E[]> dependency, Injector injector ) {
 			E[] res = (E[]) Array.newInstance( arrayType.getComponentType(), elements.length );
 			int i = 0;
-			final Dependency<E> elementDependency = (Dependency<E>) dependency.typed( Type.raw(
+			final Dependency<E> elementDependency = (Dependency<E>) dependency.typed( raw(
 					arrayType ).elementType() );
 			for ( Supplier<? extends E> e : elements ) {
 				res[i++] = e.supply( elementDependency, injector );
@@ -334,23 +328,6 @@ public final class SuppliedBy {
 		}
 	}
 
-	private static final class ProviderAsSupplier<T>
-			implements Supplier<T> {
-
-		private final Provider<T> provider;
-
-		ProviderAsSupplier( Provider<T> provider ) {
-			super();
-			this.provider = provider;
-		}
-
-		@Override
-		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			return provider.provide();
-		}
-
-	}
-
 	private static final class ProviderSupplier
 			implements Supplier<Provider<?>> {
 
@@ -369,13 +346,13 @@ public final class SuppliedBy {
 
 	}
 
-	private static final class LazyResolvedDependencyProvider<T>
+	private static final class LazyProvider<T>
 			implements Provider<T> {
 
 		private final Dependency<T> dependency;
 		private final Injector injector;
 
-		LazyResolvedDependencyProvider( Dependency<T> dependency, Injector injector ) {
+		LazyProvider( Dependency<T> dependency, Injector injector ) {
 			super();
 			this.dependency = dependency;
 			this.injector = injector;
@@ -395,9 +372,6 @@ public final class SuppliedBy {
 	/**
 	 * Adapter to a simpler API that will not need any {@link Injector} to supply it's value in any
 	 * case.
-	 * 
-	 * @author Jan Bernitt (jan@jbee.se)
-	 * 
 	 */
 	private static final class FactorySupplier<T>
 			implements Supplier<T> {

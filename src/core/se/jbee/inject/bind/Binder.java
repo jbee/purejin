@@ -12,7 +12,6 @@ import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.bind.Configuring.configuring;
 import static se.jbee.inject.bind.SuppliedBy.constant;
 import static se.jbee.inject.bind.SuppliedBy.parametrizedInstance;
-import static se.jbee.inject.bind.SuppliedBy.provider;
 import static se.jbee.inject.util.Metaclass.metaclass;
 
 import java.lang.reflect.Constructor;
@@ -30,7 +29,6 @@ import se.jbee.inject.Target;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Inspector;
 import se.jbee.inject.util.Factory;
-import se.jbee.inject.util.Provider;
 import se.jbee.inject.util.Scoped;
 
 /**
@@ -453,11 +451,6 @@ public class Binder {
 			to( instance( name, type ) );
 		}
 
-		public void to( Provider<? extends T> provider ) {
-			to( provider( provider ) );
-			implicitBindToConstant( provider );
-		}
-
 		public void to( Supplier<? extends T> supplier ) {
 			binder.bind( resource, supplier );
 		}
@@ -490,7 +483,7 @@ public class Binder {
 			if ( metaclass( impl ).undeterminable() ) {
 				throw new IllegalArgumentException( "Not a constructable type: " + impl );
 			}
-			to( SuppliedBy.costructor( binder.bind().inspector.constructorFor( impl ), parameters ) );
+			to( binder.bind().inspector.constructorFor( impl ), parameters );
 		}
 
 		public void toConstructor( Parameter<?>... parameters ) {
@@ -534,14 +527,6 @@ public class Binder {
 			return SuppliedBy.costructor( binder.bind().inspector.constructorFor( instance.getType().getRawType() ) );
 		}
 
-		@SuppressWarnings ( "unchecked" )
-		private <P> void implicitBindToConstant( Provider<P> provider ) {
-			Type<Provider<P>> providerType = (Type<Provider<P>>) Type.supertype( Provider.class,
-					raw( provider.getClass() ) );
-			binder.implicit().bind( defaultInstanceOf( providerType ) ).to(
-					SuppliedBy.constant( provider ) );
-		}
-
 		private <I> void implicitBindToConstructor( Instance<I> instance ) {
 			binder.implicitBindToConstructor( instance );
 		}
@@ -580,7 +565,7 @@ public class Binder {
 		}
 
 		public void to( Supplier<? extends E>[] elements ) {
-			to( SuppliedBy.elements( getType().getRawType(), elements ) );
+			to( SuppliedBy.references( getType().getRawType(), elements ) );
 		}
 
 		@SuppressWarnings ( "unchecked" )
