@@ -11,11 +11,11 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 
 /**
- * A {@linkplain Configuring} value describes a value (bound within an {@link Injector}) that is used
- * to control configuration dependent implementation/injection (CDI). When CDI is used a type is
- * resolved to different named instances dependent on the {@linkplain Configuring} value. To derive
- * the name a actual value is associated with a {@link Naming} strategy is specified together with
- * the {@link Instance} of the controlling value.
+ * A {@linkplain Configuring} value describes a value (bound within an {@link Injector}) that is
+ * used to control configuration dependent implementation/injection (CDI). When CDI is used a type
+ * is resolved to different named instances dependent on the {@linkplain Configuring} value. To
+ * derive the name a actual value is associated with a {@link Naming} strategy is specified together
+ * with the {@link Instance} of the controlling value.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  * 

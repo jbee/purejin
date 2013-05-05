@@ -5,7 +5,6 @@
  */
 package se.jbee.inject.bootstrap;
 
-
 /**
  * The default utility {@link Bundle} that is a {@link Bootstrap} as well so that bindings can be
  * declared nicer.

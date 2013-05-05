@@ -137,6 +137,16 @@ public final class Type<T>
 		this( false, rawType, new Type<?>[0] );
 	}
 
+	@Override
+	public Type<T> getType() {
+		return this;
+	}
+
+	@Override
+	public <E> Type<E> typed( Type<E> type ) {
+		return type;
+	}
+
 	public Type<? extends T> asLowerBound() {
 		return lowerBound( true );
 	}

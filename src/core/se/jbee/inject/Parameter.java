@@ -30,7 +30,8 @@ import java.lang.reflect.Constructor;
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
-public interface Parameter<T> {
+public interface Parameter<T>
+		extends Typed<T> {
 
 	boolean isAssignableTo( Type<?> type );
 }

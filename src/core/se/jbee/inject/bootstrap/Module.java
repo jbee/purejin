@@ -29,4 +29,6 @@ public interface Module {
 	 */
 	void declare( Bindings bindings, Inspector inspector );
 
+	//OPEN Inspector could be passed to Module by convention impl if that has such a constructor
+
 }

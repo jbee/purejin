@@ -22,7 +22,7 @@ import se.jbee.inject.DIRuntimeException.MoreFrequentExpiryException;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Dependency<T>
-		implements Typed<T>, Named, Parameter<T>, Iterable<Injection> {
+		implements Named, Parameter<T>, Iterable<Injection> {
 
 	/**
 	 * A empty {@link Injection} hierarchy. It is used whenever the {@link Dependency} does not

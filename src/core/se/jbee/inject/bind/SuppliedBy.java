@@ -5,9 +5,10 @@
  */
 package se.jbee.inject.bind;
 
-import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Type.parameterTypes;
 import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.bind.Parameterize.parameterizations;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -28,9 +29,9 @@ import se.jbee.inject.Parameter;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Invoke;
-import se.jbee.inject.util.Argument;
 import se.jbee.inject.util.Factory;
 import se.jbee.inject.util.Metaclass;
+import se.jbee.inject.util.Parameterization;
 import se.jbee.inject.util.Provider;
 
 /**
@@ -40,7 +41,8 @@ import se.jbee.inject.util.Provider;
  */
 public final class SuppliedBy {
 
-	private static final Object[] NO_ARGS = new Object[0];
+	private static final Parameterization<?>[] NO_PARAMS = new Parameterization<?>[0];
+	static final Object[] NO_ARGS = new Object[0];
 
 	private static final Supplier<?> REQUIRED = new RequiredSupplier<Object>();
 
@@ -71,34 +73,37 @@ public final class SuppliedBy {
 		return new InstanceSupplier<T>( instance );
 	}
 
+	public static <T> Supplier<T> dependency( Dependency<T> dependency ) {
+		return new DependencySupplier<T>( dependency );
+	}
+
 	public static <T> Supplier<T> parametrizedInstance( Instance<T> instance ) {
 		return new ParametrizedInstanceSupplier<T>( instance );
 	}
 
-	public static <T> Supplier<T> method( Type<T> returnType, Method factory, Object instance,
+	public static <T> Supplier<T> method( Type<T> returnType, Object instance, Method factory,
 			Parameter<?>... parameters ) {
-		if ( !Type.returnType( factory ).isAssignableTo( returnType ) ) {
+		final Type<?> actualReturnType = Type.returnType( factory );
+		if ( !actualReturnType.isAssignableTo( returnType ) ) {
 			throw new IllegalArgumentException( "The factory methods methods return type `"
-					+ Type.returnType( factory ) + "` is not assignable to: " + returnType );
+					+ actualReturnType + "` is not assignable to: " + returnType );
 		}
 		if ( instance != null && factory.getDeclaringClass() != instance.getClass() ) {
 			throw new IllegalArgumentException(
 					"The factory method and the instance it is invoked on have to be the same class." );
 		}
-		Argument<?>[] arguments = Argument.arguments( Type.parameterTypes( factory ), parameters );
-		return new FactoryMethodSupplier<T>( returnType, factory, instance, arguments );
+		Parameterization<?>[] params = parameterizations( parameterTypes( factory ), parameters );
+		return new MethodSupplier<T>( returnType, factory, instance, params );
 	}
 
 	public static <T> Supplier<T> costructor( Constructor<T> constructor,
 			Parameter<?>... parameters ) {
 		final Class<?>[] params = constructor.getParameterTypes();
 		if ( params.length == 0 ) {
-			return new StaticConstructorSupplier<T>( constructor, NO_ARGS );
+			return new ConstructorSupplier<T>( constructor, NO_PARAMS );
 		}
-		Argument<?>[] arguments = Argument.arguments( parameterTypes( constructor ), parameters );
-		return Argument.allConstants( arguments )
-			? new StaticConstructorSupplier<T>( constructor, Argument.constantsFrom( arguments ) )
-			: new ConstructorSupplier<T>( constructor, arguments );
+		return new ConstructorSupplier<T>( constructor, parameterizations(
+				parameterTypes( constructor ), parameters ) );
 	}
 
 	public static <T> Supplier<T> factory( Factory<T> factory ) {
@@ -111,6 +116,20 @@ public final class SuppliedBy {
 
 	public static <T> Provider<T> lazyProvider( Dependency<T> dependency, Injector context ) {
 		return new LazyProvider<T>( dependency, context );
+	}
+
+	public static <T> Object[] resolve( Dependency<? super T> dependency, Injector injector,
+			Parameterization<?>[] params ) {
+		Object[] args = new Object[params.length];
+		for ( int i = 0; i < params.length; i++ ) {
+			Parameterization<?> p = params[i];
+			args[i] = resolve( p, dependency, injector );
+		}
+		return args;
+	}
+
+	private static <T> T resolve( Parameterization<T> param, Dependency<?> parent, Injector injector ) {
+		return param.supply( parent.instanced( anyOf( param.getType() ) ), injector );
 	}
 
 	private SuppliedBy() {
@@ -208,6 +227,27 @@ public final class SuppliedBy {
 			return new HashSet<E>( Arrays.asList( elements ) );
 		}
 
+	}
+
+	private static final class DependencySupplier<T>
+			implements Supplier<T> {
+
+		private final Dependency<T> dependency;
+
+		DependencySupplier( Dependency<T> dependency ) {
+			super();
+			this.dependency = dependency;
+		}
+
+		@Override
+		public T supply( Dependency<? super T> dependency, Injector injector ) {
+			return injector.resolve( this.dependency );
+		}
+
+		@Override
+		public String toString() {
+			return dependency.toString();
+		}
 	}
 
 	private static final class ConstantSupplier<T>
@@ -390,64 +430,44 @@ public final class SuppliedBy {
 
 	}
 
-	/**
-	 * A simple version for all the constructors where we know all arguments as constants.
-	 */
-	private static final class StaticConstructorSupplier<T>
-			implements Supplier<T> {
-
-		private final Constructor<T> constructor;
-		private final Object[] arguments;
-
-		StaticConstructorSupplier( Constructor<T> constructor, Object[] arguments ) {
-			super();
-			this.constructor = Metaclass.accessible( constructor );
-			this.arguments = arguments;
-		}
-
-		@Override
-		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			return Invoke.constructor( constructor, arguments );
-		}
-
-	}
-
 	private static final class ConstructorSupplier<T>
 			implements Supplier<T> {
 
 		private final Constructor<T> constructor;
-		private final Argument<?>[] arguments;
+		private final Parameterization<?>[] params;
 
-		ConstructorSupplier( Constructor<T> constructor, Argument<?>[] arguments ) {
+		ConstructorSupplier( Constructor<T> constructor, Parameterization<?>[] params ) {
 			super();
 			this.constructor = Metaclass.accessible( constructor );
-			this.arguments = arguments;
+			this.params = params;
 		}
 
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			return Invoke.constructor( constructor,
-					Argument.resolve( dependency, injector, arguments ) );
+			final Object[] args = params.length == 0
+				? NO_ARGS
+				: resolve( dependency, injector, params );
+			return Invoke.constructor( constructor, args );
 		}
 
 	}
 
-	private static final class FactoryMethodSupplier<T>
+	private static final class MethodSupplier<T>
 			implements Supplier<T> {
 
 		private final Type<T> returnType;
 		private final Method factory;
 		private final Object instance;
-		private final Argument<?>[] arguments;
+		private final Parameterization<?>[] params;
 		private final boolean instanceMethod;
 
-		FactoryMethodSupplier( Type<T> returnType, Method factory, Object instance,
-				Argument<?>[] arguments ) {
+		MethodSupplier( Type<T> returnType, Method factory, Object instance,
+				Parameterization<?>[] params ) {
 			super();
 			this.returnType = returnType;
 			this.factory = Metaclass.accessible( factory );
 			this.instance = instance;
-			this.arguments = arguments;
+			this.params = params;
 			this.instanceMethod = !Modifier.isStatic( factory.getModifiers() );
 		}
 
@@ -455,9 +475,11 @@ public final class SuppliedBy {
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
 			Object owner = instance;
 			if ( instanceMethod && owner == null ) {
-				owner = injector.resolve( dependency( factory.getDeclaringClass() ) );
+				owner = injector.resolve( Dependency.dependency( factory.getDeclaringClass() ) );
 			}
-			final Object[] args = Argument.resolve( dependency, injector, arguments );
+			final Object[] args = params.length == 0
+				? NO_ARGS
+				: resolve( dependency, injector, params );
 			return returnType.getRawType().cast( Invoke.method( factory, owner, args ) );
 		}
 

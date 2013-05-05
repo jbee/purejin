@@ -4,25 +4,25 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.util.Argument.asType;
-import static se.jbee.inject.util.Argument.constant;
+import static se.jbee.inject.bind.Parameterize.asType;
+import static se.jbee.inject.bind.Parameterize.constant;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 
 import org.junit.Test;
 
+import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
+import se.jbee.inject.Supplier;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.util.Argument;
-import se.jbee.inject.util.Suppliable;
+import se.jbee.inject.util.Scoped;
 
 /**
  * The test illustrates how to use {@link Parameter}s to give hints which resources should be
@@ -43,8 +43,11 @@ public class TestConstructorParameterBinds {
 
 	private static class Foo {
 
+		final Integer baz;
+
 		@SuppressWarnings ( "unused" )
 		Foo( String bar, Integer baz ) {
+			this.baz = baz;
 			// no use
 		}
 	}
@@ -84,6 +87,22 @@ public class TestConstructorParameterBinds {
 		}
 	}
 
+	private static class IncrementingSupplier
+			implements Supplier<Integer> {
+
+		int c = 0;
+
+		IncrementingSupplier() {
+			// make visible
+		}
+
+		@Override
+		public Integer supply( Dependency<? super Integer> dependency, Injector injector ) {
+			return c++;
+		}
+
+	}
+
 	private static class ParameterConstructorBindsModule
 			extends BinderModule {
 
@@ -101,22 +120,12 @@ public class TestConstructorParameterBinds {
 			bind( Serializable.class ).to( Integer.class ); // should not be used
 			bind( Qux.class ).toConstructor( asType( CharSequence.class, y ),
 					constant( Number.class, 1980 ) );
+			per( Scoped.INJECTION ).bind( named( "inc" ), Foo.class ).toConstructor(
+					Parameterize.supplier( raw( Integer.class ), new IncrementingSupplier() ) );
 		}
 	}
 
-	private static class ConsatntParameterConstructorBindsModule
-			extends BinderModule {
-
-		@Override
-		protected void declare() {
-			bind( named( "const" ), Baz.class ).toConstructor(
-					Argument.constant( String.class, "1st" ),
-					Argument.constant( String.class, "2nd" ) );
-		}
-
-	}
-
-	private static class WrongParameterConstructorBindsModule
+	private static class FaultyParameterConstructorBindsModule
 			extends BinderModule {
 
 		@Override
@@ -129,59 +138,67 @@ public class TestConstructorParameterBinds {
 	private final Injector injector = Bootstrap.injector( ParameterConstructorBindsModule.class );
 
 	@Test
-	public void thatClassParameterIsUnderstood() {
+	public void thatClassParameterIsArranged() {
 		assertThat( injector.resolve( dependency( Foo.class ) ), notNullValue() );
 	}
 
 	@Test
-	public void thatTypeParameterIsUnderstood() {
+	public void thatTypeParameterIsArranged() {
 		assertThat( injector.resolve( dependency( Bar.class ) ), notNullValue() );
 	}
 
 	@Test
-	public void thatInstanceParameterIsUnderstood() {
+	public void thatInstanceParameterIsArranged() {
 		Bar bar = injector.resolve( dependency( Bar.class ) );
 		assertThat( bar.foo, is( "y" ) );
 	}
 
 	/**
-	 * We can see that {@link Argument#asType(Class, Parameter)} works because the instance y would
-	 * also been assignable to the 1st parameter of type {@link Serializable} (in {@link Qux}) but
-	 * since we typed it as a {@link CharSequence} it no longer is assignable to 1st argument and
-	 * will be used as 2nd argument where the as well {@link Serializable} {@link Number} constant
-	 * used as 2nd {@link Parameter} is used for as the 1st argument.
+	 * We can see that {@link Parameterize#asType(Class, Parameter)} works because the instance y
+	 * would also been assignable to the 1st parameter of type {@link Serializable} (in {@link Qux})
+	 * but since we typed it as a {@link CharSequence} it no longer is assignable to 1st argument
+	 * and will be used as 2nd argument where the as well {@link Serializable} {@link Number}
+	 * constant used as 2nd {@link Parameter} is used for as the 1st argument.
 	 */
 	@Test
-	public void thatParameterAsAnotherTypeIsUnderstood() {
+	public void thatParameterAsAnotherTypeIsArranged() {
 		Qux qux = injector.resolve( dependency( Qux.class ) );
 		assertEquals( "y", qux.sequence );
 	}
 
 	/**
-	 * @see #thatParameterAsAnotherTypeIsUnderstood()
+	 * @see #thatParameterAsAnotherTypeIsArranged()
 	 */
 	@Test
-	public void thatConstantParameterIsUnderstood() {
+	public void thatConstantParameterIsArranged() {
 		Qux qux = injector.resolve( dependency( Qux.class ) );
 		assertEquals( 1980, qux.value );
 	}
 
 	@Test
-	public void thatReoccuringTypesAreUnderstoodAsOccuringAfterAnother() {
+	public void thatReoccuringTypesAreArrangedAsOccuringAfterAnother() {
 		Baz baz = injector.resolve( dependency( Baz.class ) );
 		assertThat( baz.foo, is( "y" ) );
 		assertThat( "when x alignment after another is broken", baz.bar, is( "y" ) );
 	}
 
 	@Test ( expected = IllegalArgumentException.class )
-	public void thatParametersNotUnderstoodThrowsException() {
-		Bootstrap.injector( WrongParameterConstructorBindsModule.class );
+	public void thatParametersNotArrangedThrowsException() {
+		Bootstrap.injector( FaultyParameterConstructorBindsModule.class );
 	}
 
+	/**
+	 * As an example for a custom {@link Supplier} used as {@link Parameter} a special {@link Foo}
+	 * instance "inc" is parameterized with such a parameter. Therefore the passed {@link Integer}
+	 * value increments with every injection.
+	 */
 	@Test
-	public void thatConstantsAreJustUsedAsConstructorArgumentsWhenPossible() {
-		Suppliable<?>[] suppliables = Bootstrap.suppliables( ConsatntParameterConstructorBindsModule.class );
-		assertThat( suppliables.length, is( 1 ) );
-		assertTrue( suppliables[0].supplier.getClass().getSimpleName().contains( "Static" ) ); // don't want to expose class so we check for name with a string
+	public void thatCustomParameterIsArranged() {
+		Dependency<Foo> incFooDependency = dependency( Foo.class ).named( "inc" );
+		Foo foo = injector.resolve( incFooDependency );
+		assertEquals( 0, foo.baz.intValue() );
+
+		foo = injector.resolve( incFooDependency );
+		assertEquals( 1, foo.baz.intValue() );
 	}
 }

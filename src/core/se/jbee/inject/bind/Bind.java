@@ -37,6 +37,8 @@ public final class Bind {
 	final Scope scope;
 	final Target target;
 
+	//OPEN extend Target to Resource ???
+
 	private Bind( Bindings bindings, Inspector inspector, Source source, Scope scope, Target target ) {
 		super();
 		this.bindings = bindings;
@@ -103,7 +105,7 @@ public final class Bind {
 	}
 
 	private static class AutobindBindings
-			implements Bindings {
+			implements Bindings { //OPEN can be done as some kind of expansion from one Binding to a list of them 
 
 		private final Bindings delegate;
 

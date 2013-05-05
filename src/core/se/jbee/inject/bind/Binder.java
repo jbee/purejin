@@ -264,7 +264,7 @@ public class Binder {
 		private <T> void bind( Type<T> returnType, Method method, Object instance,
 				Parameter<?>[] parameters ) {
 			binder.bind( inspector.nameFor( method ), returnType ).to(
-					SuppliedBy.method( returnType, method, instance, parameters ) );
+					SuppliedBy.method( returnType, instance, method, parameters ) );
 		}
 
 		private <T> void bind( Constructor<T> constructor, Parameter<?>... parameters ) {

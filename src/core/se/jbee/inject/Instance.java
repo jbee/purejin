@@ -16,7 +16,7 @@ import static se.jbee.inject.Type.raw;
  * 
  */
 public final class Instance<T>
-		implements Typed<T>, Named, PreciserThan<Instance<?>>, Parameter<T> {
+		implements Named, Parameter<T>, PreciserThan<Instance<?>> {
 
 	/**
 	 * When a wildcard-type is used as bound instance type the bind will be added to all concrete
