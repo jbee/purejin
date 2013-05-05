@@ -92,10 +92,9 @@ public abstract class ServiceModule
 	}
 
 	@Override
-	public void declare( Bindings bindings, Inspector inspector ) {
+	public void declare( Bindings bindings ) {
 		Bootstrap.nonnullThrowsReentranceException( binder );
-		binder = Binder.create( Bind.create( bindings, inspector, source( getClass() ),
-				Scoped.APPLICATION ) );
+		binder = Binder.create( Bind.create( bindings, source( getClass() ), Scoped.APPLICATION ) );
 		declare();
 	}
 

@@ -134,11 +134,6 @@ public class Binder {
 		return new ConfigBinder<T>( root, type );
 	}
 
-	protected final <T> void bind( Resource<T> resource, Supplier<? extends T> supplier ) {
-		Bind b = bind();
-		b.bindings.add( resource, supplier, b.scope, b.source );
-	}
-
 	protected Binder on( Bind bind ) {
 		return new Binder( root, bind );
 	}
@@ -152,7 +147,7 @@ public class Binder {
 		if ( metaclass( impl ).undeterminable() ) {
 			return;
 		}
-		Constructor<I> constructor = bind().inspector.constructorFor( impl );
+		Constructor<I> constructor = bind().getInspector().constructorFor( impl );
 		if ( constructor != null ) {
 			implicit().with( Target.ANY ).bind( instance ).to( constructor );
 		}
@@ -335,7 +330,7 @@ public class Binder {
 			extends TargetedBinder {
 
 		ScopedBinder( RootBinder root, Bind bind ) {
-			super( root, bind ); // bindings, inspector, source, scope, Target.ANY );
+			super( root, bind );
 		}
 
 		public TargetedBinder injectingInto( Class<?> target ) {
@@ -452,7 +447,7 @@ public class Binder {
 		}
 
 		public void to( Supplier<? extends T> supplier ) {
-			binder.bind( resource, supplier );
+			binder.bind().to( resource, supplier );
 		}
 
 		public void to( T constant ) {
@@ -476,14 +471,14 @@ public class Binder {
 		}
 
 		public void toConstructor() {
-			to( binder.bind().inspector.constructorFor( resource.getType().getRawType() ) );
+			to( binder.bind().getInspector().constructorFor( resource.getType().getRawType() ) );
 		}
 
 		public void toConstructor( Class<? extends T> impl, Parameter<?>... parameters ) {
 			if ( metaclass( impl ).undeterminable() ) {
 				throw new IllegalArgumentException( "Not a constructable type: " + impl );
 			}
-			to( binder.bind().inspector.constructorFor( impl ), parameters );
+			to( binder.bind().getInspector().constructorFor( impl ), parameters );
 		}
 
 		public void toConstructor( Parameter<?>... parameters ) {
@@ -524,7 +519,8 @@ public class Binder {
 				throw new IllegalArgumentException( "Interface type linked in a loop: "
 						+ resource.getInstance() + " > " + instance );
 			}
-			return SuppliedBy.costructor( binder.bind().inspector.constructorFor( instance.getType().getRawType() ) );
+			return SuppliedBy.costructor( binder.bind().getInspector().constructorFor(
+					instance.getType().getRawType() ) );
 		}
 
 		private <I> void implicitBindToConstructor( Instance<I> instance ) {

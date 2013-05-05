@@ -6,6 +6,7 @@
 package se.jbee.inject.bind;
 
 import static se.jbee.inject.Source.source;
+import static se.jbee.inject.bootstrap.Bindings.bindings;
 import se.jbee.inject.Scope;
 import se.jbee.inject.bind.Binder.RootBinder;
 import se.jbee.inject.bootstrap.Bindings;
@@ -24,6 +25,7 @@ import se.jbee.inject.util.Scoped;
 public abstract class InitializedBinder
 		extends RootBinder {
 
+	private Boolean initialized;
 	private Bind bind;
 
 	protected InitializedBinder() {
@@ -31,7 +33,7 @@ public abstract class InitializedBinder
 	}
 
 	protected InitializedBinder( Scope inital ) {
-		super( Bind.create( null, Inspect.DEFAULT, source( InitializedBinder.class ), inital ) );
+		super( Bind.create( bindings( Inspect.DEFAULT ), source( InitializedBinder.class ), inital ) );
 		this.bind = super.bind();
 	}
 
@@ -40,9 +42,11 @@ public abstract class InitializedBinder
 		return bind;
 	}
 
-	protected final void init( Bindings bindings, Inspector inspector ) {
-		Bootstrap.nonnullThrowsReentranceException( bind.bindings );
-		this.bind = super.bind().into( bindings ).using( inspector ).with( source( getClass() ) );
+	protected final void init( Bindings bindings ) {
+		Bootstrap.nonnullThrowsReentranceException( initialized );
+		this.bind = super.bind().into( bindings ).using( bindings.getInspector() ).with(
+				source( getClass() ) );
+		initialized = true;
 	}
 
 }

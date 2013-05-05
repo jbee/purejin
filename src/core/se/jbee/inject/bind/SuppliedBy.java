@@ -118,17 +118,16 @@ public final class SuppliedBy {
 		return new LazyProvider<T>( dependency, context );
 	}
 
-	public static <T> Object[] resolve( Dependency<? super T> dependency, Injector injector,
+	public static <T> Object[] resolve( Dependency<? super T> parent, Injector injector,
 			Parameterization<?>[] params ) {
 		Object[] args = new Object[params.length];
 		for ( int i = 0; i < params.length; i++ ) {
-			Parameterization<?> p = params[i];
-			args[i] = resolve( p, dependency, injector );
+			args[i] = resolve( parent, injector, params[i] );
 		}
 		return args;
 	}
 
-	private static <T> T resolve( Parameterization<T> param, Dependency<?> parent, Injector injector ) {
+	public static <T> T resolve( Dependency<?> parent, Injector injector, Parameterization<T> param ) {
 		return param.supply( parent.instanced( anyOf( param.getType() ) ), injector );
 	}
 

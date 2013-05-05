@@ -38,8 +38,8 @@ public abstract class BinderModule
 	}
 
 	@Override
-	public final void declare( Bindings bindings, Inspector inspector ) {
-		init( bindings, inspector );
+	public final void declare( Bindings bindings ) {
+		init( bindings );
 		declare();
 	}
 

@@ -5,7 +5,6 @@
  */
 package se.jbee.inject.bootstrap;
 
-import static se.jbee.inject.util.Metaclass.metaclass;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,7 +20,6 @@ import se.jbee.inject.Scope;
 import se.jbee.inject.Source;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
-import se.jbee.inject.bootstrap.Link.ListBindings;
 
 /**
  * Default data strature to represent a 4-tuple created from {@link Bindings}.
@@ -72,26 +70,6 @@ public final class Binding<T>
 	@Override
 	public String toString() {
 		return resource + " / " + scope + " / " + source;
-	}
-
-	public static Binding<?>[] expand( Inspector inspector, Module... modules ) {
-		Set<Class<?>> declared = new HashSet<Class<?>>();
-		Set<Class<?>> multimodals = new HashSet<Class<?>>();
-		ListBindings bindings = new ListBindings();
-		for ( Module m : modules ) {
-			Class<? extends Module> ns = m.getClass();
-			final boolean hasBeenDeclared = declared.contains( ns );
-			if ( hasBeenDeclared ) {
-				if ( !metaclass( ns ).monomodal() ) {
-					multimodals.add( ns );
-				}
-			}
-			if ( !hasBeenDeclared || multimodals.contains( ns ) ) {
-				m.declare( bindings, inspector );
-				declared.add( ns );
-			}
-		}
-		return Array.of( bindings.list, Binding.class );
 	}
 
 	/**

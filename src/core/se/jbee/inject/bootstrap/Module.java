@@ -5,8 +5,6 @@
  */
 package se.jbee.inject.bootstrap;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 
 /**
  * {@link Bindings} are defined with {@link Module}s while {@link Bundle} are used to group multiple
@@ -23,12 +21,7 @@ public interface Module {
 	/**
 	 * @param bindings
 	 *            use to declare made bound within this {@link Module}.
-	 * @param inspector
-	 *            the chosen strategy to pick the {@link Constructor}s or {@link Method}s used to
-	 *            create instances.
 	 */
-	void declare( Bindings bindings, Inspector inspector );
-
-	//OPEN Inspector could be passed to Module by convention impl if that has such a constructor
+	void declare( Bindings bindings );
 
 }

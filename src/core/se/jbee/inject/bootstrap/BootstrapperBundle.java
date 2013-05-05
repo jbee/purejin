@@ -102,8 +102,8 @@ public abstract class BootstrapperBundle
 		}
 
 		@Override
-		public void declare( Bindings bindings, Inspector inspector ) {
-			module.declare( bindings, this.inspector );
+		public void declare( Bindings bindings ) {
+			module.declare( bindings.using( inspector ) );
 		}
 
 		@Override

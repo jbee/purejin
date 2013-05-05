@@ -12,7 +12,6 @@ import se.jbee.inject.Scope;
 import se.jbee.inject.Source;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Target;
-import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Inspector;
 
@@ -23,26 +22,18 @@ import se.jbee.inject.bootstrap.Inspector;
  */
 public final class Bind {
 
-	public static Bindings autobinding( Bindings delegate ) {
-		return new AutobindBindings( delegate );
-	}
-
-	public static Bind create( Bindings bindings, Inspector inspector, Source source, Scope scope ) {
-		return new Bind( bindings, inspector, source, scope, Target.ANY );
+	public static Bind create( Bindings bindings, Source source, Scope scope ) {
+		return new Bind( bindings, source, scope, Target.ANY );
 	}
 
 	final Bindings bindings;
-	final Inspector inspector;
 	final Source source;
 	final Scope scope;
 	final Target target;
 
-	//OPEN extend Target to Resource ???
-
-	private Bind( Bindings bindings, Inspector inspector, Source source, Scope scope, Target target ) {
+	private Bind( Bindings bindings, Source source, Scope scope, Target target ) {
 		super();
 		this.bindings = bindings;
-		this.inspector = inspector;
 		this.source = source;
 		this.scope = scope;
 		this.target = target;
@@ -77,55 +68,39 @@ public final class Bind {
 	}
 
 	public Bind using( Inspector inspector ) {
-		return new Bind( bindings, inspector, source, scope, target );
+		return new Bind( bindings.using( inspector ), source, scope, target );
 	}
 
 	public Bind per( Scope scope ) {
-		return new Bind( bindings, inspector, source, scope, target );
+		return new Bind( bindings, source, scope, target );
 	}
 
 	public Bind with( Target target ) {
-		return new Bind( bindings, inspector, source, scope, target );
+		return new Bind( bindings, source, scope, target );
 	}
 
 	public Bind into( Bindings bindings ) {
-		return new Bind( bindings, inspector, source, scope, target );
+		return new Bind( bindings, source, scope, target );
 	}
 
 	public Bind autobinding() {
-		return into( autobinding( bindings ) );
+		return into( bindings.autobinding() );
 	}
 
 	public Bind with( Source source ) {
-		return new Bind( bindings, inspector, source, scope, target );
+		return new Bind( bindings, source, scope, target );
 	}
 
 	public Bind within( Instance<?> parent ) {
-		return new Bind( bindings, inspector, source, scope, target.within( parent ) );
+		return new Bind( bindings, source, scope, target.within( parent ) );
 	}
 
-	private static class AutobindBindings
-			implements Bindings { //OPEN can be done as some kind of expansion from one Binding to a list of them 
+	public Inspector getInspector() {
+		return bindings.getInspector();
+	}
 
-		private final Bindings delegate;
-
-		AutobindBindings( Bindings delegate ) {
-			super();
-			this.delegate = delegate;
-		}
-
-		@Override
-		public <T> void add( Resource<T> resource, Supplier<? extends T> supplier, Scope scope,
-				Source source ) {
-			delegate.add( resource, supplier, scope, source );
-			Type<T> type = resource.getType();
-			for ( Type<? super T> supertype : type.supertypes() ) {
-				// Object is of cause a superclass of everything but not indented when doing auto-binds
-				if ( supertype.getRawType() != Object.class ) {
-					delegate.add( resource.typed( supertype ), supplier, scope, source );
-				}
-			}
-		}
+	public <T> void to( Resource<T> resource, Supplier<? extends T> supplier ) {
+		bindings.add( resource, supplier, scope, source );
 	}
 
 }

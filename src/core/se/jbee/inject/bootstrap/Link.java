@@ -5,17 +5,12 @@
  */
 package se.jbee.inject.bootstrap;
 
-import java.util.ArrayList;
 import java.util.IdentityHashMap;
-import java.util.List;
 import java.util.Map;
 
 import se.jbee.inject.Expiry;
 import se.jbee.inject.Repository;
-import se.jbee.inject.Resource;
 import se.jbee.inject.Scope;
-import se.jbee.inject.Source;
-import se.jbee.inject.Supplier;
 import se.jbee.inject.util.Scoped;
 import se.jbee.inject.util.Suppliable;
 
@@ -59,7 +54,7 @@ public final class Link {
 
 		@Override
 		public Suppliable<?>[] link( Inspector inspector, Module... modules ) {
-			return link( Binding.disambiguate( Binding.expand( inspector, modules ) ) );
+			return link( Binding.disambiguate( Bindings.expand( inspector, modules ) ) );
 		}
 
 		private Suppliable<?>[] link( Binding<?>[] bindings ) {
@@ -96,20 +91,4 @@ public final class Link {
 
 	}
 
-	static class ListBindings
-			implements Bindings {
-
-		final List<Binding<?>> list = new ArrayList<Binding<?>>( 100 );
-
-		ListBindings() {
-			// make visible
-		}
-
-		@Override
-		public <T> void add( Resource<T> resource, Supplier<? extends T> supplier, Scope scope,
-				Source source ) {
-			list.add( new Binding<T>( resource, supplier, scope, source ) );
-		}
-
-	}
 }

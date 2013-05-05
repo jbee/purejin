@@ -114,11 +114,11 @@ public final class Bootstrap {
 		}
 
 		@Override
-		public void declare( Bindings bindings, Inspector inspector ) {
+		public void declare( Bindings bindings ) {
 			@SuppressWarnings ( "unchecked" )
 			final T value = (T) presets.value( Type.supertype( PresetModule.class,
 					Type.raw( module.getClass() ) ).parameter( 0 ) );
-			module.declare( bindings, inspector, value );
+			module.declare( bindings, value );
 		}
 	}
 
