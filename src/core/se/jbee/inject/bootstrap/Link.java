@@ -53,8 +53,8 @@ public final class Link {
 		}
 
 		@Override
-		public Suppliable<?>[] link( Inspector inspector, Module... modules ) {
-			return link( Binding.disambiguate( Bindings.expand( inspector, modules ) ) );
+		public Suppliable<?>[] link( Macros macros, Inspector inspector, Module... modules ) {
+			return link( Binding.disambiguate( Bindings.expand( macros, inspector, modules ) ) );
 		}
 
 		private Suppliable<?>[] link( Binding<?>[] bindings ) {

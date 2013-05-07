@@ -12,6 +12,8 @@ import se.jbee.inject.Scope;
 import se.jbee.inject.Source;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Target;
+import se.jbee.inject.bootstrap.Binding;
+import se.jbee.inject.bootstrap.BindingType;
 import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Inspector;
 
@@ -99,8 +101,11 @@ public final class Bind {
 		return bindings.getInspector();
 	}
 
-	public <T> void to( Resource<T> resource, Supplier<? extends T> supplier ) {
-		bindings.add( resource, supplier, scope, source );
+	public <T> void to( Resource<T> resource, BindingType type, Supplier<? extends T> supplier ) {
+		bindings.add( Binding.binding( resource, type, supplier, scope, source.next() ) );
 	}
 
+	public <T> Binding<T> asMacro( Resource<T> resource ) {
+		return Binding.binding( resource, BindingType.MACRO, null, scope, source.next() );
+	}
 }

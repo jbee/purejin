@@ -14,16 +14,18 @@ public final class Source
 		implements PreciserThan<Source> {
 
 	public static Source source( Class<?> module ) {
-		return new Source( module, DeclarationType.EXPLICIT );
+		return new Source( module, DeclarationType.EXPLICIT, 0 );
 	}
 
 	private final Class<?> ident;
 	private final DeclarationType declarationType;
+	public final int declarationNo;
 
-	private Source( Class<?> ident, DeclarationType declarationType ) {
+	private Source( Class<?> ident, DeclarationType declarationType, int declarationNo ) {
 		super();
 		this.ident = ident;
 		this.declarationType = declarationType;
+		this.declarationNo = declarationNo;
 	}
 
 	public Class<?> getIdent() {
@@ -36,7 +38,7 @@ public final class Source
 
 	@Override
 	public String toString() {
-		return declarationType.name() + " " + ident.getCanonicalName();
+		return ident.getCanonicalName() + "#" + declarationNo + "[" + declarationType.name() + "]";
 	}
 
 	@Override
@@ -47,6 +49,10 @@ public final class Source
 	public Source typed( DeclarationType type ) {
 		return declarationType == type
 			? this
-			: new Source( ident, type );
+			: new Source( ident, type, declarationNo );
+	}
+
+	public Source next() {
+		return new Source( ident, declarationType, declarationNo + 1 );
 	}
 }

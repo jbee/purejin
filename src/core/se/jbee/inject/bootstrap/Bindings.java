@@ -31,29 +31,31 @@ import se.jbee.inject.Type;
  */
 public final class Bindings {
 
-	public static Bindings bindings( Inspector inspector ) {
-		return new Bindings( inspector, new ArrayList<Binding<?>>( 100 ), false );
-	}
-
 	//TODO by making this data we lost ability to just 'visit' expanded bindings - the List could be replace by a custom interface to regain this ability.
 
+	public static Bindings bindings( Macros macros, Inspector inspector ) {
+		return new Bindings( macros, inspector, new ArrayList<Binding<?>>( 100 ), false );
+	}
+
+	private final Macros macros;
 	private final Inspector inspector;
 	private final List<Binding<?>> bindings;
 	private final boolean autobinding;
 
-	private Bindings( Inspector inspector, List<Binding<?>> bindings, boolean autobinding ) {
-		super();
+	private Bindings( Macros macros, Inspector inspector, List<Binding<?>> bindings,
+			boolean autobinding ) {
+		this.macros = macros;
 		this.inspector = inspector;
 		this.bindings = bindings;
 		this.autobinding = autobinding;
 	}
 
 	public Bindings autobinding() {
-		return new Bindings( inspector, bindings, true );
+		return new Bindings( macros, inspector, bindings, true );
 	}
 
 	public Bindings using( Inspector inspector ) {
-		return new Bindings( inspector, bindings, autobinding );
+		return new Bindings( macros, inspector, bindings, autobinding );
 	}
 
 	/**
@@ -62,6 +64,10 @@ public final class Bindings {
 	 */
 	public Inspector getInspector() {
 		return inspector;
+	}
+
+	public Macros getMacros() {
+		return macros;
 	}
 
 	/**
@@ -76,34 +82,27 @@ public final class Bindings {
 	 * @param source
 	 *            describes the origin of the binding (this call) and its meaning
 	 */
-	public <T> void add( Resource<T> resource, Supplier<? extends T> supplier, Scope scope,
-			Source source ) {
-		addInternal( resource, supplier, scope, source );
+	public <T> void add( Binding<T> binding ) {
+		bindings.add( binding );
 		if ( !autobinding ) {
 			return;
 		}
-		Type<T> type = resource.getType();
-		for ( Type<? super T> supertype : type.supertypes() ) {
+		for ( Type<? super T> supertype : binding.getType().supertypes() ) {
 			// Object is of cause a superclass of everything but not indented when doing auto-binds
 			if ( supertype.getRawType() != Object.class ) {
-				addInternal( resource.typed( supertype ), supplier, scope, source );
+				bindings.add( binding.typed( supertype ) );
 			}
 		}
-	}
-
-	private <T> void addInternal( Resource<T> resource, Supplier<? extends T> supplier,
-			Scope scope, Source source ) {
-		bindings.add( new Binding<T>( resource, supplier, scope, source ) );
 	}
 
 	public Binding<?>[] toArray() {
 		return Array.of( bindings, Binding.class );
 	}
 
-	public static Binding<?>[] expand( Inspector inspector, Module... modules ) {
+	public static Binding<?>[] expand( Macros macros, Inspector inspector, Module... modules ) {
 		Set<Class<?>> declared = new HashSet<Class<?>>();
 		Set<Class<?>> multimodals = new HashSet<Class<?>>();
-		Bindings bindings = bindings( inspector );
+		Bindings bindings = bindings( macros, inspector );
 		for ( Module m : modules ) {
 			Class<? extends Module> ns = m.getClass();
 			final boolean hasBeenDeclared = declared.contains( ns );

@@ -33,7 +33,8 @@ public abstract class InitializedBinder
 	}
 
 	protected InitializedBinder( Scope inital ) {
-		super( Bind.create( bindings( Inspect.DEFAULT ), source( InitializedBinder.class ), inital ) );
+		super( Bind.create( bindings( SuppliedBy.MACROS, Inspect.DEFAULT ),
+				source( InitializedBinder.class ), inital ) );
 		this.bind = super.bind();
 	}
 

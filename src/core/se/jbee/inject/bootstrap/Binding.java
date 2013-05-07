@@ -5,7 +5,6 @@
  */
 package se.jbee.inject.bootstrap;
 
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -16,10 +15,12 @@ import se.jbee.inject.Array;
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Precision;
 import se.jbee.inject.Resource;
+import se.jbee.inject.Resourcing;
 import se.jbee.inject.Scope;
 import se.jbee.inject.Source;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
+import se.jbee.inject.Typed;
 
 /**
  * Default data strature to represent a 4-tuple created from {@link Bindings}.
@@ -30,19 +31,56 @@ import se.jbee.inject.Type;
  *            The type of the bound value (instance)
  */
 public final class Binding<T>
-		implements Comparable<Binding<?>> {
+		implements Comparable<Binding<?>>, Module, Typed<T>, Resourcing<T> {
+
+	public static <T> Binding<T> binding( Resource<T> resource, BindingType type,
+			Supplier<? extends T> supplier, Scope scope, Source source ) {
+		return new Binding<T>( resource, type, supplier, scope, source );
+	}
 
 	public final Resource<T> resource;
+	public final BindingType type;
 	public final Supplier<? extends T> supplier;
 	public final Scope scope;
 	public final Source source;
 
-	Binding( Resource<T> resource, Supplier<? extends T> supplier, Scope scope, Source source ) {
+	private Binding( Resource<T> resource, BindingType type, Supplier<? extends T> supplier,
+			Scope scope, Source source ) {
 		super();
 		this.resource = resource;
+		this.type = type;
 		this.supplier = supplier;
 		this.scope = scope;
 		this.source = source;
+	}
+
+	@Override
+	public Resource<T> getResource() {
+		return resource;
+	}
+
+	@Override
+	public Type<T> getType() {
+		return getResource().getType();
+	}
+
+	@SuppressWarnings ( "unchecked" )
+	@Override
+	public <E> Binding<E> typed( Type<E> type ) {
+		if ( !getType().isAssignableTo( type ) ) {
+			throw new UnsupportedOperationException(); //TODO better exception
+		}
+		return new Binding<E>( resource.typed( type ), this.type, (Supplier<? extends E>) supplier,
+				scope, source );
+	}
+
+	public Binding<T> suppliedBy( BindingType type, Supplier<? extends T> supplier ) {
+		return new Binding<T>( resource, type, supplier, scope, source );
+	}
+
+	@Override
+	public void declare( Bindings bindings ) {
+		bindings.add( this );
 	}
 
 	@Override

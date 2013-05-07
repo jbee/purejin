@@ -27,7 +27,11 @@ import se.jbee.inject.Scope;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Target;
 import se.jbee.inject.Type;
+import se.jbee.inject.bootstrap.Binding;
+import se.jbee.inject.bootstrap.BindingType;
 import se.jbee.inject.bootstrap.Inspector;
+import se.jbee.inject.bootstrap.Macros;
+import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.util.Factory;
 import se.jbee.inject.util.Scoped;
 
@@ -249,17 +253,12 @@ public class Binder {
 					if ( parameters.length == 0 ) {
 						parameters = inspector.parametersFor( method );
 					}
-					bind( returnType, method, instance, parameters );
+					binder.bind( inspector.nameFor( method ), returnType ).to( instance, method,
+							parameters );
 					instanceMethods = instanceMethods || !Modifier.isStatic( method.getModifiers() );
 				}
 			}
 			return instanceMethods;
-		}
-
-		private <T> void bind( Type<T> returnType, Method method, Object instance,
-				Parameter<?>[] parameters ) {
-			binder.bind( inspector.nameFor( method ), returnType ).to(
-					SuppliedBy.method( returnType, instance, method, parameters ) );
 		}
 
 		private <T> void bind( Constructor<T> constructor, Parameter<?>... parameters ) {
@@ -427,7 +426,23 @@ public class Binder {
 		}
 
 		public void to( Constructor<? extends T> constructor, Parameter<?>... parameters ) {
-			to( SuppliedBy.costructor( constructor, parameters ) );
+			toMacro( macros().expand( macroBinding(), constructor, parameters ) );
+		}
+
+		void to( Object instance, Method method, Parameter<?>[] parameters ) {
+			toMacro( macros().expand( macroBinding(), instance, method, parameters ) );
+		}
+
+		private Binding<T> macroBinding() {
+			return binder.bind().asMacro( resource );
+		}
+
+		private Macros macros() {
+			return binder.bind().bindings.getMacros();
+		}
+
+		public void toMacro( Module macro ) {
+			macro.declare( binder.bind().bindings );
 		}
 
 		public void to( Factory<? extends T> factory ) {
@@ -447,7 +462,11 @@ public class Binder {
 		}
 
 		public void to( Supplier<? extends T> supplier ) {
-			binder.bind().to( resource, supplier );
+			to( supplier, BindingType.PREDEFINED );
+		}
+
+		protected final void to( Supplier<? extends T> supplier, BindingType type ) {
+			binder.bind().to( resource, type, supplier );
 		}
 
 		public void to( T constant ) {

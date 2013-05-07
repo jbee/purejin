@@ -29,5 +29,5 @@ public interface Linker<T> {
 	 * @return A list of artifacts resulting from the {@link Module}'s declaration of
 	 *         {@link Bindings}.
 	 */
-	T[] link( Inspector inspector, Module... modules );
+	T[] link( Macros macros, Inspector inspector, Module... modules );
 }
