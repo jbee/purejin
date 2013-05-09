@@ -5,7 +5,6 @@
  */
 package se.jbee.inject.bootstrap;
 
-
 /**
  * A {@link PresetModule} is an extension to a usual {@link Module} that depends on *one* of the
  * values that have been preset.

@@ -13,6 +13,7 @@ import java.util.Set;
 
 import se.jbee.inject.Array;
 import se.jbee.inject.DeclarationType;
+import se.jbee.inject.Instance;
 import se.jbee.inject.Precision;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Resourcing;
@@ -38,7 +39,7 @@ public final class Binding<T>
 		return new Binding<T>( resource, type, supplier, scope, source );
 	}
 
-	public final Resource<T> resource;
+	private final Resource<T> resource;
 	public final BindingType type;
 	public final Supplier<? extends T> supplier;
 	public final Scope scope;
@@ -57,6 +58,10 @@ public final class Binding<T>
 	@Override
 	public Resource<T> getResource() {
 		return resource;
+	}
+
+	public Instance<T> getInstance() {
+		return resource.getInstance();
 	}
 
 	@Override

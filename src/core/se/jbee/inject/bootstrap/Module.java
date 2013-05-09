@@ -5,7 +5,6 @@
  */
 package se.jbee.inject.bootstrap;
 
-
 /**
  * {@link Bindings} are defined with {@link Module}s while {@link Bundle} are used to group multiple
  * {@link Module}s and {@link Bundle}s what allows to build graphs of {@link Bundle}s with

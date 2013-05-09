@@ -5,9 +5,9 @@
  */
 package se.jbee.inject.bind;
 
-import static se.jbee.inject.Source.source;
 import static se.jbee.inject.bootstrap.Bindings.bindings;
 import se.jbee.inject.Scope;
+import se.jbee.inject.Source;
 import se.jbee.inject.bind.Binder.RootBinder;
 import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -25,17 +25,26 @@ import se.jbee.inject.util.Scoped;
 public abstract class InitializedBinder
 		extends RootBinder {
 
-	private Boolean initialized;
+	private final Source source;
 	private Bind bind;
+	private Boolean initialized;
 
 	protected InitializedBinder() {
 		this( Scoped.APPLICATION );
 	}
 
 	protected InitializedBinder( Scope inital ) {
-		super( Bind.create( bindings( SuppliedBy.MACROS, Inspect.DEFAULT ),
-				source( InitializedBinder.class ), inital ) );
+		this( inital, null );
+	}
+
+	protected InitializedBinder( Source source ) {
+		this( Scoped.APPLICATION, source );
+	}
+
+	private InitializedBinder( Scope inital, Source source ) {
+		super( Bind.create( bindings( Macro.MACROS, Inspect.DEFAULT ), source, inital ) );
 		this.bind = super.bind();
+		this.source = source;
 	}
 
 	@Override
@@ -45,9 +54,14 @@ public abstract class InitializedBinder
 
 	protected final void init( Bindings bindings ) {
 		Bootstrap.nonnullThrowsReentranceException( initialized );
-		this.bind = super.bind().into( bindings ).using( bindings.getInspector() ).with(
-				source( getClass() ) );
+		this.bind = super.bind().into( bindings ).with( source() );
 		initialized = true;
+	}
+
+	private Source source() {
+		return this.source == null
+			? Source.source( getClass() )
+			: this.source;
 	}
 
 }

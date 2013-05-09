@@ -11,7 +11,6 @@ import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.bind.Configuring.configuring;
 import static se.jbee.inject.bind.SuppliedBy.constant;
-import static se.jbee.inject.bind.SuppliedBy.parametrizedInstance;
 import static se.jbee.inject.util.Metaclass.metaclass;
 
 import java.lang.reflect.Constructor;
@@ -229,12 +228,12 @@ public class Binder {
 			bindMethodsIn( implementingInstance.getClass(), implementingInstance, parameters );
 		}
 
-		public void in( Class<?> implementor, Parameter<?>... parameters ) {
-			boolean instanceMethods = bindMethodsIn( implementor, null, parameters );
-			Constructor<?> c = inspector.constructorFor( implementor );
+		public void in( Class<?> implementer, Parameter<?>... parameters ) {
+			boolean instanceMethods = bindMethodsIn( implementer, null, parameters );
+			Constructor<?> c = inspector.constructorFor( implementer );
 			if ( c == null ) {
 				if ( instanceMethods ) {
-					binder.root.per( Scoped.APPLICATION ).implicit().construct( implementor );
+					binder.root.per( Scoped.APPLICATION ).implicit().construct( implementer );
 				}
 			} else {
 				if ( parameters.length == 0 ) {
@@ -244,10 +243,10 @@ public class Binder {
 			}
 		}
 
-		private boolean bindMethodsIn( Class<?> implementor, Object instance,
+		private boolean bindMethodsIn( Class<?> implementer, Object instance,
 				Parameter<?>[] parameters ) {
 			boolean instanceMethods = false;
-			for ( Method method : inspector.methodsIn( implementor ) ) {
+			for ( Method method : inspector.methodsIn( implementer ) ) {
 				Type<?> returnType = Type.returnType( method );
 				if ( !Type.VOID.equalTo( returnType ) ) {
 					if ( parameters.length == 0 ) {
@@ -276,9 +275,9 @@ public class Binder {
 			}
 		}
 
-		public void in( Class<?> implementor, Class<?>... implementors ) {
-			in( implementor );
-			for ( Class<?> i : implementors ) {
+		public void in( Class<?> implementer, Class<?>... implementers ) {
+			in( implementer );
+			for ( Class<?> i : implementers ) {
 				in( i );
 			}
 		}
@@ -409,7 +408,7 @@ public class Binder {
 		 * called to get to this {@link TypedBinder}.
 		 */
 		private final Binder binder;
-		private final Resource<T> resource;
+		protected final Resource<T> resource;
 
 		TypedBinder( Binder binder, Instance<T> instance ) {
 			this( binder, new Resource<T>( instance, binder.bind().target ) );
@@ -426,31 +425,57 @@ public class Binder {
 		}
 
 		public void to( Constructor<? extends T> constructor, Parameter<?>... parameters ) {
-			toMacro( macros().expand( macroBinding(), constructor, parameters ) );
+			toMacro( macros().construct( macroBinding(), constructor, parameters ) );
 		}
 
 		void to( Object instance, Method method, Parameter<?>[] parameters ) {
-			toMacro( macros().expand( macroBinding(), instance, method, parameters ) );
-		}
-
-		private Binding<T> macroBinding() {
-			return binder.bind().asMacro( resource );
-		}
-
-		private Macros macros() {
-			return binder.bind().bindings.getMacros();
+			toMacro( macros().produce( macroBinding(), instance, method, parameters ) );
 		}
 
 		public void toMacro( Module macro ) {
-			macro.declare( binder.bind().bindings );
+			macro.declare( bind().bindings );
 		}
 
 		public void to( Factory<? extends T> factory ) {
 			to( SuppliedBy.factory( factory ) );
 		}
 
-		public <I extends T> void to( Instance<I> instance ) {
-			to( supply( instance ) );
+		public void to( Supplier<? extends T> supplier ) {
+			to( supplier, BindingType.PREDEFINED );
+		}
+
+		public void to( T constant ) {
+			toConstant( constant );
+		}
+
+		public void to( T constant1, T constant2 ) {
+			onMulti().toConstant( constant1 ).toConstant( constant2 );
+		}
+
+		public void to( T constant1, T constant2, T constant3 ) {
+			onMulti().toConstant( constant1 ).toConstant( constant2 ).toConstant( constant3 );
+		}
+
+		public final void to( T constant1, T... constants ) {
+			TypedBinder<T> multibinder = onMulti().toConstant( constant1 );
+			for ( int i = 0; i < constants.length; i++ ) {
+				multibinder.toConstant( constants[i] );
+			}
+		}
+
+		public void toConstructor() {
+			to( bind().getInspector().constructorFor( resource.getType().getRawType() ) );
+		}
+
+		public void toConstructor( Class<? extends T> impl, Parameter<?>... parameters ) {
+			if ( metaclass( impl ).undeterminable() ) {
+				throw new IllegalArgumentException( "Not a constructable type: " + impl );
+			}
+			to( bind().getInspector().constructorFor( impl ), parameters );
+		}
+
+		public void toConstructor( Parameter<?>... parameters ) {
+			toConstructor( getType().getRawType(), parameters );
 		}
 
 		public <I extends T> void to( Name name, Class<I> type ) {
@@ -461,60 +486,49 @@ public class Binder {
 			to( instance( name, type ) );
 		}
 
-		public void to( Supplier<? extends T> supplier ) {
-			to( supplier, BindingType.PREDEFINED );
-		}
-
-		protected final void to( Supplier<? extends T> supplier, BindingType type ) {
-			binder.bind().to( resource, type, supplier );
-		}
-
-		public void to( T constant ) {
-			toConstant( constant );
-		}
-
-		public void to( T constant1, T constant2 ) {
-			on( binder.bind().asMulti() ).toConstant( constant1 ).toConstant( constant2 );
-		}
-
-		public final void to( T constant1, T... constants ) {
-			TypedBinder<T> multibinder = on( binder.bind().asMulti() ).toConstant( constant1 );
-			for ( int i = 0; i < constants.length; i++ ) {
-				multibinder.toConstant( constants[i] );
-			}
-		}
-
-		public void to( T constant1, T constant2, T constant3 ) {
-			on( binder.bind().asMulti() ).toConstant( constant1 ).toConstant( constant2 ).toConstant(
-					constant3 );
-		}
-
-		public void toConstructor() {
-			to( binder.bind().getInspector().constructorFor( resource.getType().getRawType() ) );
-		}
-
-		public void toConstructor( Class<? extends T> impl, Parameter<?>... parameters ) {
-			if ( metaclass( impl ).undeterminable() ) {
-				throw new IllegalArgumentException( "Not a constructable type: " + impl );
-			}
-			to( binder.bind().getInspector().constructorFor( impl ), parameters );
-		}
-
-		public void toConstructor( Parameter<?>... parameters ) {
-			toConstructor( getType().getRawType(), parameters );
+		public <I extends T> void to( Instance<I> instance ) {
+			toMacro( macros().link( macroBinding(), instance ) );
 		}
 
 		public void to( Configuring<?> configuration ) {
-			to( SuppliedBy.configuration( getType(), configuration ) );
+			//TODO use macro
+			to( SuppliedBy.configuration( getType(), configuration ), BindingType.LINK );
 		}
 
 		public <I extends T> void toParametrized( Class<I> impl ) {
-			to( parametrizedInstance( Instance.anyOf( raw( impl ) ) ) );
+			//TODO use macro
+			to( SuppliedBy.parametrizedInstance( Instance.anyOf( raw( impl ) ) ), BindingType.LINK );
 		}
 
 		public <I extends Supplier<? extends T>> void toSupplier( Class<I> impl ) {
-			to( SuppliedBy.reference( impl ) );
+			//TODO extract to macro
+			to( SuppliedBy.reference( impl ), BindingType.LINK );
 			implicitBindToConstructor( defaultInstanceOf( raw( impl ) ) );
+		}
+
+		protected final void to( Supplier<? extends T> supplier, BindingType type ) {
+			toMacro( macros().expand( bind().asMacro( resource, type, supplier ) ) );
+		}
+
+		private TypedBinder<T> toConstant( T constant ) {
+			to( SuppliedBy.constant( constant ) );
+			return this;
+		}
+
+		<I> void implicitBindToConstructor( Instance<I> instance ) {
+			binder.implicitBindToConstructor( instance );
+		}
+
+		final Bind bind() {
+			return binder.bind();
+		}
+
+		final Binding<T> macroBinding() {
+			return bind().asMacro( resource );
+		}
+
+		final Macros macros() {
+			return bind().bindings.getMacros();
 		}
 
 		protected final Type<T> getType() {
@@ -525,30 +539,8 @@ public class Binder {
 			return new TypedBinder<T>( binder.on( bind ), resource );
 		}
 
-		<I> Supplier<I> supply( Class<I> impl ) {
-			return supply( Instance.anyOf( raw( impl ) ) );
-		}
-
-		<I> Supplier<I> supply( Instance<I> instance ) {
-			if ( !resource.getInstance().equalTo( instance ) ) {
-				implicitBindToConstructor( instance );
-				return SuppliedBy.instance( instance );
-			}
-			if ( instance.getType().getRawType().isInterface() ) {
-				throw new IllegalArgumentException( "Interface type linked in a loop: "
-						+ resource.getInstance() + " > " + instance );
-			}
-			return SuppliedBy.costructor( binder.bind().getInspector().constructorFor(
-					instance.getType().getRawType() ) );
-		}
-
-		private <I> void implicitBindToConstructor( Instance<I> instance ) {
-			binder.implicitBindToConstructor( instance );
-		}
-
-		private TypedBinder<T> toConstant( T constant ) {
-			to( SuppliedBy.constant( constant ) );
-			return this;
+		protected final TypedBinder<T> onMulti() {
+			return on( bind().asMulti() );
 		}
 
 	}
@@ -583,6 +575,8 @@ public class Binder {
 			to( SuppliedBy.references( getType().getRawType(), elements ) );
 		}
 
+		//TODO use Parameters instead of Suppliers
+
 		@SuppressWarnings ( "unchecked" )
 		public void toElements( Class<? extends E>... impls ) {
 			Supplier<? extends E>[] suppliers = (Supplier<? extends E>[]) new Supplier<?>[impls.length];
@@ -612,6 +606,22 @@ public class Binder {
 			to( constant( constant1 ), constant( constant2 ) );
 		}
 
+		<I> Supplier<I> supply( Class<I> impl ) {
+			return supply( Instance.anyOf( raw( impl ) ) );
+		}
+
+		<I> Supplier<I> supply( Instance<I> instance ) {
+			if ( !resource.getInstance().equalTo( instance ) ) {
+				implicitBindToConstructor( instance );
+				return SuppliedBy.instance( instance );
+			}
+			if ( instance.getType().getRawType().isInterface() ) {
+				throw new IllegalArgumentException( "Interface type linked in a loop: "
+						+ resource.getInstance() + " > " + instance );
+			}
+			return SuppliedBy.costructor( bind().getInspector().constructorFor(
+					instance.getType().getRawType() ) );
+		}
 	}
 
 }

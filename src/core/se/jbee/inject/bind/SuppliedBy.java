@@ -9,8 +9,7 @@ import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Type.parameterTypes;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.bind.Parameterize.parameterizations;
-import static se.jbee.inject.bootstrap.BindingType.CONSTRUCTOR;
-import static se.jbee.inject.bootstrap.BindingType.METHOD;
+import static se.jbee.inject.util.ToString.describe;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -30,10 +29,7 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
-import se.jbee.inject.bootstrap.Binding;
 import se.jbee.inject.bootstrap.Invoke;
-import se.jbee.inject.bootstrap.Macros;
-import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.util.Factory;
 import se.jbee.inject.util.Metaclass;
 import se.jbee.inject.util.Parameterization;
@@ -51,7 +47,6 @@ public final class SuppliedBy {
 
 	private static final Supplier<?> REQUIRED = new RequiredSupplier<Object>();
 
-	public static final Macros MACROS = new DefaultMacros();
 	public static final Supplier<Provider<?>> PROVIDER_BRIDGE = new ProviderSupplier();
 	public static final Supplier<List<?>> LIST_BRIDGE = new ArrayToListBridgeSupplier();
 	public static final Supplier<Set<?>> SET_BRIDGE = new ArrayToSetBridgeSupplier();
@@ -139,30 +134,6 @@ public final class SuppliedBy {
 
 	private SuppliedBy() {
 		throw new UnsupportedOperationException( "util" );
-	}
-
-	private static class DefaultMacros
-			implements Macros {
-
-		DefaultMacros() {
-			// make visible
-		}
-
-		@Override
-		public <T> Module expand( Binding<T> binding, Constructor<? extends T> constructor,
-				Parameter<?>... parameters ) {
-			return binding.suppliedBy( CONSTRUCTOR, costructor( constructor, parameters ) );
-		}
-
-		@SuppressWarnings ( "unchecked" )
-		@Override
-		public <T> Module expand( Binding<T> binding, Object instance, Method method,
-				Parameter<?>... parameters ) {
-			Supplier<? extends T> supplier = (Supplier<? extends T>) method(
-					Type.returnType( method ), instance, method, parameters );
-			return binding.suppliedBy( METHOD, supplier );
-		}
-
 	}
 
 	public static abstract class ArrayBridgeSupplier<T>
@@ -434,7 +405,7 @@ public final class SuppliedBy {
 
 		@Override
 		public String toString() {
-			return "provides<" + dependency + ">";
+			return describe( "provides", dependency );
 		}
 	}
 
@@ -455,6 +426,11 @@ public final class SuppliedBy {
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
 			return factory.produce( dependency.getInstance(), dependency.target( 1 ) );
+		}
+
+		@Override
+		public String toString() {
+			return describe( "factory", factory );
 		}
 
 	}
@@ -479,6 +455,10 @@ public final class SuppliedBy {
 			return Invoke.constructor( constructor, args );
 		}
 
+		@Override
+		public String toString() {
+			return describe( constructor, params );
+		}
 	}
 
 	private static final class MethodSupplier<T>
@@ -512,6 +492,10 @@ public final class SuppliedBy {
 			return returnType.getRawType().cast( Invoke.method( factory, owner, args ) );
 		}
 
+		@Override
+		public String toString() {
+			return describe( factory, params );
+		}
 	}
 
 	private static class RequiredSupplier<T>
@@ -526,6 +510,10 @@ public final class SuppliedBy {
 			throw new UnsupportedOperationException( "Should never be called!" );
 		}
 
+		@Override
+		public String toString() {
+			return describe( "required" );
+		}
 	}
 
 	private static class LoggerFactory

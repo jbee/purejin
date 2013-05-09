@@ -74,8 +74,8 @@ public final class Link {
 
 		private static <T> Suppliable<T> suppliableOf( Binding<T> binding, Repository repository,
 				Expiry expiration ) {
-			return new Suppliable<T>( binding.resource, binding.supplier, repository, expiration,
-					binding.source );
+			return new Suppliable<T>( binding.getResource(), binding.supplier, repository,
+					expiration, binding.source );
 		}
 
 		private static Map<Scope, Repository> initRepositories( Binding<?>[] bindings ) {

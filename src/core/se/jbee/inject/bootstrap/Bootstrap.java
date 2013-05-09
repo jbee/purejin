@@ -21,7 +21,7 @@ import se.jbee.inject.Array;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Injectron;
 import se.jbee.inject.Type;
-import se.jbee.inject.bind.SuppliedBy;
+import se.jbee.inject.bind.Macro;
 import se.jbee.inject.config.Edition;
 import se.jbee.inject.config.Feature;
 import se.jbee.inject.config.Globals;
@@ -56,7 +56,7 @@ public final class Bootstrap {
 
 	public static Injector injector( Module[] modules, Inspector inspector,
 			Linker<Suppliable<?>> linker ) {
-		return Inject.from( Suppliable.source( linker.link( SuppliedBy.MACROS, inspector, modules ) ) );
+		return Inject.from( Suppliable.source( linker.link( Macro.MACROS, inspector, modules ) ) );
 	}
 
 	public static Modulariser modulariser( Globals globals ) {
@@ -68,7 +68,7 @@ public final class Bootstrap {
 	}
 
 	public static Suppliable<?>[] suppliables( Class<? extends Bundle> root ) {
-		return Link.BUILDIN.link( SuppliedBy.MACROS, Inspect.DEFAULT,
+		return Link.BUILDIN.link( Macro.MACROS, Inspect.DEFAULT,
 				modulariser( Globals.STANDARD ).modularise( root ) );
 	}
 
