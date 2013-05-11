@@ -16,7 +16,7 @@ import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Precision;
 import se.jbee.inject.Resource;
-import se.jbee.inject.Resourcing;
+import se.jbee.inject.Resourced;
 import se.jbee.inject.Scope;
 import se.jbee.inject.Source;
 import se.jbee.inject.Supplier;
@@ -32,7 +32,7 @@ import se.jbee.inject.Typed;
  *            The type of the bound value (instance)
  */
 public final class Binding<T>
-		implements Comparable<Binding<?>>, Module, Typed<T>, Resourcing<T> {
+		implements Comparable<Binding<?>>, Module, Typed<T>, Resourced<T> {
 
 	public static <T> Binding<T> binding( Resource<T> resource, BindingType type,
 			Supplier<? extends T> supplier, Scope scope, Source source ) {

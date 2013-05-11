@@ -15,17 +15,12 @@ import java.util.List;
 import java.util.Set;
 
 import se.jbee.inject.Array;
-import se.jbee.inject.Resource;
-import se.jbee.inject.Scope;
-import se.jbee.inject.Source;
-import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 
 /**
  * {@link Bindings} accumulate the {@link Binding} 4-tuples.
  * 
- * Any builder is just a utility to construct calls to
- * {@link #add(Resource, Supplier, Scope, Source)}
+ * Any builder is just a utility to construct calls to {@link #add(Binding)}
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
@@ -72,15 +67,6 @@ public final class Bindings {
 
 	/**
 	 * Add (accumulate) a binding described by the 4-tuple given.
-	 * 
-	 * @param resource
-	 *            describes the identity of the resulting instance(s)
-	 * @param supplier
-	 *            creates this instance(s)
-	 * @param scope
-	 *            describes and controls the life-cycle of the instance(s)
-	 * @param source
-	 *            describes the origin of the binding (this call) and its meaning
 	 */
 	public <T> void add( Binding<T> binding ) {
 		bindings.add( binding );
@@ -99,10 +85,9 @@ public final class Bindings {
 		return Array.of( bindings, Binding.class );
 	}
 
-	public static Binding<?>[] expand( Macros macros, Inspector inspector, Module... modules ) {
+	public Binding<?>[] expand( Module... modules ) {
 		Set<Class<?>> declared = new HashSet<Class<?>>();
 		Set<Class<?>> multimodals = new HashSet<Class<?>>();
-		Bindings bindings = bindings( macros, inspector );
 		for ( Module m : modules ) {
 			Class<? extends Module> ns = m.getClass();
 			final boolean hasBeenDeclared = declared.contains( ns );
@@ -112,11 +97,11 @@ public final class Bindings {
 				}
 			}
 			if ( !hasBeenDeclared || multimodals.contains( ns ) ) {
-				m.declare( bindings );
+				m.declare( this );
 				declared.add( ns );
 			}
 		}
-		return bindings.toArray();
+		return toArray();
 	}
 
 }

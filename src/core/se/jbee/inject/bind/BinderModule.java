@@ -10,7 +10,6 @@ import se.jbee.inject.Source;
 import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrapper;
 import se.jbee.inject.bootstrap.Bundle;
-import se.jbee.inject.bootstrap.Inspector;
 import se.jbee.inject.bootstrap.Module;
 
 /**
@@ -54,7 +53,7 @@ public abstract class BinderModule
 	}
 
 	/**
-	 * @see Module#declare(Bindings, Inspector)
+	 * @see Module#declare(Bindings)
 	 */
 	protected abstract void declare();
 

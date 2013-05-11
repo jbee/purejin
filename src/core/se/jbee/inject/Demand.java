@@ -15,7 +15,7 @@ package se.jbee.inject;
  *            Type of the value demanded
  */
 public final class Demand<T>
-		implements Resourcing<T> {
+		implements Resourced<T> {
 
 	public static <T> Demand<T> demand( Resource<T> resource, Dependency<? super T> dependency,
 			int serialNumber, int cardinality ) {

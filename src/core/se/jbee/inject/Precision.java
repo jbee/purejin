@@ -14,7 +14,7 @@ import java.util.Comparator;
  */
 public final class Precision {
 
-	public static final Comparator<Resourcing<?>> RESOURCE_COMPARATOR = new ResourcingComparator();
+	public static final Comparator<Resourced<?>> RESOURCE_COMPARATOR = new ResourcingComparator();
 
 	public static <T extends PreciserThan<? super T>> Comparator<T> comparator() {
 		return new PreciserThanComparator<T>();
@@ -51,14 +51,14 @@ public final class Precision {
 	}
 
 	private static final class ResourcingComparator
-			implements Comparator<Resourcing<?>> {
+			implements Comparator<Resourced<?>> {
 
 		ResourcingComparator() {
 			// make visible
 		}
 
 		@Override
-		public int compare( Resourcing<?> one, Resourcing<?> other ) {
+		public int compare( Resourced<?> one, Resourced<?> other ) {
 			Resource<?> rOne = one.getResource();
 			Resource<?> rOther = other.getResource();
 			Class<?> rawOne = rOne.getType().getRawType();

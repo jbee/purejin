@@ -22,7 +22,7 @@ public class TestPackages {
 	public void thatLowerBoundTypeIsNotInPackageJavaLang() {
 		Packages javaLang = packageOf( String.class );
 		assertFalse( javaLang.contains( Type.WILDCARD ) );
-		assertFalse( javaLang.contains( raw( List.class ).asLowerBound() ) );
+		assertFalse( javaLang.contains( raw( List.class ).asUpperBound() ) );
 	}
 
 	@Test
@@ -30,7 +30,7 @@ public class TestPackages {
 		Packages all = Packages.ALL;
 		assertTrue( all.contains( raw( List.class ) ) );
 		assertTrue( all.contains( raw( AtomicBoolean.class ) ) );
-		assertTrue( all.contains( raw( List.class ).asLowerBound() ) );
+		assertTrue( all.contains( raw( List.class ).asUpperBound() ) );
 	}
 
 	@Test

@@ -19,7 +19,7 @@ import se.jbee.inject.Injectron;
 import se.jbee.inject.Precision;
 import se.jbee.inject.Repository;
 import se.jbee.inject.Resource;
-import se.jbee.inject.Resourcing;
+import se.jbee.inject.Resourced;
 import se.jbee.inject.Source;
 import se.jbee.inject.Supplier;
 
@@ -31,7 +31,7 @@ import se.jbee.inject.Supplier;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Suppliable<T>
-		implements Resourcing<T> {
+		implements Resourced<T> {
 
 	public static InjectronSource source( Suppliable<?>[] suppliables ) {
 		return new SuppliableSource( suppliables );

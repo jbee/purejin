@@ -6,6 +6,7 @@
 package se.jbee.inject.bootstrap;
 
 import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.bootstrap.Bindings.bindings;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -21,7 +22,7 @@ import se.jbee.inject.Array;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Injectron;
 import se.jbee.inject.Type;
-import se.jbee.inject.bind.Macro;
+import se.jbee.inject.bind.MacroModule;
 import se.jbee.inject.config.Edition;
 import se.jbee.inject.config.Feature;
 import se.jbee.inject.config.Globals;
@@ -51,12 +52,13 @@ public final class Bootstrap {
 
 	public static Injector injector( Class<? extends Bundle> root, Inspector inspector,
 			Globals globals ) {
-		return injector( modulariser( globals ).modularise( root ), inspector, Link.BUILDIN );
+		return injector( MacroModule.MACROS, inspector, Link.BUILDIN,
+				modulariser( globals ).modularise( root ) );
 	}
 
-	public static Injector injector( Module[] modules, Inspector inspector,
-			Linker<Suppliable<?>> linker ) {
-		return Inject.from( Suppliable.source( linker.link( Macro.MACROS, inspector, modules ) ) );
+	public static Injector injector( Macros macros, Inspector inspector,
+			Linker<Suppliable<?>> linker, Module[] modules ) {
+		return Inject.from( Suppliable.source( linker.link( bindings( macros, inspector ), modules ) ) );
 	}
 
 	public static Modulariser modulariser( Globals globals ) {
@@ -68,7 +70,7 @@ public final class Bootstrap {
 	}
 
 	public static Suppliable<?>[] suppliables( Class<? extends Bundle> root ) {
-		return Link.BUILDIN.link( Macro.MACROS, Inspect.DEFAULT,
+		return Link.BUILDIN.link( bindings( MacroModule.MACROS, Inspect.DEFAULT ),
 				modulariser( Globals.STANDARD ).modularise( root ) );
 	}
 

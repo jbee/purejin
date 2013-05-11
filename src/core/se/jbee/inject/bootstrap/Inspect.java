@@ -68,6 +68,8 @@ public class Inspect
 	private final Class<? extends Annotation> accessible;
 	private final Class<? extends Annotation> namedby;
 
+	//TODO add of(Interface.class) filter
+
 	private Inspect( boolean statics, boolean methods, boolean constructors, Packages packages,
 			Type<?> assignable, Class<? extends Annotation> accessible,
 			Class<? extends Annotation> namedBy ) {
@@ -249,6 +251,7 @@ public class Inspect
 	}
 
 	private boolean matches( Method m ) {
+		// TODO filter methods with type variables as return type
 		Type<?> returnType = Type.returnType( m );
 		return packages.contains( returnType ) && returnType.isAssignableTo( assignable )
 				&& ( !statics || Modifier.isStatic( m.getModifiers() ) )

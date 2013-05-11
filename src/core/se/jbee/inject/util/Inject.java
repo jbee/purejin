@@ -171,7 +171,7 @@ public final class Inject {
 				return toArray( elements, elementType );
 			}
 			// if there hasn't been binds to that specific wildcard Type  
-			if ( elementType.isLowerBound() ) { // wildcard dependency:
+			if ( elementType.isUpperBound() ) { // wildcard dependency:
 				List<E> elements = new ArrayList<E>();
 				for ( Entry<Class<?>, Injectron<?>[]> e : injectrons.entrySet() ) {
 					if ( Type.raw( e.getKey() ).isAssignableTo( elementType ) ) {
@@ -188,7 +188,7 @@ public final class Inject {
 
 		private <T, I> T resolveInjectronArray( Dependency<T> dependency, Type<I> instanceType ) {
 			Dependency<I> instanceDependency = dependency.typed( instanceType );
-			if ( instanceType.isLowerBound() ) {
+			if ( instanceType.isUpperBound() ) {
 				List<Injectron<?>> res = new ArrayList<Injectron<?>>();
 				for ( Entry<Class<?>, Injectron<?>[]> e : injectrons.entrySet() ) {
 					if ( raw( e.getKey() ).isAssignableTo( instanceType ) ) {
@@ -240,6 +240,7 @@ public final class Inject {
 			for ( Entry<Class<?>, Injectron<?>[]> e : injectrons.entrySet() ) {
 				b.append( e.getKey() ).append( '\n' );
 				for ( Injectron<?> i : e.getValue() ) {
+					//TODO simple name of class in to string
 					b.append( '\t' ).append( i ).append( '\n' );
 				}
 			}

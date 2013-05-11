@@ -11,7 +11,7 @@ package se.jbee.inject;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public interface Injectron<T>
-		extends Resourcing<T> {
+		extends Resourced<T> {
 
 	/**
 	 * @return The {@link Source} that {@link Injection} had been created from (e.g. did define the

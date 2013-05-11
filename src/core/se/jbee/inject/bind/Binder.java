@@ -9,9 +9,12 @@ import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Instance.defaultInstanceOf;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.Type.returnType;
 import static se.jbee.inject.bind.Configuring.configuring;
 import static se.jbee.inject.bind.SuppliedBy.constant;
+import static se.jbee.inject.util.Constructible.constructible;
 import static se.jbee.inject.util.Metaclass.metaclass;
+import static se.jbee.inject.util.Producible.producible;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -314,7 +317,8 @@ public class Binder {
 		}
 
 		public <T> void require( Type<T> dependency ) {
-			on( bind().asRequired() ).bind( dependency ).to( SuppliedBy.<T> required() );
+			on( bind().asRequired() ).bind( dependency ).to( SuppliedBy.<T> required(),
+					BindingType.REQUIRED );
 		}
 
 		@Override
@@ -425,11 +429,12 @@ public class Binder {
 		}
 
 		public void to( Constructor<? extends T> constructor, Parameter<?>... parameters ) {
-			toMacro( macros().construct( macroBinding(), constructor, parameters ) );
+			toMacro( macros().expand( macroBinding(), constructible( constructor, parameters ) ) );
 		}
 
 		void to( Object instance, Method method, Parameter<?>[] parameters ) {
-			toMacro( macros().produce( macroBinding(), instance, method, parameters ) );
+			toMacro( macros().expand( macroBinding(),
+					producible( returnType( method ), method, parameters, instance ) ) );
 		}
 
 		public void toMacro( Module macro ) {
@@ -487,22 +492,21 @@ public class Binder {
 		}
 
 		public <I extends T> void to( Instance<I> instance ) {
-			toMacro( macros().link( macroBinding(), instance ) );
+			toMacro( macros().expand( macroBinding(), instance ) );
 		}
 
 		public void to( Configuring<?> configuration ) {
-			//TODO use macro
-			to( SuppliedBy.configuration( getType(), configuration ), BindingType.LINK );
+			toMacro( macros().expand( macroBinding(), configuration ) );
 		}
 
 		public <I extends T> void toParametrized( Class<I> impl ) {
-			//TODO use macro
-			to( SuppliedBy.parametrizedInstance( Instance.anyOf( raw( impl ) ) ), BindingType.LINK );
+			toMacro( macros().expand( macroBinding(), impl ) );
 		}
 
 		public <I extends Supplier<? extends T>> void toSupplier( Class<I> impl ) {
 			//TODO extract to macro
-			to( SuppliedBy.reference( impl ), BindingType.LINK );
+			//TODO if the impl class is final and monomodal there is no good reason to use a reference
+			to( SuppliedBy.reference( impl ), BindingType.SUBSTITUTED );
 			implicitBindToConstructor( defaultInstanceOf( raw( impl ) ) );
 		}
 
@@ -619,8 +623,8 @@ public class Binder {
 				throw new IllegalArgumentException( "Interface type linked in a loop: "
 						+ resource.getInstance() + " > " + instance );
 			}
-			return SuppliedBy.costructor( bind().getInspector().constructorFor(
-					instance.getType().getRawType() ) );
+			return SuppliedBy.costructor( constructible( bind().getInspector().constructorFor(
+					instance.getType().getRawType() ) ) );
 		}
 	}
 

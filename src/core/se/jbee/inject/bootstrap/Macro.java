@@ -5,12 +5,8 @@
  */
 package se.jbee.inject.bootstrap;
 
-public enum BindingType {
 
-	REQUIRED,
-	SUBSTITUTED,
-	PREDEFINED,
-	CONSTRUCTOR,
-	METHOD,
-	MACRO,
+public interface Macro<V> {
+
+	<T> Module expand( Binding<T> binding, V value );
 }

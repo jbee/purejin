@@ -89,19 +89,19 @@ public class TestCollectionBinds {
 
 	@Test
 	public void thatListAsLowerBoundIsAvailable() {
-		Type<? extends List<Number>> wildcardListType = listTypeOf( Number.class ).parametizedAsLowerBounds();
+		Type<? extends List<Number>> wildcardListType = listTypeOf( Number.class ).parametizedAsUpperBounds();
 		ai.assertInjectsItems( new Number[] { 846, 42, 42.0f }, wildcardListType );
 	}
 
 	@Test
 	public void thatSetAsLowerBoundIsAvailable() {
-		Type<? extends Set<Number>> wildcardSetType = setTypeOf( Number.class ).parametizedAsLowerBounds();
+		Type<? extends Set<Number>> wildcardSetType = setTypeOf( Number.class ).parametizedAsUpperBounds();
 		ai.assertInjectsItems( new Number[] { 846, 42, 42.0f }, wildcardSetType );
 	}
 
 	@Test
 	public void thatCollectionAsLowerBoundIsAvailable() {
-		Type<? extends Collection<Number>> collectionType = collectionTypeOf( Number.class ).parametizedAsLowerBounds();
+		Type<? extends Collection<Number>> collectionType = collectionTypeOf( Number.class ).parametizedAsUpperBounds();
 		ai.assertInjectsItems( new Number[] { 846, 42, 42.0f }, collectionType );
 	}
 

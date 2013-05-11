@@ -70,7 +70,7 @@ public final class Packages
 	}
 
 	private static String packageNameOf( Type<?> packageOf ) {
-		return packageOf.isLowerBound()
+		return packageOf.isUpperBound()
 			? "-NONE-"
 			: packageNameOf( packageOf.getRawType() );
 	}

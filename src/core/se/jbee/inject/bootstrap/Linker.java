@@ -22,12 +22,12 @@ public interface Linker<T> {
 	 * Links the {@link Bindings} described by the given {@link Module}s to a list of artifacts that
 	 * represent those in some linker specific form.
 	 * 
-	 * @param inspector
-	 *            Default used to pick constructors (and maybe methods used as factories)
+	 * @param bindings
+	 * 
 	 * @param modules
 	 *            A list of {@link Module}s to link together.
 	 * @return A list of artifacts resulting from the {@link Module}'s declaration of
 	 *         {@link Bindings}.
 	 */
-	T[] link( Macros macros, Inspector inspector, Module... modules );
+	T[] link( Bindings bindings, Module... modules );
 }

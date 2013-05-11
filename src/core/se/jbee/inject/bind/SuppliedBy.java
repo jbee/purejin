@@ -12,8 +12,6 @@ import static se.jbee.inject.bind.Parameterize.parameterizations;
 import static se.jbee.inject.util.ToString.describe;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -26,13 +24,14 @@ import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
-import se.jbee.inject.Parameter;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Invoke;
+import se.jbee.inject.util.Constructible;
 import se.jbee.inject.util.Factory;
 import se.jbee.inject.util.Metaclass;
 import se.jbee.inject.util.Parameterization;
+import se.jbee.inject.util.Producible;
 import se.jbee.inject.util.Provider;
 
 /**
@@ -82,29 +81,20 @@ public final class SuppliedBy {
 		return new ParametrizedInstanceSupplier<T>( instance );
 	}
 
-	public static <T> Supplier<T> method( Type<T> returnType, Object instance, Method factory,
-			Parameter<?>... parameters ) {
-		final Type<?> actualReturnType = Type.returnType( factory );
-		if ( !actualReturnType.isAssignableTo( returnType ) ) {
-			throw new IllegalArgumentException( "The factory methods methods return type `"
-					+ actualReturnType + "` is not assignable to: " + returnType );
-		}
-		if ( instance != null && factory.getDeclaringClass() != instance.getClass() ) {
-			throw new IllegalArgumentException(
-					"The factory method and the instance it is invoked on have to be the same class." );
-		}
-		Parameterization<?>[] params = parameterizations( parameterTypes( factory ), parameters );
-		return new MethodSupplier<T>( returnType, factory, instance, params );
+	public static <T> Supplier<T> method( Producible<T> producible ) {
+		Parameterization<?>[] params = parameterizations( parameterTypes( producible.producer ),
+				producible.parameters );
+		return new MethodSupplier<T>( producible, params );
 	}
 
-	public static <T> Supplier<T> costructor( Constructor<T> constructor,
-			Parameter<?>... parameters ) {
-		final Class<?>[] params = constructor.getParameterTypes();
+	public static <T> Supplier<T> costructor( Constructible<T> constructible ) {
+		Constructor<T> constructor = constructible.constructor;
+		Class<?>[] params = constructor.getParameterTypes();
 		if ( params.length == 0 ) {
 			return new ConstructorSupplier<T>( constructor, NO_PARAMS );
 		}
 		return new ConstructorSupplier<T>( constructor, parameterizations(
-				parameterTypes( constructor ), parameters ) );
+				parameterTypes( constructor ), constructible.parameters ) );
 	}
 
 	public static <T> Supplier<T> factory( Factory<T> factory ) {
@@ -121,6 +111,9 @@ public final class SuppliedBy {
 
 	public static <T> Object[] resolve( Dependency<? super T> parent, Injector injector,
 			Parameterization<?>[] params ) {
+		if ( params.length == 0 ) {
+			return NO_ARGS;
+		}
 		Object[] args = new Object[params.length];
 		for ( int i = 0; i < params.length; i++ ) {
 			args[i] = resolve( parent, injector, params[i] );
@@ -336,7 +329,7 @@ public final class SuppliedBy {
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
 			Type<? super T> type = dependency.getType();
 			Instance<? extends T> parametrized = instance.typed( instance.getType().parametized(
-					type.getParameters() ).lowerBound( dependency.getType().isLowerBound() ) );
+					type.getParameters() ).upperBound( dependency.getType().isUpperBound() ) );
 			return injector.resolve( dependency.instanced( parametrized ) );
 		}
 
@@ -438,7 +431,7 @@ public final class SuppliedBy {
 	private static final class ConstructorSupplier<T>
 			implements Supplier<T> {
 
-		private final Constructor<T> constructor;
+		private final Constructor<T> constructor; //TODO use Constructible here
 		private final Parameterization<?>[] params;
 
 		ConstructorSupplier( Constructor<T> constructor, Parameterization<?>[] params ) {
@@ -449,10 +442,7 @@ public final class SuppliedBy {
 
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			final Object[] args = params.length == 0
-				? NO_ARGS
-				: resolve( dependency, injector, params );
-			return Invoke.constructor( constructor, args );
+			return Invoke.constructor( constructor, resolve( dependency, injector, params ) );
 		}
 
 		@Override
@@ -464,37 +454,29 @@ public final class SuppliedBy {
 	private static final class MethodSupplier<T>
 			implements Supplier<T> {
 
-		private final Type<T> returnType;
-		private final Method factory;
-		private final Object instance;
+		private final Producible<T> producible;
 		private final Parameterization<?>[] params;
-		private final boolean instanceMethod;
 
-		MethodSupplier( Type<T> returnType, Method factory, Object instance,
-				Parameterization<?>[] params ) {
+		MethodSupplier( Producible<T> producible, Parameterization<?>[] params ) {
 			super();
-			this.returnType = returnType;
-			this.factory = Metaclass.accessible( factory );
-			this.instance = instance;
+			this.producible = producible;
 			this.params = params;
-			this.instanceMethod = !Modifier.isStatic( factory.getModifiers() );
 		}
 
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			Object owner = instance;
-			if ( instanceMethod && owner == null ) {
-				owner = injector.resolve( Dependency.dependency( factory.getDeclaringClass() ) );
+			Object owner = producible.instance;
+			if ( producible.isInstanceMethod() && owner == null ) {
+				owner = injector.resolve( Dependency.dependency( producible.producer.getDeclaringClass() ) );
 			}
-			final Object[] args = params.length == 0
-				? NO_ARGS
-				: resolve( dependency, injector, params );
-			return returnType.getRawType().cast( Invoke.method( factory, owner, args ) );
+			return producible.returnType.getRawType().cast(
+					Invoke.method( producible.producer, owner,
+							resolve( dependency, injector, params ) ) );
 		}
 
 		@Override
 		public String toString() {
-			return describe( factory, params );
+			return describe( producible.producer, params );
 		}
 	}
 

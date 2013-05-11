@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static se.jbee.inject.Type.raw;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -63,10 +64,10 @@ public class TestType {
 		Type<List> l = Type.raw( List.class ).parametized( String.class );
 		assertThat( l.toString(), is( "java.util.List<java.lang.String>" ) );
 
-		l = Type.raw( List.class ).parametized( Type.raw( String.class ).asLowerBound() );
+		l = Type.raw( List.class ).parametized( Type.raw( String.class ).asUpperBound() );
 		assertThat( l.toString(), is( "java.util.List<? extends java.lang.String>" ) );
 
-		l = Type.raw( List.class ).parametized( Type.raw( String.class ) ).parametizedAsLowerBounds();
+		l = Type.raw( List.class ).parametized( Type.raw( String.class ) ).parametizedAsUpperBounds();
 		assertThat( l.toString(), is( "java.util.List<? extends java.lang.String>" ) );
 
 		Field stringList = TestType.class.getDeclaredField( "aStringListField" );
@@ -88,8 +89,8 @@ public class TestType {
 		Type<List> listOfNumbers = Type.raw( List.class ).parametized( Number.class );
 		assertFalse( listOfIntegers.isAssignableTo( listOfNumbers ) );
 		assertFalse( listOfNumbers.isAssignableTo( listOfIntegers ) );
-		assertTrue( listOfIntegers.isAssignableTo( listOfNumbers.parametizedAsLowerBounds() ) );
-		assertFalse( listOfNumbers.isAssignableTo( listOfIntegers.parametizedAsLowerBounds() ) );
+		assertTrue( listOfIntegers.isAssignableTo( listOfNumbers.parametizedAsUpperBounds() ) );
+		assertFalse( listOfNumbers.isAssignableTo( listOfIntegers.parametizedAsUpperBounds() ) );
 	}
 
 	@Test
@@ -99,8 +100,8 @@ public class TestType {
 		Type<Class> classOfNumbers = Type.raw( Class.class ).parametized( Number.class );
 		Type<List> listOfClassesOfNumbers = Type.raw( List.class ).parametized( classOfNumbers );
 		assertFalse( listOfClassesOfIntegers.isAssignableTo( listOfClassesOfNumbers ) );
-		assertFalse( listOfClassesOfIntegers.isAssignableTo( listOfClassesOfNumbers.parametizedAsLowerBounds() ) );
-		Type<List> listOfExtendsClassesOfExtendsNumbers = listOfClassesOfNumbers.parametized( classOfNumbers.asLowerBound().parametizedAsLowerBounds() );
+		assertFalse( listOfClassesOfIntegers.isAssignableTo( listOfClassesOfNumbers.parametizedAsUpperBounds() ) );
+		Type<List> listOfExtendsClassesOfExtendsNumbers = listOfClassesOfNumbers.parametized( classOfNumbers.asUpperBound().parametizedAsUpperBounds() );
 		assertTrue( listOfClassesOfIntegers.isAssignableTo( listOfExtendsClassesOfExtendsNumbers ) );
 	}
 
@@ -131,10 +132,10 @@ public class TestType {
 	}
 
 	@Test
-	public void testMorePreciseThanLowerBound() {
+	public void testMorePreciseThanUpperBound() {
 		Type<Integer> integer = Type.raw( Integer.class );
-		Type<? extends Integer> integerLower = Type.raw( Integer.class ).asLowerBound();
-		assertMorePrecise( integer, integerLower );
+		Type<? extends Integer> upperBoundInteger = Type.raw( Integer.class ).asUpperBound();
+		assertMorePrecise( integer, upperBoundInteger );
 	}
 
 	@Test
@@ -168,7 +169,7 @@ public class TestType {
 	@Test
 	public void testMorePreciseThanWithWildcardGenerics() {
 		Type<List> integer = Type.raw( List.class ).parametized( Integer.class );
-		Type<List> wildcardInteger = Type.raw( List.class ).parametized( Integer.class ).parametizedAsLowerBounds();
+		Type<List> wildcardInteger = Type.raw( List.class ).parametized( Integer.class ).parametizedAsUpperBounds();
 		assertMorePrecise( integer, wildcardInteger );
 	}
 
@@ -182,7 +183,7 @@ public class TestType {
 
 	@Test
 	public void testArrayType() {
-		Type<? extends Number> t = Type.raw( Number.class ).asLowerBound();
+		Type<? extends Number> t = Type.raw( Number.class ).asUpperBound();
 		assertThat( t.getArrayType().toString(), is( "? extends java.lang.Number[]" ) );
 	}
 
@@ -252,6 +253,34 @@ public class TestType {
 	@Test ( expected = IllegalArgumentException.class )
 	public void thatUpperBoundOfParameterizedTypesIsChecked() {
 		Type.raw( XList.class ).parametized( Object.class, Object.class );
+	}
+
+	@Test
+	public void thatRawTypeCanBeCastToAnySupertype() {
+		Type<ArrayList> rawArrayList = raw( ArrayList.class );
+		rawArrayList.castTo( raw( List.class ) );
+		rawArrayList.castTo( raw( List.class ).parametized( Integer.class ) );
+		rawArrayList.castTo( raw( List.class ).parametized( Integer.class ).parametizedAsUpperBounds() );
+	}
+
+	@Test
+	public void thatUnparametizedTypeCanBeCastToAllItsSupertypes() {
+		Type<Integer> integer = raw( Integer.class );
+		for ( Type<? super Integer> supertype : integer.supertypes() ) {
+			integer.castTo( supertype );
+		}
+	}
+
+	@Test ( expected = ClassCastException.class )
+	public void thatParameterizedTypeCannotBeCastToDifferentActualTypeParameterSupertype() {
+		raw( List.class ).parametized( String.class ).castTo(
+				raw( Collection.class ).parametized( Integer.class ) );
+	}
+
+	@Test
+	public void thatParameterizedTypeCanBeCastToWildcardedSupertype() {
+		raw( ArrayList.class ).parametized( Integer.class ).castTo(
+				raw( List.class ).parametized( Number.class ).parametizedAsUpperBounds() );
 	}
 
 	private static void assertContains( Type<?>[] actual, Type<?> expected ) {

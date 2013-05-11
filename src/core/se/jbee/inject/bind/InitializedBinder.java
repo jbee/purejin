@@ -12,11 +12,10 @@ import se.jbee.inject.bind.Binder.RootBinder;
 import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Inspect;
-import se.jbee.inject.bootstrap.Inspector;
 import se.jbee.inject.util.Scoped;
 
 /**
- * A {@link RootBinder} that can be initialized using the {@link #init(Bindings, Inspector)} method.
+ * A {@link RootBinder} that can be initialized using the {@link #init(Bindings)} method.
  * 
  * This allows to change the start {@link Bind} once.
  * 
@@ -42,7 +41,7 @@ public abstract class InitializedBinder
 	}
 
 	private InitializedBinder( Scope inital, Source source ) {
-		super( Bind.create( bindings( Macro.MACROS, Inspect.DEFAULT ), source, inital ) );
+		super( Bind.create( bindings( MacroModule.MACROS, Inspect.DEFAULT ), source, inital ) );
 		this.bind = super.bind();
 		this.source = source;
 	}

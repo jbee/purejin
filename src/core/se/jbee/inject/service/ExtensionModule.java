@@ -41,7 +41,7 @@ public abstract class ExtensionModule
 	@SuppressWarnings ( { "rawtypes" } )
 	public static <E extends Enum<E> & Extension<E, ? super T>, T> Dependency<Class[]> extensionDependency(
 			Class<E> extension ) {
-		return Dependency.dependency( raw( Class[].class ).parametizedAsLowerBounds() ).named(
+		return Dependency.dependency( raw( Class[].class ).parametizedAsUpperBounds() ).named(
 				namedInternal( extension.getCanonicalName() + ":" + Name.WILDCARD ) );
 	}
 }

@@ -10,7 +10,7 @@ package se.jbee.inject;
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
-public interface Resourcing<T> {
+public interface Resourced<T> {
 
 	/**
 	 * @return The {@link Resource} of this compound.

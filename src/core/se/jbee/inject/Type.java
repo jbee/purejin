@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,7 +34,7 @@ public final class Type<T>
 
 	public static final Type<Object> OBJECT = Type.raw( Object.class );
 	public static final Type<Void> VOID = raw( Void.class );
-	public static final Type<? extends Object> WILDCARD = OBJECT.asLowerBound();
+	public static final Type<? extends Object> WILDCARD = OBJECT.asUpperBound();
 
 	public static Type<?> fieldType( Field field ) {
 		return type( field.getGenericType() );
@@ -104,6 +105,13 @@ public final class Type<T>
 			GenericArrayType gat = (GenericArrayType) type;
 			return type( gat.getGenericComponentType() ).getArrayType();
 		}
+		if ( type instanceof WildcardType ) {
+			WildcardType wt = (WildcardType) type;
+			java.lang.reflect.Type[] upperBounds = wt.getUpperBounds();
+			if ( upperBounds.length == 1 ) {
+				return type( upperBounds[0] ).asUpperBound();
+			}
+		}
 		throw notSupportedYet( type );
 	}
 
@@ -118,15 +126,15 @@ public final class Type<T>
 	private final Type<?>[] params;
 
 	/**
-	 * Used to model lower bound wildcard types like <code>? extends Foo</code>
+	 * Used to model upper bound wildcard types like <code>? extends Foo</code>
 	 */
-	private final boolean lowerBound;
+	private final boolean upperBound;
 
-	private Type( boolean lowerBound, Class<T> rawType, Type<?>[] parameters ) {
+	private Type( boolean upperBound, Class<T> rawType, Type<?>[] parameters ) {
 		assert ( rawType != null );
 		this.rawType = primitiveAsWrapper( rawType );
 		this.params = parameters;
-		this.lowerBound = lowerBound;
+		this.upperBound = upperBound;
 	}
 
 	private Type( Class<T> rawType, Type<?>[] parameters ) {
@@ -147,12 +155,20 @@ public final class Type<T>
 		return type;
 	}
 
-	public Type<? extends T> asLowerBound() {
-		return lowerBound( true );
+	@SuppressWarnings ( "unchecked" )
+	public <S> Type<? extends S> castTo( Type<S> supertype ) {
+		if ( !isAssignableTo( supertype ) ) {
+			throw new ClassCastException( "Cannot cast " + this + " to " + supertype );
+		}
+		return (Type<S>) this;
 	}
 
-	public Type<? extends T> lowerBound( boolean lowerBound ) {
-		return new Type<T>( lowerBound, rawType, params );
+	public Type<? extends T> asUpperBound() {
+		return upperBound( true );
+	}
+
+	public Type<? extends T> upperBound( boolean upperBound ) {
+		return new Type<T>( upperBound, rawType, params );
 	}
 
 	public Type<? extends T> asExactType() {
@@ -162,7 +178,7 @@ public final class Type<T>
 	@SuppressWarnings ( "unchecked" )
 	public Type<T[]> getArrayType() {
 		Object proto = Array.newInstance( rawType, 0 );
-		return new Type<T[]>( lowerBound, (Class<T[]>) proto.getClass(), params );
+		return new Type<T[]>( upperBound, (Class<T[]>) proto.getClass(), params );
 	}
 
 	public boolean equalTo( Type<?> other ) {
@@ -213,7 +229,7 @@ public final class Type<T>
 
 	private <E> Type<?> asElementRawType( Class<E> elementType ) {
 		return rawType.isArray()
-			? new Type<E>( lowerBound, elementType, params )
+			? new Type<E>( upperBound, elementType, params )
 			: this;
 	}
 
@@ -268,7 +284,7 @@ public final class Type<T>
 		if ( rawType == other.rawType ) {
 			return !isParameterized() || allParametersAreAssignableTo( other );
 		}
-		return other.isLowerBound() && isAssignableTo( other.asExactType() );
+		return other.isUpperBound() && isAssignableTo( other.asExactType() );
 	}
 
 	public boolean isInterface() {
@@ -280,11 +296,11 @@ public final class Type<T>
 	}
 
 	/**
-	 * @return true if this type describes the lower bound of the required types (a wildcard
+	 * @return true if this type describes the upper bound of the required types (a wildcard
 	 *         generic).
 	 */
-	public boolean isLowerBound() {
-		return lowerBound;
+	public boolean isUpperBound() {
+		return upperBound;
 	}
 
 	/**
@@ -314,11 +330,11 @@ public final class Type<T>
 			return true;
 		}
 		if ( ( hasTypeParameter() && !isParameterized() )
-				|| ( isLowerBound() && !other.isLowerBound() ) ) {
+				|| ( isUpperBound() && !other.isUpperBound() ) ) {
 			return false; // equal or other is a subtype of this
 		}
 		if ( ( other.hasTypeParameter() && !other.isParameterized() )
-				|| ( !isLowerBound() && other.isLowerBound() ) ) {
+				|| ( !isUpperBound() && other.isUpperBound() ) ) {
 			return true;
 		}
 		if ( rawType == other.rawType ) {
@@ -349,24 +365,24 @@ public final class Type<T>
 	 * Map&lt;String,String&gt; =&gt; Map&lt;? extends String, ? extends String&gt;
 	 * </pre>
 	 * 
-	 * @return A {@link Type} having all its type arguments {@link #asLowerBound()}s. Use this to
+	 * @return A {@link Type} having all its type arguments {@link #asUpperBound()}s. Use this to
 	 *         model &lt;?&gt; wildcard generic.
 	 */
-	public Type<T> parametizedAsLowerBounds() {
+	public Type<T> parametizedAsUpperBounds() {
 		if ( !isParameterized() ) {
 			if ( isRawType() ) {
 				return parametized( wildcards( rawType.getTypeParameters() ) );
 			}
 			return this;
 		}
-		if ( allArgumentsAreLowerBounds() ) {
+		if ( allArgumentsAreUpperBounds() ) {
 			return this;
 		}
 		Type<?>[] parameters = new Type<?>[params.length];
 		for ( int i = 0; i < params.length; i++ ) {
-			parameters[i] = params[i].asLowerBound();
+			parameters[i] = params[i].asUpperBound();
 		}
-		return new Type<T>( lowerBound, rawType, parameters );
+		return new Type<T>( upperBound, rawType, parameters );
 	}
 
 	/**
@@ -378,12 +394,12 @@ public final class Type<T>
 	}
 
 	/**
-	 * @return True when all type parameters are lower bounds.
+	 * @return True when all type parameters are upper bounds.
 	 */
-	public boolean allArgumentsAreLowerBounds() {
+	public boolean allArgumentsAreUpperBounds() {
 		int c = 0;
 		for ( int i = 0; i < params.length; i++ ) {
-			if ( params[i].isLowerBound() ) {
+			if ( params[i].isUpperBound() ) {
 				c++;
 			}
 		}
@@ -400,7 +416,7 @@ public final class Type<T>
 
 	public Type<T> parametized( Type<?>... parameters ) {
 		checkParameters( parameters );
-		return new Type<T>( lowerBound, rawType, parameters );
+		return new Type<T>( upperBound, rawType, parameters );
 	}
 
 	@Override
@@ -411,7 +427,7 @@ public final class Type<T>
 	}
 
 	void toString( StringBuilder b ) {
-		if ( isLowerBound() ) {
+		if ( isUpperBound() ) {
 			if ( rawType == Object.class ) {
 				b.append( "?" );
 				return;
