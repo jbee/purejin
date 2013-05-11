@@ -15,6 +15,11 @@ import se.jbee.inject.Typed;
 public final class Producible<T>
 		implements Typed<T> {
 
+	public static Producible<?> producible( Method producer, Parameter<?>[] parameters,
+			Object instance ) {
+		return producible( Type.returnType( producer ), producer, parameters, instance );
+	}
+
 	public static <T> Producible<T> producible( Type<T> returnType, Method producer,
 			Parameter<?>[] parameters, Object instance ) {
 		return new Producible<T>( returnType, producer, parameters, instance );

@@ -9,14 +9,12 @@ import se.jbee.inject.Type;
 
 public final class Macros {
 
-	private static final Object NONE = new Object();
-
-	public static Macros macros( Class<? extends Macro<?>>... macros ) {
+	public static Macros macros( Macro<?>... macros ) {
 		Class<?>[] types = new Class<?>[macros.length];
 		Macro<?>[] mcs = new Macro<?>[macros.length];
 		for ( int i = 0; i < macros.length; i++ ) {
-			types[i] = Type.supertype( Macro.class, Type.raw( macros[i] ) ).parameter( 0 ).getRawType();
-			mcs[i] = Bootstrap.instance( macros[i] );
+			types[i] = Type.supertype( Macro.class, Type.raw( macros[i].getClass() ) ).parameter( 0 ).getRawType();
+			mcs[i] = macros[i];
 		}
 		return new Macros( types, mcs );
 	}
@@ -28,10 +26,6 @@ public final class Macros {
 		super();
 		this.types = types;
 		this.macros = macros;
-	}
-
-	public <T> Module expand( Binding<T> binding ) {
-		return expand( binding, NONE );
 	}
 
 	public <T, V> Module expand( Binding<T> binding, V value ) {

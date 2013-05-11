@@ -9,7 +9,6 @@ import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Instance.defaultInstanceOf;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.Type.returnType;
 import static se.jbee.inject.bind.Configuring.configuring;
 import static se.jbee.inject.bind.SuppliedBy.constant;
 import static se.jbee.inject.util.Constructible.constructible;
@@ -29,10 +28,8 @@ import se.jbee.inject.Scope;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Target;
 import se.jbee.inject.Type;
-import se.jbee.inject.bootstrap.Binding;
 import se.jbee.inject.bootstrap.BindingType;
 import se.jbee.inject.bootstrap.Inspector;
-import se.jbee.inject.bootstrap.Macros;
 import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.util.Factory;
 import se.jbee.inject.util.Scoped;
@@ -305,7 +302,7 @@ public class Binder {
 			return on( bind().asDefault() );
 		}
 
-		//TODO also allow naming for provided instances - this is used for value objects that become parameter
+		//OPEN also allow naming for provided instances - this is used for value objects that become parameter
 
 		public <T> void provide( Class<T> implementation, Parameter<?>... parameters ) {
 			on( bind().autobinding().asProvided() ).bind( implementation ).toConstructor(
@@ -412,6 +409,7 @@ public class Binder {
 		 * called to get to this {@link TypedBinder}.
 		 */
 		private final Binder binder;
+		private final Bind bind;
 		protected final Resource<T> resource;
 
 		TypedBinder( Binder binder, Instance<T> instance ) {
@@ -421,6 +419,7 @@ public class Binder {
 		TypedBinder( Binder binder, Resource<T> resource ) {
 			super();
 			this.binder = binder;
+			this.bind = binder.bind();
 			this.resource = resource;
 		}
 
@@ -429,16 +428,19 @@ public class Binder {
 		}
 
 		public void to( Constructor<? extends T> constructor, Parameter<?>... parameters ) {
-			toMacro( macros().expand( macroBinding(), constructible( constructor, parameters ) ) );
+			expand( constructible( constructor, parameters ) );
 		}
 
 		void to( Object instance, Method method, Parameter<?>[] parameters ) {
-			toMacro( macros().expand( macroBinding(),
-					producible( returnType( method ), method, parameters, instance ) ) );
+			expand( producible( method, parameters, instance ) );
 		}
 
 		public void toMacro( Module macro ) {
 			macro.declare( bind().bindings );
+		}
+
+		protected final void expand( Object value ) {
+			toMacro( bind().bindings.getMacros().expand( bind().asMacro( resource ), value ) );
 		}
 
 		public void to( Factory<? extends T> factory ) {
@@ -449,15 +451,15 @@ public class Binder {
 			to( supplier, BindingType.PREDEFINED );
 		}
 
-		public void to( T constant ) {
+		public final void to( T constant ) {
 			toConstant( constant );
 		}
 
-		public void to( T constant1, T constant2 ) {
+		public final void to( T constant1, T constant2 ) {
 			onMulti().toConstant( constant1 ).toConstant( constant2 );
 		}
 
-		public void to( T constant1, T constant2, T constant3 ) {
+		public final void to( T constant1, T constant2, T constant3 ) {
 			onMulti().toConstant( constant1 ).toConstant( constant2 ).toConstant( constant3 );
 		}
 
@@ -492,26 +494,23 @@ public class Binder {
 		}
 
 		public <I extends T> void to( Instance<I> instance ) {
-			toMacro( macros().expand( macroBinding(), instance ) );
+			expand( instance );
 		}
 
 		public void to( Configuring<?> configuration ) {
-			toMacro( macros().expand( macroBinding(), configuration ) );
+			expand( configuration );
 		}
 
 		public <I extends T> void toParametrized( Class<I> impl ) {
-			toMacro( macros().expand( macroBinding(), impl ) );
+			expand( impl );
 		}
 
 		public <I extends Supplier<? extends T>> void toSupplier( Class<I> impl ) {
-			//TODO extract to macro
-			//TODO if the impl class is final and monomodal there is no good reason to use a reference
-			to( SuppliedBy.reference( impl ), BindingType.SUBSTITUTED );
-			implicitBindToConstructor( defaultInstanceOf( raw( impl ) ) );
+			expand( impl ); //OPEN wrap so this case can be distinguished from toParametrized ?
 		}
 
 		protected final void to( Supplier<? extends T> supplier, BindingType type ) {
-			toMacro( macros().expand( bind().asMacro( resource, type, supplier ) ) );
+			expand( bind().asType( resource, type, supplier ) );
 		}
 
 		private TypedBinder<T> toConstant( T constant ) {
@@ -524,15 +523,7 @@ public class Binder {
 		}
 
 		final Bind bind() {
-			return binder.bind();
-		}
-
-		final Binding<T> macroBinding() {
-			return bind().asMacro( resource );
-		}
-
-		final Macros macros() {
-			return bind().bindings.getMacros();
+			return bind;
 		}
 
 		protected final Type<T> getType() {

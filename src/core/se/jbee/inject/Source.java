@@ -20,6 +20,7 @@ public final class Source
 	private final Class<?> ident;
 	private final DeclarationType declarationType;
 	public final int declarationNo;
+	private int declarations;
 
 	private Source( Class<?> ident, DeclarationType declarationType, int declarationNo ) {
 		super();
@@ -38,7 +39,7 @@ public final class Source
 
 	@Override
 	public String toString() {
-		return ident.getCanonicalName() + "#" + declarationNo + "[" + declarationType.name() + "]";
+		return ident.getSimpleName() + "#" + declarationNo + "[" + declarationType.name() + "]";
 	}
 
 	@Override
@@ -53,6 +54,6 @@ public final class Source
 	}
 
 	public Source next() {
-		return new Source( ident, declarationType, declarationNo + 1 );
+		return new Source( ident, declarationType, ++declarations );
 	}
 }

@@ -101,12 +101,12 @@ public final class Bind {
 		return bindings.getInspector();
 	}
 
-	public <T> Binding<T> asMacro( Resource<T> resource, BindingType type,
+	public <T> Binding<T> asType( Resource<T> resource, BindingType type,
 			Supplier<? extends T> supplier ) {
-		return Binding.binding( resource, type, supplier, scope, source.next() );
+		return Binding.binding( resource, type, supplier, scope, source );
 	}
 
 	public <T> Binding<T> asMacro( Resource<T> resource ) {
-		return Binding.binding( resource, BindingType.MACRO, null, scope, source.next() );
+		return asType( resource, BindingType.MACRO, null );
 	}
 }

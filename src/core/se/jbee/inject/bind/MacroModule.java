@@ -18,6 +18,7 @@ import java.lang.reflect.Constructor;
 
 import se.jbee.inject.Instance;
 import se.jbee.inject.Source;
+import se.jbee.inject.Supplier;
 import se.jbee.inject.Target;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Binding;
@@ -28,46 +29,59 @@ import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.util.Constructible;
 import se.jbee.inject.util.Producible;
 
-public final class MacroModule
-		implements Module {
+public abstract class MacroModule
+		extends BinderModule {
 
 	public static final Module NO_OP = macro();
-	@SuppressWarnings ( "unchecked" )
-	public static final Macros MACROS = Macros.macros( ExpandMacro.class, ConstructorMacro.class,
-			MethodMacro.class, SubstitutionMacro.class, ConfigurationMacro.class,
-			ForwardMacro.class );
+
+	public static final Macros MACROS = Macros.macros( new ExpandMacro(), new ConstructorMacro(),
+			new MethodMacro(), new SubstitutionMacro(), new ConfigurationMacro(),
+			new ForwardMacro() );
 
 	public static Module macro( Module mandatory, Module optional ) {
 		return optional == null || optional == NO_OP
 			? mandatory
-			: new MacroModule( mandatory, optional );
+			: new MacrosModule( mandatory, optional );
 	}
 
 	public static Module macro( Module... steps ) {
-		return new MacroModule( steps );
+		return new MacrosModule( steps );
 	}
 
-	private final Module[] steps;
-
-	private MacroModule( Module... steps ) {
-		super();
-		this.steps = steps;
+	protected MacroModule( Source source ) {
+		super( source );
 	}
 
-	@Override
-	public void declare( Bindings bindings ) {
-		for ( int i = 0; i < steps.length; i++ ) {
-			steps[i].declare( bindings );
+	private static final class MacrosModule
+			implements Module {
+
+		private final Module[] steps;
+
+		MacrosModule( Module... steps ) {
+			this.steps = steps;
+		}
+
+		@Override
+		public void declare( Bindings bindings ) {
+			for ( int i = 0; i < steps.length; i++ ) {
+				steps[i].declare( bindings );
+			}
+		}
+
+		@Override
+		public String toString() {
+			return describe( "macro", steps );
 		}
 	}
 
-	@Override
-	public String toString() {
-		return describe( "macro", steps );
-	}
+	//OPEN the below macros could maybe also impl. by the suppliers in SuppliedBy ?
 
 	private static final class ConstructorMacro
 			implements Macro<Constructible<?>> {
+
+		ConstructorMacro() {
+			// make visible
+		}
 
 		@Override
 		public <T> Module expand( Binding<T> binding, Constructible<?> constructible ) {
@@ -80,6 +94,10 @@ public final class MacroModule
 	private static final class MethodMacro
 			implements Macro<Producible<?>> {
 
+		MethodMacro() {
+			// make visible
+		}
+
 		@Override
 		public <T> Module expand( Binding<T> binding, Producible<?> producible ) {
 			return binding.suppliedBy( METHOD,
@@ -90,6 +108,10 @@ public final class MacroModule
 
 	private static final class SubstitutionMacro
 			implements Macro<Instance<?>> {
+
+		SubstitutionMacro() {
+			// make visible
+		}
 
 		@Override
 		public <T> Module expand( Binding<T> binding, Instance<?> with ) {
@@ -113,6 +135,10 @@ public final class MacroModule
 	private static final class ConfigurationMacro
 			implements Macro<Configuring<?>> {
 
+		ConfigurationMacro() {
+			// make visible
+		}
+
 		@Override
 		public <T> Module expand( Binding<T> binding, Configuring<?> by ) {
 			return binding.suppliedBy( SUBSTITUTED,
@@ -124,8 +150,20 @@ public final class MacroModule
 	private static final class ForwardMacro
 			implements Macro<Class<?>> {
 
+		ForwardMacro() {
+			// make visible
+		}
+
 		@Override
 		public <T> Module expand( Binding<T> binding, Class<?> to ) {
+			if ( Supplier.class.isAssignableFrom( to ) ) {
+				//TODO if the impl class is final and monomodal there is no good reason to use a reference
+				return macro(
+						binding.suppliedBy( SUBSTITUTED,
+								SuppliedBy.reference( (Class<? extends Supplier<? extends T>>) to ) ),
+						implicitBindToConstructor( Instance.defaultInstanceOf( raw( to ) ),
+								binding.source ) );
+			}
 			return binding.suppliedBy( SUBSTITUTED,
 					parametrizedInstance( anyOf( raw( to ).castTo( binding.getType() ) ) ) );
 		}
@@ -133,14 +171,18 @@ public final class MacroModule
 	}
 
 	private static final class ExpandMacro
-			implements Macro<Object> {
+			implements Macro<Binding<?>> {
+
+		ExpandMacro() {
+			// make visible
+		}
 
 		@Override
-		public <T> Module expand( Binding<T> binding, Object value ) {
-			if ( binding.supplier == null ) {
+		public <T> Module expand( Binding<T> binding, Binding<?> value ) {
+			if ( value.supplier == null ) {
 				throw new NullPointerException( "Binding has no supplier" );
 			}
-			return binding;
+			return value;
 		}
 
 	}
@@ -153,7 +195,7 @@ public final class MacroModule
 	}
 
 	private static final class ExplicitConstructorMacroModule<T>
-			extends BinderModule {
+			extends MacroModule {
 
 		private final Binding<T> binding;
 		private final Class<? extends T> implementer;
@@ -173,7 +215,7 @@ public final class MacroModule
 	}
 
 	private static final class ImplicitConstructorMacroModule<T>
-			extends BinderModule {
+			extends MacroModule {
 
 		private final Instance<T> instance;
 
