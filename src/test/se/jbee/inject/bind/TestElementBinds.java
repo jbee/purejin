@@ -3,6 +3,7 @@ package se.jbee.inject.bind;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.raw;
@@ -36,6 +37,7 @@ public class TestElementBinds {
 			arraybind( List[].class ).toElements( raw( ArrayList.class ), raw( LinkedList.class ) );
 			bind( ArrayList.class ).to( new ArrayList<Object>() );
 			bind( LinkedList.class ).to( new LinkedList<Object>() );
+			arraybind( Float[].class ).toElements( 2f, 4f, 7f );
 		}
 	}
 
@@ -58,5 +60,13 @@ public class TestElementBinds {
 		assertThat( elems.length, is( 2 ) );
 		assertThat( elems[0], instanceOf( ArrayList.class ) );
 		assertThat( elems[1], instanceOf( LinkedList.class ) );
+	}
+
+	@Test
+	public void thatConstantsAreBoundAsElements() {
+		Float[] floats = injector.resolve( dependency( Float[].class ) );
+		assertEquals( 2f, floats[0].floatValue(), 0.01f );
+		assertEquals( 4f, floats[1].floatValue(), 0.01f );
+		assertEquals( 7f, floats[2].floatValue(), 0.01f );
 	}
 }

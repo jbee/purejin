@@ -18,6 +18,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
+import se.jbee.inject.Array;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Packages;
@@ -564,27 +565,31 @@ public class Binder {
 			expand( parameters );
 		}
 
-		@SuppressWarnings ( "unchecked" )
 		public void toElements( E c1 ) {
 			to( array( c1 ) );
 		}
 
-		@SuppressWarnings ( "unchecked" )
 		public void toElements( E c1, E c2 ) {
 			to( array( c1, c2 ) );
 		}
 
-		@SuppressWarnings ( "unchecked" )
 		public void toElements( E c1, E c2, E c3 ) {
 			to( array( c1, c2, c3 ) );
 		}
 
 		public void toElements( E... constants ) {
-			to( constants );
+			to( array( constants ) );
 		}
 
-		private static <E> E[] array( E... elements ) {
-			return elements;
+		@SuppressWarnings ( "unchecked" )
+		private E[] array( Object... elements ) {
+			Class<E[]> rawType = getType().getRawType();
+			if ( elements.getClass() == rawType ) {
+				return (E[]) elements;
+			}
+			E[] a = Array.newArrayInstance( rawType, elements.length );
+			System.arraycopy( elements, 0, a, 0, a.length );
+			return a;
 		}
 	}
 
