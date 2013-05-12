@@ -132,6 +132,13 @@ public abstract class MacroModule
 
 		@Override
 		public <T> Module expand( Binding<T> binding, Instance<?> with ) {
+			if ( Supplier.class.isAssignableFrom( with.getType().getRawType() ) ) {
+				//TODO if the impl class is final and monomodal there is no good reason to use a reference
+				@SuppressWarnings ( "unchecked" )
+				Class<? extends Supplier<? extends T>> supplier = (Class<? extends Supplier<? extends T>>) with.getType().getRawType();
+				return macro( binding.suppliedBy( SUBSTITUTED, SuppliedBy.reference( supplier ) ),
+						implicitBindToConstructor( with, binding.source ) );
+			}
 			final Type<? extends T> type = with.getType().castTo( binding.getType() );
 			final Instance<T> bound = binding.getInstance();
 			if ( !bound.getType().equalTo( type )
@@ -173,15 +180,6 @@ public abstract class MacroModule
 
 		@Override
 		public <T> Module expand( Binding<T> binding, Class<?> to ) {
-			if ( Supplier.class.isAssignableFrom( to ) ) {
-				//TODO if the impl class is final and monomodal there is no good reason to use a reference
-				@SuppressWarnings ( "unchecked" )
-				Class<? extends Supplier<? extends T>> supplier = (Class<? extends Supplier<? extends T>>) to;
-				return macro(
-						binding.suppliedBy( SUBSTITUTED, SuppliedBy.reference( supplier ) ),
-						implicitBindToConstructor( Instance.defaultInstanceOf( raw( to ) ),
-								binding.source ) );
-			}
 			return binding.suppliedBy( SUBSTITUTED,
 					parametrizedInstance( anyOf( raw( to ).castTo( binding.getType() ) ) ) );
 		}

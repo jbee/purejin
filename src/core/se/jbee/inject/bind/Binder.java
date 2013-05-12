@@ -500,7 +500,7 @@ public class Binder {
 		}
 
 		public <I extends Supplier<? extends T>> void toSupplier( Class<I> impl ) {
-			expand( impl ); //OPEN wrap so this case can be distinguished from toParametrized ?
+			expand( defaultInstanceOf( raw( impl ) ) );
 		}
 
 		protected final void to( Supplier<? extends T> supplier, BindingType type ) {
