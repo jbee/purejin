@@ -320,8 +320,14 @@ public final class Type<T>
 		return rawType.getTypeParameters().length > 0;
 	}
 
-	public boolean isUnidimensionalArray() {
-		return rawType.isArray() && !rawType.getComponentType().isArray();
+	public int arrayDimensions() {
+		return arrayDimensions( rawType );
+	}
+
+	private static int arrayDimensions( Class<?> type ) {
+		return !type.isArray()
+			? 0
+			: 1 + arrayDimensions( type.getComponentType() );
 	}
 
 	@Override
@@ -456,7 +462,8 @@ public final class Type<T>
 		if ( parameters.length == 0 ) {
 			return; // its treated as raw-type
 		}
-		if ( isUnidimensionalArray() ) {
+		if ( arrayDimensions() == 1 ) {
+			//FIXME most likely the element type should always be a non-array type even when multi dimensional arrays are used 
 			elementRawType().checkParameters( parameters );
 			return;
 		}

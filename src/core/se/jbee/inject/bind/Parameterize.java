@@ -62,6 +62,16 @@ public final class Parameterize {
 		return new SuppliedParameter<S>( supertype, parameterization( parameter ) );
 	}
 
+	public static <E> Parameterization<? extends E>[] parameterizations(
+			Parameter<? extends E>... parameters ) {
+		@SuppressWarnings ( "unchecked" )
+		Parameterization<? extends E>[] params = new Parameterization[parameters.length];
+		for ( int i = 0; i < parameters.length; i++ ) {
+			params[i] = parameterization( parameters[i] );
+		}
+		return params;
+	}
+
 	public static Parameterization<?>[] parameterizations( Type<?>[] types,
 			Parameter<?>... parameters ) {
 		Parameterization<?>[] params = new Parameterization<?>[types.length];

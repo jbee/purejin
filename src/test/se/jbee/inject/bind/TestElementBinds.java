@@ -5,6 +5,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertThat;
 import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Type.raw;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -32,7 +33,7 @@ public class TestElementBinds {
 		protected void declare() {
 			arraybind( String[].class ).toElements( "foo", "bar" );
 			arraybind( Number[].class ).toElements( 2, 3f );
-			arraybind( List[].class ).toElements( ArrayList.class, LinkedList.class );
+			arraybind( List[].class ).toElements( raw( ArrayList.class ), raw( LinkedList.class ) );
 			bind( ArrayList.class ).to( new ArrayList<Object>() );
 			bind( LinkedList.class ).to( new LinkedList<Object>() );
 		}

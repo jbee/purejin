@@ -35,6 +35,11 @@ public final class Array {
 	}
 
 	@SuppressWarnings ( "unchecked" )
+	public static <T> T[] newArrayInstance( Class<T[]> arrayType, int length ) {
+		return (T[]) java.lang.reflect.Array.newInstance( arrayType.getComponentType(), length );
+	}
+
+	@SuppressWarnings ( "unchecked" )
 	public static <T> T[] fill( T value, int length ) {
 		T[] res = (T[]) newInstance( value.getClass(), length );
 		for ( int i = 0; i < res.length; i++ ) {

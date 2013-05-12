@@ -10,7 +10,6 @@ import static se.jbee.inject.Instance.defaultInstanceOf;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.bind.Configuring.configuring;
-import static se.jbee.inject.bind.SuppliedBy.constant;
 import static se.jbee.inject.util.Constructible.constructible;
 import static se.jbee.inject.util.Metaclass.metaclass;
 import static se.jbee.inject.util.Producible.producible;
@@ -19,6 +18,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
+import se.jbee.inject.Array;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Packages;
@@ -62,7 +62,7 @@ public class Binder {
 	}
 
 	public <E> TypedElementBinder<E> arraybind( Class<E[]> type ) {
-		return new TypedElementBinder<E>( this, defaultInstanceOf( raw( type ) ) );
+		return new TypedElementBinder<E>( bind(), defaultInstanceOf( raw( type ) ) );
 	}
 
 	public <T> TypedBinder<T> autobind( Class<T> type ) {
@@ -78,7 +78,7 @@ public class Binder {
 	}
 
 	public <T> TypedBinder<T> bind( Instance<T> instance ) {
-		return new TypedBinder<T>( this, instance );
+		return new TypedBinder<T>( bind(), instance );
 	}
 
 	public <T> TypedBinder<T> bind( Name name, Class<T> type ) {
@@ -404,22 +404,16 @@ public class Binder {
 
 	public static class TypedBinder<T> {
 
-		/**
-		 * The binder instance who's {@link RichBasicBinder#assemble(Instance)} method had been
-		 * called to get to this {@link TypedBinder}.
-		 */
-		private final Binder binder;
 		private final Bind bind;
 		protected final Resource<T> resource;
 
-		TypedBinder( Binder binder, Instance<T> instance ) {
-			this( binder, new Resource<T>( instance, binder.bind().target ) );
+		TypedBinder( Bind bind, Instance<T> instance ) {
+			this( bind, new Resource<T>( instance, bind.target ) );
 		}
 
-		TypedBinder( Binder binder, Resource<T> resource ) {
+		TypedBinder( Bind bind, Resource<T> resource ) {
 			super();
-			this.binder = binder;
-			this.bind = binder.bind();
+			this.bind = bind;
 			this.resource = resource;
 		}
 
@@ -518,10 +512,6 @@ public class Binder {
 			return this;
 		}
 
-		<I> void implicitBindToConstructor( Instance<I> instance ) {
-			binder.implicitBindToConstructor( instance );
-		}
-
 		final Bind bind() {
 			return bind;
 		}
@@ -531,7 +521,7 @@ public class Binder {
 		}
 
 		protected final TypedBinder<T> on( Bind bind ) {
-			return new TypedBinder<T>( binder.on( bind ), resource );
+			return new TypedBinder<T>( bind, resource );
 		}
 
 		protected final TypedBinder<T> onMulti() {
@@ -551,72 +541,37 @@ public class Binder {
 	public static class TypedElementBinder<E>
 			extends TypedBinder<E[]> {
 
-		TypedElementBinder( Binder binder, Instance<E[]> instance ) {
-			super( binder.on( binder.bind().asMulti() ), instance );
+		TypedElementBinder( Bind bind, Instance<E[]> instance ) {
+			super( bind.asMulti(), instance );
 		}
 
 		@SuppressWarnings ( "unchecked" )
-		public void to( Supplier<? extends E> supplier1, Supplier<? extends E> supplier2 ) {
-			to( (Supplier<? extends E>[]) new Supplier<?>[] { supplier1, supplier2 } );
+		public void toElements( Parameter<? extends E> p1 ) {
+			toElements( new Parameter[] { p1 } );
 		}
 
 		@SuppressWarnings ( "unchecked" )
-		public void to( Supplier<? extends E> supplier1, Supplier<? extends E> supplier2,
-				Supplier<? extends E> supplier3 ) {
-			to( (Supplier<? extends E>[]) new Supplier<?>[] { supplier1, supplier2, supplier3 } );
-		}
-
-		public void to( Supplier<? extends E>[] elements ) {
-			to( SuppliedBy.references( getType().getRawType(), elements ) );
-		}
-
-		//TODO use Parameters instead of Suppliers
-
-		@SuppressWarnings ( "unchecked" )
-		public void toElements( Class<? extends E>... impls ) {
-			Supplier<? extends E>[] suppliers = (Supplier<? extends E>[]) new Supplier<?>[impls.length];
-			for ( int i = 0; i < impls.length; i++ ) {
-				suppliers[i] = supply( impls[i] );
-			}
-			to( suppliers );
-		}
-
-		public void toElements( Class<? extends E> impl1, Class<? extends E> impl2 ) {
-			to( supply( impl1 ), supply( impl2 ) );
-		}
-
-		public void toElements( Class<? extends E> impl1, Class<? extends E> impl2,
-				Class<? extends E> impl3 ) {
-			to( supply( impl1 ), supply( impl2 ), supply( impl3 ) );
+		public void toElements( Parameter<? extends E> p1, Parameter<? extends E> p2 ) {
+			toElements( new Parameter[] { p1, p2 } );
 		}
 
 		@SuppressWarnings ( "unchecked" )
-		public void toElements( Class<? extends E> impl1, Class<? extends E> impl2,
-				Class<? extends E> impl3, Class<? extends E> impl4 ) {
-			to( (Supplier<? extends E>[]) new Supplier<?>[] { supply( impl1 ), supply( impl2 ),
-					supply( impl3 ), supply( impl4 ) } );
+		public void toElements( Parameter<? extends E> p1, Parameter<? extends E> p2,
+				Parameter<? extends E> p3 ) {
+			toElements( new Parameter[] { p1, p2, p3 } );
+		}
+
+		public void toElements( Parameter<? extends E>... parameters ) {
+			expand( parameters );
 		}
 
 		public void toElements( E constant1, E constant2 ) {
-			to( constant( constant1 ), constant( constant2 ) );
+			E[] elements = Array.newArrayInstance( getType().getRawType(), 2 );
+			elements[0] = constant1;
+			elements[1] = constant2;
+			to( elements );
 		}
 
-		<I> Supplier<I> supply( Class<I> impl ) {
-			return supply( Instance.anyOf( raw( impl ) ) );
-		}
-
-		<I> Supplier<I> supply( Instance<I> instance ) {
-			if ( !resource.getInstance().equalTo( instance ) ) {
-				implicitBindToConstructor( instance );
-				return SuppliedBy.instance( instance );
-			}
-			if ( instance.getType().getRawType().isInterface() ) {
-				throw new IllegalArgumentException( "Interface type linked in a loop: "
-						+ resource.getInstance() + " > " + instance );
-			}
-			return SuppliedBy.costructor( constructible( bind().getInspector().constructorFor(
-					instance.getType().getRawType() ) ) );
-		}
 	}
 
 }

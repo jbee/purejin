@@ -114,12 +114,13 @@ public final class Inject {
 		@Override
 		public <T> T resolve( Dependency<T> dependency ) {
 			final Type<T> type = dependency.getType();
-			final boolean array = type.isUnidimensionalArray();
+			final int array = type.arrayDimensions();
 			Injectron<T> injectron = applicableInjectron( dependency );
 			if ( injectron != null ) {
 				return injectron.instanceFor( dependency );
 			}
-			if ( array ) {
+			if ( array == 1 ) {
+				//OPEN what about 2D array to get all "values" when the "value" type is a 1D array ? Test if this works
 				return resolveArray( dependency, type.elementType() );
 			}
 			if ( type.getRawType() == Injectron.class ) {

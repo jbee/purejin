@@ -10,6 +10,7 @@ import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.bind.SuppliedBy.parametrizedInstance;
 import static se.jbee.inject.bootstrap.BindingType.CONSTRUCTOR;
 import static se.jbee.inject.bootstrap.BindingType.METHOD;
+import static se.jbee.inject.bootstrap.BindingType.PREDEFINED;
 import static se.jbee.inject.bootstrap.BindingType.SUBSTITUTED;
 import static se.jbee.inject.util.Metaclass.metaclass;
 import static se.jbee.inject.util.ToString.describe;
@@ -17,6 +18,7 @@ import static se.jbee.inject.util.ToString.describe;
 import java.lang.reflect.Constructor;
 
 import se.jbee.inject.Instance;
+import se.jbee.inject.Parameter;
 import se.jbee.inject.Source;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Target;
@@ -36,7 +38,7 @@ public abstract class MacroModule
 
 	public static final Macros MACROS = Macros.macros( new ExpandMacro(), new ConstructorMacro(),
 			new MethodMacro(), new SubstitutionMacro(), new ConfigurationMacro(),
-			new ForwardMacro() );
+			new ForwardMacro(), new ArrayElementsMacro() );
 
 	public static Module macro( Module mandatory, Module optional ) {
 		return optional == null || optional == NO_OP
@@ -52,26 +54,39 @@ public abstract class MacroModule
 		super( source );
 	}
 
-	private static final class MacrosModule
-			implements Module {
+	private static final class ExpandMacro
+			implements Macro<Binding<?>> {
 
-		private final Module[] steps;
-
-		MacrosModule( Module... steps ) {
-			this.steps = steps;
+		ExpandMacro() {
+			// make visible
 		}
 
 		@Override
-		public void declare( Bindings bindings ) {
-			for ( int i = 0; i < steps.length; i++ ) {
-				steps[i].declare( bindings );
+		public <T> Module expand( Binding<T> binding, Binding<?> value ) {
+			if ( value.supplier == null ) {
+				throw new NullPointerException( "Binding has no supplier" );
 			}
+			return value;
+		}
+
+	}
+
+	private static final class ArrayElementsMacro
+			implements Macro<Parameter<?>[]> {
+
+		ArrayElementsMacro() {
+			// make visible
 		}
 
 		@Override
-		public String toString() {
-			return describe( "macro", steps );
+		public <T> Module expand( Binding<T> binding, Parameter<?>[] elements ) {
+			return binding.suppliedBy( PREDEFINED, supplier( (Type) binding.getType(), elements ) );
 		}
+
+		static <E> Supplier<E> supplier( Type<E[]> array, Parameter<?>[] elements ) {
+			return (Supplier<E>) SuppliedBy.elements( array, (Parameter<? extends E>[]) elements );
+		}
+
 	}
 
 	//OPEN the below macros could maybe also impl. by the suppliers in SuppliedBy ?
@@ -170,28 +185,33 @@ public abstract class MacroModule
 
 	}
 
-	private static final class ExpandMacro
-			implements Macro<Binding<?>> {
-
-		ExpandMacro() {
-			// make visible
-		}
-
-		@Override
-		public <T> Module expand( Binding<T> binding, Binding<?> value ) {
-			if ( value.supplier == null ) {
-				throw new NullPointerException( "Binding has no supplier" );
-			}
-			return value;
-		}
-
-	}
-
 	static <T> Module implicitBindToConstructor( Instance<T> instance, Source source ) {
 		Class<T> impl = instance.getType().getRawType();
 		return metaclass( impl ).undeterminable()
 			? null
 			: new ImplicitConstructorMacroModule<T>( instance, source );
+	}
+
+	private static final class MacrosModule
+			implements Module {
+
+		private final Module[] steps;
+
+		MacrosModule( Module... steps ) {
+			this.steps = steps;
+		}
+
+		@Override
+		public void declare( Bindings bindings ) {
+			for ( int i = 0; i < steps.length; i++ ) {
+				steps[i].declare( bindings );
+			}
+		}
+
+		@Override
+		public String toString() {
+			return describe( "macro", steps );
+		}
 	}
 
 	private static final class ExplicitConstructorMacroModule<T>

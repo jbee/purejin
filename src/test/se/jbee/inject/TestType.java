@@ -1,6 +1,7 @@
 package se.jbee.inject;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -115,13 +116,13 @@ public class TestType {
 	@Test
 	public void shouldRecognize1DimensionalArrayTypes() {
 		Type<Number[]> t = Type.raw( Number[].class );
-		assertTrue( t.isUnidimensionalArray() );
+		assertEquals( 1, t.arrayDimensions() );
 	}
 
 	@Test
 	public void shouldNotRecognizeMultiDimensionalArrayTypesAsArray1D() {
 		Type<Number[][]> t = Type.raw( Number[][].class );
-		assertFalse( t.isUnidimensionalArray() );
+		assertEquals( 2, t.arrayDimensions() );
 	}
 
 	@Test

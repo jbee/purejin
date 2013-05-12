@@ -7,7 +7,6 @@ package se.jbee.inject.bind;
 
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Type.parameterTypes;
-import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.bind.Parameterize.parameterizations;
 import static se.jbee.inject.util.ToString.describe;
 
@@ -24,6 +23,7 @@ import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
+import se.jbee.inject.Parameter;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Invoke;
@@ -64,9 +64,9 @@ public final class SuppliedBy {
 		return new ReferenceSupplier<T>( type );
 	}
 
-	public static <E> Supplier<E[]> references( Class<E[]> arrayType,
-			Supplier<? extends E>[] elements ) {
-		return new ReferencesSupplier<E>( arrayType, elements );
+	public static <E> Supplier<E[]> elements( Type<E[]> arrayType,
+			Parameter<? extends E>[] elements ) {
+		return new ElementsSupplier<E>( arrayType, parameterizations( elements ) );
 	}
 
 	public static <T> Supplier<T> instance( Instance<T> instance ) {
@@ -271,13 +271,13 @@ public final class SuppliedBy {
 	 * 
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	private static final class ReferencesSupplier<E>
+	private static final class ElementsSupplier<E>
 			implements Supplier<E[]> {
 
-		private final Class<E[]> arrayType;
-		private final Supplier<? extends E>[] elements;
+		private final Type<E[]> arrayType;
+		private final Parameterization<? extends E>[] elements;
 
-		ReferencesSupplier( Class<E[]> arrayType, Supplier<? extends E>[] elements ) {
+		ElementsSupplier( Type<E[]> arrayType, Parameterization<? extends E>[] elements ) {
 			super();
 			this.arrayType = arrayType;
 			this.elements = elements;
@@ -286,11 +286,11 @@ public final class SuppliedBy {
 		@SuppressWarnings ( "unchecked" )
 		@Override
 		public E[] supply( Dependency<? super E[]> dependency, Injector injector ) {
-			E[] res = (E[]) Array.newInstance( arrayType.getComponentType(), elements.length );
+			final Type<?> elementType = arrayType.elementType();
+			final E[] res = (E[]) Array.newInstance( elementType.getRawType(), elements.length );
+			final Dependency<E> elementDependency = (Dependency<E>) dependency.typed( elementType );
 			int i = 0;
-			final Dependency<E> elementDependency = (Dependency<E>) dependency.typed( raw(
-					arrayType ).elementType() );
-			for ( Supplier<? extends E> e : elements ) {
+			for ( Parameterization<? extends E> e : elements ) {
 				res[i++] = e.supply( elementDependency, injector );
 			}
 			return res;
