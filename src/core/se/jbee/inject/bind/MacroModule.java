@@ -79,10 +79,12 @@ public abstract class MacroModule
 		}
 
 		@Override
+		@SuppressWarnings ( { "unchecked", "rawtypes" } )
 		public <T> Module expand( Binding<T> binding, Parameter<?>[] elements ) {
 			return binding.suppliedBy( PREDEFINED, supplier( (Type) binding.getType(), elements ) );
 		}
 
+		@SuppressWarnings ( "unchecked" )
 		static <E> Supplier<E> supplier( Type<E[]> array, Parameter<?>[] elements ) {
 			return (Supplier<E>) SuppliedBy.elements( array, (Parameter<? extends E>[]) elements );
 		}
@@ -173,9 +175,10 @@ public abstract class MacroModule
 		public <T> Module expand( Binding<T> binding, Class<?> to ) {
 			if ( Supplier.class.isAssignableFrom( to ) ) {
 				//TODO if the impl class is final and monomodal there is no good reason to use a reference
+				@SuppressWarnings ( "unchecked" )
+				Class<? extends Supplier<? extends T>> supplier = (Class<? extends Supplier<? extends T>>) to;
 				return macro(
-						binding.suppliedBy( SUBSTITUTED,
-								SuppliedBy.reference( (Class<? extends Supplier<? extends T>>) to ) ),
+						binding.suppliedBy( SUBSTITUTED, SuppliedBy.reference( supplier ) ),
 						implicitBindToConstructor( Instance.defaultInstanceOf( raw( to ) ),
 								binding.source ) );
 			}
