@@ -38,6 +38,7 @@ public class TestElementBinds {
 			bind( ArrayList.class ).to( new ArrayList<Object>() );
 			bind( LinkedList.class ).to( new LinkedList<Object>() );
 			arraybind( Float[].class ).toElements( 2f, 4f, 7f );
+			arraybind( Long[].class ).toElements( 1L, 2L, 3L, 4L ); // a varargs
 		}
 	}
 
@@ -68,5 +69,11 @@ public class TestElementBinds {
 		assertEquals( 2f, floats[0].floatValue(), 0.01f );
 		assertEquals( 4f, floats[1].floatValue(), 0.01f );
 		assertEquals( 7f, floats[2].floatValue(), 0.01f );
+	}
+
+	@Test
+	public void thatVarargsConstantsAreBoundAsElements() {
+		assertArrayEquals( new Long[] { 1L, 2L, 3L, 4L },
+				injector.resolve( dependency( Long[].class ) ) );
 	}
 }
