@@ -25,6 +25,7 @@ import se.jbee.inject.Target;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Binding;
 import se.jbee.inject.bootstrap.Bindings;
+import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Macro;
 import se.jbee.inject.bootstrap.Macros;
 import se.jbee.inject.bootstrap.Module;
@@ -132,14 +133,18 @@ public abstract class MacroModule
 
 		@Override
 		public <T> Module expand( Binding<T> binding, Instance<?> with ) {
-			if ( Supplier.class.isAssignableFrom( with.getType().getRawType() ) ) {
-				//TODO if the impl class is final and monomodal there is no good reason to use a reference
+			Type<?> t = with.getType();
+			if ( t.isAssignableTo( raw( Supplier.class ) )
+					&& !binding.getType().isAssignableTo( raw( Supplier.class ) ) ) {
 				@SuppressWarnings ( "unchecked" )
-				Class<? extends Supplier<? extends T>> supplier = (Class<? extends Supplier<? extends T>>) with.getType().getRawType();
+				Class<? extends Supplier<? extends T>> supplier = (Class<? extends Supplier<? extends T>>) t.getRawType();
+				if ( t.isFinal() && metaclass( t.getRawType() ).monomodal() ) {
+					binding.suppliedBy( SUBSTITUTED, Bootstrap.instance( supplier ) );
+				}
 				return macro( binding.suppliedBy( SUBSTITUTED, SuppliedBy.reference( supplier ) ),
 						implicitBindToConstructor( with, binding.source ) );
 			}
-			final Type<? extends T> type = with.getType().castTo( binding.getType() );
+			final Type<? extends T> type = t.castTo( binding.getType() );
 			final Instance<T> bound = binding.getInstance();
 			if ( !bound.getType().equalTo( type )
 					|| !with.getName().isApplicableFor( bound.getName() ) ) {
@@ -147,7 +152,7 @@ public abstract class MacroModule
 						binding.suppliedBy( SUBSTITUTED, SuppliedBy.instance( with.typed( type ) ) ),
 						implicitBindToConstructor( with, binding.source ) );
 			}
-			if ( type.getRawType().isInterface() ) {
+			if ( type.isInterface() ) {
 				throw new IllegalArgumentException( "Interface type linked in a loop: " + bound
 						+ " > " + with );
 			}

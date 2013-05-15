@@ -295,6 +295,10 @@ public final class Type<T>
 		return Modifier.isAbstract( rawType.getModifiers() );
 	}
 
+	public boolean isFinal() {
+		return Modifier.isFinal( rawType.getModifiers() );
+	}
+
 	/**
 	 * @return true if this type describes the upper bound of the required types (a wildcard
 	 *         generic).

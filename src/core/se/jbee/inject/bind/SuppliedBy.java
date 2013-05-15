@@ -64,8 +64,7 @@ public final class SuppliedBy {
 		return new ReferenceSupplier<T>( type );
 	}
 
-	public static <E> Supplier<E[]> elements( Type<E[]> arrayType,
-			Parameter<? extends E>[] elements ) {
+	public static <E> Supplier<E[]> elements( Type<E[]> arrayType, Parameter<? extends E>[] elements ) {
 		return new ElementsSupplier<E>( arrayType, parameterizations( elements ) );
 	}
 
@@ -239,28 +238,28 @@ public final class SuppliedBy {
 
 		@Override
 		public String toString() {
-			return dependency.toString();
+			return describe( "supplies", dependency );
 		}
 	}
 
 	private static final class ConstantSupplier<T>
 			implements Supplier<T> {
 
-		private final T instance;
+		private final T constant;
 
-		ConstantSupplier( T instance ) {
+		ConstantSupplier( T constant ) {
 			super();
-			this.instance = instance;
+			this.constant = constant;
 		}
 
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			return instance;
+			return constant;
 		}
 
 		@Override
 		public String toString() {
-			return instance.toString();
+			return describe( "supplies", constant );
 		}
 
 	}
@@ -296,6 +295,10 @@ public final class SuppliedBy {
 			return res;
 		}
 
+		@Override
+		public String toString() {
+			return describe( "supplies", elements );
+		}
 	}
 
 	private static final class ReferenceSupplier<T>
@@ -335,7 +338,7 @@ public final class SuppliedBy {
 
 		@Override
 		public String toString() {
-			return instance.toString();
+			return describe( "supplies", instance );
 		}
 
 	}
@@ -357,7 +360,7 @@ public final class SuppliedBy {
 
 		@Override
 		public String toString() {
-			return instance.toString();
+			return describe( "supplies", instance );
 		}
 	}
 
@@ -377,6 +380,10 @@ public final class SuppliedBy {
 			return lazyProvider( providedType.uninject().ignoredExpiry(), injector );
 		}
 
+		@Override
+		public String toString() {
+			return describe( "supplies", Provider.class );
+		}
 	}
 
 	private static final class LazyProvider<T>
@@ -423,7 +430,7 @@ public final class SuppliedBy {
 
 		@Override
 		public String toString() {
-			return describe( "factory", factory );
+			return describe( "supplies", factory );
 		}
 
 	}

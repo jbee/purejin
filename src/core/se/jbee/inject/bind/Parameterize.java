@@ -7,6 +7,7 @@ package se.jbee.inject.bind;
 
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.util.ToString.describe;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
@@ -139,7 +140,7 @@ public final class Parameterize {
 
 		@Override
 		public String toString() {
-			return "<" + supplied + ":" + supplier + ">";
+			return describe( supplied, supplier );
 		}
 	}
 }
