@@ -3,7 +3,7 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject.bind;
+package se.jbee.inject.bootstrap;
 
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Type.raw;
@@ -22,6 +22,8 @@ import se.jbee.inject.util.Parameterization;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Parameterize {
+
+	private static final Parameterization<?>[] NO_PARAMS = new Parameterization<?>[0];
 
 	@SuppressWarnings ( "unchecked" )
 	public static <T> Parameterization<T> parameterization( Parameter<T> parameter ) {
@@ -75,6 +77,9 @@ public final class Parameterize {
 
 	public static Parameterization<?>[] parameterizations( Type<?>[] types,
 			Parameter<?>... parameters ) {
+		if ( types.length == 0 ) {
+			return NO_PARAMS;
+		}
 		Parameterization<?>[] params = new Parameterization<?>[types.length];
 		for ( Parameter<?> parameter : parameters ) {
 			int i = 0;

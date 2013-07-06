@@ -3,11 +3,11 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject.bind;
+package se.jbee.inject.bootstrap;
 
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Type.parameterTypes;
-import static se.jbee.inject.bind.Parameterize.parameterizations;
+import static se.jbee.inject.bootstrap.Parameterize.parameterizations;
 import static se.jbee.inject.util.ToString.describe;
 
 import java.lang.reflect.Constructor;
@@ -26,7 +26,6 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
-import se.jbee.inject.bootstrap.Invoke;
 import se.jbee.inject.util.Constructible;
 import se.jbee.inject.util.Factory;
 import se.jbee.inject.util.Metaclass;
@@ -41,7 +40,6 @@ import se.jbee.inject.util.Provider;
  */
 public final class SuppliedBy {
 
-	private static final Parameterization<?>[] NO_PARAMS = new Parameterization<?>[0];
 	static final Object[] NO_ARGS = new Object[0];
 
 	private static final Supplier<?> REQUIRED = new RequiredSupplier<Object>();
@@ -81,19 +79,11 @@ public final class SuppliedBy {
 	}
 
 	public static <T> Supplier<T> method( Producible<T> producible ) {
-		Parameterization<?>[] params = parameterizations( parameterTypes( producible.producer ),
-				producible.parameters );
-		return new MethodSupplier<T>( producible, params );
+		return new MethodSupplier<T>( producible );
 	}
 
 	public static <T> Supplier<T> costructor( Constructible<T> constructible ) {
-		Constructor<T> constructor = constructible.constructor;
-		Class<?>[] params = constructor.getParameterTypes();
-		if ( params.length == 0 ) {
-			return new ConstructorSupplier<T>( constructor, NO_PARAMS );
-		}
-		return new ConstructorSupplier<T>( constructor, parameterizations(
-				parameterTypes( constructor ), constructible.parameters ) );
+		return new ConstructorSupplier<T>( constructible );
 	}
 
 	public static <T> Supplier<T> factory( Factory<T> factory ) {
@@ -438,13 +428,13 @@ public final class SuppliedBy {
 	private static final class ConstructorSupplier<T>
 			implements Supplier<T> {
 
-		private final Constructor<T> constructor; //TODO use Constructible here
+		private final Constructor<T> constructor;
 		private final Parameterization<?>[] params;
 
-		ConstructorSupplier( Constructor<T> constructor, Parameterization<?>[] params ) {
-			super();
-			this.constructor = Metaclass.accessible( constructor );
-			this.params = params;
+		ConstructorSupplier( Constructible<T> constructible ) {
+			this.constructor = Metaclass.accessible( constructible.constructor );
+			this.params = parameterizations( parameterTypes( constructor ),
+					constructible.parameters );
 		}
 
 		@Override
@@ -464,10 +454,11 @@ public final class SuppliedBy {
 		private final Producible<T> producible;
 		private final Parameterization<?>[] params;
 
-		MethodSupplier( Producible<T> producible, Parameterization<?>[] params ) {
+		MethodSupplier( Producible<T> producible ) {
 			super();
 			this.producible = producible;
-			this.params = params;
+			this.params = parameterizations( parameterTypes( producible.producer ),
+					producible.parameters );
 		}
 
 		@Override

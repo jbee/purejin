@@ -22,7 +22,6 @@ import se.jbee.inject.Array;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Injectron;
 import se.jbee.inject.Type;
-import se.jbee.inject.bind.MacroModule;
 import se.jbee.inject.config.Edition;
 import se.jbee.inject.config.Feature;
 import se.jbee.inject.config.Globals;
@@ -47,18 +46,17 @@ public final class Bootstrap {
 	}
 
 	public static Injector injector( Class<? extends Bundle> root, Globals globals ) {
-		return injector( root, Inspect.DEFAULT, globals );
+		return injector( root, bindings( Macros.DEFAULT, Inspect.DEFAULT ), globals );
 	}
 
-	public static Injector injector( Class<? extends Bundle> root, Inspector inspector,
+	public static Injector injector( Class<? extends Bundle> root, Bindings bindings,
 			Globals globals ) {
-		return injector( MacroModule.MACROS, inspector, Link.BUILDIN,
-				modulariser( globals ).modularise( root ) );
+		return injector( bindings, Link.BUILDIN, modulariser( globals ).modularise( root ) );
 	}
 
-	public static Injector injector( Macros macros, Inspector inspector,
-			Linker<Suppliable<?>> linker, Module[] modules ) {
-		return Inject.from( Suppliable.source( linker.link( bindings( macros, inspector ), modules ) ) );
+	public static Injector injector( Bindings bindings, Linker<Suppliable<?>> linker,
+			Module[] modules ) {
+		return Inject.from( Suppliable.source( linker.link( bindings, modules ) ) );
 	}
 
 	public static Modulariser modulariser( Globals globals ) {
@@ -69,9 +67,9 @@ public final class Bootstrap {
 		return new BuildinBootstrapper( globals );
 	}
 
-	public static Suppliable<?>[] suppliables( Class<? extends Bundle> root ) {
-		return Link.BUILDIN.link( bindings( MacroModule.MACROS, Inspect.DEFAULT ),
-				modulariser( Globals.STANDARD ).modularise( root ) );
+	public static Suppliable<?>[] suppliables( Class<? extends Bundle> root, Bindings bindings,
+			Globals globals ) {
+		return Link.BUILDIN.link( bindings, modulariser( globals ).modularise( root ) );
 	}
 
 	public static <T> Module module( PresetModule<T> module, Presets presets ) {

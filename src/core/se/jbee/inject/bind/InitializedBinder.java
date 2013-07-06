@@ -12,6 +12,7 @@ import se.jbee.inject.bind.Binder.RootBinder;
 import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Inspect;
+import se.jbee.inject.bootstrap.Macros;
 import se.jbee.inject.util.Scoped;
 
 /**
@@ -41,7 +42,7 @@ public abstract class InitializedBinder
 	}
 
 	private InitializedBinder( Scope inital, Source source ) {
-		super( Bind.create( bindings( MacroModule.MACROS, Inspect.DEFAULT ), source, inital ) );
+		super( Bind.create( bindings( Macros.DEFAULT, Inspect.DEFAULT ), source, inital ) );
 		this.bind = super.bind();
 		this.source = source;
 	}

@@ -7,15 +7,15 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith ( Suite.class )
 @SuiteClasses ( { TestAutobindBinds.class, TestElementBinds.class, TestMultibindBinds.class,
 		TestConstantBinds.class, TestSupplierBinds.class, TestInstanceBinds.class,
-		TestBootstrapper.class, TestPackageLocalisedBinds.class, TestEditionFeatureBinds.class,
-		TestModularBinds.class, TestTargetedBinds.class, TestLoggerBinds.class,
-		TestRobotLegsProblemBinds.class, TestConstructorParameterBinds.class,
-		TestDependencyParameterBinds.class, TestScopedBinds.class, TestInjectronBinds.class,
-		TestProviderBinds.class, TestPrimitiveBinds.class, TestInjectorExceptions.class,
-		TestCollectionBinds.class, TestInspectorBinds.class, TestParentTargetBinds.class,
-		TestPresetModuleBinds.class, TestRequiredProvidedBinds.class,
-		TestConfigurationDependentBinds.class, TestPrimitiveArrayBinds.class,
-		TestMultipleOptionChoicesBinds.class, TestLinker.class } )
+		TestPackageLocalisedBinds.class, TestEditionFeatureBinds.class, TestModularBinds.class,
+		TestTargetedBinds.class, TestLoggerBinds.class, TestRobotLegsProblemBinds.class,
+		TestConstructorParameterBinds.class, TestDependencyParameterBinds.class,
+		TestScopedBinds.class, TestInjectronBinds.class, TestProviderBinds.class,
+		TestPrimitiveBinds.class, TestInjectorExceptions.class, TestCollectionBinds.class,
+		TestInspectorBinds.class, TestParentTargetBinds.class, TestPresetModuleBinds.class,
+		TestRequiredProvidedBinds.class, TestConfigurationDependentBinds.class,
+		TestPrimitiveArrayBinds.class, TestMultipleOptionChoicesBinds.class, TestMacroBinds.class,
+		TestLinker.class } )
 public class SuiteBind {
 	// all tests in the bind package
 }

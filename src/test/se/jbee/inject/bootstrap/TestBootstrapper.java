@@ -1,4 +1,4 @@
-package se.jbee.inject.bind;
+package se.jbee.inject.bootstrap;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
@@ -22,6 +22,7 @@ import se.jbee.inject.Injectron;
 import se.jbee.inject.Name;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Supplier;
+import se.jbee.inject.bind.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bundle;

@@ -7,7 +7,7 @@ import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Name.namedInternal;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.bind.Configuring.configuring;
+import static se.jbee.inject.bootstrap.Configuring.configuring;
 import static se.jbee.inject.bootstrap.Inspect.methodsReturn;
 import static se.jbee.inject.util.Typecast.providerTypeOf;
 
@@ -19,6 +19,7 @@ import se.jbee.inject.Name;
 import se.jbee.inject.bind.TestInspectorBinds.Resource;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
+import se.jbee.inject.bootstrap.Configuring;
 import se.jbee.inject.util.Provider;
 import se.jbee.inject.util.Scoped;
 

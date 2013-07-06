@@ -15,6 +15,15 @@ import java.util.Collection;
  */
 public final class Array {
 
+	public static <T> T[] insert( T[] array, T value, int index ) {
+		if ( index < 0 ) {
+			return append( array, value );
+		}
+		T[] copy = array.clone();
+		copy[index] = value;
+		return copy;
+	}
+
 	public static <T> T[] append( T[] array, T value ) {
 		T[] copy = Arrays.copyOf( array, array.length + 1 );
 		copy[array.length] = value;

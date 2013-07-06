@@ -26,10 +26,8 @@ import se.jbee.inject.Type;
  */
 public final class Bindings {
 
-	//TODO by making this data we lost ability to just 'visit' expanded bindings - the List could be replace by a custom interface to regain this ability.
-
 	public static Bindings bindings( Macros macros, Inspector inspector ) {
-		return new Bindings( macros, inspector, new ArrayList<Binding<?>>( 100 ), false );
+		return new Bindings( macros, inspector, new ArrayList<Binding<?>>( 128 ), false );
 	}
 
 	private final Macros macros;
@@ -73,6 +71,7 @@ public final class Bindings {
 		if ( !autobinding ) {
 			return;
 		}
+		//OPEN this can be extracted to a macro by introducing a Auto type a macro could be bound to
 		for ( Type<? super T> supertype : binding.getType().supertypes() ) {
 			// Object is of cause a superclass of everything but not indented when doing auto-binds
 			if ( supertype.getRawType() != Object.class ) {

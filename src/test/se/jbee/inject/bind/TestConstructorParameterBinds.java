@@ -8,8 +8,8 @@ import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.bind.Parameterize.asType;
-import static se.jbee.inject.bind.Parameterize.constant;
+import static se.jbee.inject.bootstrap.Parameterize.asType;
+import static se.jbee.inject.bootstrap.Parameterize.constant;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
@@ -22,6 +22,7 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.Parameterize;
 import se.jbee.inject.util.Scoped;
 
 /**
