@@ -84,7 +84,7 @@ public class TestRequiredProvidedBinds {
 
 	}
 
-	@Test ( expected = IllegalStateException.class )
+	@Test ( expected = NoSuchResourceException.class )
 	public void thatNotProvidedRequiredBindThrowsException() {
 		Bootstrap.injector( RequirementModule.class );
 	}

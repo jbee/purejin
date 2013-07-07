@@ -6,6 +6,7 @@
 package se.jbee.inject;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Base {@link RuntimeException} for all exceptions cennected to the dependency injection process
@@ -78,6 +79,9 @@ public class DIRuntimeException
 					+ describe( available ) );
 		}
 
+		public NoSuchResourceException( Collection<Type<?>> types ) {
+			super( "No resource for required type(s) " + types );
+		}
 	}
 
 	public static String describe( Injectron<?>... injectrons ) {
@@ -106,4 +110,5 @@ public class DIRuntimeException
 			super( returnType + ":" + Arrays.toString( parameterTypes ) );
 		}
 	}
+
 }

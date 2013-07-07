@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import se.jbee.inject.Array;
+import se.jbee.inject.DIRuntimeException;
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Precision;
@@ -165,7 +166,8 @@ public final class Binding<T>
 		}
 		required.removeAll( bound );
 		if ( !provided.containsAll( required ) ) {
-			throw new IllegalStateException( "Missing required type(s)" );
+			required.removeAll( provided );
+			throw new DIRuntimeException.NoSuchResourceException( required );
 		}
 		List<Binding<?>> res = new ArrayList<Binding<?>>( uniques.size() );
 		for ( int i = 0; i < uniques.size(); i++ ) {

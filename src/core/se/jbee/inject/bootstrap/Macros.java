@@ -19,6 +19,7 @@ import static se.jbee.inject.util.ToString.describe;
 import java.lang.reflect.Constructor;
 
 import se.jbee.inject.Array;
+import se.jbee.inject.DIRuntimeException;
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
@@ -38,11 +39,18 @@ public final class Macros {
 
 	public static final Macros EMPTY = new Macros( new Class<?>[0], new Macro<?>[0] );
 
+	public static final Macro<Binding<?>> EXPAND = new ExpandMacro();
+	public static final Macro<Constructible<?>> CONSTRUCT = new ConstructorMacro();
+	public static final Macro<Instance<?>> SUBSTITUTE = new SubstitutionMacro();
+	public static final Macro<Producible<?>> PRODUCE = new MethodMacro();
+	public static final Macro<Configuring<?>> CONFIGURE = new ConfigurationMacro();
+	public static final Macro<Class<?>> FORWARD = new ForwardMacro();
+	public static final Macro<Parameter<?>[]> ARRAY = new ArrayElementsMacro();
+
 	public static final Module NO_OP = macro();
 
-	public static final Macros DEFAULT = Macros.EMPTY.use( new ExpandMacro() ).use(
-			new ConstructorMacro() ).use( new MethodMacro() ).use( new SubstitutionMacro() ).use(
-			new ConfigurationMacro() ).use( new ForwardMacro() ).use( new ArrayElementsMacro() );
+	public static final Macros DEFAULT = Macros.EMPTY.use( EXPAND ).use( CONSTRUCT ).use( PRODUCE ).use(
+			SUBSTITUTE ).use( CONFIGURE ).use( FORWARD ).use( ARRAY );
 
 	public static Module macro( Module mandatory, Module optional ) {
 		return optional == null || optional == NO_OP
@@ -63,29 +71,59 @@ public final class Macros {
 		this.macros = macros;
 	}
 
+	/**
+	 * Uses the given {@link Macro} and derives the {@link #use(Class, Macro)} type from its
+	 * declaration. This is a utility method that can be used as long as the {@link Macro}
+	 * implementation is not generic.
+	 * 
+	 * @param macro
+	 *            No generic macro class (e.g. decorators)
+	 * @return A set of {@link Macros} containing the given one for the type derived from its type
+	 *         declaration.
+	 */
 	@SuppressWarnings ( "unchecked" )
 	public <T> Macros use( Macro<T> macro ) {
 		Class<?> type = Type.supertype( Macro.class, Type.raw( macro.getClass() ) ).parameter( 0 ).getRawType();
 		return use( (Class<? super T>) type, macro );
 	}
 
+	/**
+	 * Uses the given {@link Macro} for the given exact (no super-types!) type of values.
+	 * 
+	 * @param type
+	 *            The type of value that should be passed to the {@link Macro} as value
+	 * @param macro
+	 *            The {@link Macro} expanding the type of value
+	 * @return A set of {@link Macros} containing the given one
+	 */
 	public <T> Macros use( Class<T> type, Macro<? extends T> macro ) {
 		final int index = index( type );
 		return new Macros( Array.insert( types, type, index ), Array.insert( macros, macro, index ) );
 	}
 
+	/**
+	 * A generic version of {@link Macro#expand(Binding, Object)} that uses the matching predefined
+	 * {@link Macro} for the actual type of the value and expands it.
+	 * 
+	 * @param binding
+	 *            The incoplete binding to expand
+	 * @param value
+	 *            Non-null value to expand via matching {@link Macro}
+	 * @return {@link Module} results from {@link Macro#expand(Binding, Object)}
+	 * @throws DIRuntimeException
+	 *             In case no {@link Macro} had been declared for the type of value argument
+	 */
 	public <T, V> Module expand( Binding<T> binding, V value ) {
-		return macro( value ).expand( binding, value );
+		return macro( value.getClass() ).expand( binding, value );
 	}
 
 	@SuppressWarnings ( "unchecked" )
-	private <V> Macro<V> macro( V value ) {
-		final Class<?> type = value.getClass();
+	private <V> Macro<? super V> macro( final Class<? extends V> type ) {
 		int index = index( type );
 		if ( index < 0 ) {
-			throw new IllegalArgumentException( type.getCanonicalName() );
+			throw new DIRuntimeException( "No macro for type:" + type.getCanonicalName() );
 		}
-		return (Macro<V>) macros[index];
+		return (Macro<? super V>) macros[index];
 	}
 
 	private int index( final Class<?> type ) {

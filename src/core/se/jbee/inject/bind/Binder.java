@@ -28,6 +28,7 @@ import se.jbee.inject.Scope;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Target;
 import se.jbee.inject.Type;
+import se.jbee.inject.bootstrap.Binding;
 import se.jbee.inject.bootstrap.BindingType;
 import se.jbee.inject.bootstrap.Configuring;
 import se.jbee.inject.bootstrap.Inspector;
@@ -433,6 +434,10 @@ public class Binder {
 		}
 
 		public void toMacro( Module macro ) {
+			if ( macro instanceof Binding<?> ) {
+				Binding<?> b = (Binding<?>) macro;
+				macro = bind().bindings.getMacros().expand( b, b );
+			}
 			macro.declare( bind().bindings );
 		}
 
@@ -507,7 +512,7 @@ public class Binder {
 		}
 
 		protected final void to( Supplier<? extends T> supplier, BindingType type ) {
-			expand( bind().asType( resource, type, supplier ) );
+			toMacro( bind().asType( resource, type, supplier ) );
 		}
 
 		private TypedBinder<T> toConstant( T constant ) {
