@@ -208,7 +208,7 @@ Copyright (c) 2012, Jan Bernitt
 
 	<target name="license" depends="javadoc" description="Write the license headers">
 	<echo file="${dist.dir}/javaheader.txt">/*
- *  Copyright (c) 2012, Jan Bernitt 
+ *  Copyright (c) 2012-2013, Jan Bernitt 
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */</echo>
@@ -221,7 +221,7 @@ Copyright (c) 2012, Jan Bernitt
 		</replaceregexp>
 
 	<echo file="${dist.dir}/htmlheader.txt">&lt;!-- 
-  Copyright (c) 2012, Jan Bernitt
+  Copyright (c) 2012-2013, Jan Bernitt
   
   Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
 --&gt;</echo>
