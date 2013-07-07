@@ -175,7 +175,7 @@ public class Binder {
 
 		ConfigBinder( RootBinder binder, Type<T> type ) {
 			super();
-			this.binder = binder;
+			this.binder = new RootBinder( binder.bind().next() );
 			this.type = type;
 		}
 
@@ -221,7 +221,7 @@ public class Binder {
 		InspectBinder( Inspector inspector, RootBinder binder, Scope scope ) {
 			super();
 			this.inspector = inspector;
-			this.binder = binder.on( binder.bind().asAuto() ).per( scope );
+			this.binder = binder.on( binder.bind().asAuto() ).on( binder.bind().next() ).per( scope );
 		}
 
 		public void in( Class<?> implementor ) {
@@ -412,7 +412,7 @@ public class Binder {
 		protected final Resource<T> resource;
 
 		TypedBinder( Bind bind, Instance<T> instance ) {
-			this( bind, new Resource<T>( instance, bind.target ) );
+			this( bind.next(), new Resource<T>( instance, bind.target ) );
 		}
 
 		TypedBinder( Bind bind, Resource<T> resource ) {
@@ -550,7 +550,7 @@ public class Binder {
 			extends TypedBinder<E[]> {
 
 		TypedElementBinder( Bind bind, Instance<E[]> instance ) {
-			super( bind.asMulti(), instance );
+			super( bind.asMulti().next(), instance );
 		}
 
 		@SuppressWarnings ( "unchecked" )

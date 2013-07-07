@@ -97,6 +97,12 @@ public final class Bind {
 		return new Bind( bindings, source, scope, target.within( parent ) );
 	}
 
+	public Bind next() {
+		return source == null
+			? this
+			: new Bind( bindings, source.next(), scope, target );
+	}
+
 	public Inspector getInspector() {
 		return bindings.getInspector();
 	}

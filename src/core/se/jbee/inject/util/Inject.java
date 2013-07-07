@@ -241,9 +241,10 @@ public final class Inject {
 			for ( Entry<Class<?>, Injectron<?>[]> e : injectrons.entrySet() ) {
 				b.append( e.getKey() ).append( '\n' );
 				for ( Injectron<?> i : e.getValue() ) {
+					Resource<?> r = i.getResource();
 					b.append( '\t' ).append( i.getResource().getType().simpleName() ).append( ' ' ).append(
-							i.getResource().getTarget() ).append( ' ' ).append( i.getSource() ).append(
-							'\n' );
+							r.getName() ).append( ' ' ).append( i.getResource().getTarget() ).append(
+							' ' ).append( i.getSource() ).append( '\n' );
 				}
 			}
 			return b.toString();

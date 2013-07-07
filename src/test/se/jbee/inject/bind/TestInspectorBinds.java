@@ -63,7 +63,8 @@ public class TestInspectorBinds {
 					InspectorBindsImplementor2.class );
 			bind( all().methods().returnTypeIn( packageAndSubPackagesOf( Injector.class ) ) ).in(
 					InspectorBindsImplementor3.class );
-			bind( all().methods() ).in( new InspectorBindsImplementor4( STATE ) );
+			per( Scoped.APPLICATION ).bind( all().methods() ).in(
+					new InspectorBindsImplementor4( STATE ) );
 			per( Scoped.INJECTION ).bind( all().methods() ).in( FactoryImpl.class );
 		}
 
