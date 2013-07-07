@@ -145,7 +145,6 @@ public class TestType {
 		Type<String> string = Type.raw( String.class );
 		assertTrue( integer.morePreciseThan( string ) );
 		assertTrue( string.morePreciseThan( integer ) );
-		//OPEN maybe this should eval to false both times ?
 	}
 
 	private static void assertMorePrecise( Type<?> morePrecise, Type<?> lessPrecise ) {

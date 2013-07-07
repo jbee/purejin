@@ -432,11 +432,11 @@ public final class Type<T>
 	@Override
 	public String toString() {
 		StringBuilder b = new StringBuilder();
-		toString( b );
+		toString( b, true );
 		return b.toString();
 	}
 
-	void toString( StringBuilder b ) {
+	void toString( StringBuilder b, boolean canonicalName ) {
 		if ( isUpperBound() ) {
 			if ( rawType == Object.class ) {
 				b.append( "?" );
@@ -444,22 +444,30 @@ public final class Type<T>
 			}
 			b.append( "? extends " );
 		}
-		String canonicalName = rawType.getCanonicalName();
+		String name = canonicalName
+			? rawType.getCanonicalName()
+			: rawType.getSimpleName();
 		b.append( rawType.isArray()
-			? canonicalName.substring( 0, canonicalName.indexOf( '[' ) )
-			: canonicalName );
+			? name.substring( 0, name.indexOf( '[' ) )
+			: name );
 		if ( isParameterized() ) {
 			b.append( '<' );
-			params[0].toString( b );
+			params[0].toString( b, canonicalName );
 			for ( int i = 1; i < params.length; i++ ) {
 				b.append( ',' );
-				params[i].toString( b );
+				params[i].toString( b, canonicalName );
 			}
 			b.append( '>' );
 		}
 		if ( rawType.isArray() ) {
-			b.append( canonicalName.substring( canonicalName.indexOf( '[' ) ) );
+			b.append( name.substring( name.indexOf( '[' ) ) );
 		}
+	}
+
+	public String simpleName() {
+		StringBuilder b = new StringBuilder();
+		toString( b, false );
+		return b.toString();
 	}
 
 	private void checkParameters( Type<?>... parameters ) {

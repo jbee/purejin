@@ -172,8 +172,6 @@ public final class Macros {
 
 	}
 
-	//OPEN the below macros could maybe also impl. by the suppliers in SuppliedBy ?
-
 	private static final class ConstructorMacro
 			implements Macro<Constructible<?>> {
 

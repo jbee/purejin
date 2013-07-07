@@ -10,6 +10,7 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -251,7 +252,9 @@ public class Inspect
 	}
 
 	private boolean matches( Method m ) {
-		// TODO filter methods with type variables as return type
+		if ( m.getGenericReturnType() instanceof TypeVariable<?> ) {
+			return false;
+		}
 		Type<?> returnType = Type.returnType( m );
 		return packages.contains( returnType ) && returnType.isAssignableTo( assignable )
 				&& ( !statics || Modifier.isStatic( m.getModifiers() ) )

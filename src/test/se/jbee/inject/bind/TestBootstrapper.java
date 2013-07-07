@@ -1,4 +1,4 @@
-package se.jbee.inject.bootstrap;
+package se.jbee.inject.bind;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;

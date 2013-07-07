@@ -15,7 +15,7 @@ import org.junit.runners.Suite.SuiteClasses;
 		TestInspectorBinds.class, TestParentTargetBinds.class, TestPresetModuleBinds.class,
 		TestRequiredProvidedBinds.class, TestConfigurationDependentBinds.class,
 		TestPrimitiveArrayBinds.class, TestMultipleOptionChoicesBinds.class, TestMacroBinds.class,
-		TestLinker.class } )
+		TestBootstrapper.class, TestLinker.class } )
 public class SuiteBind {
 	// all tests in the bind package
 }

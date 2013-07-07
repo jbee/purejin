@@ -74,7 +74,9 @@ public final class Binding<T>
 	@Override
 	public <E> Binding<E> typed( Type<E> type ) {
 		if ( !getType().isAssignableTo( type ) ) {
-			throw new UnsupportedOperationException(); //TODO better exception
+			throw new IllegalArgumentException(
+					"New type of a binding has to be a assignable from :" + getType()
+							+ " but was: " + type );
 		}
 		return new Binding<E>( resource.typed( type ), this.type, (Supplier<? extends E>) supplier,
 				scope, source );

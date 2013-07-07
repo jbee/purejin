@@ -13,7 +13,7 @@ Getting Started: http://www.silkdi.com/userguide/
 Installation:
 
 1) Manual
-	- Download from https://github.com/jbee/silk/downloads
+	- Download from http://www.silkdi.com/downloads/
 	- Add the jar file to your classpath
 
 2) Maven
