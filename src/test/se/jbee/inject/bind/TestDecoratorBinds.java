@@ -26,8 +26,8 @@ public class TestDecoratorBinds {
     }
 
     private static class FooDecorator implements Foo {
-        private final FooDecorator original;
-        public FooDecorator(FooDecorator original) {
+        private final Foo original;
+        public FooDecorator(Foo original) {
             this.original = original;
         }
     }
