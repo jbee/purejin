@@ -6,30 +6,30 @@
 package se.jbee.inject;
 
 /**
- * A description of an {@link Instance} together with its duration of life ({@link Expiry}).
+ * A description of an {@link Resource} together with its duration of life ({@link Expiry}).
  * 
  * @author Jan Bernitt (jan@jbee.se)
  * 
  * @param <T>
- *            The type of the instance
+ *            The type of the resource
  */
 public final class Emergence<T> {
 
-	public static <T> Emergence<T> emergence( Instance<T> instance, Expiry expiry ) {
-		return new Emergence<T>( instance, expiry );
+	public static <T> Emergence<T> emergence( Resource<T> resource, Expiry expiry ) {
+		return new Emergence<T>( resource, expiry );
 	}
 
-	private final Instance<T> instance;
+	private final Resource<T> resource;
 	private final Expiry expiry;
 
-	private Emergence( Instance<T> instance, Expiry expiry ) {
+	private Emergence( Resource<T> resource, Expiry expiry ) {
 		super();
-		this.instance = instance;
+		this.resource = resource;
 		this.expiry = expiry;
 	}
 
-	public Instance<T> getInstance() {
-		return instance;
+	public Resource<T> getResource() {
+		return resource;
 	}
 
 	public Expiry getExpiry() {
@@ -38,7 +38,7 @@ public final class Emergence<T> {
 
 	@Override
 	public String toString() {
-		return expiry + " " + instance;
+		return expiry + " " + resource;
 	}
 
 }

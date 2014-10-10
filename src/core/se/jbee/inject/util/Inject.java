@@ -290,7 +290,7 @@ public final class Inject {
 		@Override
 		public T instanceFor( Dependency<? super T> dependency ) {
 			return repository.serve( demand.from( dependency.injectingInto( emergence(
-					resource.getInstance(), expiry ) ) ), injectable );
+					resource, expiry ) ) ), injectable );
 		}
 
 		@Override

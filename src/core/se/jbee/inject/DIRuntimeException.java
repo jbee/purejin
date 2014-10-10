@@ -34,7 +34,7 @@ public class DIRuntimeException
 	public static final class DependencyCycleException
 			extends DIRuntimeException {
 
-		public DependencyCycleException( Dependency<?> dependency, Instance<?> cycleTarget ) {
+		public DependencyCycleException( Dependency<?> dependency, Resource<?> cycleTarget ) {
 			super( "Cycle detected: " + injectionStack( dependency ) + cycleTarget );
 		}
 
@@ -43,7 +43,7 @@ public class DIRuntimeException
 	public static String injectionStack( Dependency<?> dependency ) {
 		StringBuilder b = new StringBuilder();
 		for ( Injection i : dependency ) {
-			b.append( i.getTarget().getInstance() ).append( " -> " );
+			b.append( i.getTarget().getResource() ).append( " -> " );
 		}
 		return b.toString();
 	}

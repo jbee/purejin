@@ -22,7 +22,6 @@ import se.jbee.inject.Injectron;
 import se.jbee.inject.Name;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Supplier;
-import se.jbee.inject.bind.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bundle;
@@ -218,7 +217,7 @@ public class TestBootstrapper {
 	/**
 	 * The assert itself doesn't play such huge role here. we just want to reach this code.
 	 */
-	@Test
+	@Test(timeout=50)
 	public void thatBundlesAreNotBootstrappedMultipleTimesEvenWhenTheyAreMutual() {
 		Injector injector = Bootstrap.injector( OneMutualDependentBundle.class );
 		assertThat( injector, notNullValue() );
@@ -229,14 +228,14 @@ public class TestBootstrapper {
 		Bootstrap.injector( ClashingBindsModule.class );
 	}
 
-	@Test ( expected = DependencyCycleException.class )
+	@Test ( expected = DependencyCycleException.class, timeout=50 )
 	public void thatDependencyCyclesAreDetected() {
 		Injector injector = Bootstrap.injector( CyclicBindsModule.class );
 		Foo foo = injector.resolve( dependency( Foo.class ) );
 		fail( "foo should not be resolvable but was: " + foo );
 	}
 
-	@Test ( expected = DependencyCycleException.class )
+	@Test ( expected = DependencyCycleException.class, timeout=50 )
 	public void thatDependencyCyclesInCirclesAreDetected() {
 		Injector injector = Bootstrap.injector( CircularBindsModule.class );
 		A a = injector.resolve( dependency( A.class ) );

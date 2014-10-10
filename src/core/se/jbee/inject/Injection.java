@@ -8,7 +8,7 @@ package se.jbee.inject;
 import static se.jbee.inject.Emergence.emergence;
 
 /**
- * Describes on "stack-frame" within the injection process.
+ * Describes a "stack-frame" within the injection process.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
@@ -29,7 +29,7 @@ public final class Injection {
 
 	public boolean equalTo( Injection other ) {
 		return this == other || dependency.equalTo( other.dependency )
-				&& target.getInstance().equalTo( other.target.getInstance() );
+				&& target.getResource().equalTo( other.target.getResource() );
 	}
 
 	@Override
@@ -38,6 +38,6 @@ public final class Injection {
 	}
 
 	public Injection ignoredExpiry() {
-		return new Injection( dependency, emergence( target.getInstance(), Expiry.IGNORE ) );
+		return new Injection( dependency, emergence( target.getResource(), Expiry.IGNORE ) );
 	}
 }

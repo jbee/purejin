@@ -100,6 +100,7 @@ public final class Resource<T>
 	}
 
 	public boolean equalTo( Resource<?> other ) {
-		return this == other || instance.equalTo( other.instance ) && target.equalTo( other.target );
+		return this == other 
+				|| instance.equalTo( other.instance ) && target.equalTo( other.target );
 	}
 }

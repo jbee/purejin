@@ -134,7 +134,7 @@ public final class Dependency<T>
 	public Instance<?> target( int level ) {
 		return isUntargeted()
 			? Instance.ANY
-			: hierarchy[hierarchy.length - 1 - level].getTarget().getInstance();
+			: hierarchy[hierarchy.length - 1 - level].getTarget().getResource().getInstance();
 	}
 
 	public int injectionDepth() {
@@ -152,8 +152,8 @@ public final class Dependency<T>
 		return injectingInto( defaultInstanceOf( target ) );
 	}
 
-	public Dependency<T> injectingInto( Instance<?> target ) {
-		return injectingInto( emergence( target, Expiry.NEVER ) );
+	public <I> Dependency<T> injectingInto( Instance<I> target ) {
+		return injectingInto( emergence( new Resource<I>(target), Expiry.NEVER ) );
 	}
 
 	public Dependency<T> injectingInto( Emergence<?> target ) {
@@ -178,7 +178,7 @@ public final class Dependency<T>
 		for ( int i = 0; i < hierarchy.length; i++ ) {
 			Injection parent = hierarchy[i];
 			if ( parent.equalTo( injection ) ) {
-				throw new DependencyCycleException( this, injection.getTarget().getInstance() );
+				throw new DependencyCycleException( this, injection.getTarget().getResource() );
 			}
 		}
 	}
