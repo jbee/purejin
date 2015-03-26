@@ -10,9 +10,7 @@ import static se.jbee.inject.Instance.defaultInstanceOf;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.bootstrap.Configuring.configuring;
-import static se.jbee.inject.util.Constructible.constructible;
 import static se.jbee.inject.util.Metaclass.metaclass;
-import static se.jbee.inject.util.Producible.producible;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -24,19 +22,21 @@ import se.jbee.inject.Name;
 import se.jbee.inject.Packages;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Resource;
-import se.jbee.inject.Scope;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Target;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Binding;
 import se.jbee.inject.bootstrap.BindingType;
+import se.jbee.inject.bootstrap.BoundConstructor;
 import se.jbee.inject.bootstrap.Configuring;
+import se.jbee.inject.bootstrap.BoundMethod;
 import se.jbee.inject.bootstrap.Inspector;
 import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.bootstrap.Naming;
 import se.jbee.inject.bootstrap.SuppliedBy;
-import se.jbee.inject.util.Factory;
-import se.jbee.inject.util.Scoped;
+import se.jbee.inject.container.Factory;
+import se.jbee.inject.container.Scope;
+import se.jbee.inject.container.Scoped;
 
 /**
  * The default implementation of a fluent binder interface that provides a lot of utility methods to
@@ -426,11 +426,11 @@ public class Binder {
 		}
 
 		public void to( Constructor<? extends T> constructor, Parameter<?>... parameters ) {
-			expand( constructible( constructor, parameters ) );
+			expand( BoundConstructor.bind( constructor, parameters ) );
 		}
 
 		void to( Object instance, Method method, Parameter<?>[] parameters ) {
-			expand( producible( method, parameters, instance ) );
+			expand( BoundMethod.bind( instance, method, Type.returnType( method ), parameters ) );
 		}
 
 		public void toMacro( Module macro ) {

@@ -4,7 +4,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static se.jbee.inject.Dependency.dependency;
-import static se.jbee.inject.util.Scoped.TARGET_INSTANCE;
+import static se.jbee.inject.container.Scoped.TARGET_INSTANCE;
 
 import org.junit.Test;
 

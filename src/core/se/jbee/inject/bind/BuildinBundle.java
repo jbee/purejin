@@ -5,8 +5,8 @@
  */
 package se.jbee.inject.bind;
 
-import static se.jbee.inject.util.Scoped.DEPENDENCY;
-import static se.jbee.inject.util.Scoped.TARGET_INSTANCE;
+import static se.jbee.inject.container.Scoped.DEPENDENCY;
+import static se.jbee.inject.container.Scoped.TARGET_INSTANCE;
 
 import java.util.Collection;
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 import se.jbee.inject.bootstrap.Bootstrapper.ModularBootstrapper;
 import se.jbee.inject.bootstrap.ModularBundle;
 import se.jbee.inject.bootstrap.SuppliedBy;
-import se.jbee.inject.util.Provider;
+import se.jbee.inject.container.Provider;
 
 /**
  * Installs all the build-in functionality by using the core API.

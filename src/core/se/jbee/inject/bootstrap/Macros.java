@@ -12,9 +12,7 @@ import static se.jbee.inject.bootstrap.BindingType.METHOD;
 import static se.jbee.inject.bootstrap.BindingType.PREDEFINED;
 import static se.jbee.inject.bootstrap.BindingType.SUBSTITUTED;
 import static se.jbee.inject.bootstrap.SuppliedBy.parametrizedInstance;
-import static se.jbee.inject.util.Constructible.constructible;
 import static se.jbee.inject.util.Metaclass.metaclass;
-import static se.jbee.inject.util.ToString.describe;
 
 import java.lang.reflect.Constructor;
 
@@ -27,8 +25,6 @@ import se.jbee.inject.Resource;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Target;
 import se.jbee.inject.Type;
-import se.jbee.inject.util.Constructible;
-import se.jbee.inject.util.Producible;
 
 /**
  * A immutable collection of {@link Macro}s each bound to a specific type handled.
@@ -40,12 +36,12 @@ public final class Macros {
 	public static final Macros EMPTY = new Macros( new Class<?>[0], new Macro<?>[0] );
 
 	public static final Macro<Binding<?>> EXPAND = new ExpandMacro();
-	public static final Macro<Constructible<?>> CONSTRUCT = new ConstructorMacro();
-	public static final Macro<Instance<?>> SUBSTITUTE = new SubstitutionMacro();
-	public static final Macro<Producible<?>> PRODUCE = new MethodMacro();
-	public static final Macro<Configuring<?>> CONFIGURE = new ConfigurationMacro();
 	public static final Macro<Class<?>> FORWARD = new ForwardMacro();
+	public static final Macro<Instance<?>> SUBSTITUTE = new SubstitutionMacro();
 	public static final Macro<Parameter<?>[]> ARRAY = new ArrayElementsMacro();
+	public static final Macro<BoundConstructor<?>> CONSTRUCT = new ConstructorMacro();
+	public static final Macro<BoundMethod<?>> PRODUCE = new MethodMacro();
+	public static final Macro<Configuring<?>> CONFIGURE = new ConfigurationMacro();
 
 	public static final Module NO_OP = macro();
 
@@ -173,14 +169,14 @@ public final class Macros {
 	}
 
 	private static final class ConstructorMacro
-			implements Macro<Constructible<?>> {
+			implements Macro<BoundConstructor<?>> {
 
 		ConstructorMacro() {
 			// make visible
 		}
 
 		@Override
-		public <T> Module expand( Binding<T> binding, Constructible<?> constructible ) {
+		public <T> Module expand( Binding<T> binding, BoundConstructor<?> constructible ) {
 			return binding.suppliedBy( CONSTRUCTOR,
 					SuppliedBy.costructor( constructible.typed( binding.getType() ) ) );
 		}
@@ -188,14 +184,14 @@ public final class Macros {
 	}
 
 	private static final class MethodMacro
-			implements Macro<Producible<?>> {
+			implements Macro<BoundMethod<?>> {
 
 		MethodMacro() {
 			// make visible
 		}
 
 		@Override
-		public <T> Module expand( Binding<T> binding, Producible<?> producible ) {
+		public <T> Module expand( Binding<T> binding, BoundMethod<?> producible ) {
 			return binding.suppliedBy( METHOD,
 					SuppliedBy.method( producible.typed( binding.getType() ) ) );
 		}
@@ -301,7 +297,7 @@ public final class Macros {
 
 		@Override
 		public String toString() {
-			return describe( "multi", steps );
+			return SuppliedBy.describe( "multi", steps );
 		}
 	}
 
@@ -325,7 +321,7 @@ public final class Macros {
 		public void declare( Bindings bindings ) {
 			Constructor<? extends T> c = bindings.getInspector().constructorFor( implementer );
 			if ( c != null ) {
-				bindings.getMacros().expand( binding, constructible( c ) ).declare( bindings );
+				bindings.getMacros().expand( binding, BoundConstructor.bind( c ) ).declare( bindings );
 			}
 		}
 

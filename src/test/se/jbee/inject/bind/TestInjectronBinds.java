@@ -7,8 +7,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.util.Typecast.injectronTypeOf;
-import static se.jbee.inject.util.Typecast.injectronsTypeOf;
+import static se.jbee.inject.container.Typecast.injectronTypeOf;
+import static se.jbee.inject.container.Typecast.injectronsTypeOf;
 
 import java.util.List;
 

@@ -30,7 +30,7 @@ import java.util.Set;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Type<T>
-		implements PreciserThan<Type<?>>, Parameter<T> {
+		implements MorePreciseThan<Type<?>>, Parameter<T> {
 
 	public static final Type<Object> OBJECT = Type.raw( Object.class );
 	public static final Type<Void> VOID = raw( Void.class );

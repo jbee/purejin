@@ -14,7 +14,7 @@ import java.util.Arrays;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Packages
-		implements PreciserThan<Packages> {
+		implements MorePreciseThan<Packages> {
 
 	/**
 	 * Contains all packages including the (default) package.

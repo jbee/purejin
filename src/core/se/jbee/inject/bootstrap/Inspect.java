@@ -20,7 +20,7 @@ import se.jbee.inject.Name;
 import se.jbee.inject.Packages;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Type;
-import se.jbee.inject.util.Inject;
+import se.jbee.inject.container.Inject;
 
 /**
  * The basic {@link Inspector} implementations. It allows to chose {@link Constructor}s and

@@ -16,7 +16,7 @@ import java.lang.reflect.Method;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Name
-		implements PreciserThan<Name> {
+		implements MorePreciseThan<Name> {
 
 	private static final char INTERNAL = '-';
 

@@ -7,8 +7,8 @@ import static org.junit.Assert.fail;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.util.Scoped.INJECTION;
-import static se.jbee.inject.util.Typecast.injectronsTypeOf;
+import static se.jbee.inject.container.Scoped.INJECTION;
+import static se.jbee.inject.container.Typecast.injectronsTypeOf;
 
 import java.beans.ConstructorProperties;
 

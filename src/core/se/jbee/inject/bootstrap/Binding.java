@@ -15,14 +15,13 @@ import se.jbee.inject.Array;
 import se.jbee.inject.DIRuntimeException;
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Instance;
-import se.jbee.inject.Precision;
 import se.jbee.inject.Resource;
-import se.jbee.inject.Resourced;
-import se.jbee.inject.Scope;
 import se.jbee.inject.Source;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 import se.jbee.inject.Typed;
+import se.jbee.inject.container.Assembly;
+import se.jbee.inject.container.Scope;
 
 /**
  * Default data strature to represent a 4-tuple created from {@link Bindings}.
@@ -33,14 +32,14 @@ import se.jbee.inject.Typed;
  *            The type of the bound value (instance)
  */
 public final class Binding<T>
-		implements Comparable<Binding<?>>, Module, Typed<T>, Resourced<T> {
+		implements Comparable<Binding<?>>, Assembly<T>, Module, Typed<T> {
 
 	public static <T> Binding<T> binding( Resource<T> resource, BindingType type,
 			Supplier<? extends T> supplier, Scope scope, Source source ) {
 		return new Binding<T>( resource, type, supplier, scope, source );
 	}
 
-	private final Resource<T> resource;
+	public final Resource<T> resource;
 	public final BindingType type;
 	public final Supplier<? extends T> supplier;
 	public final Scope scope;
@@ -56,18 +55,33 @@ public final class Binding<T>
 		this.source = source;
 	}
 
-	@Override
-	public Resource<T> getResource() {
-		return resource;
-	}
-
 	public Instance<T> getInstance() {
 		return resource.getInstance();
 	}
 
 	@Override
+	public Resource<T> getResource() {
+		return resource;
+	}
+	
+	@Override
+	public Scope getScope() {
+		return scope;
+	}
+	
+	@Override
+	public Source getSource() {
+		return source;
+	}
+	
+	@Override
+	public Supplier<? extends T> getSupplier() {
+		return supplier;
+	}
+	
+	@Override
 	public Type<T> getType() {
-		return getResource().getType();
+		return resource.getType();
 	}
 
 	@SuppressWarnings ( "unchecked" )
@@ -98,15 +112,15 @@ public final class Binding<T>
 		if ( res != 0 ) {
 			return res;
 		}
-		res = Precision.comparePrecision( resource.getInstance(), other.resource.getInstance() );
+		res = Instance.comparePrecision( resource.getInstance(), other.resource.getInstance() );
 		if ( res != 0 ) {
 			return res;
 		}
-		res = Precision.comparePrecision( resource.getTarget(), other.resource.getTarget() );
+		res = Instance.comparePrecision( resource.getTarget(), other.resource.getTarget() );
 		if ( res != 0 ) {
 			return res;
 		}
-		res = Precision.comparePrecision( source, other.source );
+		res = Instance.comparePrecision( source, other.source );
 		if ( res != 0 ) {
 			return res;
 		}
@@ -181,4 +195,5 @@ public final class Binding<T>
 		}
 		return Array.of( res, Binding.class );
 	}
+
 }

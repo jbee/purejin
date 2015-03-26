@@ -3,7 +3,7 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject.util;
+package se.jbee.inject.container;
 
 import se.jbee.inject.Instance;
 import se.jbee.inject.Supplier;
@@ -27,9 +27,9 @@ public interface Factory<T> {
 	 *            The type of the receiving instance.
 	 * @param produced
 	 *            Describes what should be produced.
-	 * @param injected
+	 * @param injectedInto
 	 *            Describes the instance that receives the produced instance.
 	 * @return produced instance
 	 */
-	<P> T produce( Instance<? super T> produced, Instance<P> injected );
+	<P> T produce( Instance<? super T> produced, Instance<P> injectedInto );
 }

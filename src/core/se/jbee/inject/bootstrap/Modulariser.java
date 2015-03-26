@@ -13,8 +13,8 @@ package se.jbee.inject.bootstrap;
 public interface Modulariser {
 
 	/**
-	 * @return All {@link Module} that result from expanding the given root {@link Bundle} to the
-	 *         module level.
+	 * @return All {@link Module}s that result from expanding the given root
+	 *         {@link Bundle} to the module level.
 	 */
 	Module[] modularise( Class<? extends Bundle> root );
 }

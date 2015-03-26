@@ -27,9 +27,9 @@ import se.jbee.inject.Name;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Inspect;
 import se.jbee.inject.bootstrap.Inspector;
-import se.jbee.inject.util.Provider;
-import se.jbee.inject.util.Scoped;
-import se.jbee.inject.util.Typecast;
+import se.jbee.inject.container.Provider;
+import se.jbee.inject.container.Scoped;
+import se.jbee.inject.container.Typecast;
 
 /**
  * This test demonstrates the use of an {@link Inspector} to semi-automatically bind

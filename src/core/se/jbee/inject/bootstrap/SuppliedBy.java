@@ -7,8 +7,7 @@ package se.jbee.inject.bootstrap;
 
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Type.parameterTypes;
-import static se.jbee.inject.bootstrap.Parameterize.parameterizations;
-import static se.jbee.inject.util.ToString.describe;
+import static se.jbee.inject.bootstrap.BoundParameter.bind;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -26,12 +25,9 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
-import se.jbee.inject.util.Constructible;
-import se.jbee.inject.util.Factory;
+import se.jbee.inject.container.Factory;
+import se.jbee.inject.container.Provider;
 import se.jbee.inject.util.Metaclass;
-import se.jbee.inject.util.Parameterization;
-import se.jbee.inject.util.Producible;
-import se.jbee.inject.util.Provider;
 
 /**
  * Utility as a factory to create different kinds of {@link Supplier}s.
@@ -63,7 +59,7 @@ public final class SuppliedBy {
 	}
 
 	public static <E> Supplier<E[]> elements( Type<E[]> arrayType, Parameter<? extends E>[] elements ) {
-		return new ElementsSupplier<E>( arrayType, parameterizations( elements ) );
+		return new ElementsSupplier<E>( arrayType, BoundParameter.bind( elements ) );
 	}
 
 	public static <T> Supplier<T> instance( Instance<T> instance ) {
@@ -78,11 +74,11 @@ public final class SuppliedBy {
 		return new ParametrizedInstanceSupplier<T>( instance );
 	}
 
-	public static <T> Supplier<T> method( Producible<T> producible ) {
+	public static <T> Supplier<T> method( BoundMethod<T> producible ) {
 		return new MethodSupplier<T>( producible );
 	}
 
-	public static <T> Supplier<T> costructor( Constructible<T> constructible ) {
+	public static <T> Supplier<T> costructor( BoundConstructor<T> constructible ) {
 		return new ConstructorSupplier<T>( constructible );
 	}
 
@@ -98,19 +94,18 @@ public final class SuppliedBy {
 		return new LazyProvider<T>( dependency, context );
 	}
 
-	public static <T> Object[] resolve( Dependency<? super T> parent, Injector injector,
-			Parameterization<?>[] params ) {
+	public static <T> Object[] resolveParameters( Dependency<? super T> parent, Injector injector, BoundParameter<?>[] params ) {
 		if ( params.length == 0 ) {
 			return NO_ARGS;
 		}
 		Object[] args = new Object[params.length];
 		for ( int i = 0; i < params.length; i++ ) {
-			args[i] = resolve( parent, injector, params[i] );
+			args[i] = resolveParameter( parent, injector, params[i] );
 		}
 		return args;
 	}
 
-	public static <T> T resolve( Dependency<?> parent, Injector injector, Parameterization<T> param ) {
+	public static <T> T resolveParameter( Dependency<?> parent, Injector injector, BoundParameter<T> param ) {
 		return param.supply( parent.instanced( anyOf( param.getType() ) ), injector );
 	}
 
@@ -264,9 +259,9 @@ public final class SuppliedBy {
 			implements Supplier<E[]> {
 
 		private final Type<E[]> arrayType;
-		private final Parameterization<? extends E>[] elements;
+		private final BoundParameter<? extends E>[] elements;
 
-		ElementsSupplier( Type<E[]> arrayType, Parameterization<? extends E>[] elements ) {
+		ElementsSupplier( Type<E[]> arrayType, BoundParameter<? extends E>[] elements ) {
 			super();
 			this.arrayType = arrayType;
 			this.elements = elements;
@@ -279,7 +274,7 @@ public final class SuppliedBy {
 			final E[] res = (E[]) Array.newInstance( elementType.getRawType(), elements.length );
 			final Dependency<E> elementDependency = (Dependency<E>) dependency.typed( elementType );
 			int i = 0;
-			for ( Parameterization<? extends E> e : elements ) {
+			for ( BoundParameter<? extends E> e : elements ) {
 				res[i++] = e.supply( elementDependency, injector );
 			}
 			return res;
@@ -429,17 +424,17 @@ public final class SuppliedBy {
 			implements Supplier<T> {
 
 		private final Constructor<T> constructor;
-		private final Parameterization<?>[] params;
+		private final BoundParameter<?>[] params;
 
-		ConstructorSupplier( Constructible<T> constructible ) {
+		ConstructorSupplier( BoundConstructor<T> constructible ) {
 			this.constructor = Metaclass.accessible( constructible.constructor );
-			this.params = parameterizations( parameterTypes( constructor ),
+			this.params = bind( parameterTypes( constructor ),
 					constructible.parameters );
 		}
 
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			return Invoke.constructor( constructor, resolve( dependency, injector, params ) );
+			return Invoke.constructor( constructor, resolveParameters( dependency, injector, params ) );
 		}
 
 		@Override
@@ -451,30 +446,29 @@ public final class SuppliedBy {
 	private static final class MethodSupplier<T>
 			implements Supplier<T> {
 
-		private final Producible<T> producible;
-		private final Parameterization<?>[] params;
+		private final BoundMethod<T> factory;
+		private final BoundParameter<?>[] params;
 
-		MethodSupplier( Producible<T> producible ) {
+		MethodSupplier( BoundMethod<T> factory ) {
 			super();
-			this.producible = producible;
-			this.params = parameterizations( parameterTypes( producible.producer ),
-					producible.parameters );
+			this.factory = factory;
+			this.params = bind( parameterTypes( factory.factory ), factory.parameters );
 		}
 
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			Object owner = producible.instance;
-			if ( producible.isInstanceMethod() && owner == null ) {
-				owner = injector.resolve( Dependency.dependency( producible.producer.getDeclaringClass() ) );
+			Object owner = factory.instance;
+			if ( factory.isInstanceMethod() && owner == null ) {
+				owner = injector.resolve( Dependency.dependency( factory.factory.getDeclaringClass() ) );
 			}
-			return producible.returnType.getRawType().cast(
-					Invoke.method( producible.producer, owner,
-							resolve( dependency, injector, params ) ) );
+			return factory.returnType.getRawType().cast(
+					Invoke.method( factory.factory, owner,
+							resolveParameters( dependency, injector, params ) ) );
 		}
 
 		@Override
 		public String toString() {
-			return describe( producible.producer, params );
+			return describe( factory.factory, params );
 		}
 	}
 
@@ -492,7 +486,7 @@ public final class SuppliedBy {
 
 		@Override
 		public String toString() {
-			return describe( "required" );
+			return SuppliedBy.describe( "required" );
 		}
 	}
 
@@ -504,9 +498,21 @@ public final class SuppliedBy {
 		}
 
 		@Override
-		public <P> Logger produce( Instance<? super Logger> produced, Instance<P> injected ) {
-			return Logger.getLogger( injected.getType().getRawType().getCanonicalName() );
+		public <P> Logger produce( Instance<? super Logger> produced, Instance<P> injectedInto ) {
+			return Logger.getLogger( injectedInto.getType().getRawType().getCanonicalName() );
 		}
 
+	}
+
+	public static String describe( Object behaviour ) {
+		return "<" + behaviour + ">";
+	}
+
+	public static String describe( Object behaviour, Object variant ) {
+		return "<" + behaviour + ":" + variant + ">";
+	}
+
+	public static String describe( Object behaviour, Object[] variants ) {
+		return describe( behaviour, Arrays.toString( variants ) );
 	}
 }

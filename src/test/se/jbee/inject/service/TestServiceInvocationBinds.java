@@ -1,8 +1,8 @@
 package se.jbee.inject.service;
 
-import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.raw;
 
@@ -14,7 +14,6 @@ import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.service.ServiceInvocation.ServiceInvocationExtension;
-import se.jbee.inject.util.Value;
 
 public class TestServiceInvocationBinds {
 
@@ -59,24 +58,23 @@ public class TestServiceInvocationBinds {
 		int afterExceptionCount;
 
 		@Override
-		public <P, R> void after( Value<P> parameter, Value<R> result, Long before ) {
+		public <P, R> void after(Type<P> parameter, P value, Type<R> resultType, R result, Long before) {
 			afterCount++;
 			assertEquals( "before state passed to after", 42L, before.longValue() );
-			assertEquals( result.getValue(), "Foo".hashCode() );
+			assertEquals( result, "Foo".hashCode() );
 		}
 
 		@Override
-		public <P, R> Long before( Value<P> parameter, Type<R> result ) {
+		public <P, R> Long before(Type<P> parameter, P value, Type<R> result) {
 			beforeCount++;
 			assertTrue( "right type passed to before",
 					parameter.getType().equalTo( raw( String.class ) ) );
-			assertEquals( "right value passed to before", parameter.getValue(), "Foo" );
+			assertEquals( "right value passed to before", value, "Foo" );
 			return 42L;
 		}
-
+		
 		@Override
-		public <P, R> void afterException( Value<P> parameter, Type<R> result, Exception e,
-				Long before ) {
+		public <P, R> void afterException(Type<P> parameter, P value, Type<R> result, Exception e, Long before) {
 			afterExceptionCount++;
 			assertTrue( e instanceof IllegalStateException );
 		}

@@ -43,7 +43,7 @@ public class DIRuntimeException
 	public static String injectionStack( Dependency<?> dependency ) {
 		StringBuilder b = new StringBuilder();
 		for ( Injection i : dependency ) {
-			b.append( i.getTarget().getResource() ).append( " -> " );
+			b.append( i.target ).append( " -> " );
 		}
 		return b.toString();
 	}
@@ -59,7 +59,7 @@ public class DIRuntimeException
 			extends DIRuntimeException {
 
 		public MoreFrequentExpiryException( Injection parent, Injection injection ) {
-			super( "Cannot inject " + injection.getTarget() + " into " + parent.getTarget() );
+			super( "Cannot inject " + injection.target + " " + injection.expiry  + " into " + parent.target+" "+parent.expiry );
 		}
 
 	}
@@ -90,8 +90,7 @@ public class DIRuntimeException
 		}
 		StringBuilder b = new StringBuilder();
 		for ( Injectron<?> i : injectrons ) {
-			b.append( '\n' ).append( i.getResource().toString() ).append( " defined " ).append(
-					i.getSource() );
+			b.append( '\n' ).append( i.getInfo().resource.toString() ).append( " defined " ).append( i.getInfo().source );
 		}
 		return b.toString();
 	}

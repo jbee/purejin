@@ -3,8 +3,8 @@ package se.jbee.inject.bind;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.bind.AssertInjects.assertEqualSets;
-import static se.jbee.inject.util.Typecast.listTypeOf;
-import static se.jbee.inject.util.Typecast.setTypeOf;
+import static se.jbee.inject.container.Typecast.listTypeOf;
+import static se.jbee.inject.container.Typecast.setTypeOf;
 
 import java.util.List;
 import java.util.Set;

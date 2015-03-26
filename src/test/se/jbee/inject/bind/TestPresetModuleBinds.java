@@ -17,7 +17,7 @@ import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.bootstrap.PresetModule;
 import se.jbee.inject.config.Globals;
 import se.jbee.inject.config.Presets;
-import se.jbee.inject.util.Typecast;
+import se.jbee.inject.container.Typecast;
 
 /**
  * This test demonstrates how to use {@link Presets} to pass input data to the {@link Bootstrap}

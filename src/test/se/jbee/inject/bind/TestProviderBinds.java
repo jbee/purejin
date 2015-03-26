@@ -10,7 +10,7 @@ import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.util.Typecast.providerTypeOf;
+import static se.jbee.inject.container.Typecast.providerTypeOf;
 
 import java.util.List;
 import java.util.Set;
@@ -24,8 +24,8 @@ import se.jbee.inject.Name;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.util.Provider;
-import se.jbee.inject.util.Scoped;
+import se.jbee.inject.container.Provider;
+import se.jbee.inject.container.Scoped;
 
 public class TestProviderBinds {
 

@@ -9,7 +9,7 @@ import static se.jbee.inject.Name.namedInternal;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.bootstrap.Configuring.configuring;
 import static se.jbee.inject.bootstrap.Inspect.methodsReturn;
-import static se.jbee.inject.util.Typecast.providerTypeOf;
+import static se.jbee.inject.container.Typecast.providerTypeOf;
 
 import org.junit.Test;
 
@@ -20,8 +20,8 @@ import se.jbee.inject.bind.TestInspectorBinds.Resource;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Configuring;
-import se.jbee.inject.util.Provider;
-import se.jbee.inject.util.Scoped;
+import se.jbee.inject.container.Provider;
+import se.jbee.inject.container.Scoped;
 
 /**
  * This test demonstrates how to switch between different implementations during runtime dependent

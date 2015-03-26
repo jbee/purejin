@@ -10,13 +10,14 @@ import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
 
 import java.util.Arrays;
+import java.util.Comparator;
 
 import org.junit.Test;
 
 public class TestMorePrecise {
 
 	static class HigherIsPreciser
-			implements PreciserThan<HigherIsPreciser> {
+			implements MorePreciseThan<HigherIsPreciser> {
 
 		final int value;
 
@@ -54,7 +55,7 @@ public class TestMorePrecise {
 	@Test
 	public void thatMorePreciseComesFirstInSortOrder() {
 		HigherIsPreciser[] values = new HigherIsPreciser[] { hip( 1 ), hip( 2 ) };
-		Arrays.sort( values, Precision.<HigherIsPreciser> comparator() );
+		Arrays.sort( values, comparator(HigherIsPreciser.class) );
 		assertTrue( values[0].value == 2 );
 	}
 
@@ -123,14 +124,33 @@ public class TestMorePrecise {
 				source.typed( DeclarationType.AUTO ) );
 	}
 
-	private static <T extends PreciserThan<? super T>> void assertMorePrecise( T morePrecise,
+	private static <T extends MorePreciseThan<? super T>> void assertMorePrecise( T morePrecise,
 			T lessPrecise ) {
 		assertTrue( morePrecise.morePreciseThan( lessPrecise ) );
 		assertFalse( lessPrecise.morePreciseThan( morePrecise ) );
 	}
 
-	private static <T extends PreciserThan<? super T>> void assertNotMorePreciseThanItself( T type ) {
+	private static <T extends MorePreciseThan<? super T>> void assertNotMorePreciseThanItself( T type ) {
 		assertFalse( type.morePreciseThan( type ) );
-		assertThat( Precision.comparePrecision( type, type ), is( 0 ) );
+		assertThat( Instance.comparePrecision( type, type ), is( 0 ) );
 	}
+	
+	public static <T extends MorePreciseThan<? super T>> Comparator<T> comparator(@SuppressWarnings("unused") Class<T> cls) {
+		return new PreciserThanComparator<T>();
+	}
+
+	private static class PreciserThanComparator<T extends MorePreciseThan<? super T>>
+			implements Comparator<T> {
+
+		PreciserThanComparator() {
+			// make visible
+		}
+
+		@Override
+		public int compare( T one, T other ) {
+			return Instance.comparePrecision( one, other );
+		}
+
+	}
+	
 }

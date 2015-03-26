@@ -8,8 +8,8 @@ import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.bootstrap.Parameterize.asType;
-import static se.jbee.inject.bootstrap.Parameterize.constant;
+import static se.jbee.inject.bootstrap.BoundParameter.asType;
+import static se.jbee.inject.bootstrap.BoundParameter.constant;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
@@ -22,8 +22,8 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Parameterize;
-import se.jbee.inject.util.Scoped;
+import se.jbee.inject.bootstrap.BoundParameter;
+import se.jbee.inject.container.Scoped;
 
 /**
  * The test illustrates how to use {@link Parameter}s to give hints which resources should be
@@ -122,7 +122,7 @@ public class TestConstructorParameterBinds {
 			bind( Qux.class ).toConstructor( asType( CharSequence.class, y ),
 					constant( Number.class, 1980 ) );
 			per( Scoped.INJECTION ).bind( named( "inc" ), Foo.class ).toConstructor(
-					Parameterize.supplier( raw( Integer.class ), new IncrementingSupplier() ) );
+					BoundParameter.supplier( raw( Integer.class ), new IncrementingSupplier() ) );
 		}
 	}
 

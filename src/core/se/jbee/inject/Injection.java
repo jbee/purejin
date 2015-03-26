@@ -5,7 +5,6 @@
  */
 package se.jbee.inject;
 
-import static se.jbee.inject.Emergence.emergence;
 
 /**
  * Describes a "stack-frame" within the injection process.
@@ -14,22 +13,20 @@ import static se.jbee.inject.Emergence.emergence;
  */
 public final class Injection {
 
-	private final Instance<?> dependency;
-	private final Emergence<?> target;
+	public final Instance<?> dependency;
+	public final Resource<?> target;
+	public final Expiry expiry;
 
-	Injection( Instance<?> dependency, Emergence<?> target ) {
+	public Injection(Instance<?> dependency, Resource<?> target, Expiry expiry) {
 		super();
 		this.dependency = dependency;
 		this.target = target;
-	}
-
-	public Emergence<?> getTarget() {
-		return target;
+		this.expiry = expiry;
 	}
 
 	public boolean equalTo( Injection other ) {
 		return this == other || dependency.equalTo( other.dependency )
-				&& target.getResource().equalTo( other.target.getResource() );
+				&& target.equalTo( other.target );
 	}
 
 	@Override
@@ -38,6 +35,6 @@ public final class Injection {
 	}
 
 	public Injection ignoredExpiry() {
-		return new Injection( dependency, emergence( target.getResource(), Expiry.IGNORE ) );
+		return new Injection( dependency, target, Expiry.IGNORE );
 	}
 }

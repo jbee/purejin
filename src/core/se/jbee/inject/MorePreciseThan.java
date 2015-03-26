@@ -14,7 +14,7 @@ package se.jbee.inject;
  * @param <T>
  *            The type of objects that are compared
  */
-public interface PreciserThan<T extends PreciserThan<T>> {
+public interface MorePreciseThan<T extends MorePreciseThan<T>> {
 
 	/**
 	 * @return Whether or not this object or more precise than the given one. Equal objects are not
@@ -23,4 +23,5 @@ public interface PreciserThan<T extends PreciserThan<T>> {
 	 *         define one of them that is more precise.
 	 */
 	boolean morePreciseThan( T other );
+	
 }

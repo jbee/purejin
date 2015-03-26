@@ -11,7 +11,7 @@ package se.jbee.inject;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Source
-		implements PreciserThan<Source> {
+		implements MorePreciseThan<Source> {
 
 	public static Source source( Class<?> module ) {
 		return new Source( module, DeclarationType.EXPLICIT, 0, 0 );

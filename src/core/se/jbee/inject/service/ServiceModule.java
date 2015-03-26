@@ -12,9 +12,9 @@ import static se.jbee.inject.Source.source;
 import static se.jbee.inject.Type.parameterTypes;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Type.returnType;
+import static se.jbee.inject.container.Scoped.APPLICATION;
+import static se.jbee.inject.container.Scoped.DEPENDENCY_TYPE;
 import static se.jbee.inject.service.ExtensionModule.extensionDependency;
-import static se.jbee.inject.util.Scoped.APPLICATION;
-import static se.jbee.inject.util.Scoped.DEPENDENCY_TYPE;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -41,11 +41,10 @@ import se.jbee.inject.bootstrap.Bundle;
 import se.jbee.inject.bootstrap.Inspect;
 import se.jbee.inject.bootstrap.Inspector;
 import se.jbee.inject.bootstrap.Module;
+import se.jbee.inject.container.Scoped;
 import se.jbee.inject.service.ServiceInvocation.ServiceInvocationExtension;
 import se.jbee.inject.service.ServiceMethod.ServiceClassExtension;
 import se.jbee.inject.util.Metaclass;
-import se.jbee.inject.util.Scoped;
-import se.jbee.inject.util.Value;
 
 /**
  * When binding {@link ServiceMethod}s this {@link Module} can be extended.
@@ -266,7 +265,7 @@ public abstract class ServiceModule
 			Object[] template = new Object[parameterTypes.length];
 			for ( int i = 0; i < template.length; i++ ) {
 				Injectron<?> injectron = argumentInjectrons[i];
-				if ( injectron != null && injectron.getExpiry().isNever() ) {
+				if ( injectron != null && injectron.getInfo().expiry.isNever() ) {
 					template[i] = instance( injectron, dependency( parameterTypes[i] ) );
 				}
 			}
@@ -294,15 +293,16 @@ public abstract class ServiceModule
 			after( params, res, state );
 			return res;
 		}
-
-		private void afterException( P params, Exception e, Object[] states ) {
+		
+		@SuppressWarnings ( "unchecked" )
+		private <I> void afterException( P params, Exception e, Object[] states ) {
 			if ( invocations.length == 0 ) {
 				return;
 			}
-			final Value<P> paramValue = Value.value( parameterType, params );
 			for ( int i = 0; i < invocations.length; i++ ) {
 				try {
-					afterException( invocations[i], states[i], paramValue, returnType, e );
+					ServiceInvocation<I> inv = (ServiceInvocation<I>) invocations[i];
+					inv.afterException( parameterType, params, returnType, e, (I) states[i] );
 				} catch ( RuntimeException re ) {
 					// warn that invocation before had thrown an exception
 				}
@@ -314,10 +314,9 @@ public abstract class ServiceModule
 				return null;
 			}
 			Object[] invokeState = new Object[invocations.length];
-			Value<P> v = Value.value( parameterType, params );
 			for ( int i = 0; i < invocations.length; i++ ) {
 				try {
-					invokeState[i] = invocations[i].before( v, returnType );
+					invokeState[i] = invocations[i].before( parameterType, params, returnType );
 				} catch ( RuntimeException e ) {
 					// warn that invocation before had thrown an exception
 				}
@@ -325,31 +324,19 @@ public abstract class ServiceModule
 			return invokeState;
 		}
 
-		private void after( P param, T res, Object[] states ) {
+		@SuppressWarnings ( "unchecked" )
+		private <I> void after( P param, T res, Object[] states ) {
 			if ( invocations.length == 0 ) {
 				return;
 			}
-			final Value<P> paramValue = Value.value( parameterType, param );
-			final Value<T> resValue = Value.value( returnType, res );
 			for ( int i = 0; i < invocations.length; i++ ) {
 				try {
-					after( invocations[i], states[i], paramValue, resValue );
+					ServiceInvocation<I> inv = (ServiceInvocation<I>) invocations[i];
+					inv.after( parameterType, param, returnType, res, (I)states[i] );
 				} catch ( RuntimeException e ) {
 					// warn that invocation before had thrown an exception
 				}
 			}
-		}
-
-		@SuppressWarnings ( "unchecked" )
-		private static <I, P, T> void after( ServiceInvocation<I> inv, Object state,
-				Value<P> param, Value<T> result ) {
-			inv.after( param, result, (I) state );
-		}
-
-		@SuppressWarnings ( "unchecked" )
-		private static <I, P, T> void afterException( ServiceInvocation<I> inv, Object state,
-				Value<P> param, Type<T> result, Exception e ) {
-			inv.afterException( param, result, e, (I) state );
 		}
 
 		private Injectron<?>[] argumentInjectrons() {

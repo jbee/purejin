@@ -5,7 +5,6 @@
  */
 package se.jbee.inject;
 
-import static se.jbee.inject.Precision.morePreciseThan2;
 import static se.jbee.inject.Type.raw;
 
 /**
@@ -16,7 +15,7 @@ import static se.jbee.inject.Type.raw;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Resource<T>
-		implements Typed<T>, Named, PreciserThan<Resource<?>> {
+		implements Typed<T>, MorePreciseThan<Resource<?>> {
 
 	public static <T> Resource<T> resource( Class<T> type ) {
 		return new Resource<T>( Instance.anyOf( raw( type ) ) );
@@ -73,7 +72,7 @@ public final class Resource<T>
 
 	@Override
 	public boolean morePreciseThan( Resource<?> other ) {
-		return morePreciseThan2( instance, other.instance, target, other.target );
+		return Instance.morePreciseThan2( instance, other.instance, target, other.target );
 	}
 
 	@Override
@@ -81,7 +80,6 @@ public final class Resource<T>
 		return instance + " " + target;
 	}
 
-	@Override
 	public Name getName() {
 		return instance.getName();
 	}

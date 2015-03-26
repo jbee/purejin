@@ -5,12 +5,12 @@
  */
 package se.jbee.inject.bind;
 
-import se.jbee.inject.Scope;
 import se.jbee.inject.Source;
 import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrapper;
 import se.jbee.inject.bootstrap.Bundle;
 import se.jbee.inject.bootstrap.Module;
+import se.jbee.inject.container.Scope;
 
 /**
  * The default utility {@link Module} almost always used.

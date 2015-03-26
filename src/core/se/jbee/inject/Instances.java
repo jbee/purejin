@@ -13,7 +13,7 @@ import java.util.Arrays;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Instances
-		implements PreciserThan<Instances> {
+		implements MorePreciseThan<Instances> {
 
 	public static final Instances ANY = new Instances( new Instance<?>[0] );
 

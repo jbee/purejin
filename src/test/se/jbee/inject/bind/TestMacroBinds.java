@@ -29,13 +29,13 @@ import se.jbee.inject.bootstrap.BindingType;
 import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Bundle;
+import se.jbee.inject.bootstrap.BoundConstructor;
 import se.jbee.inject.bootstrap.Inspect;
 import se.jbee.inject.bootstrap.Macro;
 import se.jbee.inject.bootstrap.Macros;
 import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.bootstrap.SuppliedBy;
 import se.jbee.inject.config.Globals;
-import se.jbee.inject.util.Constructible;
 
 /**
  * Demonstrates how to use {@link Macro}s to customize the and binding automatics.
@@ -115,10 +115,10 @@ public class TestMacroBinds {
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	static final class RequiredConstructorParametersMacro
-			implements Macro<Constructible<?>> {
+			implements Macro<BoundConstructor<?>> {
 
 		@Override
-		public <T> Module expand( Binding<T> binding, Constructible<?> value ) {
+		public <T> Module expand( Binding<T> binding, BoundConstructor<?> value ) {
 			Type<?>[] params = Type.parameterTypes( value.constructor );
 			Module[] required = new Module[params.length + 1];
 			required[0] = Macros.CONSTRUCT.expand( binding, value );
@@ -182,10 +182,10 @@ public class TestMacroBinds {
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	static final class InitialisationMacro
-			implements Macro<Constructible<?>> {
+			implements Macro<BoundConstructor<?>> {
 
 		@Override
-		public <T> Module expand( Binding<T> binding, Constructible<?> constructible ) {
+		public <T> Module expand( Binding<T> binding, BoundConstructor<?> constructible ) {
 			Supplier<T> supplier = new InitialisationSupplier<T>(
 					SuppliedBy.costructor( constructible.typed( binding.getType() ) ) );
 			return binding.suppliedBy( CONSTRUCTOR, supplier );

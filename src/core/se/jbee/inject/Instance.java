@@ -5,7 +5,6 @@
  */
 package se.jbee.inject;
 
-import static se.jbee.inject.Precision.morePreciseThan2;
 import static se.jbee.inject.Type.raw;
 
 /**
@@ -16,7 +15,7 @@ import static se.jbee.inject.Type.raw;
  * 
  */
 public final class Instance<T>
-		implements Named, Parameter<T>, PreciserThan<Instance<?>> {
+		implements Parameter<T>, MorePreciseThan<Instance<?>> {
 
 	/**
 	 * When a wildcard-type is used as bound instance type the bind will be added to all concrete
@@ -76,7 +75,6 @@ public final class Instance<T>
 		return new Instance<E>( name, type );
 	}
 
-	@Override
 	public Name getName() {
 		return name;
 	}
@@ -101,4 +99,18 @@ public final class Instance<T>
 		return getType().isAssignableTo( type );
 	}
 
+	public static <T extends MorePreciseThan<? super T>> int comparePrecision( T one, T other ) {
+		if ( one.morePreciseThan( other ) ) {
+			return -1;
+		}
+		if ( other.morePreciseThan( one ) ) {
+			return 1;
+		}
+		return 0;
+	}
+
+	public static <T extends MorePreciseThan<? super T>, T2 extends MorePreciseThan<? super T2>> boolean morePreciseThan2( T a1, T a2, T2 b1, T2 b2 ) {
+		return      a1.morePreciseThan( a2 ) // 
+				|| !a2.morePreciseThan( a1 ) && b1.morePreciseThan( b2 );
+	}	
 }

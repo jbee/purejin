@@ -8,10 +8,10 @@ package se.jbee.inject.bind;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Packages;
 import se.jbee.inject.Resource;
-import se.jbee.inject.Scope;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Target;
 import se.jbee.inject.Type;
+import se.jbee.inject.container.Scope;
 
 /**
  * The minimal {@link Binder} to bind should illustrate the stages.

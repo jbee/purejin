@@ -8,7 +8,6 @@ package se.jbee.inject;
 import static se.jbee.inject.Packages.packageAndSubPackagesOf;
 import static se.jbee.inject.Packages.packageOf;
 import static se.jbee.inject.Packages.subPackagesOf;
-import static se.jbee.inject.Precision.morePreciseThan2;
 import static se.jbee.inject.Type.raw;
 
 /**
@@ -20,7 +19,7 @@ import static se.jbee.inject.Type.raw;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Target
-		implements PreciserThan<Target> {
+		implements MorePreciseThan<Target> {
 
 	public static final Target ANY = targeting( Instance.ANY );
 
@@ -154,7 +153,7 @@ public final class Target
 				return false;
 			}
 		}
-		return morePreciseThan2( instance, other.instance, packages, other.packages );
+		return Instance.morePreciseThan2( instance, other.instance, packages, other.packages );
 	}
 
 	public boolean equalTo( Target other ) {

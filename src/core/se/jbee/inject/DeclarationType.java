@@ -20,7 +20,7 @@ package se.jbee.inject;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public enum DeclarationType
-		implements PreciserThan<DeclarationType> {
+		implements MorePreciseThan<DeclarationType> {
 
 	/**
 	 * Has been added by the binder as a fall-back since some bind-calls can have ambiguous

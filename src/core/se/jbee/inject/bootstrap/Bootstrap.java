@@ -6,7 +6,6 @@
 package se.jbee.inject.bootstrap;
 
 import static se.jbee.inject.Dependency.dependency;
-import static se.jbee.inject.bootstrap.Bindings.bindings;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -22,20 +21,14 @@ import se.jbee.inject.Array;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Injectron;
 import se.jbee.inject.Type;
-import se.jbee.inject.config.Edition;
-import se.jbee.inject.config.Feature;
 import se.jbee.inject.config.Globals;
 import se.jbee.inject.config.Options;
 import se.jbee.inject.config.Presets;
-import se.jbee.inject.util.Inject;
+import se.jbee.inject.container.Inject;
 import se.jbee.inject.util.Metaclass;
-import se.jbee.inject.util.Suppliable;
 
 /**
  * Utility to create an {@link Injector} context from {@link Bundle}s and {@link Module}s.
- * 
- * It allos to use {@link Edition}s and {@link Feature}s to modularize or customize context
- * configurations.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
@@ -46,17 +39,15 @@ public final class Bootstrap {
 	}
 
 	public static Injector injector( Class<? extends Bundle> root, Globals globals ) {
-		return injector( root, bindings( Macros.DEFAULT, Inspect.DEFAULT ), globals );
+		return injector( root, Bindings.bindings( Macros.DEFAULT, Inspect.DEFAULT ), globals );
 	}
 
-	public static Injector injector( Class<? extends Bundle> root, Bindings bindings,
-			Globals globals ) {
-		return injector( bindings, Link.BUILDIN, modulariser( globals ).modularise( root ) );
+	public static Injector injector( Class<? extends Bundle> root, Bindings bindings, Globals globals ) {
+		return injector( bindings, modulariser( globals ).modularise( root ) );
 	}
 
-	public static Injector injector( Bindings bindings, Linker<Suppliable<?>> linker,
-			Module[] modules ) {
-		return Inject.from( Suppliable.source( linker.link( bindings, modules ) ) );
+	public static Injector injector( Bindings bindings, Module[] modules ) {
+		return Inject.container( Binding.disambiguate( bindings.expand(modules)) );
 	}
 
 	public static Modulariser modulariser( Globals globals ) {
@@ -67,9 +58,8 @@ public final class Bootstrap {
 		return new BuildinBootstrapper( globals );
 	}
 
-	public static Suppliable<?>[] suppliables( Class<? extends Bundle> root, Bindings bindings,
-			Globals globals ) {
-		return Link.BUILDIN.link( bindings, modulariser( globals ).modularise( root ) );
+	public static Binding<?>[] bindings( Class<? extends Bundle> root, Bindings bindings, Globals globals ) {
+		return Binding.disambiguate( bindings.expand( modulariser( globals ).modularise( root ) ) );
 	}
 
 	public static <T> Module module( PresetModule<T> module, Presets presets ) {
@@ -78,14 +68,14 @@ public final class Bootstrap {
 
 	public static void eagerSingletons( Injector injector ) {
 		for ( Injectron<?> i : injector.resolve( dependency( Injectron[].class ) ) ) {
-			if ( i.getExpiry().isNever() ) {
-				instance( i );
+			if ( i.getInfo().expiry.isNever() ) {
+				instance( i ); // instantiate to make sure they exist in repository
 			}
 		}
 	}
 
 	public static <T> T instance( Injectron<T> injectron ) {
-		return injectron.instanceFor( dependency( injectron.getResource().getInstance() ) );
+		return injectron.instanceFor( dependency( injectron.getInfo().resource.getInstance() ) );
 	}
 
 	public static void nonnullThrowsReentranceException( Object field ) {
@@ -123,7 +113,7 @@ public final class Bootstrap {
 		}
 	}
 
-	private static class BuildinBootstrapper
+	private static final class BuildinBootstrapper
 			implements Bootstrapper, Bundler, Modulariser {
 
 		private final Map<Class<? extends Bundle>, Set<Class<? extends Bundle>>> bundleChildren = new IdentityHashMap<Class<? extends Bundle>, Set<Class<? extends Bundle>>>();

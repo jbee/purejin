@@ -10,23 +10,12 @@ package se.jbee.inject;
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
-public interface Injectron<T>
-		extends Resourced<T> {
-
-	/**
-	 * @return The {@link Source} that {@link Injection} had been created from (e.g. did define the
-	 *         bind).
-	 */
-	Source getSource();
+public interface Injectron<T> {
 
 	/**
 	 * @return The instance created or resolved for the given {@link Dependency}.
 	 */
 	T instanceFor( Dependency<? super T> dependency );
-
-	/**
-	 * @return The frequency in which this injectron's {@link Resource} expires.
-	 */
-	Expiry getExpiry();
-
+	
+	InjectronInfo<T> getInfo();
 }

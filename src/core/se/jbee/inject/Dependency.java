@@ -5,7 +5,6 @@
  */
 package se.jbee.inject;
 
-import static se.jbee.inject.Emergence.emergence;
 import static se.jbee.inject.Instance.defaultInstanceOf;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Type.raw;
@@ -22,7 +21,7 @@ import se.jbee.inject.DIRuntimeException.MoreFrequentExpiryException;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Dependency<T>
-		implements Named, Parameter<T>, Iterable<Injection> {
+		implements Parameter<T>, Iterable<Injection> {
 
 	/**
 	 * A empty {@link Injection} hierarchy. It is used whenever the {@link Dependency} does not
@@ -67,7 +66,6 @@ public final class Dependency<T>
 		return instance.getType();
 	}
 
-	@Override
 	public Name getName() {
 		return instance.getName();
 	}
@@ -134,7 +132,7 @@ public final class Dependency<T>
 	public Instance<?> target( int level ) {
 		return isUntargeted()
 			? Instance.ANY
-			: hierarchy[hierarchy.length - 1 - level].getTarget().getResource().getInstance();
+			: hierarchy[hierarchy.length - 1 - level].target.getInstance();
 	}
 
 	public int injectionDepth() {
@@ -153,11 +151,11 @@ public final class Dependency<T>
 	}
 
 	public <I> Dependency<T> injectingInto( Instance<I> target ) {
-		return injectingInto( emergence( new Resource<I>(target), Expiry.NEVER ) );
+		return injectingInto( new Resource<I>(target), Expiry.NEVER );
 	}
 
-	public Dependency<T> injectingInto( Emergence<?> target ) {
-		Injection injection = new Injection( instance, target );
+	public Dependency<T> injectingInto( Resource<?> target, Expiry expiry ) {
+		Injection injection = new Injection( instance, target, expiry );
 		if ( hierarchy.length == 0 ) {
 			return new Dependency<T>( instance, injection );
 		}
@@ -178,16 +176,16 @@ public final class Dependency<T>
 		for ( int i = 0; i < hierarchy.length; i++ ) {
 			Injection parent = hierarchy[i];
 			if ( parent.equalTo( injection ) ) {
-				throw new DependencyCycleException( this, injection.getTarget().getResource() );
+				throw new DependencyCycleException( this, injection.target );
 			}
 		}
 	}
 
 	private void ensureNotMoreFrequentExpiry( Injection injection ) {
-		final Expiry expiry = injection.getTarget().getExpiry();
+		final Expiry expiry = injection.expiry;
 		for ( int i = 0; i < hierarchy.length; i++ ) {
 			Injection parent = hierarchy[i];
-			if ( expiry.moreFrequent( parent.getTarget().getExpiry() ) ) {
+			if ( expiry.moreFrequent( parent.expiry ) ) {
 				throw new MoreFrequentExpiryException( parent, injection );
 			}
 		}

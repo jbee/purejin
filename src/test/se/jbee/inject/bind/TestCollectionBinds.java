@@ -5,9 +5,9 @@ import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.util.Typecast.collectionTypeOf;
-import static se.jbee.inject.util.Typecast.listTypeOf;
-import static se.jbee.inject.util.Typecast.setTypeOf;
+import static se.jbee.inject.container.Typecast.collectionTypeOf;
+import static se.jbee.inject.container.Typecast.listTypeOf;
+import static se.jbee.inject.container.Typecast.setTypeOf;
 
 import java.util.Collection;
 import java.util.List;
@@ -20,7 +20,7 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.util.Typecast;
+import se.jbee.inject.container.Typecast;
 
 public class TestCollectionBinds {
 

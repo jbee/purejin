@@ -3,7 +3,7 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject.util;
+package se.jbee.inject.bootstrap;
 
 import java.lang.reflect.Constructor;
 
@@ -11,18 +11,18 @@ import se.jbee.inject.Parameter;
 import se.jbee.inject.Type;
 import se.jbee.inject.Typed;
 
-public final class Constructible<T>
+public final class BoundConstructor<T>
 		implements Typed<T> {
 
-	public static <T> Constructible<T> constructible( Constructor<T> constructor,
+	public static <T> BoundConstructor<T> bind( Constructor<T> constructor,
 			Parameter<?>... parameters ) {
-		return new Constructible<T>( constructor, parameters );
+		return new BoundConstructor<T>( constructor, parameters );
 	}
 
 	public final Constructor<T> constructor;
 	public final Parameter<?>[] parameters;
 
-	private Constructible( Constructor<T> constructor, Parameter<?>[] parameters ) {
+	private BoundConstructor( Constructor<T> constructor, Parameter<?>[] parameters ) {
 		super();
 		this.constructor = constructor;
 		this.parameters = parameters;
@@ -35,9 +35,9 @@ public final class Constructible<T>
 
 	@SuppressWarnings ( "unchecked" )
 	@Override
-	public <E> Constructible<E> typed( Type<E> supertype ) {
+	public <E> BoundConstructor<E> typed( Type<E> supertype ) {
 		getType().castTo( supertype );
-		return (Constructible<E>) this;
+		return (BoundConstructor<E>) this;
 	}
 
 }

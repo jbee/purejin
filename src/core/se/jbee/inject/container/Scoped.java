@@ -3,16 +3,13 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject.util;
+package se.jbee.inject.container;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import se.jbee.inject.Demand;
 import se.jbee.inject.Dependency;
-import se.jbee.inject.Injectable;
-import se.jbee.inject.Repository;
-import se.jbee.inject.Scope;
+import se.jbee.inject.InjectronInfo;
 
 /**
  * Utility as a factory to create/use {@link Scope}s.
@@ -21,29 +18,28 @@ import se.jbee.inject.Scope;
  */
 public class Scoped {
 
-	public interface KeyDeduction {
+	public interface DependencyProperty {
 
-		<T> String deduceKey( Demand<T> demand );
+		<T> String deriveFrom( Dependency<T> dependency );
 	}
 
-	public static final KeyDeduction DEPENDENCY_TYPE_KEY = new DependencyTypeAsKey();
-	public static final KeyDeduction DEPENDENCY_INSTANCE_KEY = new DependencyInstanceAsKey();
-	public static final KeyDeduction TARGET_INSTANCE_KEY = new TargetInstanceAsKey();
-	public static final KeyDeduction TARGETED_DEPENDENCY_TYPE_KEY = new ConcatKeysDeduction(
-			DEPENDENCY_INSTANCE_KEY, TARGET_INSTANCE_KEY );
+	public static final DependencyProperty DEPENDENCY_TYPE_KEY = new DependencyTypeProperty();
+	public static final DependencyProperty DEPENDENCY_INSTANCE_KEY = new DependencyInstanceProperty();
+	public static final DependencyProperty TARGET_INSTANCE_KEY = new TargetInstanceProperty();
+	public static final DependencyProperty TARGETED_DEPENDENCY_TYPE_KEY = new CombinedProperty(DEPENDENCY_INSTANCE_KEY, TARGET_INSTANCE_KEY );
 
 	/**
-	 * Often called the 'default' or 'prototype'-scope. Asks the {@link Injectable} once per
+	 * Often called the 'default' or 'prototype'-scope. Asks the {@link Provider} once per
 	 * injection.
 	 */
 	public static final Scope INJECTION = new InjectionScope();
 	/**
-	 * Asks the {@link Injectable} once per binding. Thereby instances become singletons local to
+	 * Asks the {@link Provider} once per binding. Thereby instances become singletons local to
 	 * the application.
 	 */
 	public static final Scope APPLICATION = new ApplicationScope();
 	/**
-	 * Asks the {@link Injectable} once per thread per binding which is understand commonly as a
+	 * Asks the {@link Provider} once per thread per binding which is understand commonly as a
 	 * usual 'per-thread' singleton.
 	 */
 	public static final Scope THREAD = new ThreadScope( new ThreadLocal<Repository>(), APPLICATION );
@@ -53,8 +49,8 @@ public class Scoped {
 	public static final Scope TARGET_INSTANCE = uniqueBy( TARGET_INSTANCE_KEY );
 	public static final Scope DEPENDENCY = uniqueBy( TARGETED_DEPENDENCY_TYPE_KEY );
 
-	public static Scope uniqueBy( KeyDeduction keyDeduction ) {
-		return new KeyDeductionScope( keyDeduction );
+	public static Scope uniqueBy( DependencyProperty keyDeduction ) {
+		return new DependencyPropertyScope( keyDeduction );
 	}
 
 	public static Repository asSnapshot( Repository src, Repository dest ) {
@@ -85,8 +81,8 @@ public class Scoped {
 		}
 
 		@Override
-		public <T> T serve( Demand<T> demand, Injectable<T> injectable ) {
-			return injectable.instanceFor( demand );
+		public <T> T serve( Dependency<? super T> dependency, InjectronInfo<T> info, Provider<T> injectable ) {
+			return injectable.provide();
 		}
 
 		@Override
@@ -109,14 +105,14 @@ public class Scoped {
 		}
 
 		@Override
-		public <T> T serve( Demand<T> demand, Injectable<T> injectable ) {
+		public <T> T serve(Dependency<? super T> dependency, InjectronInfo<T> info, Provider<T> provider) {
 			Repository repository = threadRepository.get();
 			if ( repository == null ) {
 				// since each thread is just accessing its own repo there cannot be a repo set for the running thread after we checked for null
 				repository = repositoryScope.init();
 				threadRepository.set( repository );
 			}
-			return repository.serve( demand, injectable );
+			return repository.serve( dependency, info, provider );
 		}
 
 		@Override
@@ -143,92 +139,94 @@ public class Scoped {
 	private static final class SnapshotRepository
 			implements Repository {
 
-		private final Repository dest;
 		private final Repository src;
+		private final Repository dest;
 
 		SnapshotRepository( Repository src, Repository dest ) {
 			super();
-			this.dest = dest;
 			this.src = src;
+			this.dest = dest;
 		}
 
 		@Override
-		public <T> T serve( Demand<T> demand, Injectable<T> injectable ) {
-			return dest.serve( demand, new SnapshotingInjectable<T>( injectable, src ) );
+		public <T> T serve(Dependency<? super T> dependency, InjectronInfo<T> info, Provider<T> provider) {
+			return dest.serve( dependency, info, new SnapshotingProvider<T>( dependency, info, provider, src ) );
 		}
 
-		private static final class SnapshotingInjectable<T>
-				implements Injectable<T> {
+		private static final class SnapshotingProvider<T>
+				implements Provider<T> {
 
-			private final Injectable<T> supplier;
+			private final Dependency<? super T> dependency;
+			private final InjectronInfo<T> info;
+			private final Provider<T> supplier;
 			private final Repository src;
 
-			SnapshotingInjectable( Injectable<T> supplier, Repository src ) {
+			SnapshotingProvider(Dependency<? super T> dependency, InjectronInfo<T> info, Provider<T> supplier, Repository src) {
 				super();
+				this.dependency = dependency;
+				this.info = info;
 				this.supplier = supplier;
 				this.src = src;
 			}
 
 			@Override
-			public T instanceFor( Demand<T> demand ) {
-				return src.serve( demand, supplier );
+			public T provide() {
+				return src.serve(dependency, info, supplier);
 			}
-
 		}
 
 	}
 
-	private static final class KeyDeductionScope
+	private static final class DependencyPropertyScope
 			implements Scope {
 
-		private final KeyDeduction keyDeduction;
+		private final DependencyProperty property;
 
-		KeyDeductionScope( KeyDeduction keyDeduction ) {
+		DependencyPropertyScope( DependencyProperty property ) {
 			super();
-			this.keyDeduction = keyDeduction;
+			this.property = property;
 		}
 
 		@Override
 		public Repository init() {
-			return new KeyDeductionRepository( keyDeduction );
+			return new DependencyPropertyRepository( property );
 		}
 
 		@Override
 		public String toString() {
-			return "(per-" + keyDeduction + ")";
+			return "(per-" + property + ")";
 		}
 
 	}
 
-	private static final class ConcatKeysDeduction
-			implements KeyDeduction {
+	private static final class CombinedProperty
+			implements DependencyProperty {
 
-		private final KeyDeduction first;
-		private final KeyDeduction second;
+		private final DependencyProperty first;
+		private final DependencyProperty second;
 
-		ConcatKeysDeduction( KeyDeduction first, KeyDeduction second ) {
+		CombinedProperty( DependencyProperty first, DependencyProperty second ) {
 			super();
 			this.first = first;
 			this.second = second;
 		}
 
 		@Override
-		public <T> String deduceKey( Demand<T> demand ) {
-			return first.deduceKey( demand ).concat( second.deduceKey( demand ) );
+		public <T> String deriveFrom( Dependency<T> dependency ) {
+			return first.deriveFrom( dependency ).concat( second.deriveFrom( dependency ) );
 		}
 
 	}
 
-	private static final class TargetInstanceAsKey
-			implements KeyDeduction {
+	private static final class TargetInstanceProperty
+			implements DependencyProperty {
 
-		TargetInstanceAsKey() {
+		TargetInstanceProperty() {
 			// make visible
 		}
 
 		@Override
-		public <T> String deduceKey( Demand<T> demand ) {
-			Dependency<? super T> dependency = demand.getDependency();
+		public <T> String deriveFrom( Dependency<T> dependency ) {
 			StringBuilder b = new StringBuilder();
 			for ( int i = dependency.injectionDepth() - 1; i >= 0; i-- ) {
 				b.append( dependency.target( i ) );
@@ -243,16 +241,16 @@ public class Scoped {
 
 	}
 
-	private static final class DependencyTypeAsKey
-			implements KeyDeduction {
+	private static final class DependencyTypeProperty
+			implements DependencyProperty {
 
-		DependencyTypeAsKey() {
+		DependencyTypeProperty() {
 			// make visible
 		}
 
 		@Override
-		public <T> String deduceKey( Demand<T> demand ) {
-			return demand.getDependency().getType().toString();
+		public <T> String deriveFrom( Dependency<T> dependency ) {
+			return dependency.getType().toString();
 		}
 
 		@Override
@@ -262,17 +260,17 @@ public class Scoped {
 
 	}
 
-	private static final class DependencyInstanceAsKey
-			implements KeyDeduction {
+	private static final class DependencyInstanceProperty
+			implements DependencyProperty {
 
-		DependencyInstanceAsKey() {
+		DependencyInstanceProperty() {
 			// make visible
 		}
 
 		@Override
-		public <T> String deduceKey( Demand<T> demand ) {
-			return demand.getDependency().getName().toString() + "@"
-					+ demand.getDependency().getType().toString();
+		public <T> String deriveFrom( Dependency<T> dependency ) {
+			return dependency.getName().toString() + "@"
+					+ dependency.getType().toString();
 		}
 
 		@Override
@@ -283,21 +281,21 @@ public class Scoped {
 
 	// e.g. get receiver class from dependency -to be reusable the provider could offer a identity --> a wrapper class would be needed anyway so maybe best is to have quite similar impl. all using a identity hash-map
 
-	private static final class KeyDeductionRepository
+	private static final class DependencyPropertyRepository
 			implements Repository {
 
 		private final Map<String, Object> instances = new HashMap<String, Object>();
-		private final KeyDeduction injectionKey;
+		private final DependencyProperty property;
 
-		KeyDeductionRepository( KeyDeduction injectionKey ) {
+		DependencyPropertyRepository( DependencyProperty injectionKey ) {
 			super();
-			this.injectionKey = injectionKey;
+			this.property = injectionKey;
 		}
 
 		@Override
 		@SuppressWarnings ( "unchecked" )
-		public <T> T serve( Demand<T> demand, Injectable<T> injectable ) {
-			final String key = injectionKey.deduceKey( demand );
+		public <T> T serve(Dependency<? super T> dependency, InjectronInfo<T> info, Provider<T> provider) {
+			final String key = property.deriveFrom( dependency );
 			T instance = (T) instances.get( key );
 			if ( instance != null ) {
 				return instance;
@@ -305,7 +303,7 @@ public class Scoped {
 			synchronized ( instances ) {
 				instance = (T) instances.get( key );
 				if ( instance == null ) {
-					instance = injectable.instanceFor( demand );
+					instance = provider.provide();
 					instances.put( key, instance );
 				}
 			}
@@ -355,20 +353,21 @@ public class Scoped {
 
 		@Override
 		@SuppressWarnings ( "unchecked" )
-		public <T> T serve( Demand<T> demand, Injectable<T> injectable ) {
+		public <T> T serve(Dependency<? super T> dependency, InjectronInfo<T> info, Provider<T> provider) {
 			if ( instances == null ) {
-				instances = new Object[demand.envCardinality()];
+				instances = new Object[info.count];
 			}
-			T res = (T) instances[demand.envSerialNumber()];
+			final int serialNo = info.serialID;
+			T res = (T) instances[serialNo];
 			if ( res != null ) {
 				return res;
 			}
 			// just sync the (later) unexpected path that is executed once
 			synchronized ( instances ) {
-				res = (T) instances[demand.envSerialNumber()];
+				res = (T) instances[serialNo];
 				if ( res == null ) { // we need to ask again since the instance could have been initialized before we got entrance to the sync block
-					res = injectable.instanceFor( demand );
-					instances[demand.envSerialNumber()] = res;
+					res = provider.provide();
+					instances[serialNo] = res;
 				}
 			}
 			return res;

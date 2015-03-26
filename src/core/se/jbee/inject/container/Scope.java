@@ -3,7 +3,9 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject;
+package se.jbee.inject.container;
+
+import se.jbee.inject.Injector;
 
 /**
  * A {@linkplain Scope} describes a particular lifecycle.
