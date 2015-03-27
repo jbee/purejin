@@ -21,8 +21,8 @@ public final class Resource<T>
 		return new Resource<T>( Instance.anyOf( raw( type ) ) );
 	}
 
-	private final Instance<T> instance;
-	private final Target target;
+	public final Instance<T> instance;
+	public final Target target;
 
 	public Resource( Instance<T> instance ) {
 		this( instance, Target.ANY );
@@ -62,7 +62,7 @@ public final class Resource<T>
 	 * Does this resource provide the instance wanted by the given {@link Dependency}'s {@link Name}
 	 */
 	public boolean isAdequateFor( Dependency<? super T> dependency ) {
-		return instance.getName().isApplicableFor( dependency.getName() );
+		return instance.name.isApplicableFor( dependency.getName() );
 	}
 
 	@Override
@@ -81,15 +81,7 @@ public final class Resource<T>
 	}
 
 	public Name getName() {
-		return instance.getName();
-	}
-
-	public Instance<T> getInstance() {
-		return instance;
-	}
-
-	public Target getTarget() {
-		return target;
+		return instance.name;
 	}
 
 	@Override

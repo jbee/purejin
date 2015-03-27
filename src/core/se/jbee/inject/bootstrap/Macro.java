@@ -26,7 +26,7 @@ public interface Macro<V> {
 	 * {@link Module} that declares the complete {@link Binding}(s).
 	 * 
 	 * @param binding
-	 *            A incomplete {@link Binding}
+	 *            A incomplete {@link Binding} (without a {@link Supplier})
 	 * @param value
 	 *            A {@link Class}, {@link Instance} or similar values that
 	 *            express the intent of the incomplete binding. This

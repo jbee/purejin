@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * Base {@link RuntimeException} for all exceptions cennected to the dependency injection process
+ * Base {@link RuntimeException} for all exceptions connected to the dependency injection process
  * itself.
  * 
  * @author Jan Bernitt (jan@jbee.se)
@@ -108,6 +108,14 @@ public class DIRuntimeException
 		public NoSuchFunctionException( Type<?> returnType, Type<?>... parameterTypes ) {
 			super( returnType + ":" + Arrays.toString( parameterTypes ) );
 		}
+	}
+	
+	public static final class BootstrappingException extends DIRuntimeException {
+
+		public BootstrappingException(String message) {
+			super(message);
+		}
+		
 	}
 
 }

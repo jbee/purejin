@@ -13,7 +13,7 @@ import org.junit.runners.Suite.SuiteClasses;
 		TestScopedBinds.class, TestInjectronBinds.class, TestProviderBinds.class,
 		TestPrimitiveBinds.class, TestInjectorExceptions.class, TestCollectionBinds.class,
 		TestInspectorBinds.class, TestParentTargetBinds.class, TestPresetModuleBinds.class,
-		TestRequiredProvidedBinds.class, TestConfigurationDependentBinds.class,
+		TestRequiredProvidedBinds.class, TestStateDependentBinds.class,
 		TestPrimitiveArrayBinds.class, TestMultipleOptionChoicesBinds.class, TestMacroBinds.class,
 		TestBootstrapper.class, TestLinker.class, TestIssue1.class, TestDecoratorBinds.class } )
 public class SuiteBind {

@@ -13,6 +13,7 @@ import java.util.Set;
 
 import se.jbee.inject.Array;
 import se.jbee.inject.DIRuntimeException;
+import se.jbee.inject.DIRuntimeException.BootstrappingException;
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Resource;
@@ -56,7 +57,7 @@ public final class Binding<T>
 	}
 
 	public Instance<T> getInstance() {
-		return resource.getInstance();
+		return resource.instance;
 	}
 
 	@Override
@@ -96,7 +97,7 @@ public final class Binding<T>
 				scope, source );
 	}
 
-	public Binding<T> suppliedBy( BindingType type, Supplier<? extends T> supplier ) {
+	public Binding<T> complete( BindingType type, Supplier<? extends T> supplier ) {
 		return new Binding<T>( resource, type, supplier, scope, source );
 	}
 
@@ -112,11 +113,11 @@ public final class Binding<T>
 		if ( res != 0 ) {
 			return res;
 		}
-		res = Instance.comparePrecision( resource.getInstance(), other.resource.getInstance() );
+		res = Instance.comparePrecision( resource.instance, other.resource.instance );
 		if ( res != 0 ) {
 			return res;
 		}
-		res = Instance.comparePrecision( resource.getTarget(), other.resource.getTarget() );
+		res = Instance.comparePrecision( resource.target, other.resource.target );
 		if ( res != 0 ) {
 			return res;
 		}
@@ -153,7 +154,7 @@ public final class Binding<T>
 			DeclarationType oneType = one.source.getType();
 			DeclarationType otherType = other.source.getType();
 			if ( equalResource && oneType.clashesWith( otherType ) ) {
-				throw new IllegalStateException( "Duplicate binds:\n" + one + "\n" + other );
+				throw new BootstrappingException( "Duplicate binds:\n" + one + "\n" + other );
 			}
 			if ( other.source.getType() == DeclarationType.REQUIRED ) {
 				required.add( other.resource.getType() );

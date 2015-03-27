@@ -78,7 +78,7 @@ public final class Target
 			return true;
 		}
 		final Instance<?> target = dependency.target();
-		return instance.getName().isApplicableFor( target.getName() )
+		return instance.name.isApplicableFor( target.name )
 				&& injectable( instance.getType(), target.getType() );
 	}
 

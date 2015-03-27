@@ -48,8 +48,8 @@ public final class Instance<T>
 		return new Instance<T>( name, type );
 	}
 
-	private final Name name;
-	private final Type<T> type;
+	public final Name name;
+	public final Type<T> type;
 
 	private Instance( Name name, Type<T> type ) {
 		super();
@@ -73,10 +73,6 @@ public final class Instance<T>
 	@Override
 	public <E> Instance<E> typed( Type<E> type ) {
 		return new Instance<E>( name, type );
-	}
-
-	public Name getName() {
-		return name;
 	}
 
 	@Override

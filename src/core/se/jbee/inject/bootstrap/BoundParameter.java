@@ -37,15 +37,15 @@ public final class BoundParameter<T> implements Parameter<T>, Supplier<T> {
 		}
 		if ( parameter instanceof Instance<?> ) {
 			Instance<T> i = (Instance<T>) parameter;
-			return new BoundParameter<T>( i.getType(), SuppliedBy.instance( i ) );
+			return new BoundParameter<T>( i.getType(), Supply.instance( i ) );
 		}
 		if ( parameter instanceof Type<?> ) {
 			Instance<T> i = anyOf( (Type<T>) parameter );
-			return new BoundParameter<T>( i.getType(), SuppliedBy.instance( i ) );
+			return new BoundParameter<T>( i.getType(), Supply.instance( i ) );
 		}
 		if ( parameter instanceof Dependency<?> ) {
 			final Dependency<T> d = (Dependency<T>) parameter;
-			return new BoundParameter<T>( d.getType(), SuppliedBy.dependency( d ) );
+			return new BoundParameter<T>( d.getType(), Supply.dependency( d ) );
 		}
 		throw new IllegalArgumentException( "Unknown parameter type:" + parameter );
 	}
@@ -55,7 +55,7 @@ public final class BoundParameter<T> implements Parameter<T>, Supplier<T> {
 	}
 
 	public static <T> Parameter<T> constant( Type<T> type, T constant ) {
-		return new BoundParameter<T>( type, SuppliedBy.constant( constant ) );
+		return new BoundParameter<T>( type, Supply.constant( constant ) );
 	}
 
 	public static <T> Parameter<T> supplier( Type<T> type, Supplier<? extends T> supplier ) {
@@ -154,7 +154,7 @@ public final class BoundParameter<T> implements Parameter<T>, Supplier<T> {
 
 	@Override
 	public String toString() {
-		return SuppliedBy.describe( supplied, supplier );
+		return Supply.describe( supplied, supplier );
 	}
 	
 }

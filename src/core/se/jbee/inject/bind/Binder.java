@@ -9,7 +9,6 @@ import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Instance.defaultInstanceOf;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.bootstrap.Configuring.configuring;
 import static se.jbee.inject.util.Metaclass.metaclass;
 
 import java.lang.reflect.Constructor;
@@ -17,6 +16,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import se.jbee.inject.Array;
+import se.jbee.inject.Dependency;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Packages;
@@ -28,12 +28,10 @@ import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Binding;
 import se.jbee.inject.bootstrap.BindingType;
 import se.jbee.inject.bootstrap.BoundConstructor;
-import se.jbee.inject.bootstrap.Configuring;
 import se.jbee.inject.bootstrap.BoundMethod;
 import se.jbee.inject.bootstrap.Inspector;
 import se.jbee.inject.bootstrap.Module;
-import se.jbee.inject.bootstrap.Naming;
-import se.jbee.inject.bootstrap.SuppliedBy;
+import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.container.Factory;
 import se.jbee.inject.container.Scope;
 import se.jbee.inject.container.Scoped;
@@ -133,33 +131,19 @@ public class Binder {
 		return bind( Instance.anyOf( Type.raw( type ) ) );
 	}
 
-	public <T, C> ConfigBinder<T> configbind( Class<T> type ) {
-		return configbind( raw( type ) );
+	public <T, C> ControllerBinder<T> connect( Class<T> type ) {
+		return connect( raw( type ) );
 	}
 
-	public <T, C> ConfigBinder<T> configbind( Type<T> type ) {
-		return new ConfigBinder<T>( root, type );
+	public <T, C> ControllerBinder<T> connect( Type<T> type ) {
+		return new ControllerBinder<T>( root, type );
 	}
 
 	protected Binder on( Bind bind ) {
 		return new Binder( root, bind );
 	}
 
-	protected final <I> void implicitBindToConstructor( Class<I> impl ) {
-		implicitBindToConstructor( defaultInstanceOf( raw( impl ) ) );
-	}
-
-	protected final <I> void implicitBindToConstructor( Instance<I> instance ) {
-		Class<I> impl = instance.getType().getRawType();
-		if ( metaclass( impl ).undeterminable() ) {
-			return;
-		}
-		Constructor<I> constructor = bind().getInspector().constructorFor( impl );
-		if ( constructor != null ) {
-			implicit().with( Target.ANY ).bind( instance ).to( constructor );
-		}
-	}
-
+	@Deprecated
 	protected final Binder implicit() {
 		return on( bind().asImplicit() );
 	}
@@ -168,49 +152,25 @@ public class Binder {
 		return new Binder( root, bind().with( target ) );
 	}
 
-	public static class ConfigBinder<T> {
+	public static class ControllerBinder<T> {
 
 		private final RootBinder binder;
 		private final Type<T> type;
 
-		ConfigBinder( RootBinder binder, Type<T> type ) {
+		ControllerBinder( RootBinder binder, Type<T> type ) {
 			super();
 			this.binder = new RootBinder( binder.bind().next() );
 			this.type = type;
 		}
 
-		public <C> TypedBinder<T> on( Configuring<C> configuring, C value ) {
-			binder.per( Scoped.INJECTION ).implicit().bind( type ).to( configuring );
-			return binder.bind( configuring.name( value ), type );
+		public <S> void via(Class<S> state) {
+			via(raw(state));
 		}
 
-		public <C extends Enum<C>> TypedBinder<T> onOther( Class<C> valueType ) {
-			return on( Name.DEFAULT, null, valueType, Configuring.ENUM );
+		public <S> void via(Type<S> state) {
+			binder.per(Scoped.INJECTION).bind( type ).to( Supply.stateDependent(type, Dependency.dependency(state)) );
 		}
-
-		public <C extends Enum<C>> TypedBinder<T> on( C value ) {
-			return on( Name.DEFAULT, value, value.getDeclaringClass(), Configuring.ENUM );
-		}
-
-		public <C> TypedBinder<T> onOther( Name name, Class<C> valueType ) {
-			return on( name, null, valueType, Configuring.TO_STRING );
-		}
-
-		public <C> TypedBinder<T> on( Name name, C value ) {
-			return on( name, value, Configuring.TO_STRING );
-		}
-
-		public <C> TypedBinder<T> on( Name name, C value, Naming<? super C> naming ) {
-			@SuppressWarnings ( "unchecked" )
-			final Class<C> valueType = (Class<C>) value.getClass();
-			return on( name, value, valueType, naming );
-		}
-
-		private <C> TypedBinder<T> on( Name name, C value, final Class<C> valueType,
-				Naming<? super C> naming ) {
-			return on( configuring( naming, instance( name, raw( valueType ) ) ), value );
-		}
-
+		
 	}
 
 	public static class InspectBinder {
@@ -309,8 +269,7 @@ public class Binder {
 		//OPEN also allow naming for provided instances - this is used for value objects that become parameter
 
 		public <T> void provide( Class<T> implementation, Parameter<?>... parameters ) {
-			on( bind().autobinding().asProvided() ).bind( implementation ).toConstructor(
-					parameters );
+			on( bind().autobinding().asProvided() ).bind( implementation ).toConstructor( parameters );
 		}
 
 		public <T> void require( Class<T> dependency ) {
@@ -318,8 +277,8 @@ public class Binder {
 		}
 
 		public <T> void require( Type<T> dependency ) {
-			on( bind().asRequired() ).bind( dependency ).to( SuppliedBy.<T> required(),
-					BindingType.REQUIRED );
+			on( bind().asRequired() )
+				.bind( dependency ).to( Supply.<T> required(), BindingType.REQUIRED );
 		}
 
 		@Override
@@ -429,11 +388,15 @@ public class Binder {
 			expand( BoundConstructor.bind( constructor, parameters ) );
 		}
 
-		void to( Object instance, Method method, Parameter<?>[] parameters ) {
+		protected final void to( Object instance, Method method, Parameter<?>[] parameters ) {
 			expand( BoundMethod.bind( instance, method, Type.returnType( method ), parameters ) );
 		}
+		
+		protected final void expand( Object value ) {
+			declareBindingsIn( bind().bindings.getMacros().expand( bind().asMacro( resource ), value ) );
+		}
 
-		public void toMacro( Module macro ) {
+		private void declareBindingsIn( Module macro ) {
 			if ( macro instanceof Binding<?> ) {
 				Binding<?> b = (Binding<?>) macro;
 				macro = bind().bindings.getMacros().expand( b, b );
@@ -441,12 +404,8 @@ public class Binder {
 			macro.declare( bind().bindings );
 		}
 
-		protected final void expand( Object value ) {
-			toMacro( bind().bindings.getMacros().expand( bind().asMacro( resource ), value ) );
-		}
-
 		public void to( Factory<? extends T> factory ) {
-			to( SuppliedBy.factory( factory ) );
+			to( Supply.factory( factory ) );
 		}
 
 		public void to( Supplier<? extends T> supplier ) {
@@ -499,10 +458,6 @@ public class Binder {
 			expand( instance );
 		}
 
-		public void to( Configuring<?> configuration ) {
-			expand( configuration );
-		}
-
 		public <I extends T> void toParametrized( Class<I> impl ) {
 			expand( impl );
 		}
@@ -512,11 +467,11 @@ public class Binder {
 		}
 
 		protected final void to( Supplier<? extends T> supplier, BindingType type ) {
-			toMacro( bind().asType( resource, type, supplier ) );
+			declareBindingsIn( bind().asType( resource, type, supplier ) );
 		}
 
 		private TypedBinder<T> toConstant( T constant ) {
-			to( SuppliedBy.constant( constant ) );
+			to( Supply.constant( constant ) );
 			return this;
 		}
 

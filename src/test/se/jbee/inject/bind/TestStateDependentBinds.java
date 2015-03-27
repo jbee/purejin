@@ -3,11 +3,8 @@ package se.jbee.inject.bind;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static se.jbee.inject.Dependency.dependency;
-import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Name.namedInternal;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.bootstrap.Configuring.configuring;
 import static se.jbee.inject.bootstrap.Inspect.methodsReturn;
 import static se.jbee.inject.container.Typecast.providerTypeOf;
 
@@ -15,21 +12,21 @@ import org.junit.Test;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
-import se.jbee.inject.Name;
+import se.jbee.inject.Type;
 import se.jbee.inject.bind.TestInspectorBinds.Resource;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.bootstrap.Configuring;
+import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.container.Provider;
 import se.jbee.inject.container.Scoped;
 
 /**
  * This test demonstrates how to switch between different implementations during runtime dependent
- * on a setting in some configuration object.
+ * on a setting in some setting object.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
-public class TestConfigurationDependentBinds {
+public class TestStateDependentBinds {
 
 	private static interface Validator {
 
@@ -61,7 +58,7 @@ public class TestConfigurationDependentBinds {
 
 	}
 
-	private static class Configuration {
+	private static class StatefulObject {
 
 		private ValidationStrength validationStrength;
 		private Integer number;
@@ -97,96 +94,92 @@ public class TestConfigurationDependentBinds {
 	 */
 
 	/**
-	 * This module demonstrates CDI on a low level using general binds.
+	 * This module demonstrates state dependent binds on a low level using general binds.
 	 */
-	private static class ConfigurationDependentBindsModule
+	private static class StateDependentBindsModule1
 			extends BinderModule {
 
 		@Override
 		protected void declare() {
-			per( Scoped.INJECTION ).bind( Validator.class ).to(
-					configuring( anyOf( ValidationStrength.class ) ) );
-			bind( namedInternal( (ValidationStrength) null ), Validator.class ).to(
-					Permissive.class );
-			bind( namedInternal( ValidationStrength.PERMISSIVE ), Validator.class ).to(
-					Permissive.class );
-			bind( namedInternal( ValidationStrength.STRICT ), Validator.class ).to( Strict.class );
+			per( Scoped.INJECTION ).bind( Validator.class ).to(	Supply.stateDependent(Type.raw(Validator.class), dependency(ValidationStrength.class)) );
+			
+			bind( named( ValidationStrength.PERMISSIVE ), Validator.class ).to(	Permissive.class );
+			bind( named( ValidationStrength.STRICT ), Validator.class ).to( Strict.class );
+			bind( named( (Object)null ), Validator.class ).to( Permissive.class );
 
 			// the below is just *a* example - it is just important to provide the 'value' per injection
-			per( Scoped.INJECTION ).bind( methodsReturn( raw( ValidationStrength.class ) ) ).in(
-					Configuration.class );
+			per( Scoped.INJECTION ).bind( methodsReturn( raw( ValidationStrength.class ) ) ).in( StatefulObject.class );
 		}
 	}
 
 	/**
-	 * The same as above using {@link #configbind(Class)}s. The important difference is that it is
-	 * not required to manually bind to a {@link Configuring} value. This is done implicitly with
+	 * The same as above using {@link #connect(Class)}s. The important difference is that it is
+	 * not required to manually bind to a {@link State} value. This is done implicitly with
 	 * each of the configbind calls. This also allow to use them in different modules without
 	 * causing clashes.
 	 * 
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	private static class ConfigurationDependentBindsModule2
+	private static class StateDependentBindsModule2
 			extends BinderModule {
 
 		@Override
 		protected void declare() {
-			configbind( Validator.class ).on( ValidationStrength.PERMISSIVE ).to( Permissive.class );
-			configbind( Validator.class ).on( ValidationStrength.STRICT ).to( Strict.class );
-			configbind( Validator.class ).onOther( ValidationStrength.class ).to( Permissive.class );
+			connect(Validator.class).via(ValidationStrength.class);
+
+			bind( named( ValidationStrength.PERMISSIVE ), Validator.class ).to(	Permissive.class );
+			bind( named( ValidationStrength.STRICT ), Validator.class ).to( Strict.class );
+			bind( named( (Object)null ), Validator.class ).to( Permissive.class );
 
 			// the below is just *a* example - it is just important to provide the 'value' per injection
-			per( Scoped.INJECTION ).bind( methodsReturn( raw( ValidationStrength.class ) ) ).in(
-					Configuration.class );
+			per( Scoped.INJECTION ).bind( methodsReturn( raw( ValidationStrength.class ) ) ).in( StatefulObject.class );
 		}
 
 	}
 
-	private static class ConfigurationDependentBindsModule3
+	private static class StateDependentBindsModule3
 			extends BinderModule {
 
 		@Override
 		protected void declare() {
-			Name answer = named( "answer" );
-			ConfigBinder<String> bind = configbind( String.class );
-			bind.on( answer, 42 ).to( "Now it is 42" );
-			bind.on( answer, 7 ).to( "Now it is 7" );
-			bind.onOther( answer, Integer.class ).to( "Default is undefined" );
+			connect(String.class).via(Integer.class);
+			
+			bind(named(42), String.class).to( "Now it is 42" );
+			bind(named(7), String.class).to( "Now it is 7" );
+			bind(named((Object)null), String.class).to( "Default is undefined" );
 
 			// the below is just *a* example - it is just important to provide the 'value' per injection
-			per( Scoped.INJECTION ).bind(
-					methodsReturn( raw( int.class ) ).namedBy( Resource.class ) ).in(
-					Configuration.class );
+			per( Scoped.INJECTION ).bind( methodsReturn( raw( int.class ) ).namedBy( Resource.class ) ).in(	StatefulObject.class );
 		}
 
 	}
 
-	private static class ConfigurationDependentBindsBundle
+	private static class StateDependentBindsBundle
 			extends BootstrapperBundle {
 
 		@Override
 		protected void bootstrap() {
-			install( ConfigurationDependentBindsModule.class );
+			install( StateDependentBindsModule1.class );
 			install( BuildinBundle.PROVIDER );
 		}
 
 	}
 
 	@Test
-	public void thatReconfigurationIsResolvedToAnotherImplementation() {
-		Injector injector = Bootstrap.injector( ConfigurationDependentBindsModule.class );
-		assertReconfigurationIsResolvedToAnotherImplementation( injector );
+	public void thatStateChangeIsResolvedToAnotherImplementation() {
+		Injector injector = Bootstrap.injector( StateDependentBindsModule1.class );
+		assertStateChangeIsResolvedToAnotherImplementation( injector );
 	}
 
 	@Test
-	public void thatReconfigurationIsResolvedToAnotherImplementation2() {
-		Injector injector = Bootstrap.injector( ConfigurationDependentBindsModule2.class );
-		assertReconfigurationIsResolvedToAnotherImplementation( injector );
+	public void thatStateChangeIsResolvedToAnotherImplementation2() {
+		Injector injector = Bootstrap.injector( StateDependentBindsModule2.class );
+		assertStateChangeIsResolvedToAnotherImplementation( injector );
 	}
 
-	private static void assertReconfigurationIsResolvedToAnotherImplementation( Injector injector ) {
+	private static void assertStateChangeIsResolvedToAnotherImplementation( Injector injector ) {
 		Dependency<Validator> dependency = dependency( Validator.class );
-		Configuration config = injector.resolve( dependency( Configuration.class ) );
+		StatefulObject config = injector.resolve( dependency( StatefulObject.class ) );
 		Validator v = injector.resolve( dependency );
 		String input = "input";
 		assertTrue( v.valid( input ) ); // default was PERMISSIVE
@@ -199,9 +192,9 @@ public class TestConfigurationDependentBinds {
 	}
 
 	@Test
-	public void thatReconfigurationIsProvidedToAnotherImplementation() {
-		Injector injector = Bootstrap.injector( ConfigurationDependentBindsBundle.class );
-		Configuration config = injector.resolve( dependency( Configuration.class ) );
+	public void thatStateChangeIsProvidedToAnotherImplementation() {
+		Injector injector = Bootstrap.injector( StateDependentBindsBundle.class );
+		StatefulObject config = injector.resolve( dependency( StatefulObject.class ) );
 		Provider<Validator> v = injector.resolve( dependency( providerTypeOf( Validator.class ) ) );
 		String input = "input";
 		assertTrue( v.provide().valid( input ) );
@@ -212,17 +205,17 @@ public class TestConfigurationDependentBinds {
 	}
 
 	@Test
-	public void thatReconfigurationResolvedUsingNamedInstances() {
+	public void thatStateChangeIsResolvedUsingNamedInstances() {
 		assertConfigNumberResolvedToStringEnding( null, "undefined" );
 		assertConfigNumberResolvedToStringEnding( 7, "7" );
 		assertConfigNumberResolvedToStringEnding( 42, "42" );
 		assertConfigNumberResolvedToStringEnding( 123, "undefined" ); // equal to null
 	}
 
-	private static void assertConfigNumberResolvedToStringEnding( Integer configValue, String ending ) {
-		Injector injector = Bootstrap.injector( ConfigurationDependentBindsModule3.class );
-		Configuration config = injector.resolve( dependency( Configuration.class ) );
-		config.setNumber( configValue );
+	private static void assertConfigNumberResolvedToStringEnding( Integer actualValue, String ending ) {
+		Injector injector = Bootstrap.injector( StateDependentBindsModule3.class );
+		StatefulObject state = injector.resolve( dependency( StatefulObject.class ) );
+		state.setNumber( actualValue );
 		String v = injector.resolve( dependency( String.class ) );
 		assertTrue( v.endsWith( ending ) );
 	}

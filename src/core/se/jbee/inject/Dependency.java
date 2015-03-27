@@ -67,7 +67,7 @@ public final class Dependency<T>
 	}
 
 	public Name getName() {
-		return instance.getName();
+		return instance.name;
 	}
 
 	@Override
@@ -132,7 +132,7 @@ public final class Dependency<T>
 	public Instance<?> target( int level ) {
 		return isUntargeted()
 			? Instance.ANY
-			: hierarchy[hierarchy.length - 1 - level].target.getInstance();
+			: hierarchy[hierarchy.length - 1 - level].target.instance;
 	}
 
 	public int injectionDepth() {

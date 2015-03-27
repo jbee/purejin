@@ -12,12 +12,12 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.bootstrap.SuppliedBy;
+import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.container.Factory;
 
 /**
  * A test that demonstrates how to extend the DI so that e.g. a class gets its class-specific-
- * {@link Logger} injected. Have a look how {@link SuppliedBy#LOGGER} is implemented.
+ * {@link Logger} injected. Have a look how {@link Supply#LOGGER} is implemented.
  * 
  * You can use {@link Factory}s for simpler cases or {@link Supplier}s when more context information
  * are needed to provide the instance.

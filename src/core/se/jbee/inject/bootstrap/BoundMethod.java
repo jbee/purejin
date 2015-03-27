@@ -26,13 +26,13 @@ public final class BoundMethod<T>
 		return new BoundMethod<T>( instance, factory, returnType, parameters );
 	}
 
-	public final Type<T> returnType;
-	public final Method factory;
-	public final Parameter<?>[] parameters;
 	public final Object instance;
+	public final Method factory;
+	public final Type<T> returnType;
+	public final Parameter<?>[] parameters;
 	private final boolean instanceMethod;
 
-	private BoundMethod( Object instance, Method factory, Type<T> returnType,	Parameter<?>[] parameters ) {
+	private BoundMethod( Object instance, Method factory, Type<T> returnType, Parameter<?>[] parameters ) {
 		super();
 		this.returnType = returnType;
 		this.factory = factory;

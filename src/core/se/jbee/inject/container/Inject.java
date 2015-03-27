@@ -236,7 +236,7 @@ public final class Inject {
 				for ( Injectron<?> i : e.getValue() ) {
 					Resource<?> r = i.getInfo().resource;
 					b.append( '\t' ).append( r.getType().simpleName() ).append( ' ' ).append(
-							r.getName() ).append( ' ' ).append( r.getTarget() ).append(
+							r.getName() ).append( ' ' ).append( r.target ).append(
 							' ' ).append( i.getInfo().source ).append( '\n' );
 				}
 			}
@@ -272,7 +272,7 @@ public final class Inject {
 
 		@Override
 		public String toString() {
-			return info.resource.toString() + info.resource.getTarget().toString() + " " + info.source.toString();
+			return info.resource.toString() + info.resource.target.toString() + " " + info.source.toString();
 		}
 	}
 

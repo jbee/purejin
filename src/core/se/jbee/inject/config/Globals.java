@@ -35,8 +35,7 @@ public final class Globals {
 	 * The standard configuration with no special {@link Options} or {@link Presets} including all
 	 * features.
 	 */
-	public static final Globals STANDARD = new Globals( Edition.FULL, Options.STANDARD,
-			Presets.EMPTY );
+	public static final Globals STANDARD = new Globals( Edition.FULL, Options.STANDARD,	Presets.EMPTY );
 
 	public final Edition edition;
 	public final Options options;

@@ -16,25 +16,26 @@ public final class InjectronInfo<T> {
 	 * The {@link Resource} represented by the {@link Injectron} of this info.
 	 */
 	public final Resource<T> resource;
-	
+
 	/**
-	 * @return The {@link Source} that {@link Injection} had been created from
-	 *         (e.g. did define the bind).
+	 * The {@link Source} that {@link Injection} had been created from (e.g. did
+	 * define the bind).
 	 */
 	public final Source source;
-	
+
 	/**
-	 * @return The frequency in which this injectron's {@link Resource} expires.
+	 * The frequency in which this injectron's {@link Resource} expires.
 	 */
 	public final Expiry expiry;
-	
+
 	/**
-	 * @return the serial ID of the {@link Injectron} being injected.
+	 * the serial ID of the {@link Injectron} being injected.
 	 */
 	public final int serialID;
-	
+
 	/**
-	 * @return the total amount of {@link Injectron}s in the same ({@link Injector}) container.
+	 * the total amount of {@link Injectron}s in the same ({@link Injector})
+	 * container.
 	 */
 	public final int count;
 	

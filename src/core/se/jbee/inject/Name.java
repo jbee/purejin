@@ -36,6 +36,10 @@ public final class Name
 
 	private final String value;
 
+	public static Name named( Object name ) {
+		return named(String.valueOf(name));
+	}
+	
 	/**
 	 * @see #namedInternal(String)
 	 */
@@ -62,12 +66,6 @@ public final class Name
 		return isInternal( name )
 			? new Name( name )
 			: new Name( INTERNAL + name );
-	}
-
-	public static Name namedInternal( Enum<?> name ) {
-		return name == null
-			? namedInternal( "-default-" )
-			: namedInternal( name.name().toLowerCase().replace( '_', INTERNAL ) );
 	}
 
 	private Name( String value ) {

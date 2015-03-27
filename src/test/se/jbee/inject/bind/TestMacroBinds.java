@@ -28,17 +28,26 @@ import se.jbee.inject.bootstrap.Binding;
 import se.jbee.inject.bootstrap.BindingType;
 import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Bundle;
 import se.jbee.inject.bootstrap.BoundConstructor;
+import se.jbee.inject.bootstrap.Bundle;
 import se.jbee.inject.bootstrap.Inspect;
 import se.jbee.inject.bootstrap.Macro;
 import se.jbee.inject.bootstrap.Macros;
 import se.jbee.inject.bootstrap.Module;
-import se.jbee.inject.bootstrap.SuppliedBy;
+import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.config.Globals;
 
 /**
- * Demonstrates how to use {@link Macro}s to customize the and binding automatics.
+ * Demonstrates how to use {@link Macro}s to customize the and binding
+ * automatics.
+ * 
+ * In particular the {@link InitialisationMacro} shows how one could initialize
+ * fields when an instance is created by using a custom macro that decorates the
+ * original {@link Supplier}.
+ * 
+ * The {@link RequiredConstructorParametersMacro} shows how all parameters of a
+ * type bound to a constructor can add bindings that make the parameter's types
+ * required so that eager exception occurs if no type is known for a parameter.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
@@ -109,8 +118,8 @@ public class TestMacroBinds {
 	}
 
 	/**
-	 * A {@link Macro} that add further bindings to make all types of used {@link Constructor}
-	 * parameters {@link DeclarationType#REQUIRED}.
+	 * A {@link Macro} that add further bindings to make all types of used
+	 * {@link Constructor} parameters {@link DeclarationType#REQUIRED}.
 	 * 
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
@@ -139,7 +148,7 @@ public class TestMacroBinds {
 	public void thatAllConstructorParameterTypesCanBeMadeRequired() {
 		Macro<?> required = new RequiredConstructorParametersMacro();
 		Injector injector = injectorWithMacro( MacroBindsModule.class, required );
-		assertNull( injector ); // just to fail in case we get here
+		assertNull("we should not get here", injector );
 	}
 
 	/**
@@ -185,10 +194,10 @@ public class TestMacroBinds {
 			implements Macro<BoundConstructor<?>> {
 
 		@Override
-		public <T> Module expand( Binding<T> binding, BoundConstructor<?> constructible ) {
+		public <T> Module expand( Binding<T> binding, BoundConstructor<?> constructor ) {
 			Supplier<T> supplier = new InitialisationSupplier<T>(
-					SuppliedBy.costructor( constructible.typed( binding.getType() ) ) );
-			return binding.suppliedBy( CONSTRUCTOR, supplier );
+					Supply.costructor( constructor.typed( binding.getType() ) ) );
+			return binding.complete( CONSTRUCTOR, supplier );
 		}
 
 	}

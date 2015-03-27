@@ -6,11 +6,11 @@
 package se.jbee.inject.bootstrap;
 
 import static se.jbee.inject.Instance.anyOf;
+import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.parameterTypes;
 import static se.jbee.inject.bootstrap.BoundParameter.bind;
 
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -34,17 +34,22 @@ import se.jbee.inject.util.Metaclass;
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
-public final class SuppliedBy {
+public final class Supply {
 
-	static final Object[] NO_ARGS = new Object[0];
-
-	private static final Supplier<?> REQUIRED = new RequiredSupplier<Object>();
+	private static final Object[] NO_ARGS = new Object[0];
 
 	public static final Supplier<Provider<?>> PROVIDER_BRIDGE = new ProviderSupplier();
 	public static final Supplier<List<?>> LIST_BRIDGE = new ArrayToListBridgeSupplier();
 	public static final Supplier<Set<?>> SET_BRIDGE = new ArrayToSetBridgeSupplier();
 	public static final Factory<Logger> LOGGER = new LoggerFactory();
 
+	private static final Supplier<?> REQUIRED = new RequiredSupplier<Object>();
+
+	/**
+	 * A {@link Supplier} used as fall-back. Should a required resource not be
+	 * provided it is still bound to this supplier that will throw an exception
+	 * should it ever be called.
+	 */
 	@SuppressWarnings ( "unchecked" )
 	public static <T> Supplier<T> required() {
 		return (Supplier<T>) REQUIRED;
@@ -55,7 +60,7 @@ public final class SuppliedBy {
 	}
 
 	public static <T> Supplier<T> reference( Class<? extends Supplier<? extends T>> type ) {
-		return new ReferenceSupplier<T>( type );
+		return new BridgeSupplier<T>( type );
 	}
 
 	public static <E> Supplier<E[]> elements( Type<E[]> arrayType, Parameter<? extends E>[] elements ) {
@@ -86,8 +91,8 @@ public final class SuppliedBy {
 		return new FactorySupplier<T>( factory );
 	}
 
-	public static <T, C> Supplier<T> configuration( Type<T> type, Configuring<C> configuration ) {
-		return new ConfigurationDependentSupplier<T, C>( type, configuration );
+	public static <T, C> Supplier<T> stateDependent( Type<T> type, Dependency<C> state ) {
+		return new StateDependentSupplier<T, C>( type, state );
 	}
 
 	public static <T> Provider<T> lazyProvider( Dependency<T> dependency, Injector context ) {
@@ -109,7 +114,7 @@ public final class SuppliedBy {
 		return param.supply( parent.instanced( anyOf( param.getType() ) ), injector );
 	}
 
-	private SuppliedBy() {
+	private Supply() {
 		throw new UnsupportedOperationException( "util" );
 	}
 
@@ -135,38 +140,40 @@ public final class SuppliedBy {
 
 	/**
 	 * This is a indirection that resolves a {@link Type} dependent on another current
-	 * {@link Configuring} value. This can be understand as a dynamic <i>name</i> switch so that a
+	 * {@link State} value. This can be understand as a dynamic <i>name</i> switch so that a
 	 * call is resolved to different named instances.
 	 * 
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	private static final class ConfigurationDependentSupplier<T, C>
+	private static final class StateDependentSupplier<T, S>
 			implements Supplier<T> {
 
 		private final Type<T> type;
-		private final Configuring<C> configuration;
+		private final Dependency<S> state;
 
-		ConfigurationDependentSupplier( Type<T> type, Configuring<C> configuration ) {
+		StateDependentSupplier( Type<T> type, Dependency<S> state ) {
 			super();
 			this.type = type;
-			this.configuration = configuration;
+			this.state = state;
 		}
 
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			final C value = injector.resolve( dependency.instanced( configuration.getInstance() ) );
-			return supply( dependency, injector, value );
+			final S actualState = injector.resolve( state );
+			return supply( dependency, injector, actualState );
 		}
 
-		private T supply( Dependency<? super T> dependency, Injector injector, final C value ) {
-			final Instance<T> current = Instance.instance( configuration.name( value ), type );
+		private T supply( Dependency<? super T> dependency, Injector injector, final S actualState ) {
+			final Instance<T> actualToInject = Instance.instance( named(actualState), type );
 			try {
-				return injector.resolve( dependency.instanced( current ) );
+				return injector.resolve( dependency.instanced( actualToInject ) );
 			} catch ( NoSuchResourceException e ) {
-				return supply( dependency, injector, null );
+				if (actualState != null) { // when not trying default
+					return supply( dependency, injector, null ); // try default
+				}
+				throw e;
 			}
 		}
-
 	}
 
 	/**
@@ -187,7 +194,7 @@ public final class SuppliedBy {
 
 		@Override
 		<E> List<E> bridge( E[] elements ) {
-			return new ArrayList<E>( Arrays.asList( elements ) );
+			return Arrays.asList( elements );
 		}
 
 	}
@@ -286,12 +293,12 @@ public final class SuppliedBy {
 		}
 	}
 
-	private static final class ReferenceSupplier<T>
+	private static final class BridgeSupplier<T>
 			implements Supplier<T> {
 
 		private final Class<? extends Supplier<? extends T>> type;
 
-		ReferenceSupplier( Class<? extends Supplier<? extends T>> type ) {
+		BridgeSupplier( Class<? extends Supplier<? extends T>> type ) {
 			super();
 			this.type = type;
 		}
@@ -426,10 +433,9 @@ public final class SuppliedBy {
 		private final Constructor<T> constructor;
 		private final BoundParameter<?>[] params;
 
-		ConstructorSupplier( BoundConstructor<T> constructible ) {
-			this.constructor = Metaclass.accessible( constructible.constructor );
-			this.params = bind( parameterTypes( constructor ),
-					constructible.parameters );
+		ConstructorSupplier( BoundConstructor<T> constructor ) {
+			this.constructor = Metaclass.accessible( constructor.constructor );
+			this.params = bind( parameterTypes( this.constructor ),	constructor.parameters );
 		}
 
 		@Override
@@ -486,7 +492,7 @@ public final class SuppliedBy {
 
 		@Override
 		public String toString() {
-			return SuppliedBy.describe( "required" );
+			return Supply.describe( "required" );
 		}
 	}
 

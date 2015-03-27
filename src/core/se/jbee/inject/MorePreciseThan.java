@@ -6,8 +6,9 @@
 package se.jbee.inject;
 
 /**
- * When determining what {@link Resource} is used to inject a {@link Dependency} everything is
- * sorted by its {@link Precision}. The most precise matching will be used to inject.
+ * When determining what {@link Resource} is used to inject a {@link Dependency}
+ * everything is sorted by precision. The most precise matching will be used to
+ * inject.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  * 
@@ -17,11 +18,12 @@ package se.jbee.inject;
 public interface MorePreciseThan<T extends MorePreciseThan<T>> {
 
 	/**
-	 * @return Whether or not this object or more precise than the given one. Equal objects are not
-	 *         more precise! Also objects that have no common context or relationship are never more
-	 *         precise. An example would be that two {@link Type}s with no common super-type do not
+	 * @return Whether or not this object or more precise than the given one.
+	 *         Equal objects are not more precise! Also objects that have no
+	 *         common context or relationship are never more precise. An example
+	 *         would be that two {@link Type}s with no common super-type do not
 	 *         define one of them that is more precise.
 	 */
-	boolean morePreciseThan( T other );
-	
+	boolean morePreciseThan(T other);
+
 }

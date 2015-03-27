@@ -14,6 +14,7 @@ import java.beans.ConstructorProperties;
 
 import org.junit.Test;
 
+import se.jbee.inject.DIRuntimeException.BootstrappingException;
 import se.jbee.inject.DIRuntimeException.DependencyCycleException;
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Dependency;
@@ -223,7 +224,7 @@ public class TestBootstrapper {
 		assertThat( injector, notNullValue() );
 	}
 
-	@Test ( expected = IllegalStateException.class )
+	@Test ( expected = BootstrappingException.class )
 	public void thatNonUniqueResourcesThrowAnException() {
 		Bootstrap.injector( ClashingBindsModule.class );
 	}

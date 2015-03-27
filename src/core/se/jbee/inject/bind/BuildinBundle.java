@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 import se.jbee.inject.bootstrap.Bootstrapper.ModularBootstrapper;
 import se.jbee.inject.bootstrap.ModularBundle;
-import se.jbee.inject.bootstrap.SuppliedBy;
+import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.container.Provider;
 
 /**
@@ -58,7 +58,7 @@ public enum BuildinBundle
 
 		@Override
 		protected void declare() {
-			per( TARGET_INSTANCE ).starbind( Logger.class ).to( SuppliedBy.LOGGER );
+			per( TARGET_INSTANCE ).starbind( Logger.class ).to( Supply.LOGGER );
 		}
 
 	}
@@ -68,7 +68,7 @@ public enum BuildinBundle
 
 		@Override
 		protected void declare() {
-			per( DEPENDENCY ).starbind( Provider.class ).to( SuppliedBy.PROVIDER_BRIDGE );
+			per( DEPENDENCY ).starbind( Provider.class ).to( Supply.PROVIDER_BRIDGE );
 		}
 
 	}
@@ -78,7 +78,7 @@ public enum BuildinBundle
 
 		@Override
 		protected void declare() {
-			per( DEPENDENCY ).starbind( List.class ).to( SuppliedBy.LIST_BRIDGE );
+			per( DEPENDENCY ).starbind( List.class ).to( Supply.LIST_BRIDGE );
 		}
 
 	}
@@ -88,7 +88,7 @@ public enum BuildinBundle
 
 		@Override
 		protected void declare() {
-			per( DEPENDENCY ).starbind( Set.class ).to( SuppliedBy.SET_BRIDGE );
+			per( DEPENDENCY ).starbind( Set.class ).to( Supply.SET_BRIDGE );
 		}
 
 	}
