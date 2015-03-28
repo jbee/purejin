@@ -8,42 +8,42 @@ import org.junit.Test;
 public class TestName {
 
 	@Test
-	public void exactSameNameShouldBeApplicable() {
-		assertTrue( named( "foo" ).isApplicableFor( named( "foo" ) ) );
+	public void exactSameNameShouldBeCompatible() {
+		assertTrue( named( "foo" ).isCompatibleWith( named( "foo" ) ) );
 	}
 
 	@Test
-	public void wildcardShouldBeApplicableToAnyName() {
-		assertTrue( named( "foo" ).isApplicableFor( Name.ANY ) );
+	public void wildcardShouldBeCompatibleToAnyName() {
+		assertTrue( named( "foo" ).isCompatibleWith( Name.ANY ) );
 	}
 
 	@Test
-	public void exactSameNameFollowedByWildcardShouldBeApplicable() {
-		assertTrue( named( "foo" ).isApplicableFor( named( "foo*" ) ) );
+	public void exactSameNameFollowedByWildcardShouldBeCompatible() {
+		assertTrue( named( "foo" ).isCompatibleWith( named( "foo*" ) ) );
 	}
 
 	@Test
-	public void letterFollwoedByWildcardShouldBeApplicable() {
-		assertTrue( named( "foo" ).isApplicableFor( named( "f*" ) ) );
+	public void letterFollwoedByWildcardShouldBeCompatible() {
+		assertTrue( named( "foo" ).isCompatibleWith( named( "f*" ) ) );
 	}
 
 	@Test
-	public void startOfNameFollowedByWildcardShouldBeApplicable() {
-		assertTrue( named( "foo" ).isApplicableFor( named( "fo*" ) ) );
+	public void startOfNameFollowedByWildcardShouldBeCompatible() {
+		assertTrue( named( "foo" ).isCompatibleWith( named( "fo*" ) ) );
 	}
 
 	@Test
-	public void defaultShouldBeApplicableToAnyName() {
-		assertTrue( Name.DEFAULT.isApplicableFor( Name.ANY ) );
+	public void defaultShouldBeCompatibleToAnyName() {
+		assertTrue( Name.DEFAULT.isCompatibleWith( Name.ANY ) );
 	}
 
 	@Test
-	public void anyShouldBeApplicableToDefaultName() {
-		assertTrue( Name.ANY.isApplicableFor( Name.DEFAULT ) );
+	public void anyShouldBeCompatibleToDefaultName() {
+		assertTrue( Name.ANY.isCompatibleWith( Name.DEFAULT ) );
 	}
 
 	@Test
-	public void anyShouldBeApplicableToWhateverName() {
-		assertTrue( Name.ANY.isApplicableFor( named( "foo" ) ) );
+	public void anyShouldBeCompatibleToWhateverName() {
+		assertTrue( Name.ANY.isCompatibleWith( named( "foo" ) ) );
 	}
 }

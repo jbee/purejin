@@ -62,7 +62,7 @@ public final class Resource<T>
 	 * Does this resource provide the instance wanted by the given {@link Dependency}'s {@link Name}
 	 */
 	public boolean isAdequateFor( Dependency<? super T> dependency ) {
-		return instance.name.isApplicableFor( dependency.getName() );
+		return instance.name.isCompatibleWith( dependency.getName() );
 	}
 
 	@Override

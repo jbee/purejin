@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.container.Scoped.DEPENDENCY_TYPE;
 
 import org.junit.Test;
 
@@ -67,7 +68,7 @@ public class TestCommandBinds {
 		@Override
 		protected void declare() {
 			bindServiceMethodsIn( MathService.class );
-			starbind( Command.class ).toSupplier( CommandSupplier.class );
+			per( DEPENDENCY_TYPE ).starbind( Command.class ).toSupplier( CommandSupplier.class );
 		}
 
 	}

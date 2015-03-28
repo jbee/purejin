@@ -5,7 +5,7 @@
  */
 package se.jbee.inject.bootstrap;
 
-import static se.jbee.inject.util.Metaclass.metaclass;
+import static se.jbee.inject.bootstrap.Metaclass.metaclass;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;

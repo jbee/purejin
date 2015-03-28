@@ -25,7 +25,6 @@ import se.jbee.inject.config.Globals;
 import se.jbee.inject.config.Options;
 import se.jbee.inject.config.Presets;
 import se.jbee.inject.container.Inject;
-import se.jbee.inject.util.Metaclass;
 
 /**
  * Utility to create an {@link Injector} context from {@link Bundle}s and {@link Module}s.

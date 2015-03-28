@@ -11,8 +11,8 @@ import static se.jbee.inject.bootstrap.BindingType.CONSTRUCTOR;
 import static se.jbee.inject.bootstrap.BindingType.METHOD;
 import static se.jbee.inject.bootstrap.BindingType.PREDEFINED;
 import static se.jbee.inject.bootstrap.BindingType.SUBSTITUTED;
+import static se.jbee.inject.bootstrap.Metaclass.metaclass;
 import static se.jbee.inject.bootstrap.Supply.parametrizedInstance;
-import static se.jbee.inject.util.Metaclass.metaclass;
 
 import java.lang.reflect.Constructor;
 
@@ -223,7 +223,7 @@ public final class Macros {
 			final Type<? extends T> type = t.castTo( binding.getType() );
 			final Instance<T> bound = binding.getInstance();
 			if ( !bound.getType().equalTo( type )
-					|| !with.name.isApplicableFor( bound.name ) ) {
+					|| !with.name.isCompatibleWith( bound.name ) ) {
 				return macro(
 						binding.complete( SUBSTITUTED, Supply.instance( with.typed( type ) ) ),
 						implicitBindToConstructor( binding, with ) );

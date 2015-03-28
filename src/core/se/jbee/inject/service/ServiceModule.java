@@ -7,8 +7,7 @@ package se.jbee.inject.service;
 
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
-import static se.jbee.inject.Name.namedInternal;
-import static se.jbee.inject.Source.source;
+import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.parameterTypes;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Type.returnType;
@@ -28,20 +27,12 @@ import se.jbee.inject.Injectron;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
-import se.jbee.inject.bind.Bind;
-import se.jbee.inject.bind.Binder;
-import se.jbee.inject.bind.Binder.RootBinder;
-import se.jbee.inject.bind.Binder.TypedBinder;
 import se.jbee.inject.bind.BinderModule;
-import se.jbee.inject.bootstrap.Bindings;
-import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Bootstrapper;
-import se.jbee.inject.bootstrap.Bundle;
 import se.jbee.inject.bootstrap.Inspect;
 import se.jbee.inject.bootstrap.Inspector;
+import se.jbee.inject.bootstrap.Metaclass;
 import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.container.Scoped;
-import se.jbee.inject.util.Metaclass;
 
 /**
  * When binding {@link ServiceMethod}s this {@link Module} can be extended.
@@ -51,7 +42,7 @@ import se.jbee.inject.util.Metaclass;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public abstract class ServiceModule
-		implements Bundle, Module {
+		extends BinderModule {
 
 	/**
 	 * The {@link Inspector} picks the {@link Method}s that are used to implement
@@ -59,41 +50,23 @@ public abstract class ServiceModule
 	 * {@link ServiceMethod}s. The {@link Inspector#methodsIn(Class)} should return all methods in
 	 * the given {@link Class} that should be used to implement a {@link ServiceMethod}.
 	 */
-	public static final Instance<Inspector> SERVICE_INSPECTOR = instance(
-			namedInternal( "service" ), raw( Inspector.class ) );
+	public static final Instance<Inspector> SERVICE_INSPECTOR = instance( named( ServiceMethod.class), raw( Inspector.class ) );
 
 	protected final void bindServiceMethodsIn( Class<?> service ) {
-		binder.plug(service).into(ServiceMethod.class);
+		plug(service).into(ServiceMethod.class);
 	}
 	
 	protected final void bindInvocationHandler( Class<? extends ServiceInvocation<?>> invocationHandler ) {
-		binder.plug(invocationHandler).into(ServiceInvocation.class);
+		plug(invocationHandler).into(ServiceInvocation.class);
 	}
 
 	protected final void bindServiceInspectorTo( Inspector inspector ) {
-		binder.bind( SERVICE_INSPECTOR ).to( inspector );
+		bind( SERVICE_INSPECTOR ).to( inspector );
 	}
 
-	protected final <T> TypedBinder<T> starbind( Class<T> service ) {
-		return binder.per( DEPENDENCY_TYPE ).starbind( service );
+	protected ServiceModule() {
+		super(Scoped.APPLICATION, null, ServiceMethodModule.class);
 	}
-
-	private RootBinder binder;
-
-	@Override
-	public final void bootstrap( Bootstrapper bootstrap ) {
-		bootstrap.install( ServiceMethodModule.class );
-		bootstrap.install( this );
-	}
-
-	@Override
-	public void declare( Bindings bindings ) {
-		Bootstrap.nonnullThrowsReentranceException( binder );
-		binder = Binder.create( Bind.create( bindings, source( getClass() ), Scoped.APPLICATION ) );
-		declare();
-	}
-
-	protected abstract void declare();
 
 	private static final class ServiceMethodModule
 			extends BinderModule {
@@ -111,8 +84,7 @@ public abstract class ServiceModule
 			implements Supplier<ServiceProvider> {
 
 		@Override
-		public ServiceProvider supply( Dependency<? super ServiceProvider> dependency,
-				Injector injector ) {
+		public ServiceProvider supply( Dependency<? super ServiceProvider> dependency, Injector injector ) {
 			return new ServiceMethodProvider( injector );
 		}
 

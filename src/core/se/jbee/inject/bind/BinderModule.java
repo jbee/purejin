@@ -24,20 +24,23 @@ public abstract class BinderModule
 		extends InitializedBinder
 		implements Bundle, Module {
 
+	private final Class<? extends Bundle> basis;
+	
 	protected BinderModule() {
 		super();
+		this.basis = null;
 	}
 
-	protected BinderModule( Scope inital ) {
-		super( inital );
-	}
-
-	protected BinderModule( Source source ) {
-		super( source );
+	protected BinderModule( Scope inital, Source source, Class<? extends Bundle> basis) {
+		super( inital, source );
+		this.basis = basis;
 	}
 
 	@Override
 	public final void bootstrap( Bootstrapper bootstrap ) {
+		if (basis != null) {
+			bootstrap.install(basis);
+		}
 		bootstrap.install( this );
 	}
 

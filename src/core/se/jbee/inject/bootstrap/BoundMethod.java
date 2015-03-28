@@ -11,7 +11,6 @@ import java.lang.reflect.Modifier;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Type;
 import se.jbee.inject.Typed;
-import se.jbee.inject.util.Metaclass;
 
 /**
  * A {@link BoundMethod} is a method bound to a particular instance 

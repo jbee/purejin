@@ -25,7 +25,6 @@ import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 import se.jbee.inject.container.Factory;
 import se.jbee.inject.container.Provider;
-import se.jbee.inject.util.Metaclass;
 
 /**
  * Utility as a factory to create different kinds of {@link Supplier}s.

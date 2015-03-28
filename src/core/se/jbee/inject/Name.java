@@ -18,8 +18,6 @@ import java.lang.reflect.Method;
 public final class Name
 		implements MorePreciseThan<Name> {
 
-	private static final char INTERNAL = '-';
-
 	/**
 	 * Character used as wildcard when matching names.
 	 */
@@ -40,32 +38,11 @@ public final class Name
 		return named(String.valueOf(name));
 	}
 	
-	/**
-	 * @see #namedInternal(String)
-	 */
 	public static Name named( String name ) {
 		if ( name == null || name.trim().isEmpty() ) {
 			return DEFAULT;
 		}
-		if ( isInternal( name ) ) {
-			throw new IllegalArgumentException(
-					"Names starting with a minus are considered to be internal names. If you meant to create such a name use method 'namedInternal' instead." );
-		}
 		return new Name( name.toLowerCase() );
-	}
-
-	/**
-	 * Internal names use a special prefix to avoid name clashes with 'usual' user defined names.
-	 * They should be used for names that the user does not directly know about.
-	 * 
-	 * @param name
-	 *            A value having the {@link #INTERNAL} prefix '-' or not.
-	 * @return The name instance having the {@link #INTERNAL} prefix in any case.
-	 */
-	public static Name namedInternal( String name ) {
-		return isInternal( name )
-			? new Name( name )
-			: new Name( INTERNAL + name );
 	}
 
 	private Name( String value ) {
@@ -100,14 +77,6 @@ public final class Name
 		return value.isEmpty();
 	}
 
-	public boolean isInternal() {
-		return isInternal( value );
-	}
-
-	private static boolean isInternal( String name ) {
-		return name.length() > 0 && name.charAt( 0 ) == INTERNAL;
-	}
-
 	@Override
 	public boolean morePreciseThan( Name other ) {
 		final boolean thisIsDefault = isDefault();
@@ -123,7 +92,7 @@ public final class Name
 		return value.length() > other.value.length() && value.startsWith( other.value );
 	}
 
-	public boolean isApplicableFor( Name other ) {
+	public boolean isCompatibleWith( Name other ) {
 		return isAny() || other.isAny() || other.value == value
 				|| ( value.matches( other.value.replace( WILDCARD, ".*" ) ) );
 	}

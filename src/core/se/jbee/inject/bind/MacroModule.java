@@ -8,6 +8,7 @@ package se.jbee.inject.bind;
 import se.jbee.inject.Source;
 import se.jbee.inject.bootstrap.Binding;
 import se.jbee.inject.bootstrap.Macro;
+import se.jbee.inject.container.Scoped;
 
 /**
  * A {@link MacroModule} is used to make the {@link Binder} API available in {@link Macro}s itself.
@@ -19,7 +20,7 @@ public abstract class MacroModule
 		extends BinderModule {
 
 	protected MacroModule( Source source ) {
-		super( source );
+		super( Scoped.APPLICATION, source, null );
 	}
 
 }

@@ -9,7 +9,7 @@ import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Instance.defaultInstanceOf;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.util.Metaclass.metaclass;
+import static se.jbee.inject.bootstrap.Metaclass.metaclass;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -21,6 +21,7 @@ import se.jbee.inject.Name;
 import se.jbee.inject.Packages;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Resource;
+import se.jbee.inject.Source;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Target;
 import se.jbee.inject.Type;
@@ -55,11 +56,11 @@ public class Binder {
 		this.root = root == null
 			? (RootBinder) this
 			: root;
-		this.bind = bind;
+		this.bind = bind.source == null ? bind.with(Source.source(getClass())) : bind;
 	}
 
 	Bind bind() {
-		return bind;
+		return bind; // !ATTENTION! This method might be overridden to update Bind properties - do not access field directly
 	}
 
 	public <E> TypedElementBinder<E> arraybind( Class<E[]> type ) {
@@ -107,7 +108,7 @@ public class Binder {
 	}
 
 	public <T> TypedBinder<T> multibind( Class<T> type ) {
-		return multibind( Type.raw( type ) );
+		return multibind( raw( type ) );
 	}
 
 	public <T> TypedBinder<T> multibind( Instance<T> instance ) {
@@ -115,7 +116,7 @@ public class Binder {
 	}
 
 	public <T> TypedBinder<T> multibind( Name name, Class<T> type ) {
-		return multibind( instance( name, Type.raw( type ) ) );
+		return multibind( instance( name, raw( type ) ) );
 	}
 
 	public <T> TypedBinder<T> multibind( Name name, Type<T> type ) {
@@ -127,11 +128,11 @@ public class Binder {
 	}
 
 	public <T> TypedBinder<T> starbind( Class<T> type ) {
-		return bind( Instance.anyOf( Type.raw( type ) ) );
+		return bind( Instance.anyOf( raw( type ) ) );
 	}
 
 	public <T> PluginBinder<T> plug( Class<T> plugin ) {
-		return new PluginBinder<T>(on(bind), plugin);
+		return new PluginBinder<T>( on(bind()), plugin);
 	}
 	
 	protected Binder on( Bind bind ) {
@@ -160,7 +161,9 @@ public class Binder {
 		public void into( Class<?> pluginPoint ) {
 			binder.multibind(Name.named(pluginPoint.getCanonicalName()+":"+plugin.getCanonicalName()), Class.class).to(plugin);
 			binder.implicit().bind(plugin).toConstructor();
-			if (Type.raw(plugin).isAssignableTo(raw(pluginPoint).asUpperBound())) {
+			// we allow both collections of classes that have a common super-type or collection that don't
+			if (raw(plugin).isAssignableTo(raw(pluginPoint).asUpperBound())) {
+				// if they have a common super-type the plugin is bound as a implementation
 				@SuppressWarnings("unchecked")
 				Class<? super T> pp = (Class<? super T>) pluginPoint;
 				binder.multibind(pp).to(plugin);

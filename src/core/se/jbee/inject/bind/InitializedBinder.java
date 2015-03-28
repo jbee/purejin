@@ -25,26 +25,16 @@ import se.jbee.inject.container.Scoped;
 public abstract class InitializedBinder
 		extends RootBinder {
 
-	private final Source source;
 	private Bind bind;
 	private Boolean initialized;
 
 	protected InitializedBinder() {
-		this( Scoped.APPLICATION );
+		this( Scoped.APPLICATION, null );
 	}
 
-	protected InitializedBinder( Scope inital ) {
-		this( inital, null );
-	}
-
-	protected InitializedBinder( Source source ) {
-		this( Scoped.APPLICATION, source );
-	}
-
-	private InitializedBinder( Scope inital, Source source ) {
+	protected InitializedBinder( Scope inital, Source source ) {
 		super( Bind.create( bindings( Macros.DEFAULT, Inspect.DEFAULT ), source, inital ) );
 		this.bind = super.bind();
-		this.source = source;
 	}
 
 	@Override
@@ -54,14 +44,8 @@ public abstract class InitializedBinder
 
 	protected final void init( Bindings bindings ) {
 		Bootstrap.nonnullThrowsReentranceException( initialized );
-		this.bind = super.bind().into( bindings ).with( source() );
+		this.bind = super.bind().into( bindings );
 		initialized = true;
-	}
-
-	private Source source() {
-		return this.source == null
-			? Source.source( getClass() )
-			: this.source;
 	}
 
 }
