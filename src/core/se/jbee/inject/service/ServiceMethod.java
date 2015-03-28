@@ -23,8 +23,4 @@ public interface ServiceMethod<P, R> {
 	 */
 	R invoke( P params );
 
-	enum ServiceClassExtension
-			implements Extension<ServiceClassExtension, Object> {
-		// no different options
-	}
 }

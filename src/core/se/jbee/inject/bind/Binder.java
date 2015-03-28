@@ -130,6 +130,10 @@ public class Binder {
 		return bind( Instance.anyOf( Type.raw( type ) ) );
 	}
 
+	public <T> PluginBinder<T> plug( Class<T> plugin ) {
+		return new PluginBinder<T>(on(bind), plugin);
+	}
+	
 	protected Binder on( Bind bind ) {
 		return new Binder( root, bind );
 	}
@@ -143,6 +147,27 @@ public class Binder {
 		return new Binder( root, bind().with( target ) );
 	}
 
+	public static class PluginBinder<T> {
+		
+		private final Binder binder;
+		private final Class<T> plugin;
+
+		PluginBinder(Binder binder, Class<T> plugin) {
+			this.binder = binder;
+			this.plugin = plugin;
+		}
+
+		public void into( Class<?> pluginPoint ) {
+			binder.multibind(Name.named(pluginPoint.getCanonicalName()+":"+plugin.getCanonicalName()), Class.class).to(plugin);
+			binder.implicit().bind(plugin).toConstructor();
+			if (Type.raw(plugin).isAssignableTo(raw(pluginPoint).asUpperBound())) {
+				@SuppressWarnings("unchecked")
+				Class<? super T> pp = (Class<? super T>) pluginPoint;
+				binder.multibind(pp).to(plugin);
+			}
+		}
+	}
+	
 	public static class InspectBinder {
 
 		private final Inspector inspector;

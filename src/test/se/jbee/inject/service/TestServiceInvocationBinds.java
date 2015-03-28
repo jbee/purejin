@@ -13,7 +13,6 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.service.ServiceInvocation.ServiceInvocationExtension;
 
 public class TestServiceInvocationBinds {
 
@@ -23,7 +22,7 @@ public class TestServiceInvocationBinds {
 		@Override
 		protected void declare() {
 			bindServiceMethodsIn( ServiceInvocationBindsService.class );
-			extend( ServiceInvocationExtension.RETURN_TYPE, AssertInvocation.class );
+			bindInvocationHandler(AssertInvocation.class );
 		}
 
 	}

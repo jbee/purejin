@@ -14,7 +14,6 @@ import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Type.returnType;
 import static se.jbee.inject.container.Scoped.APPLICATION;
 import static se.jbee.inject.container.Scoped.DEPENDENCY_TYPE;
-import static se.jbee.inject.service.ExtensionModule.extensionDependency;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -42,8 +41,6 @@ import se.jbee.inject.bootstrap.Inspect;
 import se.jbee.inject.bootstrap.Inspector;
 import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.container.Scoped;
-import se.jbee.inject.service.ServiceInvocation.ServiceInvocationExtension;
-import se.jbee.inject.service.ServiceMethod.ServiceClassExtension;
 import se.jbee.inject.util.Metaclass;
 
 /**
@@ -66,16 +63,15 @@ public abstract class ServiceModule
 			namedInternal( "service" ), raw( Inspector.class ) );
 
 	protected final void bindServiceMethodsIn( Class<?> service ) {
-		ExtensionModule.extend( binder, ServiceClassExtension.class, service );
+		binder.plug(service).into(ServiceMethod.class);
+	}
+	
+	protected final void bindInvocationHandler( Class<? extends ServiceInvocation<?>> invocationHandler ) {
+		binder.plug(invocationHandler).into(ServiceInvocation.class);
 	}
 
 	protected final void bindServiceInspectorTo( Inspector inspector ) {
 		binder.bind( SERVICE_INSPECTOR ).to( inspector );
-	}
-
-	protected final void extend( ServiceInvocationExtension type,
-			Class<? extends ServiceInvocation<?>> invocation ) {
-		ExtensionModule.extend( binder, type, invocation );
 	}
 
 	protected final <T> TypedBinder<T> starbind( Class<T> service ) {
@@ -104,10 +100,8 @@ public abstract class ServiceModule
 
 		@Override
 		public void declare() {
-			per( APPLICATION ).bind( ServiceProvider.class ).toSupplier(
-					ServiceProviderSupplier.class );
-			per( DEPENDENCY_TYPE ).starbind( ServiceMethod.class ).toSupplier(
-					ServiceSupplier.class );
+			per( APPLICATION ).bind( ServiceProvider.class ).toSupplier( ServiceProviderSupplier.class );
+			per( DEPENDENCY_TYPE ).starbind( ServiceMethod.class ).toSupplier( ServiceSupplier.class );
 			asDefault().per( APPLICATION ).bind( SERVICE_INSPECTOR ).to( Inspect.all().methods() );
 		}
 
@@ -143,7 +137,7 @@ public abstract class ServiceModule
 		ServiceMethodProvider( Injector injector ) {
 			super();
 			this.injector = injector;
-			this.serviceClasses = injector.resolve( extensionDependency( ServiceClassExtension.class ) );
+			this.serviceClasses = injector.resolve( Dependency.plugins(ServiceMethod.class) );
 			this.inspect = injector.resolve( dependency( SERVICE_INSPECTOR ).injectingInto(
 					ServiceProvider.class ) );
 		}
@@ -251,9 +245,10 @@ public abstract class ServiceModule
 			this.invocations = resolveInvocations( injector );
 		}
 
+		@Deprecated // this should be possible nicer from build in functions
 		private static ServiceInvocation<?>[] resolveInvocations( Injector context ) {
 			@SuppressWarnings ( "unchecked" )
-			Class<? extends ServiceInvocation<?>>[] classes = context.resolve( extensionDependency( ServiceInvocationExtension.class ) );
+			Class<? extends ServiceInvocation<?>>[] classes = context.resolve( Dependency.plugins(ServiceInvocation.class) );
 			ServiceInvocation<?>[] res = new ServiceInvocation<?>[classes.length];
 			for ( int i = 0; i < res.length; i++ ) {
 				res[i] = context.resolve( Dependency.dependency( classes[i] ) );

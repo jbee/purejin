@@ -32,36 +32,4 @@ public interface ServiceInvocation<T> {
 
 	<P, R> void afterException( Type<P> parameter, P value, Type<R> returnType, Exception e, T before );
 
-	/**
-	 * Used to hook up a {@link ServiceInvocation} to {@link ServiceMethod}s.
-	 * 
-	 * When targeting is used for the extension it has to be chosen which of the 4 possible types
-	 * the targeting is applied to.
-	 * 
-	 */
-	enum ServiceInvocationExtension
-			implements Extension<ServiceInvocationExtension, ServiceInvocation<?>> {
-
-		/**
-		 * The {@link Class} defined the method that becomes the injected {@link ServiceMethod}.
-		 */
-		DEFINING_TYPE,
-
-		/**
-		 * The {@link Class} (whose method) is receiving the injected {@link ServiceMethod}.
-		 */
-		INJECTED_TYPE,
-
-		/**
-		 * The {@link Type} of the {@link ServiceMethod}'s parameter generic.
-		 */
-		PARAMETER_TYPE,
-
-		/**
-		 * The {@link Type} of the {@link ServiceMethod}'s return type generic.
-		 */
-		RETURN_TYPE
-
-	}
-
 }

@@ -4,7 +4,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static se.jbee.inject.bind.AssertInjects.assertEqualSets;
-import static se.jbee.inject.service.ExtensionModule.extensionDependency;
 
 import java.io.Serializable;
 
@@ -12,22 +11,19 @@ import org.junit.Test;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
+import se.jbee.inject.bind.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Module;
-import se.jbee.inject.service.ServiceMethod.ServiceClassExtension;
 
-public class TestExtensionBinds {
+public class TestPluginBinds {
 
-	private static class TestExtensionModule
-			extends ExtensionModule {
-
+	private static class TestPluginModule extends BinderModule {
+		
 		@Override
 		protected void declare() {
-			extend( asDefault(), ServiceClassExtension.class, TestExtensionService.class );
-			extend( inPackageOf( Module.class ), ServiceClassExtension.class,
-					TestExtensionPackageLocalService.class );
-			extend( injectingInto( Serializable.class ), ServiceClassExtension.class,
-					TestExtensionInstanceOfService.class );
+			asDefault().plug(TestExtensionService.class).into(ServiceMethod.class);
+			inPackageOf( Module.class ).plug(TestExtensionPackageLocalService.class).into(ServiceMethod.class);
+			injectingInto( Serializable.class ).plug(TestExtensionInstanceOfService.class).into(ServiceMethod.class);
 		}
 	}
 
@@ -43,10 +39,10 @@ public class TestExtensionBinds {
 		// just to see that it is resolved as service class
 	}
 
-	private final Injector injector = Bootstrap.injector( TestExtensionModule.class );
+	private final Injector injector = Bootstrap.injector( TestPluginModule.class );
 
-	@SuppressWarnings ( { "rawtypes" } )
-	private final Dependency<Class[]> dependency = extensionDependency( ServiceClassExtension.class );
+	@SuppressWarnings("rawtypes")
+	private final Dependency<Class[]> dependency = Dependency.plugins(ServiceMethod.class);
 
 	@Test
 	public void thatJustUntargetedExtensionsAreResolvedGlobally() {
