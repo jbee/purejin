@@ -10,19 +10,24 @@ import static se.jbee.inject.container.Typecast.providerTypeOf;
 
 import org.junit.Test;
 
+import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
+import se.jbee.inject.Instance;
+import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
+import se.jbee.inject.bind.Binder.RootBinder;
 import se.jbee.inject.bind.TestInspectorBinds.Resource;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.container.Provider;
 import se.jbee.inject.container.Scoped;
 
 /**
- * This test demonstrates how to switch between different implementations during runtime dependent
- * on a setting in some setting object.
+ * This test demonstrates how to switch between different implementations during
+ * runtime dependent on a setting in some setting object. This example shows
+ * also how to extend the {@link BinderModule} to introduce a custom utility
+ * such as {@link ControllerModule#connect(Class)}
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
@@ -92,6 +97,76 @@ public class TestStateDependentBinds {
 	/*
 	 * Module and Bundle code to setup scenario
 	 */
+	
+	public static abstract class ControllerModule extends BinderModule {
+		
+		public <T, C> ControllerBinder<T> connect( Class<T> type ) {
+			return connect( raw( type ) );
+		}
+
+		public <T, C> ControllerBinder<T> connect( Type<T> type ) {
+			return new ControllerBinder<T>( root, type );
+		}
+	}
+	
+	public static class ControllerBinder<T> {
+
+		private final RootBinder binder;
+		private final Type<T> type;
+
+		ControllerBinder( RootBinder binder, Type<T> type ) {
+			super();
+			this.binder = new RootBinder( binder.bind().next() );
+			this.type = type;
+		}
+
+		public <S> void via(Class<S> state) {
+			via(raw(state));
+		}
+
+		public <S> void via(Type<S> state) {
+			binder.per(Scoped.INJECTION).bind( type ).to( stateDependent(type, Dependency.dependency(state)) );
+		}
+		
+	}
+	
+	/**
+	 * This is a indirection that resolves a {@link Type} dependent on another current
+	 * {@link State} value. This can be understand as a dynamic <i>name</i> switch so that a
+	 * call is resolved to different named instances.
+	 * 
+	 * @author Jan Bernitt (jan@jbee.se)
+	 */
+	private static final class StateDependentSupplier<T, S>
+			implements Supplier<T> {
+
+		private final Type<T> type;
+		private final Dependency<S> state;
+
+		StateDependentSupplier( Type<T> type, Dependency<S> state ) {
+			super();
+			this.type = type;
+			this.state = state;
+		}
+
+		@Override
+		public T supply( Dependency<? super T> dependency, Injector injector ) {
+			final S actualState = injector.resolve( state );
+			return supply( dependency, injector, actualState );
+		}
+
+		private T supply( Dependency<? super T> dependency, Injector injector, final S actualState ) {
+			final Instance<T> actualToInject = Instance.instance( named(actualState), type );
+			try {
+				return injector.resolve( dependency.instanced( actualToInject ) );
+			} catch ( NoSuchResourceException e ) {
+				if (actualState != null) { // when not trying default
+					return supply( dependency, injector, null ); // try default
+				}
+				throw e;
+			}
+		}
+	}	
 
 	/**
 	 * This module demonstrates state dependent binds on a low level using general binds.
@@ -101,7 +176,7 @@ public class TestStateDependentBinds {
 
 		@Override
 		protected void declare() {
-			per( Scoped.INJECTION ).bind( Validator.class ).to(	Supply.stateDependent(Type.raw(Validator.class), dependency(ValidationStrength.class)) );
+			per( Scoped.INJECTION ).bind( Validator.class ).to(	stateDependent(Type.raw(Validator.class), dependency(ValidationStrength.class)) );
 			
 			bind( named( ValidationStrength.PERMISSIVE ), Validator.class ).to(	Permissive.class );
 			bind( named( ValidationStrength.STRICT ), Validator.class ).to( Strict.class );
@@ -110,6 +185,10 @@ public class TestStateDependentBinds {
 			// the below is just *a* example - it is just important to provide the 'value' per injection
 			per( Scoped.INJECTION ).bind( methodsReturn( raw( ValidationStrength.class ) ) ).in( StatefulObject.class );
 		}
+	}
+
+	public static <T, C> Supplier<T> stateDependent( Type<T> type, Dependency<C> state ) {
+		return new StateDependentSupplier<T, C>( type, state );
 	}
 
 	/**
@@ -121,7 +200,7 @@ public class TestStateDependentBinds {
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	private static class StateDependentBindsModule2
-			extends BinderModule {
+			extends ControllerModule {
 
 		@Override
 		protected void declare() {
@@ -138,7 +217,7 @@ public class TestStateDependentBinds {
 	}
 
 	private static class StateDependentBindsModule3
-			extends BinderModule {
+			extends ControllerModule {
 
 		@Override
 		protected void declare() {

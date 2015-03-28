@@ -16,7 +16,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import se.jbee.inject.Array;
-import se.jbee.inject.Dependency;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Packages;
@@ -131,14 +130,6 @@ public class Binder {
 		return bind( Instance.anyOf( Type.raw( type ) ) );
 	}
 
-	public <T, C> ControllerBinder<T> connect( Class<T> type ) {
-		return connect( raw( type ) );
-	}
-
-	public <T, C> ControllerBinder<T> connect( Type<T> type ) {
-		return new ControllerBinder<T>( root, type );
-	}
-
 	protected Binder on( Bind bind ) {
 		return new Binder( root, bind );
 	}
@@ -150,27 +141,6 @@ public class Binder {
 
 	protected Binder with( Target target ) {
 		return new Binder( root, bind().with( target ) );
-	}
-
-	public static class ControllerBinder<T> {
-
-		private final RootBinder binder;
-		private final Type<T> type;
-
-		ControllerBinder( RootBinder binder, Type<T> type ) {
-			super();
-			this.binder = new RootBinder( binder.bind().next() );
-			this.type = type;
-		}
-
-		public <S> void via(Class<S> state) {
-			via(raw(state));
-		}
-
-		public <S> void via(Type<S> state) {
-			binder.per(Scoped.INJECTION).bind( type ).to( Supply.stateDependent(type, Dependency.dependency(state)) );
-		}
-		
 	}
 
 	public static class InspectBinder {

@@ -6,7 +6,6 @@
 package se.jbee.inject.bootstrap;
 
 import static se.jbee.inject.Instance.anyOf;
-import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.parameterTypes;
 import static se.jbee.inject.bootstrap.BoundParameter.bind;
 
@@ -18,7 +17,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import se.jbee.inject.Array;
-import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
@@ -91,10 +89,6 @@ public final class Supply {
 		return new FactorySupplier<T>( factory );
 	}
 
-	public static <T, C> Supplier<T> stateDependent( Type<T> type, Dependency<C> state ) {
-		return new StateDependentSupplier<T, C>( type, state );
-	}
-
 	public static <T> Provider<T> lazyProvider( Dependency<T> dependency, Injector context ) {
 		return new LazyProvider<T>( dependency, context );
 	}
@@ -136,44 +130,6 @@ public final class Supply {
 		}
 
 		abstract <E> T bridge( E[] elements );
-	}
-
-	/**
-	 * This is a indirection that resolves a {@link Type} dependent on another current
-	 * {@link State} value. This can be understand as a dynamic <i>name</i> switch so that a
-	 * call is resolved to different named instances.
-	 * 
-	 * @author Jan Bernitt (jan@jbee.se)
-	 */
-	private static final class StateDependentSupplier<T, S>
-			implements Supplier<T> {
-
-		private final Type<T> type;
-		private final Dependency<S> state;
-
-		StateDependentSupplier( Type<T> type, Dependency<S> state ) {
-			super();
-			this.type = type;
-			this.state = state;
-		}
-
-		@Override
-		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			final S actualState = injector.resolve( state );
-			return supply( dependency, injector, actualState );
-		}
-
-		private T supply( Dependency<? super T> dependency, Injector injector, final S actualState ) {
-			final Instance<T> actualToInject = Instance.instance( named(actualState), type );
-			try {
-				return injector.resolve( dependency.instanced( actualToInject ) );
-			} catch ( NoSuchResourceException e ) {
-				if (actualState != null) { // when not trying default
-					return supply( dependency, injector, null ); // try default
-				}
-				throw e;
-			}
-		}
 	}
 
 	/**
