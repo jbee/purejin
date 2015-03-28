@@ -6,6 +6,7 @@
 package se.jbee.inject.service;
 
 import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Dependency.pluginsFor;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.parameterTypes;
@@ -109,9 +110,8 @@ public abstract class ServiceModule
 		ServiceMethodProvider( Injector injector ) {
 			super();
 			this.injector = injector;
-			this.serviceClasses = injector.resolve( Dependency.plugins(ServiceMethod.class) );
-			this.inspect = injector.resolve( dependency( SERVICE_INSPECTOR ).injectingInto(
-					ServiceProvider.class ) );
+			this.serviceClasses = injector.resolve( pluginsFor(ServiceMethod.class) );
+			this.inspect = injector.resolve( dependency( SERVICE_INSPECTOR ).injectingInto(	ServiceProvider.class ) );
 		}
 
 		@SuppressWarnings ( "unchecked" )
@@ -214,18 +214,7 @@ public abstract class ServiceModule
 			this.parameterTypes = parameterTypes( method );
 			this.argumentInjectrons = argumentInjectrons();
 			this.argumentTemplate = argumentTemplate();
-			this.invocations = resolveInvocations( injector );
-		}
-
-		@Deprecated // this should be possible nicer from build in functions
-		private static ServiceInvocation<?>[] resolveInvocations( Injector context ) {
-			@SuppressWarnings ( "unchecked" )
-			Class<? extends ServiceInvocation<?>>[] classes = context.resolve( Dependency.plugins(ServiceInvocation.class) );
-			ServiceInvocation<?>[] res = new ServiceInvocation<?>[classes.length];
-			for ( int i = 0; i < res.length; i++ ) {
-				res[i] = context.resolve( Dependency.dependency( classes[i] ) );
-			}
-			return res;
+			this.invocations = injector.resolve(dependency(ServiceInvocation[].class));
 		}
 
 		private Object[] argumentTemplate() {

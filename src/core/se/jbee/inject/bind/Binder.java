@@ -245,7 +245,7 @@ public class Binder {
 		}
 
 		public void inModule() {
-			in( binder.bind().source.getIdent() );
+			in( binder.bind().source.ident );
 		}
 	}
 

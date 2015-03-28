@@ -30,7 +30,7 @@ public final class Dependency<T>
 	private static final Injection[] UNTARGETED = new Injection[0];
 
 	@SuppressWarnings("rawtypes")
-	public static Dependency<Class[]> plugins(Class<?> pluginPoint) { //TODO rname pluginsFor
+	public static Dependency<Class[]> pluginsFor(Class<?> pluginPoint) { //TODO rname pluginsFor
 		return dependency( raw( Class[].class ).parametizedAsUpperBounds() ).named(pluginPoint.getCanonicalName()+":*");		
 	}
 	

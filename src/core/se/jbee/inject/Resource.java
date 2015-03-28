@@ -34,14 +34,15 @@ public final class Resource<T>
 		this.target = target;
 	}
 
-	public boolean isApplicableFor( Dependency<? super T> dependency ) {
-		return isAdequateFor( dependency ) // check names first since default goes sorts first but will not match any named 
+	public boolean isMatching( Dependency<? super T> dependency ) {
+		return isNameCompatibleWith( dependency ) // check names first since default goes sorts first but will not match any named 
 				&& isAvailableFor( dependency )//
 				&& isAssignableTo( dependency ); // most 'expensive' check so we do it last
 	}
 
-	public boolean isSuitableFor( Dependency<? super T> dependency ) {
-		return isAdequateFor( dependency ) && isAssignableTo( dependency );
+	public boolean isCompatibleWith( Dependency<? super T> dependency ) {
+		return isNameCompatibleWith( dependency ) 
+				&& isAssignableTo( dependency );
 	}
 
 	/**
@@ -55,13 +56,13 @@ public final class Resource<T>
 	 * Does the given {@link Dependency} occur in the right package and for the right target ?
 	 */
 	public boolean isAvailableFor( Dependency<? super T> dependency ) {
-		return target.isApplicableFor( dependency );
+		return target.isAvailableFor( dependency );
 	}
 
 	/**
 	 * Does this resource provide the instance wanted by the given {@link Dependency}'s {@link Name}
 	 */
-	public boolean isAdequateFor( Dependency<? super T> dependency ) {
+	public boolean isNameCompatibleWith( Dependency<? super T> dependency ) {
 		return instance.name.isCompatibleWith( dependency.getName() );
 	}
 

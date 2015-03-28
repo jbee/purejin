@@ -132,14 +132,13 @@ public final class Inject {
 			return mostPreciseOf( typeInjectrons( dependency.getType() ), dependency );
 		}
 
-		private static <T> Injectron<T> mostPreciseOf( Injectron<T>[] injectrons,
-				Dependency<T> dependency ) {
+		private static <T> Injectron<T> mostPreciseOf( Injectron<T>[] injectrons, Dependency<T> dependency ) {
 			if ( injectrons == null ) {
 				return null;
 			}
 			for ( int i = 0; i < injectrons.length; i++ ) {
 				Injectron<T> injectron = injectrons[i];
-				if ( injectron.getInfo().resource.isApplicableFor( dependency ) ) {
+				if ( injectron.getInfo().resource.isMatching( dependency ) ) {
 					return injectron;
 				}
 			}
@@ -157,7 +156,7 @@ public final class Inject {
 			Injectron<E>[] elementInjectrons = typeInjectrons( elementType );
 			if ( elementInjectrons != null ) {
 				List<E> elements = new ArrayList<E>( elementInjectrons.length );
-				addAllApplicable( elements, dependency, elementType, elementInjectrons );
+				addAllMatching( elements, dependency, elementType, elementInjectrons );
 				if ( dependency.getType().getRawType().getComponentType().isPrimitive() ) {
 					throw new UnsupportedOperationException(
 							"Primitive arrays cannot be used to inject all instances of the wrapper type. Use the wrapper array instead." );
@@ -172,12 +171,14 @@ public final class Inject {
 						//FIXME some of the injectrons are just bridges and such - no real values - recursion causes errors here
 						@SuppressWarnings ( "unchecked" )
 						Injectron<? extends E>[] value = (Injectron<? extends E>[]) e.getValue();
-						addAllApplicable( elements, dependency, elementType, value );
+						addAllMatching( elements, dependency, elementType, value );
 					}
 				}
 				return toArray( elements, elementType );
 			}
-			throw noInjectronFor( dependency );
+			@SuppressWarnings("unchecked")
+			T empty = (T) Array.newInstance(elementType.getRawType(), 0);
+			return empty;
 		}
 
 		private <T, I> T resolveInjectronArray( Dependency<T> dependency, Type<I> instanceType ) {
@@ -189,7 +190,7 @@ public final class Inject {
 						@SuppressWarnings ( "unchecked" )
 						Injectron<? extends I>[] typeInjectrons = (Injectron<? extends I>[]) e.getValue();
 						for ( Injectron<? extends I> i : typeInjectrons ) {
-							if ( i.getInfo().resource.isSuitableFor( instanceDependency ) ) {
+							if ( i.getInfo().resource.isCompatibleWith( instanceDependency ) ) {
 								res.add( i );
 							}
 						}
@@ -200,19 +201,19 @@ public final class Inject {
 			Injectron<I>[] res = typeInjectrons( instanceType );
 			List<Injectron<I>> elements = new ArrayList<Injectron<I>>( res.length );
 			for ( Injectron<I> i : res ) {
-				if ( i.getInfo().resource.isSuitableFor( instanceDependency ) ) {
+				if ( i.getInfo().resource.isCompatibleWith( instanceDependency ) ) {
 					elements.add( i );
 				}
 			}
 			return toArray( elements, raw( Injectron.class ) );
 		}
 
-		private static <E, T> void addAllApplicable( List<E> elements, Dependency<T> dependency,
+		private static <E, T> void addAllMatching( List<E> elements, Dependency<T> dependency,
 				Type<E> elementType, Injectron<? extends E>[] elementInjectrons ) {
 			Dependency<E> elementDependency = dependency.typed( elementType );
 			for ( int i = 0; i < elementInjectrons.length; i++ ) {
 				Injectron<? extends E> injectron = elementInjectrons[i];
-				if ( injectron.getInfo().resource.isApplicableFor( elementDependency ) ) {
+				if ( injectron.getInfo().resource.isMatching( elementDependency ) ) {
 					elements.add( injectron.instanceFor( elementDependency ) );
 				}
 			}

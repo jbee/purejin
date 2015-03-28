@@ -115,4 +115,11 @@ public class TestServiceInvocationBinds {
 		}
 		fail( "Exception expected" );
 	}
+	
+	@Test
+	public void thatInvocationHandlersCanBeResolvedDirectly() {
+		ServiceInvocation<?>[] invocations = injector.resolve(dependency(ServiceInvocation[].class));
+		assertEquals(1, invocations.length);
+		assertEquals(invocations[0].getClass(), AssertInvocation.class);
+	}
 }

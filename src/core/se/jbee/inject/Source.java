@@ -17,9 +17,10 @@ public final class Source
 		return new Source( module, DeclarationType.EXPLICIT, 0, 0 );
 	}
 
-	private final Class<?> ident;
-	private final DeclarationType declarationType;
+	public final Class<?> ident;
+	public final DeclarationType declarationType;
 	public final int declarationNo;
+	
 	private int declarations;
 
 	private Source( Class<?> ident, DeclarationType declarationType, int declarationNo,
@@ -29,14 +30,6 @@ public final class Source
 		this.declarationType = declarationType;
 		this.declarationNo = declarationNo;
 		this.declarations = declarations;
-	}
-
-	public Class<?> getIdent() {
-		return ident;
-	}
-
-	public DeclarationType getType() {
-		return declarationType;
 	}
 
 	@Override

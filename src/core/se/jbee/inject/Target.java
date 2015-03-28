@@ -35,9 +35,9 @@ public final class Target
 		return new Target( Instances.ANY, instance, Packages.ALL );
 	}
 
-	private final Instances parents;
-	private final Instance<?> instance;
-	private final Packages packages;
+	public final Instances parents;
+	public final Instance<?> instance;
+	public final Packages packages;
 
 	private Target( Instances parents, Instance<?> instance, Packages packages ) {
 		super();
@@ -66,12 +66,16 @@ public final class Target
 		return injectingInto( raw( type ) );
 	}
 
-	public boolean isApplicableFor( Dependency<?> dependency ) {
-		return isAccessibleFor( dependency ) && isAdequateFor( dependency );
+	public boolean isAvailableFor( Dependency<?> dependency ) {
+		return isAccessibleFor( dependency ) && isCompatibleWith( dependency );
 	}
 
-	public boolean isAdequateFor( Dependency<?> dependency ) {
-		if ( !areParentsAdequateFor( dependency ) ) {
+	/**
+	 * @return true in case the actual types of the injection hierarchy are
+	 *         assignable with the ones demanded by this target.
+	 */
+	public boolean isCompatibleWith( Dependency<?> dependency ) {
+		if ( !areParentsCompatibleWith( dependency ) ) {
 			return false;
 		}
 		if ( instance.isAny() ) {
@@ -79,10 +83,10 @@ public final class Target
 		}
 		final Instance<?> target = dependency.target();
 		return instance.name.isCompatibleWith( target.name )
-				&& injectable( instance.getType(), target.getType() );
+				&& isAssingableTo( instance.getType(), target.getType() );
 	}
 
-	private boolean areParentsAdequateFor( Dependency<?> dependency ) {
+	private boolean areParentsCompatibleWith( Dependency<?> dependency ) {
 		if ( parents.isAny() ) {
 			return true;
 		}
@@ -93,7 +97,7 @@ public final class Target
 		}
 		int pi = 0;
 		while ( pl <= il && pl > 0 ) {
-			if ( injectable( parents.at( pi ).getType(), dependency.target( il ).getType() ) ) {
+			if ( isAssingableTo( parents.at( pi ).getType(), dependency.target( il ).getType() ) ) {
 				pl--;
 				pi++;
 			}
@@ -102,7 +106,7 @@ public final class Target
 		return pl == 0;
 	}
 
-	private static boolean injectable( Type<?> type, Type<?> targetType ) {
+	private static boolean isAssingableTo( Type<?> type, Type<?> targetType ) {
 		return type.isInterface() || type.isAbstract()
 			? targetType.isAssignableTo( type )
 			: targetType.equalTo( type );

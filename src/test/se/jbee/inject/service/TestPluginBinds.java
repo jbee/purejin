@@ -42,7 +42,7 @@ public class TestPluginBinds {
 	private final Injector injector = Bootstrap.injector( TestPluginModule.class );
 
 	@SuppressWarnings("rawtypes")
-	private final Dependency<Class[]> dependency = Dependency.plugins(ServiceMethod.class);
+	private final Dependency<Class[]> dependency = Dependency.pluginsFor(ServiceMethod.class);
 
 	@Test
 	public void thatJustUntargetedExtensionsAreResolvedGlobally() {

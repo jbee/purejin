@@ -151,12 +151,12 @@ public final class Binding<T>
 			Binding<?> one = bindings[lastDistinctIndex];
 			Binding<?> other = bindings[i];
 			final boolean equalResource = one.resource.equalTo( other.resource );
-			DeclarationType oneType = one.source.getType();
-			DeclarationType otherType = other.source.getType();
+			DeclarationType oneType = one.source.declarationType;
+			DeclarationType otherType = other.source.declarationType;
 			if ( equalResource && oneType.clashesWith( otherType ) ) {
 				throw new BootstrappingException( "Duplicate binds:\n" + one + "\n" + other );
 			}
-			if ( other.source.getType() == DeclarationType.REQUIRED ) {
+			if ( other.source.declarationType == DeclarationType.REQUIRED ) {
 				required.add( other.resource.getType() );
 			} else if ( equalResource && oneType.nullifiedBy( otherType ) ) {
 				if ( i - 1 == lastDistinctIndex ) {
@@ -175,7 +175,7 @@ public final class Binding<T>
 		Set<Type<?>> provided = new HashSet<Type<?>>();
 		for ( Binding<?> b : uniques ) {
 			Type<?> type = b.resource.getType();
-			if ( b.source.getType() == DeclarationType.PROVIDED ) {
+			if ( b.source.declarationType == DeclarationType.PROVIDED ) {
 				provided.add( type );
 			} else {
 				bound.add( type );
@@ -189,7 +189,7 @@ public final class Binding<T>
 		List<Binding<?>> res = new ArrayList<Binding<?>>( uniques.size() );
 		for ( int i = 0; i < uniques.size(); i++ ) {
 			Binding<?> b = uniques.get( i );
-			if ( b.source.getType() != DeclarationType.PROVIDED
+			if ( b.source.declarationType != DeclarationType.PROVIDED
 					|| required.contains( b.resource.getType() ) ) {
 				res.add( b );
 			}
