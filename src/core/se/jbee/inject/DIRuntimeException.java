@@ -73,10 +73,11 @@ public class DIRuntimeException
 	public static final class NoSuchResourceException
 			extends DIRuntimeException {
 
-		public <T> NoSuchResourceException( Dependency<T> dependency, Injectron<T>[] available ) {
+		public <T> NoSuchResourceException( Dependency<T> dependency, Injectron<T>[] available, String msg ) {
 			super( "No resource for dependency: " + injectionStack( dependency )
 					+ dependency.getInstance() + "\navailable are (for same raw type): "
-					+ describe( available ) );
+					+ describe( available ) + "\n"
+					+ msg);
 		}
 
 		public NoSuchResourceException( Collection<Type<?>> types ) {

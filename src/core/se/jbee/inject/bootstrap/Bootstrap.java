@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import se.jbee.inject.Array;
+import se.jbee.inject.DIRuntimeException;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Injectron;
 import se.jbee.inject.Type;
@@ -80,7 +81,7 @@ public final class Bootstrap {
 
 	public static void nonnullThrowsReentranceException( Object field ) {
 		if ( field != null ) {
-			throw new IllegalStateException( "Reentrance not allowed!" );
+			throw new DIRuntimeException.BootstrappingException( "Reentrance not allowed!" );
 		}
 	}
 

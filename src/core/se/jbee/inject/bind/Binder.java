@@ -16,6 +16,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import se.jbee.inject.Array;
+import se.jbee.inject.DIRuntimeException.BootstrappingException;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Packages;
@@ -437,7 +438,7 @@ public class Binder {
 
 		public void toConstructor( Class<? extends T> impl, Parameter<?>... parameters ) {
 			if ( metaclass( impl ).undeterminable() ) {
-				throw new IllegalArgumentException( "Not a constructable type: " + impl );
+				throw new BootstrappingException( "Not a constructable type: " + impl );
 			}
 			to( bind().getInspector().constructorFor( impl ), parameters );
 		}

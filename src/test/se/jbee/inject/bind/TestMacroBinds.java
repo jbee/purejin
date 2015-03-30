@@ -135,7 +135,7 @@ public class TestMacroBinds {
 
 		private static <T> Binding<T> required( Type<T> type, Binding<?> binding ) {
 			return Binding.binding( new Resource<T>( Instance.anyOf( type ) ),
-					BindingType.REQUIRED, null, binding.scope,
+					BindingType.REQUIRED, Supply.<T>required(), binding.scope,
 					binding.source.typed( DeclarationType.REQUIRED ) );
 		}
 	}

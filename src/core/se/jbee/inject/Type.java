@@ -594,8 +594,7 @@ public final class Type<T>
 		if ( primitive == short.class ) {
 			return (Class<T>) Short.class;
 		}
-		throw new UnsupportedOperationException( "The primitive " + primitive
-				+ " cannot be wrapped yet!" );
+		throw new UnsupportedOperationException( "The primitive " + primitive + " cannot be wrapped yet!" );
 	}
 
 }

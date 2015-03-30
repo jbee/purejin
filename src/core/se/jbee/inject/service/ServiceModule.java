@@ -243,8 +243,7 @@ public abstract class ServiceModule
 					}
 				}
 				afterException( params, e, state );
-				throw new RuntimeException( "Failed to invoke service: " + this + " \n"
-						+ e.getMessage(), e );
+				throw new RuntimeException( "Failed to invoke service: " + this + " \n"	+ e.getMessage(), e );
 			}
 			after( params, res, state );
 			return res;

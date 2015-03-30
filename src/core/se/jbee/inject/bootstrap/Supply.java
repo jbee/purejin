@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import se.jbee.inject.Array;
+import se.jbee.inject.DIRuntimeException;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
@@ -442,7 +443,7 @@ public final class Supply {
 
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			throw new UnsupportedOperationException( "Should never be called!" );
+			throw new DIRuntimeException.BootstrappingException( "Should never be called!" );
 		}
 
 		@Override

@@ -92,7 +92,7 @@ public final class Binding<T>
 	}
 
 	public boolean isComplete() {
-		return supplier != null || type == BindingType.REQUIRED;
+		return supplier != null;
 	}
 	
 	public Binding<T> complete( BindingType type, Supplier<? extends T> supplier ) {

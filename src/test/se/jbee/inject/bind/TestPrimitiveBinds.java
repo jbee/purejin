@@ -8,6 +8,7 @@ import static se.jbee.inject.Name.named;
 
 import org.junit.Test;
 
+import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -100,8 +101,8 @@ public class TestPrimitiveBinds {
 	 * The stated bridge class is not a part of Silk but easy to do. Still a loot of code for all
 	 * the primitives for a little benefit.
 	 */
-	@Test ( expected = UnsupportedOperationException.class )
-	public void thatPrimitveArrayNotWorksAsWrapperArrayClasses() {
+	@Test ( expected = NoSuchResourceException.class )
+	public void thatPrimitveArrayNotWorkAsWrapperArrayClasses() {
 		assertArrayEquals( new int[42], injector.resolve( dependency( int[].class ) ) );
 	}
 

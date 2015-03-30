@@ -148,7 +148,7 @@ public final class Inject {
 		}
 
 		private <T> NoSuchResourceException noInjectronFor( Dependency<T> dependency ) {
-			return new NoSuchResourceException( dependency, injectronsForType( dependency.getType() ) );
+			return new NoSuchResourceException( dependency, injectronsForType( dependency.getType() ), "" );
 		}
 
 		private <T, E> T resolveArray( Dependency<T> dependency, Type<E> elementType ) {
@@ -160,7 +160,7 @@ public final class Inject {
 				List<E> elements = new ArrayList<E>( elementInjectrons.length );
 				addAllMatching( elements, dependency, elementType, elementInjectrons );
 				if ( dependency.getType().getRawType().getComponentType().isPrimitive() ) {
-					throw new UnsupportedOperationException(
+					throw new NoSuchResourceException(dependency, null,
 							"Primitive arrays cannot be used to inject all instances of the wrapper type. Use the wrapper array instead." );
 				}
 				return toArray( elements, elementType );

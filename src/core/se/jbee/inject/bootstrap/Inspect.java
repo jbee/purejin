@@ -69,8 +69,6 @@ public class Inspect
 	private final Class<? extends Annotation> accessible;
 	private final Class<? extends Annotation> namedby;
 
-	//TODO add of(Interface.class) filter
-
 	private Inspect( boolean statics, boolean methods, boolean constructors, Packages packages,
 			Type<?> assignable, Class<? extends Annotation> accessible,
 			Class<? extends Annotation> namedBy ) {
@@ -223,8 +221,7 @@ public class Inspect
 	public static <T> Constructor<T> defaultConstructor( Class<T> declaringClass ) {
 		Constructor<?>[] constructors = declaringClass.getDeclaredConstructors();
 		if ( constructors.length == 0 ) {
-			throw new RuntimeException( new NoSuchMethodException(
-					declaringClass.getCanonicalName() ) );
+			throw new RuntimeException( new InstantiationException( declaringClass.getCanonicalName() ) );
 		}
 		Constructor<?> mostArgConstructor = constructors[0];
 		for ( int i = 0; i < constructors.length; i++ ) {
@@ -239,13 +236,15 @@ public class Inspect
 
 	public static <T> Constructor<T> noArgsConstructor( Class<T> declaringClass ) {
 		if ( declaringClass.isInterface() ) {
-			throw new IllegalArgumentException( "Interfaces don't have constructors: "
-					+ declaringClass );
+			throw new RuntimeException(new InstantiationException( "Interfaces don't have constructors: " + declaringClass ));
 		}
 		Constructor<T> c;
 		try {
 			c = declaringClass.getDeclaredConstructor( new Class<?>[0] );
 		} catch ( Exception e ) {
+			if (e instanceof RuntimeException) {
+				throw (RuntimeException)e;
+			}
 			throw new RuntimeException( e );
 		}
 		return c;
