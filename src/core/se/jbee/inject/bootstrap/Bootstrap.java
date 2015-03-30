@@ -6,6 +6,7 @@
 package se.jbee.inject.bootstrap;
 
 import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Type.raw;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -46,7 +47,7 @@ public final class Bootstrap {
 	}
 
 	public static Injector injector( Bindings bindings, Module[] modules ) {
-		return Inject.container( Binding.disambiguate( bindings.expand(modules)) );
+		return Inject.container( Binding.disambiguate( bindings.declareFrom(modules)) );
 	}
 
 	public static Modulariser modulariser( Globals globals ) {
@@ -58,11 +59,11 @@ public final class Bootstrap {
 	}
 
 	public static Binding<?>[] bindings( Class<? extends Bundle> root, Bindings bindings, Globals globals ) {
-		return Binding.disambiguate( bindings.expand( modulariser( globals ).modularise( root ) ) );
+		return Binding.disambiguate( bindings.declareFrom( modulariser( globals ).modularise( root ) ) );
 	}
 
 	public static <T> Module module( PresetModule<T> module, Presets presets ) {
-		return new LazyPresetModule<T>( module, presets );
+		return new ModuleToPresetModule<T>( module, presets );
 	}
 
 	public static void eagerSingletons( Injector injector ) {
@@ -91,13 +92,13 @@ public final class Bootstrap {
 		throw new UnsupportedOperationException( "util" );
 	}
 
-	private static final class LazyPresetModule<T>
+	private static final class ModuleToPresetModule<T>
 			implements Module {
 
 		private final PresetModule<T> module;
 		private final Presets presets;
 
-		LazyPresetModule( PresetModule<T> module, Presets presets ) {
+		ModuleToPresetModule( PresetModule<T> module, Presets presets ) {
 			super();
 			this.module = module;
 			this.presets = presets;
@@ -105,9 +106,9 @@ public final class Bootstrap {
 
 		@Override
 		public void declare( Bindings bindings ) {
+			Type<?> generic = Type.supertype( PresetModule.class, raw( module.getClass() ) ).parameter( 0 );
 			@SuppressWarnings ( "unchecked" )
-			final T value = (T) presets.value( Type.supertype( PresetModule.class,
-					Type.raw( module.getClass() ) ).parameter( 0 ) );
+			final T value = (T) presets.value( generic );
 			module.declare( bindings, value );
 		}
 	}

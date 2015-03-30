@@ -25,12 +25,12 @@ public enum BindingType {
 	 * The binding is a virtual or generic instance factory like one for lists
 	 * or other type parameterized "bridges".
 	 */
-	SUBSTITUTED,
+	LINK,
 
 	/**
 	 * The instances are supplied from a {@link Supplier} that has been defined
-	 * before macro expansion. This might be user defined or within the binder
-	 * API.
+	 * before macro expansion. This might be user defined or hard-wired one
+	 * within the binder API.
 	 */
 	PREDEFINED,
 

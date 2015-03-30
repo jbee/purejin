@@ -34,7 +34,6 @@ import se.jbee.inject.Type;
  */
 public final class Inject {
 
-	// TODO not use Binding but make it based on a interface or type that has all the required data
 	public static Injector container( Assembly<?>... assemblies ) {
 		return new DefaultInjector( assemblies );
 	}
@@ -45,6 +44,10 @@ public final class Inject {
 
 	/**
 	 * The default {@link Injector}.
+	 * 
+	 * For each raw type ({@link Class}) all production rules ({@link Injectron}
+	 * s) are given ordered from most precise to least precise. The first in
+	 * order that matches yields the result instance.
 	 * 
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
@@ -71,8 +74,7 @@ public final class Inject {
 				injectrons[i] = new RepositoryInjectron<T>(this, repositories.get( scope ), assembly, expiry, i, assemblies.length);
 			}
 			Arrays.sort( injectrons, COMPARATOR );
-			Map<Class<?>, Injectron<?>[]> map = new IdentityHashMap<Class<?>, Injectron<?>[]>(
-					injectrons.length );
+			Map<Class<?>, Injectron<?>[]> map = new IdentityHashMap<Class<?>, Injectron<?>[]>( injectrons.length );
 			if ( injectrons.length == 0 ) {
 				return map;
 			}
@@ -108,7 +110,7 @@ public final class Inject {
 		public <T> T resolve( Dependency<T> dependency ) {
 			final Type<T> type = dependency.getType();
 			final int array = type.arrayDimensions();
-			Injectron<T> injectron = applicableInjectron( dependency );
+			Injectron<T> injectron = matchingInjectron( dependency );
 			if ( injectron != null ) {
 				return injectron.instanceFor( dependency );
 			}
@@ -117,7 +119,7 @@ public final class Inject {
 				return resolveArray( dependency, type.elementType() );
 			}
 			if ( type.getRawType() == Injectron.class ) {
-				Injectron<?> i = applicableInjectron( dependency.onTypeParameter() );
+				Injectron<?> i = matchingInjectron( dependency.onTypeParameter() );
 				if ( i != null ) {
 					return (T) i;
 				}
@@ -128,8 +130,8 @@ public final class Inject {
 			throw noInjectronFor( dependency );
 		}
 
-		private <T> Injectron<T> applicableInjectron( Dependency<T> dependency ) {
-			return mostPreciseOf( typeInjectrons( dependency.getType() ), dependency );
+		private <T> Injectron<T> matchingInjectron( Dependency<T> dependency ) {
+			return mostPreciseOf( injectronsForType( dependency.getType() ), dependency );
 		}
 
 		private static <T> Injectron<T> mostPreciseOf( Injectron<T>[] injectrons, Dependency<T> dependency ) {
@@ -146,14 +148,14 @@ public final class Inject {
 		}
 
 		private <T> NoSuchResourceException noInjectronFor( Dependency<T> dependency ) {
-			return new NoSuchResourceException( dependency, typeInjectrons( dependency.getType() ) );
+			return new NoSuchResourceException( dependency, injectronsForType( dependency.getType() ) );
 		}
 
 		private <T, E> T resolveArray( Dependency<T> dependency, Type<E> elementType ) {
 			if ( elementType.getRawType() == Injectron.class ) {
 				return resolveInjectronArray( dependency, elementType.parameter( 0 ) );
 			}
-			Injectron<E>[] elementInjectrons = typeInjectrons( elementType );
+			Injectron<E>[] elementInjectrons = injectronsForType( elementType );
 			if ( elementInjectrons != null ) {
 				List<E> elements = new ArrayList<E>( elementInjectrons.length );
 				addAllMatching( elements, dependency, elementType, elementInjectrons );
@@ -198,7 +200,7 @@ public final class Inject {
 				}
 				return toArray( res, raw( Injectron.class ) );
 			}
-			Injectron<I>[] res = typeInjectrons( instanceType );
+			Injectron<I>[] res = injectronsForType( instanceType );
 			List<Injectron<I>> elements = new ArrayList<Injectron<I>>( res.length );
 			for ( Injectron<I> i : res ) {
 				if ( i.getInfo().resource.isCompatibleWith( instanceDependency ) ) {
@@ -225,7 +227,7 @@ public final class Inject {
 		}
 
 		@SuppressWarnings ( "unchecked" )
-		private <T> Injectron<T>[] typeInjectrons( Type<T> type ) {
+		private <T> Injectron<T>[] injectronsForType( Type<T> type ) {
 			return (Injectron<T>[]) injectrons.get( type.getRawType() );
 		}
 

@@ -27,10 +27,10 @@ import se.jbee.inject.Target;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Binding;
 import se.jbee.inject.bootstrap.BindingType;
+import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.BoundConstructor;
 import se.jbee.inject.bootstrap.BoundMethod;
 import se.jbee.inject.bootstrap.Inspector;
-import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.container.Factory;
 import se.jbee.inject.container.Scope;
@@ -391,15 +391,17 @@ public class Binder {
 		}
 		
 		protected final void expand( Object value ) {
-			declareBindingsIn( bind().bindings.getMacros().expand( bind().asMacro( resource ), value ) );
+			declareBindingsIn( bind().asType( resource, BindingType.MACRO, null ), value  );
+		}
+		
+		protected final void expand( BindingType type, Supplier<? extends T> supplier ) {
+			Binding<T> binding = bind().asType( resource, type, supplier );
+			declareBindingsIn( binding, binding );
 		}
 
-		private void declareBindingsIn( Module macro ) {
-			if ( macro instanceof Binding<?> ) {
-				Binding<?> b = (Binding<?>) macro;
-				macro = bind().bindings.getMacros().expand( b, b );
-			}
-			macro.declare( bind().bindings );
+		private void declareBindingsIn( Binding<?> binding, Object value ) {
+			Bindings bindings = bind().bindings;
+			bindings.getMacros().expandInto(bindings, binding, value);
 		}
 
 		public void to( Factory<? extends T> factory ) {
@@ -465,7 +467,7 @@ public class Binder {
 		}
 
 		protected final void to( Supplier<? extends T> supplier, BindingType type ) {
-			declareBindingsIn( bind().asType( resource, type, supplier ) );
+			expand( type, supplier);
 		}
 
 		private TypedBinder<T> toConstant( T constant ) {

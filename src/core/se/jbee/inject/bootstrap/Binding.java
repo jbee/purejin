@@ -56,10 +56,6 @@ public final class Binding<T>
 		this.source = source;
 	}
 
-	public Instance<T> getInstance() {
-		return resource.instance;
-	}
-
 	@Override
 	public Resource<T> getResource() {
 		return resource;
@@ -89,14 +85,16 @@ public final class Binding<T>
 	@Override
 	public <E> Binding<E> typed( Type<E> type ) {
 		if ( !getType().isAssignableTo( type ) ) {
-			throw new IllegalArgumentException(
-					"New type of a binding has to be a assignable from :" + getType()
-							+ " but was: " + type );
+			throw new ClassCastException(
+					"New type of a binding has to be a assignable from :" + getType() + " but was: " + type );
 		}
-		return new Binding<E>( resource.typed( type ), this.type, (Supplier<? extends E>) supplier,
-				scope, source );
+		return new Binding<E>( resource.typed( type ), this.type, (Supplier<? extends E>) supplier,	scope, source );
 	}
 
+	public boolean isComplete() {
+		return supplier != null || type == BindingType.REQUIRED;
+	}
+	
 	public Binding<T> complete( BindingType type, Supplier<? extends T> supplier ) {
 		return new Binding<T>( resource, type, supplier, scope, source );
 	}

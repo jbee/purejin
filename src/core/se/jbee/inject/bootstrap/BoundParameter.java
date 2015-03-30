@@ -138,18 +138,16 @@ public final class BoundParameter<T> implements Parameter<T>, Supplier<T> {
 	/**
 	 * @param type
 	 *            The new type of this {@link BoundParameter}
-	 * @throws UnsupportedOperationException
+	 * @throws ClassCastException
 	 *             In case the given type is incompatible with the previous one.
 	 */
 	@SuppressWarnings ( "unchecked" )
 	@Override
-	public <E> BoundParameter<E> typed( Type<E> type )
-			throws UnsupportedOperationException {
+	public <E> BoundParameter<E> typed( Type<E> type ) throws ClassCastException {
 		if ( supplied.isAssignableTo( type ) ) {
 			return new BoundParameter<E>( type, (Supplier<? extends E>) supplier );
 		}
-		throw new UnsupportedOperationException( "Only supertypes of " + supplied
-				+ " can be supplied as same paramter - but was: " + type );
+		throw new ClassCastException( "Only supertypes of " + supplied	+ " can be supplied as same paramter - but was: " + type );
 	}
 
 	@Override

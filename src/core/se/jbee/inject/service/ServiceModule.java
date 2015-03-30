@@ -66,7 +66,7 @@ public abstract class ServiceModule
 	}
 
 	protected ServiceModule() {
-		super(Scoped.APPLICATION, null, ServiceMethodModule.class);
+		super(Scoped.APPLICATION, ServiceMethodModule.class);
 	}
 
 	private static final class ServiceMethodModule

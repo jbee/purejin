@@ -5,7 +5,6 @@
  */
 package se.jbee.inject.bind;
 
-import se.jbee.inject.Source;
 import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrapper;
 import se.jbee.inject.bootstrap.Bundle;
@@ -31,8 +30,8 @@ public abstract class BinderModule
 		this.basis = null;
 	}
 
-	protected BinderModule( Scope inital, Source source, Class<? extends Bundle> basis) {
-		super( inital, source );
+	protected BinderModule( Scope inital, Class<? extends Bundle> basis) {
+		super( inital );
 		this.basis = basis;
 	}
 

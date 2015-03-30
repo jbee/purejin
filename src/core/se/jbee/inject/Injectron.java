@@ -8,6 +8,9 @@ package se.jbee.inject;
 /**
  * A kind of singleton for a {@link Resource} inside a {@link Injector}.
  * 
+ * Another way to look at it is to see it as a production rule or factory for a
+ * particular instance or a family of instances.
+ * 
  * @author Jan Bernitt (jan@jbee.se)
  */
 public interface Injectron<T> {

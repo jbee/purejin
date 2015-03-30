@@ -6,7 +6,6 @@
 package se.jbee.inject.bind;
 
 import static se.jbee.inject.bootstrap.Bindings.bindings;
-import se.jbee.inject.Source;
 import se.jbee.inject.bind.Binder.RootBinder;
 import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -29,11 +28,11 @@ public abstract class InitializedBinder
 	private Boolean initialized;
 
 	protected InitializedBinder() {
-		this( Scoped.APPLICATION, null );
+		this( Scoped.APPLICATION );
 	}
 
-	protected InitializedBinder( Scope inital, Source source ) {
-		super( Bind.create( bindings( Macros.DEFAULT, Inspect.DEFAULT ), source, inital ) );
+	protected InitializedBinder( Scope inital ) {
+		super( Bind.create( bindings( Macros.DEFAULT, Inspect.DEFAULT ), null, inital ) );
 		this.bind = super.bind();
 	}
 

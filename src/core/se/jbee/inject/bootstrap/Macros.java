@@ -7,17 +7,16 @@ package se.jbee.inject.bootstrap;
 
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.bootstrap.BindingType.CONSTRUCTOR;
+import static se.jbee.inject.bootstrap.BindingType.LINK;
 import static se.jbee.inject.bootstrap.BindingType.METHOD;
 import static se.jbee.inject.bootstrap.BindingType.PREDEFINED;
-import static se.jbee.inject.bootstrap.BindingType.SUBSTITUTED;
 import static se.jbee.inject.bootstrap.Metaclass.metaclass;
 import static se.jbee.inject.bootstrap.Supply.parametrizedInstance;
 
 import java.lang.reflect.Constructor;
 
 import se.jbee.inject.Array;
-import se.jbee.inject.DIRuntimeException;
+import se.jbee.inject.DIRuntimeException.BootstrappingException;
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
@@ -33,30 +32,18 @@ import se.jbee.inject.Type;
  */
 public final class Macros {
 
-	public static final Macro<Binding<?>> EXPAND = new ExpandMacro();
-	public static final Macro<Class<?>> FORWARD = new ForwardMacro();
-	public static final Macro<Instance<?>> SUBSTITUTE = new SubstitutionMacro();
+	public static final Macro<Binding<?>> EXPAND = new CheckAndAddMacro();
+	public static final Macro<Class<?>> PARAMETRIZED_LINK = new TypeParametrizedLinkMacro();
+	public static final Macro<Instance<?>> INSTANCE_LINK = new LinkMacro();
 	public static final Macro<Parameter<?>[]> ARRAY = new ArrayElementsMacro();
-	public static final Macro<BoundConstructor<?>> CONSTRUCT = new ConstructorMacro();
-	public static final Macro<BoundMethod<?>> PRODUCE = new MethodMacro();
-
-	public static final Module NO_OP = macro();
+	public static final Macro<BoundConstructor<?>> CONSTRUCTOR = new ConstructorMacro();
+	public static final Macro<BoundMethod<?>> FACTORY_METHOD = new MethodMacro();
 
 	public static final Macros EMPTY = new Macros( new Class<?>[0], new Macro<?>[0] );
 
 	public static final Macros DEFAULT = Macros.EMPTY
-			.use( EXPAND ).use( CONSTRUCT ).use( PRODUCE )
-			.use( SUBSTITUTE ).use( FORWARD ).use( ARRAY );
-
-	public static Module macro( Module mandatory, Module optional ) {
-		return optional == null || optional == NO_OP
-			? mandatory
-			: new MultiModule( mandatory, optional );
-	}
-
-	public static Module macro( Module... steps ) {
-		return new MultiModule( steps );
-	}
+			.with( EXPAND ).with( CONSTRUCTOR ).with( FACTORY_METHOD )
+			.with( INSTANCE_LINK ).with( PARAMETRIZED_LINK ).with( ARRAY );
 
 	private final Class<?>[] types;
 	private final Macro<?>[] macros;
@@ -68,7 +55,7 @@ public final class Macros {
 	}
 
 	/**
-	 * Uses the given {@link Macro} and derives the {@link #use(Class, Macro)} type from its
+	 * Uses the given {@link Macro} and derives the {@link #with(Class, Macro)} type from its
 	 * declaration. This is a utility method that can be used as long as the {@link Macro}
 	 * implementation is not generic.
 	 * 
@@ -78,9 +65,9 @@ public final class Macros {
 	 *         declaration.
 	 */
 	@SuppressWarnings ( "unchecked" )
-	public <T> Macros use( Macro<T> macro ) {
+	public <T> Macros with( Macro<T> macro ) {
 		Class<?> type = Type.supertype( Macro.class, Type.raw( macro.getClass() ) ).parameter( 0 ).getRawType();
-		return use( (Class<? super T>) type, macro );
+		return with( (Class<? super T>) type, macro );
 	}
 
 	/**
@@ -92,32 +79,39 @@ public final class Macros {
 	 *            The {@link Macro} expanding the type of value
 	 * @return A set of {@link Macros} containing the given one
 	 */
-	public <T> Macros use( Class<T> type, Macro<? extends T> macro ) {
+	public <T> Macros with( Class<T> type, Macro<? extends T> macro ) {
 		final int index = index( type );
 		return new Macros( Array.insert( types, type, index ), Array.insert( macros, macro, index ) );
 	}
 
 	/**
-	 * A generic version of {@link Macro#expand(Binding, Object)} that uses the matching predefined
-	 * {@link Macro} for the actual type of the value and expands it.
+	 * A generic version of {@link Macro#expand(Object, Binding, Bindings)} that
+	 * uses the matching predefined {@link Macro} for the actual type of the
+	 * value and expands it.
 	 * 
 	 * @param binding
-	 *            The incomplete binding to expand
+	 *            The usually incomplete binding to expand (and add to
+	 *            {@link Bindings})
 	 * @param value
 	 *            Non-null value to expand via matching {@link Macro}
-	 * @return {@link Module} results from {@link Macro#expand(Binding, Object)}
-	 * @throws DIRuntimeException
-	 *             In case no {@link Macro} had been declared for the type of value argument
+	 * 
+	 * @throws BootstrappingException
+	 *             In case no {@link Macro} had been declared for the type of
+	 *             value argument
 	 */
-	public <T, V> Module expand( Binding<T> binding, V value ) {
-		return macroForValueOf( value.getClass() ).expand( binding, value );
+	public <T, V> void expandInto( Bindings bindings, Binding<T> binding, V value ) {
+		macroForValueOf( value.getClass() ).expand( value, binding, bindings );
+	}
+	
+	public <T> void expandInto(Bindings bindings, Binding<T> binding) {
+		expandInto(bindings, binding, binding);
 	}
 
 	@SuppressWarnings ( "unchecked" )
 	private <V> Macro<? super V> macroForValueOf( final Class<? extends V> type ) {
 		int index = index( type );
 		if ( index < 0 ) {
-			throw new DIRuntimeException( "No macro for type:" + type.getCanonicalName() );
+			throw new BootstrappingException( "No macro for type:" + type.getCanonicalName() );
 		}
 		return (Macro<? super V>) macros[index];
 	}
@@ -131,20 +125,17 @@ public final class Macros {
 		return -1;
 	}
 
-	private static final class ExpandMacro
+	private static final class CheckAndAddMacro
 			implements Macro<Binding<?>> {
 
-		ExpandMacro() {
-			// make visible
-		}
+		CheckAndAddMacro() { /* make visible */ }
 
 		@Override
-		public <T> Module expand( Binding<T> binding, Binding<?> value ) {
-			if ( value.supplier == null ) {
-				// At this point the binding should be complete
-				throw new NullPointerException( "Binding has no supplier" );
+		public <T> void expand(Binding<?> binding, Binding<T> incomplete, Bindings bindings) {
+			if ( !binding.isComplete() ) { // At this point the binding should be complete
+				throw new BootstrappingException( "Tried to add an incomplete binding to bindings: "+incomplete );
 			}
-			return value; // the macro expansion ends here - a complete bind has been created 
+			bindings.add(binding); 
 		}
 
 	}
@@ -152,14 +143,13 @@ public final class Macros {
 	private static final class ArrayElementsMacro
 			implements Macro<Parameter<?>[]> {
 
-		ArrayElementsMacro() {
-			// make visible
-		}
-
+		ArrayElementsMacro() { /* make visible */ }
+		
 		@Override
 		@SuppressWarnings ( { "unchecked", "rawtypes" } )
-		public <T> Module expand( Binding<T> binding, Parameter<?>[] elements ) {
-			return binding.complete( PREDEFINED, supplier( (Type) binding.getType(), elements ) );
+		public <T> void expand(Parameter<?>[] elements, Binding<T> incomplete, Bindings bindings) {
+			bindings.getMacros().expandInto( bindings, 
+					incomplete.complete( PREDEFINED, supplier( (Type) incomplete.getType(), elements ) ));
 		}
 
 		@SuppressWarnings ( "unchecked" )
@@ -172,145 +162,86 @@ public final class Macros {
 	private static final class ConstructorMacro
 			implements Macro<BoundConstructor<?>> {
 
-		ConstructorMacro() {
-			// make visible
-		}
+		ConstructorMacro() { /* make visible */ }
 
 		@Override
-		public <T> Module expand( Binding<T> binding, BoundConstructor<?> constructor ) {
-			return binding.complete( CONSTRUCTOR,
-					Supply.costructor( constructor.typed( binding.getType() ) ) );
+		public <T> void expand(BoundConstructor<?> constructor, Binding<T> incomplete, Bindings bindings) {
+			bindings.getMacros().expandInto(bindings, 
+					incomplete.complete( BindingType.CONSTRUCTOR, Supply.costructor( constructor.typed( incomplete.getType() ) ) ));
 		}
-
 	}
 
 	private static final class MethodMacro
 			implements Macro<BoundMethod<?>> {
 
-		MethodMacro() {
-			// make visible
-		}
-
+		MethodMacro() {	/* make visible */ }
+		
 		@Override
-		public <T> Module expand( Binding<T> binding, BoundMethod<?> method ) {
-			return binding.complete( METHOD,
-					Supply.method( method.typed( binding.getType() ) ) );
+		public <T> void expand(BoundMethod<?> method, Binding<T> incomplete, Bindings bindings) {
+			bindings.getMacros().expandInto( bindings, 
+					incomplete.complete( METHOD, Supply.method( method.typed( incomplete.getType() ) ) ));
 		}
-
 	}
 
-	private static final class SubstitutionMacro
-			implements Macro<Instance<?>> {
+	private static final class TypeParametrizedLinkMacro
+			implements Macro<Class<?>> {
 
-		SubstitutionMacro() {
-			// make visible
-		}
+		TypeParametrizedLinkMacro() { /* make visible */ }
 
 		@Override
-		public <T> Module expand( Binding<T> binding, Instance<?> with ) {
-			Type<?> t = with.getType();
+		public <T> void expand(Class<?> to, Binding<T> incomplete, Bindings bindings) {
+			bindings.getMacros().expandInto(bindings, 
+					incomplete.complete( LINK, parametrizedInstance( anyOf( raw( to ).castTo( incomplete.getType() ) ) ) ));
+		}
+
+	}	
+	
+	private static final class LinkMacro
+			implements Macro<Instance<?>> {
+
+		LinkMacro() { /* make visible */ }
+
+		@Override
+		public <T> void expand(Instance<?> linked, Binding<T> binding, Bindings bindings) {
+			Macros macros = bindings.getMacros();
+			Type<?> t = linked.getType();
 			if ( t.isAssignableTo( raw( Supplier.class ) )
 					&& !binding.getType().isAssignableTo( raw( Supplier.class ) ) ) {
 				@SuppressWarnings ( "unchecked" )
 				Class<? extends Supplier<? extends T>> supplier = (Class<? extends Supplier<? extends T>>) t.getRawType();
-				if ( t.isFinal() && metaclass( t.getRawType() ).monomodal() ) {
-					binding.complete( SUBSTITUTED, Bootstrap.instance( supplier ) );
-				}
-				return macro( 
-						binding.complete( SUBSTITUTED, Supply.reference( supplier ) ),
-						implicitBindToConstructor( binding, with ) );
+				macros.expandInto(bindings, binding.complete( LINK, Supply.reference( supplier ) ));
+				implicitlyBindToConstructor( binding, linked, bindings );
+				return;
 			}
 			final Type<? extends T> type = t.castTo( binding.getType() );
-			final Instance<T> bound = binding.getInstance();
-			if ( !bound.getType().equalTo( type )
-					|| !with.name.isCompatibleWith( bound.name ) ) {
-				return macro(
-						binding.complete( SUBSTITUTED, Supply.instance( with.typed( type ) ) ),
-						implicitBindToConstructor( binding, with ) );
+			final Instance<T> bound = binding.resource.instance;
+			if ( !bound.getType().equalTo( type ) || !linked.name.isCompatibleWith( bound.name ) ) {
+				macros.expandInto( bindings, binding.complete( LINK, Supply.instance( linked.typed( type ) ) ));
+				implicitlyBindToConstructor( binding, linked, bindings );
+				return;
 			}
 			if ( type.isInterface() ) {
-				throw new IllegalArgumentException( "Interface type linked in a loop: " + bound
-						+ " > " + with );
+				throw new BootstrappingException( "Interface type linked in a loop: " + bound	+ " > " + linked );
 			}
-			return new ConstructorModule<T>( binding, type.getRawType() );
+			bindToInspectedConstructor(bindings, binding, type.getRawType() );
 		}
 
 	}
 
-	private static final class ForwardMacro
-			implements Macro<Class<?>> {
-
-		ForwardMacro() {
-			// make visible
-		}
-
-		@Override
-		public <T> Module expand( Binding<T> binding, Class<?> to ) {
-			return binding.complete( SUBSTITUTED,
-					parametrizedInstance( anyOf( raw( to ).castTo( binding.getType() ) ) ) );
-		}
-
-	}
-
-	static <T> Module implicitBindToConstructor( Binding<?> binding, Instance<T> instance ) {
+	static <T> void implicitlyBindToConstructor( Binding<?> incomplete, Instance<T> instance, Bindings bindings ) {
 		Class<T> impl = instance.getType().getRawType();
-		return metaclass( impl ).undeterminable()
-			? null
-			: new ConstructorModule<T>( Binding.binding( new Resource<T>( instance, Target.ANY ),
-					BindingType.CONSTRUCTOR, null, binding.scope,
-					binding.source.typed( DeclarationType.IMPLICIT ) ), impl );
-	}
-
-	/**
-	 * A composite to combine several {@link Module}s into one.
-	 * 
-	 * @author Jan Bernitt (jan@jbee.se)
-	 */
-	private static final class MultiModule
-			implements Module {
-
-		private final Module[] parts;
-
-		MultiModule( Module... parts ) {
-			this.parts = parts;
-		}
-
-		@Override
-		public void declare( Bindings bindings ) {
-			for ( int i = 0; i < parts.length; i++ ) {
-				parts[i].declare( bindings );
-			}
-		}
-
-		@Override
-		public String toString() {
-			return Supply.describe( "multi", parts );
+		if (!metaclass( impl ).undeterminable()) {
+			Binding<T> binding = Binding.binding(  new Resource<T>( instance, Target.ANY ),
+					BindingType.CONSTRUCTOR, null, incomplete.scope,
+					incomplete.source.typed( DeclarationType.IMPLICIT ) );
+			bindToInspectedConstructor(bindings, binding, impl );
 		}
 	}
 
-	/**
-	 * Binds to inspected constructor if the given implementer {@link Class}.
-	 * 
-	 * @author Jan Bernitt (jan@jbee.se)
-	 */
-	private static final class ConstructorModule<T>
-			implements Module {
-
-		private final Binding<T> binding;
-		private final Class<? extends T> implementer;
-
-		ConstructorModule( Binding<T> binding, Class<? extends T> implementer ) {
-			this.binding = binding;
-			this.implementer = implementer;
+	static <T> void bindToInspectedConstructor(Bindings bindings, Binding<T> binding, Class<? extends T> implementer) {
+		Constructor<? extends T> c = bindings.getInspector().constructorFor( implementer );
+		if ( c != null ) {
+			bindings.getMacros().expandInto( bindings, binding, BoundConstructor.bind( c ) );
 		}
-
-		@Override
-		public void declare( Bindings bindings ) {
-			Constructor<? extends T> c = bindings.getInspector().constructorFor( implementer );
-			if ( c != null ) {
-				bindings.getMacros().expand( binding, BoundConstructor.bind( c ) ).declare( bindings );
-			}
-		}
-
 	}
 }

@@ -2,18 +2,22 @@ package se.jbee.inject.service;
 
 import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Type.raw;
 
 import javax.annotation.Resource;
 
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
-import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Inspect;
-import se.jbee.inject.service.ServiceMethod;
-import se.jbee.inject.service.ServiceModule;
+import se.jbee.inject.bootstrap.Inspector;
 
+/**
+ * The tests illustrates how to change the way service methods are identified by
+ * binding a custom {@link Inspector} for services using
+ * {@link ServiceModule#bindServiceInspectorTo(Inspector)}.
+ */
 public class TestServiceInspectorBinds {
 
 	private static class TestServiceInspectorModule
@@ -44,8 +48,7 @@ public class TestServiceInspectorBinds {
 	@Test
 	public void thatTheDefaultServiceInspectorCanBeReplacedThroughCustomBind() {
 		@SuppressWarnings ( "unchecked" )
-		ServiceMethod<Void, Integer> answer = injector.resolve( dependency( Type.raw(
-				ServiceMethod.class ).parametized( Void.class, Integer.class ) ) );
+		ServiceMethod<Void, Integer> answer = injector.resolve( dependency( raw( ServiceMethod.class ).parametized( Void.class, Integer.class ) ) );
 		assertEquals( 42, answer.invoke( null ).intValue() );
 	}
 }

@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import se.jbee.inject.Array;
+import se.jbee.inject.DIRuntimeException;
 import se.jbee.inject.Type;
 
 /**
@@ -67,6 +68,9 @@ public final class Bindings {
 	 * Add (accumulate) a binding described by the 4-tuple given.
 	 */
 	public <T> void add( Binding<T> binding ) {
+		if (!binding.isComplete()) {
+			throw new DIRuntimeException.BootstrappingException("Incomplete binding added: "+binding);
+		}
 		bindings.add( binding );
 		if ( !autobinding ) {
 			return;
@@ -84,7 +88,7 @@ public final class Bindings {
 		return Array.of( bindings, Binding.class );
 	}
 
-	public Binding<?>[] expand( Module... modules ) {
+	public Binding<?>[] declareFrom( Module... modules ) {
 		Set<Class<?>> declared = new HashSet<Class<?>>();
 		Set<Class<?>> multimodals = new HashSet<Class<?>>();
 		for ( Module m : modules ) {

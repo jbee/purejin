@@ -22,6 +22,9 @@ public interface Typed<T> {
 
 	/**
 	 * @return This object with the given {@link Type}.
+	 * 
+	 * @throws ClassCastException
+	 *             in case this cannot be typed as the type given.
 	 */
-	<E> Typed<E> typed( Type<E> type );
+	<E> Typed<E> typed( Type<E> type ) throws ClassCastException;
 }

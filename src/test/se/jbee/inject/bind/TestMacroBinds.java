@@ -33,7 +33,6 @@ import se.jbee.inject.bootstrap.Bundle;
 import se.jbee.inject.bootstrap.Inspect;
 import se.jbee.inject.bootstrap.Macro;
 import se.jbee.inject.bootstrap.Macros;
-import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.config.Globals;
 
@@ -97,9 +96,8 @@ public class TestMacroBinds {
 		}
 
 		@Override
-		public <T> Module expand( Binding<T> binding, Binding<?> value ) {
+		public <T> void expand(Binding<?> value, Binding<T> incomplete, Bindings bindings) {
 			expands++;
-			return Macros.NO_OP;
 		}
 
 	}
@@ -114,7 +112,7 @@ public class TestMacroBinds {
 
 	private static Injector injectorWithMacro( Class<? extends Bundle> root, Macro<?> macro ) {
 		return Bootstrap.injector( root,
-				Bindings.bindings( Macros.DEFAULT.use( macro ), Inspect.DEFAULT ), Globals.STANDARD );
+				Bindings.bindings( Macros.DEFAULT.with( macro ), Inspect.DEFAULT ), Globals.STANDARD );
 	}
 
 	/**
@@ -127,17 +125,15 @@ public class TestMacroBinds {
 			implements Macro<BoundConstructor<?>> {
 
 		@Override
-		public <T> Module expand( Binding<T> binding, BoundConstructor<?> value ) {
+		public <T> void expand(BoundConstructor<?> value, Binding<T> incomplete, Bindings bindings) {
+			Macros.CONSTRUCTOR.expand( value, incomplete, bindings );
 			Type<?>[] params = Type.parameterTypes( value.constructor );
-			Module[] required = new Module[params.length + 1];
-			required[0] = Macros.CONSTRUCT.expand( binding, value );
 			for ( int i = 0; i < params.length; i++ ) {
-				required[i + 1] = required( params[i], binding );
+				bindings.getMacros().expandInto(bindings, required( params[i], incomplete ));
 			}
-			return Macros.macro( required );
 		}
 
-		private static <T> Module required( Type<T> type, Binding<?> binding ) {
+		private static <T> Binding<T> required( Type<T> type, Binding<?> binding ) {
 			return Binding.binding( new Resource<T>( Instance.anyOf( type ) ),
 					BindingType.REQUIRED, null, binding.scope,
 					binding.source.typed( DeclarationType.REQUIRED ) );
@@ -194,10 +190,10 @@ public class TestMacroBinds {
 			implements Macro<BoundConstructor<?>> {
 
 		@Override
-		public <T> Module expand( Binding<T> binding, BoundConstructor<?> constructor ) {
+		public <T> void expand(BoundConstructor<?> constructor, Binding<T> incomplete, Bindings bindings) {
 			Supplier<T> supplier = new InitialisationSupplier<T>(
-					Supply.costructor( constructor.typed( binding.getType() ) ) );
-			return binding.complete( CONSTRUCTOR, supplier );
+					Supply.costructor( constructor.typed( incomplete.getType() ) ) );
+			bindings.getMacros().expandInto(bindings, incomplete.complete( CONSTRUCTOR, supplier ));
 		}
 
 	}

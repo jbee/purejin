@@ -11,7 +11,20 @@ import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
+import se.jbee.inject.bootstrap.Module;
 
+/**
+ * The test shows very loose coupling using {@link BinderModule#require(Class)}
+ * and {@link BinderModule#provide(Class, se.jbee.inject.Parameter...)}
+ * bindings.
+ * 
+ * Here a {@link Module} just expresses the need for a particular implementation
+ * of an interface while one or more other modules express the ability to
+ * deliver an implementation if needed. Interface and implementation are
+ * connected without that a particular module points out both of them. This is
+ * very helpful to compose an application out of parts that do not yet know each
+ * other.
+ */
 public class TestRequiredProvidedBinds {
 
 	private static interface ExampleService {
