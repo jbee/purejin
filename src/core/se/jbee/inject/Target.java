@@ -83,7 +83,7 @@ public final class Target
 		}
 		final Instance<?> target = dependency.target();
 		return instance.name.isCompatibleWith( target.name )
-				&& isAssingableTo( instance.getType(), target.getType() );
+				&& isAssingableTo( instance.type(), target.type() );
 	}
 
 	private boolean areParentsCompatibleWith( Dependency<?> dependency ) {
@@ -97,7 +97,7 @@ public final class Target
 		}
 		int pi = 0;
 		while ( pl <= il && pl > 0 ) {
-			if ( isAssingableTo( parents.at( pi ).getType(), dependency.target( il ).getType() ) ) {
+			if ( isAssingableTo( parents.at( pi ).type(), dependency.target( il ).type() ) ) {
 				pl--;
 				pi++;
 			}
@@ -113,7 +113,7 @@ public final class Target
 	}
 
 	public boolean isAccessibleFor( Dependency<?> dependency ) {
-		return packages.contains( dependency.target().getType() );
+		return packages.contains( dependency.target().type() );
 	}
 
 	@Override

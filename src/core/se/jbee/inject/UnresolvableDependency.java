@@ -14,10 +14,10 @@ import java.util.Collection;
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
-public class DIRuntimeException
+public abstract class UnresolvableDependency
 		extends RuntimeException {
 
-	public DIRuntimeException( String message ) {
+	protected UnresolvableDependency( String message ) {
 		super( message );
 	}
 
@@ -31,10 +31,10 @@ public class DIRuntimeException
 	 * 
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	public static final class DependencyCycleException
-			extends DIRuntimeException {
+	public static final class DependencyCycle
+			extends UnresolvableDependency {
 
-		public DependencyCycleException( Dependency<?> dependency, Resource<?> cycleTarget ) {
+		public DependencyCycle( Dependency<?> dependency, Resource<?> cycleTarget ) {
 			super( "Cycle detected: " + injectionStack( dependency ) + cycleTarget );
 		}
 
@@ -55,10 +55,10 @@ public class DIRuntimeException
 	 * 
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	public static final class MoreFrequentExpiryException
-			extends DIRuntimeException {
+	public static final class UnstableDependency
+			extends UnresolvableDependency {
 
-		public MoreFrequentExpiryException( Injection parent, Injection injection ) {
+		public UnstableDependency( Injection parent, Injection injection ) {
 			super( "Cannot inject " + injection.target + " " + injection.expiry  + " into " + parent.target+" "+parent.expiry );
 		}
 
@@ -70,17 +70,17 @@ public class DIRuntimeException
 	 * 
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	public static final class NoSuchResourceException
-			extends DIRuntimeException {
+	public static final class NoResourceForDependency
+			extends UnresolvableDependency {
 
-		public <T> NoSuchResourceException( Dependency<T> dependency, Injectron<T>[] available, String msg ) {
+		public <T> NoResourceForDependency( Dependency<T> dependency, Injectron<T>[] available, String msg ) {
 			super( "No resource for dependency: " + injectionStack( dependency )
-					+ dependency.getInstance() + "\navailable are (for same raw type): "
+					+ dependency.instance() + "\navailable are (for same raw type): "
 					+ describe( available ) + "\n"
 					+ msg);
 		}
 
-		public NoSuchResourceException( Collection<Type<?>> types ) {
+		public NoResourceForDependency( Collection<Type<?>> types ) {
 			super( "No resource for required type(s) " + types );
 		}
 	}
@@ -91,7 +91,7 @@ public class DIRuntimeException
 		}
 		StringBuilder b = new StringBuilder();
 		for ( Injectron<?> i : injectrons ) {
-			b.append( '\n' ).append( i.getInfo().resource.toString() ).append( " defined " ).append( i.getInfo().source );
+			b.append( '\n' ).append( i.info().resource.toString() ).append( " defined " ).append( i.info().source );
 		}
 		return b.toString();
 	}
@@ -103,20 +103,12 @@ public class DIRuntimeException
 	 * 
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	public static final class NoSuchFunctionException
-			extends DIRuntimeException {
+	public static final class NoMethodForDependency
+			extends UnresolvableDependency {
 
-		public NoSuchFunctionException( Type<?> returnType, Type<?>... parameterTypes ) {
+		public NoMethodForDependency( Type<?> returnType, Type<?>... parameterTypes ) {
 			super( returnType + ":" + Arrays.toString( parameterTypes ) );
 		}
-	}
-	
-	public static final class BootstrappingException extends DIRuntimeException {
-
-		public BootstrappingException(String message) {
-			super(message);
-		}
-		
 	}
 
 }

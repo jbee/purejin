@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-import se.jbee.inject.DIRuntimeException;
+import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Injectron;
@@ -158,7 +158,7 @@ public abstract class ServiceModule
 					}
 				}
 			}
-			throw new DIRuntimeException.NoSuchFunctionException( returnType, parameterType );
+			throw new UnresolvableDependency.NoMethodForDependency( returnType, parameterType );
 		}
 
 		private Method[] serviceClassMethods( Class<?> service ) {
@@ -185,7 +185,7 @@ public abstract class ServiceModule
 		public ServiceMethod<?, ?> supply( Dependency<? super ServiceMethod<?, ?>> dependency,
 				Injector injector ) {
 			ServiceProvider serviceProvider = injector.resolve( dependency.anyTyped( ServiceProvider.class ) );
-			Type<? super ServiceMethod<?, ?>> type = dependency.getType();
+			Type<? super ServiceMethod<?, ?>> type = dependency.type();
 			return serviceProvider.provide( type.parameter( 0 ), type.parameter( 1 ) );
 		}
 	}
@@ -221,7 +221,7 @@ public abstract class ServiceModule
 			Object[] template = new Object[parameterTypes.length];
 			for ( int i = 0; i < template.length; i++ ) {
 				Injectron<?> injectron = argumentInjectrons[i];
-				if ( injectron != null && injectron.getInfo().expiry.isNever() ) {
+				if ( injectron != null && injectron.info().expiry.isNever() ) {
 					template[i] = instance( injectron, dependency( parameterTypes[i] ) );
 				}
 			}

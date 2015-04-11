@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import se.jbee.inject.Array;
-import se.jbee.inject.DIRuntimeException;
+import se.jbee.inject.BindingIsInconsistent;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Injectron;
 import se.jbee.inject.Type;
@@ -69,19 +69,19 @@ public final class Bootstrap {
 
 	public static void eagerSingletons( Injector injector ) {
 		for ( Injectron<?> i : injector.resolve( dependency( Injectron[].class ) ) ) {
-			if ( i.getInfo().expiry.isNever() ) {
+			if ( i.info().expiry.isNever() ) {
 				instance( i ); // instantiate to make sure they exist in repository
 			}
 		}
 	}
 
 	public static <T> T instance( Injectron<T> injectron ) {
-		return injectron.instanceFor( dependency( injectron.getInfo().resource.instance ) );
+		return injectron.instanceFor( dependency( injectron.info().resource.instance ) );
 	}
 
 	public static void nonnullThrowsReentranceException( Object field ) {
 		if ( field != null ) {
-			throw new DIRuntimeException.BootstrappingException( "Reentrance not allowed!" );
+			throw new BindingIsInconsistent( "Reentrance not allowed!" );
 		}
 	}
 

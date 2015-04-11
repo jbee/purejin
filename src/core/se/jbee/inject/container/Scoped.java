@@ -250,7 +250,7 @@ public class Scoped {
 
 		@Override
 		public <T> String deriveFrom( Dependency<T> dependency ) {
-			return dependency.getType().toString();
+			return dependency.type().toString();
 		}
 
 		@Override
@@ -269,8 +269,8 @@ public class Scoped {
 
 		@Override
 		public <T> String deriveFrom( Dependency<T> dependency ) {
-			return dependency.getName().toString() + "@"
-					+ dependency.getType().toString();
+			return dependency.name().toString() + "@"
+					+ dependency.type().toString();
 		}
 
 		@Override

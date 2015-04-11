@@ -6,14 +6,13 @@
 package se.jbee.inject;
 
 import static se.jbee.inject.Instance.defaultInstanceOf;
-import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Type.raw;
 
 import java.util.Arrays;
 import java.util.Iterator;
 
-import se.jbee.inject.DIRuntimeException.DependencyCycleException;
-import se.jbee.inject.DIRuntimeException.MoreFrequentExpiryException;
+import se.jbee.inject.UnresolvableDependency.DependencyCycle;
+import se.jbee.inject.UnresolvableDependency.UnstableDependency;
 
 /**
  * Describes what is wanted/needed as parameter to construct a instance of T.
@@ -43,7 +42,7 @@ public final class Dependency<T>
 	}
 
 	private static <T> Dependency<T> dependency( Type<T> type, Injection[] hierarchy ) {
-		return dependency( instance( Name.ANY, type ), hierarchy );
+		return dependency( Instance.instance( Name.ANY, type ), hierarchy );
 	}
 
 	public static <T> Dependency<T> dependency( Instance<T> instance ) {
@@ -62,16 +61,16 @@ public final class Dependency<T>
 		this.hierarchy = hierarchy;
 	}
 
-	public Instance<T> getInstance() {
+	public Instance<T> instance() {
 		return instance;
 	}
 
 	@Override
-	public Type<T> getType() {
-		return instance.getType();
+	public Type<T> type() {
+		return instance.type();
 	}
 
-	public Name getName() {
+	public Name name() {
 		return instance.name;
 	}
 
@@ -83,7 +82,7 @@ public final class Dependency<T>
 	}
 
 	public Dependency<?> onTypeParameter() {
-		return dependency( getType().parameter( 0 ), hierarchy );
+		return dependency( type().parameter( 0 ), hierarchy );
 	}
 
 	public <E> Dependency<E> instanced( Instance<E> instance ) {
@@ -92,11 +91,11 @@ public final class Dependency<T>
 
 	@Override
 	public <E> Dependency<E> typed( Type<E> type ) {
-		return dependency( instance( getName(), type ), hierarchy );
+		return dependency( Instance.instance( name(), type ), hierarchy );
 	}
 
 	public <E> Dependency<E> anyTyped( Type<E> type ) {
-		return dependency( instance( Name.ANY, type ), hierarchy );
+		return dependency( Instance.instance( Name.ANY, type ), hierarchy );
 	}
 
 	public <E> Dependency<E> anyTyped( Class<E> type ) {
@@ -108,7 +107,7 @@ public final class Dependency<T>
 	}
 
 	public Dependency<T> named( Name name ) {
-		return dependency( instance( name, getType() ), hierarchy );
+		return dependency( Instance.instance( name, type() ), hierarchy );
 	}
 
 	public Dependency<T> untargeted() {
@@ -176,29 +175,28 @@ public final class Dependency<T>
 		return new Dependency<T>( instance, Array.copy( hierarchy, hierarchy.length - 1 ) );
 	}
 
-	private void ensureNoCycle( Injection injection )
-			throws DependencyCycleException {
+	private void ensureNoCycle( Injection injection ) throws DependencyCycle {
 		for ( int i = 0; i < hierarchy.length; i++ ) {
 			Injection parent = hierarchy[i];
 			if ( parent.equalTo( injection ) ) {
-				throw new DependencyCycleException( this, injection.target );
+				throw new DependencyCycle( this, injection.target );
 			}
 		}
 	}
 
-	private void ensureNotMoreFrequentExpiry( Injection injection ) {
+	private void ensureNotMoreFrequentExpiry( Injection injection ) throws UnstableDependency {
 		final Expiry expiry = injection.expiry;
 		for ( int i = 0; i < hierarchy.length; i++ ) {
 			Injection parent = hierarchy[i];
 			if ( expiry.moreFrequent( parent.expiry ) ) {
-				throw new MoreFrequentExpiryException( parent, injection );
+				throw new UnstableDependency( parent, injection );
 			}
 		}
 	}
 
 	@Override
 	public boolean isAssignableTo( Type<?> type ) {
-		return getType().isAssignableTo( type );
+		return type().isAssignableTo( type );
 	}
 
 	@Override

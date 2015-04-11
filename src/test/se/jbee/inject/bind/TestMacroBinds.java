@@ -15,7 +15,6 @@ import java.lang.reflect.Field;
 
 import org.junit.Test;
 
-import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
@@ -24,6 +23,7 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.bootstrap.Binding;
 import se.jbee.inject.bootstrap.BindingType;
 import se.jbee.inject.bootstrap.Bindings;
@@ -129,7 +129,7 @@ public class TestMacroBinds {
 			Macros.CONSTRUCTOR.expand( value, incomplete, bindings );
 			Type<?>[] params = Type.parameterTypes( value.constructor );
 			for ( int i = 0; i < params.length; i++ ) {
-				bindings.getMacros().expandInto(bindings, required( params[i], incomplete ));
+				bindings.macros.expandInto(bindings, required( params[i], incomplete ));
 			}
 		}
 
@@ -140,7 +140,7 @@ public class TestMacroBinds {
 		}
 	}
 
-	@Test ( expected = NoSuchResourceException.class )
+	@Test ( expected = NoResourceForDependency.class )
 	public void thatAllConstructorParameterTypesCanBeMadeRequired() {
 		Macro<?> required = new RequiredConstructorParametersMacro();
 		Injector injector = injectorWithMacro( MacroBindsModule.class, required );
@@ -192,8 +192,8 @@ public class TestMacroBinds {
 		@Override
 		public <T> void expand(BoundConstructor<?> constructor, Binding<T> incomplete, Bindings bindings) {
 			Supplier<T> supplier = new InitialisationSupplier<T>(
-					Supply.costructor( constructor.typed( incomplete.getType() ) ) );
-			bindings.getMacros().expandInto(bindings, incomplete.complete( CONSTRUCTOR, supplier ));
+					Supply.costructor( constructor.typed( incomplete.type() ) ) );
+			bindings.macros.expandInto(bindings, incomplete.complete( CONSTRUCTOR, supplier ));
 		}
 
 	}

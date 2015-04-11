@@ -38,7 +38,7 @@ public class TestServiceBinds {
 		@Override
 		public Service<?, ?> supply( Dependency<? super Service<?, ?>> dependency, Injector injector ) {
 			ServiceProvider provider = injector.resolve( dependency( ServiceProvider.class ) );
-			Type<? super Service<?, ?>> type = dependency.getType();
+			Type<? super Service<?, ?>> type = dependency.type();
 			return newService( provider.provide( type.parameter( 0 ), type.parameter( 1 ) ) );
 		}
 

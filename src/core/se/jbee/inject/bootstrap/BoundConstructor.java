@@ -29,14 +29,14 @@ public final class BoundConstructor<T>
 	}
 
 	@Override
-	public Type<T> getType() {
+	public Type<T> type() {
 		return Type.raw( constructor.getDeclaringClass() );
 	}
 
 	@SuppressWarnings ( "unchecked" )
 	@Override
 	public <E> BoundConstructor<E> typed( Type<E> supertype ) {
-		getType().castTo( supertype );
+		type().castTo( supertype );
 		return (BoundConstructor<E>) this;
 	}
 

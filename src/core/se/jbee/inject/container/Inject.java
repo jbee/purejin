@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import se.jbee.inject.Array;
-import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Expiry;
 import se.jbee.inject.Injector;
@@ -66,7 +66,7 @@ public final class Inject {
 			for (int i = 0; i < assemblies.length; i++) {
 				@SuppressWarnings("unchecked")
 				Assembly<T> assembly = (Assembly<T>) assemblies[i];
-				Scope scope = assembly.getScope();
+				Scope scope = assembly.scope();
 				Expiry expiry = EXPIRATION.get( scope );
 				if ( expiry == null ) {
 					expiry = Expiry.NEVER;
@@ -78,10 +78,10 @@ public final class Inject {
 			if ( injectrons.length == 0 ) {
 				return map;
 			}
-			Class<?> lastRawType = injectrons[0].getInfo().resource.getType().getRawType();
+			Class<?> lastRawType = injectrons[0].info().resource.type().getRawType();
 			int start = 0;
 			for ( int i = 0; i < injectrons.length; i++ ) {
-				Class<?> rawType = injectrons[i].getInfo().resource.getType().getRawType();
+				Class<?> rawType = injectrons[i].info().resource.type().getRawType();
 				if ( rawType != lastRawType ) {
 					map.put( lastRawType, Arrays.copyOfRange( injectrons, start, i ) );
 					start = i;
@@ -95,7 +95,7 @@ public final class Inject {
 		private static Map<Scope, Repository> initRepositories( Assembly<?>[] assemblies ) {
 			Map<Scope, Repository> repositories = new IdentityHashMap<Scope, Repository>();
 			for ( Assembly<?> a : assemblies ) {
-				Scope scope = a.getScope();
+				Scope scope = a.scope();
 				Repository repository = repositories.get( scope );
 				if ( repository == null ) {
 					repositories.put( scope, scope.init() );
@@ -108,7 +108,7 @@ public final class Inject {
 		@SuppressWarnings ( "unchecked" )
 		@Override
 		public <T> T resolve( Dependency<T> dependency ) {
-			final Type<T> type = dependency.getType();
+			final Type<T> type = dependency.type();
 			final int array = type.arrayDimensions();
 			Injectron<T> injectron = matchingInjectron( dependency );
 			if ( injectron != null ) {
@@ -131,7 +131,7 @@ public final class Inject {
 		}
 
 		private <T> Injectron<T> matchingInjectron( Dependency<T> dependency ) {
-			return mostPreciseOf( injectronsForType( dependency.getType() ), dependency );
+			return mostPreciseOf( injectronsForType( dependency.type() ), dependency );
 		}
 
 		private static <T> Injectron<T> mostPreciseOf( Injectron<T>[] injectrons, Dependency<T> dependency ) {
@@ -140,15 +140,15 @@ public final class Inject {
 			}
 			for ( int i = 0; i < injectrons.length; i++ ) {
 				Injectron<T> injectron = injectrons[i];
-				if ( injectron.getInfo().resource.isMatching( dependency ) ) {
+				if ( injectron.info().resource.isMatching( dependency ) ) {
 					return injectron;
 				}
 			}
 			return null;
 		}
 
-		private <T> NoSuchResourceException noInjectronFor( Dependency<T> dependency ) {
-			return new NoSuchResourceException( dependency, injectronsForType( dependency.getType() ), "" );
+		private <T> NoResourceForDependency noInjectronFor( Dependency<T> dependency ) {
+			return new NoResourceForDependency( dependency, injectronsForType( dependency.type() ), "" );
 		}
 
 		private <T, E> T resolveArray( Dependency<T> dependency, Type<E> elementType ) {
@@ -159,8 +159,8 @@ public final class Inject {
 			if ( elementInjectrons != null ) {
 				List<E> elements = new ArrayList<E>( elementInjectrons.length );
 				addAllMatching( elements, dependency, elementType, elementInjectrons );
-				if ( dependency.getType().getRawType().getComponentType().isPrimitive() ) {
-					throw new NoSuchResourceException(dependency, null,
+				if ( dependency.type().getRawType().getComponentType().isPrimitive() ) {
+					throw new NoResourceForDependency(dependency, null,
 							"Primitive arrays cannot be used to inject all instances of the wrapper type. Use the wrapper array instead." );
 				}
 				return toArray( elements, elementType );
@@ -192,7 +192,7 @@ public final class Inject {
 						@SuppressWarnings ( "unchecked" )
 						Injectron<? extends I>[] typeInjectrons = (Injectron<? extends I>[]) e.getValue();
 						for ( Injectron<? extends I> i : typeInjectrons ) {
-							if ( i.getInfo().resource.isCompatibleWith( instanceDependency ) ) {
+							if ( i.info().resource.isCompatibleWith( instanceDependency ) ) {
 								res.add( i );
 							}
 						}
@@ -203,7 +203,7 @@ public final class Inject {
 			Injectron<I>[] res = injectronsForType( instanceType );
 			List<Injectron<I>> elements = new ArrayList<Injectron<I>>( res.length );
 			for ( Injectron<I> i : res ) {
-				if ( i.getInfo().resource.isCompatibleWith( instanceDependency ) ) {
+				if ( i.info().resource.isCompatibleWith( instanceDependency ) ) {
 					elements.add( i );
 				}
 			}
@@ -215,7 +215,7 @@ public final class Inject {
 			Dependency<E> elementDependency = dependency.typed( elementType );
 			for ( int i = 0; i < elementInjectrons.length; i++ ) {
 				Injectron<? extends E> injectron = elementInjectrons[i];
-				if ( injectron.getInfo().resource.isMatching( elementDependency ) ) {
+				if ( injectron.info().resource.isMatching( elementDependency ) ) {
 					elements.add( injectron.instanceFor( elementDependency ) );
 				}
 			}
@@ -237,10 +237,10 @@ public final class Inject {
 			for ( Entry<Class<?>, Injectron<?>[]> e : injectrons.entrySet() ) {
 				b.append( e.getKey() ).append( '\n' );
 				for ( Injectron<?> i : e.getValue() ) {
-					Resource<?> r = i.getInfo().resource;
-					b.append( '\t' ).append( r.getType().simpleName() ).append( ' ' ).append(
-							r.getName() ).append( ' ' ).append( r.target ).append(
-							' ' ).append( i.getInfo().source ).append( '\n' );
+					Resource<?> r = i.info().resource;
+					b.append( '\t' ).append( r.type().simpleName() ).append( ' ' ).append(
+							r.name() ).append( ' ' ).append( r.target ).append(
+							' ' ).append( i.info().source ).append( '\n' );
 				}
 			}
 			return b.toString();
@@ -258,12 +258,12 @@ public final class Inject {
 			super();
 			this.injector = injector;
 			this.repository = repository;
-			this.supplier = assembly.getSupplier();
-			this.info = new InjectronInfo<T>(assembly.getResource(), assembly.getSource(), expiry, serialID, count);
+			this.supplier = assembly.supplier();
+			this.info = new InjectronInfo<T>(assembly.resource(), assembly.source(), expiry, serialID, count);
 		}
 
 		@Override
-		public InjectronInfo<T> getInfo() {
+		public InjectronInfo<T> info() {
 			return info;
 		}
 
@@ -320,10 +320,10 @@ public final class Inject {
 
 		@Override
 		public int compare( Injectron<?> one, Injectron<?> other ) {
-			Resource<?> r1 = one.getInfo().resource;
-			Resource<?> r2 = other.getInfo().resource;
-			Class<?> c1 = r1.getType().getRawType();
-			Class<?> c2 = r2.getType().getRawType();
+			Resource<?> r1 = one.info().resource;
+			Resource<?> r2 = other.info().resource;
+			Class<?> c1 = r1.type().getRawType();
+			Class<?> c2 = r2.type().getRawType();
 			if ( c1 != c2 ) {
 				return c1.getCanonicalName().compareTo( c2.getCanonicalName() );
 			}

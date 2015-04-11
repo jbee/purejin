@@ -16,7 +16,7 @@ import static se.jbee.inject.bootstrap.Supply.parametrizedInstance;
 import java.lang.reflect.Constructor;
 
 import se.jbee.inject.Array;
-import se.jbee.inject.DIRuntimeException.BootstrappingException;
+import se.jbee.inject.BindingIsInconsistent;
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
@@ -95,7 +95,7 @@ public final class Macros {
 	 * @param value
 	 *            Non-null value to expand via matching {@link Macro}
 	 * 
-	 * @throws BootstrappingException
+	 * @throws BindingIsInconsistent
 	 *             In case no {@link Macro} had been declared for the type of
 	 *             value argument
 	 */
@@ -111,7 +111,7 @@ public final class Macros {
 	private <V> Macro<? super V> macroForValueOf( final Class<? extends V> type ) {
 		int index = index( type );
 		if ( index < 0 ) {
-			throw new BootstrappingException( "No macro for type:" + type.getCanonicalName() );
+			throw new BindingIsInconsistent( "No macro for type:" + type.getCanonicalName() );
 		}
 		return (Macro<? super V>) macros[index];
 	}
@@ -133,7 +133,7 @@ public final class Macros {
 		@Override
 		public <T> void expand(Binding<?> binding, Binding<T> incomplete, Bindings bindings) {
 			if ( !binding.isComplete() ) { // At this point the binding should be complete
-				throw new BootstrappingException( "Tried to add an incomplete binding to bindings: "+incomplete );
+				throw new BindingIsInconsistent( "Tried to add an incomplete binding to bindings: "+incomplete );
 			}
 			bindings.add(binding); 
 		}
@@ -148,8 +148,8 @@ public final class Macros {
 		@Override
 		@SuppressWarnings ( { "unchecked", "rawtypes" } )
 		public <T> void expand(Parameter<?>[] elements, Binding<T> incomplete, Bindings bindings) {
-			bindings.getMacros().expandInto( bindings, 
-					incomplete.complete( PREDEFINED, supplier( (Type) incomplete.getType(), elements ) ));
+			bindings.macros.expandInto( bindings, 
+					incomplete.complete( PREDEFINED, supplier( (Type) incomplete.type(), elements ) ));
 		}
 
 		@SuppressWarnings ( "unchecked" )
@@ -166,8 +166,8 @@ public final class Macros {
 
 		@Override
 		public <T> void expand(BoundConstructor<?> constructor, Binding<T> incomplete, Bindings bindings) {
-			bindings.getMacros().expandInto(bindings, 
-					incomplete.complete( BindingType.CONSTRUCTOR, Supply.costructor( constructor.typed( incomplete.getType() ) ) ));
+			bindings.macros.expandInto(bindings, 
+					incomplete.complete( BindingType.CONSTRUCTOR, Supply.costructor( constructor.typed( incomplete.type() ) ) ));
 		}
 	}
 
@@ -178,8 +178,8 @@ public final class Macros {
 		
 		@Override
 		public <T> void expand(BoundMethod<?> method, Binding<T> incomplete, Bindings bindings) {
-			bindings.getMacros().expandInto( bindings, 
-					incomplete.complete( METHOD, Supply.method( method.typed( incomplete.getType() ) ) ));
+			bindings.macros.expandInto( bindings, 
+					incomplete.complete( METHOD, Supply.method( method.typed( incomplete.type() ) ) ));
 		}
 	}
 
@@ -190,8 +190,8 @@ public final class Macros {
 
 		@Override
 		public <T> void expand(Class<?> to, Binding<T> incomplete, Bindings bindings) {
-			bindings.getMacros().expandInto(bindings, 
-					incomplete.complete( LINK, parametrizedInstance( anyOf( raw( to ).castTo( incomplete.getType() ) ) ) ));
+			bindings.macros.expandInto(bindings, 
+					incomplete.complete( LINK, parametrizedInstance( anyOf( raw( to ).castTo( incomplete.type() ) ) ) ));
 		}
 
 	}	
@@ -203,25 +203,24 @@ public final class Macros {
 
 		@Override
 		public <T> void expand(Instance<?> linked, Binding<T> binding, Bindings bindings) {
-			Macros macros = bindings.getMacros();
-			Type<?> t = linked.getType();
+			Type<?> t = linked.type();
 			if ( t.isAssignableTo( raw( Supplier.class ) )
-					&& !binding.getType().isAssignableTo( raw( Supplier.class ) ) ) {
+					&& !binding.type().isAssignableTo( raw( Supplier.class ) ) ) {
 				@SuppressWarnings ( "unchecked" )
 				Class<? extends Supplier<? extends T>> supplier = (Class<? extends Supplier<? extends T>>) t.getRawType();
-				macros.expandInto(bindings, binding.complete( LINK, Supply.reference( supplier ) ));
+				bindings.macros.expandInto(bindings, binding.complete( LINK, Supply.reference( supplier ) ));
 				implicitlyBindToConstructor( binding, linked, bindings );
 				return;
 			}
-			final Type<? extends T> type = t.castTo( binding.getType() );
+			final Type<? extends T> type = t.castTo( binding.type() );
 			final Instance<T> bound = binding.resource.instance;
-			if ( !bound.getType().equalTo( type ) || !linked.name.isCompatibleWith( bound.name ) ) {
-				macros.expandInto( bindings, binding.complete( LINK, Supply.instance( linked.typed( type ) ) ));
+			if ( !bound.type().equalTo( type ) || !linked.name.isCompatibleWith( bound.name ) ) {
+				bindings.macros.expandInto( bindings, binding.complete( LINK, Supply.instance( linked.typed( type ) ) ));
 				implicitlyBindToConstructor( binding, linked, bindings );
 				return;
 			}
 			if ( type.isInterface() ) {
-				throw new BootstrappingException( "Interface type linked in a loop: " + bound	+ " > " + linked );
+				throw new BindingIsInconsistent( "Interface type linked in a loop: " + bound	+ " > " + linked );
 			}
 			bindToInspectedConstructor(bindings, binding, type.getRawType() );
 		}
@@ -229,7 +228,7 @@ public final class Macros {
 	}
 
 	static <T> void implicitlyBindToConstructor( Binding<?> incomplete, Instance<T> instance, Bindings bindings ) {
-		Class<T> impl = instance.getType().getRawType();
+		Class<T> impl = instance.type().getRawType();
 		if (!metaclass( impl ).undeterminable()) {
 			Binding<T> binding = Binding.binding(  new Resource<T>( instance, Target.ANY ),
 					BindingType.CONSTRUCTOR, null, incomplete.scope,
@@ -239,9 +238,9 @@ public final class Macros {
 	}
 
 	static <T> void bindToInspectedConstructor(Bindings bindings, Binding<T> binding, Class<? extends T> implementer) {
-		Constructor<? extends T> c = bindings.getInspector().constructorFor( implementer );
+		Constructor<? extends T> c = bindings.inspector.constructorFor( implementer );
 		if ( c != null ) {
-			bindings.getMacros().expandInto( bindings, binding, BoundConstructor.bind( c ) );
+			bindings.macros.expandInto( bindings, binding, BoundConstructor.bind( c ) );
 		}
 	}
 }

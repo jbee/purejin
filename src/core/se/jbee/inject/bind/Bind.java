@@ -103,8 +103,8 @@ public final class Bind {
 			: new Bind( bindings, source.next(), scope, target );
 	}
 
-	public Inspector getInspector() {
-		return bindings.getInspector();
+	public Inspector inspector() {
+		return bindings.inspector;
 	}
 
 	public <T> Binding<T> asType( Resource<T> resource, BindingType type, Supplier<? extends T> supplier ) {

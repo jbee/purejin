@@ -20,7 +20,7 @@ import java.lang.reflect.Method;
 import org.hamcrest.Factory;
 import org.junit.Test;
 
-import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
@@ -196,7 +196,7 @@ public class TestInspectorBinds {
 				injector.resolve( dependency( Typecast.providerTypeOf( Boolean.class ) ) ).provide() );
 	}
 
-	@Test ( expected = NoSuchResourceException.class )
+	@Test ( expected = NoResourceForDependency.class )
 	public void thatNoMethodsAreBoundThatAreNotAssignableToSpecifiedType() {
 		injector.resolve( dependency( Character.class ) );
 	}
@@ -206,7 +206,7 @@ public class TestInspectorBinds {
 		assertEquals( named( "foobar" ), injector.resolve( dependency( Name.class ) ) );
 	}
 
-	@Test ( expected = NoSuchResourceException.class )
+	@Test ( expected = NoResourceForDependency.class )
 	public void thatNoMethodsAreBoundThatAreNotInSpecifiedPackagesSet() {
 		injector.resolve( dependency( String.class ) );
 	}

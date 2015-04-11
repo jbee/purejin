@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import se.jbee.inject.Array;
-import se.jbee.inject.DIRuntimeException;
+import se.jbee.inject.BindingIsInconsistent;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
@@ -105,7 +105,7 @@ public final class Supply {
 	}
 
 	public static <T> T resolveParameter( Dependency<?> parent, Injector injector, BoundParameter<T> param ) {
-		return param.supply( parent.instanced( anyOf( param.getType() ) ), injector );
+		return param.supply( parent.instanced( anyOf( param.type() ) ), injector );
 	}
 
 	private Supply() {
@@ -121,7 +121,7 @@ public final class Supply {
 
 		@Override
 		public final T supply( Dependency<? super T> dependency, Injector injector ) {
-			Type<?> elementType = dependency.getType().parameter( 0 );
+			Type<?> elementType = dependency.type().parameter( 0 );
 			return bridge( supplyArray( dependency.typed( elementType.getArrayType() ), injector ) );
 		}
 
@@ -278,9 +278,9 @@ public final class Supply {
 
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			Type<? super T> type = dependency.getType();
-			Instance<? extends T> parametrized = instance.typed( instance.getType().parametized(
-					type.getParameters() ).upperBound( dependency.getType().isUpperBound() ) );
+			Type<? super T> type = dependency.type();
+			Instance<? extends T> parametrized = instance.typed( instance.type().parametized(
+					type.getParameters() ).upperBound( dependency.type().isUpperBound() ) );
 			return injector.resolve( dependency.instanced( parametrized ) );
 		}
 
@@ -322,8 +322,8 @@ public final class Supply {
 		@Override
 		public Provider<?> supply( Dependency<? super Provider<?>> dependency, Injector injector ) {
 			Dependency<?> providedType = dependency.onTypeParameter();
-			if ( !dependency.getName().isDefault() ) {
-				providedType = providedType.named( dependency.getName() );
+			if ( !dependency.name().isDefault() ) {
+				providedType = providedType.named( dependency.name() );
 			}
 			return lazyProvider( providedType.uninject().ignoredExpiry(), injector );
 		}
@@ -373,7 +373,7 @@ public final class Supply {
 
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			return factory.produce( dependency.getInstance(), dependency.target( 1 ) );
+			return factory.produce( dependency.instance(), dependency.target( 1 ) );
 		}
 
 		@Override
@@ -443,7 +443,7 @@ public final class Supply {
 
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			throw new DIRuntimeException.BootstrappingException( "Should never be called!" );
+			throw new BindingIsInconsistent( "Should never be called!" );
 		}
 
 		@Override
@@ -461,7 +461,7 @@ public final class Supply {
 
 		@Override
 		public <P> Logger produce( Instance<? super Logger> produced, Instance<P> injectedInto ) {
-			return Logger.getLogger( injectedInto.getType().getRawType().getCanonicalName() );
+			return Logger.getLogger( injectedInto.type().getRawType().getCanonicalName() );
 		}
 
 	}

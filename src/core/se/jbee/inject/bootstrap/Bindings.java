@@ -7,15 +7,13 @@ package se.jbee.inject.bootstrap;
 
 import static se.jbee.inject.bootstrap.Metaclass.metaclass;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import se.jbee.inject.Array;
-import se.jbee.inject.DIRuntimeException;
+import se.jbee.inject.BindingIsInconsistent;
 import se.jbee.inject.Type;
 
 /**
@@ -31,10 +29,11 @@ public final class Bindings {
 		return new Bindings( macros, inspector, new ArrayList<Binding<?>>( 128 ), false );
 	}
 
-	private final Macros macros;
-	private final Inspector inspector;
+	public final Macros macros;
+	public final Inspector inspector;
+	public final boolean autobinding;
+	
 	private final List<Binding<?>> bindings;
-	private final boolean autobinding;
 
 	private Bindings( Macros macros, Inspector inspector, List<Binding<?>> bindings,
 			boolean autobinding ) {
@@ -53,30 +52,18 @@ public final class Bindings {
 	}
 
 	/**
-	 * @return the chosen strategy to pick the {@link Constructor}s or {@link Method}s used to
-	 *         create instances.
-	 */
-	public Inspector getInspector() {
-		return inspector;
-	}
-
-	public Macros getMacros() {
-		return macros;
-	}
-
-	/**
 	 * Add (accumulate) a binding described by the 4-tuple given.
 	 */
 	public <T> void add( Binding<T> binding ) {
 		if (!binding.isComplete()) {
-			throw new DIRuntimeException.BootstrappingException("Incomplete binding added: "+binding);
+			throw new BindingIsInconsistent("Incomplete binding added: "+binding);
 		}
 		bindings.add( binding );
 		if ( !autobinding ) {
 			return;
 		}
 		//OPEN this can be extracted to a macro by introducing a Auto type a macro could be bound to
-		for ( Type<? super T> supertype : binding.getType().supertypes() ) {
+		for ( Type<? super T> supertype : binding.type().supertypes() ) {
 			// Object is of cause a superclass of everything but not indented when doing auto-binds
 			if ( supertype.getRawType() != Object.class ) {
 				bindings.add( binding.typed( supertype ) );

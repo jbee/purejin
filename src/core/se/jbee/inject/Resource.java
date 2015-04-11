@@ -49,7 +49,7 @@ public final class Resource<T>
 	 * Does the {@link Type} of this a valid argument for the one of the {@link Dependency} given ?
 	 */
 	public boolean isAssignableTo( Dependency<? super T> dependency ) {
-		return instance.getType().isAssignableTo( dependency.getType() );
+		return instance.type().isAssignableTo( dependency.type() );
 	}
 
 	/**
@@ -63,12 +63,12 @@ public final class Resource<T>
 	 * Does this resource provide the instance wanted by the given {@link Dependency}'s {@link Name}
 	 */
 	public boolean isNameCompatibleWith( Dependency<? super T> dependency ) {
-		return instance.name.isCompatibleWith( dependency.getName() );
+		return instance.name.isCompatibleWith( dependency.name() );
 	}
 
 	@Override
-	public Type<T> getType() {
-		return instance.getType();
+	public Type<T> type() {
+		return instance.type();
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public final class Resource<T>
 		return instance + " " + target;
 	}
 
-	public Name getName() {
+	public Name name() {
 		return instance.name;
 	}
 

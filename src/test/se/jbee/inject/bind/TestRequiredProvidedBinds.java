@@ -7,7 +7,7 @@ import static se.jbee.inject.Dependency.dependency;
 
 import org.junit.Test;
 
-import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
@@ -97,7 +97,7 @@ public class TestRequiredProvidedBinds {
 
 	}
 
-	@Test ( expected = NoSuchResourceException.class )
+	@Test ( expected = NoResourceForDependency.class )
 	public void thatNotProvidedRequiredBindThrowsException() {
 		Bootstrap.injector( RequirementModule.class );
 	}
@@ -114,7 +114,7 @@ public class TestRequiredProvidedBinds {
 		try {
 			injector.resolve( dependency( UnusedImpl.class ) );
 			fail( "Should not be bound and therefore throw below exception" );
-		} catch ( NoSuchResourceException e ) {
+		} catch ( NoResourceForDependency e ) {
 			// expected this
 		} catch ( Throwable e ) {
 			fail( "Expected another exception but got: " + e );

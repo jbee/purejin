@@ -6,7 +6,7 @@ import static se.jbee.inject.Dependency.dependency;
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
-import se.jbee.inject.DIRuntimeException.MoreFrequentExpiryException;
+import se.jbee.inject.UnresolvableDependency.UnstableDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.container.Scoped;
 
@@ -34,7 +34,7 @@ public class TestScopedBinds {
 		}
 	}
 
-	@Test ( expected = MoreFrequentExpiryException.class )
+	@Test ( expected = UnstableDependency.class )
 	public void thatInjectingAnInjectionScopedInstanceIntoAppScopedInstanceThrowsAnException() {
 		Injector injector = Bootstrap.injector( ScopedBindsModule.class );
 		Foo foo = injector.resolve( dependency( Foo.class ) );

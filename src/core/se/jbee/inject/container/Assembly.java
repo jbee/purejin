@@ -26,12 +26,12 @@ import se.jbee.inject.Supplier;
  */
 public interface Assembly<T> {
 
-	Source getSource();
+	Source source();
 	
-	Resource<T> getResource();
+	Resource<T> resource();
 	
-	Scope getScope();
+	Scope scope();
 	
-	Supplier<? extends T> getSupplier();
+	Supplier<? extends T> supplier();
 	
 }

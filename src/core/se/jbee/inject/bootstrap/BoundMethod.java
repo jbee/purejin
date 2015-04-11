@@ -55,14 +55,14 @@ public final class BoundMethod<T>
 	}
 
 	@Override
-	public Type<T> getType() {
+	public Type<T> type() {
 		return returnType;
 	}
 
 	@SuppressWarnings ( "unchecked" )
 	@Override
 	public <E> BoundMethod<E> typed( Type<E> supertype ) {
-		getType().castTo( supertype ); // make sure is valid
+		type().castTo( supertype ); // make sure is valid
 		return (BoundMethod<E>) this;
 	}
 }

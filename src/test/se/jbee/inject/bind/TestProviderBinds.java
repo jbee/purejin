@@ -17,7 +17,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import se.jbee.inject.DIRuntimeException.MoreFrequentExpiryException;
+import se.jbee.inject.UnresolvableDependency.UnstableDependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
@@ -129,7 +129,7 @@ public class TestProviderBinds {
 		injector.resolve( dependency( WorkingStateConsumer.class ) );
 	}
 
-	@Test ( expected = MoreFrequentExpiryException.class )
+	@Test ( expected = UnstableDependency.class )
 	public void thatNoProviderCausesExceptionWhenPerInjectionInjectedIntoPerApplication() {
 		injector.resolve( dependency( FaultyStateConsumer.class ) );
 	}

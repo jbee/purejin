@@ -18,7 +18,7 @@ public interface Typed<T> {
 	/**
 	 * @return The {@link Type} of this object.
 	 */
-	Type<T> getType();
+	Type<T> type();
 
 	/**
 	 * @return This object with the given {@link Type}.

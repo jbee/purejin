@@ -20,5 +20,5 @@ public interface Injectron<T> {
 	 */
 	T instanceFor( Dependency<? super T> dependency );
 	
-	InjectronInfo<T> getInfo();
+	InjectronInfo<T> info();
 }

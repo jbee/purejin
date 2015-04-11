@@ -66,7 +66,7 @@ public final class Instance<T>
 	}
 
 	@Override
-	public Type<T> getType() {
+	public Type<T> type() {
 		return type;
 	}
 
@@ -92,7 +92,7 @@ public final class Instance<T>
 
 	@Override
 	public boolean isAssignableTo( Type<?> type ) {
-		return getType().isAssignableTo( type );
+		return type().isAssignableTo( type );
 	}
 
 	public static <T extends MorePreciseThan<? super T>> int comparePrecision( T one, T other ) {

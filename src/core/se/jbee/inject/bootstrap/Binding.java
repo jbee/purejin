@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Set;
 
 import se.jbee.inject.Array;
-import se.jbee.inject.DIRuntimeException;
-import se.jbee.inject.DIRuntimeException.BootstrappingException;
+import se.jbee.inject.BindingIsInconsistent;
+import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Resource;
@@ -57,36 +57,36 @@ public final class Binding<T>
 	}
 
 	@Override
-	public Resource<T> getResource() {
+	public Resource<T> resource() {
 		return resource;
 	}
 	
 	@Override
-	public Scope getScope() {
+	public Scope scope() {
 		return scope;
 	}
 	
 	@Override
-	public Source getSource() {
+	public Source source() {
 		return source;
 	}
 	
 	@Override
-	public Supplier<? extends T> getSupplier() {
+	public Supplier<? extends T> supplier() {
 		return supplier;
 	}
 	
 	@Override
-	public Type<T> getType() {
-		return resource.getType();
+	public Type<T> type() {
+		return resource.type();
 	}
 
 	@SuppressWarnings ( "unchecked" )
 	@Override
 	public <E> Binding<E> typed( Type<E> type ) {
-		if ( !getType().isAssignableTo( type ) ) {
+		if ( !type().isAssignableTo( type ) ) {
 			throw new ClassCastException(
-					"New type of a binding has to be a assignable from :" + getType() + " but was: " + type );
+					"New type of a binding has to be a assignable from :" + type() + " but was: " + type );
 		}
 		return new Binding<E>( resource.typed( type ), this.type, (Supplier<? extends E>) supplier,	scope, source );
 	}
@@ -106,8 +106,8 @@ public final class Binding<T>
 
 	@Override
 	public int compareTo( Binding<?> other ) {
-		int res = resource.getType().getRawType().getCanonicalName().compareTo(
-				other.resource.getType().getRawType().getCanonicalName() );
+		int res = resource.type().getRawType().getCanonicalName().compareTo(
+				other.resource.type().getRawType().getCanonicalName() );
 		if ( res != 0 ) {
 			return res;
 		}
@@ -152,14 +152,14 @@ public final class Binding<T>
 			DeclarationType oneType = one.source.declarationType;
 			DeclarationType otherType = other.source.declarationType;
 			if ( equalResource && oneType.clashesWith( otherType ) ) {
-				throw new BootstrappingException( "Duplicate binds:\n" + one + "\n" + other );
+				throw new BindingIsInconsistent( "Duplicate binds:\n" + one + "\n" + other );
 			}
 			if ( other.source.declarationType == DeclarationType.REQUIRED ) {
-				required.add( other.resource.getType() );
+				required.add( other.resource.type() );
 			} else if ( equalResource && oneType.nullifiedBy( otherType ) ) {
 				if ( i - 1 == lastDistinctIndex ) {
 					uniques.remove( uniques.size() - 1 );
-					nullified.add( one.resource.getType() );
+					nullified.add( one.resource.type() );
 				}
 			} else if ( !equalResource || !otherType.replacedBy( oneType ) ) {
 				uniques.add( other );
@@ -172,7 +172,7 @@ public final class Binding<T>
 		Set<Type<?>> bound = new HashSet<Type<?>>();
 		Set<Type<?>> provided = new HashSet<Type<?>>();
 		for ( Binding<?> b : uniques ) {
-			Type<?> type = b.resource.getType();
+			Type<?> type = b.resource.type();
 			if ( b.source.declarationType == DeclarationType.PROVIDED ) {
 				provided.add( type );
 			} else {
@@ -182,13 +182,13 @@ public final class Binding<T>
 		required.removeAll( bound );
 		if ( !provided.containsAll( required ) ) {
 			required.removeAll( provided );
-			throw new DIRuntimeException.NoSuchResourceException( required );
+			throw new UnresolvableDependency.NoResourceForDependency( required );
 		}
 		List<Binding<?>> res = new ArrayList<Binding<?>>( uniques.size() );
 		for ( int i = 0; i < uniques.size(); i++ ) {
 			Binding<?> b = uniques.get( i );
 			if ( b.source.declarationType != DeclarationType.PROVIDED
-					|| required.contains( b.resource.getType() ) ) {
+					|| required.contains( b.resource.type() ) ) {
 				res.add( b );
 			}
 		}

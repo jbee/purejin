@@ -5,7 +5,7 @@ import static se.jbee.inject.Name.named;
 
 import org.junit.Test;
 
-import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Name;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -25,12 +25,12 @@ public class TestInjectorExceptions {
 
 	private final Injector injector = Bootstrap.injector( TestInjectorBundle.class );
 
-	@Test ( expected = NoSuchResourceException.class )
+	@Test ( expected = NoResourceForDependency.class )
 	public void thatExceptionIsThrownWhenResolvingAnUnboundDependency() {
 		injector.resolve( dependency( String.class ) );
 	}
 
-	@Test ( expected = NoSuchResourceException.class )
+	@Test ( expected = NoResourceForDependency.class )
 	public void thatExceptionIsThrownWhenResolvingAnUnboundDependencyWithBoundRawType() {
 		injector.resolve( dependency( Integer.class ).named( Name.DEFAULT ) );
 	}

@@ -67,7 +67,7 @@ public class TestServiceInvocationBinds {
 		public <P, R> Long before(Type<P> parameter, P value, Type<R> result) {
 			beforeCount++;
 			assertTrue( "right type passed to before",
-					parameter.getType().equalTo( raw( String.class ) ) );
+					parameter.type().equalTo( raw( String.class ) ) );
 			assertEquals( "right value passed to before", value, "Foo" );
 			return 42L;
 		}

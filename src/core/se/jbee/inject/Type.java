@@ -146,7 +146,7 @@ public final class Type<T>
 	}
 
 	@Override
-	public Type<T> getType() {
+	public Type<T> type() {
 		return this;
 	}
 

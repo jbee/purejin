@@ -14,8 +14,8 @@ import java.beans.ConstructorProperties;
 
 import org.junit.Test;
 
-import se.jbee.inject.DIRuntimeException.BootstrappingException;
-import se.jbee.inject.DIRuntimeException.DependencyCycleException;
+import se.jbee.inject.BindingIsInconsistent;
+import se.jbee.inject.UnresolvableDependency.DependencyCycle;
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
@@ -169,7 +169,7 @@ public class TestBootstrapper {
 
 		@Override
 		public String supply( Dependency<? super String> dependency, Injector injector ) {
-			if ( !dependency.getName().equalTo( named( "lazy" ) ) ) {
+			if ( !dependency.name().equalTo( named( "lazy" ) ) ) {
 				eagers++;
 				return "eager";
 			}
@@ -224,19 +224,19 @@ public class TestBootstrapper {
 		assertThat( injector, notNullValue() );
 	}
 
-	@Test ( expected = BootstrappingException.class )
+	@Test ( expected = BindingIsInconsistent.class )
 	public void thatNonUniqueResourcesThrowAnException() {
 		Bootstrap.injector( ClashingBindsModule.class );
 	}
 
-	@Test ( expected = DependencyCycleException.class, timeout=50 )
+	@Test ( expected = DependencyCycle.class, timeout=50 )
 	public void thatDependencyCyclesAreDetected() {
 		Injector injector = Bootstrap.injector( CyclicBindsModule.class );
 		Foo foo = injector.resolve( dependency( Foo.class ) );
 		fail( "foo should not be resolvable but was: " + foo );
 	}
 
-	@Test ( expected = DependencyCycleException.class, timeout=50 )
+	@Test ( expected = DependencyCycle.class, timeout=50 )
 	public void thatDependencyCyclesInCirclesAreDetected() {
 		Injector injector = Bootstrap.injector( CircularBindsModule.class );
 		A a = injector.resolve( dependency( A.class ) );

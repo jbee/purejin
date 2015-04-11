@@ -16,7 +16,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import se.jbee.inject.Array;
-import se.jbee.inject.DIRuntimeException.BootstrappingException;
+import se.jbee.inject.BindingIsInconsistent;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Packages;
@@ -402,7 +402,7 @@ public class Binder {
 
 		private void declareBindingsIn( Binding<?> binding, Object value ) {
 			Bindings bindings = bind().bindings;
-			bindings.getMacros().expandInto(bindings, binding, value);
+			bindings.macros.expandInto(bindings, binding, value);
 		}
 
 		public void to( Factory<? extends T> factory ) {
@@ -433,14 +433,14 @@ public class Binder {
 		}
 
 		public void toConstructor() {
-			to( bind().getInspector().constructorFor( resource.getType().getRawType() ) );
+			to( bind().inspector().constructorFor( resource.type().getRawType() ) );
 		}
 
 		public void toConstructor( Class<? extends T> impl, Parameter<?>... parameters ) {
 			if ( metaclass( impl ).undeterminable() ) {
-				throw new BootstrappingException( "Not a constructable type: " + impl );
+				throw new BindingIsInconsistent( "Not a constructable type: " + impl );
 			}
-			to( bind().getInspector().constructorFor( impl ), parameters );
+			to( bind().inspector().constructorFor( impl ), parameters );
 		}
 
 		public void toConstructor( Parameter<?>... parameters ) {
@@ -481,7 +481,7 @@ public class Binder {
 		}
 
 		protected final Type<T> getType() {
-			return resource.getType();
+			return resource.type();
 		}
 
 		protected final TypedBinder<T> on( Bind bind ) {

@@ -1,6 +1,38 @@
 # Release notes
 
 
+v0.9
+===============
+
+> Release 0.9 contained no new features but renamed exceptions and "getters" for
+> better readability. 
+
+Exceptions got renamed to better reflect the problem (the generic term 
+`Exception` is no longer necessary).
+
+- renamed `DIRuntimeException` to `UnresolvableDependency`
+- renamed `DependencyCycleException` to `DependencyCycle`
+- renamed `NoSuchResourceException` to `NoResourceForDependency`
+- renamed `NoSuchFunctionException` to `NoMethodForDependency`
+- renamed `MoreFrequentExpiryException` to `UnstableDependency`
+- renamed `BootstrappingException` to `MisconfiguredBinding`
+
+- renamed `Typed#getType` to `type`
+- renamed `Resource#getName` to `name`
+- renamed `Injectron#getInfo` to `info`
+- renamed `Dependency#getName` to `name`
+- renamed `Dependency#getInstance` to `instance`
+- renamed getters in `Assembly` to not use `get` prefix
+- renamed getters in `Bindings` to not use `get` prefix
+- renamed `Bind#getInspector` to `inspector`
+
+- removed `Bindings#getInspector` (use field access)
+- removed `Bindings#getMacros` (use field access)
+
+- declared `BindingIsInconsistent` as `RuntimeException` 
+  (does not extend `UnresolvableDependency` any longer)
+- declared `UnresolvableDependency` as `abstract` (should not be instantiated)
+
 v0.8
 ===============
 
@@ -13,8 +45,8 @@ The `service` facility and the `Macro` expansion as well as the `Repository`
 abstraction have been redesigned. 
 The container implementation details have been moved to a new package 
 `container`. The data types have been cleaned up, field access now is the 
-prefered way to read immutable values.
-The type of thrown exception has been revised in favor of more specific 
+preferred way to read immutable values.
+The type of thrown exception has been revised in favour of more specific 
 exceptions and stated contracts have been added where possible. The naming of
 mostly internal types, fields and methods has been improved. 
 
@@ -74,7 +106,7 @@ M = changed/modified
 - redesigned `Injectron` interface (see `InjectronInfo`)
 - redesigned `Macro` interface changed completely
 
-- redefined `Injector` to retrun ab empty array if no bind existed for element 
+- redefined `Injector` to return an empty array if no bind existed for element 
   type instead of throwing an exception
 - redefined `Typed#typed` now explicitly has the contract to throw 
   `ClassCastException` when argument type is not valid

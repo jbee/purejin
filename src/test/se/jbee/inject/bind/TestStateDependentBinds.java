@@ -10,7 +10,7 @@ import static se.jbee.inject.container.Typecast.providerTypeOf;
 
 import org.junit.Test;
 
-import se.jbee.inject.DIRuntimeException.NoSuchResourceException;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
@@ -159,7 +159,7 @@ public class TestStateDependentBinds {
 			final Instance<T> actualToInject = Instance.instance( named(actualState), type );
 			try {
 				return injector.resolve( dependency.instanced( actualToInject ) );
-			} catch ( NoSuchResourceException e ) {
+			} catch ( NoResourceForDependency e ) {
 				if (actualState != null) { // when not trying default
 					return supply( dependency, injector, null ); // try default
 				}
