@@ -65,7 +65,7 @@ public final class Bindings {
 		//OPEN this can be extracted to a macro by introducing a Auto type a macro could be bound to
 		for ( Type<? super T> supertype : binding.type().supertypes() ) {
 			// Object is of cause a superclass of everything but not indented when doing auto-binds
-			if ( supertype.getRawType() != Object.class ) {
+			if ( supertype.rawType != Object.class ) {
 				bindings.add( binding.typed( supertype ) );
 			}
 		}

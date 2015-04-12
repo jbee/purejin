@@ -17,7 +17,6 @@ thrown (even though these are not checked exceptions).
 - renamed `NoSuchFunctionException` to `NoMethodForDependency`
 - renamed `MoreFrequentExpiryException` to `UnstableDependency`
 - renamed `BootstrappingException` to `InconsistentBinding`
-
 - renamed `Typed#getType` to `type`
 - renamed `Resource#getName` to `name`
 - renamed `Injectron#getInfo` to `info`
@@ -26,13 +25,23 @@ thrown (even though these are not checked exceptions).
 - renamed getters in `Assembly` to not use `get` prefix
 - renamed getters in `Bindings` to not use `get` prefix
 - renamed `Bind#getInspector` to `inspector`
+- renamed `Type#getArrayType` to `addArrayDimension`
+- renamed `Type#getParameters` to `parameters` (does a clone!)
+- renamed `Type#allArgumentsAreUpperBounds` to `areAllTypeParametersAreUpperBounds`
 
+- removed `Type#getRawType` (use field access)
+- removed `Type#isFinal` (not used)
 - removed `Bindings#getInspector` (use field access)
 - removed `Bindings#getMacros` (use field access)
 
 - declared `InconsistentBinding` as `RuntimeException` 
   (does not extend `UnresolvableDependency` any longer)
 - declared `UnresolvableDependency` as `abstract` (should not be instantiated)
+
+- fixed bug in `Type#supertypes()` that added `Object` for interface instead of 
+  classes
+- changed `Type#elementType` to `baseType` (returns non-array type)
+
 
 v0.8
 ===============

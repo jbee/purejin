@@ -21,13 +21,13 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Injectron;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
+import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bind.BinderModule;
 import se.jbee.inject.bootstrap.Inspect;
 import se.jbee.inject.bootstrap.Inspector;
@@ -234,7 +234,7 @@ public abstract class ServiceModule
 			Object[] state = before( params );
 			T res = null;
 			try {
-				res = returnType.getRawType().cast( method.invoke( implementor, args ) );
+				res = returnType.rawType.cast( method.invoke( implementor, args ) );
 			} catch ( Exception e ) {
 				if ( e instanceof InvocationTargetException ) {
 					Throwable t = ( (InvocationTargetException) e ).getTargetException();

@@ -72,7 +72,7 @@ public final class Packages
 	private static String packageNameOf( Type<?> packageOf ) {
 		return packageOf.isUpperBound()
 			? "-NONE-"
-			: packageNameOf( packageOf.getRawType() );
+			: packageNameOf( packageOf.rawType );
 	}
 
 	private final String[] roots;

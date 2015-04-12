@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import se.jbee.inject.Array;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Expiry;
 import se.jbee.inject.Injector;
@@ -26,6 +25,7 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 
 /**
  * Utility to create/use the core containers {@link Injector} and {@link Injectron}.
@@ -78,10 +78,10 @@ public final class Inject {
 			if ( injectrons.length == 0 ) {
 				return map;
 			}
-			Class<?> lastRawType = injectrons[0].info().resource.type().getRawType();
+			Class<?> lastRawType = injectrons[0].info().resource.type().rawType;
 			int start = 0;
 			for ( int i = 0; i < injectrons.length; i++ ) {
-				Class<?> rawType = injectrons[i].info().resource.type().getRawType();
+				Class<?> rawType = injectrons[i].info().resource.type().rawType;
 				if ( rawType != lastRawType ) {
 					map.put( lastRawType, Arrays.copyOfRange( injectrons, start, i ) );
 					start = i;
@@ -116,15 +116,15 @@ public final class Inject {
 			}
 			if ( array == 1 ) {
 				//OPEN what about 2D array to get all "values" when the "value" type is a 1D array ? Test if this works
-				return resolveArray( dependency, type.elementType() );
+				return resolveArray( dependency, type.baseType() );
 			}
-			if ( type.getRawType() == Injectron.class ) {
+			if ( type.rawType == Injectron.class ) {
 				Injectron<?> i = matchingInjectron( dependency.onTypeParameter() );
 				if ( i != null ) {
 					return (T) i;
 				}
 			}
-			if ( type.getRawType() == Injector.class ) {
+			if ( type.rawType == Injector.class ) {
 				return (T) this;
 			}
 			throw noInjectronFor( dependency );
@@ -152,14 +152,14 @@ public final class Inject {
 		}
 
 		private <T, E> T resolveArray( Dependency<T> dependency, Type<E> elementType ) {
-			if ( elementType.getRawType() == Injectron.class ) {
+			if ( elementType.rawType == Injectron.class ) {
 				return resolveInjectronArray( dependency, elementType.parameter( 0 ) );
 			}
 			Injectron<E>[] elementInjectrons = injectronsForType( elementType );
 			if ( elementInjectrons != null ) {
 				List<E> elements = new ArrayList<E>( elementInjectrons.length );
 				addAllMatching( elements, dependency, elementType, elementInjectrons );
-				if ( dependency.type().getRawType().getComponentType().isPrimitive() ) {
+				if ( dependency.type().rawType.getComponentType().isPrimitive() ) {
 					throw new NoResourceForDependency(dependency, null,
 							"Primitive arrays cannot be used to inject all instances of the wrapper type. Use the wrapper array instead." );
 				}
@@ -179,7 +179,7 @@ public final class Inject {
 				return toArray( elements, elementType );
 			}
 			@SuppressWarnings("unchecked")
-			T empty = (T) Array.newInstance(elementType.getRawType(), 0);
+			T empty = (T) Array.newInstance(elementType.rawType, 0);
 			return empty;
 		}
 
@@ -223,12 +223,12 @@ public final class Inject {
 
 		@SuppressWarnings ( "unchecked" )
 		private static <T, E> T toArray( List<? extends E> elements, Type<E> elementType ) {
-			return (T) Array.of( elements, elementType.getRawType() );
+			return (T) Array.of( elements, elementType.rawType );
 		}
 
 		@SuppressWarnings ( "unchecked" )
 		private <T> Injectron<T>[] injectronsForType( Type<T> type ) {
-			return (Injectron<T>[]) injectrons.get( type.getRawType() );
+			return (Injectron<T>[]) injectrons.get( type.rawType );
 		}
 
 		@Override
@@ -322,8 +322,8 @@ public final class Inject {
 		public int compare( Injectron<?> one, Injectron<?> other ) {
 			Resource<?> r1 = one.info().resource;
 			Resource<?> r2 = other.info().resource;
-			Class<?> c1 = r1.type().getRawType();
-			Class<?> c2 = r2.type().getRawType();
+			Class<?> c1 = r1.type().rawType;
+			Class<?> c2 = r2.type().rawType;
 			if ( c1 != c2 ) {
 				return c1.getCanonicalName().compareTo( c2.getCanonicalName() );
 			}

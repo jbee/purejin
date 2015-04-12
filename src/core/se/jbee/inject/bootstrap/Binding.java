@@ -12,15 +12,15 @@ import java.util.List;
 import java.util.Set;
 
 import se.jbee.inject.Array;
-import se.jbee.inject.InconsistentBinding;
-import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.DeclarationType;
+import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Source;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 import se.jbee.inject.Typed;
+import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.container.Assembly;
 import se.jbee.inject.container.Scope;
 
@@ -106,8 +106,8 @@ public final class Binding<T>
 
 	@Override
 	public int compareTo( Binding<?> other ) {
-		int res = resource.type().getRawType().getCanonicalName().compareTo(
-				other.resource.type().getRawType().getCanonicalName() );
+		int res = resource.type().rawType.getCanonicalName().compareTo(
+				other.resource.type().rawType.getCanonicalName() );
 		if ( res != 0 ) {
 			return res;
 		}

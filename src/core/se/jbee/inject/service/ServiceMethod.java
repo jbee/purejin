@@ -18,8 +18,8 @@ package se.jbee.inject.service;
 public interface ServiceMethod<P, R> {
 
 	/**
-	 * @return the value results from the execution of this service with the given argument as
-	 *         parameter.
+	 * @return the value results from the execution of this service with the
+	 *         given argument as parameter.
 	 */
 	R invoke( P params );
 

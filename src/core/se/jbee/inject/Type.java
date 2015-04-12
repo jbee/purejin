@@ -68,7 +68,7 @@ public final class Type<T>
 
 	@SuppressWarnings ( "unchecked" )
 	public static <T> Type<T> elementType( Class<T[]> arrayType ) {
-		return (Type<T>) raw( arrayType ).elementType();
+		return (Type<T>) raw( arrayType ).baseType();
 	}
 
 	public static <T> Type<T> raw( Class<T> type ) {
@@ -105,7 +105,7 @@ public final class Type<T>
 		}
 		if ( type instanceof GenericArrayType ) {
 			GenericArrayType gat = (GenericArrayType) type;
-			return type( gat.getGenericComponentType() ).getArrayType();
+			return type( gat.getGenericComponentType() ).addArrayDimension();
 		}
 		if ( type instanceof WildcardType ) {
 			WildcardType wt = (WildcardType) type;
@@ -124,7 +124,7 @@ public final class Type<T>
 		return new Type<T>( rawType, types( type.getActualTypeArguments(), actualTypeArguments ) );
 	}
 
-	private final Class<T> rawType;
+	public final Class<T> rawType;
 	private final Type<?>[] params;
 
 	/**
@@ -178,7 +178,7 @@ public final class Type<T>
 	}
 
 	@SuppressWarnings ( "unchecked" )
-	public Type<T[]> getArrayType() {
+	public Type<T[]> addArrayDimension() {
 		Object proto = Array.newInstance( rawType, 0 );
 		return new Type<T[]>( upperBound, (Class<T[]>) proto.getClass(), params );
 	}
@@ -215,35 +215,22 @@ public final class Type<T>
 	 * @return in case of an array type the {@link Class#getComponentType()} with the same type
 	 *         parameters as this type or otherwise this type.
 	 */
-	public Type<?> elementType() {
-		Type<?> elemRawType = elementRawType();
-		return elemRawType == this
-			? this
-			: elemRawType.parametized( params );
-	}
-
-	/**
-	 * @return in case of an array type the {@link Class#getComponentType()} otherwise this type.
-	 */
-	private Type<?> elementRawType() {
-		return asElementRawType( rawType.getComponentType() );
-	}
-
-	private <E> Type<?> asElementRawType( Class<E> elementType ) {
-		return rawType.isArray()
-			? new Type<E>( upperBound, elementType, params )
-			: this;
-	}
-
-	public Class<T> getRawType() {
-		return rawType;
+	@SuppressWarnings("unchecked")
+	public <B> Type<?> baseType() {
+		if (!rawType.isArray())
+			return this;
+		Class<?> baseType = rawType;
+		while (baseType.isArray()) {
+			baseType = baseType.getComponentType();
+		}
+		return new Type<B>( upperBound, (Class<B>)baseType, params );
 	}
 
 	/**
 	 * @return The actual type parameters (arguments).
 	 */
-	public Type<?>[] getParameters() {
-		return params;
+	public Type<?>[] parameters() {
+		return params.clone();
 	}
 
 	public Type<?> parameter( int index ) {
@@ -268,7 +255,7 @@ public final class Type<T>
 			return allParametersAreAssignableTo( other );
 		}
 		@SuppressWarnings ( "unchecked" )
-		Class<? super T> commonRawType = (Class<? super T>) other.getRawType();
+		Class<? super T> commonRawType = (Class<? super T>) other.rawType;
 		Type<?> asOther = supertype( commonRawType, this );
 		return asOther.allParametersAreAssignableTo( other );
 	}
@@ -295,10 +282,6 @@ public final class Type<T>
 
 	public boolean isAbstract() {
 		return Modifier.isAbstract( rawType.getModifiers() );
-	}
-
-	public boolean isFinal() {
-		return Modifier.isFinal( rawType.getModifiers() );
 	}
 
 	/**
@@ -387,7 +370,7 @@ public final class Type<T>
 			}
 			return this;
 		}
-		if ( allArgumentsAreUpperBounds() ) {
+		if ( areAllTypeParametersAreUpperBounds() ) {
 			return this;
 		}
 		Type<?>[] parameters = new Type<?>[params.length];
@@ -408,14 +391,13 @@ public final class Type<T>
 	/**
 	 * @return True when all type parameters are upper bounds.
 	 */
-	public boolean allArgumentsAreUpperBounds() {
-		int c = 0;
+	public boolean areAllTypeParametersAreUpperBounds() {
 		for ( int i = 0; i < params.length; i++ ) {
-			if ( params[i].isUpperBound() ) {
-				c++;
+			if ( !params[i].isUpperBound() ) {
+				return false;
 			}
 		}
-		return c == params.length;
+		return true;
 	}
 
 	public Type<T> parametized( Class<?>... arguments ) {
@@ -427,15 +409,13 @@ public final class Type<T>
 	}
 
 	public Type<T> parametized( Type<?>... parameters ) {
-		checkParameters( parameters );
+		checkTypeParameters( parameters );
 		return new Type<T>( upperBound, rawType, parameters );
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder b = new StringBuilder();
-		toString( b, true );
-		return b.toString();
+		return name(true);
 	}
 
 	void toString( StringBuilder b, boolean canonicalName ) {
@@ -467,18 +447,21 @@ public final class Type<T>
 	}
 
 	public String simpleName() {
+		return name(false);
+	}
+
+	private String name(boolean canonicalName) {
 		StringBuilder b = new StringBuilder();
-		toString( b, false );
+		toString( b, canonicalName );
 		return b.toString();
 	}
 
-	private void checkParameters( Type<?>... parameters ) {
+	private void checkTypeParameters( Type<?>... parameters ) {
 		if ( parameters.length == 0 ) {
-			return; // its treated as raw-type
+			return; // is treated as raw-type
 		}
-		if ( arrayDimensions() == 1 ) {
-			//FIXME most likely the element type should always be a non-array type even when multi dimensional arrays are used 
-			elementRawType().checkParameters( parameters );
+		if ( arrayDimensions() > 0 ) {
+			baseType().checkTypeParameters( parameters );
 			return;
 		}
 		TypeVariable<Class<T>>[] vars = rawType.getTypeParameters();
@@ -504,12 +487,11 @@ public final class Type<T>
 			return raw( supertype ); // just for better performance 
 		}
 		for ( Type<?> s : type.supertypes() ) {
-			if ( s.getRawType() == supertype ) {
+			if ( s.rawType == supertype ) {
 				return (Type<? extends S>) s;
 			}
 		}
-		throw new IllegalArgumentException( "`" + supertype + "` is not a supertype of: `" + type
-				+ "`" );
+		throw new IllegalArgumentException( "`" + supertype + "` is not a supertype of: `" + type + "`" );
 	}
 
 	/**
@@ -523,7 +505,7 @@ public final class Type<T>
 		java.lang.reflect.Type genericSupertype = null;
 		Type<?> type = this;
 		Map<String, Type<?>> actualTypeArguments = actualTypeArguments( type );
-		if ( isInterface() ) {
+		if ( !isInterface() ) {
 			res.add( OBJECT );
 		}
 		while ( supertype != null ) {
@@ -551,8 +533,7 @@ public final class Type<T>
 		return actualTypeArguments;
 	}
 
-	private void addSuperInterfaces( Set<Type<?>> res, Class<?> type,
-			Map<String, Type<?>> actualTypeArguments ) {
+	private void addSuperInterfaces( Set<Type<?>> res, Class<?> type, Map<String, Type<?>> actualTypeArguments ) {
 		Class<?>[] interfaces = type.getInterfaces();
 		java.lang.reflect.Type[] genericInterfaces = type.getGenericInterfaces();
 		for ( int i = 0; i < interfaces.length; i++ ) {
@@ -598,5 +579,4 @@ public final class Type<T>
 		}
 		throw new UnsupportedOperationException( "The primitive " + primitive + " cannot be wrapped yet!" );
 	}
-
 }

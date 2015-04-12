@@ -16,8 +16,8 @@ import static se.jbee.inject.bootstrap.Supply.parametrizedInstance;
 import java.lang.reflect.Constructor;
 
 import se.jbee.inject.Array;
-import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.DeclarationType;
+import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Resource;
@@ -66,7 +66,7 @@ public final class Macros {
 	 */
 	@SuppressWarnings ( "unchecked" )
 	public <T> Macros with( Macro<T> macro ) {
-		Class<?> type = Type.supertype( Macro.class, Type.raw( macro.getClass() ) ).parameter( 0 ).getRawType();
+		Class<?> type = Type.supertype( Macro.class, Type.raw( macro.getClass() ) ).parameter( 0 ).rawType;
 		return with( (Class<? super T>) type, macro );
 	}
 
@@ -206,7 +206,7 @@ public final class Macros {
 			if ( t.isAssignableTo( raw( Supplier.class ) )
 					&& !binding.type().isAssignableTo( raw( Supplier.class ) ) ) {
 				@SuppressWarnings ( "unchecked" )
-				Class<? extends Supplier<? extends T>> supplier = (Class<? extends Supplier<? extends T>>) t.getRawType();
+				Class<? extends Supplier<? extends T>> supplier = (Class<? extends Supplier<? extends T>>) t.rawType;
 				bindings.macros.expandInto(bindings, binding.complete( LINK, Supply.reference( supplier ) ));
 				implicitlyBindToConstructor( binding, linked, bindings );
 				return;
@@ -221,13 +221,13 @@ public final class Macros {
 			if ( type.isInterface() ) {
 				throw new InconsistentBinding( "Interface type linked in a loop: " + bound	+ " > " + linked );
 			}
-			bindToInspectedConstructor(bindings, binding, type.getRawType() );
+			bindToInspectedConstructor(bindings, binding, type.rawType );
 		}
 
 	}
 
 	static <T> void implicitlyBindToConstructor( Binding<?> incomplete, Instance<T> instance, Bindings bindings ) {
-		Class<T> impl = instance.type().getRawType();
+		Class<T> impl = instance.type().rawType;
 		if (!metaclass( impl ).undeterminable()) {
 			Binding<T> binding = Binding.binding(  new Resource<T>( instance, Target.ANY ),
 					BindingType.CONSTRUCTOR, null, incomplete.scope,

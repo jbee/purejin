@@ -72,7 +72,7 @@ public class TestBinderModule {
 	@SuppressWarnings("unchecked")
 	private static <T> Binding<T> forType(Class<T> type, Binding<?>[] bindings) {
 		for (Binding<?> b : bindings) {
-			if (b.type().getRawType() == type)
+			if (b.type().rawType == type)
 				return (Binding<T>) b;
 		}
 		return null;

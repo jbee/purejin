@@ -109,8 +109,22 @@ public class TestType {
 	@Test
 	public void testGenericArrays() {
 		Type<Class[]> classArray = Type.raw( Class[].class ).parametized( String.class );
-		assertThat( classArray.elementType().toString(), is( "java.lang.Class<java.lang.String>" ) );
+		assertThat( classArray.baseType().toString(), is( "java.lang.Class<java.lang.String>" ) );
 		assertThat( classArray.toString(), is( "java.lang.Class<java.lang.String>[]" ) );
+	}
+
+	@Test
+	public void testTwoDimensionalGenericArrays() {
+		Type<Class[][]> classArray = Type.raw( Class[][].class ).parametized( String.class );
+		assertThat( classArray.baseType().toString(), is( "java.lang.Class<java.lang.String>" ) );
+		assertThat( classArray.toString(), is( "java.lang.Class<java.lang.String>[][]" ) );
+	}
+	
+	@Test
+	public void testMultiDimensionalGenericArrays() {
+		Type<Class[][][]> classArray = Type.raw( Class[][][].class ).parametized( String.class );
+		assertThat( classArray.baseType().toString(), is( "java.lang.Class<java.lang.String>" ) );
+		assertThat( classArray.toString(), is( "java.lang.Class<java.lang.String>[][][]" ) );
 	}
 
 	@Test
@@ -184,7 +198,7 @@ public class TestType {
 	@Test
 	public void testArrayType() {
 		Type<? extends Number> t = Type.raw( Number.class ).asUpperBound();
-		assertThat( t.getArrayType().toString(), is( "? extends java.lang.Number[]" ) );
+		assertThat( t.addArrayDimension().toString(), is( "? extends java.lang.Number[]" ) );
 	}
 
 	@Test

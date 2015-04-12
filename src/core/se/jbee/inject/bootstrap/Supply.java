@@ -123,7 +123,7 @@ public final class Supply {
 		@Override
 		public final T supply( Dependency<? super T> dependency, Injector injector ) {
 			Type<?> elementType = dependency.type().parameter( 0 );
-			return bridge( supplyArray( dependency.typed( elementType.getArrayType() ), injector ) );
+			return bridge( supplyArray( dependency.typed( elementType.addArrayDimension() ), injector ) );
 		}
 
 		private static <E> E[] supplyArray( Dependency<E[]> elementType, Injector resolver ) {
@@ -234,8 +234,8 @@ public final class Supply {
 		@SuppressWarnings ( "unchecked" )
 		@Override
 		public E[] supply( Dependency<? super E[]> dependency, Injector injector ) {
-			final Type<?> elementType = arrayType.elementType();
-			final E[] res = (E[]) Array.newInstance( elementType.getRawType(), elements.length );
+			final Type<?> elementType = arrayType.baseType();
+			final E[] res = (E[]) Array.newInstance( elementType.rawType, elements.length );
 			final Dependency<E> elementDependency = (Dependency<E>) dependency.typed( elementType );
 			int i = 0;
 			for ( BoundParameter<? extends E> e : elements ) {
@@ -281,7 +281,7 @@ public final class Supply {
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
 			Type<? super T> type = dependency.type();
 			Instance<? extends T> parametrized = instance.typed( instance.type().parametized(
-					type.getParameters() ).upperBound( dependency.type().isUpperBound() ) );
+					type.parameters() ).upperBound( dependency.type().isUpperBound() ) );
 			return injector.resolve( dependency.instanced( parametrized ) );
 		}
 
@@ -424,7 +424,7 @@ public final class Supply {
 			if ( factory.isInstanceMethod() && owner == null ) {
 				owner = injector.resolve( Dependency.dependency( factory.factory.getDeclaringClass() ) );
 			}
-			return factory.returnType.getRawType().cast(
+			return factory.returnType.rawType.cast(
 					Invoke.method( factory.factory, owner,
 							resolveParameters( dependency, injector, params ) ) );
 		}
@@ -467,7 +467,7 @@ public final class Supply {
 
 		@Override
 		public <P> Logger produce( Instance<? super Logger> produced, Instance<P> injectedInto ) {
-			return Logger.getLogger( injectedInto.type().getRawType().getCanonicalName() );
+			return Logger.getLogger( injectedInto.type().rawType.getCanonicalName() );
 		}
 
 	}

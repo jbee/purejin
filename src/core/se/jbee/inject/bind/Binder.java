@@ -433,7 +433,7 @@ public class Binder {
 		}
 
 		public void toConstructor() {
-			to( bind().inspector().constructorFor( resource.type().getRawType() ) );
+			to( bind().inspector().constructorFor( resource.type().rawType ) );
 		}
 
 		public void toConstructor( Class<? extends T> impl, Parameter<?>... parameters ) {
@@ -444,7 +444,7 @@ public class Binder {
 		}
 
 		public void toConstructor( Parameter<?>... parameters ) {
-			toConstructor( getType().getRawType(), parameters );
+			toConstructor( getType().rawType, parameters );
 		}
 
 		public <I extends T> void to( Name name, Class<I> type ) {
@@ -547,11 +547,11 @@ public class Binder {
 
 		@SuppressWarnings ( "unchecked" )
 		private E[] array( Object... elements ) {
-			Class<E[]> rawType = getType().getRawType();
+			Class<E[]> rawType = getType().rawType;
 			if ( elements.getClass() == rawType ) {
 				return (E[]) elements;
 			}
-			Object[] a = Array.newInstance( getType().elementType().getRawType(), elements.length );
+			Object[] a = Array.newInstance( getType().baseType().rawType, elements.length );
 			System.arraycopy( elements, 0, a, 0, a.length );
 			return (E[]) a;
 		}
