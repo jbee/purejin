@@ -1,3 +1,8 @@
+/*
+ *  Copyright (c) 2012-2013, Jan Bernitt 
+ *			
+ *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
+ */
 package se.jbee.inject;
 
 /**
@@ -5,10 +10,12 @@ package se.jbee.inject;
  * the context of a container) this exception is thrown during
  * bootstrapping. It is never thrown after the bootstrapping step has
  * finished (a {@link Injector} was created successfully).
+ * 
+ * @see UnresolvableDependency
  */
-public final class BindingIsInconsistent extends RuntimeException {
+public final class InconsistentBinding extends RuntimeException {
 
-	public BindingIsInconsistent(String message) {
+	public InconsistentBinding(String message) {
 		super(message);
 	}
 	

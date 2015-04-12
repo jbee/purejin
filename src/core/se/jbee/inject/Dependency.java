@@ -146,19 +146,19 @@ public final class Dependency<T>
 	/**
 	 * Means we inject into the argument target class.
 	 */
-	public Dependency<T> injectingInto( Class<?> target ) {
+	public Dependency<T> injectingInto( Class<?> target ) throws DependencyCycle, UnstableDependency {
 		return injectingInto( raw( target ) );
 	}
 
-	public Dependency<T> injectingInto( Type<?> target ) {
+	public Dependency<T> injectingInto( Type<?> target ) throws DependencyCycle, UnstableDependency {
 		return injectingInto( defaultInstanceOf( target ) );
 	}
 
-	public <I> Dependency<T> injectingInto( Instance<I> target ) {
+	public <I> Dependency<T> injectingInto( Instance<I> target ) throws DependencyCycle, UnstableDependency {
 		return injectingInto( new Resource<I>(target), Expiry.NEVER );
 	}
 
-	public Dependency<T> injectingInto( Resource<?> target, Expiry expiry ) {
+	public Dependency<T> injectingInto( Resource<?> target, Expiry expiry ) throws DependencyCycle, UnstableDependency {
 		Injection injection = new Injection( instance, target, expiry );
 		if ( hierarchy.length == 0 ) {
 			return new Dependency<T>( instance, injection );
@@ -172,7 +172,7 @@ public final class Dependency<T>
 		if ( hierarchy.length <= 1 ) {
 			return untargeted();
 		}
-		return new Dependency<T>( instance, Array.copy( hierarchy, hierarchy.length - 1 ) );
+		return new Dependency<T>( instance, Arrays.copyOf( hierarchy, hierarchy.length - 1 ) );
 	}
 
 	private void ensureNoCycle( Injection injection ) throws DependencyCycle {

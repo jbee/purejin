@@ -6,6 +6,7 @@
 package se.jbee.inject.service;
 
 import se.jbee.inject.Type;
+import se.jbee.inject.UnresolvableDependency.NoMethodForDependency;
 
 /**
  * A {@link ServiceProvider} resolves {@link ServiceMethod}s by {@link Type}.
@@ -15,8 +16,8 @@ import se.jbee.inject.Type;
 public interface ServiceProvider {
 
 	/**
-	 * @return the {@link ServiceMethod} that implements a service having the given parameter and
-	 *         return {@link Type}.
+	 * @return the {@link ServiceMethod} that implements a service having the
+	 *         given parameter and return {@link Type}.
 	 */
-	<P, R> ServiceMethod<P, R> provide( Type<P> parameterType, Type<R> returnType );
+	<P, R> ServiceMethod<P, R> provide( Type<P> parameterType, Type<R> returnType ) throws NoMethodForDependency;
 }

@@ -107,7 +107,7 @@ public class Inspect
 				res.add( Instance.instance( name, types[i] ) );
 			}
 		}
-		return Array.of( res, NO_PARAMETERS );
+		return Array.of(res, Parameter.class);
 	}
 
 	@Override
@@ -147,7 +147,7 @@ public class Inspect
 				res.add( m );
 			}
 		}
-		return Array.of( res, NO_METHODS );
+		return Array.of( res, Method.class );
 	}
 
 	/**

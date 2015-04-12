@@ -29,7 +29,7 @@ public interface Macro<V> {
 	 *            express the intent of the incomplete binding. This
 	 *            {@link Macro} will use them especially to decide the
 	 *            {@link Supplier} used.
-	 * @param binding
+	 * @param incomplete
 	 *            A usually incomplete {@link Binding} (without a
 	 *            {@link Supplier})
 	 * @param bindings

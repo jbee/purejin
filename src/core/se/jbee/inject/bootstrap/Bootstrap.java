@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import se.jbee.inject.Array;
-import se.jbee.inject.BindingIsInconsistent;
+import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Injectron;
 import se.jbee.inject.Type;
@@ -81,7 +81,7 @@ public final class Bootstrap {
 
 	public static void nonnullThrowsReentranceException( Object field ) {
 		if ( field != null ) {
-			throw new BindingIsInconsistent( "Reentrance not allowed!" );
+			throw new InconsistentBinding( "Reentrance not allowed!" );
 		}
 	}
 
@@ -268,8 +268,7 @@ public final class Bootstrap {
 			}
 		}
 
-		private void addAllInstalledIn( Class<? extends Bundle> bundle,
-				Set<Class<? extends Bundle>> accu ) {
+		private void addAllInstalledIn( Class<? extends Bundle> bundle, Set<Class<? extends Bundle>> accu ) {
 			accu.add( bundle );
 			Set<Class<? extends Bundle>> children = bundleChildren.get( bundle );
 			if ( children == null ) {

@@ -16,14 +16,9 @@ package se.jbee.inject;
 public interface Supplier<T> {
 
 	/**
-	 * This {@link Supplier} is asked to supply the instance that should be used the given
-	 * {@link Dependency}.
-	 * 
-	 * @param injector
-	 *            The {@link Injector} is used to resolve {@link Dependency}s during a possible
-	 *            object creation of the returned instance.
-	 * @return the instance created or resolved.
+	 * This {@link Supplier} is asked to supply the instance that is used for
+	 * the given {@link Dependency} (probably with help of the {@link Injector}).
 	 */
-	T supply( Dependency<? super T> dependency, Injector injector );
+	T supply( Dependency<? super T> dependency, Injector injector ) throws UnresolvableDependency;
 
 }

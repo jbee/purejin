@@ -28,7 +28,6 @@ public enum DeclarationType implements MorePreciseThan<DeclarationType> {
 	 * !!!ATTENTION!!! - the order of constants matters to the logic!
 	 */
 	
-	
 	/**
 	 * Has been added by the binder as a fall-back since some bind-calls can
 	 * have ambiguous intentions.

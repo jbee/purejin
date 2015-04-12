@@ -6,6 +6,7 @@
 package se.jbee.inject.container;
 
 import se.jbee.inject.Supplier;
+import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bootstrap.Bundle;
 
 /**
@@ -23,8 +24,5 @@ import se.jbee.inject.bootstrap.Bundle;
  */
 public interface Provider<T> {
 
-	/**
-	 * @return the current instance.
-	 */
-	T provide();
+	T provide() throws UnresolvableDependency;
 }

@@ -14,7 +14,7 @@ import java.beans.ConstructorProperties;
 
 import org.junit.Test;
 
-import se.jbee.inject.BindingIsInconsistent;
+import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.UnresolvableDependency.DependencyCycle;
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Dependency;
@@ -224,7 +224,7 @@ public class TestBootstrapper {
 		assertThat( injector, notNullValue() );
 	}
 
-	@Test ( expected = BindingIsInconsistent.class )
+	@Test ( expected = InconsistentBinding.class )
 	public void thatNonUniqueResourcesThrowAnException() {
 		Bootstrap.injector( ClashingBindsModule.class );
 	}

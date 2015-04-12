@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import se.jbee.inject.Array;
-import se.jbee.inject.BindingIsInconsistent;
+import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Instance;
@@ -152,7 +152,7 @@ public final class Binding<T>
 			DeclarationType oneType = one.source.declarationType;
 			DeclarationType otherType = other.source.declarationType;
 			if ( equalResource && oneType.clashesWith( otherType ) ) {
-				throw new BindingIsInconsistent( "Duplicate binds:\n" + one + "\n" + other );
+				throw new InconsistentBinding( "Duplicate binds:\n" + one + "\n" + other );
 			}
 			if ( other.source.declarationType == DeclarationType.REQUIRED ) {
 				required.add( other.resource.type() );

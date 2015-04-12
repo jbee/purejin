@@ -16,7 +16,7 @@ import static se.jbee.inject.bootstrap.Supply.parametrizedInstance;
 import java.lang.reflect.Constructor;
 
 import se.jbee.inject.Array;
-import se.jbee.inject.BindingIsInconsistent;
+import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
@@ -80,8 +80,7 @@ public final class Macros {
 	 * @return A set of {@link Macros} containing the given one
 	 */
 	public <T> Macros with( Class<T> type, Macro<? extends T> macro ) {
-		final int index = index( type );
-		return new Macros( Array.insert( types, type, index ), Array.insert( macros, macro, index ) );
+		return new Macros( Array.prepand(type, types), Array.prepand( macro, macros ) );
 	}
 
 	/**
@@ -95,7 +94,7 @@ public final class Macros {
 	 * @param value
 	 *            Non-null value to expand via matching {@link Macro}
 	 * 
-	 * @throws BindingIsInconsistent
+	 * @throws InconsistentBinding
 	 *             In case no {@link Macro} had been declared for the type of
 	 *             value argument
 	 */
@@ -111,7 +110,7 @@ public final class Macros {
 	private <V> Macro<? super V> macroForValueOf( final Class<? extends V> type ) {
 		int index = index( type );
 		if ( index < 0 ) {
-			throw new BindingIsInconsistent( "No macro for type:" + type.getCanonicalName() );
+			throw new InconsistentBinding( "No macro for type:" + type.getCanonicalName() );
 		}
 		return (Macro<? super V>) macros[index];
 	}
@@ -133,7 +132,7 @@ public final class Macros {
 		@Override
 		public <T> void expand(Binding<?> binding, Binding<T> incomplete, Bindings bindings) {
 			if ( !binding.isComplete() ) { // At this point the binding should be complete
-				throw new BindingIsInconsistent( "Tried to add an incomplete binding to bindings: "+incomplete );
+				throw new InconsistentBinding( "Tried to add an incomplete binding to bindings: "+incomplete );
 			}
 			bindings.add(binding); 
 		}
@@ -220,7 +219,7 @@ public final class Macros {
 				return;
 			}
 			if ( type.isInterface() ) {
-				throw new BindingIsInconsistent( "Interface type linked in a loop: " + bound	+ " > " + linked );
+				throw new InconsistentBinding( "Interface type linked in a loop: " + bound	+ " > " + linked );
 			}
 			bindToInspectedConstructor(bindings, binding, type.getRawType() );
 		}

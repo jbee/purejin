@@ -28,10 +28,10 @@ public final class Bind {
 		return new Bind( bindings, source, scope, Target.ANY );
 	}
 
-	final Bindings bindings;
-	final Source source;
-	final Scope scope;
-	final Target target;
+	public final Bindings bindings;
+	public final Source source;
+	public final Scope scope;
+	public final Target target;
 
 	private Bind( Bindings bindings, Source source, Scope scope, Target target ) {
 		super();

@@ -7,6 +7,7 @@ package se.jbee.inject.container;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.InjectronInfo;
+import se.jbee.inject.UnresolvableDependency;
 
 /**
  * Manages the already created instances but does not know how to create them.
@@ -23,5 +24,5 @@ public interface Repository {
 	 *         depending on the scope). {@link Dependency} and
 	 *         {@link InjectronInfo} can be used to lookup existing instances.
 	 */
-	<T> T serve( Dependency<? super T> dependency, InjectronInfo<T> info, Provider<T> provider );
+	<T> T serve( Dependency<? super T> dependency, InjectronInfo<T> info, Provider<T> provider ) throws UnresolvableDependency;
 }

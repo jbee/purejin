@@ -7,6 +7,7 @@ package se.jbee.inject.container;
 
 import se.jbee.inject.Instance;
 import se.jbee.inject.Supplier;
+import se.jbee.inject.UnresolvableDependency;
 
 /**
  * A slightly more high level abstraction than a {@link Supplier} purely for ease of implementation
@@ -29,7 +30,8 @@ public interface Factory<T> {
 	 *            Describes what should be produced.
 	 * @param injectedInto
 	 *            Describes the instance that receives the produced instance.
-	 * @return produced instance
+	 * @return produced instance (note that is does not throw an
+	 *         {@link UnresolvableDependency} exception!)
 	 */
 	<P> T produce( Instance<? super T> produced, Instance<P> injectedInto );
 }

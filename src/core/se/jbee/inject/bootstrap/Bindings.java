@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import se.jbee.inject.Array;
-import se.jbee.inject.BindingIsInconsistent;
+import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.Type;
 
 /**
@@ -56,7 +56,7 @@ public final class Bindings {
 	 */
 	public <T> void add( Binding<T> binding ) {
 		if (!binding.isComplete()) {
-			throw new BindingIsInconsistent("Incomplete binding added: "+binding);
+			throw new InconsistentBinding("Incomplete binding added: "+binding);
 		}
 		bindings.add( binding );
 		if ( !autobinding ) {

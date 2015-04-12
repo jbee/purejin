@@ -21,15 +21,17 @@ public final class Source
 	public final DeclarationType declarationType;
 	public final int declarationNo;
 	
-	private int declarations;
+	/**
+	 * Number of declarations from this source in total.
+	 */
+	private int totalDeclarations;
 
-	private Source( Class<?> ident, DeclarationType declarationType, int declarationNo,
-			int declarations ) {
+	private Source( Class<?> ident, DeclarationType declarationType, int declarationNo, int totalDeclarations ) {
 		super();
 		this.ident = ident;
 		this.declarationType = declarationType;
 		this.declarationNo = declarationNo;
-		this.declarations = declarations;
+		this.totalDeclarations = totalDeclarations;
 	}
 
 	@Override
@@ -45,13 +47,13 @@ public final class Source
 	public Source typed( DeclarationType type ) {
 		return declarationType == type
 			? this
-			: new Source( ident, type, declarationNo, declarations );
+			: new Source( ident, type, declarationNo, totalDeclarations );
 	}
 
 	public Source next() {
-		declarations++;
+		totalDeclarations++;
 		return declarationNo > 0
 			? this
-			: new Source( ident, declarationType, declarations, 0 );
+			: new Source( ident, declarationType, totalDeclarations, 0 );
 	}
 }

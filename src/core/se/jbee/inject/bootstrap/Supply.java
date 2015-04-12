@@ -17,13 +17,14 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import se.jbee.inject.Array;
-import se.jbee.inject.BindingIsInconsistent;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
+import se.jbee.inject.Injectron;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.container.Factory;
 import se.jbee.inject.container.Provider;
 
@@ -443,7 +444,12 @@ public final class Supply {
 
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			throw new BindingIsInconsistent( "Should never be called!" );
+			throw required(dependency);
+		}
+		
+		@SuppressWarnings("unchecked")
+		private static <T> NoResourceForDependency required(Dependency<T> dependency) {
+			return new NoResourceForDependency(dependency, (Injectron<T>[])new Injectron<?>[0], "Should never be called!" );
 		}
 
 		@Override

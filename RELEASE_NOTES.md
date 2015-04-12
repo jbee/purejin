@@ -8,14 +8,15 @@ v0.9
 > better readability. 
 
 Exceptions got renamed to better reflect the problem (the generic term 
-`Exception` is no longer necessary).
+`Exception` is no longer necessary). Interfaces explicitly state the exceptions
+thrown (even though these are not checked exceptions).
 
 - renamed `DIRuntimeException` to `UnresolvableDependency`
 - renamed `DependencyCycleException` to `DependencyCycle`
 - renamed `NoSuchResourceException` to `NoResourceForDependency`
 - renamed `NoSuchFunctionException` to `NoMethodForDependency`
 - renamed `MoreFrequentExpiryException` to `UnstableDependency`
-- renamed `BootstrappingException` to `MisconfiguredBinding`
+- renamed `BootstrappingException` to `InconsistentBinding`
 
 - renamed `Typed#getType` to `type`
 - renamed `Resource#getName` to `name`
@@ -29,7 +30,7 @@ Exceptions got renamed to better reflect the problem (the generic term
 - removed `Bindings#getInspector` (use field access)
 - removed `Bindings#getMacros` (use field access)
 
-- declared `BindingIsInconsistent` as `RuntimeException` 
+- declared `InconsistentBinding` as `RuntimeException` 
   (does not extend `UnresolvableDependency` any longer)
 - declared `UnresolvableDependency` as `abstract` (should not be instantiated)
 

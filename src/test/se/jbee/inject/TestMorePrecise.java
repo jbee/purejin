@@ -16,25 +16,25 @@ import org.junit.Test;
 
 public class TestMorePrecise {
 
-	static class HigherIsPreciser
-			implements MorePreciseThan<HigherIsPreciser> {
+	static class HigherNumberIsMorePrecise
+			implements MorePreciseThan<HigherNumberIsMorePrecise> {
 
 		final int value;
 
-		HigherIsPreciser( int value ) {
+		HigherNumberIsMorePrecise( int value ) {
 			super();
 			this.value = value;
 		}
 
 		@Override
-		public boolean morePreciseThan( HigherIsPreciser other ) {
+		public boolean morePreciseThan( HigherNumberIsMorePrecise other ) {
 			return value > other.value;
 		}
 
 	}
 
-	static HigherIsPreciser hip( int value ) {
-		return new HigherIsPreciser( value );
+	static HigherNumberIsMorePrecise hip( int value ) {
+		return new HigherNumberIsMorePrecise( value );
 	}
 
 	@Test
@@ -54,8 +54,8 @@ public class TestMorePrecise {
 
 	@Test
 	public void thatMorePreciseComesFirstInSortOrder() {
-		HigherIsPreciser[] values = new HigherIsPreciser[] { hip( 1 ), hip( 2 ) };
-		Arrays.sort( values, comparator(HigherIsPreciser.class) );
+		HigherNumberIsMorePrecise[] values = new HigherNumberIsMorePrecise[] { hip( 1 ), hip( 2 ) };
+		Arrays.sort( values, comparator(HigherNumberIsMorePrecise.class) );
 		assertTrue( values[0].value == 2 );
 	}
 

@@ -9,8 +9,16 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * Base {@link RuntimeException} for all exceptions connected to the dependency injection process
- * itself.
+ * A {@link Dependency} that should be resolved during the injection or
+ * resolution process.
+ * 
+ * This is a grouping {@link RuntimeException} the problem specific exceptions
+ * are derived from.
+ * 
+ * @see DependencyCycle
+ * @see UnstableDependency
+ * @see NoResourceForDependency
+ * @see NoMethodForDependency
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */

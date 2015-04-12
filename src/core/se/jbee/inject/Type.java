@@ -61,7 +61,9 @@ public final class Type<T>
 	}
 
 	public static Type<?>[] wildcards( TypeVariable<?>... variables ) {
-		return Array.fill( WILDCARD, variables.length );
+		Type<?>[] wildcards = new Type<?>[variables.length];
+		Arrays.fill(wildcards, WILDCARD);
+		return wildcards;
 	}
 
 	@SuppressWarnings ( "unchecked" )

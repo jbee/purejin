@@ -16,7 +16,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import se.jbee.inject.Array;
-import se.jbee.inject.BindingIsInconsistent;
+import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Packages;
@@ -438,7 +438,7 @@ public class Binder {
 
 		public void toConstructor( Class<? extends T> impl, Parameter<?>... parameters ) {
 			if ( metaclass( impl ).undeterminable() ) {
-				throw new BindingIsInconsistent( "Not a constructable type: " + impl );
+				throw new InconsistentBinding( "Not a constructable type: " + impl );
 			}
 			to( bind().inspector().constructorFor( impl ), parameters );
 		}
@@ -551,9 +551,9 @@ public class Binder {
 			if ( elements.getClass() == rawType ) {
 				return (E[]) elements;
 			}
-			E[] a = Array.newArrayInstance( rawType, elements.length );
+			Object[] a = Array.newInstance( getType().elementType().getRawType(), elements.length );
 			System.arraycopy( elements, 0, a, 0, a.length );
-			return a;
+			return (E[]) a;
 		}
 	}
 

@@ -15,10 +15,7 @@ package se.jbee.inject;
  */
 public interface Injectron<T> {
 
-	/**
-	 * @return The instance created or resolved for the given {@link Dependency}.
-	 */
-	T instanceFor( Dependency<? super T> dependency );
+	T instanceFor( Dependency<? super T> dependency ) throws UnresolvableDependency;
 	
 	InjectronInfo<T> info();
 }
