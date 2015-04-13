@@ -142,55 +142,44 @@ public final class Binding<T>
 		List<Binding<?>> uniques = new ArrayList<Binding<?>>( bindings.length );
 		Arrays.sort( bindings );
 		uniques.add( bindings[0] );
-		int lastDistinctIndex = 0;
+		int lastUniqueIndex = 0;
 		Set<Type<?>> required = new HashSet<Type<?>>();
-		Set<Type<?>> nullified = new HashSet<Type<?>>();
+		List<Binding<?>> dropped = new ArrayList<Binding<?>>(); 
 		for ( int i = 1; i < bindings.length; i++ ) {
-			Binding<?> one = bindings[lastDistinctIndex];
-			Binding<?> other = bindings[i];
-			final boolean equalResource = one.resource.equalTo( other.resource );
-			DeclarationType oneType = one.source.declarationType;
-			DeclarationType otherType = other.source.declarationType;
-			if ( equalResource && oneType.clashesWith( otherType ) ) {
-				throw new InconsistentBinding( "Duplicate binds:\n" + one + "\n" + other );
+			Binding<?> b_d = bindings[lastUniqueIndex];
+			Binding<?> b_i = bindings[i];
+			final boolean equalResource = b_d.resource.equalTo( b_i.resource );
+			DeclarationType t_d = b_d.source.declarationType;
+			DeclarationType t_i = b_i.source.declarationType;
+			if ( equalResource && t_d.clashesWith( t_i ) ) {
+				throw new InconsistentBinding( "Duplicate binds:\n" + b_d + "\n" + b_i );
 			}
-			if ( other.source.declarationType == DeclarationType.REQUIRED ) {
-				required.add( other.resource.type() );
-			} else if ( equalResource && oneType.nullifiedBy( otherType ) ) {
-				if ( i - 1 == lastDistinctIndex ) {
-					uniques.remove( uniques.size() - 1 );
-					nullified.add( one.resource.type() );
+			if ( t_i == DeclarationType.REQUIRED ) {
+				required.add( b_i.resource.type() );
+			} else if ( equalResource && t_d.droppedWith( t_i ) ) {
+				if ( i - 1 == lastUniqueIndex ) {
+					dropped.add(uniques.remove( uniques.size() - 1 ));
 				}
-			} else if ( !equalResource || !otherType.replacedBy( oneType ) ) {
-				uniques.add( other );
-				lastDistinctIndex = i;
+				dropped.add(b_i);
+			} else if ( !equalResource || !t_i.replacedBy( t_d ) ) {
+				uniques.add( b_i );
+				lastUniqueIndex = i;
 			}
 		}
-		if ( required.isEmpty() ) {
-			return Array.of( uniques, Binding.class );
-		}
-		Set<Type<?>> bound = new HashSet<Type<?>>();
-		Set<Type<?>> provided = new HashSet<Type<?>>();
-		for ( Binding<?> b : uniques ) {
+		return withoutProvidedThatAreNotRequiredIn(uniques, required, dropped);
+	}
+
+	private static Binding<?>[] withoutProvidedThatAreNotRequiredIn(List<Binding<?>> bindings, Set<Type<?>> required, List<Binding<?>> dropped) {
+		List<Binding<?>> res = new ArrayList<Binding<?>>( bindings.size() );
+		for ( Binding<?> b : bindings ) {
 			Type<?> type = b.resource.type();
-			if ( b.source.declarationType == DeclarationType.PROVIDED ) {
-				provided.add( type );
-			} else {
-				bound.add( type );
-			}
-		}
-		required.removeAll( bound );
-		if ( !provided.containsAll( required ) ) {
-			required.removeAll( provided );
-			throw new UnresolvableDependency.NoResourceForDependency( required );
-		}
-		List<Binding<?>> res = new ArrayList<Binding<?>>( uniques.size() );
-		for ( int i = 0; i < uniques.size(); i++ ) {
-			Binding<?> b = uniques.get( i );
-			if ( b.source.declarationType != DeclarationType.PROVIDED
-					|| required.contains( b.resource.type() ) ) {
+			if ( b.source.declarationType != DeclarationType.PROVIDED || required.contains(type) ) {
 				res.add( b );
+				required.remove(type);
 			}
+		}
+		if (!required.isEmpty() ) {
+			throw new UnresolvableDependency.NoResourceForDependency( required, dropped );
 		}
 		return Array.of( res, Binding.class );
 	}

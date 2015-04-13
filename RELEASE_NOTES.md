@@ -28,9 +28,11 @@ thrown (even though these are not checked exceptions).
 - renamed `Type#getArrayType` to `addArrayDimension`
 - renamed `Type#getParameters` to `parameters` (does a clone!)
 - renamed `Type#allArgumentsAreUpperBounds` to `areAllTypeParametersAreUpperBounds`
+- renamed `DeclarationType#nullifiedBy` to `droppedWith`
 
 - removed `Type#getRawType` (use field access)
 - removed `Type#isFinal` (not used)
+- removed `Type#elementType(Class)` (not used)
 - removed `Bindings#getInspector` (use field access)
 - removed `Bindings#getMacros` (use field access)
 
@@ -41,6 +43,7 @@ thrown (even though these are not checked exceptions).
 - fixed bug in `Type#supertypes()` that added `Object` for interface instead of 
   classes
 - changed `Type#elementType` to `baseType` (returns non-array type)
+- changed `autobind` expansion to occur via macros
 
 
 v0.8

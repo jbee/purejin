@@ -85,10 +85,6 @@ public final class Bind {
 		return new Bind( bindings, source, scope, target );
 	}
 
-	public Bind autobinding() {
-		return into( bindings.autobinding() );
-	}
-
 	public Bind with( Source source ) {
 		return new Bind( bindings, source, scope, target );
 	}

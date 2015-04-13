@@ -14,7 +14,6 @@ import java.util.Set;
 
 import se.jbee.inject.Array;
 import se.jbee.inject.InconsistentBinding;
-import se.jbee.inject.Type;
 
 /**
  * {@link Bindings} accumulate the {@link Binding} 4-tuples.
@@ -26,29 +25,22 @@ import se.jbee.inject.Type;
 public final class Bindings {
 
 	public static Bindings bindings( Macros macros, Inspector inspector ) {
-		return new Bindings( macros, inspector, new ArrayList<Binding<?>>( 128 ), false );
+		return new Bindings( macros, inspector, new ArrayList<Binding<?>>( 128 ) );
 	}
 
 	public final Macros macros;
 	public final Inspector inspector;
-	public final boolean autobinding;
 	
 	private final List<Binding<?>> bindings;
 
-	private Bindings( Macros macros, Inspector inspector, List<Binding<?>> bindings,
-			boolean autobinding ) {
+	private Bindings( Macros macros, Inspector inspector, List<Binding<?>> bindings) {
 		this.macros = macros;
 		this.inspector = inspector;
 		this.bindings = bindings;
-		this.autobinding = autobinding;
-	}
-
-	public Bindings autobinding() {
-		return new Bindings( macros, inspector, bindings, true );
 	}
 
 	public Bindings using( Inspector inspector ) {
-		return new Bindings( macros, inspector, bindings, autobinding );
+		return new Bindings( macros, inspector, bindings );
 	}
 
 	/**
@@ -59,16 +51,6 @@ public final class Bindings {
 			throw new InconsistentBinding("Incomplete binding added: "+binding);
 		}
 		bindings.add( binding );
-		if ( !autobinding ) {
-			return;
-		}
-		//OPEN this can be extracted to a macro by introducing a Auto type a macro could be bound to
-		for ( Type<? super T> supertype : binding.type().supertypes() ) {
-			// Object is of cause a superclass of everything but not indented when doing auto-binds
-			if ( supertype.rawType != Object.class ) {
-				bindings.add( binding.typed( supertype ) );
-			}
-		}
 	}
 
 	public Binding<?>[] toArray() {

@@ -7,6 +7,9 @@ package se.jbee.inject;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+
+import se.jbee.inject.bootstrap.Binding;
 
 /**
  * A {@link Dependency} that should be resolved during the injection or
@@ -88,8 +91,8 @@ public abstract class UnresolvableDependency
 					+ msg);
 		}
 
-		public NoResourceForDependency( Collection<Type<?>> types ) {
-			super( "No resource for required type(s) " + types );
+		public NoResourceForDependency( Collection<Type<?>> types, List<Binding<?>> dropped ) {
+			super( "No resource for required type(s): " + types+"\ndrobbed bindings:\n"+dropped );
 		}
 	}
 

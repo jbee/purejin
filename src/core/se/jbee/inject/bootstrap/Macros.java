@@ -32,7 +32,7 @@ import se.jbee.inject.Type;
  */
 public final class Macros {
 
-	public static final Macro<Binding<?>> EXPAND = new CheckAndAddMacro();
+	public static final Macro<Binding<?>> EXPAND = new AutoInheritanceMacro();
 	public static final Macro<Class<?>> PARAMETRIZED_LINK = new TypeParametrizedLinkMacro();
 	public static final Macro<Instance<?>> INSTANCE_LINK = new LinkMacro();
 	public static final Macro<Parameter<?>[]> ARRAY = new ArrayElementsMacro();
@@ -124,19 +124,25 @@ public final class Macros {
 		return -1;
 	}
 
-	private static final class CheckAndAddMacro
+	private static final class AutoInheritanceMacro
 			implements Macro<Binding<?>> {
 
-		CheckAndAddMacro() { /* make visible */ }
+		AutoInheritanceMacro() { /* make visible */ }
 
 		@Override
-		public <T> void expand(Binding<?> binding, Binding<T> incomplete, Bindings bindings) {
-			if ( !binding.isComplete() ) { // At this point the binding should be complete
-				throw new InconsistentBinding( "Tried to add an incomplete binding to bindings: "+incomplete );
+		public <T> void expand(Binding<?> untyped, Binding<T> binding, Bindings bindings) {
+			bindings.add(binding);
+			DeclarationType declarationType = binding.source.declarationType;
+			if ( declarationType != DeclarationType.AUTO && declarationType != DeclarationType.PROVIDED ) {
+				return;
 			}
-			bindings.add(binding); 
+			for ( Type<? super T> supertype : binding.type().supertypes() ) {
+				// Object is of course a superclass but not indented when doing auto-binds
+				if ( supertype.rawType != Object.class ) {
+					bindings.add( binding.typed( supertype ) );
+				}
+			}			
 		}
-
 	}
 
 	private static final class ArrayElementsMacro

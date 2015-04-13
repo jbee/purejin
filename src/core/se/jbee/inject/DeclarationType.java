@@ -90,7 +90,7 @@ public enum DeclarationType implements MorePreciseThan<DeclarationType> {
 		return other.ordinal() > ordinal() || ( this == IMPLICIT && other == IMPLICIT );
 	}
 
-	public boolean nullifiedBy( DeclarationType other ) {
+	public boolean droppedWith( DeclarationType other ) {
 		return this == other && ( this == AUTO || this == PROVIDED );
 	}
 

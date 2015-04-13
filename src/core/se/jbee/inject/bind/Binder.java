@@ -73,7 +73,7 @@ public class Binder {
 	}
 
 	public <T> TypedBinder<T> autobind( Type<T> type ) {
-		return on( bind().autobinding().asAuto() ).bind( type );
+		return on( bind().asAuto() ).bind( type );
 	}
 
 	public <T> TypedBinder<T> bind( Class<T> type ) {
@@ -268,7 +268,7 @@ public class Binder {
 		//OPEN also allow naming for provided instances - this is used for value objects that become parameter
 
 		public <T> void provide( Class<T> implementation, Parameter<?>... parameters ) {
-			on( bind().autobinding().asProvided() ).bind( implementation ).toConstructor( parameters );
+			on( bind().asProvided() ).bind( implementation ).toConstructor( parameters );
 		}
 
 		public <T> void require( Class<T> dependency ) {

@@ -66,11 +66,6 @@ public final class Type<T>
 		return wildcards;
 	}
 
-	@SuppressWarnings ( "unchecked" )
-	public static <T> Type<T> elementType( Class<T[]> arrayType ) {
-		return (Type<T>) raw( arrayType ).baseType();
-	}
-
 	public static <T> Type<T> raw( Class<T> type ) {
 		return new Type<T>( type );
 	}
