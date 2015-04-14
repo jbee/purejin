@@ -6,7 +6,7 @@
 package se.jbee.inject;
 
 /**
- * <i>Has a {@link Type}, is typed</i>.
+ * <i>Has a</i> {@link Type}, {@link #typed(Type)} as...
  * 
  * @author Jan Bernitt (jan@jbee.se)
  * 

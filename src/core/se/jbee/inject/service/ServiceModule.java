@@ -7,6 +7,7 @@ package se.jbee.inject.service;
 
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Dependency.pluginsFor;
+import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.parameterTypes;
@@ -184,7 +185,7 @@ public abstract class ServiceModule
 		@Override
 		public ServiceMethod<?, ?> supply( Dependency<? super ServiceMethod<?, ?>> dependency,
 				Injector injector ) {
-			ServiceProvider serviceProvider = injector.resolve( dependency.anyTyped( ServiceProvider.class ) );
+			ServiceProvider serviceProvider = injector.resolve( dependency.instanced(anyOf( ServiceProvider.class )));
 			Type<? super ServiceMethod<?, ?>> type = dependency.type();
 			return serviceProvider.provide( type.parameter( 0 ), type.parameter( 1 ) );
 		}

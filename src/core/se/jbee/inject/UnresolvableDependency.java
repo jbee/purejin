@@ -86,7 +86,7 @@ public abstract class UnresolvableDependency
 
 		public <T> NoResourceForDependency( Dependency<T> dependency, Injectron<T>[] available, String msg ) {
 			super( "No resource for dependency: " + injectionStack( dependency )
-					+ dependency.instance() + "\navailable are (for same raw type): "
+					+ dependency.instance + "\navailable are (for same raw type): "
 					+ describe( available ) + "\n"
 					+ msg);
 		}

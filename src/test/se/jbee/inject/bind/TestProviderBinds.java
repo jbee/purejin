@@ -10,6 +10,7 @@ import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.container.Typecast.listTypeOf;
 import static se.jbee.inject.container.Typecast.providerTypeOf;
 
 import java.util.List;
@@ -17,11 +18,11 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import se.jbee.inject.UnresolvableDependency.UnstableDependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Type;
+import se.jbee.inject.UnresolvableDependency.UnstableDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.container.Provider;
@@ -141,6 +142,17 @@ public class TestProviderBinds {
 		WorkingStateConsumer b = injector.resolve( dependency( B ) );
 		assertNotSame( a, b );
 		assertSame( DYNAMIC_STATE_IN_B, b.state() );
+	}
+	
+	@Test
+	public void thatProviderCanBeCombinedWithOtherBridges() {
+		Provider<List<WorkingStateConsumer>> provider = injector.resolve(dependency(providerTypeOf(listTypeOf(WorkingStateConsumer.class))));
+		assertNotNull(provider);
+		List<WorkingStateConsumer> consumers = provider.provide();
+		assertEquals(3, consumers.size());
+		assertNotNull(consumers.get(0).state.provide());
+		assertNotNull(consumers.get(1).state.provide());
+		assertNotNull(consumers.get(2).state.provide());
 	}
 
 	@Test

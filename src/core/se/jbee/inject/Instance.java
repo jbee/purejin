@@ -74,6 +74,10 @@ public final class Instance<T>
 	public <E> Instance<E> typed( Type<E> type ) {
 		return new Instance<E>( name, type );
 	}
+	
+	public Instance<T> named(Name name) {
+		return new Instance<T>(name, type);
+	}	
 
 	@Override
 	public String toString() {
@@ -108,5 +112,6 @@ public final class Instance<T>
 	public static <T extends MorePreciseThan<? super T>, T2 extends MorePreciseThan<? super T2>> boolean morePreciseThan2( T a1, T a2, T2 b1, T2 b2 ) {
 		return      a1.morePreciseThan( a2 ) // 
 				|| !a2.morePreciseThan( a1 ) && b1.morePreciseThan( b2 );
-	}	
+	}
+
 }

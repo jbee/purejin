@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import se.jbee.inject.Dependency;
+import se.jbee.inject.Injectron;
 import se.jbee.inject.InjectronInfo;
 
 /**
@@ -16,7 +17,7 @@ import se.jbee.inject.InjectronInfo;
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
-public class Scoped {
+public final class Scoped {
 
 	public interface DependencyProperty {
 
@@ -81,8 +82,8 @@ public class Scoped {
 		}
 
 		@Override
-		public <T> T serve( Dependency<? super T> dependency, InjectronInfo<T> info, Provider<T> injectable ) {
-			return injectable.provide();
+		public <T> T serve( Dependency<? super T> dependency, InjectronInfo<T> info, Provider<T> provider ) {
+			return provider.provide();
 		}
 
 		@Override
@@ -269,8 +270,7 @@ public class Scoped {
 
 		@Override
 		public <T> String deriveFrom( Dependency<T> dependency ) {
-			return dependency.name().toString() + "@"
-					+ dependency.type().toString();
+			return dependency.instance.name.toString() + "@" + dependency.type().toString();
 		}
 
 		@Override
@@ -327,7 +327,7 @@ public class Scoped {
 
 		@Override
 		public Repository init() {
-			return new ResourceRepository();
+			return new LazyInjectronRepository();
 		}
 
 		@Override
@@ -337,17 +337,18 @@ public class Scoped {
 	}
 
 	/**
-	 * Contains once instance per resource. Resources are never updated. This can be used to create
-	 * a thread or request {@link Scope}.
+	 * Contains once instance per {@link Injectron}. Instances are never
+	 * updated. This can be used to create a thread, request or application
+	 * {@link Scope}.
 	 * 
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	private static final class ResourceRepository
+	private static final class LazyInjectronRepository
 			implements Repository {
 
 		private Object[] instances;
 
-		ResourceRepository() {
+		LazyInjectronRepository() {
 			super();
 		}
 
@@ -357,17 +358,17 @@ public class Scoped {
 			if ( instances == null ) {
 				instances = new Object[info.count];
 			}
-			final int serialNo = info.serialID;
-			T res = (T) instances[serialNo];
+			final int serialID = info.serialID;
+			T res = (T) instances[serialID];
 			if ( res != null ) {
 				return res;
 			}
 			// just sync the (later) unexpected path that is executed once
 			synchronized ( instances ) {
-				res = (T) instances[serialNo];
+				res = (T) instances[serialID];
 				if ( res == null ) { // we need to ask again since the instance could have been initialized before we got entrance to the sync block
 					res = provider.provide();
-					instances[serialNo] = res;
+					instances[serialID] = res;
 				}
 			}
 			return res;

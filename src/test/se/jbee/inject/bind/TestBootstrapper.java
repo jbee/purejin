@@ -14,15 +14,15 @@ import java.beans.ConstructorProperties;
 
 import org.junit.Test;
 
-import se.jbee.inject.InconsistentBinding;
-import se.jbee.inject.UnresolvableDependency.DependencyCycle;
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Dependency;
+import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Injectron;
 import se.jbee.inject.Name;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Supplier;
+import se.jbee.inject.UnresolvableDependency.DependencyCycle;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bundle;
@@ -169,7 +169,7 @@ public class TestBootstrapper {
 
 		@Override
 		public String supply( Dependency<? super String> dependency, Injector injector ) {
-			if ( !dependency.name().equalTo( named( "lazy" ) ) ) {
+			if ( !dependency.instance.name.equalTo( named( "lazy" ) ) ) {
 				eagers++;
 				return "eager";
 			}

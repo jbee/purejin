@@ -7,6 +7,7 @@ package se.jbee.inject.bootstrap;
 
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Type.parameterTypes;
+import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.bootstrap.BoundParameter.bind;
 
 import java.lang.reflect.Constructor;
@@ -24,6 +25,7 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
+import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.container.Factory;
 import se.jbee.inject.container.Provider;
@@ -36,6 +38,7 @@ import se.jbee.inject.container.Provider;
 public final class Supply {
 
 	private static final Object[] NO_ARGS = new Object[0];
+	static final Type<Object[]> OBJECT_ARRAY = raw(Object[].class);
 
 	public static final Supplier<Provider<?>> PROVIDER_BRIDGE = new ProviderSupplier();
 	public static final Supplier<List<?>> LIST_BRIDGE = new ArrayToListBridgeSupplier();
@@ -63,7 +66,7 @@ public final class Supply {
 	}
 
 	public static <E> Supplier<E[]> elements( Type<E[]> arrayType, Parameter<? extends E>[] elements ) {
-		return new ElementsSupplier<E>( arrayType, BoundParameter.bind( elements ) );
+		return new PredefinedArraySupplier<E>( arrayType, BoundParameter.bind( elements ) );
 	}
 
 	public static <T> Supplier<T> instance( Instance<T> instance ) {
@@ -78,12 +81,14 @@ public final class Supply {
 		return new ParametrizedInstanceSupplier<T>( instance );
 	}
 
-	public static <T> Supplier<T> method( BoundMethod<T> producible ) {
-		return new MethodSupplier<T>( producible );
+	public static <T> Supplier<T> method( BoundMethod<T> factory ) {
+		return new MethodSupplier<T>( factory, new BufferedParameterSupplier(bind( parameterTypes( factory.factory ), factory.parameters )) );
 	}
 
-	public static <T> Supplier<T> costructor( BoundConstructor<T> constructible ) {
-		return new ConstructorSupplier<T>( constructible );
+	public static <T> Supplier<T> costructor( BoundConstructor<T> constructor ) {
+		return new ConstructorSupplier<T>( 
+				Metaclass.accessible( constructor.constructor ), 
+				new BufferedParameterSupplier(bind( parameterTypes( constructor.constructor ), constructor.parameters )) );
 	}
 
 	public static <T> Supplier<T> factory( Factory<T> factory ) {
@@ -219,13 +224,13 @@ public final class Supply {
 	 * 
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	private static final class ElementsSupplier<E>
+	private static final class PredefinedArraySupplier<E>
 			implements Supplier<E[]> {
 
 		private final Type<E[]> arrayType;
 		private final BoundParameter<? extends E>[] elements;
 
-		ElementsSupplier( Type<E[]> arrayType, BoundParameter<? extends E>[] elements ) {
+		PredefinedArraySupplier( Type<E[]> arrayType, BoundParameter<? extends E>[] elements ) {
 			super();
 			this.arrayType = arrayType;
 			this.elements = elements;
@@ -262,7 +267,7 @@ public final class Supply {
 
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			final Supplier<? extends T> supplier = injector.resolve( dependency.anyTyped( type ) );
+			final Supplier<? extends T> supplier = injector.resolve( dependency.instanced(anyOf(type)));
 			return supplier.supply( dependency, injector );
 		}
 	}
@@ -322,11 +327,7 @@ public final class Supply {
 
 		@Override
 		public Provider<?> supply( Dependency<? super Provider<?>> dependency, Injector injector ) {
-			Dependency<?> providedType = dependency.onTypeParameter();
-			if ( !dependency.name().isDefault() ) {
-				providedType = providedType.named( dependency.name() );
-			}
-			return lazyProvider( providedType.uninject().ignoredExpiry(), injector );
+			return lazyProvider( dependency.onTypeParameter().uninject().ignoredExpiry(), injector );
 		}
 
 		@Override
@@ -339,17 +340,18 @@ public final class Supply {
 			implements Provider<T> {
 
 		private final Dependency<T> dependency;
-		private final Injector injector;
-
+		private final Injectron<? extends T> injectron;
+		
+		@SuppressWarnings("unchecked")
 		LazyProvider( Dependency<T> dependency, Injector injector ) {
 			super();
 			this.dependency = dependency;
-			this.injector = injector;
+			this.injectron = injector.resolve(dependency.typed(raw( Injectron.class ).parametized(dependency.type())));
 		}
 
 		@Override
 		public T provide() {
-			return injector.resolve( dependency );
+			return injectron.instanceFor(dependency);
 		}
 
 		@Override
@@ -374,7 +376,7 @@ public final class Supply {
 
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			return factory.produce( dependency.instance(), dependency.target( 1 ) );
+			return factory.fabricate( dependency.instance, dependency.target( 1 ) );
 		}
 
 		@Override
@@ -383,55 +385,70 @@ public final class Supply {
 		}
 
 	}
+	
+	static final class BufferedParameterSupplier implements Supplier<Object[]> {
+
+		private final BoundParameter<?>[] params;
+		
+		public BufferedParameterSupplier(BoundParameter<?>[] params) {
+			super();
+			this.params = params;
+		}
+
+		@Override
+		public Object[] supply(Dependency<? super Object[]> dependency,	Injector injector) throws UnresolvableDependency {
+			return resolveParameters( dependency, injector, params );
+		}
+		
+	}
 
 	private static final class ConstructorSupplier<T>
 			implements Supplier<T> {
 
 		private final Constructor<T> constructor;
-		private final BoundParameter<?>[] params;
+		private final Supplier<Object[]> args;
 
-		ConstructorSupplier( BoundConstructor<T> constructor ) {
-			this.constructor = Metaclass.accessible( constructor.constructor );
-			this.params = bind( parameterTypes( this.constructor ),	constructor.parameters );
+		ConstructorSupplier( Constructor<T> constructor, Supplier<Object[]> args ) {
+			this.constructor = constructor;
+			this.args=args;
 		}
 
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			return Invoke.constructor( constructor, resolveParameters( dependency, injector, params ) );
+			return Invoke.constructor( constructor, args.supply(dependency.typed(OBJECT_ARRAY), injector) );
 		}
 
 		@Override
 		public String toString() {
-			return describe( constructor, params );
+			return describe( constructor, args );
 		}
 	}
 
 	private static final class MethodSupplier<T>
 			implements Supplier<T> {
 
-		private final BoundMethod<T> factory;
-		private final BoundParameter<?>[] params;
+		private final BoundMethod<T> method;
+		private final Supplier<Object[]> args;
 
-		MethodSupplier( BoundMethod<T> factory ) {
+		MethodSupplier( BoundMethod<T> method, Supplier<Object[]> args ) {
 			super();
-			this.factory = factory;
-			this.params = bind( parameterTypes( factory.factory ), factory.parameters );
+			this.method = method;
+			this.args = args;
 		}
 
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			Object owner = factory.instance;
-			if ( factory.isInstanceMethod() && owner == null ) {
-				owner = injector.resolve( Dependency.dependency( factory.factory.getDeclaringClass() ) );
+			Object owner = method.instance;
+			if ( method.isInstanceMethod && owner == null ) {
+				owner = injector.resolve( Dependency.dependency( method.factory.getDeclaringClass() ) );
 			}
-			return factory.returnType.rawType.cast(
-					Invoke.method( factory.factory, owner,
-							resolveParameters( dependency, injector, params ) ) );
+			return method.returnType.rawType.cast(
+					Invoke.method( method.factory, owner, args.supply(dependency.typed(OBJECT_ARRAY), injector)) );
 		}
 
 		@Override
 		public String toString() {
-			return describe( factory.factory, params );
+			return describe( method.factory, args );
 		}
 	}
 
@@ -466,8 +483,8 @@ public final class Supply {
 		}
 
 		@Override
-		public <P> Logger produce( Instance<? super Logger> produced, Instance<P> injectedInto ) {
-			return Logger.getLogger( injectedInto.type().rawType.getCanonicalName() );
+		public <P> Logger fabricate( Instance<? super Logger> created, Instance<P> receiver ) {
+			return Logger.getLogger( receiver.type().rawType.getCanonicalName() );
 		}
 
 	}

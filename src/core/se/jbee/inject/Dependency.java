@@ -40,13 +40,13 @@ public final class Dependency<T>
 	public static <T> Dependency<T> dependency( Type<T> type ) {
 		return dependency( type, UNTARGETED );
 	}
+	
+	public static <T> Dependency<T> dependency( Instance<T> instance ) {
+		return dependency( instance, UNTARGETED );
+	}
 
 	private static <T> Dependency<T> dependency( Type<T> type, Injection[] hierarchy ) {
 		return dependency( Instance.instance( Name.ANY, type ), hierarchy );
-	}
-
-	public static <T> Dependency<T> dependency( Instance<T> instance ) {
-		return dependency( instance, UNTARGETED );
 	}
 
 	private static <T> Dependency<T> dependency( Instance<T> instance, Injection[] hierarchy ) {
@@ -54,24 +54,16 @@ public final class Dependency<T>
 	}
 
 	private final Injection[] hierarchy;
-	private final Instance<T> instance;
+	public final Instance<T> instance;
 
 	private Dependency( Instance<T> instance, Injection... hierarchy ) {
 		this.instance = instance;
 		this.hierarchy = hierarchy;
 	}
 
-	public Instance<T> instance() {
-		return instance;
-	}
-
 	@Override
 	public Type<T> type() {
-		return instance.type();
-	}
-
-	public Name name() {
-		return instance.name;
+		return instance.type;
 	}
 
 	@Override
@@ -81,33 +73,25 @@ public final class Dependency<T>
 			: " " + Arrays.toString( hierarchy ) );
 	}
 
+	@Override
+	public <E> Dependency<E> typed( Type<E> type ) {
+		return instanced( instance.typed(type) );
+	}
+	
 	public Dependency<?> onTypeParameter() {
-		return dependency( type().parameter( 0 ), hierarchy );
+		return typed( type().parameter( 0 ) );
+	}
+	
+	public Dependency<T> named( String name ) {
+		return named( Name.named( name ) );
+	}
+	
+	public Dependency<T> named( Name name ) {
+		return instanced( instance.named(name));
 	}
 
 	public <E> Dependency<E> instanced( Instance<E> instance ) {
 		return dependency( instance, hierarchy );
-	}
-
-	@Override
-	public <E> Dependency<E> typed( Type<E> type ) {
-		return dependency( Instance.instance( name(), type ), hierarchy );
-	}
-
-	public <E> Dependency<E> anyTyped( Type<E> type ) {
-		return dependency( Instance.instance( Name.ANY, type ), hierarchy );
-	}
-
-	public <E> Dependency<E> anyTyped( Class<E> type ) {
-		return anyTyped( raw( type ) );
-	}
-
-	public Dependency<T> named( String name ) {
-		return named( Name.named( name ) );
-	}
-
-	public Dependency<T> named( Name name ) {
-		return dependency( Instance.instance( name, type() ), hierarchy );
 	}
 
 	public Dependency<T> untargeted() {
@@ -164,7 +148,7 @@ public final class Dependency<T>
 			return new Dependency<T>( instance, injection );
 		}
 		ensureNotMoreFrequentExpiry( injection );
-		ensureNoCycle( injection );
+		ensureNoDependencyCycle( injection );
 		return new Dependency<T>( instance, Array.append( hierarchy, injection ) );
 	}
 
@@ -175,7 +159,7 @@ public final class Dependency<T>
 		return new Dependency<T>( instance, Arrays.copyOf( hierarchy, hierarchy.length - 1 ) );
 	}
 
-	private void ensureNoCycle( Injection injection ) throws DependencyCycle {
+	private void ensureNoDependencyCycle( Injection injection ) throws DependencyCycle {
 		for ( int i = 0; i < hierarchy.length; i++ ) {
 			Injection parent = hierarchy[i];
 			if ( parent.equalTo( injection ) ) {

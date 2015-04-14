@@ -29,7 +29,7 @@ public final class BoundMethod<T>
 	public final Method factory;
 	public final Type<T> returnType;
 	public final Parameter<?>[] parameters;
-	private final boolean instanceMethod;
+	public final boolean isInstanceMethod;
 
 	private BoundMethod( Object instance, Method factory, Type<T> returnType, Parameter<?>[] parameters ) {
 		super();
@@ -37,7 +37,7 @@ public final class BoundMethod<T>
 		this.factory = factory;
 		this.parameters = parameters;
 		this.instance = instance;
-		this.instanceMethod = !Modifier.isStatic( factory.getModifiers() );
+		this.isInstanceMethod = !Modifier.isStatic( factory.getModifiers() );
 		final Type<?> actualReturnType = Type.returnType( factory );
 		if ( !actualReturnType.isAssignableTo( returnType ) ) {
 			throw new IllegalArgumentException( "The producer methods methods return type `"
@@ -48,10 +48,6 @@ public final class BoundMethod<T>
 					"The producer method and the instance it is invoked on have to be the same class." );
 		}
 		Metaclass.accessible( factory );
-	}
-
-	public boolean isInstanceMethod() {
-		return instanceMethod;
 	}
 
 	@Override

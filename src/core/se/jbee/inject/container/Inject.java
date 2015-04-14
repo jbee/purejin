@@ -109,28 +109,26 @@ public final class Inject {
 		@Override
 		public <T> T resolve( Dependency<T> dependency ) {
 			final Type<T> type = dependency.type();
-			final int array = type.arrayDimensions();
-			Injectron<T> injectron = matchingInjectron( dependency );
-			if ( injectron != null ) {
-				return injectron.instanceFor( dependency );
-			}
-			if ( array == 1 ) {
-				//OPEN what about 2D array to get all "values" when the "value" type is a 1D array ? Test if this works
-				return resolveArray( dependency, type.baseType() );
-			}
 			if ( type.rawType == Injectron.class ) {
-				Injectron<?> i = matchingInjectron( dependency.onTypeParameter() );
-				if ( i != null ) {
-					return (T) i;
+				Injectron<?> res = injectronMatching( dependency.onTypeParameter() );
+				if ( res != null ) {
+					return (T) res;
 				}
 			}
 			if ( type.rawType == Injector.class ) {
 				return (T) this;
 			}
+			Injectron<T> injectron = injectronMatching( dependency );
+			if ( injectron != null ) {
+				return injectron.instanceFor( dependency );
+			}
+			if ( type.arrayDimensions() == 1 ) {
+				return resolveArray( dependency, type.baseType() );
+			}
 			throw noInjectronFor( dependency );
 		}
 
-		private <T> Injectron<T> matchingInjectron( Dependency<T> dependency ) {
+		private <T> Injectron<T> injectronMatching( Dependency<T> dependency ) {
 			return mostPreciseOf( injectronsForType( dependency.type() ), dependency );
 		}
 
@@ -165,12 +163,11 @@ public final class Inject {
 				}
 				return toArray( elements, elementType );
 			}
-			// if there hasn't been binds to that specific wildcard Type  
-			if ( elementType.isUpperBound() ) { // wildcard dependency:
+			// if there hasn't been binds to that specific wild-card Type  
+			if ( elementType.isUpperBound() ) { // wild-card dependency:
 				List<E> elements = new ArrayList<E>();
 				for ( Entry<Class<?>, Injectron<?>[]> e : injectrons.entrySet() ) {
 					if ( Type.raw( e.getKey() ).isAssignableTo( elementType ) ) {
-						//FIXME some of the injectrons are just bridges and such - no real values - recursion causes errors here
 						@SuppressWarnings ( "unchecked" )
 						Injectron<? extends E>[] value = (Injectron<? extends E>[]) e.getValue();
 						addAllMatching( elements, dependency, elementType, value );
@@ -239,7 +236,7 @@ public final class Inject {
 				for ( Injectron<?> i : e.getValue() ) {
 					Resource<?> r = i.info().resource;
 					b.append( '\t' ).append( r.type().simpleName() ).append( ' ' ).append(
-							r.name() ).append( ' ' ).append( r.target ).append(
+							r.instance.name ).append( ' ' ).append( r.target ).append(
 							' ' ).append( i.info().source ).append( '\n' );
 				}
 			}

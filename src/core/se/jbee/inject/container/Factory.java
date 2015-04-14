@@ -10,8 +10,9 @@ import se.jbee.inject.Supplier;
 import se.jbee.inject.UnresolvableDependency;
 
 /**
- * A slightly more high level abstraction than a {@link Supplier} purely for ease of implementation
- * of <i>sources</i> that behave like a classical factory (pattern).
+ * A slightly more high level abstraction than a {@link Supplier} purely for
+ * ease of implementation of <i>sources</i> that behave like a classical factory
+ * (pattern).
  * 
  * @see Supplier
  * @see Provider
@@ -19,19 +20,19 @@ import se.jbee.inject.UnresolvableDependency;
  * @author Jan Bernitt (jan@jbee.se)
  * 
  * @param <T>
- *            The type of value produced
+ *            The type of value created
  */
 public interface Factory<T> {
 
 	/**
 	 * @param <P>
 	 *            The type of the receiving instance.
-	 * @param produced
-	 *            Describes what should be produced.
-	 * @param injectedInto
-	 *            Describes the instance that receives the produced instance.
-	 * @return produced instance (note that is does not throw an
+	 * @param created
+	 *            Describes what should be created.
+	 * @param receiver
+	 *            Describes the instance that receives the created instance.
+	 * @return created instance (note that is does not throw an
 	 *         {@link UnresolvableDependency} exception!)
 	 */
-	<P> T produce( Instance<? super T> produced, Instance<P> injectedInto );
+	<P> T fabricate( Instance<? super T> created, Instance<P> receiver );
 }

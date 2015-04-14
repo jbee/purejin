@@ -63,7 +63,7 @@ public final class Resource<T>
 	 * Does this resource provide the instance wanted by the given {@link Dependency}'s {@link Name}
 	 */
 	public boolean isNameCompatibleWith( Dependency<? super T> dependency ) {
-		return instance.name.isCompatibleWith( dependency.name() );
+		return instance.name.isCompatibleWith( dependency.instance.name );
 	}
 
 	@Override
@@ -79,10 +79,6 @@ public final class Resource<T>
 	@Override
 	public String toString() {
 		return instance + " " + target;
-	}
-
-	public Name name() {
-		return instance.name;
 	}
 
 	@Override

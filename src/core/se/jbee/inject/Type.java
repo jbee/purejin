@@ -70,10 +70,6 @@ public final class Type<T>
 		return new Type<T>( type );
 	}
 
-	private static UnsupportedOperationException notSupportedYet( java.lang.reflect.Type type ) {
-		return new UnsupportedOperationException( "Type has no support yet: " + type );
-	}
-
 	private static Type<?>[] types( java.lang.reflect.Type[] parameters,
 			Map<String, Type<?>> actualTypeArguments ) {
 		Type<?>[] args = new Type<?>[parameters.length];
@@ -87,8 +83,7 @@ public final class Type<T>
 		return type( type, Collections.<String, Type<?>> emptyMap() );
 	}
 
-	private static Type<?> type( java.lang.reflect.Type type,
-			Map<String, Type<?>> actualTypeArguments ) {
+	private static Type<?> type( java.lang.reflect.Type type, Map<String, Type<?>> actualTypeArguments ) {
 		if ( type instanceof Class<?> ) {
 			return raw( (Class<?>) type );
 		}
@@ -109,7 +104,7 @@ public final class Type<T>
 				return type( upperBounds[0] ).asUpperBound();
 			}
 		}
-		throw notSupportedYet( type );
+		throw new UnsupportedOperationException( "Type has no support yet: " + type );
 	}
 
 	private static <T> Type<T> parameterizedType( ParameterizedType type,

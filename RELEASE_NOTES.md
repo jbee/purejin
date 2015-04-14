@@ -5,7 +5,9 @@ v0.9
 ===============
 
 > Release 0.9 contained no new features but renamed exceptions and "getters" for
-> better readability. 
+> better readability. Auto-binding implementation moved to macros. 
+> Providers utilise injectrons for better performance. These now forward the
+> dependency's name
 
 Exceptions got renamed to better reflect the problem (the generic term 
 `Exception` is no longer necessary). Interfaces explicitly state the exceptions
@@ -29,21 +31,31 @@ thrown (even though these are not checked exceptions).
 - renamed `Type#getParameters` to `parameters` (does a clone!)
 - renamed `Type#allArgumentsAreUpperBounds` to `areAllTypeParametersAreUpperBounds`
 - renamed `DeclarationType#nullifiedBy` to `droppedWith`
+- renamed `Factory#produce` to `fabricate` (less confusing naming)
 
 - removed `Type#getRawType` (use field access)
 - removed `Type#isFinal` (not used)
 - removed `Type#elementType(Class)` (not used)
 - removed `Bindings#getInspector` (use field access)
 - removed `Bindings#getMacros` (use field access)
+- removed `Dependency#anyTyped` (use `instanced(anyOf(...))` instead)
+- removed `Dependency#instance` (use field access)
+- removed `Dependency#name` (use `instance.name` instead)
+- removed `Resource#name` (not needed, use field access)
 
+- declared `UnresolvableDependency` as `abstract` (should not be instantiated)
 - declared `InconsistentBinding` as `RuntimeException` 
   (does not extend `UnresolvableDependency` any longer)
-- declared `UnresolvableDependency` as `abstract` (should not be instantiated)
 
-- fixed bug in `Type#supertypes()` that added `Object` for interface instead of 
-  classes
+- fixed `Type#supertypes()` that added `Object` for interfaces not classes
+
 - changed `Type#elementType` to `baseType` (returns non-array type)
 - changed `autobind` expansion to occur via macros
+- changed `Dependency#onTypeParameter` keeps instance name
+- changed semantics of resolving `Injectron`s (cannot be bound any more)
+
+- improved `Provider` implementation to use `Injectron`s (better performance!)
+- improved `Injectorn` dependencies forward `Name`
 
 
 v0.8
