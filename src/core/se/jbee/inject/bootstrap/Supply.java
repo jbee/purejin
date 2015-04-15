@@ -82,13 +82,17 @@ public final class Supply {
 	}
 
 	public static <T> Supplier<T> method( BoundMethod<T> factory ) {
-		return new MethodSupplier<T>( factory, new BufferedParameterSupplier(bind( parameterTypes( factory.factory ), factory.parameters )) );
+		return new MethodSupplier<T>( factory, parameters( parameterTypes( factory.factory ), factory.parameters ));
 	}
 
 	public static <T> Supplier<T> costructor( BoundConstructor<T> constructor ) {
 		return new ConstructorSupplier<T>( 
 				Metaclass.accessible( constructor.constructor ), 
-				new BufferedParameterSupplier(bind( parameterTypes( constructor.constructor ), constructor.parameters )) );
+				parameters( parameterTypes( constructor.constructor ), constructor.parameters ));
+	}
+	
+	public static Supplier<Object[]> parameters(Type<?>[] types, Parameter<?>... parameters) {
+		return new BufferedParameterSupplier(bind(types, parameters));
 	}
 
 	public static <T> Supplier<T> factory( Factory<T> factory ) {
@@ -224,6 +228,7 @@ public final class Supply {
 	 * 
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
+	@Deprecated // should use new args
 	private static final class PredefinedArraySupplier<E>
 			implements Supplier<E[]> {
 
@@ -499,5 +504,54 @@ public final class Supply {
 
 	public static String describe( Object behaviour, Object[] variants ) {
 		return describe( behaviour, Arrays.toString( variants ) );
+	}
+	
+	static class Foo {
+		
+		private final Injector injector;
+		private final Injectron<?>[] argumentInjectrons;
+		private final Type<?>[] parameterTypes;
+		private final Object[] argumentTemplate;
+
+		Foo(Injector injector, Type<?>[] types) {
+			this.injector = injector;
+			this.parameterTypes = types;
+			this.argumentInjectrons = argumentInjectrons();
+			this.argumentTemplate = argumentTemplate();
+		}
+		
+		private Object[] argumentTemplate() {
+			Object[] template = new Object[parameterTypes.length];
+			for ( int i = 0; i < template.length; i++ ) {
+				Injectron<?> injectron = argumentInjectrons[i];
+				if ( injectron != null && injectron.info().expiry.isNever() ) {
+					template[i] = instance( injectron, Dependency.dependency( parameterTypes[i] ) );
+				}
+			}
+			return template;
+		}
+
+		private Injectron<?>[] argumentInjectrons() {
+			Injectron<?>[] res = new Injectron<?>[parameterTypes.length];
+			for ( int i = 0; i < res.length; i++ ) {
+				Type<?> paramType = parameterTypes[i];
+				res[i] = injector.resolve( Dependency.dependency( raw( Injectron.class ).parametized( paramType ) ) );
+			}
+			return res;
+		}
+
+		private Object[] actualArguments() {
+			Object[] args = argumentTemplate.clone();
+			for ( int i = 0; i < args.length; i++ ) {
+				Type<?> paramType = parameterTypes[i];
+				args[i] = instance( argumentInjectrons[i], Dependency.dependency( paramType ) );
+			}
+			return args;
+		}
+
+		@SuppressWarnings ( "unchecked" )
+		private static <I> I instance( Injectron<I> injectron, Dependency<?> dependency ) {
+			return injectron.instanceFor( (Dependency<? super I>) dependency );
+		}		
 	}
 }

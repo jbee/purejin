@@ -23,7 +23,7 @@ public class TestServiceBinds {
 	 * code. The only place you are coupled to the DI-framework is still in the binding code that is
 	 * additional to the application code.
 	 */
-	private static interface Service<P, R> {
+	private static interface AppService<P, R> {
 
 		R calc( P param );
 	}
@@ -32,22 +32,21 @@ public class TestServiceBinds {
 	 * This is an adapter to 'your' application specific service interface adapting to the
 	 * {@link ServiceMethod} interface of the DI-framework. So internally both are resolvable.
 	 */
-	private static class ServiceSupplier
-			implements Supplier<Service<?, ?>> {
+	private static class AppServiceSupplier
+			implements Supplier<AppService<?, ?>> {
 
 		@Override
-		public Service<?, ?> supply( Dependency<? super Service<?, ?>> dependency, Injector injector ) {
-			ServiceProvider provider = injector.resolve( dependency( ServiceProvider.class ) );
-			Type<? super Service<?, ?>> type = dependency.type();
-			return newService( provider.provide( type.parameter( 0 ), type.parameter( 1 ) ) );
+		public AppService<?, ?> supply( Dependency<? super AppService<?, ?>> dependency, Injector injector ) {
+			Type<? super AppService<?, ?>> type = dependency.type();
+			return newService( injector.resolve( ServiceModule.serviceDependency( type.parameter( 0 ), type.parameter( 1 ) ) ));
 		}
 
-		private static <P, R> Service<P, R> newService( ServiceMethod<P, R> service ) {
+		private static <P, R> AppService<P, R> newService( ServiceMethod<P, R> service ) {
 			return new ServiceToServiceMethodAdapter<P, R>( service );
 		}
 
 		static class ServiceToServiceMethodAdapter<P, R>
-				implements Service<P, R> {
+				implements AppService<P, R> {
 
 			private final ServiceMethod<P, R> service;
 
@@ -71,7 +70,7 @@ public class TestServiceBinds {
 		@Override
 		protected void declare() {
 			bindServiceMethodsIn( MathService.class );
-			per( DEPENDENCY_TYPE ).starbind( Service.class ).toSupplier( ServiceSupplier.class );
+			per( DEPENDENCY_TYPE ).starbind( AppService.class ).toSupplier( AppServiceSupplier.class );
 		}
 
 	}
@@ -87,10 +86,10 @@ public class TestServiceBinds {
 	public void thatServiceCanBeResolvedWhenHavingGenericsInSameOrder() {
 		Injector injector = Bootstrap.injector( ServiceBindsModule.class );
 		@SuppressWarnings ( { "rawtypes" } )
-		Dependency<Service> dependency = dependency( raw( Service.class ).parametized(
+		Dependency<AppService> dependency = dependency( raw( AppService.class ).parametized(
 				Integer.class, Long.class ) );
 		@SuppressWarnings ( "unchecked" )
-		Service<Integer, Long> square = injector.resolve( dependency );
+		AppService<Integer, Long> square = injector.resolve( dependency );
 		assertThat( square.calc( 2 ), is( 4L ) );
 	}
 

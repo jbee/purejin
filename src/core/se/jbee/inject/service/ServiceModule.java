@@ -7,7 +7,6 @@ package se.jbee.inject.service;
 
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Dependency.pluginsFor;
-import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.parameterTypes;
@@ -24,16 +23,18 @@ import java.util.Map;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
-import se.jbee.inject.Injectron;
 import se.jbee.inject.Instance;
+import se.jbee.inject.Parameter;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bind.BinderModule;
+import se.jbee.inject.bootstrap.BoundParameter;
 import se.jbee.inject.bootstrap.Inspect;
 import se.jbee.inject.bootstrap.Inspector;
 import se.jbee.inject.bootstrap.Metaclass;
 import se.jbee.inject.bootstrap.Module;
+import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.container.Scoped;
 
 /**
@@ -54,6 +55,12 @@ public abstract class ServiceModule
 	 */
 	public static final Instance<Inspector> SERVICE_INSPECTOR = instance( named( ServiceMethod.class), raw( Inspector.class ) );
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static <I,O> Dependency<ServiceMethod<I,O>> serviceDependency(Type<I> paramType, Type<O> returnType) {
+		Type type = raw(ServiceMethod.class).parametized(paramType, returnType);
+		return dependency(type);
+	}	
+	
 	protected final void bindServiceMethodsIn( Class<?> service ) {
 		plug(service).into(ServiceMethod.class);
 	}
@@ -75,25 +82,14 @@ public abstract class ServiceModule
 
 		@Override
 		public void declare() {
-			per( APPLICATION ).bind( ServiceProvider.class ).toSupplier( ServiceProviderSupplier.class );
-			per( DEPENDENCY_TYPE ).starbind( ServiceMethod.class ).toSupplier( ServiceSupplier.class );
+			asDefault().per( DEPENDENCY_TYPE ).starbind( ServiceMethod.class ).toSupplier( ServiceSupplier.class );
 			asDefault().per( APPLICATION ).bind( SERVICE_INSPECTOR ).to( Inspect.all().methods() );
 		}
 
 	}
 
-	private static final class ServiceProviderSupplier
-			implements Supplier<ServiceProvider> {
-
-		@Override
-		public ServiceProvider supply( Dependency<? super ServiceProvider> dependency, Injector injector ) {
-			return new ServiceMethodProvider( injector );
-		}
-
-	}
-
-	private static final class ServiceMethodProvider
-			implements ServiceProvider {
+	static final class ServiceSupplier
+			implements Supplier<ServiceMethod<?, ?>> {
 
 		/**
 		 * A list of service methods for each service class.
@@ -108,39 +104,45 @@ public abstract class ServiceModule
 		private final Inspector inspect;
 		private final Class<?>[] serviceClasses;
 
-		ServiceMethodProvider( Injector injector ) {
+		public ServiceSupplier( Injector injector ) {
 			super();
 			this.injector = injector;
 			this.serviceClasses = injector.resolve( pluginsFor(ServiceMethod.class) );
-			this.inspect = injector.resolve( dependency( SERVICE_INSPECTOR ).injectingInto(	ServiceProvider.class ) );
+			this.inspect = injector.resolve( dependency( SERVICE_INSPECTOR ).injectingInto(	ServiceSupplier.class ) );
+		}
+		
+		@Override
+		public ServiceMethod<?, ?> supply( Dependency<? super ServiceMethod<?, ?>> dependency, Injector injector ) {
+			Type<? super ServiceMethod<?, ?>> type = dependency.type();
+			return provide( type.parameter( 0 ), type.parameter( 1 ) );
 		}
 
 		@SuppressWarnings ( "unchecked" )
-		@Override
-		public <P, R> ServiceMethod<P, R> provide( Type<P> parameterType, Type<R> returnType ) {
+		private <I, O> ServiceMethod<I, O> provide( Type<I> parameterType, Type<O> returnType ) {
 			String signatur = parameterType + "->" + returnType; // haskell like function signature
 			ServiceMethod<?, ?> service = serviceCache.get( signatur );
 			if ( service == null ) {
 				synchronized ( serviceCache ) {
 					service = serviceCache.get( signatur );
 					if ( service == null ) {
-						service = create( resolveServiceMethod( parameterType, returnType ),
-								parameterType, returnType, injector );
+						Method method = resolveServiceMethod( parameterType, returnType );
+						Object implementor = injector.resolve( dependency( method.getDeclaringClass() ) );
+						Type<?>[] types = parameterTypes(method);
+						Parameter<?>[] parameters = new Parameter<?>[types.length];
+						System.arraycopy(types, 0, parameters, 0, types.length);
+						int i = parameterIndex(method, parameterType);
+						if (i >= 0) {
+							parameters[i] = BoundParameter.constant(parameterType, null);
+						}
+						service = new InterceptableServiceMethod<I, O>( implementor, method, parameterType, returnType, Supply.parameters(types, parameters), injector );
 						serviceCache.put( signatur, service );
 					}
 				}
 			}
-			return (ServiceMethod<P, R>) service;
+			return (ServiceMethod<I, O>) service;
 		}
 
-		private static <P, T> ServiceMethod<P, T> create( Method service, Type<P> parameterType,
-				Type<T> returnType, Injector injector ) {
-			Object implementor = injector.resolve( dependency( service.getDeclaringClass() ) );
-			return new PreresolvingServiceMethod<P, T>( implementor, service, parameterType,
-					returnType, injector );
-		}
-
-		private <P, T> Method resolveServiceMethod( Type<P> parameterType, Type<T> returnType ) {
+		private <I, O> Method resolveServiceMethod( Type<I> parameterType, Type<O> returnType ) {
 			for ( Class<?> service : serviceClasses ) {
 				for ( Method sm : serviceClassMethods( service ) ) {
 					Type<?> rt = returnType( sm );
@@ -178,62 +180,50 @@ public abstract class ServiceModule
 		}
 
 	}
-
-	private static final class ServiceSupplier
-			implements Supplier<ServiceMethod<?, ?>> {
-
-		@Override
-		public ServiceMethod<?, ?> supply( Dependency<? super ServiceMethod<?, ?>> dependency,
-				Injector injector ) {
-			ServiceProvider serviceProvider = injector.resolve( dependency.instanced(anyOf( ServiceProvider.class )));
-			Type<? super ServiceMethod<?, ?>> type = dependency.type();
-			return serviceProvider.provide( type.parameter( 0 ), type.parameter( 1 ) );
+	
+	static int parameterIndex(Method method, Type<?> parameterType) {
+		Type<?>[] types = parameterTypes(method);
+		for (int i = 0; i < types.length; i++) {
+			if (types[i].equalTo(parameterType))
+				return i;
 		}
+		return -1;
 	}
 
-	private static final class PreresolvingServiceMethod<P, T>
-			implements ServiceMethod<P, T> {
+	private static final class InterceptableServiceMethod<I, O>
+			implements ServiceMethod<I, O> {
 
 		private final Object implementor;
 		private final Method method;
-		private final Type<P> parameterType;
-		private final Type<T> returnType;
-		private final Injector injector;
-		private final Injectron<?>[] argumentInjectrons;
-		private final Type<?>[] parameterTypes;
-		private final Object[] argumentTemplate;
+		private final int parameterIndex;
+		private final Type<I> parameterType;
+		private final Type<O> returnType;
 		private final ServiceInvocation<?>[] invocations;
+		private final Injector injector;
+		private final Supplier<Object[]> argsSupplier;
+		private final Dependency<Object[]> argsDependency;
 
-		PreresolvingServiceMethod( Object implementor, Method service, Type<P> parameterType,
-				Type<T> returnType, Injector injector ) {
+		InterceptableServiceMethod( Object implementor, Method method, Type<I> parameterType, Type<O> returnType, Supplier<Object[]> args, Injector injector ) {
 			super();
 			this.implementor = implementor;
-			this.method = Metaclass.accessible( service );
+			this.method = Metaclass.accessible( method );
 			this.parameterType = parameterType;
 			this.returnType = returnType;
-			this.injector = injector;
-			this.parameterTypes = parameterTypes( method );
-			this.argumentInjectrons = argumentInjectrons();
-			this.argumentTemplate = argumentTemplate();
 			this.invocations = injector.resolve(dependency(ServiceInvocation[].class));
-		}
-
-		private Object[] argumentTemplate() {
-			Object[] template = new Object[parameterTypes.length];
-			for ( int i = 0; i < template.length; i++ ) {
-				Injectron<?> injectron = argumentInjectrons[i];
-				if ( injectron != null && injectron.info().expiry.isNever() ) {
-					template[i] = instance( injectron, dependency( parameterTypes[i] ) );
-				}
-			}
-			return template;
+			this.injector = injector;
+			this.argsSupplier = args;
+			this.argsDependency = Dependency.dependency(raw(Object[].class));
+			this.parameterIndex = parameterIndex(method, parameterType);
 		}
 
 		@Override
-		public T invoke( P params ) {
-			Object[] args = actualArguments( params );
+		public O invoke( I params ) throws ServiceMalfunction {
+			Object[] args = argsSupplier.supply(argsDependency, injector);
+			if (parameterIndex >= 0) {
+				args[parameterIndex] = params;
+			}
 			Object[] state = before( params );
-			T res = null;
+			O res = null;
 			try {
 				res = returnType.rawType.cast( method.invoke( implementor, args ) );
 			} catch ( Exception e ) {
@@ -244,28 +234,28 @@ public abstract class ServiceModule
 					}
 				}
 				afterException( params, e, state );
-				throw new RuntimeException( "Failed to invoke service: " + this + " \n"	+ e.getMessage(), e );
+				throw new ServiceMalfunction(implementor.getClass().getSimpleName()+"#"+method.getName()+" failed: "+e.getMessage(), e );
 			}
 			after( params, res, state );
 			return res;
 		}
 		
 		@SuppressWarnings ( "unchecked" )
-		private <I> void afterException( P params, Exception e, Object[] states ) {
+		private <T> void afterException( I params, Exception e, Object[] states ) {
 			if ( invocations.length == 0 ) {
 				return;
 			}
 			for ( int i = 0; i < invocations.length; i++ ) {
 				try {
-					ServiceInvocation<I> inv = (ServiceInvocation<I>) invocations[i];
-					inv.afterException( parameterType, params, returnType, e, (I) states[i] );
+					ServiceInvocation<T> inv = (ServiceInvocation<T>) invocations[i];
+					inv.afterException( parameterType, params, returnType, e, (T) states[i] );
 				} catch ( RuntimeException re ) {
 					// warn that invocation before had thrown an exception
 				}
 			}
 		}
 
-		private Object[] before( P params ) {
+		private Object[] before( I params ) {
 			if ( invocations.length == 0 ) {
 				return null;
 			}
@@ -281,47 +271,18 @@ public abstract class ServiceModule
 		}
 
 		@SuppressWarnings ( "unchecked" )
-		private <I> void after( P param, T res, Object[] states ) {
+		private <T> void after( I param, O res, Object[] states ) {
 			if ( invocations.length == 0 ) {
 				return;
 			}
 			for ( int i = 0; i < invocations.length; i++ ) {
 				try {
-					ServiceInvocation<I> inv = (ServiceInvocation<I>) invocations[i];
-					inv.after( parameterType, param, returnType, res, (I)states[i] );
+					ServiceInvocation<T> inv = (ServiceInvocation<T>) invocations[i];
+					inv.after( parameterType, param, returnType, res, (T)states[i] );
 				} catch ( RuntimeException e ) {
 					// warn that invocation before had thrown an exception
 				}
 			}
-		}
-
-		private Injectron<?>[] argumentInjectrons() {
-			Injectron<?>[] res = new Injectron<?>[parameterTypes.length];
-			for ( int i = 0; i < res.length; i++ ) {
-				Type<?> paramType = parameterTypes[i];
-				res[i] = paramType.equalTo( parameterType )
-					? null
-					: injector.resolve( dependency( raw( Injectron.class ).parametized( paramType ) ) );
-			}
-			return res;
-		}
-
-		private Object[] actualArguments( P params ) {
-			Object[] args = argumentTemplate.clone();
-			for ( int i = 0; i < args.length; i++ ) {
-				Type<?> paramType = parameterTypes[i];
-				if ( paramType.equalTo( parameterType ) ) {
-					args[i] = params;
-				} else if ( args[i] == null ) {
-					args[i] = instance( argumentInjectrons[i], dependency( paramType ) );
-				}
-			}
-			return args;
-		}
-
-		@SuppressWarnings ( "unchecked" )
-		private static <I> I instance( Injectron<I> injectron, Dependency<?> dependency ) {
-			return injectron.instanceFor( (Dependency<? super I>) dependency );
 		}
 
 		@Override

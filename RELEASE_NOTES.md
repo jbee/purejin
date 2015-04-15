@@ -42,6 +42,8 @@ thrown (even though these are not checked exceptions).
 - removed `Dependency#instance` (use field access)
 - removed `Dependency#name` (use `instance.name` instead)
 - removed `Resource#name` (not needed, use field access)
+- removed `ServiceProvider` interface (rebind `ServiceMethod` instead, adapt via
+  `ServiceModule.serviceDependency`)
 
 - declared `UnresolvableDependency` as `abstract` (should not be instantiated)
 - declared `InconsistentBinding` as `RuntimeException` 
@@ -53,6 +55,7 @@ thrown (even though these are not checked exceptions).
 - changed `autobind` expansion to occur via macros
 - changed `Dependency#onTypeParameter` keeps instance name
 - changed semantics of resolving `Injectron`s (cannot be bound any more)
+- changed `ServiceMethod` explicitly throws new `ServiceMalfunction` exception
 
 - improved `Provider` implementation to use `Injectron`s (better performance!)
 - improved `Injectorn` dependencies forward `Name`

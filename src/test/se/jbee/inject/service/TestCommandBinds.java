@@ -35,11 +35,9 @@ public class TestCommandBinds {
 
 		@Override
 		public Command<?> supply( Dependency<? super Command<?>> dependency, Injector injector ) {
-			ServiceProvider provider = injector.resolve( dependency( ServiceProvider.class ) );
-			return newCommand( provider.provide( dependency.type().parameter( 0 ),
-					raw( Long.class ) ) );
+			return newCommand( injector.resolve( ServiceModule.serviceDependency(dependency.type().parameter( 0 ), raw( Long.class )) ) );
 		}
-
+		
 		private static <P> Command<P> newCommand( ServiceMethod<P, Long> service ) {
 			return new CommandToServiceMethodAdapter<P>( service );
 		}

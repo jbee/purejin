@@ -10,17 +10,17 @@ package se.jbee.inject.service;
  * 
  * @author Jan Bernitt (jan@jbee.se)
  * 
- * @param <R>
- *            The return type of the method wired to this service
- * @param <P>
+ * @param <I>
  *            The type of the parameter of the service
+ * @param <O>
+ *            The return type of the method wired to this service
  */
-public interface ServiceMethod<P, R> {
+public interface ServiceMethod<I, O> {
 
 	/**
 	 * @return the value results from the execution of this service with the
 	 *         given argument as parameter.
 	 */
-	R invoke( P params );
+	O invoke( I params ) throws ServiceMalfunction;
 
 }

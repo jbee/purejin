@@ -107,7 +107,7 @@ public class TestServiceInvocationBinds {
 		int afterExceptionCount = inv.afterExceptionCount;
 		try {
 			fail.invoke( "Foo" );
-		} catch ( RuntimeException e ) {
+		} catch ( ServiceMalfunction e ) {
 			assertTrue( e.getCause() instanceof IllegalStateException );
 			assertEquals( e.getCause().getMessage(), "Foo" );
 			assertEquals( afterExceptionCount + 1, inv.afterExceptionCount );

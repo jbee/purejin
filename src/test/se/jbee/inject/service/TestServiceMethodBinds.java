@@ -45,7 +45,7 @@ public class TestServiceMethodBinds {
 
 	@SuppressWarnings ( "unchecked" )
 	@Test
-	public void test() {
+	public void thatServicesAbstractUsualConcreteMethods() {
 		Injector injector = Bootstrap.injector( ServiceBindsModule.class );
 		@SuppressWarnings ( "rawtypes" )
 		Dependency<ServiceMethod> dependency = dependency( raw( ServiceMethod.class ).parametized(
