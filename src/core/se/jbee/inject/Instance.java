@@ -36,14 +36,6 @@ public final class Instance<T>
 		return instance( Name.ANY, type );
 	}
 
-	public static Instance<?>[] anyOf( Type<?>... types ) {
-		Instance<?>[] instances = new Instance<?>[types.length];
-		for ( int i = 0; i < instances.length; i++ ) {
-			instances[i] = anyOf( types[i] );
-		}
-		return instances;
-	}
-
 	public static <T> Instance<T> instance( Name name, Type<T> type ) {
 		return new Instance<T>( name, type );
 	}
