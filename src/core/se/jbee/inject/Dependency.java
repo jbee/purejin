@@ -179,11 +179,6 @@ public final class Dependency<T>
 	}
 
 	@Override
-	public boolean isAssignableTo( Type<?> type ) {
-		return type().isAssignableTo( type );
-	}
-
-	@Override
 	public Iterator<Injection> iterator() {
 		return Arrays.asList( hierarchy ).iterator();
 	}

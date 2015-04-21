@@ -89,7 +89,7 @@ public final class BoundParameter<T> implements Parameter<T>, Supplier<T> {
 			boolean found = false;
 			while ( i < types.length && !found ) {
 				if ( params[i] == null ) {
-					found = parameter.isAssignableTo( types[i] );
+					found = parameter.type().isAssignableTo( types[i] );
 					if ( found ) {
 						params[i] = bind( parameter );
 					}
@@ -118,11 +118,6 @@ public final class BoundParameter<T> implements Parameter<T>, Supplier<T> {
 		super();
 		this.supplied = type;
 		this.supplier = supplier;
-	}
-
-	@Override
-	public boolean isAssignableTo( Type<?> type ) {
-		return supplied.isAssignableTo( type );
 	}
 
 	@Override

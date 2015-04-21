@@ -233,7 +233,6 @@ public final class Type<T>
 			: params[index];
 	}
 
-	@Override
 	public boolean isAssignableTo( Type<?> other ) {
 		if ( !other.rawType.isAssignableFrom( rawType ) ) {
 			return false;

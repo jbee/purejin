@@ -32,5 +32,4 @@ import java.lang.reflect.Constructor;
  */
 public interface Parameter<T> extends Typed<T> {
 
-	boolean isAssignableTo( Type<?> type );
 }

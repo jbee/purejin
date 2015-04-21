@@ -94,11 +94,6 @@ public final class Instance<T>
 		return morePreciseThan2( type, other.type, name, other.name );
 	}
 
-	@Override
-	public boolean isAssignableTo( Type<?> type ) {
-		return type().isAssignableTo( type );
-	}
-
 	public static <T extends MorePreciseThan<? super T>> int comparePrecision( T one, T other ) {
 		if ( one.morePreciseThan( other ) ) {
 			return -1;
