@@ -118,7 +118,7 @@ public final class Dependency<T>
 	}
 
 	public Instance<?> target( int level ) {
-		return isUntargeted()
+		return level >= hierarchy.length
 			? Instance.ANY
 			: hierarchy[hierarchy.length - 1 - level].target.instance;
 	}
