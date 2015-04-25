@@ -6,8 +6,9 @@
 package se.jbee.inject.bootstrap;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import se.jbee.inject.UnresolvableDependency.SupplyFailed;
 
 /**
  * A util to invoke {@link Constructor}s or {@link Method}s that converts checked {@link Exception}s
@@ -21,32 +22,20 @@ public final class Invoke {
 		throw new UnsupportedOperationException( "util" );
 	}
 
-	public static <T> T constructor( Constructor<T> constructor, Object... args ) {
+	public static <T> T constructor( Constructor<T> constructor, Object... args ) throws SupplyFailed {
 		try {
 			return constructor.newInstance( args );
 		} catch ( Exception e ) {
-			throw asRuntimeException(e);
+			throw SupplyFailed.valueOf(e, constructor);
 		}
 	}
 
-	public static Object method( Method method, Object owner, Object... args ) {
+	public static Object method( Method method, Object owner, Object... args ) throws SupplyFailed {
 		try {
 			return method.invoke( owner, args );
 		} catch ( Exception e ) {
-			throw asRuntimeException(e);
+			throw SupplyFailed.valueOf(e, method);
 		}
 	}
 
-	private static RuntimeException asRuntimeException(Exception e) {
-		if ( e instanceof InvocationTargetException ) {
-			Throwable t = ( (InvocationTargetException) e ).getTargetException();
-			if ( t instanceof Exception ) {
-				e = (Exception) t;
-			}
-		}
-		if (e instanceof RuntimeException) {
-			return (RuntimeException) e;
-		}
-		return new RuntimeException( e );
-	}
 }

@@ -10,7 +10,15 @@ import static se.jbee.inject.container.Typecast.injectronTypeOf;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Injectron;
+import se.jbee.inject.UnresolvableDependency;
 
+/**
+ * Slimier to a call-site each {@linkplain InjectionSite} represents the
+ * resolution of arguments from a specific site or path that is represented by a
+ * {@link Dependency}.
+ * 
+ * @author jan
+ */
 public final class InjectionSite {
 
 	public final Dependency<?> site;
@@ -31,7 +39,7 @@ public final class InjectionSite {
 		this.args = initNonDynamicParameters(injector);
 	}
 	
-	public Object[] args(Injector injector) {
+	public Object[] args(Injector injector) throws UnresolvableDependency {
 		if (dynamicsLength == 0) {
 			return args;
 		}

@@ -28,6 +28,7 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
+import se.jbee.inject.UnresolvableDependency.SupplyFailed;
 import se.jbee.inject.bind.BinderModule;
 import se.jbee.inject.bootstrap.BoundParameter;
 import se.jbee.inject.bootstrap.InjectionSite;
@@ -224,9 +225,13 @@ public abstract class ServiceModule
 					args[parameterIndex] = params;
 				}
 				res = returnType.rawType.cast(Invoke.method(method, owner, args));
-			} catch ( Exception e ) {
-				afterException( params, e, state );
-				throw new ServiceMalfunction(method.getDeclaringClass().getSimpleName()+"#"+method.getName()+" failed: "+e.getMessage(), e );
+			} catch ( UnresolvableDependency e ) {
+				Exception ex = e;
+				if ( e instanceof SupplyFailed && e.getCause() instanceof Exception ) {
+					ex = (Exception) e.getCause();
+				}
+				afterException( params, ex, state );
+				throw new ServiceMalfunction(method.getDeclaringClass().getSimpleName()+"#"+method.getName()+" failed: "+e.getMessage(), ex );
 			}
 			after( params, res, state );
 			return res;

@@ -33,6 +33,7 @@ thrown (even though these are not checked exceptions).
 - renamed `DeclarationType#nullifiedBy` to `droppedWith`
 - renamed `Factory#produce` to `fabricate` (less confusing naming)
 
+- removed `UnresolvableDependency#injectionStack` (now `Dependency`'s `toString`)
 - removed `Type#getRawType` (use field access)
 - removed `Type#isFinal` (not used)
 - removed `Type#elementType(Class)` (not used)
@@ -61,6 +62,8 @@ thrown (even though these are not checked exceptions).
 - improved `Provider` implementation to use `Injectron`s (better performance!)
 - improved `Injectorn` dependencies forward `Name`
 - added `Dependency#equalTo` (and `equals`)
+- added `InjectionSite` utility to provide "cached" arguments
+- added `SupplyFailed` exception (errors during supply attempt)
 
 v0.8
 ===============

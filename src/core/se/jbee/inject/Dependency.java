@@ -60,11 +60,6 @@ public final class Dependency<T>
 		this.instance = instance;
 		this.hierarchy = hierarchy;
 	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return obj instanceof Dependency && equalTo((Dependency<?>) obj);
-	}
 	
 	public boolean equalTo( Dependency<?> other ) {
 		// cheapest first...
@@ -80,13 +75,10 @@ public final class Dependency<T>
 	@Override
 	public String toString() {
 		StringBuilder b = new StringBuilder();
-		String indent = "";
-		for (int i = 0; i < hierarchy.length; i++) {
-			b.append(indent);
-			b.append(hierarchy[i]).append('\n');
-			indent+= "  ";
+		for ( Injection i : hierarchy ) {
+			b.append( i.target ).append( " -> " );
 		}
-		b.append(indent).append(instance);
+		b.append(instance);
 		return b.toString();
 	}
 

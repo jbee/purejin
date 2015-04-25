@@ -5,6 +5,8 @@
  */
 package se.jbee.inject;
 
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -22,6 +24,7 @@ import se.jbee.inject.bootstrap.Binding;
  * @see UnstableDependency
  * @see NoResourceForDependency
  * @see NoMethodForDependency
+ * @see SupplyFailed
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
@@ -30,6 +33,10 @@ public abstract class UnresolvableDependency
 
 	protected UnresolvableDependency( String message ) {
 		super( message );
+	}
+
+	protected UnresolvableDependency(String message, Throwable cause) {
+		super(message, cause);
 	}
 
 	@Override
@@ -46,17 +53,9 @@ public abstract class UnresolvableDependency
 			extends UnresolvableDependency {
 
 		public DependencyCycle( Dependency<?> dependency, Resource<?> cycleTarget ) {
-			super( "Cycle detected: " + injectionStack( dependency ) + cycleTarget );
+			super( "Cycle detected: " +  dependency + cycleTarget );
 		}
 
-	}
-
-	public static String injectionStack( Dependency<?> dependency ) {
-		StringBuilder b = new StringBuilder();
-		for ( Injection i : dependency ) {
-			b.append( i.target ).append( " -> " );
-		}
-		return b.toString();
 	}
 
 	/**
@@ -85,8 +84,7 @@ public abstract class UnresolvableDependency
 			extends UnresolvableDependency {
 
 		public <T> NoResourceForDependency( Dependency<T> dependency, Injectron<T>[] available, String msg ) {
-			super( "No resource for dependency: " + injectionStack( dependency )
-					+ dependency.instance + "\navailable are (for same raw type): "
+			super( "No resource for dependency: " + dependency + "\navailable are (for same raw type): "
 					+ describe( available ) + "\n"
 					+ msg);
 		}
@@ -111,15 +109,33 @@ public abstract class UnresolvableDependency
 	 * A method has been described by its return and {@link Parameter} {@link Type}s (e.g. for use
 	 * as factory or service) but such a method cannot be found. That usual means the defining class
 	 * hasn't been bound correctly or the signature has changed.
-	 * 
-	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	public static final class NoMethodForDependency
-			extends UnresolvableDependency {
+	public static final class NoMethodForDependency extends UnresolvableDependency {
 
 		public NoMethodForDependency( Type<?> returnType, Type<?>... parameterTypes ) {
 			super( returnType + ":" + Arrays.toString( parameterTypes ) );
 		}
+	}
+	
+	/**
+	 * When trying to supply a {@link Dependency} (e.g. by calling a method or
+	 * constructor) a error occurred that prevented a successful supply.
+	 */
+	public static final class SupplyFailed extends UnresolvableDependency {
+
+		public SupplyFailed(String msg, Throwable cause) {
+			super(msg, cause);
+		}
+		
+		public static SupplyFailed valueOf(Exception e, AccessibleObject invoked) {
+			if ( e instanceof InvocationTargetException ) {
+				Throwable t = ( (InvocationTargetException) e ).getTargetException();
+				if ( t instanceof Exception ) {
+					e = (Exception) t;
+				}
+			}
+			return new SupplyFailed("Failed to invoke: "+invoked, e );
+		}		
 	}
 
 }

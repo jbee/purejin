@@ -140,7 +140,6 @@ public class Binder {
 		return new Binder( root, bind );
 	}
 
-	@Deprecated
 	protected final Binder implicit() {
 		return on( bind().asImplicit() );
 	}
@@ -161,10 +160,10 @@ public class Binder {
 
 		public void into( Class<?> pluginPoint ) {
 			binder.multibind(Name.named(pluginPoint.getCanonicalName()+":"+plugin.getCanonicalName()), Class.class).to(plugin);
-			binder.implicit().bind(plugin).toConstructor();
-			// we allow both collections of classes that have a common super-type or collection that don't
+			binder.implicit().construct(plugin);
+			// we allow both collections of classes that have a common super-type or collections that don't
 			if (raw(plugin).isAssignableTo(raw(pluginPoint).asUpperBound())) {
-				// if they have a common super-type the plugin is bound as a implementation
+				// if they have a common super-type the plugin is bound as an implementation
 				@SuppressWarnings("unchecked")
 				Class<? super T> pp = (Class<? super T>) pluginPoint;
 				binder.multibind(pp).to(plugin);
@@ -224,23 +223,24 @@ public class Binder {
 		}
 
 		private <T> void bind( Constructor<T> constructor, Parameter<?>... parameters ) {
+			// isn#t this a bit like provide?
 			Name name = inspector.nameFor( constructor );
-			Class<T> implementation = constructor.getDeclaringClass();
+			Class<T> impl = constructor.getDeclaringClass();
 			if ( name.isDefault() ) {
-				binder.autobind( implementation ).to( constructor, parameters );
+				binder.autobind( impl ).to( constructor, parameters );
 			} else {
-				binder.bind( name, implementation ).to( constructor, parameters );
-				for ( Type<? super T> st : Type.raw( implementation ).supertypes() ) {
+				binder.bind( name, impl ).to( constructor, parameters );
+				for ( Type<? super T> st : Type.raw( impl ).supertypes() ) {
 					if ( st.isInterface() ) {
-						binder.implicit().bind( name, st ).to( name, implementation );
+						binder.implicit().bind( name, st ).to( name, impl );
 					}
 				}
 			}
 		}
 
-		public void in( Class<?> implementer, Class<?>... implementers ) {
-			in( implementer );
-			for ( Class<?> i : implementers ) {
+		public void in( Class<?> impl, Class<?>... more ) {
+			in( impl );
+			for ( Class<?> i : more ) {
 				in( i );
 			}
 		}
