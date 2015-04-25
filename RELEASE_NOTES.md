@@ -56,10 +56,11 @@ thrown (even though these are not checked exceptions).
 - changed `Dependency#onTypeParameter` keeps instance name
 - changed semantics of resolving `Injectron`s (cannot be bound any more)
 - changed `ServiceMethod` explicitly throws new `ServiceMalfunction` exception
+- changed unified exception handling when invoking methods and constructors
 
 - improved `Provider` implementation to use `Injectron`s (better performance!)
 - improved `Injectorn` dependencies forward `Name`
-
+- added `Dependency#equalTo` (and `equals`)
 
 v0.8
 ===============

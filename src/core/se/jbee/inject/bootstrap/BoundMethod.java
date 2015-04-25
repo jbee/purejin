@@ -34,7 +34,7 @@ public final class BoundMethod<T>
 	private BoundMethod( Object instance, Method factory, Type<T> returnType, Parameter<?>[] parameters ) {
 		super();
 		this.returnType = returnType;
-		this.factory = factory;
+		this.factory = Metaclass.accessible(factory);
 		this.parameters = parameters;
 		this.instance = instance;
 		this.isInstanceMethod = !Modifier.isStatic( factory.getModifiers() );

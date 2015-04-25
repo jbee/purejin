@@ -25,7 +25,7 @@ public final class Invoke {
 		try {
 			return constructor.newInstance( args );
 		} catch ( Exception e ) {
-			throw new RuntimeException( e );
+			throw asRuntimeException(e);
 		}
 	}
 
@@ -33,15 +33,20 @@ public final class Invoke {
 		try {
 			return method.invoke( owner, args );
 		} catch ( Exception e ) {
-			if ( e instanceof InvocationTargetException ) {
-				Throwable t = ( (InvocationTargetException) e ).getTargetException();
-				if ( t instanceof Exception ) {
-					e = (Exception) t;
-				}
-			}
-			throw new RuntimeException( "Failed to invoke method: " + method + " \n"
-					+ e.getMessage(), e );
+			throw asRuntimeException(e);
 		}
 	}
 
+	private static RuntimeException asRuntimeException(Exception e) {
+		if ( e instanceof InvocationTargetException ) {
+			Throwable t = ( (InvocationTargetException) e ).getTargetException();
+			if ( t instanceof Exception ) {
+				e = (Exception) t;
+			}
+		}
+		if (e instanceof RuntimeException) {
+			return (RuntimeException) e;
+		}
+		return new RuntimeException( e );
+	}
 }

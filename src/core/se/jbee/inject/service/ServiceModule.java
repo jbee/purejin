@@ -5,6 +5,7 @@
  */
 package se.jbee.inject.service;
 
+import static java.util.Arrays.asList;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Dependency.pluginsFor;
 import static se.jbee.inject.Instance.instance;
@@ -15,8 +16,8 @@ import static se.jbee.inject.Type.returnType;
 import static se.jbee.inject.container.Scoped.APPLICATION;
 import static se.jbee.inject.container.Scoped.DEPENDENCY_TYPE;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -24,17 +25,17 @@ import java.util.Map;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
-import se.jbee.inject.Parameter;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bind.BinderModule;
 import se.jbee.inject.bootstrap.BoundParameter;
+import se.jbee.inject.bootstrap.InjectionSite;
 import se.jbee.inject.bootstrap.Inspect;
 import se.jbee.inject.bootstrap.Inspector;
+import se.jbee.inject.bootstrap.Invoke;
 import se.jbee.inject.bootstrap.Metaclass;
 import se.jbee.inject.bootstrap.Module;
-import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.container.Scoped;
 
 /**
@@ -127,14 +128,7 @@ public abstract class ServiceModule
 					if ( service == null ) {
 						Method method = resolveServiceMethod( parameterType, returnType );
 						Object implementor = injector.resolve( dependency( method.getDeclaringClass() ) );
-						Type<?>[] types = parameterTypes(method);
-						Parameter<?>[] parameters = new Parameter<?>[types.length];
-						System.arraycopy(types, 0, parameters, 0, types.length);
-						int i = parameterIndex(method, parameterType);
-						if (i >= 0) {
-							parameters[i] = BoundParameter.constant(parameterType, null);
-						}
-						service = new InterceptableServiceMethod<I, O>( implementor, method, parameterType, returnType, Supply.parameters(types, parameters), injector );
+						service = new InterceptableServiceMethod<I, O>( implementor, method, parameterType, returnType, injector );
 						serviceCache.put( signatur, service );
 					}
 				}
@@ -193,48 +187,46 @@ public abstract class ServiceModule
 	private static final class InterceptableServiceMethod<I, O>
 			implements ServiceMethod<I, O> {
 
-		private final Object implementor;
+		private final Object owner;
 		private final Method method;
-		private final int parameterIndex;
+
 		private final Type<I> parameterType;
 		private final Type<O> returnType;
 		private final ServiceInvocation<?>[] invocations;
+		
 		private final Injector injector;
-		private final Supplier<Object[]> argsSupplier;
-		private final Dependency<Object[]> argsDependency;
+		private final InjectionSite injection;
+		private final int parameterIndex;
 
-		InterceptableServiceMethod( Object implementor, Method method, Type<I> parameterType, Type<O> returnType, Supplier<Object[]> args, Injector injector ) {
+		InterceptableServiceMethod( Object owner, Method method, Type<I> parameterType, Type<O> returnType, Injector injector ) {
 			super();
-			this.implementor = implementor;
-			this.method = Metaclass.accessible( method );
+			this.method = Metaclass.accessible(method);
 			this.parameterType = parameterType;
 			this.returnType = returnType;
 			this.invocations = injector.resolve(dependency(ServiceInvocation[].class));
 			this.injector = injector;
-			this.argsSupplier = args;
-			this.argsDependency = Dependency.dependency(raw(Object[].class));
-			this.parameterIndex = parameterIndex(method, parameterType);
+			Type<?>[] types = Type.parameterTypes(method);
+			this.injection = new InjectionSite(dependency(returnType).injectingInto(method.getDeclaringClass()), injector, BoundParameter.bind(types, BoundParameter.constant(parameterType, null)));
+			if ( !Modifier.isStatic( method.getModifiers() ) && owner == null ) {
+				owner = injector.resolve( Dependency.dependency( method.getDeclaringClass() ) );
+			}
+			this.owner = owner;
+			this.parameterIndex = asList(types).indexOf(parameterType);
 		}
-
+		
 		@Override
 		public O invoke( I params ) throws ServiceMalfunction {
-			Object[] args = argsSupplier.supply(argsDependency, injector);
-			if (parameterIndex >= 0) {
-				args[parameterIndex] = params;
-			}
 			Object[] state = before( params );
 			O res = null;
 			try {
-				res = returnType.rawType.cast( method.invoke( implementor, args ) );
-			} catch ( Exception e ) {
-				if ( e instanceof InvocationTargetException ) {
-					Throwable t = ( (InvocationTargetException) e ).getTargetException();
-					if ( t instanceof Exception ) {
-						e = (Exception) t;
-					}
+				Object[] args = injection.args(injector);
+				if (parameterIndex >= 0) {
+					args[parameterIndex] = params;
 				}
+				res = returnType.rawType.cast(Invoke.method(method, owner, args));
+			} catch ( Exception e ) {
 				afterException( params, e, state );
-				throw new ServiceMalfunction(implementor.getClass().getSimpleName()+"#"+method.getName()+" failed: "+e.getMessage(), e );
+				throw new ServiceMalfunction(method.getDeclaringClass().getSimpleName()+"#"+method.getName()+" failed: "+e.getMessage(), e );
 			}
 			after( params, res, state );
 			return res;

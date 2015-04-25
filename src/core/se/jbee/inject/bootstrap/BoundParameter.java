@@ -27,8 +27,10 @@ import se.jbee.inject.Type;
  * @param <T>
  *            The {@link Type} of the parameter
  */
-public final class BoundParameter<T> implements Parameter<T>, Supplier<T> {
+public final class BoundParameter<T> implements Parameter<T> {
 
+	public static enum ParameterType { INSTANCE, CONSTANT, EXTERNAL }
+	
 	private static final BoundParameter<?>[] NO_PARAMS = new BoundParameter<?>[0];
 
 	public static <T> BoundParameter<T> bind( Parameter<T> parameter ) {
@@ -37,15 +39,15 @@ public final class BoundParameter<T> implements Parameter<T>, Supplier<T> {
 		}
 		if ( parameter instanceof Instance<?> ) {
 			Instance<T> i = (Instance<T>) parameter;
-			return new BoundParameter<T>( i.type(), Supply.instance( i ) );
+			return new BoundParameter<T>(ParameterType.INSTANCE, i.type(), i, null, Supply.instance( i ) );
 		}
 		if ( parameter instanceof Type<?> ) {
 			Instance<T> i = anyOf( (Type<T>) parameter );
-			return new BoundParameter<T>( i.type(), Supply.instance( i ) );
+			return new BoundParameter<T>(ParameterType.INSTANCE, i.type(), i, null, Supply.instance( i ) );
 		}
 		if ( parameter instanceof Dependency<?> ) {
 			final Dependency<T> d = (Dependency<T>) parameter;
-			return new BoundParameter<T>( d.type(), Supply.dependency( d ) );
+			return new BoundParameter<T>(ParameterType.EXTERNAL, d.type(), d.instance, null, Supply.dependency( d ) );
 		}
 		throw new IllegalArgumentException( "Unknown parameter type:" + parameter );
 	}
@@ -55,11 +57,11 @@ public final class BoundParameter<T> implements Parameter<T>, Supplier<T> {
 	}
 
 	public static <T> Parameter<T> constant( Type<T> type, T constant ) {
-		return new BoundParameter<T>( type, Supply.constant( constant ) );
+		return new BoundParameter<T>(ParameterType.CONSTANT, type, Instance.defaultInstanceOf(type), constant, Supply.constant( constant ) );
 	}
 
 	public static <T> Parameter<T> supplier( Type<T> type, Supplier<? extends T> supplier ) {
-		return new BoundParameter<T>( type, supplier );
+		return new BoundParameter<T>(ParameterType.EXTERNAL, type, Instance.defaultInstanceOf(type), null, supplier );
 	}
 
 	public static <S, T extends S> Parameter<S> asType( Class<S> supertype, Parameter<T> parameter ) {
@@ -67,7 +69,7 @@ public final class BoundParameter<T> implements Parameter<T>, Supplier<T> {
 	}
 
 	public static <S, T extends S> Parameter<S> asType( Type<S> supertype, Parameter<T> parameter ) {
-		return new BoundParameter<S>( supertype, bind( parameter ) );
+		return bind( parameter ).typed(supertype);
 	}
 
 	public static <E> BoundParameter<? extends E>[] bind(Parameter<? extends E>... parameters ) {
@@ -111,23 +113,24 @@ public final class BoundParameter<T> implements Parameter<T>, Supplier<T> {
 	
 	//------------------------------------------------------
 	
-	private final Type<T> supplied;
-	private final Supplier<? extends T> supplier;
+	public final ParameterType type;
+	public final Type<T> asType;
+	public final Instance<? extends T> instance;
+	public final T value;
+	public final Supplier<? extends T> supplier;
 
-	BoundParameter( Type<T> type, Supplier<? extends T> supplier ) {
+	public BoundParameter(ParameterType type, Type<T> asType, Instance<? extends T> instance, T value, Supplier<? extends T> supplier) {
 		super();
-		this.supplied = type;
+		this.type = asType.rawType == Injector.class ? ParameterType.EXTERNAL : type;
+		this.asType = asType;
+		this.instance = instance;
+		this.value = value;
 		this.supplier = supplier;
 	}
 
 	@Override
-	public T supply( Dependency<? super T> dependency, Injector injector ) {
-		return supplier.supply( dependency, injector );
-	}
-
-	@Override
 	public Type<T> type() {
-		return supplied;
+		return asType;
 	}
 
 	/**
@@ -139,15 +142,15 @@ public final class BoundParameter<T> implements Parameter<T>, Supplier<T> {
 	@SuppressWarnings ( "unchecked" )
 	@Override
 	public <E> BoundParameter<E> typed( Type<E> type ) throws ClassCastException {
-		if ( supplied.isAssignableTo( type ) ) {
-			return new BoundParameter<E>( type, (Supplier<? extends E>) supplier );
+		if ( asType.isAssignableTo( type ) ) {
+			return new BoundParameter<E>(this.type, type, (Instance<E>)instance, (E)value, (Supplier<? extends E>) supplier );
 		}
-		throw new ClassCastException( "Only supertypes of " + supplied	+ " can be supplied as same paramter - but was: " + type );
+		throw new ClassCastException( "Only supertypes of " + asType	+ " can be supplied as same paramter - but was: " + type );
 	}
 
 	@Override
 	public String toString() {
-		return Supply.describe( supplied, supplier );
+		return Supply.describe( asType, supplier );
 	}
 	
 }

@@ -14,8 +14,7 @@ import se.jbee.inject.Typed;
 public final class BoundConstructor<T>
 		implements Typed<T> {
 
-	public static <T> BoundConstructor<T> bind( Constructor<T> constructor,
-			Parameter<?>... parameters ) {
+	public static <T> BoundConstructor<T> bind( Constructor<T> constructor, Parameter<?>... parameters ) {
 		return new BoundConstructor<T>( constructor, parameters );
 	}
 
@@ -24,7 +23,7 @@ public final class BoundConstructor<T>
 
 	private BoundConstructor( Constructor<T> constructor, Parameter<?>[] parameters ) {
 		super();
-		this.constructor = constructor;
+		this.constructor = Metaclass.accessible(constructor);
 		this.parameters = parameters;
 	}
 

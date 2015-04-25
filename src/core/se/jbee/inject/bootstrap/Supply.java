@@ -37,9 +37,6 @@ import se.jbee.inject.container.Provider;
  */
 public final class Supply {
 
-	private static final Object[] NO_ARGS = new Object[0];
-	static final Type<Object[]> OBJECT_ARRAY = raw(Object[].class);
-
 	public static final Supplier<Provider<?>> PROVIDER_BRIDGE = new ProviderSupplier();
 	public static final Supplier<List<?>> LIST_BRIDGE = new ArrayToListBridgeSupplier();
 	public static final Supplier<Set<?>> SET_BRIDGE = new ArrayToSetBridgeSupplier();
@@ -82,17 +79,13 @@ public final class Supply {
 	}
 
 	public static <T> Supplier<T> method( BoundMethod<T> factory ) {
-		return new MethodSupplier<T>( factory, parameters( parameterTypes( factory.factory ), factory.parameters ));
+		return new MethodSupplier<T>(factory, 
+				bind( parameterTypes(factory.factory), factory.parameters ));
 	}
 
 	public static <T> Supplier<T> costructor( BoundConstructor<T> constructor ) {
-		return new ConstructorSupplier<T>( 
-				Metaclass.accessible( constructor.constructor ), 
-				parameters( parameterTypes( constructor.constructor ), constructor.parameters ));
-	}
-	
-	public static Supplier<Object[]> parameters(Type<?>[] types, Parameter<?>... parameters) {
-		return new BufferedParameterSupplier(bind(types, parameters));
+		return new ConstructorSupplier<T>( constructor.constructor, 
+				bind( parameterTypes(constructor.constructor), constructor.parameters));
 	}
 
 	public static <T> Supplier<T> factory( Factory<T> factory ) {
@@ -101,21 +94,6 @@ public final class Supply {
 
 	public static <T> Provider<T> lazyProvider( Dependency<T> dependency, Injector context ) {
 		return new LazyProvider<T>( dependency, context );
-	}
-
-	public static <T> Object[] resolveParameters( Dependency<? super T> parent, Injector injector, BoundParameter<?>[] params ) {
-		if ( params.length == 0 ) {
-			return NO_ARGS;
-		}
-		Object[] args = new Object[params.length];
-		for ( int i = 0; i < params.length; i++ ) {
-			args[i] = resolveParameter( parent, injector, params[i] );
-		}
-		return args;
-	}
-
-	public static <T> T resolveParameter( Dependency<?> parent, Injector injector, BoundParameter<T> param ) {
-		return param.supply( parent.instanced( anyOf( param.type() ) ), injector );
 	}
 
 	private Supply() {
@@ -179,6 +157,7 @@ public final class Supply {
 
 	}
 
+	@Deprecated // should not be needed 
 	private static final class DependencySupplier<T>
 			implements Supplier<T> {
 
@@ -228,35 +207,30 @@ public final class Supply {
 	 * 
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	@Deprecated // should use new args
-	private static final class PredefinedArraySupplier<E>
-			implements Supplier<E[]> {
+	private static final class PredefinedArraySupplier<E> extends WithParameters<E[]> {
 
 		private final Type<E[]> arrayType;
-		private final BoundParameter<? extends E>[] elements;
-
-		PredefinedArraySupplier( Type<E[]> arrayType, BoundParameter<? extends E>[] elements ) {
-			super();
-			this.arrayType = arrayType;
-			this.elements = elements;
-		}
+		private final E[] res;
 
 		@SuppressWarnings ( "unchecked" )
+		PredefinedArraySupplier( Type<E[]> arrayType, BoundParameter<? extends E>[] elements ) {
+			super(elements);
+			this.arrayType = arrayType;
+			this.res = (E[]) Array.newInstance( arrayType.baseType().rawType, elements.length );
+		}
+
 		@Override
-		public E[] supply( Dependency<? super E[]> dependency, Injector injector ) {
-			final Type<?> elementType = arrayType.baseType();
-			final E[] res = (E[]) Array.newInstance( elementType.rawType, elements.length );
-			final Dependency<E> elementDependency = (Dependency<E>) dependency.typed( elementType );
-			int i = 0;
-			for ( BoundParameter<? extends E> e : elements ) {
-				res[i++] = e.supply( elementDependency, injector );
-			}
+		protected void init(Dependency<? super E[]> dependency, Injector injector) { /*NOOP*/ }
+		
+		@Override
+		protected E[] invoke(Object[] args) {
+			System.arraycopy(args, 0, res, 0, res.length);
 			return res;
 		}
 
 		@Override
 		public String toString() {
-			return describe( "supplies", elements );
+			return describe( "supplies", arrayType );
 		}
 	}
 
@@ -301,7 +275,7 @@ public final class Supply {
 		}
 
 	}
-
+	
 	private static final class InstanceSupplier<T>
 			implements Supplier<T> {
 
@@ -314,6 +288,7 @@ public final class Supply {
 
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
+			//TODO use "buffered" Injectron (as long as same dependency not re-resolve it
 			return injector.resolve( dependency.instanced( instance ) );
 		}
 
@@ -391,69 +366,57 @@ public final class Supply {
 
 	}
 	
-	static final class BufferedParameterSupplier implements Supplier<Object[]> {
-
-		private final BoundParameter<?>[] params;
-		
-		public BufferedParameterSupplier(BoundParameter<?>[] params) {
-			super();
-			this.params = params;
-		}
-
-		@Override
-		public Object[] supply(Dependency<? super Object[]> dependency,	Injector injector) throws UnresolvableDependency {
-			return resolveParameters( dependency, injector, params );
-		}
-		
-	}
-
-	private static final class ConstructorSupplier<T>
-			implements Supplier<T> {
+	private static final class ConstructorSupplier<T> extends WithParameters<T> {
 
 		private final Constructor<T> constructor;
-		private final Supplier<Object[]> args;
 
-		ConstructorSupplier( Constructor<T> constructor, Supplier<Object[]> args ) {
+		ConstructorSupplier( Constructor<T> constructor, BoundParameter<?>[] params) {
+			super(params);
 			this.constructor = constructor;
-			this.args=args;
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			return Invoke.constructor( constructor, args.supply(dependency.typed(OBJECT_ARRAY), injector) );
+		protected void init(Dependency<? super T> dependency, Injector injector) { /*NOOP*/}
+
+		@Override
+		protected T invoke(Object[] args) {
+			return Invoke.constructor(constructor, args);
 		}
 
 		@Override
 		public String toString() {
-			return describe( constructor, args );
+			return describe( constructor );
 		}
 	}
 
-	private static final class MethodSupplier<T>
-			implements Supplier<T> {
+	private static final class MethodSupplier<T> extends WithParameters<T> {
 
 		private final BoundMethod<T> method;
-		private final Supplier<Object[]> args;
-
-		MethodSupplier( BoundMethod<T> method, Supplier<Object[]> args ) {
-			super();
+		private Object owner;
+		private final Class<T> returnType;
+	
+		MethodSupplier( BoundMethod<T> method, BoundParameter<?>[] parameters ) {
+			super(parameters);
 			this.method = method;
-			this.args = args;
+			this.returnType = method.returnType.rawType;
+			this.owner = method.instance;
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			Object owner = method.instance;
+		protected void init(Dependency<? super T> dependency, Injector injector) {
 			if ( method.isInstanceMethod && owner == null ) {
 				owner = injector.resolve( Dependency.dependency( method.factory.getDeclaringClass() ) );
 			}
-			return method.returnType.rawType.cast(
-					Invoke.method( method.factory, owner, args.supply(dependency.typed(OBJECT_ARRAY), injector)) );
+		}
+		
+		@Override
+		protected T invoke(Object[] args) {
+			return returnType.cast(Invoke.method( method.factory, owner, args ));
 		}
 
 		@Override
 		public String toString() {
-			return describe( method.factory, args );
+			return describe( method.factory );
 		}
 	}
 
@@ -506,52 +469,34 @@ public final class Supply {
 		return describe( behaviour, Arrays.toString( variants ) );
 	}
 	
-	static class Foo {
+	public static abstract class WithParameters<T> implements Supplier<T> {
 		
-		private final Injector injector;
-		private final Injectron<?>[] argumentInjectrons;
-		private final Type<?>[] parameterTypes;
-		private final Object[] argumentTemplate;
+		private final BoundParameter<?>[] params;
 
-		Foo(Injector injector, Type<?>[] types) {
-			this.injector = injector;
-			this.parameterTypes = types;
-			this.argumentInjectrons = argumentInjectrons();
-			this.argumentTemplate = argumentTemplate();
+		private InjectionSite previous;
+
+		WithParameters(BoundParameter<?>[] params) {
+			super();
+			this.params = params;
+
 		}
 		
-		private Object[] argumentTemplate() {
-			Object[] template = new Object[parameterTypes.length];
-			for ( int i = 0; i < template.length; i++ ) {
-				Injectron<?> injectron = argumentInjectrons[i];
-				if ( injectron != null && injectron.info().expiry.isNever() ) {
-					template[i] = instance( injectron, Dependency.dependency( parameterTypes[i] ) );
-				}
+		protected abstract void init(Dependency<? super T> dependency, Injector injector);
+		
+		protected abstract T invoke(Object[] args);
+		
+		@Override
+		public T supply(Dependency<? super T> dependency, Injector injector) throws UnresolvableDependency {
+			InjectionSite local = previous; // this is important so previous might work as a simple cache but never causes trouble for this invocation in face of multiple threads calling
+			if (local == null) {
+				init(dependency, injector);
 			}
-			return template;
-		}
-
-		private Injectron<?>[] argumentInjectrons() {
-			Injectron<?>[] res = new Injectron<?>[parameterTypes.length];
-			for ( int i = 0; i < res.length; i++ ) {
-				Type<?> paramType = parameterTypes[i];
-				res[i] = injector.resolve( Dependency.dependency( raw( Injectron.class ).parametized( paramType ) ) );
+			if (local == null || !local.site.equalTo(dependency)) {
+				local = new InjectionSite(dependency, injector, params);
+				previous = local;
 			}
-			return res;
+			return invoke(local.args(injector));	
 		}
-
-		private Object[] actualArguments() {
-			Object[] args = argumentTemplate.clone();
-			for ( int i = 0; i < args.length; i++ ) {
-				Type<?> paramType = parameterTypes[i];
-				args[i] = instance( argumentInjectrons[i], Dependency.dependency( paramType ) );
-			}
-			return args;
-		}
-
-		@SuppressWarnings ( "unchecked" )
-		private static <I> I instance( Injectron<I> injectron, Dependency<?> dependency ) {
-			return injectron.instanceFor( (Dependency<? super I>) dependency );
-		}		
+	
 	}
 }

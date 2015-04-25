@@ -62,17 +62,39 @@ public final class Dependency<T>
 	}
 
 	@Override
-	public Type<T> type() {
-		return instance.type;
+	public boolean equals(Object obj) {
+		return obj instanceof Dependency && equalTo((Dependency<?>) obj);
+	}
+	
+	public boolean equalTo( Dependency<?> other ) {
+		// cheapest first...
+		if (hierarchy.length != other.hierarchy.length || !instance.equalTo(other.instance))
+			return false;
+		for (int i = 0; i < hierarchy.length; i++) {
+			if (!hierarchy[i].equalTo(other.hierarchy[i]))
+				return false;
+		}
+		return true;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder b = new StringBuilder();
+		String indent = "";
+		for (int i = 0; i < hierarchy.length; i++) {
+			b.append(indent);
+			b.append(hierarchy[i]).append('\n');
+			indent+= "  ";
+		}
+		b.append(indent).append(instance);
+		return b.toString();
 	}
 
 	@Override
-	public String toString() {
-		return instance.toString() + ( hierarchy.length == 0
-			? ""
-			: " " + Arrays.toString( hierarchy ) );
+	public Type<T> type() {
+		return instance.type;
 	}
-
+	
 	@Override
 	public <E> Dependency<E> typed( Type<E> type ) {
 		return instanced( instance.typed(type) );

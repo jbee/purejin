@@ -31,7 +31,7 @@ public final class Injection {
 
 	@Override
 	public String toString() {
-		return "(" + dependency + "->" + target + ")";
+		return dependency + " for " + target+" ?";
 	}
 
 	public Injection ignoredExpiry() {
