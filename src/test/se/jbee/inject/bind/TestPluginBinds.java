@@ -1,4 +1,4 @@
-package se.jbee.inject.service;
+package se.jbee.inject.bind;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertSame;
@@ -14,6 +14,7 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.bind.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Module;
+import se.jbee.inject.procedure.Procedure;
 
 public class TestPluginBinds {
 
@@ -21,9 +22,9 @@ public class TestPluginBinds {
 		
 		@Override
 		protected void declare() {
-			asDefault().plug(TestExtensionService.class).into(ServiceMethod.class);
-			inPackageOf( Module.class ).plug(TestExtensionPackageLocalService.class).into(ServiceMethod.class);
-			injectingInto( Serializable.class ).plug(TestExtensionInstanceOfService.class).into(ServiceMethod.class);
+			asDefault().plug(TestExtensionService.class).into(Procedure.class);
+			inPackageOf( Module.class ).plug(TestExtensionPackageLocalService.class).into(Procedure.class);
+			injectingInto( Serializable.class ).plug(TestExtensionInstanceOfService.class).into(Procedure.class);
 		}
 	}
 
@@ -42,7 +43,7 @@ public class TestPluginBinds {
 	private final Injector injector = Bootstrap.injector( TestPluginModule.class );
 
 	@SuppressWarnings("rawtypes")
-	private final Dependency<Class[]> dependency = Dependency.pluginsFor(ServiceMethod.class);
+	private final Dependency<Class[]> dependency = Dependency.pluginsFor(Procedure.class);
 
 	@Test
 	public void thatJustUntargetedExtensionsAreResolvedGlobally() {

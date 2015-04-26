@@ -1,8 +1,8 @@
-package se.jbee.inject.service;
+package se.jbee.inject.procedure;
 
 import static org.junit.Assert.assertEquals;
-import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.procedure.ProcedureModule.procedureDependency;
 
 import javax.annotation.Resource;
 
@@ -16,17 +16,17 @@ import se.jbee.inject.bootstrap.Inspector;
 /**
  * The tests illustrates how to change the way service methods are identified by
  * binding a custom {@link Inspector} for services using
- * {@link ServiceModule#bindServiceInspectorTo(Inspector)}.
+ * {@link ProcedureModule#discoverProceduresBy(Inspector)}.
  */
-public class TestServiceInspectorBinds {
+public class TestProcedureInspectorBinds {
 
 	private static class TestServiceInspectorModule
-			extends ServiceModule {
+			extends ProcedureModule {
 
 		@Override
 		protected void declare() {
-			bindServiceInspectorTo( Inspect.all().methods().annotatedWith( Resource.class ) );
-			bindServiceMethodsIn( ServiceInspectorBindsServices.class );
+			discoverProceduresBy( Inspect.all().methods().annotatedWith( Resource.class ) );
+			bindProceduresIn( ServiceInspectorBindsServices.class );
 		}
 
 	}
@@ -46,9 +46,8 @@ public class TestServiceInspectorBinds {
 	private final Injector injector = Bootstrap.injector( TestServiceInspectorModule.class );
 
 	@Test
-	public void thatTheDefaultServiceInspectorCanBeReplacedThroughCustomBind() {
-		@SuppressWarnings ( "unchecked" )
-		ServiceMethod<Void, Integer> answer = injector.resolve( dependency( raw( ServiceMethod.class ).parametized( Void.class, Integer.class ) ) );
-		assertEquals( 42, answer.invoke( null ).intValue() );
+	public void thatTheDefaultInspectorCanBeReplacedThroughCustomBind() {
+		Procedure<Void, Integer> answer = injector.resolve( procedureDependency(raw( Void.class), raw(Integer.class ) ) );
+		assertEquals( 42, answer.run( null ).intValue() );
 	}
 }

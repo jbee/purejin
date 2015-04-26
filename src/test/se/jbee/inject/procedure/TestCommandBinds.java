@@ -1,4 +1,4 @@
-package se.jbee.inject.service;
+package se.jbee.inject.procedure;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -12,10 +12,12 @@ import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.procedure.Procedure;
+import se.jbee.inject.procedure.ProcedureModule;
 
 /**
  * This test demonstrates that it is possible to have different higher level 'service' on top of
- * {@link ServiceMethod}s.
+ * {@link Procedure}s.
  * 
  * While the {@link TestServiceBinds} shows how do build a generic service this test shows a simpler
  * version {@link Command} of such generic service having a fix return type. Thereby it is very well
@@ -35,37 +37,37 @@ public class TestCommandBinds {
 
 		@Override
 		public Command<?> supply( Dependency<? super Command<?>> dependency, Injector injector ) {
-			return newCommand( injector.resolve( ServiceModule.serviceDependency(dependency.type().parameter( 0 ), raw( Long.class )) ) );
+			return newCommand( injector.resolve( ProcedureModule.procedureDependency(dependency.type().parameter( 0 ), raw( Long.class )) ) );
 		}
 		
-		private static <P> Command<P> newCommand( ServiceMethod<P, Long> service ) {
+		private static <P> Command<P> newCommand( Procedure<P, Long> service ) {
 			return new CommandToServiceMethodAdapter<P>( service );
 		}
 
 		static class CommandToServiceMethodAdapter<P>
 				implements Command<P> {
 
-			private final ServiceMethod<P, Long> service;
+			private final Procedure<P, Long> service;
 
-			CommandToServiceMethodAdapter( ServiceMethod<P, Long> service ) {
+			CommandToServiceMethodAdapter( Procedure<P, Long> service ) {
 				super();
 				this.service = service;
 			}
 
 			@Override
 			public Long calc( P param ) {
-				return service.invoke( param );
+				return service.run( param );
 			}
 
 		}
 	}
 
 	private static class CommandBindsModule
-			extends ServiceModule {
+			extends ProcedureModule {
 
 		@Override
 		protected void declare() {
-			bindServiceMethodsIn( MathService.class );
+			bindProceduresIn( MathService.class );
 			per( DEPENDENCY_TYPE ).starbind( Command.class ).toSupplier( CommandSupplier.class );
 		}
 

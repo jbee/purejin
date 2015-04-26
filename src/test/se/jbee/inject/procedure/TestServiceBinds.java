@@ -1,10 +1,11 @@
-package se.jbee.inject.service;
+package se.jbee.inject.procedure;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.container.Scoped.DEPENDENCY_TYPE;
+import static se.jbee.inject.procedure.ProcedureModule.procedureDependency;
 
 import org.junit.Test;
 
@@ -23,41 +24,41 @@ public class TestServiceBinds {
 	 * code. The only place you are coupled to the DI-framework is still in the binding code that is
 	 * additional to the application code.
 	 */
-	private static interface AppService<P, R> {
+	private static interface Service<P, R> {
 
 		R calc( P param );
 	}
 
 	/**
 	 * This is an adapter to 'your' application specific service interface adapting to the
-	 * {@link ServiceMethod} interface of the DI-framework. So internally both are resolvable.
+	 * {@link Procedure} interface of the DI-framework. So internally both are resolvable.
 	 */
-	private static class AppServiceSupplier
-			implements Supplier<AppService<?, ?>> {
+	private static class ServiceSupplier
+			implements Supplier<Service<?, ?>> {
 
 		@Override
-		public AppService<?, ?> supply( Dependency<? super AppService<?, ?>> dependency, Injector injector ) {
-			Type<? super AppService<?, ?>> type = dependency.type();
-			return newService( injector.resolve( ServiceModule.serviceDependency( type.parameter( 0 ), type.parameter( 1 ) ) ));
+		public Service<?, ?> supply( Dependency<? super Service<?, ?>> dependency, Injector injector ) {
+			Type<? super Service<?, ?>> type = dependency.type();
+			return newService( injector.resolve( procedureDependency( type.parameter( 0 ), type.parameter( 1 ) ) ));
 		}
 
-		private static <P, R> AppService<P, R> newService( ServiceMethod<P, R> service ) {
-			return new ServiceToServiceMethodAdapter<P, R>( service );
+		private static <P, R> Service<P, R> newService( Procedure<P, R> proc ) {
+			return new ServiceToProcedureAdapter<P, R>( proc );
 		}
 
-		static class ServiceToServiceMethodAdapter<P, R>
-				implements AppService<P, R> {
+		static class ServiceToProcedureAdapter<P, R>
+				implements Service<P, R> {
 
-			private final ServiceMethod<P, R> service;
+			private final Procedure<P, R> proc;
 
-			ServiceToServiceMethodAdapter( ServiceMethod<P, R> service ) {
+			ServiceToProcedureAdapter( Procedure<P, R> proc ) {
 				super();
-				this.service = service;
+				this.proc = proc;
 			}
 
 			@Override
 			public R calc( P param ) {
-				return service.invoke( param );
+				return proc.run( param );
 			}
 
 		}
@@ -65,12 +66,12 @@ public class TestServiceBinds {
 	}
 
 	private static class ServiceBindsModule
-			extends ServiceModule {
+			extends ProcedureModule {
 
 		@Override
 		protected void declare() {
-			bindServiceMethodsIn( MathService.class );
-			per( DEPENDENCY_TYPE ).starbind( AppService.class ).toSupplier( AppServiceSupplier.class );
+			bindProceduresIn( MathService.class );
+			per( DEPENDENCY_TYPE ).starbind( Service.class ).toSupplier( ServiceSupplier.class );
 		}
 
 	}
@@ -86,10 +87,10 @@ public class TestServiceBinds {
 	public void thatServiceCanBeResolvedWhenHavingGenericsInSameOrder() {
 		Injector injector = Bootstrap.injector( ServiceBindsModule.class );
 		@SuppressWarnings ( { "rawtypes" } )
-		Dependency<AppService> dependency = dependency( raw( AppService.class ).parametized(
+		Dependency<Service> dependency = dependency( raw( Service.class ).parametized(
 				Integer.class, Long.class ) );
 		@SuppressWarnings ( "unchecked" )
-		AppService<Integer, Long> square = injector.resolve( dependency );
+		Service<Integer, Long> square = injector.resolve( dependency );
 		assertThat( square.calc( 2 ), is( 4L ) );
 	}
 

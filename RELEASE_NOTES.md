@@ -32,6 +32,14 @@ thrown (even though these are not checked exceptions).
 - renamed `Type#allArgumentsAreUpperBounds` to `areAllTypeParametersAreUpperBounds`
 - renamed `DeclarationType#nullifiedBy` to `droppedWith`
 - renamed `Factory#produce` to `fabricate` (less confusing naming)
+- renamed `ServiceMethod` to `Procedure` (also moved to `procedure` package)
+- renamed `ServiceMethod#invoke` to `Procedure#run`
+- renamed `ServiceMalfunction` to `ProcedureMalfunction`
+- renamed `ServiceModule` to `ProcedureModule`
+- renamed `ServiceModule#bindServiceMethodsIn` to `bindProceduresIn`
+- renamed `ServiceModule#serviceDependency` to ``
+- renamed `ServiceModule#SERVICE_INSPECTOR` to `PROCEDURE_INSPECTOR`
+- renamed `ServiceModule#bindServiceInspectorTo` to `discoverProceduresBy`
 
 - removed `UnresolvableDependency#injectionStack` (now `Dependency`'s `toString`)
 - removed `Type#getRawType` (use field access)
@@ -43,6 +51,8 @@ thrown (even though these are not checked exceptions).
 - removed `Dependency#instance` (use field access)
 - removed `Dependency#name` (use `instance.name` instead)
 - removed `Resource#name` (not needed, use field access)
+- removed `ServiceModule#bindInvocationHandler` (no core feature, see test)
+- removed `ServiceInvocation` (became test example of how to add such a thing)
 - removed `ServiceProvider` interface (rebind `ServiceMethod` instead, adapt via
   `ServiceModule.serviceDependency`)
 

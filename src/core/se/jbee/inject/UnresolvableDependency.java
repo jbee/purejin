@@ -84,7 +84,7 @@ public abstract class UnresolvableDependency
 			extends UnresolvableDependency {
 
 		public <T> NoResourceForDependency( Dependency<T> dependency, Injectron<T>[] available, String msg ) {
-			super( "No resource for dependency: " + dependency + "\navailable are (for same raw type): "
+			super( "No resource for dependency:\n" + dependency + "\navailable are (for same raw type): "
 					+ describe( available ) + "\n"
 					+ msg);
 		}
