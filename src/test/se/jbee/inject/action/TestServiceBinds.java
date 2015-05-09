@@ -1,11 +1,11 @@
-package se.jbee.inject.procedure;
+package se.jbee.inject.action;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.action.ActionModule.actionDependency;
 import static se.jbee.inject.container.Scoped.DEPENDENCY_TYPE;
-import static se.jbee.inject.procedure.ProcedureModule.procedureDependency;
 
 import org.junit.Test;
 
@@ -31,34 +31,34 @@ public class TestServiceBinds {
 
 	/**
 	 * This is an adapter to 'your' application specific service interface adapting to the
-	 * {@link Procedure} interface of the DI-framework. So internally both are resolvable.
+	 * {@link Action} interface of the DI-framework. So internally both are resolvable.
 	 */
-	private static class ServiceSupplier
+	private static final class ServiceSupplier
 			implements Supplier<Service<?, ?>> {
 
 		@Override
 		public Service<?, ?> supply( Dependency<? super Service<?, ?>> dependency, Injector injector ) {
 			Type<? super Service<?, ?>> type = dependency.type();
-			return newService( injector.resolve( procedureDependency( type.parameter( 0 ), type.parameter( 1 ) ) ));
+			return newService( injector.resolve( actionDependency( type.parameter( 0 ), type.parameter( 1 ) ) ));
 		}
 
-		private static <P, R> Service<P, R> newService( Procedure<P, R> proc ) {
-			return new ServiceToProcedureAdapter<P, R>( proc );
+		private static <I, O> Service<I, O> newService( Action<I, O> action ) {
+			return new ServiceToActionAdapter<I, O>( action );
 		}
 
-		static class ServiceToProcedureAdapter<P, R>
-				implements Service<P, R> {
+		static final class ServiceToActionAdapter<I, O>
+				implements Service<I, O> {
 
-			private final Procedure<P, R> proc;
+			private final Action<I, O> action;
 
-			ServiceToProcedureAdapter( Procedure<P, R> proc ) {
+			ServiceToActionAdapter( Action<I, O> action ) {
 				super();
-				this.proc = proc;
+				this.action = action;
 			}
 
 			@Override
-			public R calc( P param ) {
-				return proc.run( param );
+			public O calc( I input ) {
+				return action.exec( input );
 			}
 
 		}
@@ -66,11 +66,11 @@ public class TestServiceBinds {
 	}
 
 	private static class ServiceBindsModule
-			extends ProcedureModule {
+			extends ActionModule {
 
 		@Override
 		protected void declare() {
-			bindProceduresIn( MathService.class );
+			bindActionsIn( MathService.class );
 			per( DEPENDENCY_TYPE ).starbind( Service.class ).toSupplier( ServiceSupplier.class );
 		}
 
@@ -84,7 +84,7 @@ public class TestServiceBinds {
 	}
 
 	@Test
-	public void thatServiceCanBeResolvedWhenHavingGenericsInSameOrder() {
+	public void servicesAreResolvable() {
 		Injector injector = Bootstrap.injector( ServiceBindsModule.class );
 		@SuppressWarnings ( { "rawtypes" } )
 		Dependency<Service> dependency = dependency( raw( Service.class ).parametized(

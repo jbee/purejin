@@ -11,9 +11,10 @@ import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Injectron;
 import se.jbee.inject.UnresolvableDependency;
+import se.jbee.inject.bootstrap.BoundParameter.ParameterType;
 
 /**
- * Slimier to a call-site each {@linkplain InjectionSite} represents the
+ * Similar to a call-site each {@linkplain InjectionSite} represents the
  * resolution of arguments from a specific site or path that is represented by a
  * {@link Dependency}.
  * 
@@ -65,6 +66,11 @@ public final class InjectionSite {
 		for (int i = 0; i < injectrons.length; i++)  {
 			args[i] = null;
 			BoundParameter<?> p = parameters[i];
+			if (p.type == ParameterType.INSTANCE && p.type().arrayDimensions() == 1) {
+				// in this case there is no single injectron, the injector composes the result array from multiple injectrons
+				p = p.external();
+				parameters[i] = p;
+			}
 			switch (p.type) {
 			case INSTANCE:
 				Dependency<? extends Injectron<?>> injDep = site.typed( injectronTypeOf(p.instance.type )).named(p.instance.name);

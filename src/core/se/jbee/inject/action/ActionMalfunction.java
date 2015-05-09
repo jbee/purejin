@@ -3,11 +3,11 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject.procedure;
+package se.jbee.inject.action;
 
-public class ProcedureMalfunction extends RuntimeException {
+public class ActionMalfunction extends RuntimeException {
 
-	public ProcedureMalfunction(String message, Throwable cause) {
+	public ActionMalfunction(String message, Throwable cause) {
 		super(message, cause);
 	}
 	

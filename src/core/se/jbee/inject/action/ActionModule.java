@@ -3,7 +3,7 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject.procedure;
+package se.jbee.inject.action;
 
 import static java.util.Arrays.asList;
 import static se.jbee.inject.Dependency.dependency;
@@ -38,48 +38,48 @@ import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.container.Scoped;
 
 /**
- * When binding {@link Procedure}s this {@link Module} can be extended.
+ * When binding {@link Action}s this {@link Module} can be extended.
  * 
  * It provides procedure-related bind methods.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
-public abstract class ProcedureModule
+public abstract class ActionModule
 		extends BinderModule {
 
 	/**
 	 * The {@link Inspector} picks the {@link Method}s that are used to implement
-	 * {@link Procedure}s. This abstraction allows to customize what methods are bound as
-	 * {@link Procedure}s. The {@link Inspector#methodsIn(Class)} should return all methods in
-	 * the given {@link Class} that should be used to implement a {@link Procedure}.
+	 * {@link Action}s. This abstraction allows to customize what methods are bound as
+	 * {@link Action}s. The {@link Inspector#methodsIn(Class)} should return all methods in
+	 * the given {@link Class} that should be used to implement a {@link Action}.
 	 */
-	public static final Instance<Inspector> PROCEDURE_INSPECTOR = instance( named(Procedure.class), raw( Inspector.class ) );
+	public static final Instance<Inspector> ACTION_INSPECTOR = instance( named(Action.class), raw( Inspector.class ) );
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static <I,O> Dependency<Procedure<I,O>> procedureDependency(Type<I> input, Type<O> output) {
-		Type type = raw(Procedure.class).parametized(input, output);
+	public static <I,O> Dependency<Action<I,O>> actionDependency(Type<I> input, Type<O> output) {
+		Type type = raw(Action.class).parametized(input, output);
 		return dependency(type);
 	}	
 	
-	protected final void bindProceduresIn( Class<?> impl ) {
-		plug(impl).into(Procedure.class);
+	protected final void bindActionsIn( Class<?> impl ) {
+		plug(impl).into(Action.class);
 	}
 	
-	protected final void discoverProceduresBy( Inspector inspector ) {
-		bind( PROCEDURE_INSPECTOR ).to( inspector );
+	protected final void discoverActionsBy( Inspector inspector ) {
+		bind( ACTION_INSPECTOR ).to( inspector );
 	}
 
-	protected ProcedureModule() {
-		super(Scoped.APPLICATION, ProcedureBaseModule.class);
+	protected ActionModule() {
+		super(Scoped.APPLICATION, ActionBaseModule.class);
 	}
 
-	private static final class ProcedureBaseModule
+	private static final class ActionBaseModule
 			extends BinderModule {
 
 		@Override
 		public void declare() {
-			asDefault().per( DEPENDENCY_TYPE ).starbind( Procedure.class ).toSupplier( ProcedureSupplier.class );
-			asDefault().per( APPLICATION ).bind( PROCEDURE_INSPECTOR ).to( Inspect.all().methods() );
+			asDefault().per( DEPENDENCY_TYPE ).starbind( Action.class ).toSupplier( ActionSupplier.class );
+			asDefault().per( APPLICATION ).bind( ACTION_INSPECTOR ).to( Inspect.all().methods() );
 			asDefault().per(APPLICATION).bind(Executor.class).to(DirectExecutor.class);
 		}
 
@@ -88,74 +88,74 @@ public abstract class ProcedureModule
 	static final class DirectExecutor implements Executor {
 
 		@Override
-		public <I, O> O run(Object impl, Method proc, Object[] args, Type<O> output, Type<I> input, I value) {
-			return output.rawType.cast(Invoke.method(proc, impl, args));
+		public <I, O> O exec(Object impl, Method action, Object[] args, Type<O> output, Type<I> input, I value) {
+			return output.rawType.cast(Invoke.method(action, impl, args));
 		}
 		
 	}
 
-	static final class ProcedureSupplier
-			implements Supplier<Procedure<?, ?>> {
+	static final class ActionSupplier
+			implements Supplier<Action<?, ?>> {
 
 		/**
 		 * A list of discovered methods for each implementation class.
 		 */
 		private final Map<Class<?>, Method[]> cachedMethods = new IdentityHashMap<Class<?>, Method[]>();
 		/**
-		 * All already created {@link Procedure}s identified by a unique function signature.
+		 * All already created {@link Action}s identified by a unique function signature.
 		 */
-		private final Map<String, Procedure<?, ?>> cachedProcedures = new HashMap<String, Procedure<?, ?>>();
+		private final Map<String, Action<?, ?>> cachedActions = new HashMap<String, Action<?, ?>>();
 
 		private final Injector injector;
 		private final Inspector inspect;
 		private final Executor executor;
 		private final Class<?>[] implementationClasses;
 
-		public ProcedureSupplier( Injector injector ) {
+		public ActionSupplier( Injector injector ) {
 			super();
 			this.injector = injector;
 			this.executor = injector.resolve(dependency(Executor.class));
-			this.implementationClasses = injector.resolve( pluginsFor(Procedure.class) );
-			this.inspect = injector.resolve( dependency( PROCEDURE_INSPECTOR ).injectingInto(ProcedureSupplier.class));
+			this.implementationClasses = injector.resolve( pluginsFor(Action.class) );
+			this.inspect = injector.resolve( dependency( ACTION_INSPECTOR ).injectingInto(ActionSupplier.class));
 		}
 		
 		@Override
-		public Procedure<?, ?> supply( Dependency<? super Procedure<?, ?>> dependency, Injector injector ) {
-			Type<? super Procedure<?, ?>> type = dependency.type();
+		public Action<?, ?> supply( Dependency<? super Action<?, ?>> dependency, Injector injector ) {
+			Type<? super Action<?, ?>> type = dependency.type();
 			return provide( type.parameter( 0 ), type.parameter( 1 ) );
 		}
 
 		@SuppressWarnings ( "unchecked" )
-		private <I, O> Procedure<I, O> provide( Type<I> input, Type<O> output ) {
+		private <I, O> Action<I, O> provide( Type<I> input, Type<O> output ) {
 			final String key = input + "->" + output; // haskell like function signature
-			Procedure<?, ?> proc = cachedProcedures.get( key );
-			if ( proc == null ) {
-				synchronized ( cachedProcedures ) {
-					proc = cachedProcedures.get( key );
-					if ( proc == null ) {
-						Method method = resolveProcedure( input, output );
+			Action<?, ?> action = cachedActions.get( key );
+			if ( action == null ) {
+				synchronized ( cachedActions ) {
+					action = cachedActions.get( key );
+					if ( action == null ) {
+						Method method = resolveAction( input, output );
 						Object impl = injector.resolve( dependency( method.getDeclaringClass() ) );
-						proc = new ExecutorProcedure<I, O>(impl, method, input, output, executor, injector);
-						cachedProcedures.put( key, proc );
+						action = new ExecutedAction<I, O>(impl, method, input, output, executor, injector);
+						cachedActions.put( key, action );
 					}
 				}
 			}
-			return (Procedure<I, O>) proc;
+			return (Action<I, O>) action;
 		}
 
-		private <I, O> Method resolveProcedure( Type<I> input, Type<O> output ) {
+		private <I, O> Method resolveAction( Type<I> input, Type<O> output ) {
 			for ( Class<?> impl : implementationClasses ) {
-				for ( Method proc : procedures( impl ) ) {
-					Type<?> rt = returnType( proc );
+				for ( Method action : actionsIn( impl ) ) {
+					Type<?> rt = returnType( action );
 					if ( rt.equalTo( output ) ) {
 						if ( input.equalTo( Type.VOID ) ) {
-							if ( proc.getParameterTypes().length == 0 ) {
-								return proc;
+							if ( action.getParameterTypes().length == 0 ) {
+								return action;
 							}
 						} else {
-							for ( Type<?> pt : parameterTypes( proc ) ) {
+							for ( Type<?> pt : parameterTypes( action ) ) {
 								if ( pt.equalTo( input ) ) {
-									return proc;
+									return action;
 								}
 							}
 						}
@@ -165,7 +165,7 @@ public abstract class ProcedureModule
 			throw new UnresolvableDependency.NoMethodForDependency( output, input );
 		}
 
-		private Method[] procedures( Class<?> impl ) {
+		private Method[] actionsIn( Class<?> impl ) {
 			Method[] methods = cachedMethods.get( impl );
 			if ( methods != null ) {
 				return methods;
@@ -181,10 +181,10 @@ public abstract class ProcedureModule
 		}
 	}
 	
-	private static final class ExecutorProcedure<I,O> implements Procedure<I, O> {
+	private static final class ExecutedAction<I,O> implements Action<I, O> {
 		
 		private final Object impl;
-		private final Method proc;
+		private final Method action;
 		private final Type<I> input;
 		private final Type<O> output;
 		
@@ -194,31 +194,30 @@ public abstract class ProcedureModule
 		private final InjectionSite injection;
 		private final int inputIndex;
 		
-		public ExecutorProcedure(Object impl, Method proc, Type<I> input, Type<O> output, Executor executor, Injector injector) {
+		public ExecutedAction(Object impl, Method action, Type<I> input, Type<O> output, Executor executor, Injector injector) {
 			super();
 			this.impl = impl;
-			this.proc = Metaclass.accessible(proc);
+			this.action = Metaclass.accessible(action);
 			this.input = input;
 			this.output = output;
 			this.executor = executor;
 			this.injector = injector;
-			Type<?>[] types = Type.parameterTypes(proc);
-			this.injection = new InjectionSite(dependency(output).injectingInto(proc.getDeclaringClass()), injector, BoundParameter.bind(types, BoundParameter.constant(input, null)));
+			Type<?>[] types = Type.parameterTypes(action);
+			this.injection = new InjectionSite(dependency(output).injectingInto(action.getDeclaringClass()), injector, BoundParameter.bind(types, BoundParameter.constant(input, null)));
 			this.inputIndex = asList(types).indexOf(input);
 		}
 		
 		@Override
-		public O run(I input) throws ProcedureMalfunction {
+		public O exec(I input) throws ActionMalfunction {
 			try {
 				Object[] args = injection.args(injector);
 				if (inputIndex >= 0) {
 					args[inputIndex] = input;
 				}
-				return executor.run(impl, proc, args, output, this.input, input);
+				return executor.exec(impl, action, args, output, this.input, input);
 			} catch (UnresolvableDependency e) {
-				throw new ProcedureMalfunction("Failed to provide all indirect arguments!", e);
+				throw new ActionMalfunction("Failed to provide all implicit arguments!", e);
 			}
 		}
 	}
-
 }

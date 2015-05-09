@@ -1,4 +1,4 @@
-package se.jbee.inject.procedure;
+package se.jbee.inject.action;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -11,13 +11,13 @@ import org.junit.Test;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Supplier;
+import se.jbee.inject.action.Action;
+import se.jbee.inject.action.ActionModule;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.procedure.Procedure;
-import se.jbee.inject.procedure.ProcedureModule;
 
 /**
  * This test demonstrates that it is possible to have different higher level 'service' on top of
- * {@link Procedure}s.
+ * {@link Action}s.
  * 
  * While the {@link TestServiceBinds} shows how do build a generic service this test shows a simpler
  * version {@link Command} of such generic service having a fix return type. Thereby it is very well
@@ -37,37 +37,37 @@ public class TestCommandBinds {
 
 		@Override
 		public Command<?> supply( Dependency<? super Command<?>> dependency, Injector injector ) {
-			return newCommand( injector.resolve( ProcedureModule.procedureDependency(dependency.type().parameter( 0 ), raw( Long.class )) ) );
+			return newCommand( injector.resolve( ActionModule.actionDependency(dependency.type().parameter( 0 ), raw( Long.class )) ) );
 		}
 		
-		private static <P> Command<P> newCommand( Procedure<P, Long> service ) {
+		private static <P> Command<P> newCommand( Action<P, Long> service ) {
 			return new CommandToServiceMethodAdapter<P>( service );
 		}
 
 		static class CommandToServiceMethodAdapter<P>
 				implements Command<P> {
 
-			private final Procedure<P, Long> service;
+			private final Action<P, Long> service;
 
-			CommandToServiceMethodAdapter( Procedure<P, Long> service ) {
+			CommandToServiceMethodAdapter( Action<P, Long> service ) {
 				super();
 				this.service = service;
 			}
 
 			@Override
 			public Long calc( P param ) {
-				return service.run( param );
+				return service.exec( param );
 			}
 
 		}
 	}
 
 	private static class CommandBindsModule
-			extends ProcedureModule {
+			extends ActionModule {
 
 		@Override
 		protected void declare() {
-			bindProceduresIn( MathService.class );
+			bindActionsIn( MathService.class );
 			per( DEPENDENCY_TYPE ).starbind( Command.class ).toSupplier( CommandSupplier.class );
 		}
 

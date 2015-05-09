@@ -78,9 +78,9 @@ public final class Supply {
 		return new ParametrizedInstanceSupplier<T>( instance );
 	}
 
-	public static <T> Supplier<T> method( BoundMethod<T> factory ) {
-		return new MethodSupplier<T>(factory, 
-				bind( parameterTypes(factory.factory), factory.parameters ));
+	public static <T> Supplier<T> method( BoundMethod<T> method ) {
+		return new MethodSupplier<T>(method, 
+				bind( parameterTypes(method.factory), method.parameters ));
 	}
 
 	public static <T> Supplier<T> costructor( BoundConstructor<T> constructor ) {
@@ -92,8 +92,10 @@ public final class Supply {
 		return new FactorySupplier<T>( factory );
 	}
 
-	public static <T> Provider<T> lazyProvider( Dependency<T> dependency, Injector context ) {
-		return new LazyProvider<T>( dependency, context );
+	public static <T> Provider<T> lazyProvider( Dependency<T> dependency, Injector injector ) {
+		return dependency.type().arrayDimensions() == 1 // no injectrons for results composed within the Injector
+				? new LazyDirectProvider<T>(dependency, injector) 
+				: new LazyProvider<T>(dependency, injector);
 	}
 
 	private Supply() {
@@ -251,6 +253,9 @@ public final class Supply {
 		}
 	}
 
+	/**
+	 * E.g. used to "forward" Collection<T> to List<T>.
+	 */
 	private static final class ParametrizedInstanceSupplier<T>
 			implements Supplier<T> {
 
@@ -288,7 +293,7 @@ public final class Supply {
 
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			//TODO use "buffered" Injectron (as long as same dependency not re-resolve it
+			// Note that this is not "buffered" using Injectrons as it is used to implement the plain resolution
 			return injector.resolve( dependency.instanced( instance ) );
 		}
 
@@ -315,9 +320,25 @@ public final class Supply {
 			return describe( "supplies", Provider.class );
 		}
 	}
+	
+	private static final class LazyDirectProvider<T> implements Provider<T> {
+		
+		private final Dependency<T> dependency;
+		private final Injector injector;
 
-	private static final class LazyProvider<T>
-			implements Provider<T> {
+		LazyDirectProvider(Dependency<T> dependency, Injector injector) {
+			this.dependency = dependency;
+			this.injector = injector;
+		}
+
+		@Override
+		public T provide() throws UnresolvableDependency {
+			return injector.resolve(dependency);
+		}
+		
+	}
+
+	private static final class LazyProvider<T> implements Provider<T> {
 
 		private final Dependency<T> dependency;
 		private final Injectron<? extends T> injectron;

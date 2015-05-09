@@ -1,7 +1,6 @@
 package se.jbee.inject.bind;
 
-import static java.util.Collections.singleton;
-import static java.util.Collections.singletonList;
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
@@ -13,6 +12,7 @@ import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.container.Typecast.listTypeOf;
 import static se.jbee.inject.container.Typecast.providerTypeOf;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -44,6 +44,7 @@ public class TestProviderBinds {
 		@Override
 		protected void declare() {
 			bind( String.class ).to( "foobar" );
+			bind( named("special"), String.class ).to( "special" );
 			bind( CharSequence.class ).to( "bar" );
 			bind( Integer.class ).to( 42 );
 			bind( named( "foo" ), Integer.class ).to( 846 );
@@ -89,10 +90,12 @@ public class TestProviderBinds {
 	private static class WorkingStateConsumer {
 
 		final Provider<DynamicState> state;
+		final Provider<String[]> strings;
 
 		@SuppressWarnings ( "unused" )
-		WorkingStateConsumer( Provider<DynamicState> state ) {
+		WorkingStateConsumer( Provider<DynamicState> state, Provider<String[]> strings ) {
 			this.state = state;
+			this.strings = strings;
 		}
 
 		DynamicState state() {
@@ -103,40 +106,50 @@ public class TestProviderBinds {
 	private final Injector injector = Bootstrap.injector( ProviderBindsBundle.class );
 
 	@Test
-	public void thatProviderIsAvailableForAnyBoundType() {
+	public void providersAreAvailableForAnyBoundType() {
 		assertInjectsProviderFor( "foobar", raw( String.class ) );
 		assertInjectsProviderFor( 42, raw( Integer.class ) );
 	}
 
 	@Test
-	public void thatProviderIsAvailableForAnyNamedBoundType() {
+	public void providersAreAvailableForAnyNamedBoundType() {
 		assertInjectsProviderFor( 846, raw( Integer.class ), named( "foo" ) );
 	}
 
 	@Test
-	public void thatProviderIsAvailableAlsoForListType() {
-		List<String> list = singletonList( "foobar" );
+	public void providersAreAvailableForArrays() {
+		WorkingStateConsumer state = injector.resolve( dependency( WorkingStateConsumer.class ) );
+		assertNotNull(state.strings);
+		String[] strings = state.strings.provide();
+		assertEquals(2, strings.length);
+		assertEquals("foobar", strings[0]);
+		assertEquals("special", strings[1]);
+	}
+	
+	@Test
+	public void providersAreAvailableForLists() {
+		List<String> list = asList( "foobar", "special" );
 		assertInjectsProviderFor( list, raw( List.class ).parametized( String.class ) );
 	}
 
 	@Test
-	public void thatProviderIsAvailableAlsoForSetType() {
-		Set<String> set = singleton( "foobar" );
+	public void providersAreAvailableForSets() {
+		Set<String> set = new HashSet<String>(asList( "foobar", "special" ));
 		assertInjectsProviderFor( set, raw( Set.class ).parametized( String.class ) );
 	}
 
 	@Test
-	public void thatProviderMakesPerInjectionInjectableIntoPerApplication() {
+	public void providersOvercomeExpirationConflicts() {
 		injector.resolve( dependency( WorkingStateConsumer.class ) );
 	}
 
 	@Test ( expected = UnstableDependency.class )
-	public void thatNoProviderCausesExceptionWhenPerInjectionInjectedIntoPerApplication() {
+	public void expirationConflictsCauseException() {
 		injector.resolve( dependency( FaultyStateConsumer.class ) );
 	}
 
 	@Test
-	public void thatProviderKeepsHierarchySoProvidedDependencyIsResolvedAsIfResolvedDirectly() {
+	public void providersKeepHierarchySoProvidedDependencyIsResolvedAsIfResolvedDirectly() {
 		WorkingStateConsumer a = injector.resolve( dependency( A ) );
 		assertSame( DYNAMIC_STATE_IN_A, a.state() );
 		WorkingStateConsumer b = injector.resolve( dependency( B ) );
@@ -145,7 +158,7 @@ public class TestProviderBinds {
 	}
 	
 	@Test
-	public void thatProviderCanBeCombinedWithOtherBridges() {
+	public void providersCanBeCombinedWithOtherBridges() {
 		Provider<List<WorkingStateConsumer>> provider = injector.resolve(dependency(providerTypeOf(listTypeOf(WorkingStateConsumer.class))));
 		assertNotNull(provider);
 		List<WorkingStateConsumer> consumers = provider.provide();
@@ -156,7 +169,7 @@ public class TestProviderBinds {
 	}
 
 	@Test
-	public void thatProviderCanProvidePerInjectionInstanceWithinAnPerApplicationParent() {
+	public void providerCanProvidePerInjectionInstanceWithinAnPerApplicationParent() {
 		WorkingStateConsumer obj = injector.resolve( dependency( WorkingStateConsumer.class ) );
 		assertNotNull( obj.state() ); // if expiry is a problem this will throw an exception
 	}

@@ -3,18 +3,18 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject.procedure;
+package se.jbee.inject.action;
 
 /**
- * The low level representation of a procedure (or operation; microservice).
+ * The low level representation of an action (a operation or micro-service).
  * 
  * @param <I>
  *            The type of the input
  * @param <O>
  *            The type of the output
  */
-public interface Procedure<I, O> {
+public interface Action<I, O> {
 
-	O run( I input ) throws ProcedureMalfunction;
+	O exec( I input ) throws ActionMalfunction;
 
 }

@@ -6,8 +6,9 @@ v0.9
 
 > Release 0.9 contained no new features but renamed exceptions and "getters" for
 > better readability. Auto-binding implementation moved to macros. 
-> Providers utilise injectrons for better performance. These now forward the
-> dependency's name
+> Providers utilise injectrons for better performance. 
+> Injectrons now forward the dependency's name
+> Services got renamed (and repackaged) as actions
 
 Exceptions got renamed to better reflect the problem (the generic term 
 `Exception` is no longer necessary). Interfaces explicitly state the exceptions
@@ -32,14 +33,14 @@ thrown (even though these are not checked exceptions).
 - renamed `Type#allArgumentsAreUpperBounds` to `areAllTypeParametersAreUpperBounds`
 - renamed `DeclarationType#nullifiedBy` to `droppedWith`
 - renamed `Factory#produce` to `fabricate` (less confusing naming)
-- renamed `ServiceMethod` to `Procedure` (also moved to `procedure` package)
-- renamed `ServiceMethod#invoke` to `Procedure#run`
-- renamed `ServiceMalfunction` to `ProcedureMalfunction`
-- renamed `ServiceModule` to `ProcedureModule`
-- renamed `ServiceModule#bindServiceMethodsIn` to `bindProceduresIn`
-- renamed `ServiceModule#serviceDependency` to ``
-- renamed `ServiceModule#SERVICE_INSPECTOR` to `PROCEDURE_INSPECTOR`
-- renamed `ServiceModule#bindServiceInspectorTo` to `discoverProceduresBy`
+- renamed `ServiceMethod` to `Action` (also moved to `procedure` package)
+- renamed `ServiceMethod#invoke` to `Action#exec`
+- renamed `ServiceMalfunction` to `ActionMalfunction`
+- renamed `ServiceModule` to `ActionModule`
+- renamed `ServiceModule#bindServiceMethodsIn` to `bindActionsIn`
+- renamed `ServiceModule#serviceDependency` to `actionDependency`
+- renamed `ServiceModule#SERVICE_INSPECTOR` to `ACTION_INSPECTOR`
+- renamed `ServiceModule#bindServiceInspectorTo` to `discoverActionBy`
 
 - removed `UnresolvableDependency#injectionStack` (now `Dependency`'s `toString`)
 - removed `Type#getRawType` (use field access)
@@ -53,8 +54,8 @@ thrown (even though these are not checked exceptions).
 - removed `Resource#name` (not needed, use field access)
 - removed `ServiceModule#bindInvocationHandler` (no core feature, see test)
 - removed `ServiceInvocation` (became test example of how to add such a thing)
-- removed `ServiceProvider` interface (rebind `ServiceMethod` instead, adapt via
-  `ServiceModule.serviceDependency`)
+- removed `ServiceProvider` interface (rebind `Action` instead, adapt via
+  `ActionModule.actionDependency`)
 
 - declared `UnresolvableDependency` as `abstract` (should not be instantiated)
 - declared `InconsistentBinding` as `RuntimeException` 
@@ -66,11 +67,12 @@ thrown (even though these are not checked exceptions).
 - changed `autobind` expansion to occur via macros
 - changed `Dependency#onTypeParameter` keeps instance name
 - changed semantics of resolving `Injectron`s (cannot be bound any more)
-- changed `ServiceMethod` explicitly throws new `ServiceMalfunction` exception
+- changed `Action` explicitly throws new `ActionMalfunction` exception
 - changed unified exception handling when invoking methods and constructors
 
 - improved `Provider` implementation to use `Injectron`s (better performance!)
 - improved `Injectorn` dependencies forward `Name`
+
 - added `Dependency#equalTo` (and `equals`)
 - added `InjectionSite` utility to provide "cached" arguments
 - added `SupplyFailed` exception (errors during supply attempt)

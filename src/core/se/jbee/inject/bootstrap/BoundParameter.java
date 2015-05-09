@@ -132,6 +132,10 @@ public final class BoundParameter<T> implements Parameter<T> {
 	public Type<T> type() {
 		return asType;
 	}
+	
+	public BoundParameter<T> external() {
+		return new BoundParameter<T>(ParameterType.EXTERNAL, asType, instance, value, supplier);
+	}
 
 	/**
 	 * @param type

@@ -46,8 +46,6 @@ public abstract class UnresolvableDependency
 
 	/**
 	 * A dependency cycle so that injection is not possible. Remove the cycle to resolve.
-	 * 
-	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	public static final class DependencyCycle
 			extends UnresolvableDependency {
@@ -62,8 +60,6 @@ public abstract class UnresolvableDependency
 	 * It has been tried to inject a shorter living instance into one that will most likely outlive
 	 * the injected one. This is considered to be unintentional. Use a indirection like a provider
 	 * or services to resolve the problem.
-	 * 
-	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	public static final class UnstableDependency
 			extends UnresolvableDependency {
@@ -77,8 +73,6 @@ public abstract class UnresolvableDependency
 	/**
 	 * An {@link Injector} couldn't find a {@link Resource} that matches a {@link Dependency} to
 	 * resolve.
-	 * 
-	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	public static final class NoResourceForDependency
 			extends UnresolvableDependency {

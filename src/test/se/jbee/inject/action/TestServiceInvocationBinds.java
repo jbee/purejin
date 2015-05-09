@@ -1,4 +1,4 @@
-package se.jbee.inject.procedure;
+package se.jbee.inject.action;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -21,11 +21,11 @@ import se.jbee.inject.bootstrap.Invoke;
 public class TestServiceInvocationBinds {
 
 	private static class ServiceInvocationBindsModule
-	extends ProcedureModule {
+	extends ActionModule {
 
 		@Override
 		protected void declare() {
-			bindProceduresIn( ServiceInvocationBindsService.class );
+			bindActionsIn( ServiceInvocationBindsService.class );
 			plug(AssertInvocation.class).into(ServiceInvocation.class);
 			bind(Executor.class).to(InstrumentedExecutor.class);
 		}
@@ -92,12 +92,12 @@ public class TestServiceInvocationBinds {
 	@Test
 	public void thatInvocationIsInvokedBeforeAndAfterTheServiceMethodCall() {
 		@SuppressWarnings ( "rawtypes" )
-		Dependency<Procedure> dependency = dependency( raw( Procedure.class ).parametized(
+		Dependency<Action> dependency = dependency( raw( Action.class ).parametized(
 				String.class, Integer.class ) );
-		Procedure<String, Integer> hashCode = injector.resolve( dependency );
+		Action<String, Integer> hashCode = injector.resolve( dependency );
 		int beforeCount = inv.beforeCount;
 		int afterCount = inv.afterCount;
-		assertEquals( "Foo".hashCode(), hashCode.run( "Foo" ).intValue() );
+		assertEquals( "Foo".hashCode(), hashCode.exec( "Foo" ).intValue() );
 		assertEquals( beforeCount + 1, inv.beforeCount );
 		assertEquals( afterCount + 1, inv.afterCount );
 	}
@@ -106,13 +106,13 @@ public class TestServiceInvocationBinds {
 	@Test
 	public void thatInvocationIsInvokedAfterExceptionInTheServiceMethodCall() {
 		@SuppressWarnings ( "rawtypes" )
-		Dependency<Procedure> dependency = dependency( raw( Procedure.class ).parametized(
+		Dependency<Action> dependency = dependency( raw( Action.class ).parametized(
 				String.class, Void.class ) );
-		Procedure<String, Void> fail = injector.resolve( dependency );
+		Action<String, Void> fail = injector.resolve( dependency );
 		int afterExceptionCount = inv.afterExceptionCount;
 		try {
-			fail.run( "Foo" );
-		} catch ( ProcedureMalfunction e ) {
+			fail.exec( "Foo" );
+		} catch ( ActionMalfunction e ) {
 			assertTrue( e.getCause() instanceof IllegalStateException );
 			assertEquals( e.getCause().getMessage(), "Foo" );
 			assertEquals( afterExceptionCount + 1, inv.afterExceptionCount );
@@ -132,24 +132,24 @@ public class TestServiceInvocationBinds {
 
 		private final ServiceInvocation<?>[] invocations;
 
-		InstrumentedExecutor( Injector injector ) { //TODO why doesn't it work to ask for the array of ServiceInvocation directly?
+		InstrumentedExecutor( ServiceInvocation<?>[] invocations ) {
 			super();
-			this.invocations = injector.resolve(dependency(ServiceInvocation[].class));
+			this.invocations = invocations;
 		}
 
 		@Override
-		public <I, O> O run(Object impl, Method proc, Object[] args, Type<O> output, Type<I> input, I value) throws ProcedureMalfunction {
+		public <I, O> O exec(Object impl, Method action, Object[] args, Type<O> output, Type<I> input, I value) throws ActionMalfunction {
 			Object[] state = before( output, input, value );
 			O res = null;
 			try {
-				res = output.rawType.cast(Invoke.method(proc, impl, args));
+				res = output.rawType.cast(Invoke.method(action, impl, args));
 			} catch ( SupplyFailed e ) {
 				Exception ex = e;
 				if ( e.getCause() instanceof Exception ) {
 					ex = (Exception) e.getCause();
 				}
 				afterException(output, input, value, ex, state );
-				throw new ProcedureMalfunction(proc.getDeclaringClass().getSimpleName()+"#"+proc.getName()+" failed: "+e.getMessage(), ex );
+				throw new ActionMalfunction(action.getDeclaringClass().getSimpleName()+"#"+action.getName()+" failed: "+e.getMessage(), ex );
 			}
 			after( output, input, value, res, state );
 			return res;

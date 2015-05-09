@@ -1,8 +1,8 @@
-package se.jbee.inject.procedure;
+package se.jbee.inject.action;
 
 import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.procedure.ProcedureModule.procedureDependency;
+import static se.jbee.inject.action.ActionModule.actionDependency;
 
 import javax.annotation.Resource;
 
@@ -16,29 +16,29 @@ import se.jbee.inject.bootstrap.Inspector;
 /**
  * The tests illustrates how to change the way service methods are identified by
  * binding a custom {@link Inspector} for services using
- * {@link ProcedureModule#discoverProceduresBy(Inspector)}.
+ * {@link ActionModule#discoverActionsBy(Inspector)}.
  */
-public class TestProcedureInspectorBinds {
+public class TestActionInspectorBinds {
 
 	private static class TestServiceInspectorModule
-			extends ProcedureModule {
+			extends ActionModule {
 
 		@Override
 		protected void declare() {
-			discoverProceduresBy( Inspect.all().methods().annotatedWith( Resource.class ) );
-			bindProceduresIn( ServiceInspectorBindsServices.class );
+			discoverActionsBy( Inspect.all().methods().annotatedWith( Resource.class ) );
+			bindActionsIn( ActionInspectorBindsActions.class );
 		}
 
 	}
 
-	static class ServiceInspectorBindsServices {
+	static class ActionInspectorBindsActions {
 
 		int notBoundSinceNotAnnotated() {
 			return 13;
 		}
 
 		@Resource
-		int aServiceProducingInts() {
+		int anActionYieldingInts() {
 			return 42;
 		}
 	}
@@ -46,8 +46,8 @@ public class TestProcedureInspectorBinds {
 	private final Injector injector = Bootstrap.injector( TestServiceInspectorModule.class );
 
 	@Test
-	public void thatTheDefaultInspectorCanBeReplacedThroughCustomBind() {
-		Procedure<Void, Integer> answer = injector.resolve( procedureDependency(raw( Void.class), raw(Integer.class ) ) );
-		assertEquals( 42, answer.run( null ).intValue() );
+	public void actionInspectorCanBeCustomized() {
+		Action<Void, Integer> answer = injector.resolve( actionDependency(raw( Void.class), raw(Integer.class ) ) );
+		assertEquals( 42, answer.exec( null ).intValue() );
 	}
 }
