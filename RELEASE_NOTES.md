@@ -77,6 +77,7 @@ thrown (even though these are not checked exceptions).
 - added `InjectionSite` utility to provide "cached" arguments
 - added `SupplyFailed` exception (errors during supply attempt)
 
+
 v0.8
 ===============
 
