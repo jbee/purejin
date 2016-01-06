@@ -129,9 +129,9 @@ public class Binder {
 	}
 
 	public <T> TypedBinder<T> starbind( Class<T> type ) {
-		return bind( Instance.anyOf( raw( type ) ) );
+		return bind( anyOf( raw( type ) ) );
 	}
-
+	
 	public <T> PluginBinder<T> plug( Class<T> plugin ) {
 		return new PluginBinder<T>( on(bind()), plugin);
 	}

@@ -160,11 +160,11 @@ public final class Type<T>
 	}
 
 	public Type<? extends T> upperBound( boolean upperBound ) {
-		return new Type<T>( upperBound, rawType, params );
+		return this.upperBound == upperBound ? this : new Type<T>( upperBound, rawType, params );
 	}
 
 	public Type<? extends T> asExactType() {
-		return new Type<T>( false, rawType, params );
+		return upperBound( false );
 	}
 
 	@SuppressWarnings ( "unchecked" )
@@ -177,10 +177,7 @@ public final class Type<T>
 		if ( this == other ) {
 			return true;
 		}
-		if ( rawType != other.rawType ) {
-			return false;
-		}
-		if ( params.length != other.params.length ) {
+		if ( rawType != other.rawType || params.length != other.params.length) {
 			return false;
 		}
 		for ( int i = 0; i < params.length; i++ ) {

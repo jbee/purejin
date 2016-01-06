@@ -1,5 +1,11 @@
 # Release notes
 
+v1.0 (unreleased)
+==============
+
+> Support for wild-card bindings (supply any sub-class of X).
+
+- improved `DefaultInjector` (now resolving falls back to wild-card bindings)
 
 v0.9
 ===============
@@ -94,16 +100,6 @@ preferred way to read immutable values.
 The type of thrown exception has been revised in favour of more specific 
 exceptions and stated contracts have been added where possible. The naming of
 mostly internal types, fields and methods has been improved. 
-
-
-
-**Changes since 0.7**
-
-! = API change!
-D = deleted
-N = renamed
-P = moved package and/or containing class
-M = changed/modified
 
 - **deleted** `configbind` (see `TestStateDependentBinds` for replacement)
 - deleted `Configuring` (no core feature any more as it is easy to add)

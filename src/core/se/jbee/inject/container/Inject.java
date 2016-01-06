@@ -9,6 +9,7 @@ import static se.jbee.inject.Type.raw;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -54,10 +55,12 @@ public final class Inject {
 	private static final class DefaultInjector implements Injector {
 
 		private final Map<Class<?>, Injectron<?>[]> injectrons;
+		private final Injectron<?>[] wildcardInjectrons;
 
 		DefaultInjector( Assembly<?>... assemblies ) {
 			super();
 			this.injectrons = initFrom( assemblies );
+			this.wildcardInjectrons = wildcardInjectrons(injectrons);
 		}
 
 		private <T> Map<Class<?>, Injectron<?>[]> initFrom( Assembly<?>... assemblies ) {
@@ -92,6 +95,19 @@ public final class Inject {
 			return map;
 		}
 		
+		private static Injectron<?>[] wildcardInjectrons(Map<Class<?>, Injectron<?>[]> injectrons) {
+			List<Injectron<?>> res = new ArrayList<Injectron<?>>();
+			for (Injectron<?>[] is : injectrons.values()) {
+				for (Injectron<?> i : is) {
+					if (i.info().resource.type().isUpperBound()) {
+						res.add(i);
+					}
+				}
+			}
+			Collections.sort(res, COMPARATOR);
+			return res.size() == 0 ? null : res.toArray(new Injectron[res.size()]);
+		}
+		
 		private static Map<Scope, Repository> initRepositories( Assembly<?>[] assemblies ) {
 			Map<Scope, Repository> repositories = new IdentityHashMap<Scope, Repository>();
 			for ( Assembly<?> a : assemblies ) {
@@ -124,6 +140,24 @@ public final class Inject {
 			}
 			if ( type.arrayDimensions() == 1 ) {
 				return resolveArray( dependency, type.baseType() );
+			}
+			return resolveFromUpperBound(dependency);
+		}
+
+		/**
+		 * There is no direct match for the required type but there might be a wild-card binding,
+		 * that is a binding capable of producing all sub-types of a certain super-type. 
+		 */
+		@SuppressWarnings ( "unchecked" )
+		private <T> T resolveFromUpperBound(Dependency<T> dependency) {
+			final Type<T> type = dependency.type();
+			if ( wildcardInjectrons != null ) {
+				for (int i = 0; i < wildcardInjectrons.length; i++) {
+					Injectron<?> res = wildcardInjectrons[i];
+					if (type.isAssignableTo(res.info().resource.type())) {
+						return (T) res.instanceFor((Dependency<Object>) dependency);
+					}
+				}
 			}
 			throw noInjectronFor( dependency );
 		}
@@ -232,15 +266,22 @@ public final class Inject {
 		public String toString() {
 			StringBuilder b = new StringBuilder();
 			for ( Entry<Class<?>, Injectron<?>[]> e : injectrons.entrySet() ) {
-				b.append( e.getKey() ).append( '\n' );
-				for ( Injectron<?> i : e.getValue() ) {
-					Resource<?> r = i.info().resource;
-					b.append( '\t' ).append( r.type().simpleName() ).append( ' ' ).append(
-							r.instance.name ).append( ' ' ).append( r.target ).append(
-							' ' ).append( i.info().source ).append( '\n' );
-				}
+				toString(b, e.getKey().toString(), e.getValue());
+			}
+			if (wildcardInjectrons != null) {
+				toString(b, "? extends *", wildcardInjectrons);
 			}
 			return b.toString();
+		}
+
+		private static void toString(StringBuilder b, String group, Injectron<?>[] values) {
+			b.append( group ).append( '\n' );
+			for ( Injectron<?> i : values ) {
+				Resource<?> r = i.info().resource;
+				b.append( '\t' ).append( r.type().simpleName() ).append( ' ' ).append(
+						r.instance.name ).append( ' ' ).append( r.target ).append(
+						' ' ).append( i.info().source ).append( '\n' );
+			}
 		}
 	}
 
@@ -322,6 +363,12 @@ public final class Inject {
 			Class<?> c1 = r1.type().rawType;
 			Class<?> c2 = r2.type().rawType;
 			if ( c1 != c2 ) {
+				if (c1.isAssignableFrom(c2)) {
+					return 1;
+				}
+				if (c2.isAssignableFrom(c1)) {
+					return -1;
+				}
 				return c1.getCanonicalName().compareTo( c2.getCanonicalName() );
 			}
 			return Instance.comparePrecision( r1, r2 );
