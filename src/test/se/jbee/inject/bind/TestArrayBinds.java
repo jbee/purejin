@@ -36,6 +36,8 @@ public class TestArrayBinds {
 	static final Name CMD_2 = named("command2");
 	static final Name CMD_3 = named("command3");
 	static final Name CMD_4 = named("command4");
+	static final Name CMD_5 = named("command5");
+	static final Name CMD_6 = named("command6");
 
 	static final Name PRE_2 = named("precond2");
 	
@@ -43,19 +45,28 @@ public class TestArrayBinds {
 
 		@Override
 		protected void declare() {
-			bind(PRE_2, Double.class).to(new Double(2));
+			bind(PRE_2, Double.class).to(new Double(2)); // used by both CMD_1 and CMD_2
+			
 			bind(CMD_1, Command.class ).toConstructor();
-			bind(CMD_2, Command.class ).toConstructor();
-			bind(CMD_3, Command.class ).toConstructor();
 			injectingInto(CMD_1, Command.class).multibind(Number.class).to(new Integer(1));
 			injectingInto(CMD_1, Command.class).multibind(Number.class).to(PRE_2, Double.class);
+
+			bind(CMD_2, Command.class ).toConstructor();
 			injectingInto(CMD_2, Command.class).multibind(Number.class).to(PRE_2, Double.class);
 			injectingInto(CMD_2, Command.class).multibind(Number.class).to(new Float(3));
 			injectingInto(CMD_2, Command.class).multibind(Number.class).to(new Long(5));
+
+			bind(CMD_3, Command.class ).toConstructor();
 			injectingInto(CMD_3, Command.class).bind(Number.class).to(1, 6d, 8);
+
 			bind(CMD_4, Command.class).toConstructor(BoundParameter.constant(Number[].class, new Number[] {2d, 9}));
+
+			bind(CMD_5, Command.class ).toConstructor();
+			injectingInto(CMD_5, Command.class).arraybind(Number[].class).toElements(1,2,3);
+
+			bind(CMD_6, Command.class ).toConstructor();
+			injectingInto(CMD_6, Command.class).bind(Number[].class).to(new Number[] {4,5,6});
 		}
-		
 	}
 	
 	private Injector injector = Bootstrap.injector(ArrayBindsModule.class);
@@ -77,5 +88,13 @@ public class TestArrayBinds {
 		Command cmd4 = injector.resolve(dependency(instance(CMD_4, raw(Command.class))));
 		assertEquals(2, cmd4.preconds.length);
 		assertEqualSets(new Number[] {2d, 9}, cmd4.preconds);
+		
+		Command cmd5 = injector.resolve(dependency(instance(CMD_5, raw(Command.class))));
+		assertEquals(3, cmd5.preconds.length);
+		assertEqualSets(new Number[] {1,2,3}, cmd5.preconds);
+		
+		Command cmd6 = injector.resolve(dependency(instance(CMD_6, raw(Command.class))));
+		assertEquals(3, cmd6.preconds.length);
+		assertEqualSets(new Number[] {4,5,6}, cmd6.preconds);
 	}
 }
