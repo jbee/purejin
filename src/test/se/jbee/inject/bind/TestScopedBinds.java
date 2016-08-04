@@ -40,4 +40,5 @@ public class TestScopedBinds {
 		Foo foo = injector.resolve( dependency( Foo.class ) );
 		fail( "It should not be possible to create a foo but got one: " + foo );
 	}
+	
 }
