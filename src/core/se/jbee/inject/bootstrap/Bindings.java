@@ -58,8 +58,8 @@ public final class Bindings {
 	}
 
 	public Binding<?>[] declareFrom( Module... modules ) {
-		Set<Class<?>> declared = new HashSet<Class<?>>();
-		Set<Class<?>> multimodals = new HashSet<Class<?>>();
+		Set<Class<?>> declared = new HashSet<>();
+		Set<Class<?>> multimodals = new HashSet<>();
 		for ( Module m : modules ) {
 			Class<? extends Module> ns = m.getClass();
 			final boolean hasBeenDeclared = declared.contains( ns );

@@ -10,12 +10,12 @@ import static se.jbee.inject.container.Typecast.providerTypeOf;
 
 import org.junit.Test;
 
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.bind.Binder.RootBinder;
 import se.jbee.inject.bind.TestInspectorBinds.Resource;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -105,7 +105,7 @@ public class TestStateDependentBinds {
 		}
 
 		public <T, C> ControllerBinder<T> connect( Type<T> type ) {
-			return new ControllerBinder<T>( root, type );
+			return new ControllerBinder<>( root, type );
 		}
 	}
 	
@@ -188,7 +188,7 @@ public class TestStateDependentBinds {
 	}
 
 	public static <T, C> Supplier<T> stateDependent( Type<T> type, Dependency<C> state ) {
-		return new StateDependentSupplier<T, C>( type, state );
+		return new StateDependentSupplier<>( type, state );
 	}
 
 	/**

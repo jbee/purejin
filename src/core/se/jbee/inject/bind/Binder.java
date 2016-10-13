@@ -65,7 +65,7 @@ public class Binder {
 	}
 
 	public <E> TypedElementBinder<E> arraybind( Class<E[]> type ) {
-		return new TypedElementBinder<E>( bind(), defaultInstanceOf( raw( type ) ) );
+		return new TypedElementBinder<>( bind(), defaultInstanceOf( raw( type ) ) );
 	}
 
 	public <T> TypedBinder<T> autobind( Class<T> type ) {
@@ -81,7 +81,7 @@ public class Binder {
 	}
 
 	public <T> TypedBinder<T> bind( Instance<T> instance ) {
-		return new TypedBinder<T>( bind(), instance );
+		return new TypedBinder<>( bind(), instance );
 	}
 
 	public <T> TypedBinder<T> bind( Name name, Class<T> type ) {
@@ -133,7 +133,7 @@ public class Binder {
 	}
 	
 	public <T> PluginBinder<T> plug( Class<T> plugin ) {
-		return new PluginBinder<T>( on(bind()), plugin);
+		return new PluginBinder<>( on(bind()), plugin);
 	}
 	
 	protected Binder on( Bind bind ) {
@@ -370,7 +370,7 @@ public class Binder {
 		protected final Resource<T> resource;
 
 		TypedBinder( Bind bind, Instance<T> instance ) {
-			this( bind.next(), new Resource<T>( instance, bind.target ) );
+			this( bind.next(), new Resource<>( instance, bind.target ) );
 		}
 
 		TypedBinder( Bind bind, Resource<T> resource ) {
@@ -425,6 +425,7 @@ public class Binder {
 			onMulti().toConstant( constant1 ).toConstant( constant2 ).toConstant( constant3 );
 		}
 
+		@SafeVarargs
 		public final void to( T constant1, T... constants ) {
 			TypedBinder<T> multibinder = onMulti().toConstant( constant1 );
 			for ( int i = 0; i < constants.length; i++ ) {
@@ -485,7 +486,7 @@ public class Binder {
 		}
 
 		protected final TypedBinder<T> on( Bind bind ) {
-			return new TypedBinder<T>( bind, resource );
+			return new TypedBinder<>( bind, resource );
 		}
 
 		protected final TypedBinder<T> onMulti() {
@@ -525,7 +526,8 @@ public class Binder {
 			toElements( new Parameter[] { p1, p2, p3 } );
 		}
 
-		public void toElements( Parameter<? extends E>... parameters ) {
+		@SafeVarargs
+		public final void toElements( Parameter<? extends E>... parameters ) {
 			expand( parameters );
 		}
 
@@ -541,7 +543,8 @@ public class Binder {
 			to( array( c1, c2, c3 ) );
 		}
 
-		public void toElements( E... constants ) {
+		@SafeVarargs
+		public final void toElements( E... constants ) {
 			to( array( constants ) );
 		}
 

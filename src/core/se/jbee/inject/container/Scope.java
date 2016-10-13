@@ -15,6 +15,7 @@ import se.jbee.inject.Injector;
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
+@FunctionalInterface
 public interface Scope {
 
 	/**

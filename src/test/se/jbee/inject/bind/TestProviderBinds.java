@@ -134,7 +134,7 @@ public class TestProviderBinds {
 
 	@Test
 	public void providersAreAvailableForSets() {
-		Set<String> set = new HashSet<String>(asList( "foobar", "special" ));
+		Set<String> set = new HashSet<>(asList( "foobar", "special" ));
 		assertInjectsProviderFor( set, raw( Set.class ).parametized( String.class ) );
 	}
 

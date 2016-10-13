@@ -22,6 +22,7 @@ import se.jbee.inject.bootstrap.Bundle;
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
+@FunctionalInterface
 public interface Provider<T> {
 
 	T provide() throws UnresolvableDependency;

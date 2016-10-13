@@ -18,6 +18,7 @@ import se.jbee.inject.Supplier;
  * @param <V>
  *            The type of value that is expanded by this macro
  */
+@FunctionalInterface
 public interface Macro<V> {
 
 	/**

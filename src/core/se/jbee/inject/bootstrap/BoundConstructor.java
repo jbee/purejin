@@ -15,7 +15,7 @@ public final class BoundConstructor<T>
 		implements Typed<T> {
 
 	public static <T> BoundConstructor<T> bind( Constructor<T> constructor, Parameter<?>... parameters ) {
-		return new BoundConstructor<T>( constructor, parameters );
+		return new BoundConstructor<>( constructor, parameters );
 	}
 
 	public final Constructor<T> constructor;

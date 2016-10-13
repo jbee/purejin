@@ -22,7 +22,7 @@ public final class BoundMethod<T>
 		implements Typed<T> {
 
 	public static <T> BoundMethod<T> bind( Object instance, Method factory, Type<T> returnType, Parameter<?>... parameters ) {
-		return new BoundMethod<T>( instance, factory, returnType, parameters );
+		return new BoundMethod<>( instance, factory, returnType, parameters );
 	}
 
 	public final Object instance;

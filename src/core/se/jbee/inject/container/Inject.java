@@ -74,10 +74,10 @@ public final class Inject {
 				if ( expiry == null ) {
 					expiry = Expiry.NEVER;
 				}
-				injectrons[i] = new RepositoryInjectron<T>(this, repositories.get( scope ), assembly, expiry, i, assemblies.length);
+				injectrons[i] = new RepositoryInjectron<>(this, repositories.get( scope ), assembly, expiry, i, assemblies.length);
 			}
 			Arrays.sort( injectrons, COMPARATOR );
-			Map<Class<?>, Injectron<?>[]> map = new IdentityHashMap<Class<?>, Injectron<?>[]>( injectrons.length );
+			Map<Class<?>, Injectron<?>[]> map = new IdentityHashMap<>( injectrons.length );
 			if ( injectrons.length == 0 ) {
 				return map;
 			}
@@ -96,7 +96,7 @@ public final class Inject {
 		}
 		
 		private static Injectron<?>[] wildcardInjectrons(Map<Class<?>, Injectron<?>[]> injectrons) {
-			List<Injectron<?>> res = new ArrayList<Injectron<?>>();
+			List<Injectron<?>> res = new ArrayList<>();
 			for (Injectron<?>[] is : injectrons.values()) {
 				for (Injectron<?> i : is) {
 					if (i.info().resource.type().isUpperBound()) {
@@ -109,7 +109,7 @@ public final class Inject {
 		}
 		
 		private static Map<Scope, Repository> initRepositories( Assembly<?>[] assemblies ) {
-			Map<Scope, Repository> repositories = new IdentityHashMap<Scope, Repository>();
+			Map<Scope, Repository> repositories = new IdentityHashMap<>();
 			for ( Assembly<?> a : assemblies ) {
 				Scope scope = a.scope();
 				Repository repository = repositories.get( scope );
@@ -189,7 +189,7 @@ public final class Inject {
 			}
 			Injectron<E>[] elementInjectrons = injectronsForType( elementType );
 			if ( elementInjectrons != null ) {
-				List<E> elements = new ArrayList<E>( elementInjectrons.length );
+				List<E> elements = new ArrayList<>( elementInjectrons.length );
 				addAllMatching( elements, dependency, elementType, elementInjectrons );
 				if ( dependency.type().rawType.getComponentType().isPrimitive() ) {
 					throw new NoResourceForDependency(dependency, null,
@@ -199,7 +199,7 @@ public final class Inject {
 			}
 			// if there hasn't been binds to that specific wild-card Type  
 			if ( elementType.isUpperBound() ) { // wild-card dependency:
-				List<E> elements = new ArrayList<E>();
+				List<E> elements = new ArrayList<>();
 				for ( Entry<Class<?>, Injectron<?>[]> e : injectrons.entrySet() ) {
 					if ( Type.raw( e.getKey() ).isAssignableTo( elementType ) ) {
 						@SuppressWarnings ( "unchecked" )
@@ -217,7 +217,7 @@ public final class Inject {
 		private <T, I> T resolveInjectronArray( Dependency<T> dependency, Type<I> instanceType ) {
 			Dependency<I> instanceDependency = dependency.typed( instanceType );
 			if ( instanceType.isUpperBound() ) {
-				List<Injectron<?>> res = new ArrayList<Injectron<?>>();
+				List<Injectron<?>> res = new ArrayList<>();
 				for ( Entry<Class<?>, Injectron<?>[]> e : injectrons.entrySet() ) {
 					if ( raw( e.getKey() ).isAssignableTo( instanceType ) ) {
 						@SuppressWarnings ( "unchecked" )
@@ -232,7 +232,7 @@ public final class Inject {
 				return toArray( res, raw( Injectron.class ) );
 			}
 			Injectron<I>[] res = injectronsForType( instanceType );
-			List<Injectron<I>> elements = new ArrayList<Injectron<I>>( res.length );
+			List<Injectron<I>> elements = new ArrayList<>( res.length );
 			for ( Injectron<I> i : res ) {
 				if ( i.info().resource.isCompatibleWith( instanceDependency ) ) {
 					elements.add( i );
@@ -297,7 +297,7 @@ public final class Inject {
 			this.injector = injector;
 			this.repository = repository;
 			this.supplier = assembly.supplier();
-			this.info = new InjectronInfo<T>(assembly.resource(), assembly.source(), expiry, serialID, count);
+			this.info = new InjectronInfo<>(assembly.resource(), assembly.source(), expiry, serialID, count);
 		}
 
 		@Override
@@ -338,7 +338,7 @@ public final class Inject {
 	static final IdentityHashMap<Scope, Expiry> EXPIRATION = defaultExpiration();
 	
 	private static IdentityHashMap<Scope, Expiry> defaultExpiration() {
-		IdentityHashMap<Scope, Expiry> map = new IdentityHashMap<Scope, Expiry>();
+		IdentityHashMap<Scope, Expiry> map = new IdentityHashMap<>();
 		map.put( Scoped.APPLICATION, Expiry.NEVER );
 		map.put( Scoped.INJECTION, Expiry.expires( 1000 ) );
 		map.put( Scoped.THREAD, Expiry.expires( 500 ) );

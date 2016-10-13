@@ -15,6 +15,7 @@ package se.jbee.inject.bootstrap;
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
+@FunctionalInterface
 public interface Module {
 
 	/**

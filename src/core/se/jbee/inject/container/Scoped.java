@@ -151,7 +151,7 @@ public final class Scoped {
 
 		@Override
 		public <T> T serve(Dependency<? super T> dependency, InjectronInfo<T> info, Provider<T> provider) {
-			return dest.serve( dependency, info, new SnapshotingProvider<T>( dependency, info, provider, src ) );
+			return dest.serve( dependency, info, new SnapshotingProvider<>( dependency, info, provider, src ) );
 		}
 
 		private static final class SnapshotingProvider<T>
@@ -284,7 +284,7 @@ public final class Scoped {
 	private static final class DependencyPropertyRepository
 			implements Repository {
 
-		private final Map<String, Object> instances = new HashMap<String, Object>();
+		private final Map<String, Object> instances = new HashMap<>();
 		private final DependencyProperty property;
 
 		DependencyPropertyRepository( DependencyProperty injectionKey ) {

@@ -44,6 +44,7 @@ public abstract class BootstrapperBundle
 	}
 
 	@Override
+	@SafeVarargs
 	public final <M extends Enum<M> & ModularBundle<M>> void install( M... modules ) {
 		bootstrap.install( modules );
 	}
@@ -55,6 +56,7 @@ public abstract class BootstrapperBundle
 	}
 
 	@Override
+	@SafeVarargs
 	public final <M extends Enum<M> & ModularBundle<M>> void uninstall( M... modules ) {
 		bootstrap.uninstall( modules );
 	}

@@ -22,6 +22,7 @@ import se.jbee.inject.UnresolvableDependency;
  * @param <T>
  *            The type of value created
  */
+@FunctionalInterface
 public interface Factory<T> {
 
 	/**

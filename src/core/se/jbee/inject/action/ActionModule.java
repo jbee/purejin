@@ -100,11 +100,11 @@ public abstract class ActionModule
 		/**
 		 * A list of discovered methods for each implementation class.
 		 */
-		private final Map<Class<?>, Method[]> cachedMethods = new IdentityHashMap<Class<?>, Method[]>();
+		private final Map<Class<?>, Method[]> cachedMethods = new IdentityHashMap<>();
 		/**
 		 * All already created {@link Action}s identified by a unique function signature.
 		 */
-		private final Map<String, Action<?, ?>> cachedActions = new HashMap<String, Action<?, ?>>();
+		private final Map<String, Action<?, ?>> cachedActions = new HashMap<>();
 
 		private final Injector injector;
 		private final Inspector inspect;
@@ -135,7 +135,7 @@ public abstract class ActionModule
 					if ( action == null ) {
 						Method method = resolveAction( input, output );
 						Object impl = injector.resolve( dependency( method.getDeclaringClass() ) );
-						action = new ExecutedAction<I, O>(impl, method, input, output, executor, injector);
+						action = new ExecutedAction<>(impl, method, input, output, executor, injector);
 						cachedActions.put( key, action );
 					}
 				}

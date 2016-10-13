@@ -136,7 +136,7 @@ public class TestMorePrecise {
 	}
 	
 	public static <T extends MorePreciseThan<? super T>> Comparator<T> comparator(@SuppressWarnings("unused") Class<T> cls) {
-		return new PreciserThanComparator<T>();
+		return new PreciserThanComparator<>();
 	}
 
 	private static class PreciserThanComparator<T extends MorePreciseThan<? super T>>

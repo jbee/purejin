@@ -42,7 +42,7 @@ public final class Supply {
 	public static final Supplier<Set<?>> SET_BRIDGE = new ArrayToSetBridgeSupplier();
 	public static final Factory<Logger> LOGGER = new LoggerFactory();
 
-	private static final Supplier<?> REQUIRED = new RequiredSupplier<Object>();
+	private static final Supplier<?> REQUIRED = new RequiredSupplier<>();
 
 	/**
 	 * A {@link Supplier} used as fall-back. Should a required resource not be
@@ -55,47 +55,47 @@ public final class Supply {
 	}
 
 	public static <T> Supplier<T> constant( T constant ) {
-		return new ConstantSupplier<T>( constant );
+		return new ConstantSupplier<>( constant );
 	}
 
 	public static <T> Supplier<T> reference( Class<? extends Supplier<? extends T>> type ) {
-		return new BridgeSupplier<T>( type );
+		return new BridgeSupplier<>( type );
 	}
 
 	public static <E> Supplier<E[]> elements( Type<E[]> arrayType, Parameter<? extends E>[] elements ) {
-		return new PredefinedArraySupplier<E>( arrayType, BoundParameter.bind( elements ) );
+		return new PredefinedArraySupplier<>( arrayType, BoundParameter.bind( elements ) );
 	}
 
 	public static <T> Supplier<T> instance( Instance<T> instance ) {
-		return new InstanceSupplier<T>( instance );
+		return new InstanceSupplier<>( instance );
 	}
 
 	public static <T> Supplier<T> dependency( Dependency<T> dependency ) {
-		return new DependencySupplier<T>( dependency );
+		return new DependencySupplier<>( dependency );
 	}
 
 	public static <T> Supplier<T> parametrizedInstance( Instance<T> instance ) {
-		return new ParametrizedInstanceSupplier<T>( instance );
+		return new ParametrizedInstanceSupplier<>( instance );
 	}
 
 	public static <T> Supplier<T> method( BoundMethod<T> method ) {
-		return new MethodSupplier<T>(method, 
+		return new MethodSupplier<>(method, 
 				bind( parameterTypes(method.factory), method.parameters ));
 	}
 
 	public static <T> Supplier<T> costructor( BoundConstructor<T> constructor ) {
-		return new ConstructorSupplier<T>( constructor.constructor, 
+		return new ConstructorSupplier<>( constructor.constructor, 
 				bind( parameterTypes(constructor.constructor), constructor.parameters));
 	}
 
 	public static <T> Supplier<T> factory( Factory<T> factory ) {
-		return new FactorySupplier<T>( factory );
+		return new FactorySupplier<>( factory );
 	}
 
 	public static <T> Provider<T> lazyProvider( Dependency<T> dependency, Injector injector ) {
 		return dependency.type().arrayDimensions() == 1 // no injectrons for results composed within the Injector
-				? new LazyDirectProvider<T>(dependency, injector) 
-				: new LazyProvider<T>(dependency, injector);
+				? new LazyDirectProvider<>(dependency, injector) 
+				: new LazyProvider<>(dependency, injector);
 	}
 
 	private Supply() {
@@ -154,7 +154,7 @@ public final class Supply {
 
 		@Override
 		<E> Set<E> bridge( E[] elements ) {
-			return new HashSet<E>( Arrays.asList( elements ) );
+			return new HashSet<>( Arrays.asList( elements ) );
 		}
 
 	}

@@ -11,8 +11,6 @@ import org.junit.Test;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Supplier;
-import se.jbee.inject.action.Action;
-import se.jbee.inject.action.ActionModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 
 /**
@@ -41,7 +39,7 @@ public class TestCommandBinds {
 		}
 		
 		private static <P> Command<P> newCommand( Action<P, Long> service ) {
-			return new CommandToServiceMethodAdapter<P>( service );
+			return new CommandToServiceMethodAdapter<>( service );
 		}
 
 		static class CommandToServiceMethodAdapter<P>

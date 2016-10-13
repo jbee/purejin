@@ -67,7 +67,7 @@ public final class Type<T>
 	}
 
 	public static <T> Type<T> raw( Class<T> type ) {
-		return new Type<T>( type );
+		return new Type<>( type );
 	}
 
 	private static Type<?>[] types( java.lang.reflect.Type[] parameters,
@@ -111,7 +111,7 @@ public final class Type<T>
 			Map<String, Type<?>> actualTypeArguments ) {
 		@SuppressWarnings ( "unchecked" )
 		Class<T> rawType = (Class<T>) type.getRawType();
-		return new Type<T>( rawType, types( type.getActualTypeArguments(), actualTypeArguments ) );
+		return new Type<>( rawType, types( type.getActualTypeArguments(), actualTypeArguments ) );
 	}
 
 	public final Class<T> rawType;
@@ -160,7 +160,7 @@ public final class Type<T>
 	}
 
 	public Type<? extends T> upperBound( boolean upperBound ) {
-		return this.upperBound == upperBound ? this : new Type<T>( upperBound, rawType, params );
+		return this.upperBound == upperBound ? this : new Type<>( upperBound, rawType, params );
 	}
 
 	public Type<? extends T> asExactType() {
@@ -170,7 +170,7 @@ public final class Type<T>
 	@SuppressWarnings ( "unchecked" )
 	public Type<T[]> addArrayDimension() {
 		Object proto = Array.newInstance( rawType, 0 );
-		return new Type<T[]>( upperBound, (Class<T[]>) proto.getClass(), params );
+		return new Type<>( upperBound, (Class<T[]>) proto.getClass(), params );
 	}
 
 	public boolean equalTo( Type<?> other ) {
@@ -210,7 +210,7 @@ public final class Type<T>
 		while (baseType.isArray()) {
 			baseType = baseType.getComponentType();
 		}
-		return new Type<B>( upperBound, (Class<B>)baseType, params );
+		return new Type<>( upperBound, (Class<B>)baseType, params );
 	}
 
 	/**
@@ -363,7 +363,7 @@ public final class Type<T>
 		for ( int i = 0; i < params.length; i++ ) {
 			parameters[i] = params[i].asUpperBound();
 		}
-		return new Type<T>( upperBound, rawType, parameters );
+		return new Type<>( upperBound, rawType, parameters );
 	}
 
 	/**
@@ -396,7 +396,7 @@ public final class Type<T>
 
 	public Type<T> parametized( Type<?>... parameters ) {
 		checkTypeParameters( parameters );
-		return new Type<T>( upperBound, rawType, parameters );
+		return new Type<>( upperBound, rawType, parameters );
 	}
 
 	@Override
@@ -486,7 +486,7 @@ public final class Type<T>
 	 *         type hierarchy.
 	 */
 	public Type<? super T>[] supertypes() {
-		Set<Type<?>> res = new LinkedHashSet<Type<?>>();
+		Set<Type<?>> res = new LinkedHashSet<>();
 		Class<?> supertype = rawType;
 		java.lang.reflect.Type genericSupertype = null;
 		Type<?> type = this;
@@ -510,7 +510,7 @@ public final class Type<T>
 	}
 
 	private static <V> Map<String, Type<?>> actualTypeArguments( Type<V> type ) {
-		Map<String, Type<?>> actualTypeArguments = new HashMap<String, Type<?>>();
+		Map<String, Type<?>> actualTypeArguments = new HashMap<>();
 		TypeVariable<Class<V>>[] typeParameters = type.rawType.getTypeParameters();
 		for ( int i = 0; i < typeParameters.length; i++ ) {
 			// it would be correct to use the joint type of the bounds but since it is not possible to create a type with illegal parameters it is ok to just use Object since there is no way to model a joint type

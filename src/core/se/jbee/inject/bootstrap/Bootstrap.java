@@ -64,7 +64,7 @@ public final class Bootstrap {
 	}
 
 	public static <T> Module module( PresetModule<T> module, Presets presets ) {
-		return new ModuleToPresetModule<T>( module, presets );
+		return new ModuleToPresetModule<>( module, presets );
 	}
 
 	public static void eagerSingletons( Injector injector ) {
@@ -117,11 +117,11 @@ public final class Bootstrap {
 	private static final class BuildinBootstrapper
 			implements Bootstrapper, Bundler, Modulariser {
 
-		private final Map<Class<? extends Bundle>, Set<Class<? extends Bundle>>> bundleChildren = new IdentityHashMap<Class<? extends Bundle>, Set<Class<? extends Bundle>>>();
-		private final Map<Class<? extends Bundle>, List<Module>> bundleModules = new IdentityHashMap<Class<? extends Bundle>, List<Module>>();
-		private final Set<Class<? extends Bundle>> uninstalled = new HashSet<Class<? extends Bundle>>();
-		private final Set<Class<? extends Bundle>> installed = new HashSet<Class<? extends Bundle>>();
-		private final LinkedList<Class<? extends Bundle>> stack = new LinkedList<Class<? extends Bundle>>();
+		private final Map<Class<? extends Bundle>, Set<Class<? extends Bundle>>> bundleChildren = new IdentityHashMap<>();
+		private final Map<Class<? extends Bundle>, List<Module>> bundleModules = new IdentityHashMap<>();
+		private final Set<Class<? extends Bundle>> uninstalled = new HashSet<>();
+		private final Set<Class<? extends Bundle>> installed = new HashSet<>();
+		private final LinkedList<Class<? extends Bundle>> stack = new LinkedList<>();
 		private final Globals globals;
 
 		BuildinBootstrapper( Globals globals ) {
@@ -143,7 +143,7 @@ public final class Bootstrap {
 				final Class<? extends Bundle> parent = stack.peek();
 				Set<Class<? extends Bundle>> children = bundleChildren.get( parent );
 				if ( children == null ) {
-					children = new LinkedHashSet<Class<? extends Bundle>>();
+					children = new LinkedHashSet<>();
 					bundleChildren.put( parent, children );
 				}
 				children.add( bundle );
@@ -162,18 +162,15 @@ public final class Bootstrap {
 				return;
 			}
 			final Options options = globals.options;
-			Bootstrap.instance( bundle ).bootstrap( new ModularBootstrapper<C>() {
-
-				@Override
-				public void install( Class<? extends Bundle> bundle, C module ) {
-					if ( options.isChosen( property, module ) ) { // null is a valid value to define what happens when no configuration is present
-						BuildinBootstrapper.this.install( bundle );
-					}
+			Bootstrap.instance( bundle ).bootstrap( (bundleType, module) -> {
+				if ( options.isChosen( property, module ) ) { // null is a valid value to define what happens when no configuration is present
+					BuildinBootstrapper.this.install( bundleType );
 				}
-			} );
+			});
 		}
 
 		@Override
+		@SafeVarargs
 		public final <M extends Enum<M> & ModularBundle<M>> void install( M... modules ) {
 			if ( modules.length > 0 ) {
 				final M bundle = modules[0];
@@ -181,15 +178,11 @@ public final class Bootstrap {
 					return;
 				}
 				final EnumSet<M> installing = EnumSet.of( bundle, modules );
-				bundle.bootstrap( new ModularBootstrapper<M>() {
-
-					@Override
-					public void install( Class<? extends Bundle> bundle, M module ) {
-						if ( installing.contains( module ) ) {
-							BuildinBootstrapper.this.install( bundle );
-						}
+				bundle.bootstrap( (bundleType, module) -> {
+					if ( installing.contains( module ) ) {
+						BuildinBootstrapper.this.install( bundleType );
 					}
-				} );
+				});
 			}
 		}
 
@@ -201,7 +194,7 @@ public final class Bootstrap {
 			}
 			List<Module> modules = bundleModules.get( bundle );
 			if ( modules == null ) {
-				modules = new ArrayList<Module>();
+				modules = new ArrayList<>();
 				bundleModules.put( bundle, modules );
 			}
 			modules.add( module );
@@ -223,13 +216,13 @@ public final class Bootstrap {
 			if ( !installed.contains( root ) ) {
 				install( root );
 			}
-			Set<Class<? extends Bundle>> installed = new LinkedHashSet<Class<? extends Bundle>>();
+			Set<Class<? extends Bundle>> installed = new LinkedHashSet<>();
 			addAllInstalledIn( root, installed );
 			return Array.of( installed, Class.class );
 		}
 
 		private Module[] modulesOf( Class<? extends Bundle>[] bundles ) {
-			List<Module> installed = new ArrayList<Module>( bundles.length );
+			List<Module> installed = new ArrayList<>( bundles.length );
 			for ( Class<? extends Bundle> b : bundles ) {
 				List<Module> modules = bundleModules.get( b );
 				if ( modules != null ) {
@@ -253,16 +246,13 @@ public final class Bootstrap {
 		}
 
 		@Override
+		@SafeVarargs
 		public final <M extends Enum<M> & ModularBundle<M>> void uninstall( M... modules ) {
 			if ( modules.length > 0 ) {
 				final EnumSet<M> uninstalling = EnumSet.of( modules[0], modules );
-				modules[0].bootstrap( new ModularBootstrapper<M>() {
-
-					@Override
-					public void install( Class<? extends Bundle> bundle, M module ) {
-						if ( uninstalling.contains( module ) ) {
-							uninstall( bundle );
-						}
+				modules[0].bootstrap( (bundleType, module) -> {
+					if ( uninstalling.contains( module ) ) {
+						uninstall( bundleType );
 					}
 				} );
 			}

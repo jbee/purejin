@@ -13,8 +13,8 @@ import se.jbee.inject.UnresolvableDependency;
  * Manages the already created instances but does not know how to create them.
  * 
  * @author Jan Bernitt (jan@jbee.se)
- * 
  */
+@FunctionalInterface
 public interface Repository {
 
 	/**

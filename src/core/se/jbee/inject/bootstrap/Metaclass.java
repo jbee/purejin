@@ -83,5 +83,4 @@ public final class Metaclass {
 		return obj;
 	}
 
-	//monovalent
 }

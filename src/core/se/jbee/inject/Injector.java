@@ -19,6 +19,7 @@ package se.jbee.inject;
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
+@FunctionalInterface
 public interface Injector {
 
 	<T> T resolve( Dependency<T> dependency ) throws UnresolvableDependency;

@@ -98,8 +98,9 @@ public final class Macros {
 	 *             In case no {@link Macro} had been declared for the type of
 	 *             value argument
 	 */
+	@SuppressWarnings("unchecked")
 	public <T, V> void expandInto( Bindings bindings, Binding<T> binding, V value ) {
-		macroForValueOf( value.getClass() ).expand( value, binding, bindings );
+		macroForValueOf( (Class<? super V>) value.getClass() ).expand( value, binding, bindings );
 	}
 	
 	public <T> void expandInto(Bindings bindings, Binding<T> binding) {
@@ -235,7 +236,7 @@ public final class Macros {
 	static <T> void implicitlyBindToConstructor( Binding<?> incomplete, Instance<T> instance, Bindings bindings ) {
 		Class<T> impl = instance.type().rawType;
 		if (!metaclass( impl ).undeterminable()) {
-			Binding<T> binding = Binding.binding(  new Resource<T>( instance, Target.ANY ),
+			Binding<T> binding = Binding.binding(  new Resource<>( instance, Target.ANY ),
 					BindingType.CONSTRUCTOR, null, incomplete.scope,
 					incomplete.source.typed( DeclarationType.IMPLICIT ) );
 			bindToInspectedConstructor(bindings, binding, impl );

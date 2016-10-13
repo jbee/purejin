@@ -16,6 +16,7 @@ package se.jbee.inject.bootstrap;
  * @param <T>
  *            The type of the preset value
  */
+@FunctionalInterface
 public interface PresetModule<T> {
 
 	/**

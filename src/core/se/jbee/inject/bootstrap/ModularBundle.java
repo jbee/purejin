@@ -13,6 +13,7 @@ import se.jbee.inject.bootstrap.Bootstrapper.ModularBootstrapper;
  * @author Jan Bernitt (jan@jbee.se)
  * 
  */
+@FunctionalInterface
 public interface ModularBundle<M> {
 
 	/**

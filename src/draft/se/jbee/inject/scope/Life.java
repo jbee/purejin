@@ -14,7 +14,7 @@ public class Life {
 
 	public static final Lifespan<Thread> CURRENT_THREAD = new CurrentThreadLifespan();
 
-	public static final Lifespan<Object> JVM = new ObjectLifespan<Object>( Object.class );
+	public static final Lifespan<Object> JVM = new ObjectLifespan<>( Object.class );
 
 	private static final class ObjectLifespan<T>
 			implements Lifespan<T> {

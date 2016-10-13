@@ -51,6 +51,7 @@ public final class Options {
 		return new Options( clone );
 	}
 
+	@SafeVarargs
 	public final <C extends Enum<C>> Options chosen( C... options ) {
 		if ( options.length == 0 ) {
 			return this;

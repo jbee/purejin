@@ -43,7 +43,7 @@ public class TestServiceBinds {
 		}
 
 		private static <I, O> Service<I, O> newService( Action<I, O> action ) {
-			return new ServiceToActionAdapter<I, O>( action );
+			return new ServiceToActionAdapter<>( action );
 		}
 
 		static final class ServiceToActionAdapter<I, O>

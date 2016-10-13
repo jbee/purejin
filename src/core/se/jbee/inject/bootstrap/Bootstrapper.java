@@ -68,13 +68,13 @@ public interface Bootstrapper {
 	 * @param modules
 	 *            The choices made to install.
 	 */
-	<M extends Enum<M> & ModularBundle<M>> void install( M... modules );
+	<M extends Enum<M> & ModularBundle<M>> void install( @SuppressWarnings("unchecked") M... modules );
 
 	/**
 	 * @param modules
 	 *            The choices made to uninstall again.
 	 */
-	<M extends Enum<M> & ModularBundle<M>> void uninstall( M... modules );
+	<M extends Enum<M> & ModularBundle<M>> void uninstall( @SuppressWarnings("unchecked") M... modules );
 
 	/**
 	 * @see Options
@@ -92,6 +92,7 @@ public interface Bootstrapper {
 	 * @param <M>
 	 *            The type of choices possible
 	 */
+	@FunctionalInterface
 	interface ModularBootstrapper<M> {
 
 		/**

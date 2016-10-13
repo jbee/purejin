@@ -134,7 +134,7 @@ public class TestMacroBinds {
 		}
 
 		private static <T> Binding<T> required( Type<T> type, Binding<?> binding ) {
-			return Binding.binding( new Resource<T>( Instance.anyOf( type ) ),
+			return Binding.binding( new Resource<>( Instance.anyOf( type ) ),
 					BindingType.REQUIRED, Supply.<T>required(), binding.scope,
 					binding.source.typed( DeclarationType.REQUIRED ) );
 		}
@@ -191,7 +191,7 @@ public class TestMacroBinds {
 
 		@Override
 		public <T> void expand(BoundConstructor<?> constructor, Binding<T> incomplete, Bindings bindings) {
-			Supplier<T> supplier = new InitialisationSupplier<T>(
+			Supplier<T> supplier = new InitialisationSupplier<>(
 					Supply.costructor( constructor.typed( incomplete.type() ) ) );
 			bindings.macros.expandInto(bindings, incomplete.complete( CONSTRUCTOR, supplier ));
 		}

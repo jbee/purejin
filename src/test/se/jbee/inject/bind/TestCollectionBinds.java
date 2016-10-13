@@ -77,7 +77,7 @@ public class TestCollectionBinds {
 	@Test
 	public void thatSetIsAvailableForBoundType() {
 		ai.assertInjects( singleton( "foobar" ), setTypeOf( String.class ) );
-		ai.assertInjects( new TreeSet<Integer>( asList( new Integer[] { 42, 846 } ) ),
+		ai.assertInjects( new TreeSet<>( asList( new Integer[] { 42, 846 } ) ),
 				setTypeOf( Integer.class ) );
 	}
 

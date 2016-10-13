@@ -43,6 +43,6 @@ public class AssertInjects {
 	}
 
 	private static <E> Set<E> set( E[] expected ) {
-		return new HashSet<E>( Arrays.asList( expected ) );
+		return new HashSet<>( Arrays.asList( expected ) );
 	}
 }

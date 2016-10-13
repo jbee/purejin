@@ -37,7 +37,7 @@ public final class Instance<T>
 	}
 
 	public static <T> Instance<T> instance( Name name, Type<T> type ) {
-		return new Instance<T>( name, type );
+		return new Instance<>( name, type );
 	}
 
 	public final Name name;
@@ -54,7 +54,7 @@ public final class Instance<T>
 	}
 
 	public Instance<T> discriminableBy( Name name ) {
-		return new Instance<T>( name, type );
+		return new Instance<>( name, type );
 	}
 
 	@Override
@@ -64,11 +64,11 @@ public final class Instance<T>
 
 	@Override
 	public <E> Instance<E> typed( Type<E> type ) {
-		return new Instance<E>( name, type );
+		return new Instance<>( name, type );
 	}
 	
 	public Instance<T> named(Name name) {
-		return new Instance<T>(name, type);
+		return new Instance<>(name, type);
 	}	
 
 	@Override

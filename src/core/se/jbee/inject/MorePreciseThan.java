@@ -15,6 +15,7 @@ package se.jbee.inject;
  * @param <T>
  *            The type of objects that are compared
  */
+@FunctionalInterface
 public interface MorePreciseThan<T extends MorePreciseThan<T>> {
 
 	/**

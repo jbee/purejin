@@ -13,6 +13,7 @@ import se.jbee.inject.bootstrap.Module;
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
+@FunctionalInterface
 public interface Edition {
 
 	/**

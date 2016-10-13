@@ -5,6 +5,8 @@
  */
 package se.jbee.inject.bootstrap;
 
+import static se.jbee.inject.Type.raw;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
@@ -20,6 +22,7 @@ import se.jbee.inject.Name;
 import se.jbee.inject.Packages;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Type;
+import se.jbee.inject.UnresolvableDependency.NoMethodForDependency;
 import se.jbee.inject.container.Inject;
 
 /**
@@ -100,7 +103,7 @@ public class Inspect
 	}
 
 	private Parameter<?>[] parametersFor( Type<?>[] types, Annotation[][] annotations ) {
-		List<Parameter<?>> res = new ArrayList<Parameter<?>>();
+		List<Parameter<?>> res = new ArrayList<>();
 		for ( int i = 0; i < annotations.length; i++ ) {
 			Name name = Name.namedBy( namedby, annotations[i] );
 			if ( name != Name.DEFAULT ) {
@@ -141,7 +144,7 @@ public class Inspect
 		if ( !methods ) {
 			return NO_METHODS;
 		}
-		List<Method> res = new ArrayList<Method>();
+		List<Method> res = new ArrayList<>();
 		for ( Method m : implementor.getDeclaredMethods() ) {
 			if ( matches( m ) ) {
 				res.add( m );
@@ -215,13 +218,13 @@ public class Inspect
 	 * @param declaringClass
 	 *            constructed type
 	 * @return The constructor with the most parameters.
-	 * @throws NoSuchMethodException
+	 * @throws NoMethodForDependency
 	 *             in case the type is not constructible (has no constructors at all)
 	 */
-	public static <T> Constructor<T> defaultConstructor( Class<T> declaringClass ) {
+	public static <T> Constructor<T> defaultConstructor( Class<T> declaringClass ) throws NoMethodForDependency {
 		Constructor<?>[] constructors = declaringClass.getDeclaredConstructors();
 		if ( constructors.length == 0 ) {
-			throw new RuntimeException( new InstantiationException( declaringClass.getCanonicalName() ) );
+			throw new NoMethodForDependency( raw(declaringClass) );
 		}
 		Constructor<?> mostArgConstructor = constructors[0];
 		for ( int i = 0; i < constructors.length; i++ ) {

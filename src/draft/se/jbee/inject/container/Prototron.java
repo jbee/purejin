@@ -8,7 +8,7 @@ package se.jbee.inject.container;
 import se.jbee.inject.Parameter;
 
 /**
- * Unifying interface for "prepared" constructor and method invocations.
+ * Unifying interface for a "prepared" constructor and method invocations.
  * 
  * Prototype + Singleton => Prototron 
  * 

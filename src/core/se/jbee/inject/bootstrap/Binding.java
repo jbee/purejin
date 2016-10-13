@@ -37,7 +37,7 @@ public final class Binding<T>
 
 	public static <T> Binding<T> binding( Resource<T> resource, BindingType type,
 			Supplier<? extends T> supplier, Scope scope, Source source ) {
-		return new Binding<T>( resource, type, supplier, scope, source );
+		return new Binding<>( resource, type, supplier, scope, source );
 	}
 
 	public final Resource<T> resource;
@@ -88,7 +88,7 @@ public final class Binding<T>
 			throw new ClassCastException(
 					"New type of a binding has to be a assignable from :" + type() + " but was: " + type );
 		}
-		return new Binding<E>( resource.typed( type ), this.type, (Supplier<? extends E>) supplier,	scope, source );
+		return new Binding<>( resource.typed( type ), this.type, (Supplier<? extends E>) supplier,	scope, source );
 	}
 
 	public boolean isComplete() {
@@ -96,7 +96,7 @@ public final class Binding<T>
 	}
 	
 	public Binding<T> complete( BindingType type, Supplier<? extends T> supplier ) {
-		return new Binding<T>( resource, type, supplier, scope, source );
+		return new Binding<>( resource, type, supplier, scope, source );
 	}
 
 	@Override
@@ -139,12 +139,12 @@ public final class Binding<T>
 		if ( bindings.length <= 1 ) {
 			return bindings;
 		}
-		List<Binding<?>> uniques = new ArrayList<Binding<?>>( bindings.length );
+		List<Binding<?>> uniques = new ArrayList<>( bindings.length );
 		Arrays.sort( bindings );
 		uniques.add( bindings[0] );
 		int lastUniqueIndex = 0;
-		Set<Type<?>> required = new HashSet<Type<?>>();
-		List<Binding<?>> dropped = new ArrayList<Binding<?>>(); 
+		Set<Type<?>> required = new HashSet<>();
+		List<Binding<?>> dropped = new ArrayList<>(); 
 		for ( int i = 1; i < bindings.length; i++ ) {
 			Binding<?> b_d = bindings[lastUniqueIndex];
 			Binding<?> b_i = bindings[i];
@@ -170,7 +170,7 @@ public final class Binding<T>
 	}
 
 	private static Binding<?>[] withoutProvidedThatAreNotRequiredIn(List<Binding<?>> bindings, Set<Type<?>> required, List<Binding<?>> dropped) {
-		List<Binding<?>> res = new ArrayList<Binding<?>>( bindings.size() );
+		List<Binding<?>> res = new ArrayList<>( bindings.size() );
 		for ( Binding<?> b : bindings ) {
 			Type<?> type = b.resource.type();
 			if ( b.source.declarationType != DeclarationType.PROVIDED || required.contains(type) ) {

@@ -13,6 +13,7 @@ package se.jbee.inject.action;
  * @param <O>
  *            The type of the output
  */
+@FunctionalInterface
 public interface Action<I, O> {
 
 	O exec( I input ) throws ActionMalfunction;

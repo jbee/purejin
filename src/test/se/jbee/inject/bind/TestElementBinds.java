@@ -35,8 +35,8 @@ public class TestElementBinds {
 			arraybind( String[].class ).toElements( "foo", "bar" );
 			arraybind( Number[].class ).toElements( 2, 3f );
 			arraybind( List[].class ).toElements( raw( ArrayList.class ), raw( LinkedList.class ) );
-			bind( ArrayList.class ).to( new ArrayList<Object>() );
-			bind( LinkedList.class ).to( new LinkedList<Object>() );
+			bind( ArrayList.class ).to( new ArrayList<>() );
+			bind( LinkedList.class ).to( new LinkedList<>() );
 			arraybind( Float[].class ).toElements( 2f, 4f, 7f );
 			arraybind( Long[].class ).toElements( 1L, 2L, 3L, 4L ); // a varargs
 		}

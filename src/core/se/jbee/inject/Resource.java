@@ -18,7 +18,7 @@ public final class Resource<T>
 		implements Typed<T>, MorePreciseThan<Resource<?>> {
 
 	public static <T> Resource<T> resource( Class<T> type ) {
-		return new Resource<T>( Instance.anyOf( raw( type ) ) );
+		return new Resource<>( Instance.anyOf( raw( type ) ) );
 	}
 
 	public final Instance<T> instance;
@@ -83,7 +83,7 @@ public final class Resource<T>
 
 	@Override
 	public <E> Resource<E> typed( Type<E> type ) {
-		return new Resource<E>( instance.typed( type ), target );
+		return new Resource<>( instance.typed( type ), target );
 	}
 
 	public boolean equalTo( Resource<?> other ) {

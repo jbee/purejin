@@ -23,8 +23,9 @@ import se.jbee.inject.Type;
  */
 public final class Globals {
 
+	@SafeVarargs
 	public static <T extends Enum<T> & Feature<T>> Edition featureEdition( T... featured ) {
-		return new FeatureEdition<T>( featured[0], EnumSet.of( featured[0], featured ) );
+		return new FeatureEdition<>( featured[0], EnumSet.of( featured[0], featured ) );
 	}
 
 	public static Edition packagesEdition( Packages included ) {
@@ -56,7 +57,8 @@ public final class Globals {
 		return edition( packagesEdition( included ) );
 	}
 
-	public <T extends Enum<T> & Feature<T>> Globals edition( T... featured ) {
+	@SafeVarargs
+	public final <T extends Enum<T> & Feature<T>> Globals edition( T... featured ) {
 		return edition( featureEdition( featured ) );
 	}
 

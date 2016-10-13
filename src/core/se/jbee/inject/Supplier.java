@@ -13,6 +13,7 @@ package se.jbee.inject;
  * @param <T>
  *            The type of the instance being resolved
  */
+@FunctionalInterface
 public interface Supplier<T> {
 
 	/**

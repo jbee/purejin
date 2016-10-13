@@ -17,6 +17,7 @@ import se.jbee.inject.bootstrap.Module;
  * @param <T>
  *            The enum used as different features/options to chose from.
  */
+@FunctionalInterface
 public interface Feature<T extends Enum<T>> {
 
 	/**

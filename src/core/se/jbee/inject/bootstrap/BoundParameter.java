@@ -39,15 +39,15 @@ public final class BoundParameter<T> implements Parameter<T> {
 		}
 		if ( parameter instanceof Instance<?> ) {
 			Instance<T> i = (Instance<T>) parameter;
-			return new BoundParameter<T>(ParameterType.INSTANCE, i.type(), i, null, Supply.instance( i ) );
+			return new BoundParameter<>(ParameterType.INSTANCE, i.type(), i, null, Supply.instance( i ) );
 		}
 		if ( parameter instanceof Type<?> ) {
 			Instance<T> i = anyOf( (Type<T>) parameter );
-			return new BoundParameter<T>(ParameterType.INSTANCE, i.type(), i, null, Supply.instance( i ) );
+			return new BoundParameter<>(ParameterType.INSTANCE, i.type(), i, null, Supply.instance( i ) );
 		}
 		if ( parameter instanceof Dependency<?> ) {
 			final Dependency<T> d = (Dependency<T>) parameter;
-			return new BoundParameter<T>(ParameterType.EXTERNAL, d.type(), d.instance, null, Supply.dependency( d ) );
+			return new BoundParameter<>(ParameterType.EXTERNAL, d.type(), d.instance, null, Supply.dependency( d ) );
 		}
 		throw new IllegalArgumentException( "Unknown parameter type:" + parameter );
 	}
@@ -57,11 +57,11 @@ public final class BoundParameter<T> implements Parameter<T> {
 	}
 
 	public static <T> Parameter<T> constant( Type<T> type, T constant ) {
-		return new BoundParameter<T>(ParameterType.CONSTANT, type, Instance.defaultInstanceOf(type), constant, Supply.constant( constant ) );
+		return new BoundParameter<>(ParameterType.CONSTANT, type, Instance.defaultInstanceOf(type), constant, Supply.constant( constant ) );
 	}
 
 	public static <T> Parameter<T> supplier( Type<T> type, Supplier<? extends T> supplier ) {
-		return new BoundParameter<T>(ParameterType.EXTERNAL, type, Instance.defaultInstanceOf(type), null, supplier );
+		return new BoundParameter<>(ParameterType.EXTERNAL, type, Instance.defaultInstanceOf(type), null, supplier );
 	}
 
 	public static <S, T extends S> Parameter<S> asType( Class<S> supertype, Parameter<T> parameter ) {
@@ -72,6 +72,7 @@ public final class BoundParameter<T> implements Parameter<T> {
 		return bind( parameter ).typed(supertype);
 	}
 
+	@SafeVarargs
 	public static <E> BoundParameter<? extends E>[] bind(Parameter<? extends E>... parameters ) {
 		@SuppressWarnings ( "unchecked" )
 		BoundParameter<? extends E>[] params = new BoundParameter[parameters.length];
@@ -134,7 +135,7 @@ public final class BoundParameter<T> implements Parameter<T> {
 	}
 	
 	public BoundParameter<T> external() {
-		return new BoundParameter<T>(ParameterType.EXTERNAL, asType, instance, value, supplier);
+		return new BoundParameter<>(ParameterType.EXTERNAL, asType, instance, value, supplier);
 	}
 
 	/**
@@ -147,7 +148,7 @@ public final class BoundParameter<T> implements Parameter<T> {
 	@Override
 	public <E> BoundParameter<E> typed( Type<E> type ) throws ClassCastException {
 		if ( asType.isAssignableTo( type ) ) {
-			return new BoundParameter<E>(this.type, type, (Instance<E>)instance, (E)value, (Supplier<? extends E>) supplier );
+			return new BoundParameter<>(this.type, type, (Instance<E>)instance, (E)value, (Supplier<? extends E>) supplier );
 		}
 		throw new ClassCastException( "Only supertypes of " + asType	+ " can be supplied as same paramter - but was: " + type );
 	}

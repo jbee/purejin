@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 
 import se.jbee.inject.Type;
 
+@FunctionalInterface
 public interface Executor {
 
 	<I,O> O exec(Object impl, Method action, Object[] args, Type<O> output, Type<I> input, I value) throws ActionMalfunction;

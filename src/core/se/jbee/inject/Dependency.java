@@ -50,7 +50,7 @@ public final class Dependency<T>
 	}
 
 	private static <T> Dependency<T> dependency( Instance<T> instance, Injection[] hierarchy ) {
-		return new Dependency<T>( instance, hierarchy );
+		return new Dependency<>( instance, hierarchy );
 	}
 
 	private final Injection[] hierarchy;
@@ -153,24 +153,24 @@ public final class Dependency<T>
 	}
 
 	public <I> Dependency<T> injectingInto( Instance<I> target ) throws DependencyCycle, UnstableDependency {
-		return injectingInto( new Resource<I>(target), Expiry.NEVER );
+		return injectingInto( new Resource<>(target), Expiry.NEVER );
 	}
 
 	public Dependency<T> injectingInto( Resource<?> target, Expiry expiry ) throws DependencyCycle, UnstableDependency {
 		Injection injection = new Injection( instance, target, expiry );
 		if ( hierarchy.length == 0 ) {
-			return new Dependency<T>( instance, injection );
+			return new Dependency<>( instance, injection );
 		}
 		ensureNotMoreFrequentExpiry( injection );
 		ensureNoDependencyCycle( injection );
-		return new Dependency<T>( instance, Array.append( hierarchy, injection ) );
+		return new Dependency<>( instance, Array.append( hierarchy, injection ) );
 	}
 
 	public Dependency<T> uninject() {
 		if ( hierarchy.length <= 1 ) {
 			return untargeted();
 		}
-		return new Dependency<T>( instance, Arrays.copyOf( hierarchy, hierarchy.length - 1 ) );
+		return new Dependency<>( instance, Arrays.copyOf( hierarchy, hierarchy.length - 1 ) );
 	}
 
 	private void ensureNoDependencyCycle( Injection injection ) throws DependencyCycle {
