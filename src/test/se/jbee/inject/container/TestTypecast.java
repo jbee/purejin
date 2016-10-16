@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import se.jbee.inject.Type;
-import se.jbee.inject.container.Typecast;
 
 public class TestTypecast {
 

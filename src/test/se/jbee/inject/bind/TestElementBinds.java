@@ -1,10 +1,8 @@
 package se.jbee.inject.bind;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.raw;
 
@@ -15,13 +13,14 @@ import java.util.List;
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
+import se.jbee.inject.Parameter;
 import se.jbee.inject.bind.Binder.TypedElementBinder;
 import se.jbee.inject.bootstrap.Bootstrap;
 
 /**
  * Tests that demonstrates how to overlay the default behavior of 1-dimensional array types by
  * defining the elements of them explicitly using the
- * {@link TypedElementBinder#toElements(Class, Class)} methods.
+ * {@link TypedElementBinder#toElements(Parameter, Parameter)} methods.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
@@ -58,9 +57,9 @@ public class TestElementBinds {
 	@Test
 	public void thatTypesAreBoundAsElements() {
 		List<?>[] elems = injector.resolve( dependency( List[].class ) );
-		assertThat( elems.length, is( 2 ) );
-		assertThat( elems[0], instanceOf( ArrayList.class ) );
-		assertThat( elems[1], instanceOf( LinkedList.class ) );
+		assertEquals( 2, elems.length );
+		assertTrue( elems[0] instanceof ArrayList );
+		assertTrue( elems[1] instanceof LinkedList );
 	}
 
 	@Test

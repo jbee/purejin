@@ -1,10 +1,8 @@
 package se.jbee.inject.bind;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.container.Typecast.injectronTypeOf;
@@ -42,8 +40,8 @@ public class TestInjectronBinds {
 	public void thatInjectronIsAvailableForEveryBoundResource() {
 		Dependency<? extends Injectron<String>> dependency = dependency( injectronTypeOf( String.class ) );
 		Injectron<String> injectron = injector.resolve( dependency );
-		assertThat( injectron, notNullValue() );
-		assertThat( injectron.instanceFor( dependency( String.class ) ), is( "foobar" ) );
+		assertNotNull( injectron );
+		assertEquals( "foobar", injectron.instanceFor( dependency( String.class ) ) );
 	}
 
 	@Test
@@ -64,13 +62,13 @@ public class TestInjectronBinds {
 				injectronsTypeOf( String.class ) ).named( "special" );
 		Injectron<String>[] injectrons = injector.resolve( dependency );
 		assertEquals( 2, injectrons.length );
-		assertThat( injectrons[0].instanceFor( dependency( String.class ) ), is( "special-list" ) );
-		assertThat( injectrons[1].instanceFor( dependency( String.class ) ), is( "special" ) );
+		assertEquals( "special-list", injectrons[0].instanceFor( dependency( String.class ) ) );
+		assertEquals( "special", injectrons[1].instanceFor( dependency( String.class ) ) );
 	}
 
 	@Test
 	public void thatInjectorIsAvailableByDefault() {
 		Injector resolved = injector.resolve( dependency( Injector.class ) );
-		assertThat( resolved, sameInstance( injector ) );
+		assertSame( injector, resolved );
 	}
 }

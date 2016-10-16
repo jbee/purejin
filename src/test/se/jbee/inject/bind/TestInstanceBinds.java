@@ -1,9 +1,8 @@
 package se.jbee.inject.bind;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static se.jbee.inject.Dependency.dependency;
 
 import org.junit.Test;
@@ -39,8 +38,8 @@ public class TestInstanceBinds {
 	@Test
 	public void thatNumberDependencyIsResolvedToIntegerBoundSupplier() {
 		Number number = injector.resolve( dependency( Number.class ) );
-		assertThat( number, instanceOf( Integer.class ) );
-		assertThat( number.intValue(), is( 42 ) );
+		assertTrue(number instanceof Integer);
+		assertEquals( 42, number.intValue() );
 	}
 
 	@Test

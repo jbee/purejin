@@ -1,8 +1,7 @@
 package se.jbee.inject.bind;
 
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
@@ -221,7 +220,7 @@ public class TestBootstrapper {
 	@Test(timeout=50)
 	public void thatBundlesAreNotBootstrappedMultipleTimesEvenWhenTheyAreMutual() {
 		Injector injector = Bootstrap.injector( OneMutualDependentBundle.class );
-		assertThat( injector, notNullValue() );
+		assertNotNull( injector );
 	}
 
 	@Test ( expected = InconsistentBinding.class )

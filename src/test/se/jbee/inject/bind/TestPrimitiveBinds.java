@@ -1,16 +1,15 @@
 package se.jbee.inject.bind;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 
 import org.junit.Test;
 
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
 
 /**
@@ -62,32 +61,32 @@ public class TestPrimitiveBinds {
 
 	@Test
 	public void thatIntPrimitivesWorkAsWrapperClasses() {
-		assertThat( injector.resolve( dependency( Integer.class ) ), is( 42 ) );
-		assertThat( injector.resolve( dependency( int.class ) ), is( 42 ) );
+		assertEquals( 42, injector.resolve( dependency( Integer.class ) ).intValue() );
+		assertEquals( 42, injector.resolve( dependency( int.class ) ).intValue() );
 	}
 
 	@Test
 	public void thatLongPrimitivesWorkAsWrapperClasses() {
-		assertThat( injector.resolve( dependency( Long.class ) ), is( 132L ) );
-		assertThat( injector.resolve( dependency( long.class ) ), is( 132L ) );
+		assertEquals( 132L, injector.resolve( dependency( Long.class ) ).longValue() );
+		assertEquals( 132L, injector.resolve( dependency( long.class ) ).longValue() );
 	}
 
 	@Test
 	public void thatBooleanPrimitivesWorkAsWrapperClasses() {
-		assertThat( injector.resolve( dependency( Boolean.class ) ), is( true ) );
-		assertThat( injector.resolve( dependency( boolean.class ) ), is( true ) );
+		assertEquals( true, injector.resolve( dependency( Boolean.class ) ) );
+		assertEquals( true, injector.resolve( dependency( boolean.class ) ) );
 	}
 
 	@Test
 	public void thatFloatPrimitivesWorkAsWrapperClasses() {
-		assertThat( injector.resolve( dependency( Float.class ).named( "pi" ) ), is( 3.1415f ) );
-		assertThat( injector.resolve( dependency( float.class ).named( "pi" ) ), is( 3.1415f ) );
+		assertEquals( 3.1415f, injector.resolve( dependency( Float.class ).named( "pi" ) ).floatValue(), 0.01f );
+		assertEquals( 3.1415f, injector.resolve( dependency( float.class ).named( "pi" ) ).floatValue(), 0.01f );
 	}
 
 	@Test
 	public void thatDoublePrimitivesWorkAsWrapperClasses() {
-		assertThat( injector.resolve( dependency( Double.class ).named( "e" ) ), is( 2.71828d ) );
-		assertThat( injector.resolve( dependency( double.class ).named( "e" ) ), is( 2.71828d ) );
+		assertEquals( 2.71828d, injector.resolve( dependency( Double.class ).named( "e" ) ).doubleValue(), 0.01d );
+		assertEquals( 2.71828d, injector.resolve( dependency( double.class ).named( "e" ) ).doubleValue(), 0.01d );
 	}
 
 	/**
@@ -109,11 +108,11 @@ public class TestPrimitiveBinds {
 	@Test
 	public void thatPrimitivesWorkAsPrimitiveOrWrapperClassesWhenInjected() {
 		PrimitiveBindsBean bean = injector.resolve( dependency( PrimitiveBindsBean.class ) );
-		assertThat( bean.i, is( 42 ) );
-		assertThat( bean.f, is( 3.1415f ) );
-		assertThat( bean.b, is( true ) );
-		assertThat( bean.bigI, is( 42 ) );
-		assertThat( bean.bigF, is( 3.1415f ) );
-		assertThat( bean.bigB, is( true ) );
+		assertEquals( 42, bean.i );
+		assertEquals( 3.1415f, bean.f, 0.01f );
+		assertEquals( true, bean.b );
+		assertEquals( 42, bean.bigI.intValue() );
+		assertEquals( 3.1415f, bean.bigF.floatValue(), 0.01f );
+		assertEquals( true, bean.bigB );
 	}
 }

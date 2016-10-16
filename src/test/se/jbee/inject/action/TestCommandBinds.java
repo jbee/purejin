@@ -1,7 +1,6 @@
 package se.jbee.inject.action;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.container.Scoped.DEPENDENCY_TYPE;
@@ -86,6 +85,6 @@ public class TestCommandBinds {
 		Dependency<Command> dependency = dependency( raw( Command.class ).parametized(
 				Integer.class ) );
 		Command<Integer> square = injector.resolve( dependency );
-		assertThat( square.calc( 3 ), is( 9L ) );
+		assertEquals(  9L, square.calc( 3 ).longValue() );
 	}
 }

@@ -1,7 +1,6 @@
 package se.jbee.inject.action;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.action.ActionModule.actionDependency;
@@ -91,7 +90,7 @@ public class TestServiceBinds {
 				Integer.class, Long.class ) );
 		@SuppressWarnings ( "unchecked" )
 		Service<Integer, Long> square = injector.resolve( dependency );
-		assertThat( square.calc( 2 ), is( 4L ) );
+		assertEquals( 4L, square.calc( 2 ).longValue() );
 	}
 
 }

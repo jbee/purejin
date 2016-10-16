@@ -1,7 +1,6 @@
 package se.jbee.inject.bind;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.raw;
 
@@ -48,6 +47,6 @@ public class TestConstantBinds {
 	}
 
 	private <T> void assertInjects( T expected, Type<? extends T> dependencyType ) {
-		assertThat( injector.resolve( dependency( dependencyType ) ), is( expected ) );
+		assertEquals( expected, injector.resolve(dependency(dependencyType)));
 	}
 }

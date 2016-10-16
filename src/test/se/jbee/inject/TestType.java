@@ -1,9 +1,7 @@
 package se.jbee.inject;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static se.jbee.inject.Type.raw;
@@ -63,17 +61,16 @@ public class TestType {
 	public void testToString()
 			throws Exception {
 		Type<List> l = Type.raw( List.class ).parametized( String.class );
-		assertThat( l.toString(), is( "java.util.List<java.lang.String>" ) );
+		assertEquals( "java.util.List<java.lang.String>", l.toString() );
 
 		l = Type.raw( List.class ).parametized( Type.raw( String.class ).asUpperBound() );
-		assertThat( l.toString(), is( "java.util.List<? extends java.lang.String>" ) );
+		assertEquals( "java.util.List<? extends java.lang.String>", l.toString() );
 
 		l = Type.raw( List.class ).parametized( Type.raw( String.class ) ).parametizedAsUpperBounds();
-		assertThat( l.toString(), is( "java.util.List<? extends java.lang.String>" ) );
+		assertEquals( "java.util.List<? extends java.lang.String>",  l.toString() );
 
 		Field stringList = TestType.class.getDeclaredField( "aStringListField" );
-		assertThat( Type.fieldType( stringList ).toString(),
-				is( "java.util.List<java.lang.String>" ) );
+		assertEquals( "java.util.List<java.lang.String>", Type.fieldType( stringList ).toString() );
 	}
 
 	@Test
@@ -109,22 +106,22 @@ public class TestType {
 	@Test
 	public void testGenericArrays() {
 		Type<Class[]> classArray = Type.raw( Class[].class ).parametized( String.class );
-		assertThat( classArray.baseType().toString(), is( "java.lang.Class<java.lang.String>" ) );
-		assertThat( classArray.toString(), is( "java.lang.Class<java.lang.String>[]" ) );
+		assertEquals( "java.lang.Class<java.lang.String>", classArray.baseType().toString() );
+		assertEquals( "java.lang.Class<java.lang.String>[]", classArray.toString() );
 	}
 
 	@Test
 	public void testTwoDimensionalGenericArrays() {
 		Type<Class[][]> classArray = Type.raw( Class[][].class ).parametized( String.class );
-		assertThat( classArray.baseType().toString(), is( "java.lang.Class<java.lang.String>" ) );
-		assertThat( classArray.toString(), is( "java.lang.Class<java.lang.String>[][]" ) );
+		assertEquals( "java.lang.Class<java.lang.String>", classArray.baseType().toString() );
+		assertEquals( "java.lang.Class<java.lang.String>[][]", classArray.toString() );
 	}
 	
 	@Test
 	public void testMultiDimensionalGenericArrays() {
 		Type<Class[][][]> classArray = Type.raw( Class[][][].class ).parametized( String.class );
-		assertThat( classArray.baseType().toString(), is( "java.lang.Class<java.lang.String>" ) );
-		assertThat( classArray.toString(), is( "java.lang.Class<java.lang.String>[][][]" ) );
+		assertEquals( "java.lang.Class<java.lang.String>", classArray.baseType().toString() );
+		assertEquals( "java.lang.Class<java.lang.String>[][][]", classArray.toString() );
 	}
 
 	@Test
@@ -198,7 +195,7 @@ public class TestType {
 	@Test
 	public void testArrayType() {
 		Type<? extends Number> t = Type.raw( Number.class ).asUpperBound();
-		assertThat( t.addArrayDimension().toString(), is( "? extends java.lang.Number[]" ) );
+		assertEquals( "? extends java.lang.Number[]", t.addArrayDimension().toString() );
 	}
 
 	@Test

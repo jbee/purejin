@@ -1,9 +1,7 @@
 package se.jbee.inject.bind;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertNotNull;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
@@ -140,22 +138,22 @@ public class TestConstructorParameterBinds {
 
 	@Test
 	public void thatClassParameterIsArranged() {
-		assertThat( injector.resolve( dependency( Foo.class ) ), notNullValue() );
+		assertNotNull( injector.resolve( dependency( Foo.class ) ) );
 	}
 
 	@Test
 	public void thatTypeParameterIsArranged() {
-		assertThat( injector.resolve( dependency( Bar.class ) ), notNullValue() );
+		assertNotNull( injector.resolve( dependency( Bar.class ) ) );
 	}
 
 	@Test
 	public void thatInstanceParameterIsArranged() {
 		Bar bar = injector.resolve( dependency( Bar.class ) );
-		assertThat( bar.foo, is( "y" ) );
+		assertEquals( "y", bar.foo );
 	}
 
 	/**
-	 * We can see that {@link Parameterize#asType(Class, Parameter)} works because the instance y
+	 * We can see that {@link BoundParameter#asType(Class, Parameter)} works because the instance y
 	 * would also been assignable to the 1st parameter of type {@link Serializable} (in {@link Qux})
 	 * but since we typed it as a {@link CharSequence} it no longer is assignable to 1st argument
 	 * and will be used as 2nd argument where the as well {@link Serializable} {@link Number}
@@ -179,8 +177,8 @@ public class TestConstructorParameterBinds {
 	@Test
 	public void thatReoccuringTypesAreArrangedAsOccuringAfterAnother() {
 		Baz baz = injector.resolve( dependency( Baz.class ) );
-		assertThat( baz.foo, is( "y" ) );
-		assertThat( "when x alignment after another is broken", baz.bar, is( "y" ) );
+		assertEquals( "y" , baz.foo );
+		assertEquals( "when x alignment after another is broken", "y", baz.bar );
 	}
 
 	@Test ( expected = IllegalArgumentException.class )

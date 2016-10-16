@@ -1,8 +1,7 @@
 package se.jbee.inject.bind;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
 import static se.jbee.inject.bind.AssertInjects.assertEqualSets;
 
 import java.io.Serializable;
@@ -47,7 +46,7 @@ public class TestPluginBinds {
 	@Test
 	public void thatJustUntargetedExtensionsAreResolvedGlobally() {
 		Class<?>[] classes = injector.resolve( dependency );
-		assertThat( classes.length, is( 1 ) );
+		assertEquals( 1, classes.length );
 		assertSame( TestExtensionAction.class, classes[0] );
 	}
 

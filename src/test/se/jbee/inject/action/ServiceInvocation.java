@@ -6,7 +6,6 @@
 package se.jbee.inject.action;
 
 import se.jbee.inject.Type;
-import se.jbee.inject.action.Action;
 
 /**
  * Frames the invocation of {@link Action}s with further functionality that can be executed

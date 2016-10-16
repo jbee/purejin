@@ -1,7 +1,6 @@
 package se.jbee.inject.bind;
 
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertSame;
 import static se.jbee.inject.Dependency.dependency;
 
 import java.util.logging.Logger;
@@ -65,7 +64,6 @@ public class TestDependencyParameterBinds {
 	public void thatDependencyParameterIsUnderstood() {
 		Injector resolver = Bootstrap.injector( DependencyParameterBindsBundle.class );
 		LoggerInspector inspector = resolver.resolve( dependency( LoggerInspector.class ) );
-		assertThat( inspector.logger,
-				sameInstance( Logger.getLogger( BinderModule.class.getCanonicalName() ) ) );
+		assertSame( Logger.getLogger( BinderModule.class.getCanonicalName() ) , inspector.logger );
 	}
 }

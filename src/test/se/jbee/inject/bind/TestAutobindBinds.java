@@ -1,8 +1,6 @@
 package se.jbee.inject.bind;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.raw;
 
@@ -49,12 +47,12 @@ public class TestAutobindBinds {
 
 	@Test
 	public void thatTheAutoboundTypeItselfIsBound() {
-		assertThat( injector.resolve( dependency( Integer.class ) ), is( 42 ) );
+		assertEquals( 42, injector.resolve( dependency( Integer.class ) ).intValue() );
 	}
 
 	@Test
 	public void thatDirectSuperclassOfAutoboundTypeIsBound() {
-		assertThat( injector.resolve( dependency( Number.class ) ).intValue(), is( 42 ) );
+		assertEquals( 42, injector.resolve( dependency( Number.class ) ).intValue() );
 	}
 
 	@Test

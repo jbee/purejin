@@ -1,7 +1,6 @@
 package se.jbee.inject.bind;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Dependency.dependency;
 
 import org.junit.Test;
@@ -33,6 +32,6 @@ public class TestSupplierBinds {
 	public void test() {
 		Injector injector = Bootstrap.injector( SupplierBindsModule.class );
 		String value = injector.resolve( dependency( String.class ) );
-		assertThat( value, is( "foobar" ) );
+		assertEquals( "foobar", value );
 	}
 }

@@ -1,7 +1,6 @@
 package se.jbee.inject.bind;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertArrayEquals;
 import static se.jbee.inject.Dependency.dependency;
 
 import org.junit.Test;
@@ -107,6 +106,6 @@ public class TestModularBinds {
 		Injector injector = Bootstrap.injector( ModularBindsBundle.class,
 				Globals.STANDARD.options( options ) );
 		String[] actual = injector.resolve( dependency( String[].class ) );
-		assertThat( actual, is( new String[] { expected } ) );
+		assertArrayEquals( new String[] { expected } , actual );
 	}
 }

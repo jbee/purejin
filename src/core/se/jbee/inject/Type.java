@@ -34,7 +34,7 @@ public final class Type<T>
 
 	public static final Type<Object> OBJECT = Type.raw( Object.class );
 	public static final Type<Void> VOID = raw( Void.class );
-	public static final Type<? extends Object> WILDCARD = OBJECT.asUpperBound();
+	public static final Type<?> WILDCARD = OBJECT.asUpperBound();
 
 	public static Type<?> fieldType( Field field ) {
 		return type( field.getGenericType() );

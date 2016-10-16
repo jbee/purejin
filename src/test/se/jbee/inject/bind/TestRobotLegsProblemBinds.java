@@ -1,8 +1,6 @@
 package se.jbee.inject.bind;
 
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertNotSame;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.container.Scoped.TARGET_INSTANCE;
 
@@ -83,7 +81,7 @@ public class TestRobotLegsProblemBinds {
 	private static void assertRobotHasDifferentLegsWithDifferentFoots( Injector injector ) {
 		Leg leftLeg = injector.resolve( dependency( Leg.class ).named( left ) );
 		Leg rightLeg = injector.resolve( dependency( Leg.class ).named( right ) );
-		assertThat( "same leg", leftLeg, not( sameInstance( rightLeg ) ) );
-		assertThat( "same foot", leftLeg.foot, not( sameInstance( rightLeg.foot ) ) );
+		assertNotSame( "same leg", rightLeg, leftLeg );
+		assertNotSame( "same foot", rightLeg.foot, leftLeg.foot );
 	}
 }

@@ -1,7 +1,6 @@
 package se.jbee.inject.bind;
 
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertSame;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
@@ -103,40 +102,40 @@ public class TestTargetedBinds {
 	@Test
 	public void thatBindWithTargetIsUsedWhenInjectingIntoIt() {
 		Foo foo = injector.resolve( dependency( Foo.class ) );
-		assertThat( foo.bar, sameInstance( BAR_IN_FOO ) );
+		assertSame( BAR_IN_FOO, foo.bar );
 	}
 
 	@Test
 	public void thatBindWithTargetIsNotUsedWhenNotInjectingIntoIt() {
 		Bar bar = injector.resolve( dependency( Bar.class ) );
-		assertThat( bar, sameInstance( BAR_EVERYWHERE_ELSE ) );
+		assertSame( BAR_EVERYWHERE_ELSE, bar );
 	}
 
 	@Test
 	public void thatNamedTargetIsUsedWhenInjectingIntoIt() {
 		Instance<Foo> specialFoo = instance( named( "special" ), raw( Foo.class ) );
 		Bar bar = injector.resolve( dependency( Bar.class ).injectingInto( specialFoo ) );
-		assertThat( bar, sameInstance( BAR_EVERYWHERE_ELSE ) );
+		assertSame( BAR_EVERYWHERE_ELSE, bar );
 	}
 
 	@Test
 	public void thatBindWithNamedTargetIsUsedWhenInjectingIntoIt() {
 		Dependency<Foo> fooDependency = dependency( Foo.class );
 		Foo foo = injector.resolve( fooDependency.named( named( "special" ) ) );
-		assertThat( foo.bar, sameInstance( BAR_EVERYWHERE_ELSE ) );
+		assertSame( BAR_EVERYWHERE_ELSE, foo.bar );
 		foo = injector.resolve( fooDependency.named( named( "Awesome" ) ) );
-		assertThat( foo.bar, sameInstance( BAR_IN_AWESOME_FOO ) );
+		assertSame( BAR_IN_AWESOME_FOO, foo.bar );
 	}
 
 	@Test
 	public void thatBindWithInterfaceTargetIsUsedWhenInjectingIntoClassHavingThatInterface() {
 		Baz baz = injector.resolve( dependency( Baz.class ) );
-		assertThat( baz.bar, sameInstance( BAR_IN_SERIALIZABLE ) );
+		assertSame( BAR_IN_SERIALIZABLE, baz.bar );
 	}
 
 	@Test
 	public void thatBindWithExactClassTargetIsUsedWhenInjectingIntoClassHavingThatClassButAlsoAnInterfaceMatching() {
 		Qux qux = injector.resolve( dependency( Qux.class ) );
-		assertThat( qux.bar, sameInstance( BAR_IN_QUX ) );
+		assertSame( BAR_IN_QUX, qux.bar );
 	}
 }

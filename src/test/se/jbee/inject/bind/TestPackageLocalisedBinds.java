@@ -1,7 +1,6 @@
 package se.jbee.inject.bind;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Packages.subPackagesOf;
 
@@ -47,43 +46,43 @@ public class TestPackageLocalisedBinds {
 
 	@Test
 	public void thatDepedencyWithoutTargetResolvedToGlobalBind() {
-		assertThat( injector.resolve( stringGlobal ), is( "default" ) );
+		assertEquals( "default" , injector.resolve( stringGlobal ) );
 	}
 
 	@Test
 	public void thatDependencyWithTargetResolvedToSpecificBindInThatPackage() {
 		Dependency<String> stringInBind = stringGlobal.injectingInto( TestPackageLocalisedBinds.class );
-		assertThat( injector.resolve( stringInBind ), is( "test" ) );
+		assertEquals(  "test", injector.resolve( stringInBind ) );
 	}
 
 	@Test
 	public void thatDependencyWithTargetSomewhereElseResolvedToGlobalBind() {
 		Dependency<String> stringSomewhereElse = stringGlobal.injectingInto( java.io.Closeable.class );
-		assertThat( injector.resolve( stringSomewhereElse ), is( "default" ) );
+		assertEquals( "default", injector.resolve( stringSomewhereElse ) );
 	}
 
 	@Test
 	public void thatDependencyWithTargetResolvedToRelevantSubPackagesBind() {
 		Dependency<String> stringInAnnotation = stringGlobal.injectingInto( java.lang.annotation.Target.class );
-		assertThat( injector.resolve( stringInAnnotation ), is( "java-lang.*" ) );
+		assertEquals( "java-lang.*", injector.resolve( stringInAnnotation ) );
 	}
 
 	@Test
 	public void thatDependencyWithTargetResolvedToRelevantPackageOfPackageAndSubPackagesBind() {
 		Dependency<String> stringInUtil = stringGlobal.injectingInto( java.util.List.class );
-		assertThat( injector.resolve( stringInUtil ), is( "java-util.*" ) );
+		assertEquals( "java-util.*", injector.resolve( stringInUtil ) );
 	}
 
 	@Test
 	public void thatDependencyWithTargetResolvedToRelevantSubPackageOfPackageAndSubPackagesBind() {
 		Dependency<String> stringInUtil = stringGlobal.injectingInto( java.util.concurrent.Callable.class );
-		assertThat( injector.resolve( stringInUtil ), is( "java-util.*" ) );
+		assertEquals( "java-util.*", injector.resolve( stringInUtil ) );
 	}
 
 	@Test
 	public void thatDependencyWithTargetResolvedToRelevantMultiSubPackagesBind() {
 		Dependency<String> stringInUtil = stringGlobal.injectingInto( java.text.spi.NumberFormatProvider.class );
-		assertThat( injector.resolve( stringInUtil ), is( "java-awt.* & java-text.*" ) );
+		assertEquals( "java-awt.* & java-text.*", injector.resolve( stringInUtil ) );
 	}
 
 }

@@ -17,13 +17,14 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-import org.hamcrest.Factory;
+import javax.jws.WebMethod;
+
 import org.junit.Test;
 
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Inspect;
 import se.jbee.inject.bootstrap.Inspector;
@@ -57,7 +58,7 @@ public class TestInspectorBinds {
 		@Override
 		protected void declare() {
 			bind( all().methods() ).inModule();
-			bind( all().methods().annotatedWith( Factory.class ).namedBy( Resource.class ) ).in(
+			bind( all().methods().annotatedWith( WebMethod.class ).namedBy( Resource.class ) ).in(
 					InspectorBindsImplementor1.class );
 			bind( all().methods().returnTypeAssignableTo( raw( Provider.class ) ) ).in(
 					InspectorBindsImplementor2.class );
@@ -88,18 +89,18 @@ public class TestInspectorBinds {
 
 	static class InspectorBindsImplementor1 {
 
-		@Factory
+		@WebMethod
 		float instanceFactoryMethod() {
 			return 42f;
 		}
 
-		@Factory
+		@WebMethod
 		@Resource ( "twentyone" )
 		float instanceFactoryMethodWithName() {
 			return 21f;
 		}
 
-		@Factory
+		@WebMethod
 		@Resource ( "Foo" )
 		double instanceFactoryMethodWithParameters( @Resource ( "twentyone" ) float factor ) {
 			return factor * 2d;

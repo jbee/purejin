@@ -5,7 +5,6 @@
  */
 package se.jbee.inject;
 
-import se.jbee.inject.Instance;
 
 /**
  * This about the HOW to inject (field, constructor/setter)

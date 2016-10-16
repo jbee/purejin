@@ -1,8 +1,7 @@
 package se.jbee.inject;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static se.jbee.inject.Instance.defaultInstanceOf;
 import static se.jbee.inject.Instance.instance;
@@ -132,7 +131,7 @@ public class TestMorePrecise {
 
 	private static <T extends MorePreciseThan<? super T>> void assertNotMorePreciseThanItself( T type ) {
 		assertFalse( type.morePreciseThan( type ) );
-		assertThat( Instance.comparePrecision( type, type ), is( 0 ) );
+		assertEquals( 0, Instance.comparePrecision( type, type ) );
 	}
 	
 	public static <T extends MorePreciseThan<? super T>> Comparator<T> comparator(@SuppressWarnings("unused") Class<T> cls) {

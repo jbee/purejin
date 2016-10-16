@@ -1,7 +1,6 @@
 package se.jbee.inject.container;
 
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertSame;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Resource.resource;
 import static se.jbee.inject.Source.source;
@@ -49,9 +48,9 @@ public class TestScopes {
 		B b = new B();
 		Provider<A> ia = new ConstantProvider<>( a );
 		Provider<B> ib = new ConstantProvider<>( b );
-		assertThat( r.serve( dependency( A.class ), da, ia ), sameInstance( a ) );
-		assertThat( r.serve( dependency( A.class ), da, null ), sameInstance( a ) ); // the null Provider shouldn't be called now 
-		assertThat( r.serve( dependency( B.class ), db, ib ), sameInstance( b ) );
-		assertThat( r.serve( dependency( B.class ), db, null ), sameInstance( b ) ); // the null Provider shouldn't be called now
+		assertSame( r.serve( dependency( A.class ), da, ia ), a );
+		assertSame( r.serve( dependency( A.class ), da, null ), a ); // the null Provider shouldn't be called now
+		assertSame( r.serve( dependency( B.class ), db, ib ), b );
+		assertSame( r.serve( dependency( B.class ), db, null ), b ); // the null Provider shouldn't be called now
 	}
 }

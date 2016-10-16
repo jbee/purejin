@@ -1,9 +1,8 @@
 package se.jbee.inject.bind;
 
 import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static se.jbee.inject.Dependency.dependency;
 
@@ -25,7 +24,12 @@ public class AssertInjects {
 	}
 
 	public <T> void assertInjects( T expected, Type<? extends T> dependencyType ) {
-		assertThat( injector.resolve( dependency( dependencyType ) ), is( expected ) );
+		if (expected instanceof Object[]) {
+			Object[] arr = (Object[]) expected;
+			assertArrayEquals(arr, (Object[]) injector.resolve( dependency( dependencyType ) ) );
+		} else {
+			assertEquals( expected, injector.resolve( dependency( dependencyType ) ) );
+		}
 	}
 
 	public <E> void assertInjectsItems( E[] expected, Type<? extends Collection<?>> dependencyType ) {
