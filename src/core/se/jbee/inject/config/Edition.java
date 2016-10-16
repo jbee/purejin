@@ -5,9 +5,6 @@
  */
 package se.jbee.inject.config;
 
-import se.jbee.inject.bootstrap.Bundle;
-import se.jbee.inject.bootstrap.Module;
-
 /**
  * An {@link Edition} decides wich features are contained in a specific setup.
  * 
@@ -22,7 +19,7 @@ public interface Edition {
 	Edition FULL = bundleOrModule -> true;
 
 	/**
-	 * @return true if the given {@link Class} of a {@link Module} or {@link Bundle} should be
+	 * @return true if the given {@link Class} of a module or bundle should be
 	 *         included in the context created (should be installed).
 	 */
 	boolean featured( Class<?> bundleOrModule );

@@ -5,9 +5,6 @@
  */
 package se.jbee.inject.config;
 
-import se.jbee.inject.bootstrap.Bundle;
-import se.jbee.inject.bootstrap.Module;
-
 /**
  * {@link Feature}s can be used to model more fine grained {@link Edition} by using
  * <code>enum</code>s as the options to chose from.
@@ -21,7 +18,7 @@ import se.jbee.inject.bootstrap.Module;
 public interface Feature<T extends Enum<T>> {
 
 	/**
-	 * @return The feature this given {@link Bundle} or {@link Module} class represents or
+	 * @return The feature this given bundle or module class represents or
 	 *         <code>null</code> is it doesn't represent any special feature (so it will be install
 	 *         in any case).
 	 */
