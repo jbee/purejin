@@ -44,7 +44,7 @@ public class TestPrimitiveArrayBinds {
 			Integer[] values = injector.resolve( dependency( Integer[].class ) );
 			int[] primitives = new int[values.length];
 			for ( int i = 0; i < primitives.length; i++ ) {
-				primitives[i] = values[i].intValue();
+				primitives[i] = values[i];
 			}
 			return primitives;
 		}

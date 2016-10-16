@@ -23,7 +23,7 @@ import java.util.IdentityHashMap;
 public final class Options {
 
 	public static final Options STANDARD = new Options(
-			new IdentityHashMap<Class<? extends Enum<?>>, EnumSet<?>>() );
+            new IdentityHashMap<>() );
 
 	private final IdentityHashMap<Class<? extends Enum<?>>, EnumSet<?>> properties;
 

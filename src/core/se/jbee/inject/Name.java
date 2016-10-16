@@ -61,6 +61,7 @@ public final class Name
 	}
 
 	public boolean equalTo( Name other ) {
+		//noinspection StringEquality
 		return value == other.value;
 	}
 
@@ -93,6 +94,7 @@ public final class Name
 	}
 
 	public boolean isCompatibleWith( Name other ) {
+		//noinspection StringEquality
 		return isAny() || other.isAny() || other.value == value
 				|| ( value.matches( other.value.replace( WILDCARD, ".*" ) ) );
 	}

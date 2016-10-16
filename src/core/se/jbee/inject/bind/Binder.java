@@ -201,7 +201,7 @@ public class Binder {
 				if ( parameters.length == 0 ) {
 					parameters = inspector.parametersFor( c );
 				}
-				bind( (Constructor<?>) c, parameters );
+				bind(c, parameters );
 			}
 		}
 
@@ -277,7 +277,7 @@ public class Binder {
 
 		public <T> void require( Type<T> dependency ) {
 			on( bind().asRequired() )
-				.bind( dependency ).to( Supply.<T> required(), BindingType.REQUIRED );
+				.bind( dependency ).to( Supply.required(), BindingType.REQUIRED );
 		}
 
 		@Override

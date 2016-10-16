@@ -45,7 +45,7 @@ public class TestInspectorBinds {
 
 	@Target ( { METHOD, PARAMETER } )
 	@Retention ( RUNTIME )
-	public static @interface Resource {
+	public @interface Resource {
 
 		String value();
 	}
@@ -114,13 +114,7 @@ public class TestInspectorBinds {
 	static class InspectorBindsImplementor2 {
 
 		Provider<Boolean> assignableToProvider() {
-			return new Provider<Boolean>() {
-
-				@Override
-				public Boolean provide() {
-					return true;
-				}
-			};
+			return () -> true;
 		}
 
 		Character shouldNotBeBoundSinceItDoesNotReturnTypeThatIsAssignableToProvider() {
@@ -156,7 +150,7 @@ public class TestInspectorBinds {
 
 	@Test
 	public void thatInstanceFactoryMethodIsAvailable() {
-		assertEquals( 42f, injector.resolve( dependency( float.class ) ).floatValue(), 0.01f );
+		assertEquals( 42f, injector.resolve(dependency(float.class)), 0.01f );
 	}
 
 	@Test
@@ -170,7 +164,7 @@ public class TestInspectorBinds {
 	 */
 	@Test
 	public void thatInstanceFactoryMethodWithParametersIsAvailable() {
-		assertEquals( 42d, injector.resolve( dependency( double.class ) ).doubleValue(), 0.01d );
+		assertEquals( 42d, injector.resolve(dependency(double.class)), 0.01d );
 	}
 
 	@Test
@@ -187,7 +181,7 @@ public class TestInspectorBinds {
 	@Test
 	public void thatNamedWithAnnotationCanBeUsedToGetNamedResources() {
 		assertEquals( 42d,
-				injector.resolve( dependency( double.class ).named( "foo" ) ).doubleValue(), 0.01d );
+				injector.resolve(dependency(double.class).named("foo")), 0.01d );
 	}
 
 	@Test

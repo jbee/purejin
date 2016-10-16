@@ -14,7 +14,7 @@ import se.jbee.inject.config.Options;
 
 public class TestMultipleOptionChoicesBinds {
 
-	private static enum Choices {
+	private enum Choices {
 		A,
 		B,
 		C,

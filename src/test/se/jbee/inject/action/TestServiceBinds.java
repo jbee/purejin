@@ -23,7 +23,7 @@ public class TestServiceBinds {
 	 * code. The only place you are coupled to the DI-framework is still in the binding code that is
 	 * additional to the application code.
 	 */
-	private static interface Service<P, R> {
+	private interface Service<P, R> {
 
 		R calc( P param );
 	}

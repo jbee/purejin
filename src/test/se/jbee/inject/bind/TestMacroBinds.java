@@ -54,7 +54,7 @@ public class TestMacroBinds {
 
 	@Target ( { METHOD, FIELD } )
 	@Retention ( RUNTIME )
-	private static @interface Initialisation {
+	private @interface Initialisation {
 
 	}
 
@@ -69,7 +69,7 @@ public class TestMacroBinds {
 	private static class Bar {
 
 		@Initialisation
-		String s;
+        String s;
 	}
 
 	private static class MacroBindsModule
@@ -135,7 +135,7 @@ public class TestMacroBinds {
 
 		private static <T> Binding<T> required( Type<T> type, Binding<?> binding ) {
 			return Binding.binding( new Resource<>( Instance.anyOf( type ) ),
-					BindingType.REQUIRED, Supply.<T>required(), binding.scope,
+					BindingType.REQUIRED, Supply.required(), binding.scope,
 					binding.source.typed( DeclarationType.REQUIRED ) );
 		}
 	}
@@ -186,7 +186,7 @@ public class TestMacroBinds {
 	 * 
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	static final class InitialisationMacro
+	private static final class InitialisationMacro
 			implements Macro<BoundConstructor<?>> {
 
 		@Override

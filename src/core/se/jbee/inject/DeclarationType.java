@@ -52,13 +52,13 @@ public enum DeclarationType implements MorePreciseThan<DeclarationType> {
 	/**
 	 * A auto-bind has been used. That is binding a class or instance to the
 	 * exact type as {@link #EXPLICIT} and to all its super-classes and
-	 * -interfaces as a {@link #AUTO} bound bind.
+	 * -interfaces as a AUTO bound bind.
 	 */
 	AUTO,
 	
 	/**
 	 * A bind that is meant to co-exist with others that might have the same
-	 * {@link Resource}. Those have to be defined as {@link #MULTI} as well!
+	 * {@link Resource}. Those have to be defined as MULTI!
 	 */
 	MULTI,
 	

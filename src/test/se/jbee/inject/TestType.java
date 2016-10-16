@@ -20,7 +20,7 @@ import org.junit.Test;
 @SuppressWarnings ( { "rawtypes" } )
 public class TestType {
 
-	private static interface Baz<T> {
+	private interface Baz<T> {
 		// needed to check supertypes() method
 	}
 
@@ -42,11 +42,11 @@ public class TestType {
 		// needed to check supertypes() method
 	}
 
-	private static interface QuxQux<T> {
+	private interface QuxQux<T> {
 		// needed to check supertypes() method
 	}
 
-	private static interface XList<X extends Serializable, E>
+	private interface XList<X extends Serializable, E>
 			extends List<E> {
 		// needed to check supertypes() and isAssignableTo methods
 	}

@@ -79,14 +79,14 @@ public class TestPrimitiveBinds {
 
 	@Test
 	public void thatFloatPrimitivesWorkAsWrapperClasses() {
-		assertEquals( 3.1415f, injector.resolve( dependency( Float.class ).named( "pi" ) ).floatValue(), 0.01f );
-		assertEquals( 3.1415f, injector.resolve( dependency( float.class ).named( "pi" ) ).floatValue(), 0.01f );
+		assertEquals( 3.1415f, injector.resolve(dependency(Float.class).named("pi")), 0.01f );
+		assertEquals( 3.1415f, injector.resolve(dependency(float.class).named("pi")), 0.01f );
 	}
 
 	@Test
 	public void thatDoublePrimitivesWorkAsWrapperClasses() {
-		assertEquals( 2.71828d, injector.resolve( dependency( Double.class ).named( "e" ) ).doubleValue(), 0.01d );
-		assertEquals( 2.71828d, injector.resolve( dependency( double.class ).named( "e" ) ).doubleValue(), 0.01d );
+		assertEquals( 2.71828d, injector.resolve(dependency(Double.class).named("e")), 0.01d );
+		assertEquals( 2.71828d, injector.resolve(dependency(double.class).named("e")), 0.01d );
 	}
 
 	/**
@@ -112,7 +112,7 @@ public class TestPrimitiveBinds {
 		assertEquals( 3.1415f, bean.f, 0.01f );
 		assertEquals( true, bean.b );
 		assertEquals( 42, bean.bigI.intValue() );
-		assertEquals( 3.1415f, bean.bigF.floatValue(), 0.01f );
+		assertEquals( 3.1415f, bean.bigF, 0.01f );
 		assertEquals( true, bean.bigB );
 	}
 }

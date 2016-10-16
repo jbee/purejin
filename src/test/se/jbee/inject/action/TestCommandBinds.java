@@ -24,7 +24,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
  */
 public class TestCommandBinds {
 
-	private static interface Command<P> {
+	private interface Command<P> {
 
 		Long calc( P param );
 	}

@@ -19,7 +19,7 @@ import se.jbee.inject.Type;
  */
 public final class Presets {
 
-	public static final Presets EMPTY = new Presets( new IdentityHashMap<String, Object>( 0 ) );
+	public static final Presets EMPTY = new Presets(new IdentityHashMap<>(0) );
 
 	private final IdentityHashMap<String, Object> values;
 

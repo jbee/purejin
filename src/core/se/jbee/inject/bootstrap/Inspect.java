@@ -243,7 +243,7 @@ public class Inspect
 		}
 		Constructor<T> c;
 		try {
-			c = declaringClass.getDeclaredConstructor( new Class<?>[0] );
+			c = declaringClass.getDeclaredConstructor();
 		} catch ( Exception e ) {
 			if (e instanceof RuntimeException) {
 				throw (RuntimeException)e;

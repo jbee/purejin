@@ -36,8 +36,8 @@ public class TestRobotLegsProblemBinds {
 		}
 	}
 
-	static Name left = Name.named( "left" );
-	static Name right = Name.named( "right" );
+	static final Name left = Name.named( "left" );
+	static final Name right = Name.named( "right" );
 
 	/**
 	 * left and right {@link Foot} could be explicitly bind to left or right {@link Leg}.

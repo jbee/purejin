@@ -160,10 +160,11 @@ public final class Packages
 		return false;
 	}
 
-	public static boolean regionEqual( String p1, String p2, int length ) {
+	private static boolean regionEqual(String p1, String p2, int length) {
 		if ( p1.length() < length || p2.length() < length ) {
 			return false;
 		}
+		//noinspection StringEquality
 		if ( p1 == p2 ) {
 			return true;
 		}
@@ -191,13 +192,10 @@ public final class Packages
 
 	@Override
 	public boolean morePreciseThan( Packages other ) {
-		if ( includingSubpackages != other.includingSubpackages ) {
+		if (includingSubpackages != other.includingSubpackages) {
 			return !includingSubpackages;
 		}
-		if ( rootDepth != other.rootDepth ) {
-			return rootDepth > other.rootDepth;
-		}
-		return false;
+		return rootDepth != other.rootDepth && rootDepth > other.rootDepth;
 	}
 
 	@Override

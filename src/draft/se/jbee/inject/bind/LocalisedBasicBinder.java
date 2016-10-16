@@ -1,6 +1,3 @@
-/**
- * 
- */
 package se.jbee.inject.bind;
 
 public interface LocalisedBasicBinder

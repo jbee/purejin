@@ -80,7 +80,7 @@ public final class Type<T>
 	}
 
 	private static Type<?> type( java.lang.reflect.Type type ) {
-		return type( type, Collections.<String, Type<?>> emptyMap() );
+		return type( type, Collections.emptyMap() );
 	}
 
 	private static Type<?> type( java.lang.reflect.Type type, Map<String, Type<?>> actualTypeArguments ) {
@@ -458,7 +458,7 @@ public final class Type<T>
 		}
 		for ( int i = 0; i < vars.length; i++ ) {
 			for ( java.lang.reflect.Type t : vars[i].getBounds() ) {
-				Type<?> vt = type( t, new HashMap<String, Type<?>>() );
+				Type<?> vt = type( t, new HashMap<>() );
 				if ( t != Object.class && !parameters[i].isAssignableTo( vt ) ) {
 					throw new IllegalArgumentException( parameters[i]
 							+ " is not assignable to the type variable: " + vt );
@@ -505,7 +505,7 @@ public final class Type<T>
 			supertype = supertype.getSuperclass();
 		}
 		@SuppressWarnings ( "unchecked" )
-		Type<? super T>[] supertypes = (Type<? super T>[]) res.toArray( new Type<?>[res.size()] );
+		Type<? super T>[] supertypes = (Type<? super T>[]) res.toArray( new Type<?>[0] );
 		return supertypes;
 	}
 

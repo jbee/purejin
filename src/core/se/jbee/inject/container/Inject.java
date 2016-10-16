@@ -308,7 +308,7 @@ public final class Inject {
 		@Override
 		public T instanceFor( Dependency<? super T> dependency ) {
 			final Dependency<? super T> injected = dependency.injectingInto( info.resource, info.expiry );
-			return repository.serve(injected, info, new DependencyProvider<T>(supplier, injected, injector) );
+			return repository.serve(injected, info, new DependencyProvider<>(supplier, injected, injector) );
 		}
 
 		@Override

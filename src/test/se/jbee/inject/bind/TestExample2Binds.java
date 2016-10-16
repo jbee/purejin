@@ -18,7 +18,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
  */
 public class TestExample2Binds {
 
-	static interface Decoupling {
+	interface Decoupling {
 		
 	}
 	

@@ -20,7 +20,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
  */
 public class TestSpecificImplementationBinds {
 
-	static interface Action {
+	interface Action {
 		String doIt();
 	}
 	

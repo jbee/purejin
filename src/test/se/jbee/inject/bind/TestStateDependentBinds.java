@@ -33,12 +33,12 @@ import se.jbee.inject.container.Scoped;
  */
 public class TestStateDependentBinds {
 
-	private static interface Validator {
+	private interface Validator {
 
 		boolean valid( String input );
 	}
 
-	private static enum ValidationStrength {
+	private enum ValidationStrength {
 		PERMISSIVE,
 		STRICT
 	}
@@ -132,7 +132,7 @@ public class TestStateDependentBinds {
 	
 	/**
 	 * This is a indirection that resolves a {@link Type} dependent on another current
-	 * {@link State} value. This can be understand as a dynamic <i>name</i> switch so that a
+	 * {@link ValidationStrength} value. This can be understand as a dynamic <i>name</i> switch so that a
 	 * call is resolved to different named instances.
 	 * 
 	 * @author Jan Bernitt (jan@jbee.se)
@@ -193,9 +193,7 @@ public class TestStateDependentBinds {
 
 	/**
 	 * The same as above using {@link #connect(Class)}s. The important difference is that it is
-	 * not required to manually bind to a {@link State} value. This is done implicitly with
-	 * each of the configbind calls. This also allow to use them in different modules without
-	 * causing clashes.
+	 * not required to manually bind to a {@link ValidationStrength} value.
 	 * 
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */

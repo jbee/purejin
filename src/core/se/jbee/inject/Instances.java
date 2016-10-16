@@ -15,7 +15,7 @@ import java.util.Arrays;
 public final class Instances
 		implements MorePreciseThan<Instances> {
 
-	public static final Instances ANY = new Instances( new Instance<?>[0] );
+	public static final Instances ANY = new Instances();
 
 	private final Instance<?>[] hierarchy;
 

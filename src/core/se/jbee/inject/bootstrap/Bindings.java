@@ -25,7 +25,7 @@ import se.jbee.inject.InconsistentBinding;
 public final class Bindings {
 
 	public static Bindings bindings( Macros macros, Inspector inspector ) {
-		return new Bindings( macros, inspector, new ArrayList<Binding<?>>( 128 ) );
+		return new Bindings( macros, inspector, new ArrayList<>(128) );
 	}
 
 	public final Macros macros;

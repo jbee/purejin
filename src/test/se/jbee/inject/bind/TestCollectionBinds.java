@@ -71,7 +71,7 @@ public class TestCollectionBinds {
 	@Test
 	public void thatListIsAvailableForBoundType() {
 		ai.assertInjects( singletonList( "foobar" ), listTypeOf( String.class ) );
-		ai.assertInjects( asList( new Integer[] { 42, 846 } ), listTypeOf( Integer.class ) );
+		ai.assertInjects( asList(42, 846), listTypeOf( Integer.class ) );
 	}
 
 	@Test

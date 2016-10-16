@@ -21,7 +21,7 @@ import se.jbee.inject.bootstrap.BootstrapperBundle;
  */
 public class TestIssue1 {
 
-	static interface A {
+	interface A {
 
 	}
 
@@ -45,9 +45,9 @@ public class TestIssue1 {
 
 	}
 
-	static Name left = Name.named( "left" );
-	static Name right = Name.named( "right" );
-	static Name special = Name.named( "special" );
+	static final Name left = Name.named( "left" );
+	static final Name right = Name.named( "right" );
+	static final Name special = Name.named( "special" );
 
 	static class Module1
 			extends BinderModule {

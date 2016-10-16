@@ -27,7 +27,7 @@ import se.jbee.inject.bootstrap.Module;
  */
 public class TestRequiredProvidedBinds {
 
-	private static interface ExampleService {
+	private interface ExampleService {
 		// a classic singleton bean
 	}
 

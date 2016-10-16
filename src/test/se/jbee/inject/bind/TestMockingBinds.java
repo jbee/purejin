@@ -65,7 +65,7 @@ public class TestMockingBinds {
 			// so a wrongly implemented supplier would lead to a ClassCastExceptions
 			@SuppressWarnings("unchecked")
 			Type<B> upperBound = (Type<B>) raw(base).asUpperBound();
-			per(INJECTION).bind(anyOf(upperBound)).to(new MockSupplier<B>(base));
+			per(INJECTION).bind(anyOf(upperBound)).to(new MockSupplier<>(base));
 		}
 
 	}
@@ -75,7 +75,7 @@ public class TestMockingBinds {
 	 * be used to build "rich" mocks that have a common interface to
 	 * check/verify mock interaction.
 	 */
-	static interface Mock {
+    interface Mock {
 		
 		/**
 		 * Here the mocks just count invocations but this could be as
@@ -90,7 +90,7 @@ public class TestMockingBinds {
 	 */
 	static class MockSupplier<T> implements Supplier<T> {
 		
-		private Class<?> base;
+		private final Class<?> base;
 
 		public MockSupplier(Class<?> base) {
 			this.base = base;

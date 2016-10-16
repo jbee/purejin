@@ -30,7 +30,7 @@ import se.jbee.inject.config.Options;
  */
 public class TestModularBinds {
 
-	private static enum Machine {
+	private enum Machine {
 		LOCALHOST,
 		WORKER_1
 	}

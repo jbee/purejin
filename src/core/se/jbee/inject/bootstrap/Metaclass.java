@@ -19,7 +19,7 @@ import java.util.Collection;
  */
 public final class Metaclass {
 
-	public final static Metaclass metaclass( Class<?> cls ) {
+	public static Metaclass metaclass(Class<?> cls ) {
 		return new Metaclass( cls );
 	}
 

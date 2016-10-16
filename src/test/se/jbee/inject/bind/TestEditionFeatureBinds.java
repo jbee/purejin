@@ -33,7 +33,7 @@ import se.jbee.inject.config.Globals;
  */
 public class TestEditionFeatureBinds {
 
-	public static enum AnnotatedFeature
+	public enum AnnotatedFeature
 			implements Feature<AnnotatedFeature> {
 		FOO,
 		BAR,
@@ -50,7 +50,7 @@ public class TestEditionFeatureBinds {
 
 	@Target ( ElementType.TYPE )
 	@Retention ( RetentionPolicy.RUNTIME )
-	public static @interface Featured {
+	public @interface Featured {
 
 		AnnotatedFeature value();
 	}
@@ -99,7 +99,7 @@ public class TestEditionFeatureBinds {
 	}
 
 	@Featured ( AnnotatedFeature.BAZ )
-	private static enum FeaturedModularBundle
+	private enum FeaturedModularBundle
 			implements ModularBundle<FeaturedModularBundle> {
 		QUX;
 

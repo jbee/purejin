@@ -48,7 +48,7 @@ public interface BasicBinder {
 	 * 
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	public interface RootBasicBinder
+    interface RootBasicBinder
 			extends ScopedBasicBinder {
 
 		/**

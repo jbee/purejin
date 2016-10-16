@@ -19,13 +19,7 @@ public interface Edition {
 	/**
 	 * Default {@link Edition} that has all features.
 	 */
-	Edition FULL = new Edition() {
-
-		@Override
-		public boolean featured( Class<?> bundleOrModule ) {
-			return true;
-		}
-	};
+	Edition FULL = bundleOrModule -> true;
 
 	/**
 	 * @return true if the given {@link Class} of a {@link Module} or {@link Bundle} should be

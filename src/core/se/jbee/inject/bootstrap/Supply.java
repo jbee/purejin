@@ -159,7 +159,6 @@ public final class Supply {
 
 	}
 
-	@Deprecated // should not be needed 
 	private static final class DependencySupplier<T>
 			implements Supplier<T> {
 

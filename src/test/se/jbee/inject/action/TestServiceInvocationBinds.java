@@ -140,7 +140,7 @@ public class TestServiceInvocationBinds {
 		@Override
 		public <I, O> O exec(Object impl, Method action, Object[] args, Type<O> output, Type<I> input, I value) throws ActionMalfunction {
 			Object[] state = before( output, input, value );
-			O res = null;
+			O res;
 			try {
 				res = output.rawType.cast(Invoke.method(action, impl, args));
 			} catch ( SupplyFailed e ) {

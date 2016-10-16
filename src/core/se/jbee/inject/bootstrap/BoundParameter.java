@@ -29,7 +29,7 @@ import se.jbee.inject.Type;
  */
 public final class BoundParameter<T> implements Parameter<T> {
 
-	public static enum ParameterType { INSTANCE, CONSTANT, EXTERNAL }
+	public enum ParameterType { INSTANCE, CONSTANT, EXTERNAL }
 	
 	private static final BoundParameter<?>[] NO_PARAMS = new BoundParameter<?>[0];
 

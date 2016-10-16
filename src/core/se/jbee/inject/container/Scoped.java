@@ -43,7 +43,7 @@ public final class Scoped {
 	 * Asks the {@link Provider} once per thread per binding which is understand commonly as a
 	 * usual 'per-thread' singleton.
 	 */
-	public static final Scope THREAD = new ThreadScope( new ThreadLocal<Repository>(), APPLICATION );
+	public static final Scope THREAD = new ThreadScope(new ThreadLocal<>(), APPLICATION );
 
 	public static final Scope DEPENDENCY_TYPE = uniqueBy( DEPENDENCY_TYPE_KEY );
 	public static final Scope DEPENDENCY_INSTANCE = uniqueBy( DEPENDENCY_INSTANCE_KEY );
@@ -59,8 +59,8 @@ public final class Scoped {
 	}
 
 	/**
-	 * What is usually called a 'default'-{@link Scope} will ask the {@link Injectable} passed each
-	 * time the {@link Repository#serve(Dependency, Injectable)}-method is invoked.
+	 * What is usually called a 'default'-{@link Scope} will ask the {@link Provider} passed each
+	 * time the {@link Repository#serve(Dependency, InjectronInfo, Provider)}}-method is invoked.
 	 * 
 	 * The {@link Scope} is also used as {@link Repository} instance since both don#t have any
 	 * state.

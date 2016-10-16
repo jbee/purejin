@@ -25,7 +25,7 @@ public class TestArrayBinds {
 
 	static class Command {
 		
-		Number[] preconds;
+		final Number[] preconds;
 
 		public Command(Number[] preconds) {
 			this.preconds = preconds;
@@ -69,7 +69,7 @@ public class TestArrayBinds {
 		}
 	}
 	
-	private Injector injector = Bootstrap.injector(ArrayBindsModule.class);
+	private final Injector injector = Bootstrap.injector(ArrayBindsModule.class);
 	
 	@Test
 	public void thatEachCommandGetsOnlyThePreconditionsBoundToIt() {

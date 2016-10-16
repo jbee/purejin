@@ -65,9 +65,9 @@ public class TestElementBinds {
 	@Test
 	public void thatConstantsAreBoundAsElements() {
 		Float[] floats = injector.resolve( dependency( Float[].class ) );
-		assertEquals( 2f, floats[0].floatValue(), 0.01f );
-		assertEquals( 4f, floats[1].floatValue(), 0.01f );
-		assertEquals( 7f, floats[2].floatValue(), 0.01f );
+		assertEquals( 2f, floats[0], 0.01f );
+		assertEquals( 4f, floats[1], 0.01f );
+		assertEquals( 7f, floats[2], 0.01f );
 	}
 
 	@Test

@@ -14,7 +14,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
  */
 public class TestDecoratorBinds {
 
-	static interface Foo {
+	interface Foo {
 		// the used abstraction
 	}
 	
