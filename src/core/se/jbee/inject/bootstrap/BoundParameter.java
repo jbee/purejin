@@ -147,10 +147,8 @@ public final class BoundParameter<T> implements Parameter<T> {
 	@SuppressWarnings ( "unchecked" )
 	@Override
 	public <E> BoundParameter<E> typed( Type<E> type ) throws ClassCastException {
-		if ( asType.isAssignableTo( type ) ) {
-			return new BoundParameter<>(this.type, type, (Instance<E>)instance, (E)value, (Supplier<? extends E>) supplier );
-		}
-		throw new ClassCastException( "Only supertypes of " + asType	+ " can be supplied as same paramter - but was: " + type );
+		asType.toSupertype(type);
+		return new BoundParameter<>(this.type, type, (Instance<E>)instance, (E)value, (Supplier<? extends E>) supplier );
 	}
 
 	@Override

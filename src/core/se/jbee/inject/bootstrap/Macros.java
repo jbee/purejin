@@ -11,6 +11,7 @@ import static se.jbee.inject.bootstrap.BindingType.LINK;
 import static se.jbee.inject.bootstrap.BindingType.METHOD;
 import static se.jbee.inject.bootstrap.BindingType.PREDEFINED;
 import static se.jbee.inject.bootstrap.Metaclass.metaclass;
+import static se.jbee.inject.bootstrap.Supply.costructor;
 import static se.jbee.inject.bootstrap.Supply.parametrizedInstance;
 
 import java.lang.reflect.Constructor;
@@ -39,9 +40,9 @@ public final class Macros {
 	public static final Macro<BoundConstructor<?>> CONSTRUCTOR = new ConstructorMacro();
 	public static final Macro<BoundMethod<?>> FACTORY_METHOD = new MethodMacro();
 
-	public static final Macros EMPTY = new Macros( new Class<?>[0], new Macro<?>[0] );
+	public static final Macros NONE = new Macros( new Class<?>[0], new Macro<?>[0] );
 
-	public static final Macros DEFAULT = Macros.EMPTY
+	public static final Macros DEFAULT = Macros.NONE
 			.with( EXPAND ).with( CONSTRUCTOR ).with( FACTORY_METHOD )
 			.with( INSTANCE_LINK ).with( PARAMETRIZED_LINK ).with( ARRAY );
 
@@ -102,10 +103,6 @@ public final class Macros {
 	public <T, V> void expandInto( Bindings bindings, Binding<T> binding, V value ) {
 		macroForValueOf( (Class<? super V>) value.getClass() ).expand( value, binding, bindings );
 	}
-	
-	public <T> void expandInto(Bindings bindings, Binding<T> binding) {
-		expandInto(bindings, binding, binding);
-	}
 
 	@SuppressWarnings ( "unchecked" )
 	private <V> Macro<? super V> macroForValueOf( final Class<? extends V> type ) {
@@ -154,7 +151,7 @@ public final class Macros {
 		@Override
 		@SuppressWarnings ( { "unchecked", "rawtypes" } )
 		public <T> void expand(Parameter<?>[] elements, Binding<T> incomplete, Bindings bindings) {
-			bindings.macros.expandInto( bindings, 
+			bindings.expandInto( 
 					incomplete.complete( PREDEFINED, supplier( (Type) incomplete.type(), elements ) ));
 		}
 
@@ -172,8 +169,8 @@ public final class Macros {
 
 		@Override
 		public <T> void expand(BoundConstructor<?> constructor, Binding<T> incomplete, Bindings bindings) {
-			bindings.macros.expandInto(bindings, 
-					incomplete.complete( BindingType.CONSTRUCTOR, Supply.costructor( constructor.typed( incomplete.type() ) ) ));
+			bindings.expandInto( 
+					incomplete.complete( BindingType.CONSTRUCTOR, costructor( constructor.typed( incomplete.type() ) ) ));
 		}
 	}
 
@@ -184,7 +181,7 @@ public final class Macros {
 		
 		@Override
 		public <T> void expand(BoundMethod<?> method, Binding<T> incomplete, Bindings bindings) {
-			bindings.macros.expandInto( bindings, 
+			bindings.expandInto( 
 					incomplete.complete( METHOD, Supply.method( method.typed( incomplete.type() ) ) ));
 		}
 	}
@@ -196,7 +193,7 @@ public final class Macros {
 
 		@Override
 		public <T> void expand(Class<?> to, Binding<T> incomplete, Bindings bindings) {
-			bindings.macros.expandInto(bindings, 
+			bindings.expandInto( 
 					incomplete.complete( LINK, parametrizedInstance( anyOf( raw( to ).castTo( incomplete.type() ) ) ) ));
 		}
 
@@ -214,14 +211,14 @@ public final class Macros {
 					&& !binding.type().isAssignableTo( raw( Supplier.class ) ) ) {
 				@SuppressWarnings ( "unchecked" )
 				Class<? extends Supplier<? extends T>> supplier = (Class<? extends Supplier<? extends T>>) t.rawType;
-				bindings.macros.expandInto(bindings, binding.complete( LINK, Supply.reference( supplier ) ));
+				bindings.expandInto(binding.complete( LINK, Supply.reference( supplier ) ));
 				implicitlyBindToConstructor( binding, linked, bindings );
 				return;
 			}
 			final Type<? extends T> type = t.castTo( binding.type() );
 			final Instance<T> bound = binding.resource.instance;
 			if ( !bound.type().equalTo( type ) || !linked.name.isCompatibleWith( bound.name ) ) {
-				bindings.macros.expandInto( bindings, binding.complete( LINK, Supply.instance( linked.typed( type ) ) ));
+				bindings.expandInto( binding.complete( LINK, Supply.instance( linked.typed( type ) ) ));
 				implicitlyBindToConstructor( binding, linked, bindings );
 				return;
 			}
@@ -236,7 +233,7 @@ public final class Macros {
 	static <T> void implicitlyBindToConstructor( Binding<?> incomplete, Instance<T> instance, Bindings bindings ) {
 		Class<T> impl = instance.type().rawType;
 		if (!metaclass( impl ).undeterminable()) {
-			Binding<T> binding = Binding.binding(  new Resource<>( instance, Target.ANY ),
+			Binding<T> binding = Binding.binding(  new Resource<>( instance ),
 					BindingType.CONSTRUCTOR, null, incomplete.scope,
 					incomplete.source.typed( DeclarationType.IMPLICIT ) );
 			bindToInspectedConstructor(bindings, binding, impl );

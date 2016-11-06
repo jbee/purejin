@@ -5,7 +5,7 @@
  */
 package se.jbee.inject.bootstrap;
 
-import se.jbee.inject.bootstrap.Bootstrapper.ModularBootstrapper;
+import se.jbee.inject.bootstrap.Bootstrapper.OptionBootstrapper;
 
 /**
  * A {@link Bundle} that does different installation for different options.
@@ -14,11 +14,11 @@ import se.jbee.inject.bootstrap.Bootstrapper.ModularBootstrapper;
  * 
  */
 @FunctionalInterface
-public interface ModularBundle<M> {
+public interface OptionBundle<O> {
 
 	/**
-	 * @param bootstrap
-	 *            the {@link ModularBootstrapper} this bundle should install itself in.
+	 * @param bootstrapper
+	 *            the {@link OptionBootstrapper} this bundle should install itself in.
 	 */
-	void bootstrap( ModularBootstrapper<M> bootstrap );
+	void bootstrap( OptionBootstrapper<O> bootstrapper );
 }

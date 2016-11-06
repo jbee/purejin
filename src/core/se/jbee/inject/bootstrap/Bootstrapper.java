@@ -65,43 +65,43 @@ public interface Bootstrapper {
 	<T> void install( PresetModule<T> module );
 
 	/**
-	 * @param modules
+	 * @param options
 	 *            The choices made to install.
 	 */
-	<M extends Enum<M> & ModularBundle<M>> void install( @SuppressWarnings("unchecked") M... modules );
+	<O extends Enum<O> & OptionBundle<O>> void install( @SuppressWarnings("unchecked") O... options );
 
 	/**
-	 * @param modules
+	 * @param options
 	 *            The choices made to uninstall again.
 	 */
-	<M extends Enum<M> & ModularBundle<M>> void uninstall( @SuppressWarnings("unchecked") M... modules );
+	<O extends Enum<O> & OptionBundle<O>> void uninstall( @SuppressWarnings("unchecked") O... options );
 
 	/**
 	 * @see Options
 	 * @param bundle
 	 *            the {@link Bundle} to install
-	 * @param property
+	 * @param optionProperty
 	 *            The property the installation is connected to.
 	 */
-	<M extends Enum<M>> void install( Class<? extends ModularBundle<M>> bundle, Class<M> property );
+	<O extends Enum<O>> void install( Class<? extends OptionBundle<O>> bundle, Class<O> optionProperty );
 
 	/**
 	 * 
 	 * @author Jan Bernitt (jan@jbee.se)
 	 * 
-	 * @param <M>
+	 * @param <O>
 	 *            The type of choices possible
 	 */
 	@FunctionalInterface
-	interface ModularBootstrapper<M> {
+	interface OptionBootstrapper<O> {
 
 		/**
-		 * Installs the bundle within the given module.
+		 * Installs the bundle when the given option is used.
 		 * 
 		 * If the module passed hasn't been {@link Bootstrapper#install(Enum...)}ed the call will be
 		 * ignored.
 		 */
-		void install( Class<? extends Bundle> bundle, M module );
+		void install( Class<? extends Bundle> bundle, O onOption );
 	}
 
 }

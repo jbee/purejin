@@ -1,11 +1,18 @@
 # Release notes
 
-v1.0 (unreleased)
+v0.10 (unreleased)
 ==============
 
 > Support for wild-card bindings (supply any sub-class of X).
 
 - improved `DefaultInjector` (now resolving falls back to wild-card bindings)
+- moved macro `expand` utility method to `Bindings` (less argument passing)
+- renamed `ModularBundle` to `OptionBundle`
+- renamed `ModularBootstrapper` to `OptionBootstrapper`
+- renamed `ModularBootstrapperBundle` to `OptionBootstrapperBundle`
+- renamed `Macros.EMPTY` to `Macros.NONE`
+- added `Type#toSupertype` for type compatibility checks
+- type compatibility checks (more) consistently throw `ClassCastException`s
 
 v0.9
 ===============

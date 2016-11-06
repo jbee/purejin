@@ -8,7 +8,7 @@ import org.junit.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.bootstrap.ModularBootstrapperBundle;
+import se.jbee.inject.bootstrap.OptionBootstrapperBundle;
 import se.jbee.inject.config.Globals;
 import se.jbee.inject.config.Options;
 
@@ -72,7 +72,7 @@ public class TestMultipleOptionChoicesBinds {
 	}
 
 	private static class ChoicesBundle
-			extends ModularBootstrapperBundle<Choices> {
+			extends OptionBootstrapperBundle<Choices> {
 
 		@Override
 		protected void bootstrap() {

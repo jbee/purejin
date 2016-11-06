@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import se.jbee.inject.bootstrap.Bootstrapper.ModularBootstrapper;
-import se.jbee.inject.bootstrap.ModularBundle;
+import se.jbee.inject.bootstrap.Bootstrapper.OptionBootstrapper;
+import se.jbee.inject.bootstrap.OptionBundle;
 import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.container.Provider;
 
@@ -22,7 +22,7 @@ import se.jbee.inject.container.Provider;
  * Installs all the build-in functionality by using the core API.
  */
 public enum BuildinBundle
-		implements ModularBundle<BuildinBundle> {
+		implements OptionBundle<BuildinBundle> {
 	/**
 	 * Adds: {@link Provider}s can be injected for all bound types.
 	 */
@@ -45,12 +45,12 @@ public enum BuildinBundle
 	LOGGER;
 
 	@Override
-	public void bootstrap( ModularBootstrapper<BuildinBundle> bootstrap ) {
-		bootstrap.install( ListBridgeModule.class, LIST );
-		bootstrap.install( SetBridgeModule.class, SET );
-		bootstrap.install( CollectionBridgeModule.class, COLLECTION );
-		bootstrap.install( ProviderBridgeModule.class, PROVIDER );
-		bootstrap.install( LoggerModule.class, LOGGER );
+	public void bootstrap( OptionBootstrapper<BuildinBundle> bootstrapper ) {
+		bootstrapper.install( ListBridgeModule.class, LIST );
+		bootstrapper.install( SetBridgeModule.class, SET );
+		bootstrapper.install( CollectionBridgeModule.class, COLLECTION );
+		bootstrapper.install( ProviderBridgeModule.class, PROVIDER );
+		bootstrapper.install( LoggerModule.class, LOGGER );
 	}
 
 	private static class LoggerModule

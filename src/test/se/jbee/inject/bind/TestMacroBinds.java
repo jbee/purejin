@@ -129,7 +129,7 @@ public class TestMacroBinds {
 			Macros.CONSTRUCTOR.expand( value, incomplete, bindings );
 			Type<?>[] params = Type.parameterTypes( value.constructor );
 			for ( int i = 0; i < params.length; i++ ) {
-				bindings.macros.expandInto(bindings, required( params[i], incomplete ));
+				bindings.expandInto(required( params[i], incomplete ));
 			}
 		}
 
@@ -155,7 +155,7 @@ public class TestMacroBinds {
 	 * 
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	private static final class InitialisationSupplier<T>
+	static final class InitialisationSupplier<T>
 			implements Supplier<T> {
 
 		private final Supplier<T> decorated;
@@ -186,14 +186,14 @@ public class TestMacroBinds {
 	 * 
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	private static final class InitialisationMacro
+	static final class InitialisationMacro
 			implements Macro<BoundConstructor<?>> {
 
 		@Override
 		public <T> void expand(BoundConstructor<?> constructor, Binding<T> incomplete, Bindings bindings) {
 			Supplier<T> supplier = new InitialisationSupplier<>(
 					Supply.costructor( constructor.typed( incomplete.type() ) ) );
-			bindings.macros.expandInto(bindings, incomplete.complete( CONSTRUCTOR, supplier ));
+			bindings.expandInto(incomplete.complete( CONSTRUCTOR, supplier ));
 		}
 
 	}

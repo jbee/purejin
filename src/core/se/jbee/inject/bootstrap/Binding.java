@@ -84,11 +84,7 @@ public final class Binding<T>
 	@SuppressWarnings ( "unchecked" )
 	@Override
 	public <E> Binding<E> typed( Type<E> type ) {
-		if ( !type().isAssignableTo( type ) ) {
-			throw new ClassCastException(
-					"New type of a binding has to be a assignable from :" + type() + " but was: " + type );
-		}
-		return new Binding<>( resource.typed( type ), this.type, (Supplier<? extends E>) supplier,	scope, source );
+		return new Binding<>( resource.typed( type().toSupertype(type) ), this.type, (Supplier<? extends E>) supplier,	scope, source );
 	}
 
 	public boolean isComplete() {

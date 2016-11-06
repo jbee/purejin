@@ -150,7 +150,7 @@ public class TestInspectorBinds {
 
 	@Test
 	public void thatInstanceFactoryMethodIsAvailable() {
-		assertEquals( 42f, injector.resolve(dependency(float.class)), 0.01f );
+		assertEquals( 42f, injector.resolve(dependency(float.class)).floatValue(), 0.01f );
 	}
 
 	@Test

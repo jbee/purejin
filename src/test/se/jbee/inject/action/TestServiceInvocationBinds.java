@@ -18,6 +18,14 @@ import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Invoke;
 
+/**
+ * This test show how to bring back custom behaviour before or after
+ * service/action method calls. This had been in the core but as it is easy to
+ * add one can build something like {@link ServiceInvocation} specialized to
+ * ones needs.
+ * 
+ * @author jan
+ */
 public class TestServiceInvocationBinds {
 
 	private static class ServiceInvocationBindsModule

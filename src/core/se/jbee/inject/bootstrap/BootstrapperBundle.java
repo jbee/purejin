@@ -45,28 +45,28 @@ public abstract class BootstrapperBundle
 
 	@Override
 	@SafeVarargs
-	public final <M extends Enum<M> & ModularBundle<M>> void install( M... modules ) {
+	public final <M extends Enum<M> & OptionBundle<M>> void install( M... modules ) {
 		bootstrap.install( modules );
 	}
 
 	@Override
-	public final <C extends Enum<C>> void install( Class<? extends ModularBundle<C>> bundle,
+	public final <C extends Enum<C>> void install( Class<? extends OptionBundle<C>> bundle,
 			Class<C> property ) {
 		bootstrap.install( bundle, property );
 	}
 
 	@Override
 	@SafeVarargs
-	public final <M extends Enum<M> & ModularBundle<M>> void uninstall( M... modules ) {
-		bootstrap.uninstall( modules );
+	public final <O extends Enum<O> & OptionBundle<O>> void uninstall( O... options ) {
+		bootstrap.uninstall( options );
 	}
 
-	protected final <M extends Enum<M> & ModularBundle<M>> void installAll( Class<M> modules ) {
-		install( modules.getEnumConstants() );
+	protected final <O extends Enum<O> & OptionBundle<O>> void installAll( Class<O> optionsOfType ) {
+		install( optionsOfType.getEnumConstants() );
 	}
 
-	protected final <M extends Enum<M> & ModularBundle<M>> void uninstallAll( Class<M> modules ) {
-		uninstall( modules.getEnumConstants() );
+	protected final <O extends Enum<O> & OptionBundle<O>> void uninstallAll( Class<O> optionsOfType ) {
+		uninstall( optionsOfType.getEnumConstants() );
 	}
 
 	/**

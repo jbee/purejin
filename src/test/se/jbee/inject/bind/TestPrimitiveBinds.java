@@ -79,8 +79,8 @@ public class TestPrimitiveBinds {
 
 	@Test
 	public void thatFloatPrimitivesWorkAsWrapperClasses() {
-		assertEquals( 3.1415f, injector.resolve(dependency(Float.class).named("pi")), 0.01f );
-		assertEquals( 3.1415f, injector.resolve(dependency(float.class).named("pi")), 0.01f );
+		assertEquals( 3.1415f, injector.resolve(dependency(Float.class).named("pi")).floatValue(), 0.01f );
+		assertEquals( 3.1415f, injector.resolve(dependency(float.class).named("pi")).floatValue(), 0.01f );
 	}
 
 	@Test

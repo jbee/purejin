@@ -17,7 +17,7 @@ import se.jbee.inject.bootstrap.Bundle;
  * In contrast to other DI-frameworks this is no core concept. To enable {@linkplain Provider}s
  * install the them through buildin-{@link Bundle}.
  * 
- * But it is also very easy to use another similar provider interface by installing such a bridge
+ * But it is also very easy to use another similar provider interface by installing a similar bridge
  * {@link Supplier}.
  * 
  * @author Jan Bernitt (jan@jbee.se)

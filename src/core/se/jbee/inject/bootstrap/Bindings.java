@@ -52,6 +52,10 @@ public final class Bindings {
 		}
 		bindings.add( binding );
 	}
+	
+	public <T> void expandInto(Binding<T> binding) {
+		macros.expandInto(this, binding, binding);
+	}
 
 	public Binding<?>[] toArray() {
 		return Array.of( bindings, Binding.class );

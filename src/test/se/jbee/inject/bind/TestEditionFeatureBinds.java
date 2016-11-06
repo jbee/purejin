@@ -13,10 +13,10 @@ import org.junit.Test;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Bootstrapper.ModularBootstrapper;
+import se.jbee.inject.bootstrap.Bootstrapper.OptionBootstrapper;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bundle;
-import se.jbee.inject.bootstrap.ModularBundle;
+import se.jbee.inject.bootstrap.OptionBundle;
 import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.config.Edition;
 import se.jbee.inject.config.Feature;
@@ -62,7 +62,7 @@ public class TestEditionFeatureBinds {
 		protected void bootstrap() {
 			install( FeaturedBundle.class );
 			install( FeaturedModule.class );
-			install( FeaturedModularBundle.QUX );
+			install( FeaturedOptionBundle.QUX );
 		}
 
 	}
@@ -99,13 +99,13 @@ public class TestEditionFeatureBinds {
 	}
 
 	@Featured ( AnnotatedFeature.BAZ )
-	private enum FeaturedModularBundle
-			implements ModularBundle<FeaturedModularBundle> {
+	private enum FeaturedOptionBundle
+			implements OptionBundle<FeaturedOptionBundle> {
 		QUX;
 
 		@Override
-		public void bootstrap( ModularBootstrapper<FeaturedModularBundle> bootstrap ) {
-			bootstrap.install( AnotherModule.class, QUX );
+		public void bootstrap( OptionBootstrapper<FeaturedOptionBundle> bootstrapper ) {
+			bootstrapper.install( AnotherModule.class, QUX );
 		}
 
 	}

@@ -9,7 +9,7 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bundle;
-import se.jbee.inject.bootstrap.ModularBootstrapperBundle;
+import se.jbee.inject.bootstrap.OptionBootstrapperBundle;
 import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.config.Globals;
 import se.jbee.inject.config.Options;
@@ -28,7 +28,7 @@ import se.jbee.inject.config.Options;
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
-public class TestModularBinds {
+public class TestOptionBinds {
 
 	private enum Machine {
 		LOCALHOST,
@@ -50,7 +50,7 @@ public class TestModularBinds {
 	 * in the {@link Options} so that it is actually <code>null</code>.
 	 */
 	private static class MachineBundle
-			extends ModularBootstrapperBundle<Machine> {
+			extends OptionBootstrapperBundle<Machine> {
 
 		@Override
 		protected void bootstrap() {

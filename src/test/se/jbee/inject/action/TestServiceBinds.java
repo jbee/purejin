@@ -14,6 +14,14 @@ import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Bootstrap;
 
+/**
+ * This test shows how to build an application specific service layer on top of
+ * the action concept. The benefit is that application code does not become
+ * dependent on the {@link Action} abstraction that is part of the DI aspect and
+ * should be transparent.
+ * 
+ * @author jan
+ */
 public class TestServiceBinds {
 
 	/**

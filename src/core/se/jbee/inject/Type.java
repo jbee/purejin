@@ -148,11 +148,16 @@ public final class Type<T>
 	}
 
 	@SuppressWarnings ( "unchecked" )
-	public <S> Type<? extends S> castTo( Type<S> supertype ) {
+	public <S> Type<? extends S> castTo( Type<S> supertype ) throws ClassCastException {
+		toSupertype(supertype);
+		return (Type<S>) this;
+	}
+	
+	public <S> Type<S> toSupertype(Type<S> supertype) {
 		if ( !isAssignableTo( supertype ) ) {
 			throw new ClassCastException( "Cannot cast " + this + " to " + supertype );
 		}
-		return (Type<S>) this;
+		return supertype;
 	}
 
 	public Type<? extends T> asUpperBound() {

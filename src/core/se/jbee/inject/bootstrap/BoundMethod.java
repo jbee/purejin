@@ -39,10 +39,7 @@ public final class BoundMethod<T>
 		this.instance = instance;
 		this.isInstanceMethod = !Modifier.isStatic( factory.getModifiers() );
 		final Type<?> actualReturnType = Type.returnType( factory );
-		if ( !actualReturnType.isAssignableTo( returnType ) ) {
-			throw new IllegalArgumentException( "The producer methods methods return type `"
-					+ actualReturnType + "` is not assignable to: " + returnType );
-		}
+		actualReturnType.toSupertype(returnType ); // make sure types are compatible
 		if ( instance != null && factory.getDeclaringClass() != instance.getClass() ) {
 			throw new IllegalArgumentException(
 					"The producer method and the instance it is invoked on have to be the same class." );
@@ -57,7 +54,7 @@ public final class BoundMethod<T>
 
 	@SuppressWarnings ( "unchecked" )
 	@Override
-	public <E> BoundMethod<E> typed( Type<E> supertype ) {
+	public <E> BoundMethod<E> typed( Type<E> supertype ) throws ClassCastException {
 		type().castTo( supertype ); // make sure is valid
 		return (BoundMethod<E>) this;
 	}

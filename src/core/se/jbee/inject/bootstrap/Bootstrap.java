@@ -107,9 +107,9 @@ public final class Bootstrap {
 
 		@Override
 		public void declare( Bindings bindings ) {
-			Type<?> generic = Type.supertype( PresetModule.class, raw( module.getClass() ) ).parameter( 0 );
+			Type<?> valueType = Type.supertype( PresetModule.class, raw( module.getClass() ) ).parameter( 0 );
 			@SuppressWarnings ( "unchecked" )
-			final T value = (T) presets.value( generic );
+			final T value = (T) presets.value( valueType );
 			module.declare( bindings, value );
 		}
 	}
@@ -156,31 +156,31 @@ public final class Bootstrap {
 		}
 
 		@Override
-		public <C extends Enum<C>> void install( Class<? extends ModularBundle<C>> bundle,
-				final Class<C> property ) {
+		public <O extends Enum<O>> void install( Class<? extends OptionBundle<O>> bundle,
+				final Class<O> property ) {
 			if ( !globals.edition.featured( property ) ) {
 				return;
 			}
 			final Options options = globals.options;
-			Bootstrap.instance( bundle ).bootstrap( (bundleType, module) -> {
-				if ( options.isChosen( property, module ) ) { // null is a valid value to define what happens when no configuration is present
-					BuildinBootstrapper.this.install( bundleType );
+			Bootstrap.instance( bundle ).bootstrap( (bundleForOption, onOption) -> {
+				if ( options.isChosen( property, onOption ) ) { // null is a valid value to define what happens when no configuration is present
+					BuildinBootstrapper.this.install( bundleForOption );
 				}
 			});
 		}
 
 		@Override
 		@SafeVarargs
-		public final <M extends Enum<M> & ModularBundle<M>> void install( M... modules ) {
-			if ( modules.length > 0 ) {
-				final M bundle = modules[0];
-				if ( !globals.edition.featured( bundle.getClass() ) ) {
+		public final <O extends Enum<O> & OptionBundle<O>> void install( O... options ) {
+			if ( options.length > 0 ) {
+				final O option = options[0];
+				if ( !globals.edition.featured( option.getClass() ) ) {
 					return;
 				}
-				final EnumSet<M> installing = EnumSet.of( bundle, modules );
-				bundle.bootstrap( (bundleType, module) -> {
-					if ( installing.contains( module ) ) {
-						BuildinBootstrapper.this.install( bundleType );
+				final EnumSet<O> installing = EnumSet.of( option, options );
+				option.bootstrap( (bundle, onOption) -> {
+					if ( installing.contains( onOption ) ) {
+						BuildinBootstrapper.this.install( bundle );
 					}
 				});
 			}
@@ -247,12 +247,12 @@ public final class Bootstrap {
 
 		@Override
 		@SafeVarargs
-		public final <M extends Enum<M> & ModularBundle<M>> void uninstall( M... modules ) {
-			if ( modules.length > 0 ) {
-				final EnumSet<M> uninstalling = EnumSet.of( modules[0], modules );
-				modules[0].bootstrap( (bundleType, module) -> {
-					if ( uninstalling.contains( module ) ) {
-						uninstall( bundleType );
+		public final <O extends Enum<O> & OptionBundle<O>> void uninstall( O... bundles ) {
+			if ( bundles.length > 0 ) {
+				final EnumSet<O> uninstalling = EnumSet.of( bundles[0], bundles );
+				bundles[0].bootstrap( (bundle, onOption) -> {
+					if ( uninstalling.contains( onOption ) ) {
+						uninstall( bundle );
 					}
 				} );
 			}

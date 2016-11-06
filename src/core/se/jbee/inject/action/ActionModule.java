@@ -53,7 +53,7 @@ public abstract class ActionModule
 	 * {@link Action}s. The {@link Inspector#methodsIn(Class)} should return all methods in
 	 * the given {@link Class} that should be used to implement a {@link Action}.
 	 */
-	private static final Instance<Inspector> ACTION_INSPECTOR = instance( named(Action.class), raw( Inspector.class ) );
+	static final Instance<Inspector> ACTION_INSPECTOR = instance( named(Action.class), raw( Inspector.class ) );
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <I,O> Dependency<Action<I,O>> actionDependency(Type<I> input, Type<O> output) {
