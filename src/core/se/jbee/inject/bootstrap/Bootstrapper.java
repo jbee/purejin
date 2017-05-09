@@ -68,13 +68,15 @@ public interface Bootstrapper {
 	 * @param options
 	 *            The choices made to install.
 	 */
-	<O extends Enum<O> & OptionBundle<O>> void install( @SuppressWarnings("unchecked") O... options );
+	@SuppressWarnings("unchecked")
+	<O extends Enum<O> & OptionBundle<O>> void install( O... options );
 
 	/**
 	 * @param options
 	 *            The choices made to uninstall again.
 	 */
-	<O extends Enum<O> & OptionBundle<O>> void uninstall( @SuppressWarnings("unchecked") O... options );
+	@SuppressWarnings("unchecked")
+	<O extends Enum<O> & OptionBundle<O>> void uninstall( O... options );
 
 	/**
 	 * @see Options
