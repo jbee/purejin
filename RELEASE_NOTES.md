@@ -1,6 +1,6 @@
 # Release notes
 
-v0.10 (unreleased)
+v0.10
 ==============
 
 > Support for wild-card bindings (supply any sub-class of X).
