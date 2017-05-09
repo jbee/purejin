@@ -23,7 +23,6 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Supplier;
-import se.jbee.inject.Target;
 import se.jbee.inject.Type;
 
 /**

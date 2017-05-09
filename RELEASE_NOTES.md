@@ -13,6 +13,9 @@ v0.10 (unreleased)
 - renamed `Macros.EMPTY` to `Macros.NONE`
 - added `Type#toSupertype` for type compatibility checks
 - type compatibility checks (more) consistently throw `ClassCastException`s
+- constructor lookup for interface types now throws a `NoMethodForDependency`
+- action execution now wraps all runtime exceptions in `ActionMalfunction`
+ 
 
 v0.9
 ===============

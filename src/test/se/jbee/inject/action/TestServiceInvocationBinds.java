@@ -157,7 +157,7 @@ public class TestServiceInvocationBinds {
 					ex = (Exception) e.getCause();
 				}
 				afterException(output, input, value, ex, state );
-				throw new ActionMalfunction(action.getDeclaringClass().getSimpleName()+"#"+action.getName()+" failed: "+e.getMessage(), ex );
+				throw new ActionMalfunction(action.getDeclaringClass().getSimpleName()+"#"+action.getName()+" failed: "+ex.getMessage(), ex );
 			}
 			after( output, input, value, res, state );
 			return res;

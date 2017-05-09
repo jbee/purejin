@@ -239,7 +239,7 @@ public class Inspect
 
 	public static <T> Constructor<T> noArgsConstructor( Class<T> declaringClass ) {
 		if ( declaringClass.isInterface() ) {
-			throw new RuntimeException(new InstantiationException( "Interfaces don't have constructors: " + declaringClass ));
+			throw new NoMethodForDependency( raw(declaringClass) );
 		}
 		Constructor<T> c;
 		try {

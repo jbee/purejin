@@ -2,6 +2,8 @@ package se.jbee.inject.action;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.action.ActionModule.actionDependency;
 
@@ -9,6 +11,7 @@ import org.junit.Test;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
+import se.jbee.inject.UnresolvableDependency.SupplyFailed;
 import se.jbee.inject.bootstrap.Bootstrap;
 
 public class TestActionBinds {
@@ -28,6 +31,10 @@ public class TestActionBinds {
 
 		public Integer negate( Number value ) {
 			return -value.intValue();
+		}
+		
+		public Void error() {
+			throw new IllegalStateException("This should be wrapped!");
 		}
 	}
 
@@ -54,5 +61,18 @@ public class TestActionBinds {
 		assertNotNull( mul2 );
 		assertEquals( -3, negate.exec( 3 ).intValue() );
 		assertEquals( 11, mul2.exec( 4 ).intValue() );
+	}
+	
+	@Test
+	public void exceptionsAreWrappedInActionMalfunction() {
+		Injector injector = Bootstrap.injector( ActionBindsModule.class );
+		Dependency<Action<Void, Void>> de = actionDependency(raw(Void.class), raw(Void.class));
+		Action<Void, Void> error = injector.resolve( de );
+		try {
+			error.exec(null);
+			fail("Expected an exception...");
+		} catch (ActionMalfunction e) {
+			assertSame(IllegalStateException.class, e.getCause().getClass());
+		}
 	}
 }

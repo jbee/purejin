@@ -6,7 +6,7 @@
 package se.jbee.inject.action;
 
 /**
- * The low level representation of an action (a operation or micro-service).
+ * The low user level representation of an action (a operation or micro-service).
  * 
  * @param <I>
  *            The type of the input
@@ -16,6 +16,18 @@ package se.jbee.inject.action;
 @FunctionalInterface
 public interface Action<I, O> {
 
+	/**
+	 * Runs the action to compute the output from the input. This typically does
+	 * not change any inner state but it might in rare cases be part of an
+	 * action to do such a thing.
+	 * 
+	 * @param input
+	 *            might be null for {@link Void} arguments or when argument was
+	 *            resolved to null
+	 * @return might be null
+	 * @throws ActionMalfunction
+	 *             wraps all {@link RuntimeException}s
+	 */
 	O exec( I input ) throws ActionMalfunction;
 
 }

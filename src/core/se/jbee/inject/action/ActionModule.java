@@ -27,6 +27,7 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
+import se.jbee.inject.UnresolvableDependency.SupplyFailed;
 import se.jbee.inject.bind.BinderModule;
 import se.jbee.inject.bootstrap.BoundParameter;
 import se.jbee.inject.bootstrap.InjectionSite;
@@ -88,10 +89,17 @@ public abstract class ActionModule
 	static final class DirectExecutor implements Executor {
 
 		@Override
-		public <I, O> O exec(Object impl, Method action, Object[] args, Type<O> output, Type<I> input, I value) {
-			return output.rawType.cast(Invoke.method(action, impl, args));
+		public <I, O> O exec(Object impl, Method action, Object[] args,	Type<O> output, Type<I> input, I value) {
+			try {
+				return output.rawType.cast(Invoke.method(action, impl, args));
+			} catch (SupplyFailed e) {
+				Exception ex = e;
+				if ( e.getCause() instanceof Exception ) {
+					ex = (Exception) e.getCause();
+				}
+				throw new ActionMalfunction("Exception on invocation of the action", ex);
+			}
 		}
-		
 	}
 
 	static final class ActionSupplier
@@ -194,7 +202,7 @@ public abstract class ActionModule
 		private final InjectionSite injection;
 		private final int inputIndex;
 		
-		public ExecutedAction(Object impl, Method action, Type<I> input, Type<O> output, Executor executor, Injector injector) {
+		ExecutedAction(Object impl, Method action, Type<I> input, Type<O> output, Executor executor, Injector injector) {
 			super();
 			this.impl = impl;
 			this.action = Metaclass.accessible(action);
@@ -202,22 +210,23 @@ public abstract class ActionModule
 			this.output = output;
 			this.executor = executor;
 			this.injector = injector;
-			Type<?>[] types = Type.parameterTypes(action);
+			Type<?>[] types = parameterTypes(action);
 			this.injection = new InjectionSite(dependency(output).injectingInto(action.getDeclaringClass()), injector, BoundParameter.bind(types, BoundParameter.constant(input, null)));
 			this.inputIndex = asList(types).indexOf(input);
 		}
 		
 		@Override
 		public O exec(I input) throws ActionMalfunction {
+			Object[] args = null;
 			try {
-				Object[] args = injection.args(injector);
-				if (inputIndex >= 0) {
-					args[inputIndex] = input;
-				}
-				return executor.exec(impl, action, args, output, this.input, input);
+				args = injection.args(injector);
 			} catch (UnresolvableDependency e) {
-				throw new ActionMalfunction("Failed to provide all implicit arguments!", e);
+				throw new ActionMalfunction("Failed to provide all implicit arguments", e);
 			}
+			if (inputIndex >= 0) {
+				args[inputIndex] = input;
+			}
+			return executor.exec(impl, action, args, output, this.input, input);
 		}
 	}
 }
