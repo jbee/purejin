@@ -45,28 +45,34 @@ However, it makes some strong decisions to keep dependency injection sane.
 Don't fight them. Ask why. Learn.
 
 Or you are just one of those unlucky employees getting told to mess things up
-because business really needs this feature and that. Not that they know what it
-does.
+because business really needs this feature and that. 
+Not that they know why it would help. 
+The customer asked for it.
 
-## What it can do
-Fluent API with:
-
+## What it does
+* provide a type safe fluent API for...
 * basic semantic: bind this to that under those circumstances
-* bind types or instances (named instances of a type)
-* bind with full generic support (even different binds depending on different generics)
-* bind any class/interface (no exceptions or special handling)
-* bind multiple values and receive them as array, list, set
+* binds types or instances (named instances of a type)
+* provide full generic support (even different binds depending on different generics)
+* binds any class/interface (no exceptions or special handling)
+* binds multiple values together or in different modules and receives them as array, list, set
 * use your list/set implementations instead of javas (is really easy)
-* bind different configurations without a single `if`
-* bind in different scopes
+* binds different configurations without a single `if`
+* binds in different scopes
 * use your own scopes/lifecycles (is really easy)
 * use your own provider interface to escape scoping problems (is really easy) 
-* restrict bindings to packages, types, instances or type/instance hierarchies
-* extendable using binds
+* restrict bindings to packages, types, instances or type/instance hierarchies or parents
+* tell you at **construction time** what is missing, ambigous or
+wrongly scoped.
+* ask you how to find and identify "things of interest" (instead of telling you how to mark them)
 * ...
 
-The container will tell you at **construction time** what is missing, ambigous or
-wrongly scoped. No pesky problems later on.
+## What it doesn't do
+* capitalise on familiarity to get you hooked, than make itself indispensable
+* give you headaches (through grotesque limitation, awkward patterns or cryptic error messages)
+* have you google for workarounds and write a lot of really ugly code to do what you want
+* have you waiting at every start of the application to do ... something obviously too slow
+* use techniques that -- while being fancy -- cause any of the above
 
 ## How to use it
 * Checkout the [sources](https://github.com/jbee/silk) or pick a 

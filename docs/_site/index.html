@@ -96,30 +96,38 @@ However, it makes some strong decisions to keep dependency injection sane.
 Don’t fight them. Ask why. Learn.</p>
 
 <p>Or you are just one of those unlucky employees getting told to mess things up
-because business really needs this feature and that. Not that they know what it
-does.</p>
+because business really needs this feature and that. 
+Not that they know why it would help. 
+The customer asked for it.</p>
 
-<h2 id="what-it-can-do">What it can do</h2>
-<p>Fluent API with:</p>
-
+<h2 id="what-it-does">What it does</h2>
 <ul>
+  <li>provide a type safe fluent API for…</li>
   <li>basic semantic: bind this to that under those circumstances</li>
-  <li>bind types or instances (named instances of a type)</li>
-  <li>bind with full generic support (even different binds depending on different generics)</li>
-  <li>bind any class/interface (no exceptions or special handling)</li>
-  <li>bind multiple values and receive them as array, list, set</li>
+  <li>binds types or instances (named instances of a type)</li>
+  <li>provide full generic support (even different binds depending on different generics)</li>
+  <li>binds any class/interface (no exceptions or special handling)</li>
+  <li>binds multiple values together or in different modules and receives them as array, list, set</li>
   <li>use your list/set implementations instead of javas (is really easy)</li>
-  <li>bind different configurations without a single <code>if</code></li>
-  <li>bind in different scopes</li>
+  <li>binds different configurations without a single <code>if</code></li>
+  <li>binds in different scopes</li>
   <li>use your own scopes/lifecycles (is really easy)</li>
   <li>use your own provider interface to escape scoping problems (is really easy)</li>
-  <li>restrict bindings to packages, types, instances or type/instance hierarchies</li>
-  <li>extendable using binds</li>
+  <li>restrict bindings to packages, types, instances or type/instance hierarchies or parents</li>
+  <li>tell you at <strong>construction time</strong> what is missing, ambigous or
+wrongly scoped.</li>
+  <li>ask you how to find and identify “things of interest” (instead of telling you how to mark them)</li>
   <li>…</li>
 </ul>
 
-<p>The container will tell you at <strong>construction time</strong> what is missing, ambigous or
-wrongly scoped. No pesky problems later on.</p>
+<h2 id="what-it-doesnt-do">What it doesn’t do</h2>
+<ul>
+  <li>capitalise on familiarity to get you hooked, than make itself indispensable</li>
+  <li>give you headaches (through grotesque limitation, awkward patterns or cryptic error messages)</li>
+  <li>have you google for workarounds and write a lot of really ugly code to do what you want</li>
+  <li>have you waiting at every start of the application to do … something obviously too slow</li>
+  <li>use techniques that – while being fancy – cause any of the above</li>
+</ul>
 
 <h2 id="how-to-use-it">How to use it</h2>
 <ul>
