@@ -44,4 +44,6 @@ TODO
 * DI => more general app wiring
 * Ask wrong question: Ask the receiver: What instance do you want to receive?
 * Breaks abstraction and composition: the two things the framework should have helped with
+
+
 Receiver should not need to know (abstraction) and must be able to receive different (composition)

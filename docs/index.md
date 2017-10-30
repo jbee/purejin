@@ -11,8 +11,10 @@ layout: default
 ## What happened?
 
 The detailed documentation provided earlier -- as so often -- got outdated when the code
-evolved. The following is not much but it will be accurate at least. 
-If something is not covered ask [me](http://jbee.github.io).
+evolved. I decided to not explain something in words again that code can say so much better.
+
+The following is not much but it will be accurate. 
+If something is not covered [ask me](http://jbee.github.io).
 
 ## What it is
 Dependency management through code. 
@@ -37,11 +39,14 @@ If you have already decided to use a container you're most likely better off
 with silk. It's tiny, debuggable, straight forward stand alone library that 
 makes common things easy and uncommon ones easy to add.
 It avoids anything not refactoring-safe, confusing, complicated or otherwise 
-hard to maintain like XML or annotations, aspects etcetera.
+hard to maintain like XML or annotations, aspects, bytecode rewirting, classloader magic etcetera.
 It really is just plain old boring code. 
 However, it makes some strong decisions to keep dependency injection sane.
 Don't fight them. Ask why. Learn.
 
+Or you are just one of those unlucky employees getting told to mess things up
+because business really needs this feature and that. Not that they know what it
+does.
 
 ## What it can do
 Fluent API with:
@@ -52,7 +57,7 @@ Fluent API with:
 * bind any class/interface (no exceptions or special handling)
 * bind multiple values and receive them as array, list, set
 * use your list/set implementations instead of javas (is really easy)
-* bind different configurations with a single `if`
+* bind different configurations without a single `if`
 * bind in different scopes
 * use your own scopes/lifecycles (is really easy)
 * use your own provider interface to escape scoping problems (is really easy) 
@@ -62,8 +67,6 @@ Fluent API with:
 
 The container will tell you at **construction time** what is missing, ambigous or
 wrongly scoped. No pesky problems later on.
-
-
 
 ## How to use it
 * Checkout the [sources](https://github.com/jbee/silk) or pick a 

@@ -62,8 +62,10 @@ h1 + ul li {
 <h2 id="what-happened">What happened?</h2>
 
 <p>The detailed documentation provided earlier – as so often – got outdated when the code
-evolved. The following is not much but it will be accurate at least. 
-If something is not covered ask <a href="http://jbee.github.io">me</a>.</p>
+evolved. I decided to not explain something in words again that code can say so much better.</p>
+
+<p>The following is not much but it will be accurate. 
+If something is not covered <a href="http://jbee.github.io">ask me</a>.</p>
 
 <h2 id="what-it-is">What it is</h2>
 <p>Dependency management through code. 
@@ -88,10 +90,14 @@ We don’t need a library for that. So I’m not using it.</p>
 with silk. It’s tiny, debuggable, straight forward stand alone library that 
 makes common things easy and uncommon ones easy to add.
 It avoids anything not refactoring-safe, confusing, complicated or otherwise 
-hard to maintain like XML or annotations, aspects etcetera.
+hard to maintain like XML or annotations, aspects, bytecode rewirting, classloader magic etcetera.
 It really is just plain old boring code. 
 However, it makes some strong decisions to keep dependency injection sane.
 Don’t fight them. Ask why. Learn.</p>
+
+<p>Or you are just one of those unlucky employees getting told to mess things up
+because business really needs this feature and that. Not that they know what it
+does.</p>
 
 <h2 id="what-it-can-do">What it can do</h2>
 <p>Fluent API with:</p>
@@ -103,7 +109,7 @@ Don’t fight them. Ask why. Learn.</p>
   <li>bind any class/interface (no exceptions or special handling)</li>
   <li>bind multiple values and receive them as array, list, set</li>
   <li>use your list/set implementations instead of javas (is really easy)</li>
-  <li>bind different configurations with a single <code>if</code></li>
+  <li>bind different configurations without a single <code>if</code></li>
   <li>bind in different scopes</li>
   <li>use your own scopes/lifecycles (is really easy)</li>
   <li>use your own provider interface to escape scoping problems (is really easy)</li>
