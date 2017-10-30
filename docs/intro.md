@@ -39,8 +39,9 @@ While we can understand how we got to what I call "fancy map model" it requires 
 
 ## Abstraction and Composition
 
-....
-DI => more general app wiring
-Ask wrong question: Ask the receiver: What instance do you want to receive?
-Breaks abstraction and composition: the two things the framework should have helped with
+TODO
+
+* DI => more general app wiring
+* Ask wrong question: Ask the receiver: What instance do you want to receive?
+* Breaks abstraction and composition: the two things the framework should have helped with
 Receiver should not need to know (abstraction) and must be able to receive different (composition)
