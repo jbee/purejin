@@ -107,8 +107,8 @@ Robot robot = injector.resolve( dependency( Robot.class ) );
 ## What about maven?
 Maven is part of the complexity problem. I you don't see that yet you will struggle to see
 why someone would prefer a library over a framework, code over annotations and
-so forth. Take it as a hint. Maybe you feel that something is quite wrong. 
-Open your mind for the possibility that maven is one of those things and you'll understand. 
+so forth. Take it as a hint. Maybe you feel that something isn't right? 
+Then open your mind for the possibility that maven is one of those things and you'll understand. 
 
 ## How to learn it
 The [tests](https://github.com/jbee/silk/tree/master/src/test/se/jbee/inject/bind)
