@@ -1,5 +1,12 @@
+---
+layout: default
+---
 
-Let me try to explain why silk DI is not similar to (most) other frameworks like google guice, dagger or spring DI and why it matters.
+# A Different Container
+
+Let me try to explain why silk DI is not similar to (most) other containers like google guice, dagger or spring DI and why it matters.
+
+## The Fancy Map Model
 
 Lets imagine a very simple container as a map. 
 We "declare" an instance entry in that map by "attaching" a name to a class.
@@ -7,8 +14,8 @@ We "resolve" that instance by attaching the same name to a field or parameter to
 This could be called "resolution by name". Quit simple.
 This is more or less how spring started.
 
-Lets add a little convenience feature: A class can be "added" to the container without naming it explicitly.
-Than we would add multiple entries to the map. One for the exact canonical name of the class and one for the names of each superclass or interface (except unreasonable ones like `Object`). 
+Lets add a little convenience feature: Classes with a certain feature are "added" to the container without stating it explicitly.
+We would add multiple entries to the map. One for the exact canonical name of the class and one for the names of each superclass or interface (except unreasonable ones like `Object`). 
 Also when "resolving" an instance without stating a name we automatically look for the instance with the target type name.
 This could be called "resolution by type". 
 Spring later added it. In guice this is the "usual" way to resolve dependencies.
@@ -20,17 +27,17 @@ We can imagine that guice's `@Named` works like that.
 
 One thing got overlooked when we added "types" to the names. 
 Multiple types can have the same supertype. This should not cause trouble. 
-Different "services" might inherit from an "abstract" service.
+E.g. different "services" might inherit from an "abstract" service.
 Still, we would never try to resolve the abstract service.
-So the map values in general are lists of classes.
+So our map's values really should be lists of classes.
 But if we actually try to resolve a name that is associated with multiple classes/instances we don't know which one we should use and have to throw an error.
 These errors should be familiar from guice and spring.
 They are necessary because of the map-model. 
 
-While we can understand how we got to this model it requires some thought to understand why it is a poor solution.
+While we can understand how we got to what I call "fancy map model" it requires some thought to understand why it is a poor solution.
    
 
-
+## Abstraction and Composition
 
 ....
 DI => more general app wiring
