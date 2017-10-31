@@ -7,3 +7,4 @@ pom.*
 *~
 .idea
 *.iml
+_site/

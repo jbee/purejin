@@ -25,9 +25,23 @@ This could be called "resolution by type".
 Spring later added it. In guice this is the "usual" way to resolve dependencies.
 This, however, does constraint us to one instance per type. Too simplistic.
 
+```java
+class Foo implements Bar { }
+```
+
+```
+"my.package.Foo" => "my.package.Foo"
+"my.package.Bar" => "my.package.Foo"
+```
+
 So, lets tweak our feature a little bit. When a name is used in connection with a type this is meant as a type "local" name instead of a map "global" name. In practice we can imagine this to work like before; except that we add even more entries to the map where we combine the "local" name with the class name(s) to compute further names for our map
 that all lead to the very same instance. 
 We can imagine that guice's `@Named` works like that. 
+
+```
+"my.package.Foo.bar" => "my.package.Foo" // bar instance
+"my.package.Foo.baz" => "my.package.Foo" // baz instance
+```
 
 One thing got overlooked when we added "types" to the names. 
 Multiple types can have the same supertype. 
@@ -37,6 +51,17 @@ So our map's values really have to be lists of classes associated with a name.
 But if we actually try to resolve a name that is associated with multiple classes/instances we don't know which one we should use and have to throw an error.
 These errors should be familiar from guice and spring.
 They are necessary because of the map-model. 
+
+```java
+class Foo implements Bar { }
+class Que implements Bar { }
+```
+
+```
+"my.package.Foo" => [ "my.package.Foo" ]
+"my.package.Que" => [ "my.package.Que" ]
+"my.package.Bar" => [ "my.package.Foo", "my.package.Que" ]
+```
 
 While we can understand how we got to what I call the "fancy map model"<sup>[1](#fn1)</sup> it requires some thought to understand why it is a poor solution.
    

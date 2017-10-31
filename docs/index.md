@@ -75,7 +75,7 @@ wrongly scoped.
 * have you waiting at every start of the application to do ... something obviously too slow
 * use techniques that -- while being fancy -- cause any of the above
 
-So... it's [different](/differences.html).
+So... it's [different](differences.html).
 
 ## How to use it
 * Checkout the [sources](https://github.com/jbee/silk) or pick a 
