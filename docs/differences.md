@@ -4,6 +4,10 @@ layout: default
 
 # A Different Container
 
+* java
+* dependency injection
+* models
+
 Let me try to explain why silk DI is not similar to (most) other containers like google guice, dagger or spring DI and why it matters.
 
 ## The Fancy Map Model
@@ -38,9 +42,13 @@ So, lets tweak our feature a little bit. When a name is used in connection with 
 that all lead to the very same instance. 
 We can imagine that guice's `@Named` works like that. 
 
+```java
+@Named("foo")
+class Foo extends Bar {}
 ```
-"my.package.Foo.bar" => "my.package.Foo" // bar instance
-"my.package.Foo.baz" => "my.package.Foo" // baz instance
+
+```
+"my.package.Bar.foo" => "my.package.Foo"
 ```
 
 One thing got overlooked when we added "types" to the names. 
@@ -48,9 +56,6 @@ Multiple types can have the same supertype.
 Like multiple classes implementing the same interface.
 This has to work smothly. 
 So our map's values really have to be lists of classes associated with a name.
-But if we actually try to resolve a name that is associated with multiple classes/instances we don't know which one we should use and have to throw an error.
-These errors should be familiar from guice and spring.
-They are necessary because of the map-model. 
 
 ```java
 class Foo implements Bar { }
@@ -62,6 +67,10 @@ class Que implements Bar { }
 "my.package.Que" => [ "my.package.Que" ]
 "my.package.Bar" => [ "my.package.Foo", "my.package.Que" ]
 ```
+
+But if we actually try to resolve a name that is associated with multiple classes/instances we don't know which one we should use and have to throw an error.
+These errors should be familiar from guice and spring.
+They are necessary because of the map like model. 
 
 While we can understand how we got to what I call the "fancy map model"<sup>[1](#fn1)</sup> it requires some thought to understand why it is a poor solution.
    
