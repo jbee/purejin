@@ -68,11 +68,14 @@ wrongly scoped.
 * ...
 
 ## What it doesn't do
-* capitalise on familiarity to get you hooked, than make itself indispensable
-* give you headaches (through grotesque limitation, awkward patterns or cryptic error messages)
+* capitalise on familiarity or proclaimed "ease of use" to get you hooked, then make itself indispensable; Later..
+* give you headaches (through grotesque limitations, awkward patterns or cryptic error messages)
 * have you google for workarounds and write a lot of really ugly code to do what you want
+* have you clutter your code with hints
 * have you waiting at every start of the application to do ... something obviously too slow
 * use techniques that -- while being fancy -- cause any of the above
+
+So... it's [different](/differences.html).
 
 ## How to use it
 * Checkout the [sources](https://github.com/jbee/silk) or pick a 
@@ -142,38 +145,4 @@ Looking at the other tests in the same folder will also be useful.
 There is more to discover. Most likely silk allows to do what you want.
 Otherwise just ask [me](http://jbee.github.io) for help.
 
-## How it works
-At the core is a quite simple instance container. 
-It consists of a list of injectrons sorted by precision (most precise first) 
-that is assembled from bindings during initialization and then never changes again.
-Each injectron is a factory like typed source of instances. When a dependency is resolved
-the first injectorn that matches the requested dependency is asked to yield
-the instance for it. If the requested type is a 1-dimensional array and no
-injectorn specifically for that type exists, the resulting array is assembled
-from all matching element instance providers. That's it.
-
-#### Utilities
-Most of the library is just a utility build around the container.
-The fluent API is a utility to describe bindings (assemblies) to create a
-container from. Modules and bundles are utilities to organize and assemble
-sets of such bindings to allow configuration and customization during the
-bootstrapping of a container. 
-Suppliers, repositories and scopes are abstractions to create and manage 
-instances and their life-cycles. Providers and factories make this even more
-convenient. Finally actions utilize several features to build a 
-input-processing-output abstraction onto methods.
-
-#### Precision?
-Both dependencies (instance requirements) as well as injectrons (instance providers)
-are (also) data descriptions of what they require/provide.
-Such descriptions can be more or less specific or precise.
-A wild-card type is less precise than a fully specified one.
-A sub-class more specific than a super-class.
-A named instance more precise than a unnamed one, 
-one specifically meant for a particular package or parent instance is again more 
-precise than one that doesn't specify these. 
-There is no particular logic other than: the more we know about when/where
-something applies the more specific or precise it is. 
-All in all it is fairly intuitive - one just needs to remember the sequence 
-in which properties are compared: type, name, hierarchy, package.
 

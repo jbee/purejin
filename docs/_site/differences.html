@@ -19,6 +19,7 @@ body {
 	padding: 1% 5%;
 	font-size: 12px;
 }
+footer { padding:2em 0 1em 0; }
 b, strong { color: #0088FF; font-weight: normal; }
 h1 { font-size: 20px; }
 h2 {
@@ -38,6 +39,15 @@ p code {
 p + p {
 	text-indent: 1em;
 }
+hr {
+	height: 0;
+	border-width: 0;
+	border-bottom: 2px solid #777;
+	margin-top: 4em;
+}
+hr + ol {
+	font-size: 10px; color: #333;
+}
 /* tags */
 h1 + ul { padding: 0; margin: 2px; }
 h1 + ul li {
@@ -51,6 +61,12 @@ h1 + ul li {
 	</style>	
   </head>
   <body>
+	<a href="/">home</a> / 
+	<a href="/differences.html">differences</a> / 
+	<a href="https://github.com/jbee/silk/issues">issues</a> /
+	<a href="https://github.com/jbee/silk">github</a> 
+	<br/>
+
 	<h1 id="a-different-container">A Different Container</h1>
 
 <p>Let me try to explain why silk DI is not similar to (most) other containers like google guice, dagger or spring DI and why it matters.</p>
@@ -58,13 +74,17 @@ h1 + ul li {
 <h2 id="the-fancy-map-model">The Fancy Map Model</h2>
 
 <p>Lets imagine a very simple container as a map. 
-We “declare” an instance entry in that map by “attaching” a name to a class.
+We “declare” an instance entry in that map by “attaching” a “unique” instance name to a canonical class name.
 We “resolve” that instance by attaching the same name to a field or parameter to “tell” which instance we want.<br />
 This could be called “resolution by name”. Quit simple.
 This is more or less how spring started.</p>
 
-<p>Lets add a little convenience feature: Classes with a certain feature are “added” to the container without stating it explicitly.
-We would add multiple entries to the map. One for the exact canonical name of the class and one for the names of each superclass or interface (except unreasonable ones like <code>Object</code>). 
+<p><code>
+"foo" =&gt; "my.package.Foo"
+</code></p>
+
+<p>Lets add a little convenience feature: Classes with a certain feature (like package or an annotation) are “added” to the container without stating something explicitly.
+We would add multiple entries to the map. One for the exact canonical name of the class (as instance name) and one for the names of each superclass or interface (except unreasonable ones like <code>Object</code>). 
 Also when “resolving” an instance without stating a name we automatically look for the instance with the target type name.
 This could be called “resolution by type”. 
 Spring later added it. In guice this is the “usual” way to resolve dependencies.
@@ -75,15 +95,15 @@ that all lead to the very same instance.
 We can imagine that guice’s <code>@Named</code> works like that.</p>
 
 <p>One thing got overlooked when we added “types” to the names. 
-Multiple types can have the same supertype. This should not cause trouble. 
-E.g. different “services” might inherit from an “abstract” service.
-Still, we would never try to resolve the abstract service.
-So our map’s values really should be lists of classes.
+Multiple types can have the same supertype. 
+Like multiple classes implementing the same interface.
+This has to work smothly. 
+So our map’s values really have to be lists of classes associated with a name.
 But if we actually try to resolve a name that is associated with multiple classes/instances we don’t know which one we should use and have to throw an error.
 These errors should be familiar from guice and spring.
 They are necessary because of the map-model.</p>
 
-<p>While we can understand how we got to what I call “fancy map model” it requires some thought to understand why it is a poor solution.</p>
+<p>While we can understand how we got to what I call the “fancy map model”<sup><a href="#fn1">1</a></sup> it requires some thought to understand why it is a poor solution.</p>
 
 <h2 id="abstraction-and-composition">Abstraction and Composition</h2>
 
@@ -93,9 +113,14 @@ They are necessary because of the map-model.</p>
   <li>DI =&gt; more general app wiring</li>
   <li>Ask wrong question: Ask the receiver: What instance do you want to receive?</li>
   <li>Breaks abstraction and composition: the two things the framework should have helped with</li>
+  <li>Receiver should not need to know (abstraction) and must be able to receive different (composition)</li>
 </ul>
 
-<p>Receiver should not need to know (abstraction) and must be able to receive different (composition)</p>
+<hr />
+<ol>
+  <li><a name="fn1"></a>I’m not saying anyone implemented it this way. It is just a simplified mental model for how we can imagine it to work.</li>
+</ol>
+
 
 
 <footer>

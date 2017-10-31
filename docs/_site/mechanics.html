@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="author" content="Jan Bernitt" />
+    <meta name="description" content="Silk DI - Java dependency injection through code.">    
+    <meta name="google-site-verification" content="RUSGBDySczIqgJhW3IYYfECMvXskBRw8R3g-C6N_f1I" />    
+    <title> Silk DI</title>
+	<style>
+@import url('https://fonts.googleapis.com/css?family=Oxygen+Mono');
+
+body, pre, code {
+	font-family: 'Oxygen Mono', monospace;
+}
+
+body {
+	max-width: 40em;
+	padding: 1% 5%;
+	font-size: 12px;
+}
+footer { padding:2em 0 1em 0; }
+b, strong { color: #0088FF; font-weight: normal; }
+h1 { font-size: 20px; }
+h2 {
+	font-weight: normal;
+	padding-top: 2em;
+	display: block;
+	color: #DD8855;
+}
+pre {
+	background-color: #eee;
+	padding: 2px;
+	tab-size: 4;
+}
+p code {
+	color: #880000;
+}
+p + p {
+	text-indent: 1em;
+}
+hr {
+	height: 0;
+	border-width: 0;
+	border-bottom: 2px solid #777;
+	margin-top: 4em;
+}
+hr + ol {
+	font-size: 10px; color: #333;
+}
+/* tags */
+h1 + ul { padding: 0; margin: 2px; }
+h1 + ul li {
+	background-color: #EEEE77; color: #664400; padding: 2px; display: inline-block;
+}
+/* code blocks */
+.kd, .kt { color: #CC44CC;}
+.nf { color: #0000AA; }
+.c1 { color: #00CC55; }
+
+	</style>	
+  </head>
+  <body>
+	<a href="/">home</a> / 
+	<a href="/differences.html">differences</a> / 
+	<a href="https://github.com/jbee/silk/issues">issues</a> /
+	<a href="https://github.com/jbee/silk">github</a> 
+	<br/>
+
+	<h1 id="how-it-works">How it works</h1>
+<p>At the core is a quite simple instance container. 
+It consists of a list of injectrons sorted by precision (most precise first) 
+that is assembled from bindings during initialization and then never changes again.
+Each injectron is a factory like typed source of instances. When a dependency is resolved
+the first injectorn that matches the requested dependency is asked to yield
+the instance for it. If the requested type is a 1-dimensional array and no
+injectorn specifically for that type exists, the resulting array is assembled
+from all matching element instance providers. That’s it.</p>
+
+<h2 id="utilities">Utilities</h2>
+<p>Most of the library is just a utility build around the container.
+The fluent API is a utility to describe bindings (assemblies) to create a
+container from. Modules and bundles are utilities to organize and assemble
+sets of such bindings to allow configuration and customization during the
+bootstrapping of a container. 
+Suppliers, repositories and scopes are abstractions to create and manage 
+instances and their life-cycles. Providers and factories make this even more
+convenient. Finally actions utilize several features to build a 
+input-processing-output abstraction onto methods.</p>
+
+<h2 id="precision">Precision?</h2>
+<p>Both dependencies (instance requirements) as well as injectrons (instance providers)
+are (also) data descriptions of what they require/provide.
+Such descriptions can be more or less specific or precise.
+A wild-card type is less precise than a fully specified one.
+A sub-class more specific than a super-class.
+A named instance more precise than a unnamed one, 
+one specifically meant for a particular package or parent instance is again more 
+precise than one that doesn’t specify these. 
+There is no particular logic other than: the more we know about when/where
+something applies the more specific or precise it is. 
+All in all it is fairly intuitive - one just needs to remember the sequence 
+in which properties are compared: type, name, hierarchy, package.</p>
+
+
+
+<footer>
+&copy; 2017 <a href="http://jbee.github.io/">Jan Bernitt</a>
+</footer>
+  </body>
+</html>
