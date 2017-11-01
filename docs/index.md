@@ -71,11 +71,10 @@ wrongly scoped.
 * capitalise on familiarity or proclaimed "ease of use" to get you hooked, then make itself indispensable; Later..
 * give you headaches (through grotesque limitations, awkward patterns or cryptic error messages)
 * have you google for workarounds and write a lot of really ugly code to do what you want
-* have you clutter your code with hints
+* have you clutter your code with DI hints
 * have you waiting at every start of the application to do ... something obviously too slow
 * use techniques that -- while being fancy -- cause any of the above
 
-So... it's [different](differences.html).
 
 ## How to use it
 * Checkout the [sources](https://github.com/jbee/silk) or pick a 
