@@ -8,22 +8,24 @@ layout: default
 * library
 * refactoring
 
-## What happened?
 
+## What happened?
 The detailed documentation provided earlier -- as so often -- got outdated when the code
 evolved. I decided to not explain something in words again that code can say so much better.
 
 The following is not much but it will be accurate. 
 If something is not covered [ask me](http://jbee.github.io).
 
+
 ## What it is
-Dependency management through code. 
-**No XML**. **No annotations**. No code dependencies in the wrong direction. 
+Dependency management through **code**. 
+No XML. No annotations. No code dependencies in the wrong direction. 
 Application code is written as if there is no DI library. 
 Indeed, this is the goal: wiring up the application had become so simple that no 
 sophisticated library is needed to aid it. 
 Silk will make sophisticated wiring easier until it is no longer needed and
 gracefully disappears as simplicity emerges.
+
 
 ## Why it came to be
 The classic struggle: How hard could it be to write something better than 
@@ -33,6 +35,7 @@ More importantly: while the major players are all addictive frameworks the silk
 library is intended as a substitute that in the end gets rid of itself.
 Confused? It's just saying: [Small is beautiful](http://www.infoq.com/presentations/small-large-systems).
 We don't need a library for that. So I'm not using it.
+
 
 ## Why use it?
 If you have already decided to use a container you're most likely better off 
@@ -44,10 +47,6 @@ It really is just plain old boring code.
 However, it makes some strong decisions to keep dependency injection sane.
 Don't fight them. Ask why. Learn.
 
-Or you are just one of those unlucky employees getting told to mess things up
-because business really needs this feature and that. 
-Not that they know why it would help. 
-The customer asked for it.
 
 ## What it does
 * provide a type safe fluent API for...
@@ -107,11 +106,13 @@ Injector injector = Bootstrap.injector( RobotLegsProblem.class );
 Robot robot = injector.resolve( dependency( Robot.class ) ); 
 {%endhighlight%}
 
+
 ## What about maven?
 Maven is part of the complexity problem. I you don't see that yet you will struggle to see
 why someone would prefer a library over a framework, code over annotations and
 so forth. Take it as a hint. Maybe you feel that something isn't right? 
 Then open your mind for the possibility that maven is one of those things and you'll understand. 
+
 
 ## How to learn it
 The [tests](https://github.com/jbee/silk/tree/master/src/test/se/jbee/inject/bind)
