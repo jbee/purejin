@@ -2,7 +2,7 @@
 layout: default
 ---
 
-# Dependency Injection Through Code.
+# Dependency Injection Through Code
 * java
 * dependency injection
 * library
@@ -147,3 +147,7 @@ There is more to discover. Most likely silk allows to do what you want.
 Otherwise just ask [me](http://jbee.github.io) for help.
 
 
+## Curiosities
+
+* [mocking](https://github.com/jbee/silk/blob/master/src/test/se/jbee/inject/bind/TestMockingBinds.java): "teach" the container to mock undefined dependencies in tests
+* [state-switches](https://github.com/jbee/silk/blob/master/src/test/se/jbee/inject/bind/TestStateDependentBinds.java): inject different instances depending on runtime state
