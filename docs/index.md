@@ -73,7 +73,7 @@ wrongly scoped.
 * have you clutter your code with DI hints
 * have you waiting at every start of the application to do ... something obviously too slow
 * unload half of maven central (and therby <a href="#what-about-maven">maven</a>) onto you
-* use techniques that -- while being fancy -- cause any of the above
+* use techniques that -- while being fancy or "modern" -- cause any of the above
 
 
 ## How to use it
@@ -109,8 +109,8 @@ Robot robot = injector.resolve( dependency( Robot.class ) );
 
 ## What about maven?
 Maven is part of the complexity problem. I you don't see that yet you will struggle to see
-why someone would prefer a library over a framework, code over annotations and
-so forth. Take it as a hint. Maybe you feel that something isn't right? 
+why someone would prefer a library over a framework, code over annotations yadda yadda yadda. 
+Take it as a hint. Maybe you feel that something isn't right? 
 Then open your mind for the possibility that maven is one of those things and you'll understand. 
 
 

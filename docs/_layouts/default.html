@@ -10,7 +10,7 @@
 	<style>
 @import url('https://fonts.googleapis.com/css?family=Oxygen+Mono');
 
-html { background-color: #eee; }
+html { background-color: #ccc; }
 body, pre, code { font-family: 'Oxygen Mono', monospace; }
 body {
 	background-color: white;	
@@ -20,33 +20,29 @@ body {
 	margin: 0 auto;
 }
 footer { padding: 2em 12%; }
-footer a:visited, header a:visited { color: blue; }
-footer a, header a { text-decoration: none; }
+footer a:visited, header a:visited, blockquote a:visited { color: blue; }
+footer a, header a, blockquote a { text-decoration: none; }
 section { padding: 1em 12%; }
 nav { padding: 1em; }
-nav + nav { background-color: #AAFFEE; }
-b, strong { color: #00CC55; font-weight: normal; }
+nav + nav { background-color: #65DBEF; }
+b, strong { color: #3AA241; font-weight: normal; }
+i, em { color: #B766B5; font-style: normal; }
 h1 { font-size: 20px; margin-top: 3em; }
 h2 {
 	font-weight: normal;
 	padding-top: 2em;
 	display: block;
-	color: #0088FF;
 }
 pre {
-	background-color: #ddd;
+	background-color: #ccc;
 	padding: 2px;
 	tab-size: 4;
 }
 blockquote {
-	background-color: #EEEE77; padding: 1em;
-}
-p code, li > code {
-	color: #664400; background-color: #ddd;
-}
-p + p {
-	text-indent: 1em;
-}
+	background-color: #DED087; padding: 1em;
+	text-align: center;
+} 
+p code, li > code {	color: #5955E0; }
 hr {
 	height: 0;
 	border-width: 0;
@@ -56,16 +52,16 @@ hr {
 hr + ol {
 	font-size: 10px; color: #333;
 }
+/* ? */
+big { font-size: 100px; color: #DB6559; display: block; text-align: center; padding: 30px 0; }
 /* tags */
 h1 + ul { padding: 0; margin: 2px; }
 h1 + ul li {
-	background-color: #EEEE77; color: #664400; padding: 1px 4px; display: inline-block;
+	background-color: #DED087; color: #5955E0; padding: 1px 4px; display: inline-block;
 }
 /* code blocks */
-.kd, .kt { color: #CC44CC;}
-.nf { color: #0000AA; }
-.c1 { color: #00CC55; }
-
+.kd, .kt { color: #5955E0;}
+.c1 { color: #3AA241; }
 	</style>	
 </head>
 <body>
@@ -81,7 +77,10 @@ h1 + ul li {
 		</nav>
 	</header>
 	<section>{{ content }}</section>
-
-	<footer>&copy; 2017 <a href="http://jbee.github.io/">Jan Bernitt</a></footer>
+	<footer>
+		&copy; 2017 <a href="http://jbee.github.io/">Jan Bernitt</a>  
+		[colors: <a href="https://en.wikipedia.org/wiki/List_of_8-bit_computer_hardware_palettes#Original_MSX">MSX</a>,
+        font: <a href="https://fonts.google.com/specimen/Oxygen+Mono">Oxygen Mono</a>]
+	</footer>
 </body>
 </html>
