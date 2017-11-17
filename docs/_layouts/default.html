@@ -8,60 +8,32 @@
 	<meta name="google-site-verification" content="RUSGBDySczIqgJhW3IYYfECMvXskBRw8R3g-C6N_f1I" />    
 	<title>{% if page.title %} {{ page.title }} - {% endif %} Silk DI</title>
 	<style>
-@import url('https://fonts.googleapis.com/css?family=Oxygen+Mono');
-
-html { background-color: #ccc; }
-body, pre, code { font-family: 'Oxygen Mono', monospace; }
-body {
-	background-color: white;	
-	max-width: 50em;
-	padding: 0;
-	font-size: 12px;
-	margin: 0 auto;
-}
-footer { padding: 2em 12%; }
+body { max-width: 500px; padding: 0; margin: 0 auto; }
+footer { padding: 0.5em 0; }
 footer a:visited, header a:visited, blockquote a:visited { color: blue; }
 footer a, header a, blockquote a { text-decoration: none; }
-section { padding: 1em 12%; }
-nav { padding: 1em; }
-nav + nav { background-color: #65DBEF; }
-b, strong { color: #3AA241; font-weight: normal; }
-i, em { color: #B766B5; font-style: normal; }
-h1 { font-size: 20px; margin-top: 3em; }
-h2 {
-	font-weight: normal;
-	padding-top: 2em;
-	display: block;
-}
-pre {
-	background-color: #ccc;
-	padding: 2px;
-	tab-size: 4;
-}
-blockquote {
-	background-color: #DED087; padding: 1em;
-	text-align: center;
-} 
-p code, li > code {	color: #5955E0; }
-hr {
-	height: 0;
-	border-width: 0;
-	border-bottom: 2px solid #777;
-	margin-top: 4em;
-}
-hr + ol {
-	font-size: 10px; color: #333;
-}
+section { padding: 1em 0; }
+nav { padding: 0.5em 0 0 0; }
+h1 { margin-top: 3em; }
+h2 { padding-top: 2em; display: block; font-size: 18px; }
+ul, ol { padding-left: 2em; }
+pre { padding: 2px; tab-size: 4; }
+pre, code { background-color: #ccc; }
+p code, li code {  white-space: nowrap; }
+blockquote { margin: 2em 1em; text-align: center; font-style: italic; }
+blockquote em { font-style: normal; }
+svg { margin: 0 auto; display: block; } 
+em code { background-color: #aaa; }
+hr { margin: 0.5em 0; }
+hr + ol { font-size: 10px; color: #333; }
 /* ? */
-big { font-size: 100px; color: #DB6559; display: block; text-align: center; padding: 30px 0; }
+big { font-size: 100px; display: block; text-align: center; padding: 30px 0; }
 /* tags */
 h1 + ul { padding: 0; margin: 2px; }
-h1 + ul li {
-	background-color: #DED087; color: #5955E0; padding: 1px 4px; display: inline-block;
-}
+h1 + ul li { background-color: black; color: white; padding: 1px 4px; display: inline-block; font-size: small; }
 /* code blocks */
-.kd, .kt { color: #5955E0;}
-.c1 { color: #3AA241; }
+.kd, .kt { font-weight: bold;}
+.c1 { font-style: italic; }
 	</style>	
 </head>
 <body>
@@ -69,6 +41,7 @@ h1 + ul li {
 		<nav>
 		jbee: <a href="/">home</a>
 		</nav>
+		<hr/>
 		<nav>
 		project:
 		<a href="index.html">home</a> / 
@@ -76,11 +49,11 @@ h1 + ul li {
 		<a href="https://github.com/jbee/silk">github</a>
 		</nav>
 	</header>
+	<hr/>
 	<section>{{ content }}</section>
+	<hr/>
 	<footer>
 		&copy; 2017 <a href="http://jbee.github.io/">Jan Bernitt</a>  
-		[colors: <a href="https://en.wikipedia.org/wiki/List_of_8-bit_computer_hardware_palettes#Original_MSX">MSX</a>,
-        font: <a href="https://fonts.google.com/specimen/Oxygen+Mono">Oxygen Mono</a>]
 	</footer>
 </body>
 </html>
