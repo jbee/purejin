@@ -83,7 +83,7 @@ public abstract class UnresolvableDependency
 					+ msg);
 		}
 
-		public NoResourceForDependency( Collection<Type<?>> types, List<Binding<?>> dropped ) {
+		public NoResourceForDependency( Collection<Type<?>> types, List<?> dropped ) {
 			super( "No resource for required type(s): " + types+"\ndrobbed bindings:\n"+dropped );
 		}
 	}

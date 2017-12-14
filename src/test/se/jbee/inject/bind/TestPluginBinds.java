@@ -5,12 +5,15 @@ import static org.junit.Assert.assertSame;
 import static se.jbee.inject.bind.AssertInjects.assertEqualSets;
 
 import java.io.Serializable;
+import java.util.concurrent.Callable;
 
 import org.junit.Test;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.action.Action;
+import se.jbee.inject.bind.Binder;
+import se.jbee.inject.bind.BinderModule;
 import se.jbee.inject.bind.Binder.PluginBinder;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Module;
@@ -23,7 +26,7 @@ import se.jbee.inject.bootstrap.Module;
  * 
  * The set than can be received from the {@link Injector} using
  * {@link Dependency#pluginsFor(Class)}. This allows to easily build
- * abstractions like {@link Action}s that use this to collect the set of classes
+ * abstractions like actions that use this to collect the set of classes
  * used to look for action methods.
  * 
  * The sets are just ordinary bindings on {@link Class}. That means the sets can
@@ -36,9 +39,9 @@ public class TestPluginBinds {
 		
 		@Override
 		protected void declare() {
-			asDefault().plug(TestExtensionAction.class).into(Action.class);
-			inPackageOf( Module.class ).plug(TestExtensionPackageLocalAction.class).into(Action.class);
-			injectingInto( Serializable.class ).plug(TestExtensionInstanceOfAction.class).into(Action.class);
+			asDefault().plug(TestExtensionAction.class).into(Callable.class);
+			inPackageOf( Module.class ).plug(TestExtensionPackageLocalAction.class).into(Callable.class);
+			injectingInto( Serializable.class ).plug(TestExtensionInstanceOfAction.class).into(Callable.class);
 		}
 	}
 
@@ -57,7 +60,7 @@ public class TestPluginBinds {
 	private final Injector injector = Bootstrap.injector( TestPluginModule.class );
 
 	@SuppressWarnings("rawtypes")
-	private final Dependency<Class[]> dependency = Dependency.pluginsFor(Action.class);
+	private final Dependency<Class[]> dependency = Dependency.pluginsFor(Callable.class);
 
 	@Test
 	public void thatJustUntargetedExtensionsAreResolvedGlobally() {
