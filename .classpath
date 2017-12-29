@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry kind="src" output="target/core" path="src/core"/>
 	<classpathentry kind="src" output="target/test" path="src/test"/>
-	<classpathentry kind="src" output="target/draft" path="src/draft"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/junit-4.8.1.jar"/>
 	<classpathentry kind="output" path="target/misc"/>
