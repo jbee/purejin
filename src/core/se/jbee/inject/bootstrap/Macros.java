@@ -80,6 +80,12 @@ public final class Macros {
 	 * @return A set of {@link Macros} containing the given one
 	 */
 	public <T> Macros with( Class<T> type, Macro<? extends T> macro ) {
+		int index = index(type);
+		if (index >= 0) {
+			Macro<?>[] tmp = macros.clone();
+			tmp[index] = macro;
+			return new Macros(types, tmp);
+		}
 		return new Macros( Array.prepand(type, types), Array.prepand( macro, macros ) );
 	}
 

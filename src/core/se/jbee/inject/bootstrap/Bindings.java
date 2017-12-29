@@ -46,11 +46,12 @@ public final class Bindings {
 	/**
 	 * Add (accumulate) a binding described by the 4-tuple given.
 	 */
-	public <T> void add( Binding<T> binding ) {
-		if (!binding.isComplete()) {
-			throw new InconsistentBinding("Incomplete binding added: "+binding);
+	public <T> void add( Binding<T> complete ) {
+		if (!complete.isComplete()) {
+			throw new InconsistentBinding("Incomplete binding added: "+complete);
 		}
-		bindings.add( binding );
+		//NB. #64 here we can inform post binding that about the new binding
+		bindings.add( complete );
 	}
 	
 	public <T> void expandInto(Binding<T> binding) {

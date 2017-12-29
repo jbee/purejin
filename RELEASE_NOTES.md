@@ -1,5 +1,11 @@
 # Release notes
 
+v0.11 (upcoming)
+==============
+
+- macros are now replaced when defined for same type (no behaviour change)
+
+
 v0.10
 ==============
 
