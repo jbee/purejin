@@ -17,6 +17,7 @@ import java.lang.reflect.Modifier;
 
 import se.jbee.inject.Array;
 import se.jbee.inject.InconsistentBinding;
+import se.jbee.inject.Initialiser;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Packages;
@@ -106,6 +107,10 @@ public class Binder {
 
 	public void construct( Name name, Class<?> type ) {
 		construct( instance( name, raw( type ) ) );
+	}
+	
+	public TypedBinder<Initialiser> initbind() {
+		return multibind(Initialiser.class);
 	}
 
 	public <T> TypedBinder<T> multibind( Class<T> type ) {

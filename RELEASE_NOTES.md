@@ -3,6 +3,7 @@
 v0.11 (upcoming)
 ==============
 
+- added `initbind` and `Initialiser`s (run code when container is ready)
 - macros are now replaced when defined for same type (no behaviour change)
 
 

@@ -5,6 +5,7 @@
  */
 package se.jbee.inject.container;
 
+import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.raw;
 
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import java.util.Map.Entry;
 import se.jbee.inject.Array;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Expiry;
+import se.jbee.inject.Initialiser;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Injectron;
 import se.jbee.inject.InjectronInfo;
@@ -61,6 +63,13 @@ public final class Inject {
 			super();
 			this.injectrons = initFrom( assemblies );
 			this.wildcardInjectrons = wildcardInjectrons(injectrons);
+			initInitialisers();
+		}
+		
+		private void initInitialisers() {
+			for (Initialiser i : resolve(dependency(Initialiser[].class))) {
+				i.init(this);
+			}
 		}
 
 		private <T> Map<Class<?>, Injectron<?>[]> initFrom( Assembly<?>... assemblies ) {
