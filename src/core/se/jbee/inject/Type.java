@@ -537,37 +537,17 @@ public final class Type<T>
 	}
 
 	@SuppressWarnings ( "unchecked" )
-	public static <T> Class<T> primitiveAsWrapper( Class<T> primitive ) {
-		if ( !primitive.isPrimitive() ) {
-			return primitive;
-		}
-		if ( primitive == int.class ) {
-			return (Class<T>) Integer.class;
-		}
-		if ( primitive == boolean.class ) {
-			return (Class<T>) Boolean.class;
-		}
-		if ( primitive == long.class ) {
-			return (Class<T>) Long.class;
-		}
-		if ( primitive == char.class ) {
-			return (Class<T>) Character.class;
-		}
-		if ( primitive == void.class ) {
-			return (Class<T>) Void.class;
-		}
-		if ( primitive == float.class ) {
-			return (Class<T>) Float.class;
-		}
-		if ( primitive == double.class ) {
-			return (Class<T>) Double.class;
-		}
-		if ( primitive == byte.class ) {
-			return (Class<T>) Byte.class;
-		}
-		if ( primitive == short.class ) {
-			return (Class<T>) Short.class;
-		}
-		throw new UnsupportedOperationException( "The primitive " + primitive + " cannot be wrapped yet!" );
+	public static <T> Class<T> primitiveAsWrapper( Class<T> type ) {
+		if ( !type.isPrimitive() )	 return type;
+		if ( type == int.class )     return (Class<T>) Integer.class;
+		if ( type == boolean.class ) return (Class<T>) Boolean.class;
+		if ( type == long.class )    return (Class<T>) Long.class;
+		if ( type == char.class )    return (Class<T>) Character.class;
+		if ( type == void.class )    return (Class<T>) Void.class;
+		if ( type == float.class )   return (Class<T>) Float.class;
+		if ( type == double.class )  return (Class<T>) Double.class;
+		if ( type == byte.class )    return (Class<T>) Byte.class;
+		if ( type == short.class )   return (Class<T>) Short.class;
+		throw new UnsupportedOperationException( "The primitive " + type + " cannot be wrapped yet!" );
 	}
 }
