@@ -254,7 +254,7 @@ public class Inspect
 	}
 
 	private boolean matches( Method m ) {
-		if ( m.getGenericReturnType() instanceof TypeVariable<?> ) {
+		if ( m.getGenericReturnType() instanceof TypeVariable<?> || m.isSynthetic()) {
 			return false;
 		}
 		Type<?> returnType = Type.returnType( m );

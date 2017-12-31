@@ -38,7 +38,8 @@ public class TestInitialiserBinds {
 		@Override
 		public void init(Injector context) {
 			// just to show that one could use the module itself as well
-			// this e.g. allows to pass down and use setup data by using PresetModule's
+			// this e.g. allows to pass down and use setup data by using 
+			// PresetModule's as shown with TestInitialiserBindsPresetModule
 			moduleInitRan = true;
 		}
 		
@@ -139,5 +140,6 @@ public class TestInitialiserBinds {
 		assertTrue(initialiser instanceof TestInitialiserBindsPresetModule);
 		TestInitialiserBindsPresetModule module = (TestInitialiserBindsPresetModule) initialiser;
 		assertNotNull(module.setup);
+		assertEquals(42, module.setup.intValue());
 	}
 }
