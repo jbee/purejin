@@ -1,5 +1,6 @@
 package se.jbee.inject.bind;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -43,12 +44,25 @@ public class TestInitialiserBinds {
 	
 	static class AutoCloseableInitialiser implements Initialiser {
 
+		public AutoCloseableInitialiser(AutoCloseable[] autoCloseables) {
+			// since this instance is created by the container it is also properly injected.
+			// so this can be used to receive instances that should be initialized as well
+			// in this case we just did it to show the possibility but it is not needed
+			assertEquals(0, autoCloseables.length);
+			// however in this case there is no way to express the type 
+			// "? extends AutoCloseable[]" in the java language and
+			// AutoCloseable[] is empty since we did not bind anything 
+			// explicitly or implicitly to the AutoCloseable interface
+			// in such cases this must be done in the init method as shown below
+		}
+		
 		@Override
 		public void init(Injector context) {
 			// by the use of upper bound we receive all implementing classes 
 			// even though they have not be bound explicitly for AutoCloseable.
 			AutoCloseable[] autoCloseables = context.resolve(
 					dependency(raw(AutoCloseable[].class).asUpperBound()));
+			assertTrue(autoCloseables.length > 0);
 			shutdownHookMock = () -> {
 				for (AutoCloseable a : autoCloseables)
 					try {
