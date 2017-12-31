@@ -12,6 +12,8 @@ import org.junit.Test;
 import se.jbee.inject.Initialiser;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.config.Globals;
+import se.jbee.inject.config.Presets;
 
 /**
  * The tests demonstrates how the {@link Initialiser} and
@@ -36,10 +38,29 @@ public class TestInitialiserBinds {
 		@Override
 		public void init(Injector context) {
 			// just to show that one could use the module itself as well
+			// this e.g. allows to pass down and use setup data by using PresetModule's
 			moduleInitRan = true;
-			// OBS: But the injector will create another instance so it should not have state!
 		}
 		
+	}
+	
+	static final class TestInitialiserBindsPresetModule extends BinderModuleWith<Integer> implements Initialiser {
+
+		private Integer setup;
+		
+		@Override
+		protected void declare(Integer setup) {
+			//... some binds
+			initbind().to(this);
+			
+			this.setup = setup;
+		}
+
+		@Override
+		public void init(Injector context) {
+			assertNotNull(setup);
+			// use setup to initialize something
+		}
 	}
 	
 	static class AutoCloseableInitialiser implements Initialiser {
@@ -106,5 +127,17 @@ public class TestInitialiserBinds {
 		assertTrue(resource.isClosed);
 		
 		assertTrue(moduleInitRan);
+	}
+	
+	@Test
+	public void initialisersCanMakeUseOfParammetersUsingPresetModules() {
+		Globals globals = Globals.STANDARD.presets(Presets.EMPTY.preset(Integer.class, 42)); // setup some parameter
+		Injector injector = Bootstrap.injector(TestInitialiserBindsPresetModule.class, globals);
+		
+		// double check
+		Initialiser initialiser = injector.resolve(dependency(Initialiser.class));
+		assertTrue(initialiser instanceof TestInitialiserBindsPresetModule);
+		TestInitialiserBindsPresetModule module = (TestInitialiserBindsPresetModule) initialiser;
+		assertNotNull(module.setup);
 	}
 }
