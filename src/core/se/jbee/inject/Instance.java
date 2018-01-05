@@ -48,6 +48,16 @@ public final class Instance<T>
 		this.name = name;
 		this.type = type;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof Instance && equalTo((Instance<?>) obj);
+	}
+	
+	@Override
+	public int hashCode() {
+		return name.hashCode() ^ type.hashCode();
+	}
 
 	public boolean equalTo( Instance<?> other ) {
 		return type.equalTo( other.type ) && name.equals( other.name );

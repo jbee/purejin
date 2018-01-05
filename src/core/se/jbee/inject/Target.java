@@ -164,4 +164,14 @@ public final class Target
 		return this == other || packages.equalTo( other.packages )
 				&& instance.equalTo( other.instance ) && parents.equalTo( other.parents );
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof Target && equalTo((Target) obj);
+	}
+	
+	@Override
+	public int hashCode() {
+		return instance.hashCode() ^ parents.hashCode();
+	}
 }

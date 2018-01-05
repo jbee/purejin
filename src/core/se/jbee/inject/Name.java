@@ -62,7 +62,7 @@ public final class Name
 
 	public boolean equalTo( Name other ) {
 		//noinspection StringEquality
-		return value == other.value;
+		return value == other.value; // we use intern() so this is fine
 	}
 
 	@Override

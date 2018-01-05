@@ -23,6 +23,16 @@ public final class Injection {
 		this.target = target;
 		this.expiry = expiry;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof Injection && equalTo((Injection) obj);
+	}
+	
+	@Override
+	public int hashCode() {
+		return dependency.hashCode() ^ target.hashCode();
+	}
 
 	public boolean equalTo( Injection other ) {
 		return this == other || dependency.equalTo( other.dependency )

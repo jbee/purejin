@@ -61,6 +61,16 @@ public final class Dependency<T>
 		this.hierarchy = hierarchy;
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof Dependency && equalTo((Dependency<?>) obj);
+	}
+	
+	@Override
+	public int hashCode() {
+		return instance.hashCode() ^ Arrays.hashCode(hierarchy);
+	}
+	
 	public boolean equalTo( Dependency<?> other ) {
 		// cheapest first...
 		if (hierarchy.length != other.hierarchy.length || !instance.equalTo(other.instance))

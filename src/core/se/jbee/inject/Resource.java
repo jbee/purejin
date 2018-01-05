@@ -90,4 +90,14 @@ public final class Resource<T>
 		return this == other 
 				|| instance.equalTo( other.instance ) && target.equalTo( other.target );
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof Resource && equalTo((Resource<?>) obj);
+	}
+	
+	@Override
+	public int hashCode() {
+		return instance.hashCode() ^ target.hashCode();
+	}
 }

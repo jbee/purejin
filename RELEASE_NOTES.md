@@ -5,6 +5,8 @@ v0.11 (upcoming)
 
 - added `initbind` and `Initialiser`s (run code when container is ready)
 - macros are now replaced when defined for same type (no behaviour change)
+- all value objects in `se.jbee.inject` that implement `equalTo` also
+  implement `equals` and `hashCode` (for convenience, no library requirement)
 
 
 v0.10
