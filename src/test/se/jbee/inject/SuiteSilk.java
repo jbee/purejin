@@ -10,7 +10,7 @@ import se.jbee.inject.container.SuitContainer;
 
 @RunWith ( Suite.class )
 @SuiteClasses ( { TestName.class, TestType.class, TestPackages.class, TestMorePrecise.class,
-		TestTarget.class, TestDeclarationType.class,
+		TestTarget.class, TestDeclarationType.class, TestEqualsHashCode.class,
 		// suits
 		SuitContainer.class, SuiteBind.class, SuiteAction.class } )
 public class SuiteSilk {

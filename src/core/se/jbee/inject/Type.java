@@ -182,7 +182,7 @@ public final class Type<T>
 		if ( this == other ) {
 			return true;
 		}
-		if ( rawType != other.rawType || params.length != other.params.length) {
+		if ( rawType != other.rawType || params.length != other.params.length || upperBound != other.upperBound) {
 			return false;
 		}
 		for ( int i = 0; i < params.length; i++ ) {

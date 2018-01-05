@@ -7,6 +7,7 @@ v0.11 (upcoming)
 - macros are now replaced when defined for same type (no behaviour change)
 - all value objects in `se.jbee.inject` that implement `equalTo` also
   implement `equals` and `hashCode` (for convenience, no library requirement)
+- fixed: `Type` `equals`/`equalTo` now considers `upperBound` flag
 
 
 v0.10
