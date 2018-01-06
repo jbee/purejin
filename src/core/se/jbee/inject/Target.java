@@ -146,9 +146,8 @@ public final class Target
 	public boolean morePreciseThan( Target other ) {
 		final int ol = other.parents.depth();
 		final int l = parents.depth();
-		if ( ol != l ) {
+		if ( ol != l )
 			return l > ol;
-		}
 		if ( l > 0 ) { // length is known to be equal
 			if ( parents.morePreciseThan( other.parents ) ) {
 				return true;
