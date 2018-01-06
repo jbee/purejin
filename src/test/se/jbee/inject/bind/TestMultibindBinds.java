@@ -1,5 +1,6 @@
 package se.jbee.inject.bind;
 
+import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.bind.AssertInjects.assertEqualSets;
@@ -29,6 +30,9 @@ public class TestMultibindBinds {
 			multibind( Integer.class ).to( 1 );
 			multibind( foo, Integer.class ).to( 2 );
 			multibind( bar, Integer.class ).to( 4 );
+			bind(Long.class).to(1L,2L,3L,4L);
+			bind(Float.class).to(2f,3f);
+			bind(Double.class).to(5d,6d,7d);
 		}
 
 	}
@@ -58,9 +62,10 @@ public class TestMultibindBinds {
 
 	}
 
+	private final Injector injector = Bootstrap.injector( MultibindBindsBundle.class );
+	
 	@Test
 	public void thatMultipleNamedElementsCanBeBound() {
-		Injector injector = Bootstrap.injector( MultibindBindsBundle.class );
 		Integer[] foos = injector.resolve( dependency( Integer[].class ).named( foo ) );
 		assertEqualSets( new Integer[] { 2, 3 }, foos );
 		Integer[] bars = injector.resolve( dependency( Integer[].class ).named( bar ) );
@@ -73,7 +78,6 @@ public class TestMultibindBinds {
 
 	@Test
 	public void thatMultipleBoundNamedElementsCanUsedAsList() {
-		Injector injector = Bootstrap.injector( MultibindBindsBundle.class );
 		List<Integer> foos = injector.resolve( dependency( listTypeOf( Integer.class ) ).named( foo ) );
 		assertEqualSets( new Integer[] { 2, 3 }, foos.toArray() );
 		List<Integer> bars = injector.resolve( dependency( listTypeOf( Integer.class ) ).named( bar ) );
@@ -82,11 +86,18 @@ public class TestMultibindBinds {
 
 	@Test
 	public void thatMultipleBoundNamedElementsCanUsedAsSet() {
-		Injector injector = Bootstrap.injector( MultibindBindsBundle.class );
 		Set<Integer> foos = injector.resolve( dependency( setTypeOf( Integer.class ) ).named( foo ) );
 		assertEqualSets( new Integer[] { 2, 3 }, foos.toArray() );
 		Set<Integer> bars = injector.resolve( dependency( setTypeOf( Integer.class ) ).named( bar ) );
 		assertEqualSets( new Integer[] { 4, 5 }, bars.toArray() );
+	}
+	
+	@Test
+	public void thatMultipleToConstantsCanBeBound() {
+		List<Long> longs = injector.resolve(dependency(listTypeOf(long.class)));
+		assertEqualSets(new Long[] {1L, 2L, 3L, 4L}, longs.toArray());
+		assertEquals(2, injector.resolve(dependency(Float[].class)).length);
+		assertEquals(3, injector.resolve(dependency(Double[].class)).length);
 	}
 
 }
