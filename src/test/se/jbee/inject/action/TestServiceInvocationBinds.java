@@ -16,7 +16,7 @@ import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency.SupplyFailed;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.bootstrap.Invoke;
+import se.jbee.inject.bootstrap.Supply;
 
 /**
  * This test show how to bring back custom behaviour before or after
@@ -150,7 +150,7 @@ public class TestServiceInvocationBinds {
 			Object[] state = before( output, input, value );
 			O res;
 			try {
-				res = output.rawType.cast(Invoke.method(action, impl, args));
+				res = output.rawType.cast(Supply.method(action, impl, args));
 			} catch ( SupplyFailed e ) {
 				Exception ex = e;
 				if ( e.getCause() instanceof Exception ) {

@@ -86,7 +86,7 @@ public final class Bootstrap {
 	}
 
 	public static <T> T instance( Class<T> type ) {
-		return Invoke.constructor( Metaclass.accessible( Inspect.noArgsConstructor( type ) ) );
+		return Supply.constructor( Metaclass.accessible( Inspect.noArgsConstructor( type ) ) );
 	}
 
 	private Bootstrap() {

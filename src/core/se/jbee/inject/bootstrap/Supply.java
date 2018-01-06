@@ -11,6 +11,7 @@ import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.bootstrap.BoundParameter.bind;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -27,6 +28,7 @@ import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import se.jbee.inject.UnresolvableDependency.SupplyFailed;
 import se.jbee.inject.container.Factory;
 import se.jbee.inject.container.Provider;
 
@@ -400,7 +402,7 @@ public final class Supply {
 
 		@Override
 		protected T invoke(Object[] args) {
-			return Invoke.constructor(constructor, args);
+			return Supply.constructor(constructor, args);
 		}
 
 		@Override
@@ -431,7 +433,7 @@ public final class Supply {
 		
 		@Override
 		protected T invoke(Object[] args) {
-			return returnType.cast(Invoke.method( method.factory, owner, args ));
+			return returnType.cast(Supply.method( method.factory, owner, args ));
 		}
 
 		@Override
@@ -518,5 +520,21 @@ public final class Supply {
 			return invoke(local.args(injector));	
 		}
 	
+	}
+
+	public static <T> T constructor( Constructor<T> constructor, Object... args ) throws SupplyFailed {
+		try {
+			return constructor.newInstance( args );
+		} catch ( Exception e ) {
+			throw SupplyFailed.valueOf(e, constructor);
+		}
+	}
+
+	public static Object method( Method method, Object owner, Object... args ) throws SupplyFailed {
+		try {
+			return method.invoke( owner, args );
+		} catch ( Exception e ) {
+			throw SupplyFailed.valueOf(e, method);
+		}
 	}
 }

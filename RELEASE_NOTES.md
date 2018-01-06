@@ -8,6 +8,7 @@ v0.11 (upcoming)
 - all value objects in `se.jbee.inject` that implement `equalTo` also
   implement `equals` and `hashCode` (for convenience, no library requirement)
 - fixed: `Type` `equals`/`equalTo` now considers `upperBound` flag
+- moved `Invoke` static methods to `Supply`
 
 
 v0.10

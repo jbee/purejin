@@ -33,9 +33,9 @@ import se.jbee.inject.bootstrap.BoundParameter;
 import se.jbee.inject.bootstrap.InjectionSite;
 import se.jbee.inject.bootstrap.Inspect;
 import se.jbee.inject.bootstrap.Inspector;
-import se.jbee.inject.bootstrap.Invoke;
 import se.jbee.inject.bootstrap.Metaclass;
 import se.jbee.inject.bootstrap.Module;
+import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.container.Scoped;
 
 /**
@@ -91,7 +91,7 @@ public abstract class ActionModule
 		@Override
 		public <I, O> O exec(Object impl, Method action, Object[] args,	Type<O> output, Type<I> input, I value) {
 			try {
-				return output.rawType.cast(Invoke.method(action, impl, args));
+				return output.rawType.cast(Supply.method(action, impl, args));
 			} catch (SupplyFailed e) {
 				Exception ex = e;
 				if ( e.getCause() instanceof Exception ) {
