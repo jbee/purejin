@@ -91,14 +91,10 @@ public final class Packages
 	}
 
 	public Packages parents() {
-		if ( rootDepth == 0 ) {
+		if ( rootDepth == 0 )
 			return this;
-		}
-		if ( rootDepth == 1 ) {
-			return includingSubpackages
-				? ALL
-				: DEFAULT;
-		}
+		if ( rootDepth == 1 )
+			return includingSubpackages ? ALL : DEFAULT;
 		String[] parentRoots = new String[roots.length];
 		for ( int i = 0; i < roots.length; i++ ) {
 			parentRoots[i] = parent( roots[i] );
@@ -113,10 +109,9 @@ public final class Packages
 	 * </pre>
 	 */
 	private static String parent( String root ) {
-		return root.substring( 0,
-				root.lastIndexOf( '.', root.length() - 2 ) + ( root.endsWith( "." )
-					? 1
-					: 0 ) );
+		return root.substring(0, 
+				root.lastIndexOf('.', root.length() - 2)
+				+ (root.endsWith(".") ? 1 : 0));
 	}
 
 	private static void commonPackageDepth( Class<?> type, Class<?>[] types ) {
@@ -130,9 +125,7 @@ public final class Packages
 	}
 
 	private static int rootDepth( String[] roots ) {
-		return roots.length == 0
-			? 0
-			: dotsIn( roots[0] );
+		return roots.length == 0 ? 0 : dotsIn(roots[0]);
 	}
 
 	private static int dotsIn( String s ) {
@@ -146,9 +139,8 @@ public final class Packages
 	}
 
 	public boolean contains( Type<?> type ) {
-		if ( includesAll() ) {
+		if ( includesAll() )
 			return true;
-		}
 		final String packageNameOfType = packageNameOf( type );
 		for ( String root : roots ) {
 			if ( regionEqual( root, packageNameOfType, includingSubpackages
@@ -161,17 +153,14 @@ public final class Packages
 	}
 
 	private static boolean regionEqual(String p1, String p2, int length) {
-		if ( p1.length() < length || p2.length() < length ) {
+		if ( p1.length() < length || p2.length() < length )
 			return false;
-		}
 		//noinspection StringEquality
-		if ( p1 == p2 ) {
+		if ( p1 == p2 )
 			return true;
-		}
 		for ( int i = length - 1; i > 0; i-- ) {
-			if ( p1.charAt( i ) != p2.charAt( i ) ) {
+			if ( p1.charAt( i ) != p2.charAt( i ) )
 				return false;
-			}
 		}
 		return true;
 	}
@@ -215,10 +204,8 @@ public final class Packages
 		return b.substring( 1 );
 	}
 
-	private String toString( String root ) {
-		return root + ( includingSubpackages
-			? "*"
-			: "" );
+	private String toString(String root) {
+		return root + (includingSubpackages ? "*" : "");
 	}
 
 	public boolean equalTo( Packages other ) {
