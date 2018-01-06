@@ -23,7 +23,6 @@ Copyright (c) 2012, Jan Bernitt
 	
 	<property name="core.src.dir" value="${src.dir}/core" />
 	<property name="test.src.dir" value="${src.dir}/test" />
-	<property name="draft.src.dir" value="${src.dir}/draft" />
 
 	<property name="core.target.dir" value="${target.dir}/core" />
 	<property name="draft.target.dir" value="${target.dir}/draft" />
@@ -68,12 +67,6 @@ Copyright (c) 2012, Jan Bernitt
 				<exclude name="**/*.java" />
 			</fileset>
 		</copy>
-		<copy includeemptydirs="false" todir="${draft.target.dir}">
-			<fileset dir="${draft.src.dir}">
-				<exclude name="**/*.launch" />
-				<exclude name="**/*.java" />
-			</fileset>
-		</copy>
 	</target>
 
 	<target name="cleanall" depends="clean">
@@ -88,11 +81,6 @@ Copyright (c) 2012, Jan Bernitt
 	<target name="compile" depends="init">
 		<javac debug="true"  destdir="${core.target.dir}" source="${source}" target="${target}" includeantruntime="false">
 			<src path="${core.src.dir}" />
-			<classpath refid="classpath.core" />
-			<compilerarg value="-Xlint:unchecked" />
-		</javac>
-		<javac debug="true"  destdir="${draft.target.dir}" source="${source}" target="${target}" includeantruntime="false">
-			<src path="${draft.src.dir}" />
 			<classpath refid="classpath.core" />
 			<compilerarg value="-Xlint:unchecked" />
 		</javac>
