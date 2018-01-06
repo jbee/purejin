@@ -6,7 +6,7 @@
 package se.jbee.inject.bootstrap;
 
 /**
- * Determines / extracts the {@link Module} result from a root {@link Bundle}.
+ * Determines / extracts the {@link Module}s from a root {@link Bundle}.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */

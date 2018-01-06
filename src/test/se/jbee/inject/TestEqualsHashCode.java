@@ -80,13 +80,13 @@ public class TestEqualsHashCode {
 		Object a2 = newInstance(cls, baseA);
 		assertEquals(a, a);
 		assertEquals(a, a2);
+		assertEquals(a2, a);
 		assertEquals(a.hashCode(), a.hashCode());
 		assertEquals(a.hashCode(), a2.hashCode());
 		assertNotSame(a, b);
 		assertNotSame(a, a2);
 		assertFalse(a.equals(b));
-		assertEquals(a, a2);
-		
+		assertFalse(b.equals(a));
 		assertFalse(a.equals(null));
 		assertFalse(b.equals(null));
 		
@@ -96,6 +96,7 @@ public class TestEqualsHashCode {
 				assertTrue("Field "+f.getName()+" is not final.", isFinal(f.getModifiers()));
 			}
 		}
+		// while we are at it - cover toString as well
 		assertFalse(a.toString().isEmpty());
 		assertEquals(a.toString(), a2.toString());
 		assertFalse(a.toString().equals(b.toString()));
@@ -120,6 +121,8 @@ public class TestEqualsHashCode {
 			if (c == null || ci.getParameterCount() > c.getParameterCount())
 				c = ci;
 		}
+		if (c == null)
+			return null;
 		if (!isPublic(c.getModifiers())) {
 			c.setAccessible(true);
 		}
