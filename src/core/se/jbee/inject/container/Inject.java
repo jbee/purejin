@@ -320,10 +320,6 @@ public final class Inject {
 			return repository.serve(injected, info, new DependencyProvider<>(supplier, injected, injector) );
 		}
 
-		@Override
-		public String toString() {
-			return info.resource.toString() + info.resource.target.toString() + " " + info.source.toString();
-		}
 	}
 
 	private static final class DependencyProvider<T> implements Provider<T> {
