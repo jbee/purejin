@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
@@ -17,9 +17,9 @@ import se.jbee.inject.InconsistentBinding;
 
 /**
  * {@link Bindings} accumulate the {@link Binding} 4-tuples.
- * 
+ *
  * Any builder is just a utility to construct calls to {@link #add(Binding)}
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Bindings {
@@ -30,7 +30,7 @@ public final class Bindings {
 
 	public final Macros macros;
 	public final Inspector inspector;
-	
+
 	private final List<Binding<?>> bindings;
 
 	private Bindings( Macros macros, Inspector inspector, List<Binding<?>> bindings) {
@@ -53,8 +53,8 @@ public final class Bindings {
 		//NB. #64 here we can inform post binding that about the new binding
 		bindings.add( complete );
 	}
-	
-	public <T> void expandInto(Binding<T> binding) {
+
+	public void expandInto(Binding<?> binding) {
 		macros.expandInto(this, binding, binding);
 	}
 
