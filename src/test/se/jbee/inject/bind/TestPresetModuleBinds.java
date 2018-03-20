@@ -1,10 +1,12 @@
 package se.jbee.inject.bind;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
+import static se.jbee.inject.container.Typecast.listTypeOf;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -17,7 +19,6 @@ import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.bootstrap.PresetModule;
 import se.jbee.inject.config.Globals;
 import se.jbee.inject.config.Presets;
-import se.jbee.inject.container.Typecast;
 
 /**
  * This test demonstrates how to use {@link Presets} to pass input data to the {@link Bootstrap}
@@ -25,7 +26,7 @@ import se.jbee.inject.container.Typecast;
  * {@link BinderModuleWith#declare(Object)} is determined by the type of the generic. This has to be
  * the same {@link Type} as the one used when declaring the value via
  * {@link Presets#preset(Class, Object)}.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestPresetModuleBinds {
@@ -71,12 +72,21 @@ public class TestPresetModuleBinds {
 
 	}
 
+	private static class PresetModuleBindsModule4 extends BinderModuleWith<Presets> {
+
+		@Override
+		protected void declare(Presets preset) {
+			assertNotNull(preset);
+		}
+
+	}
+
 	private final Injector injector = injector();
 
 	private static Injector injector() {
-		Presets presets = Presets.EMPTY.preset( Properties.class, exampleProperties() );
-		presets = presets.preset( Typecast.listTypeOf( String.class ), Arrays.asList( "a", "b" ) );
-		presets = presets.preset( Typecast.listTypeOf( Integer.class ), Arrays.asList( 1, 2 ) );
+		Presets presets = Presets.EMPTY.preset( Properties.class, exampleProperties() )
+			.preset( listTypeOf( String.class ), asList( "a", "b" ) )
+			.preset( listTypeOf( Integer.class ), asList( 1, 2 ) );
 		return Bootstrap.injector( PresetModuleBindsBundle.class,
 				Globals.STANDARD.presets( presets ) );
 	}
@@ -96,5 +106,11 @@ public class TestPresetModuleBinds {
 	public void thatDifferentParametizedPresetValuesForSameGenericTypeArePosssible() {
 		assertEquals( "b", injector.resolve( dependency( String.class ).named( "list" ) ) );
 		assertEquals( 2, injector.resolve( dependency( Integer.class ).named( "list" ) ).intValue() );
+	}
+
+	@Test
+	public void presetItselfCanBePassedToModule() {
+		Injector injector = Bootstrap.injector(PresetModuleBindsModule4.class);
+		assertNotNull(injector);
 	}
 }

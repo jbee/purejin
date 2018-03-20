@@ -9,6 +9,7 @@ v0.11 (upcoming)
   implement `equals` and `hashCode` (for convenience, no library requirement)
 - fixed: `Type` `equals`/`equalTo` now considers `upperBound` flag
 - moved `Invoke` static methods to `Supply`
+- `PresetModule` now also supplies the `Presets` itself
 
 
 v0.10

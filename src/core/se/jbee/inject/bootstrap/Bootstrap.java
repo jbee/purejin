@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
@@ -30,7 +30,7 @@ import se.jbee.inject.container.Inject;
 
 /**
  * Utility to create an {@link Injector} context from {@link Bundle}s and {@link Module}s.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Bootstrap {
@@ -109,7 +109,7 @@ public final class Bootstrap {
 		public void declare( Bindings bindings ) {
 			Type<?> valueType = Type.supertype( PresetModule.class, raw( module.getClass() ) ).parameter( 0 );
 			@SuppressWarnings ( "unchecked" )
-			final T value = (T) presets.value( valueType );
+			final T value = (T) (valueType.rawType == Presets.class ? presets : presets.value( valueType ));
 			module.declare( bindings, value );
 		}
 	}
