@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
@@ -27,7 +27,7 @@ import se.jbee.inject.Type;
 
 /**
  * A immutable collection of {@link Macro}s each bound to a specific type handled.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Macros {
@@ -38,12 +38,18 @@ public final class Macros {
 	public static final Macro<Parameter<?>[]> ARRAY = new ArrayElementsMacro();
 	public static final Macro<BoundConstructor<?>> CONSTRUCTOR = new ConstructorMacro();
 	public static final Macro<BoundMethod<?>> FACTORY_METHOD = new MethodMacro();
+	public static final Macro<BoundConstant<?>> CONSTANT = new ConstantMacro();
 
 	public static final Macros NONE = new Macros( new Class<?>[0], new Macro<?>[0] );
 
 	public static final Macros DEFAULT = Macros.NONE
-			.with( EXPAND ).with( CONSTRUCTOR ).with( FACTORY_METHOD )
-			.with( INSTANCE_LINK ).with( PARAMETRIZED_LINK ).with( ARRAY );
+			.with(EXPAND)
+			.with(CONSTRUCTOR)
+			.with(CONSTANT)
+			.with(FACTORY_METHOD)
+			.with(INSTANCE_LINK)
+			.with(PARAMETRIZED_LINK)
+			.with(ARRAY);
 
 	private final Class<?>[] types;
 	private final Macro<?>[] macros;
@@ -58,7 +64,7 @@ public final class Macros {
 	 * Uses the given {@link Macro} and derives the {@link #with(Class, Macro)} type from its
 	 * declaration. This is a utility method that can be used as long as the {@link Macro}
 	 * implementation is not generic.
-	 * 
+	 *
 	 * @param macro
 	 *            No generic macro class (e.g. decorators)
 	 * @return A set of {@link Macros} containing the given one for the type derived from its type
@@ -72,7 +78,7 @@ public final class Macros {
 
 	/**
 	 * Uses the given {@link Macro} for the given exact (no super-types!) type of values.
-	 * 
+	 *
 	 * @param type
 	 *            The type of value that should be passed to the {@link Macro} as value
 	 * @param macro
@@ -93,13 +99,13 @@ public final class Macros {
 	 * A generic version of {@link Macro#expand(Object, Binding, Bindings)} that
 	 * uses the matching predefined {@link Macro} for the actual type of the
 	 * value and expands it.
-	 * 
+	 *
 	 * @param binding
 	 *            The usually incomplete binding to expand (and add to
 	 *            {@link Bindings})
 	 * @param value
 	 *            Non-null value to expand via matching {@link Macro}
-	 * 
+	 *
 	 * @throws InconsistentBinding
 	 *             In case no {@link Macro} had been declared for the type of
 	 *             value argument
@@ -144,7 +150,7 @@ public final class Macros {
 				if ( supertype.rawType != Object.class ) {
 					bindings.add( binding.typed( supertype ) );
 				}
-			}			
+			}
 		}
 	}
 
@@ -152,11 +158,11 @@ public final class Macros {
 			implements Macro<Parameter<?>[]> {
 
 		ArrayElementsMacro() { /* make visible */ }
-		
+
 		@Override
 		@SuppressWarnings ( { "unchecked", "rawtypes" } )
 		public <T> void expand(Parameter<?>[] elements, Binding<T> incomplete, Bindings bindings) {
-			bindings.expandInto( 
+			bindings.expandInto(
 					incomplete.complete( PREDEFINED, supplier( (Type) incomplete.type(), elements ) ));
 		}
 
@@ -174,7 +180,7 @@ public final class Macros {
 
 		@Override
 		public <T> void expand(BoundConstructor<?> constructor, Binding<T> incomplete, Bindings bindings) {
-			bindings.expandInto( 
+			bindings.expandInto(
 					incomplete.complete( BindingType.CONSTRUCTOR, costructor( constructor.typed( incomplete.type() ) ) ));
 		}
 	}
@@ -183,10 +189,10 @@ public final class Macros {
 			implements Macro<BoundMethod<?>> {
 
 		MethodMacro() {	/* make visible */ }
-		
+
 		@Override
 		public <T> void expand(BoundMethod<?> method, Binding<T> incomplete, Bindings bindings) {
-			bindings.expandInto( 
+			bindings.expandInto(
 					incomplete.complete( METHOD, Supply.method( method.typed( incomplete.type() ) ) ));
 		}
 	}
@@ -198,12 +204,30 @@ public final class Macros {
 
 		@Override
 		public <T> void expand(Class<?> to, Binding<T> incomplete, Bindings bindings) {
-			bindings.expandInto( 
+			bindings.expandInto(
 					incomplete.complete( LINK, parametrizedInstance( anyOf( raw( to ).castTo( incomplete.type() ) ) ) ));
 		}
 
-	}	
-	
+	}
+
+	private static final class ConstantMacro implements Macro<BoundConstant<?>> {
+
+		@Override
+		public <T> void expand(BoundConstant<?> value, Binding<T> incomplete, Bindings bindings) {
+			Supplier<T> supplier = Supply.constant( incomplete.type().rawType.cast(value.constant) );
+			bindings.expandInto(incomplete.complete(BindingType.PREDEFINED, supplier ));
+			if (incomplete.source.declarationType == DeclarationType.EXPLICIT) {
+				if (incomplete.type().rawType != value.constant.getClass()) {
+					@SuppressWarnings("unchecked")
+					Class<T> type = (Class<T>) value.constant.getClass();
+					bindings.expandInto(Binding.binding(  incomplete.resource.typed(raw(type)),
+							BindingType.PREDEFINED, supplier, incomplete.scope,
+							incomplete.source.typed( DeclarationType.IMPLICIT )));
+				}
+			}
+		}
+	}
+
 	private static final class LinkMacro
 			implements Macro<Instance<?>> {
 

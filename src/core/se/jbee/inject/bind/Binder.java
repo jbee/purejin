@@ -1,10 +1,12 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bind;
 
+import static java.lang.System.identityHashCode;
+import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Instance.defaultInstanceOf;
 import static se.jbee.inject.Instance.instance;
@@ -14,10 +16,15 @@ import static se.jbee.inject.bootstrap.Metaclass.metaclass;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.BiConsumer;
 
 import se.jbee.inject.Array;
+import se.jbee.inject.Dependency;
 import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.Initialiser;
+import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Packages;
@@ -30,6 +37,7 @@ import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Binding;
 import se.jbee.inject.bootstrap.BindingType;
 import se.jbee.inject.bootstrap.Bindings;
+import se.jbee.inject.bootstrap.BoundConstant;
 import se.jbee.inject.bootstrap.BoundConstructor;
 import se.jbee.inject.bootstrap.BoundMethod;
 import se.jbee.inject.bootstrap.Inspector;
@@ -41,7 +49,7 @@ import se.jbee.inject.container.Scoped;
 /**
  * The default implementation of a fluent binder interface that provides a lot of utility methods to
  * improve readability and keep binding compact.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public class Binder {
@@ -108,7 +116,7 @@ public class Binder {
 	public void construct( Name name, Class<?> type ) {
 		construct( instance( name, raw( type ) ) );
 	}
-	
+
 	public TypedBinder<Initialiser> initbind() {
 		return multibind(Initialiser.class);
 	}
@@ -136,11 +144,11 @@ public class Binder {
 	public <T> TypedBinder<T> starbind( Class<T> type ) {
 		return bind( anyOf( raw( type ) ) );
 	}
-	
+
 	public <T> PluginBinder<T> plug( Class<T> plugin ) {
 		return new PluginBinder<>( on(bind()), plugin);
 	}
-	
+
 	protected Binder on( Bind bind ) {
 		return new Binder( root, bind );
 	}
@@ -153,8 +161,37 @@ public class Binder {
 		return new Binder( root, bind().with( target ) );
 	}
 
+	public <P> ConnectBinder<P> autoconnect(Class<P> plug) {
+		return new ConnectBinder<>(on(bind()), plug);
+	}
+
+	public static class ConnectBinder<P> {
+
+		private final Binder binder;
+		private final Class<P> plug;
+
+		ConnectBinder(Binder binder, Class<P> plug) {
+			super();
+			this.binder = binder;
+			this.plug = plug;
+		}
+
+		public <T> void via(BiConsumer<T, P> method, Class<? extends T> toType) {
+			binder.initbind().to(injector -> {
+				T target = injector.resolve(dependency(toType));
+				P[] plugs = injector.resolve(dependency(raw(plug).addArrayDimension().asUpperBound()));
+				Set<Integer> identities = new HashSet<>();
+				for (P plug : plugs)
+					if (identities.add(identityHashCode(plug)))
+						method.accept(target, plug);
+			});
+			binder.implicit().construct(toType);
+		}
+
+	}
+
 	public static class PluginBinder<T> {
-		
+
 		private final Binder binder;
 		private final Class<T> plugin;
 
@@ -175,7 +212,7 @@ public class Binder {
 			}
 		}
 	}
-	
+
 	public static class InspectBinder {
 
 		private final Inspector inspector;
@@ -379,7 +416,6 @@ public class Binder {
 		}
 
 		TypedBinder( Bind bind, Resource<T> resource ) {
-			super();
 			this.bind = bind;
 			this.resource = resource;
 		}
@@ -395,11 +431,11 @@ public class Binder {
 		protected final void to( Object instance, Method method, Parameter<?>[] parameters ) {
 			expand( BoundMethod.bind( instance, method, Type.returnType( method ), parameters ) );
 		}
-		
+
 		protected final void expand( Object value ) {
 			declareBindingsIn( bind().asType( resource, BindingType.MACRO, null ), value  );
 		}
-		
+
 		protected final void expand( BindingType type, Supplier<? extends T> supplier ) {
 			Binding<T> binding = bind().asType( resource, type, supplier );
 			declareBindingsIn( binding, binding );
@@ -416,6 +452,10 @@ public class Binder {
 
 		public void to( Supplier<? extends T> supplier ) {
 			to( supplier, BindingType.PREDEFINED );
+		}
+
+		public void to( java.util.function.Supplier<? extends T> method ) {
+			to( (Supplier<? extends T>) (Dependency<? super T> d, Injector i) -> method.get());
 		}
 
 		public final void to( T constant ) {
@@ -478,7 +518,7 @@ public class Binder {
 		}
 
 		private TypedBinder<T> toConstant( T constant ) {
-			to( Supply.constant( constant ) );
+			expand(new BoundConstant<>(constant));
 			return this;
 		}
 
@@ -504,9 +544,9 @@ public class Binder {
 	 * This kind of bindings actually re-map the []-type so that the automatic behavior of returning
 	 * all known instances of the element type will no longer be used whenever the bind made
 	 * applies.
-	 * 
+	 *
 	 * @author Jan Bernitt (jan@jbee.se)
-	 * 
+	 *
 	 */
 	public static class TypedElementBinder<E>
 			extends TypedBinder<E[]> {

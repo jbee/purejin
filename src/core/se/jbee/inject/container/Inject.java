@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.container;
@@ -32,7 +32,7 @@ import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 
 /**
  * Utility to create/use the core containers {@link Injector} and {@link Injectron}.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Inject {
@@ -40,18 +40,18 @@ public final class Inject {
 	public static Injector container( Assembly<?>... assemblies ) {
 		return new DefaultInjector( assemblies );
 	}
-	
+
 	private Inject() {
 		throw new UnsupportedOperationException( "util" );
 	}
 
 	/**
 	 * The default {@link Injector}.
-	 * 
+	 *
 	 * For each raw type ({@link Class}) all production rules ({@link Injectron}
 	 * s) are given ordered from most precise to least precise. The first in
 	 * order that matches yields the result instance.
-	 * 
+	 *
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	private static final class DefaultInjector implements Injector {
@@ -65,7 +65,7 @@ public final class Inject {
 			this.wildcardInjectrons = wildcardInjectrons(injectrons);
 			initInitialisers();
 		}
-		
+
 		private void initInitialisers() {
 			for (Initialiser i : resolve(dependency(Initialiser[].class))) {
 				i.init(this);
@@ -103,7 +103,7 @@ public final class Inject {
 			map.put( lastRawType, Arrays.copyOfRange( injectrons, start, injectrons.length ) );
 			return map;
 		}
-		
+
 		private static Injectron<?>[] wildcardInjectrons(Map<Class<?>, Injectron<?>[]> injectrons) {
 			List<Injectron<?>> res = new ArrayList<>();
 			for (Injectron<?>[] is : injectrons.values()) {
@@ -116,7 +116,7 @@ public final class Inject {
 			Collections.sort(res, COMPARATOR);
 			return res.size() == 0 ? null : res.toArray(new Injectron[res.size()]);
 		}
-		
+
 		private static Map<Scope, Repository> initRepositories( Assembly<?>[] assemblies ) {
 			Map<Scope, Repository> repositories = new IdentityHashMap<>();
 			for ( Assembly<?> a : assemblies ) {
@@ -128,8 +128,8 @@ public final class Inject {
 			}
 			return repositories;
 		}
-		
-		
+
+
 		@SuppressWarnings ( "unchecked" )
 		@Override
 		public <T> T resolve( Dependency<T> dependency ) {
@@ -155,7 +155,7 @@ public final class Inject {
 
 		/**
 		 * There is no direct match for the required type but there might be a wild-card binding,
-		 * that is a binding capable of producing all sub-types of a certain super-type. 
+		 * that is a binding capable of producing all sub-types of a certain super-type.
 		 */
 		@SuppressWarnings ( "unchecked" )
 		private <T> T resolveFromUpperBound(Dependency<T> dependency) {
@@ -196,18 +196,18 @@ public final class Inject {
 			if ( elementType.rawType == Injectron.class ) {
 				return resolveInjectronArray( dependency, elementType.parameter( 0 ) );
 			}
-			Injectron<E>[] elementInjectrons = injectronsForType( elementType );
-			if ( elementInjectrons != null ) {
-				List<E> elements = new ArrayList<>( elementInjectrons.length );
-				addAllMatching( elements, dependency, elementType, elementInjectrons );
-				if ( dependency.type().rawType.getComponentType().isPrimitive() ) {
-					throw new NoResourceForDependency(dependency, null,
-							"Primitive arrays cannot be used to inject all instances of the wrapper type. Use the wrapper array instead." );
+			if (!elementType.isUpperBound()) {
+				Injectron<E>[] elementInjectrons = injectronsForType( elementType );
+				if ( elementInjectrons != null ) {
+					List<E> elements = new ArrayList<>( elementInjectrons.length );
+					addAllMatching( elements, dependency, elementType, elementInjectrons );
+					if ( dependency.type().rawType.getComponentType().isPrimitive() ) {
+						throw new NoResourceForDependency(dependency, null,
+								"Primitive arrays cannot be used to inject all instances of the wrapper type. Use the wrapper array instead." );
+					}
+					return toArray( elements, elementType );
 				}
-				return toArray( elements, elementType );
-			}
-			// if there hasn't been binds to that specific wild-card Type  
-			if ( elementType.isUpperBound() ) { // wild-card dependency:
+			} else { // wild-card dependency:
 				List<E> elements = new ArrayList<>();
 				for ( Entry<Class<?>, Injectron<?>[]> e : injectrons.entrySet() ) {
 					if ( Type.raw( e.getKey() ).isAssignableTo( elementType ) ) {
@@ -339,9 +339,9 @@ public final class Inject {
 			return supplier.supply(dependency, injector);
 		}
 	}
-	
+
 	static final IdentityHashMap<Scope, Expiry> EXPIRATION = defaultExpiration();
-	
+
 	private static IdentityHashMap<Scope, Expiry> defaultExpiration() {
 		IdentityHashMap<Scope, Expiry> map = new IdentityHashMap<>();
 		map.put( Scoped.APPLICATION, Expiry.NEVER );
@@ -352,7 +352,7 @@ public final class Inject {
 		map.put( Scoped.DEPENDENCY, Expiry.NEVER );
 		return map;
 	}
-	
+
 	public static final Comparator<Injectron<?>> COMPARATOR = new InjectronComparator();
 
 	private static final class InjectronComparator implements Comparator<Injectron<?>> {
@@ -378,5 +378,5 @@ public final class Inject {
 			}
 			return Instance.comparePrecision( r1, r2 );
 		}
-	}	
+	}
 }

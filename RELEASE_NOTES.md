@@ -10,7 +10,11 @@ v0.11 (upcoming)
 - fixed: `Type` `equals`/`equalTo` now considers `upperBound` flag
 - moved `Invoke` static methods to `Supply`
 - `PresetModule` now also supplies the `Presets` itself
-
+- supplied constant are now expanded via macros as `BoundConstant`
+- explicit `BoundConstant`s implicitly bind the constant actual type too
+- fixed: wild-card array dependencies are honored in presents of same raw type bounds
+- added `to` for JDK 8 `Supplier` (method references)
+- added `autoconnect` to (automatic type bound linkage between instances)
 
 v0.10
 ==============
