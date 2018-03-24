@@ -12,11 +12,43 @@ import java.util.List;
 
 import org.junit.Test;
 
+import se.jbee.inject.Initialiser;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Supplier;
+import se.jbee.inject.bind.Binder.InitBinder;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.Bundle;
 import se.jbee.inject.bootstrap.Supply;
 
+/**
+ * A tests the shows how {@link Initialiser}s behind {@link Binder#init(Class)}
+ * can be used to automatically wire a pub-sub relation.
+ *
+ * In the test scenario there is a interface for a {@link Publisher} and a
+ * {@link Subscriber} and 3 {@link Service}s that all also implement
+ * {@link Subscriber}. Goal is to have them all
+ * {@link Publisher#subscribe(Subscriber)} to the {@link PublisherImpl}
+ * implementation. This works both for {@link Publisher#subscribe(Subscriber)}
+ * being defined in the interface or only in the {@link PublisherImpl}
+ * implementation.
+ *
+ * The important thing to understand is that wiring is done after the
+ * {@link Injector} context has been created. The {@link Initialiser} resolves
+ * the target instance (here the {@link PublisherImpl}) and the arguments. In
+ * one case we use {@link Binder#multibind(Class)} to explicitly bind all three
+ * implementation classes to the {@link Subscriber} interface. In the other
+ * example we rely on implicit reference bindings being made. For example
+ * {@code SomeService.class} is linked to the same constant supplied when bound
+ * to {@link Service}.
+ * {@link InitBinder#withEvery(Class, java.util.function.BiConsumer)} fetches
+ * all bound instances that do implement the target type (here
+ * {@link Subscriber}).
+ *
+ * In both examples it is important to end up with reference bindings to the
+ * very same instance of the 3 {@link Service} implementations. Otherwise the
+ * instance resolved and subscribed is not the same instance that is resolved
+ * when using the {@link Service}.
+ */
 public class TestPubSubBinds {
 
 	private static interface Subscriber {
@@ -27,12 +59,15 @@ public class TestPubSubBinds {
 	private static interface Publisher {
 
 		public void publish();
+
+		void subscribe(Subscriber sub);
 	}
 
 	private static class PublisherImpl implements Publisher {
 
 		private final List<Subscriber> subs = new ArrayList<>();
 
+		@Override
 		public void subscribe(Subscriber sub) {
 			subs.add(sub);
 		}
@@ -95,14 +130,54 @@ public class TestPubSubBinds {
 			multibind(Subscriber.class).to(predefined);
 
 			bind(Publisher.class).to(PublisherImpl.class);
-			autoconnect(Subscriber.class).via(PublisherImpl::subscribe, PublisherImpl.class);
+			init(PublisherImpl.class).withEvery(Subscriber.class, Publisher::subscribe);
+		}
+
+	}
+
+	/**
+	 * An alternative way is to use {@link #multibind(Class)} and
+	 * {@link InitBinder#withAll(se.jbee.inject.Type, java.util.function.BiConsumer)}.
+	 */
+	private static class PubSubBindsModule2 extends BinderModule {
+
+		/**
+		 * Any of the below could have been in another module
+		 */
+		@Override
+		protected void declare() {
+			// a constant
+			bind(SomeService.class).to(new SomeService());
+			bind(Service.class).to(SomeService.class);
+			multibind(Subscriber.class).to(SomeService.class);
+
+			// a reference and implicit constructor
+			bind(named("ref"), Service.class).to(AnotherService.class);
+			multibind(Subscriber.class).to(AnotherService.class);
+
+			// a predefined (unknown constant) with aid of explicit multibind to Subscriber
+			Supplier<PredefinedService> predefined = Supply.constant(new PredefinedService());
+			bind(named("pre"), Service.class).to(predefined);
+			multibind(Subscriber.class).to(predefined);
+
+			bind(Publisher.class).to(PublisherImpl.class);
+			init(PublisherImpl.class).withAll(raw(Subscriber[].class), Publisher::subscribe);
 		}
 
 	}
 
 	@Test
-	public void test() {
-		Injector injector = Bootstrap.injector(PubSubBindsModule.class);
+	public void withEveryUpperBound() {
+		assertSubscribedToPublisher(PubSubBindsModule.class);
+	}
+
+	@Test
+	public void withAllAndMultibind() {
+		assertSubscribedToPublisher(PubSubBindsModule2.class);
+	}
+
+	private static void assertSubscribedToPublisher(Class<? extends Bundle> bundle) {
+		Injector injector = Bootstrap.injector(bundle);
 		Publisher pub = injector.resolve(dependency(Publisher.class));
 		SomeService sub = injector.resolve(dependency(SomeService.class));
 		AnotherService sub2 = injector.resolve(dependency(AnotherService.class));

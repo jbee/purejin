@@ -45,7 +45,7 @@ public abstract class BinderModule
 
 	@Override
 	public final void declare( Bindings bindings ) {
-		init( bindings );
+		__init__( bindings );
 		declare();
 	}
 

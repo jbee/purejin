@@ -3,18 +3,20 @@
 v0.11 (upcoming)
 ==============
 
+- fixed `Type` `equals`/`equalTo` now considers `upperBound` flag
+- fixed wild-card array dependencies are honored in presents of same raw type bounds
+- improved `DefaultInjector`, composed arrays contain instances only once
 - added `initbind` and `Initialiser`s (run code when container is ready)
+- added `init` utility methods to link instances during initialisation
 - macros are now replaced when defined for same type (no behaviour change)
-- all value objects in `se.jbee.inject` that implement `equalTo` also
-  implement `equals` and `hashCode` (for convenience, no library requirement)
-- fixed: `Type` `equals`/`equalTo` now considers `upperBound` flag
-- moved `Invoke` static methods to `Supply`
-- `PresetModule` now also supplies the `Presets` itself
 - supplied constant are now expanded via macros as `BoundConstant`
-- explicit `BoundConstant`s implicitly bind the constant actual type too
-- fixed: wild-card array dependencies are honored in presents of same raw type bounds
+- improved explicit `BoundConstant`s implicitly bind to constant's actual type too
+- improved value objects in `se.jbee.inject` that implement `equalTo` also
+  implement `equals` and `hashCode` (for convenience, no library requirement)
+- moved `Invoke` static methods to `Supply`
+- improved `PresetModule` now also supplies the `Presets` itself
 - added `to` for JDK 8 `Supplier` (method references)
-- added `autoconnect` to (automatic type bound linkage between instances)
+- renamed `Array.of` to `Array.array`
 
 v0.10
 ==============

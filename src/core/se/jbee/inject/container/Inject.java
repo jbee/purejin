@@ -5,6 +5,8 @@
  */
 package se.jbee.inject.container;
 
+import static java.lang.System.identityHashCode;
+import static se.jbee.inject.Array.array;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.raw;
 
@@ -12,12 +14,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
-import se.jbee.inject.Array;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Expiry;
 import se.jbee.inject.Initialiser;
@@ -143,7 +146,7 @@ public final class Inject {
 			if ( type.rawType == Injector.class ) {
 				return (T) this;
 			}
-			Injectron<T> injectron = injectronMatching( dependency );
+			Injectron<T> injectron = injectronMatching( dependency ); //TODO need to test if this also works for preset array types
 			if ( injectron != null ) {
 				return injectron.instanceFor( dependency );
 			}
@@ -196,31 +199,28 @@ public final class Inject {
 			if ( elementType.rawType == Injectron.class ) {
 				return resolveInjectronArray( dependency, elementType.parameter( 0 ) );
 			}
+			if ( dependency.type().rawType.getComponentType().isPrimitive() ) {
+				throw new NoResourceForDependency(dependency, null,
+						"Primitive arrays cannot be used to inject all instances of the wrapper type. Use the wrapper array instead." );
+			}
+			Set<Integer> identities = new HashSet<>();
 			if (!elementType.isUpperBound()) {
+				List<E> elements = new ArrayList<>();
 				Injectron<E>[] elementInjectrons = injectronsForType( elementType );
 				if ( elementInjectrons != null ) {
-					List<E> elements = new ArrayList<>( elementInjectrons.length );
-					addAllMatching( elements, dependency, elementType, elementInjectrons );
-					if ( dependency.type().rawType.getComponentType().isPrimitive() ) {
-						throw new NoResourceForDependency(dependency, null,
-								"Primitive arrays cannot be used to inject all instances of the wrapper type. Use the wrapper array instead." );
-					}
-					return toArray( elements, elementType );
-				}
-			} else { // wild-card dependency:
-				List<E> elements = new ArrayList<>();
-				for ( Entry<Class<?>, Injectron<?>[]> e : injectrons.entrySet() ) {
-					if ( Type.raw( e.getKey() ).isAssignableTo( elementType ) ) {
-						@SuppressWarnings ( "unchecked" )
-						Injectron<? extends E>[] value = (Injectron<? extends E>[]) e.getValue();
-						addAllMatching( elements, dependency, elementType, value );
-					}
+					addAllMatching( elements, identities, dependency, elementType, elementInjectrons );
 				}
 				return toArray( elements, elementType );
 			}
-			@SuppressWarnings("unchecked")
-			T empty = (T) Array.newInstance(elementType.rawType, 0);
-			return empty;
+			List<E> elements = new ArrayList<>();
+			for ( Entry<Class<?>, Injectron<?>[]> e : injectrons.entrySet() ) {
+				if ( Type.raw( e.getKey() ).isAssignableTo( elementType ) ) {
+					@SuppressWarnings ( "unchecked" )
+					Injectron<? extends E>[] value = (Injectron<? extends E>[]) e.getValue();
+					addAllMatching( elements, identities, dependency, elementType, value );
+				}
+			}
+			return toArray( elements, elementType );
 		}
 
 		private <T, I> T resolveInjectronArray( Dependency<T> dependency, Type<I> instanceType ) {
@@ -250,20 +250,22 @@ public final class Inject {
 			return toArray( elements, raw( Injectron.class ) );
 		}
 
-		private static <E, T> void addAllMatching( List<E> elements, Dependency<T> dependency,
-				Type<E> elementType, Injectron<? extends E>[] elementInjectrons ) {
+		private static <E, T> void addAllMatching( List<E> elements, Set<Integer> identities,
+				Dependency<T> dependency, Type<E> elementType, Injectron<? extends E>[] elementInjectrons ) {
 			Dependency<E> elementDependency = dependency.typed( elementType );
 			for ( int i = 0; i < elementInjectrons.length; i++ ) {
 				Injectron<? extends E> injectron = elementInjectrons[i];
 				if ( injectron.info().resource.isMatching( elementDependency ) ) {
-					elements.add( injectron.instanceFor( elementDependency ) );
+					E instance = injectron.instanceFor( elementDependency );
+					if (identities.add(identityHashCode(instance)))
+						elements.add( instance );
 				}
 			}
 		}
 
 		@SuppressWarnings ( "unchecked" )
 		private static <T, E> T toArray( List<? extends E> elements, Type<E> elementType ) {
-			return (T) Array.of( elements, elementType.rawType );
+			return (T) array( elements, elementType.rawType );
 		}
 
 		@SuppressWarnings ( "unchecked" )

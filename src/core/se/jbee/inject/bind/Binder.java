@@ -5,7 +5,6 @@
  */
 package se.jbee.inject.bind;
 
-import static java.lang.System.identityHashCode;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Instance.defaultInstanceOf;
@@ -16,8 +15,6 @@ import static se.jbee.inject.bootstrap.Metaclass.metaclass;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.function.BiConsumer;
 
 import se.jbee.inject.Array;
@@ -161,31 +158,51 @@ public class Binder {
 		return new Binder( root, bind().with( target ) );
 	}
 
-	public <P> ConnectBinder<P> autoconnect(Class<P> plug) {
-		return new ConnectBinder<>(on(bind()), plug);
+	public <T> InitBinder<T> init(Class<T> target) {
+		return init(Name.DEFAULT, raw(target));
 	}
 
-	public static class ConnectBinder<P> {
+	public <T> InitBinder<T> init(Name name, Type<T> target) {
+		return new InitBinder<>(on(bind()), instance(name, target));
+	}
+
+	public static class InitBinder<T> {
 
 		private final Binder binder;
-		private final Class<P> plug;
+		private final Instance<T> target;
 
-		ConnectBinder(Binder binder, Class<P> plug) {
-			super();
+		InitBinder(Binder binder, Instance<T> target) {
 			this.binder = binder;
-			this.plug = plug;
+			this.target = target;
 		}
 
-		public <T> void via(BiConsumer<T, P> method, Class<? extends T> toType) {
+		public <C> void withEvery(Class<? extends C> arguments, BiConsumer<T, C> initialiser) {
+			withAll(raw(arguments).addArrayDimension().asUpperBound(), initialiser);
+		}
+
+		public <C> void withAll(Type<? extends C[]> arguments, BiConsumer<T, C> initialiser) {
 			binder.initbind().to(injector -> {
-				T target = injector.resolve(dependency(toType));
-				P[] plugs = injector.resolve(dependency(raw(plug).addArrayDimension().asUpperBound()));
-				Set<Integer> identities = new HashSet<>();
-				for (P plug : plugs)
-					if (identities.add(identityHashCode(plug)))
-						method.accept(target, plug);
+				T obj = injector.resolve(dependency(target));
+				C[] args = injector.resolve(dependency(arguments).injectingInto(target));
+				for (C arg : args)
+					initialiser.accept(obj, arg);
 			});
-			binder.implicit().construct(toType);
+		}
+
+		public <C> void with(Class<? extends C> argument, BiConsumer<T, C> initialiser) {
+			with(defaultInstanceOf(raw(argument)), initialiser);
+		}
+
+		public <C> void with(Name argName, Class<? extends C> argType, BiConsumer<T, C> initialiser) {
+			with(Instance.instance(argName, raw(argType)), initialiser);
+		}
+
+		public <C> void with(Instance<? extends C> argument, BiConsumer<T, C> initialiser) {
+			binder.initbind().to(injector -> {
+				T obj = injector.resolve(dependency(target));
+				C arg = injector.resolve(dependency(argument).injectingInto(target));
+				initialiser.accept(obj, arg);
+			});
 		}
 
 	}

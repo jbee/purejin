@@ -1,16 +1,18 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
+
+import static java.lang.System.arraycopy;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 /**
  * Silks array util.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Array {
@@ -24,7 +26,7 @@ public final class Array {
 	@SuppressWarnings ( "unchecked" )
 	public static <T> T[] prepand( T value, T[] array ) {
 		T[] copy = (T[]) newInstance( array.getClass().getComponentType(), array.length + 1 );
-		System.arraycopy( array, 0, copy, 1, array.length );
+		arraycopy( array, 0, copy, 1, array.length );
 		copy[0] = value;
 		return copy;
 	}
@@ -34,7 +36,7 @@ public final class Array {
 		return (T[]) java.lang.reflect.Array.newInstance( componentType, length );
 	}
 
-	public static <T> T[] of( Collection<? extends T> list, Class<T> type ) {
+	public static <T> T[] array( Collection<? extends T> list, Class<T> type ) {
 		return list.toArray( newInstance( type, list.size() ) );
 	}
 

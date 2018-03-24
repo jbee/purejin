@@ -5,6 +5,7 @@
  */
 package se.jbee.inject.bootstrap;
 
+import static se.jbee.inject.Array.array;
 import static se.jbee.inject.bootstrap.Metaclass.metaclass;
 
 import java.util.ArrayList;
@@ -12,7 +13,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import se.jbee.inject.Array;
 import se.jbee.inject.InconsistentBinding;
 
 /**
@@ -59,7 +59,7 @@ public final class Bindings {
 	}
 
 	public Binding<?>[] toArray() {
-		return Array.of( bindings, Binding.class );
+		return array( bindings, Binding.class );
 	}
 
 	public Binding<?>[] declareFrom( Module... modules ) {

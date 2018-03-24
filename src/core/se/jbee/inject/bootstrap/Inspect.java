@@ -1,10 +1,12 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
 
+import static se.jbee.inject.Array.array;
+import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Type.raw;
 
 import java.lang.annotation.Annotation;
@@ -16,8 +18,6 @@ import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.List;
 
-import se.jbee.inject.Array;
-import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Packages;
 import se.jbee.inject.Parameter;
@@ -29,7 +29,7 @@ import se.jbee.inject.container.Inject;
  * The basic {@link Inspector} implementations. It allows to chose {@link Constructor}s and
  * {@link Method}s based on the {@link Annotation}s present, the {@link Type}s a method returns or
  * the {@link Packages} they are defined in.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public class Inspect
@@ -107,10 +107,10 @@ public class Inspect
 		for ( int i = 0; i < annotations.length; i++ ) {
 			Name name = Name.namedBy( namedby, annotations[i] );
 			if ( name != Name.DEFAULT ) {
-				res.add( Instance.instance( name, types[i] ) );
+				res.add( instance( name, types[i] ) );
 			}
 		}
-		return Array.of(res, Parameter.class);
+		return array(res, Parameter.class);
 	}
 
 	@Override
@@ -150,7 +150,7 @@ public class Inspect
 				res.add( m );
 			}
 		}
-		return Array.of( res, Method.class );
+		return array( res, Method.class );
 	}
 
 	/**
@@ -214,7 +214,7 @@ public class Inspect
 
 	/**
 	 * Returns the constructor usually should be used.
-	 * 
+	 *
 	 * @param declaringClass
 	 *            constructed type
 	 * @return The constructor with the most parameters.

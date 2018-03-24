@@ -15,7 +15,7 @@ import se.jbee.inject.container.Scope;
 import se.jbee.inject.container.Scoped;
 
 /**
- * A {@link RootBinder} that can be initialized using the {@link #init(Bindings)} method.
+ * A {@link RootBinder} that can be initialized using the {@link #__init__(Bindings)} method.
  * 
  * This allows to change the start {@link Bind} once.
  * 
@@ -41,7 +41,7 @@ public abstract class InitializedBinder
 		return bind;
 	}
 
-	protected final void init( Bindings bindings ) {
+	protected final void __init__( Bindings bindings ) {
 		Bootstrap.nonnullThrowsReentranceException( initialized );
 		this.bind = super.bind().into( bindings );
 		initialized = true;

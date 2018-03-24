@@ -5,6 +5,7 @@
  */
 package se.jbee.inject.bootstrap;
 
+import static se.jbee.inject.Array.array;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.raw;
 
@@ -18,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import se.jbee.inject.Array;
 import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Injectron;
@@ -218,7 +218,7 @@ public final class Bootstrap {
 			}
 			Set<Class<? extends Bundle>> installed = new LinkedHashSet<>();
 			addAllInstalledIn( root, installed );
-			return Array.of( installed, Class.class );
+			return array( installed, Class.class );
 		}
 
 		private Module[] modulesOf( Class<? extends Bundle>[] bundles ) {
@@ -229,7 +229,7 @@ public final class Bootstrap {
 					installed.addAll( modules );
 				}
 			}
-			return Array.of( installed, Module.class );
+			return array( installed, Module.class );
 		}
 
 		@Override

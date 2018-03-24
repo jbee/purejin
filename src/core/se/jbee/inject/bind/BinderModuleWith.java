@@ -31,7 +31,7 @@ public abstract class BinderModuleWith<T>
 
 	@Override
 	public final void declare( Bindings bindings, T preset ) {
-		init( bindings );
+		__init__( bindings );
 		declare( preset );
 	}
 

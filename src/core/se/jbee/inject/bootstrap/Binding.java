@@ -1,9 +1,12 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
+
+import static se.jbee.inject.Array.array;
+import static se.jbee.inject.Instance.comparePrecision;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,10 +14,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import se.jbee.inject.Array;
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.InconsistentBinding;
-import se.jbee.inject.Instance;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Source;
 import se.jbee.inject.Supplier;
@@ -26,9 +27,9 @@ import se.jbee.inject.container.Scope;
 
 /**
  * Default data strature to represent a 4-tuple created from {@link Bindings}.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
- * 
+ *
  * @param <T>
  *            The type of the bound value (instance)
  */
@@ -60,22 +61,22 @@ public final class Binding<T>
 	public Resource<T> resource() {
 		return resource;
 	}
-	
+
 	@Override
 	public Scope scope() {
 		return scope;
 	}
-	
+
 	@Override
 	public Source source() {
 		return source;
 	}
-	
+
 	@Override
 	public Supplier<? extends T> supplier() {
 		return supplier;
 	}
-	
+
 	@Override
 	public Type<T> type() {
 		return resource.type();
@@ -90,7 +91,7 @@ public final class Binding<T>
 	public boolean isComplete() {
 		return supplier != null;
 	}
-	
+
 	public Binding<T> complete( BindingType type, Supplier<? extends T> supplier ) {
 		return new Binding<>( resource, type, supplier, scope, source );
 	}
@@ -107,15 +108,15 @@ public final class Binding<T>
 		if ( res != 0 ) {
 			return res;
 		}
-		res = Instance.comparePrecision( resource.instance, other.resource.instance );
+		res = comparePrecision( resource.instance, other.resource.instance );
 		if ( res != 0 ) {
 			return res;
 		}
-		res = Instance.comparePrecision( resource.target, other.resource.target );
+		res = comparePrecision( resource.target, other.resource.target );
 		if ( res != 0 ) {
 			return res;
 		}
-		res = Instance.comparePrecision( source, other.source );
+		res = comparePrecision( source, other.source );
 		if ( res != 0 ) {
 			return res;
 		}
@@ -140,7 +141,7 @@ public final class Binding<T>
 		uniques.add( bindings[0] );
 		int lastUniqueIndex = 0;
 		Set<Type<?>> required = new HashSet<>();
-		List<Binding<?>> dropped = new ArrayList<>(); 
+		List<Binding<?>> dropped = new ArrayList<>();
 		for ( int i = 1; i < bindings.length; i++ ) {
 			Binding<?> b_d = bindings[lastUniqueIndex];
 			Binding<?> b_i = bindings[i];
@@ -177,7 +178,7 @@ public final class Binding<T>
 		if (!required.isEmpty() ) {
 			throw new UnresolvableDependency.NoResourceForDependency( required, dropped );
 		}
-		return Array.of( res, Binding.class );
+		return array( res, Binding.class );
 	}
 
 }
