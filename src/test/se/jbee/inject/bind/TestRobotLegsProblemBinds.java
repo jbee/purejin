@@ -1,7 +1,6 @@
 package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertNotSame;
-import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.container.Scoped.TARGET_INSTANCE;
 
 import org.junit.Test;
@@ -13,10 +12,10 @@ import se.jbee.inject.bootstrap.Bootstrap;
 
 /**
  * This tests demonstrates 2 different ways to solve the <i>Robot legs problem</i> with Silk.
- * 
+ *
  * This problem is a simple example where 2 slightly different object trees needs to be created. In
  * the case of the robot each of the robots legs should get its on instance of a feet.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestRobotLegsProblemBinds {
@@ -79,8 +78,8 @@ public class TestRobotLegsProblemBinds {
 	}
 
 	private static void assertRobotHasDifferentLegsWithDifferentFoots( Injector injector ) {
-		Leg leftLeg = injector.resolve( dependency( Leg.class ).named( left ) );
-		Leg rightLeg = injector.resolve( dependency( Leg.class ).named( right ) );
+		Leg leftLeg = injector.resolve( left, Leg.class );
+		Leg rightLeg = injector.resolve( right, Leg.class );
 		assertNotSame( "same leg", rightLeg, leftLeg );
 		assertNotSame( "same foot", rightLeg.foot, leftLeg.foot );
 	}

@@ -1,8 +1,8 @@
 package se.jbee.inject.action;
 
 import static org.junit.Assert.assertEquals;
-import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.action.ActionModule.actionDependency;
 import static se.jbee.inject.container.Scoped.DEPENDENCY_TYPE;
 
 import org.junit.Test;
@@ -15,11 +15,11 @@ import se.jbee.inject.bootstrap.Bootstrap;
 /**
  * This test demonstrates that it is possible to have different higher level 'service' on top of
  * {@link Action}s.
- * 
+ *
  * While the {@link TestServiceBinds} shows how do build a generic service this test shows a simpler
  * version {@link Command} of such generic service having a fix return type. Thereby it is very well
  * possible to use different higher level services in the same time.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestCommandBinds {
@@ -34,9 +34,9 @@ public class TestCommandBinds {
 
 		@Override
 		public Command<?> supply( Dependency<? super Command<?>> dependency, Injector injector ) {
-			return newCommand( injector.resolve( ActionModule.actionDependency(dependency.type().parameter( 0 ), raw( Long.class )) ) );
+			return newCommand( injector.resolve( actionDependency(dependency.type().parameter( 0 ), raw( Long.class )) ) );
 		}
-		
+
 		private static <P> Command<P> newCommand( Action<P, Long> service ) {
 			return new CommandToServiceMethodAdapter<>( service );
 		}
@@ -77,14 +77,11 @@ public class TestCommandBinds {
 		}
 	}
 
-	@SuppressWarnings ( "unchecked" )
 	@Test
 	public void thatServiceCanBeResolvedWhenHavingJustOneGeneric() {
 		Injector injector = Bootstrap.injector( CommandBindsModule.class );
-		@SuppressWarnings ( "rawtypes" )
-		Dependency<Command> dependency = dependency( raw( Command.class ).parametized(
-				Integer.class ) );
-		Command<Integer> square = injector.resolve( dependency );
+		@SuppressWarnings ( "unchecked" )
+		Command<Integer> square = injector.resolve(raw(Command.class).parametized(Integer.class));
 		assertEquals(  9L, square.calc( 3 ).longValue() );
 	}
 }

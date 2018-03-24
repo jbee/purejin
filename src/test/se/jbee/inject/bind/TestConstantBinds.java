@@ -1,7 +1,6 @@
 package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertEquals;
-import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.raw;
 
 import org.junit.Test;
@@ -47,6 +46,6 @@ public class TestConstantBinds {
 	}
 
 	private <T> void assertInjects( T expected, Type<? extends T> dependencyType ) {
-		assertEquals( expected, injector.resolve(dependency(dependencyType)));
+		assertEquals( expected, injector.resolve(dependencyType));
 	}
 }

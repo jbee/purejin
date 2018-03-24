@@ -2,8 +2,6 @@ package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static se.jbee.inject.Dependency.dependency;
-import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
 
@@ -178,10 +176,10 @@ public class TestPubSubBinds {
 
 	private static void assertSubscribedToPublisher(Class<? extends Bundle> bundle) {
 		Injector injector = Bootstrap.injector(bundle);
-		Publisher pub = injector.resolve(dependency(Publisher.class));
-		SomeService sub = injector.resolve(dependency(SomeService.class));
-		AnotherService sub2 = injector.resolve(dependency(AnotherService.class));
-		PredefinedService sub3 = (PredefinedService)injector.resolve(dependency(instance(named("pre"), raw(Service.class))));
+		Publisher pub = injector.resolve(Publisher.class);
+		SomeService sub = injector.resolve(SomeService.class);
+		AnotherService sub2 = injector.resolve(AnotherService.class);
+		PredefinedService sub3 = (PredefinedService)injector.resolve("pre", Service.class);
 
 		assertFalse(sub.event);
 		assertFalse(sub2.event);

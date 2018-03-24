@@ -9,7 +9,6 @@ import java.util.Properties;
 
 import org.junit.Test;
 
-import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BoundParameter;
@@ -22,18 +21,18 @@ import se.jbee.inject.config.Presets;
 public class TestExample1Binds {
 
 	static class MyClass {
-		
+
 		final String abc;
 		final int twelve;
-		
+
 		public MyClass(String abc, int twelve) {
 			super();
 			this.abc = abc;
 			this.twelve = twelve;
 		}
-		
+
 	}
-	
+
 	static final class Example1Module1 extends BinderModuleWith<Properties> {
 
 		@Override
@@ -43,7 +42,7 @@ public class TestExample1Binds {
 					BoundParameter.constant(Integer.class, (Integer)properties.get("y")));
 		}
 	}
-	
+
 	static final class Example1Module2 extends BinderModule {
 
 		@Override
@@ -57,7 +56,7 @@ public class TestExample1Binds {
 			bind(named("bar"), int.class).to(12);
 		}
 	}
-	
+
 	@Test
 	public void constructorArgumentsCanBePassedToBootstrappingUsingPresets() {
 		Properties props = new Properties();
@@ -66,15 +65,15 @@ public class TestExample1Binds {
 		Presets presets = Presets.EMPTY.preset(Properties.class, props);
 		Globals globals = Globals.STANDARD.presets(presets);
 		Injector injector = Bootstrap.injector(Example1Module1.class, globals);
-		MyClass obj = injector.resolve(Dependency.dependency(MyClass.class));
+		MyClass obj = injector.resolve(MyClass.class);
 		assertEquals(12, obj.twelve);
 		assertEquals("abc", obj.abc);
 	}
-	
+
 	@Test
 	public void constructorArgumentsCanBeResolvedUsingNamedInstances() {
 		Injector injector = Bootstrap.injector(Example1Module2.class);
-		MyClass obj = injector.resolve(Dependency.dependency(MyClass.class));
+		MyClass obj = injector.resolve(MyClass.class);
 		assertEquals(12, obj.twelve);
 		assertEquals("abc", obj.abc);
 	}

@@ -3,7 +3,6 @@ package se.jbee.inject.bind;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.container.Scoped.INJECTION;
@@ -31,7 +30,7 @@ import se.jbee.inject.bootstrap.Inspect;
  * The tests shows an example of cyclic depended {@link Bundle}s. It shows that a {@link Bundle}
  * doesn't have to know or consider other bundles since it is valid to make cyclic references or
  * install the {@link Bundle}s multiple times.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestBootstrapper {
@@ -217,7 +216,7 @@ public class TestBootstrapper {
 	/**
 	 * The assert itself doesn't play such huge role here. we just want to reach this code.
 	 */
-	@Test(timeout=50)
+	@Test(timeout=100)
 	public void thatBundlesAreNotBootstrappedMultipleTimesEvenWhenTheyAreMutual() {
 		Injector injector = Bootstrap.injector( OneMutualDependentBundle.class );
 		assertNotNull( injector );
@@ -231,14 +230,14 @@ public class TestBootstrapper {
 	@Test ( expected = DependencyCycle.class, timeout=50 )
 	public void thatDependencyCyclesAreDetected() {
 		Injector injector = Bootstrap.injector( CyclicBindsModule.class );
-		Foo foo = injector.resolve( dependency( Foo.class ) );
+		Foo foo = injector.resolve( Foo.class );
 		fail( "foo should not be resolvable but was: " + foo );
 	}
 
 	@Test ( expected = DependencyCycle.class, timeout=50 )
 	public void thatDependencyCyclesInCirclesAreDetected() {
 		Injector injector = Bootstrap.injector( CircularBindsModule.class );
-		A a = injector.resolve( dependency( A.class ) );
+		A a = injector.resolve( A.class );
 		fail( "A should not be resolvable but was: " + a );
 	}
 
@@ -250,13 +249,13 @@ public class TestBootstrapper {
 	@Test
 	public void thatBindingsAreReplacedByMorePreciseOnes() {
 		Injector injector = Bootstrap.injector( ReplacingBindsModule.class );
-		assertEquals( 6, injector.resolve( dependency( Number.class ) ) );
-		Injectron<?>[] injectrons = injector.resolve( dependency( Injectron[].class ) );
+		assertEquals( 6, injector.resolve( Number.class ));
+		Injectron<?>[] injectrons = injector.resolve( Injectron[].class );
 		assertEquals( 7, injectrons.length ); // 3x Comparable, Float, Double, Integer and Number (3x Serializable has been nullified)
-		Injectron<Number>[] numberInjectrons = injector.resolve( dependency( injectronsTypeOf( Number.class ) ) );
+		Injectron<Number>[] numberInjectrons = injector.resolve( injectronsTypeOf( Number.class ) );
 		assertEquals( 1, numberInjectrons.length );
 		@SuppressWarnings ( "rawtypes" )
-		Injectron<Comparable>[] compareableInjectrons = injector.resolve( dependency( injectronsTypeOf( Comparable.class ) ) );
+		Injectron<Comparable>[] compareableInjectrons = injector.resolve( injectronsTypeOf( Comparable.class ) );
 		assertEquals( 3, compareableInjectrons.length );
 	}
 
@@ -271,6 +270,6 @@ public class TestBootstrapper {
 	@Test
 	public void thatCustomInspectorIsUsedToPickConstructor() {
 		Injector injector = Bootstrap.injector( CustomInspectedBundle.class );
-		assertEquals( "will be passed to D", injector.resolve( dependency( D.class ) ).s );
+		assertEquals( "will be passed to D", injector.resolve( D.class ).s );
 	}
 }

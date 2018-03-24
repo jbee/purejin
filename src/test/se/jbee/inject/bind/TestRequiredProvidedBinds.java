@@ -3,7 +3,6 @@ package se.jbee.inject.bind;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static se.jbee.inject.Dependency.dependency;
 
 import org.junit.Test;
 
@@ -17,7 +16,7 @@ import se.jbee.inject.bootstrap.Module;
  * The test shows very loose coupling using {@link BinderModule#require(Class)}
  * and {@link BinderModule#provide(Class, se.jbee.inject.Parameter...)}
  * bindings.
- * 
+ *
  * Here a {@link Module} just expresses the need for a particular implementation
  * of an interface while one or more other modules express the ability to
  * deliver an implementation if needed. Interface and implementation are
@@ -42,7 +41,7 @@ public class TestRequiredProvidedBinds {
 	}
 
 	private static class UnusedImpl {
-		// just something we provide but do not require 
+		// just something we provide but do not require
 	}
 
 	private static class RequirementModule
@@ -105,14 +104,14 @@ public class TestRequiredProvidedBinds {
 	@Test
 	public void thatRequirementIsFulfilledByProvidedBind() {
 		Injector injector = Bootstrap.injector( RequiredProvidedBindsBundle.class );
-		assertNotNull( injector.resolve( dependency( ExampleService.class ) ) );
+		assertNotNull( injector.resolve( ExampleService.class ) );
 	}
 
 	@Test
 	public void thatUnusedProvidedBindIsNotAddedToInjectorContext() {
 		Injector injector = Bootstrap.injector( RequiredProvidedBindsBundle.class );
 		try {
-			injector.resolve( dependency( UnusedImpl.class ) );
+			injector.resolve( UnusedImpl.class );
 			fail( "Should not be bound and therefore throw below exception" );
 		} catch ( NoResourceForDependency e ) {
 			// expected this
@@ -124,7 +123,7 @@ public class TestRequiredProvidedBinds {
 	@Test
 	public void thatAnExplicitBindReplacesTheProvidedImplementation() {
 		Injector injector = Bootstrap.injector( ExplicitBindBundle.class );
-		ExampleService s = injector.resolve( dependency( ExampleService.class ) );
+		ExampleService s = injector.resolve( ExampleService.class );
 		assertTrue( s instanceof ExplicitExampleService );
 	}
 }

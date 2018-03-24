@@ -1,7 +1,6 @@
 package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertEquals;
-import static se.jbee.inject.Dependency.dependency;
 
 import org.junit.Test;
 
@@ -33,7 +32,7 @@ public class TestLambdaBinds {
 	@Test
 	public void thatLambdasCanBeUsedToDescribeModules() {
 		Injector injector = Bootstrap.injector(LambdaBindsModule.class);
-		
-		assertEquals(1, injector.resolve(dependency(int.class)).intValue());
+
+		assertEquals(1, injector.resolve(int.class).intValue());
 	}
 }

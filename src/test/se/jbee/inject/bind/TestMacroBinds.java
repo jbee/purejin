@@ -5,7 +5,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Type.fieldType;
 import static se.jbee.inject.bootstrap.BindingType.CONSTRUCTOR;
 
 import java.lang.annotation.Retention;
@@ -39,15 +39,15 @@ import se.jbee.inject.config.Globals;
 /**
  * Demonstrates how to use {@link Macro}s to customize the and binding
  * automatics.
- * 
+ *
  * In particular the {@link InitialisationMacro} shows how one could initialize
  * fields when an instance is created by using a custom macro that decorates the
  * original {@link Supplier}.
- * 
+ *
  * The {@link RequiredConstructorParametersMacro} shows how all parameters of a
  * type bound to a constructor can add bindings that make the parameter's types
  * required so that eager exception occurs if no type is known for a parameter.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestMacroBinds {
@@ -107,7 +107,7 @@ public class TestMacroBinds {
 		CountMacro count = new CountMacro();
 		Injector injector = injectorWithMacro( MacroBindsModule.class, count );
 		assertEquals( 6, count.expands );
-		assertEquals( 0, injector.resolve( Dependency.dependency( Injectron[].class ) ).length );
+		assertEquals( 0, injector.resolve( Injectron[].class ).length );
 	}
 
 	private static Injector injectorWithMacro( Class<? extends Bundle> root, Macro<?> macro ) {
@@ -118,7 +118,7 @@ public class TestMacroBinds {
 	/**
 	 * A {@link Macro} that add further bindings to make all types of used
 	 * {@link Constructor} parameters {@link DeclarationType#REQUIRED}.
-	 * 
+	 *
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	static final class RequiredConstructorParametersMacro
@@ -149,10 +149,10 @@ public class TestMacroBinds {
 
 	/**
 	 * A simple example-wise {@link Supplier} that allows to initialized newly created instances.
-	 * 
+	 *
 	 * In this example a very basic field injection is build but it could be any kind of context
 	 * dependent instance initialization.
-	 * 
+	 *
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	static final class InitialisationSupplier<T>
@@ -171,7 +171,7 @@ public class TestMacroBinds {
 			for ( Field f : instance.getClass().getDeclaredFields() ) {
 				if ( f.isAnnotationPresent( Initialisation.class ) ) {
 					try {
-						f.set( instance, injector.resolve( dependency( Type.fieldType( f ) ) ) );
+						f.set(instance, injector.resolve(fieldType(f)));
 					} catch ( Exception e ) {
 						throw new RuntimeException( e );
 					}
@@ -183,7 +183,7 @@ public class TestMacroBinds {
 
 	/**
 	 * Decorates the usual constructor with initialization.
-	 * 
+	 *
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	static final class InitialisationMacro
@@ -201,6 +201,6 @@ public class TestMacroBinds {
 	@Test
 	public void thatCustomInitialisationCanBeAdded() {
 		Injector injector = injectorWithMacro( MacroBindsModule.class, new InitialisationMacro() );
-		assertEquals( "answer", injector.resolve( dependency( Bar.class ) ).s );
+		assertEquals("answer", injector.resolve(Bar.class).s);
 	}
 }

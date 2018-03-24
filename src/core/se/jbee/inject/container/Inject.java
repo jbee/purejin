@@ -6,8 +6,8 @@
 package se.jbee.inject.container;
 
 import static java.lang.System.identityHashCode;
+import static java.util.Arrays.copyOfRange;
 import static se.jbee.inject.Array.array;
-import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.raw;
 
 import java.util.ArrayList;
@@ -70,9 +70,8 @@ public final class Inject {
 		}
 
 		private void initInitialisers() {
-			for (Initialiser i : resolve(dependency(Initialiser[].class))) {
+			for (Initialiser i : resolve(Initialiser[].class))
 				i.init(this);
-			}
 		}
 
 		private <T> Map<Class<?>, Injectron<?>[]> initFrom( Assembly<?>... assemblies ) {
@@ -98,12 +97,12 @@ public final class Inject {
 			for ( int i = 0; i < injectrons.length; i++ ) {
 				Class<?> rawType = injectrons[i].info().resource.type().rawType;
 				if ( rawType != lastRawType ) {
-					map.put( lastRawType, Arrays.copyOfRange( injectrons, start, i ) );
+					map.put( lastRawType, copyOfRange( injectrons, start, i ) );
 					start = i;
 				}
 				lastRawType = rawType;
 			}
-			map.put( lastRawType, Arrays.copyOfRange( injectrons, start, injectrons.length ) );
+			map.put( lastRawType, copyOfRange( injectrons, start, injectrons.length ) );
 			return map;
 		}
 

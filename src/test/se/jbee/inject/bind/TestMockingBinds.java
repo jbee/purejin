@@ -38,7 +38,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
  * This test illustrates how to use binds with {@link Type#asUpperBound()} types
  * (wild-card types) to dynamically yield instances of different types that are
  * all sub-types of a common base class.
- * 
+ *
  * This can e.g. be used to "automatically" supply mocks in tests for all
  * dependencies that have not be bound explicitly. A single declaration with a
  * custom supplier is enough to achieve this.
@@ -55,9 +55,9 @@ public class TestMockingBinds {
 			// bind some values returned from mock methods
 			within(Mock.class).bind(anyOf(Rectangle.class)).to(new Rectangle(0, 0, 42, 42));
 		}
-		
+
 		/**
-		 * The unbound types mocks are limited to interfaces in this example implementation. 
+		 * The unbound types mocks are limited to interfaces in this example implementation.
 		 */
 		private <B> void mockAnyUnbound(Class<? super B> base) {
 			// type safety is essentially gone here as wild-card binds work the other way around:
@@ -69,27 +69,27 @@ public class TestMockingBinds {
 		}
 
 	}
-	
+
 	/**
 	 * This interface is implemented by all mocks to illustrate how this could
 	 * be used to build "rich" mocks that have a common interface to
 	 * check/verify mock interaction.
 	 */
     interface Mock {
-		
+
 		/**
 		 * Here the mocks just count invocations but this could be as
 		 * sophisticated as needed to verify right behavior.
 		 */
 		int timesInvoked();
 	}
-	
+
 	/**
 	 * In this example mocks just work for interfaces as {@link Proxy} is used
 	 * to create the mocks.
 	 */
 	static class MockSupplier<T> implements Supplier<T> {
-		
+
 		private final Class<?> base;
 
 		public MockSupplier(Class<?> base) {
@@ -108,7 +108,7 @@ public class TestMockingBinds {
 			return (T) Proxy.newProxyInstance(cl, interfaces, handler);
 		}
 	}
-	
+
 	static class MockInvocationHandler implements InvocationHandler {
 
 		private final Class<?> base;
@@ -148,50 +148,50 @@ public class TestMockingBinds {
 				return null;
 			}
 		}
-		
+
 	}
-	
+
 	@Test
 	public void wildcardBindsDoFallBackToMostGeneralIfRequired() {
 		Injector injector = Bootstrap.injector(TestMockingBindsModule.class);
-		Serializable mock = injector.resolve(dependency(Serializable.class));
+		Serializable mock = injector.resolve(Serializable.class);
 		assertTrue(isProxyClass(mock.getClass()));
 		assertEquals(Object.class.getCanonicalName(), mock.toString());
 	}
-	
+
 	@Test
 	public void moreSpecificUpperBoundTypesAreMorePrecise() {
 		Injector injector = Bootstrap.injector(TestMockingBindsModule.class);
-		MouseListener mock = injector.resolve(dependency(MouseListener.class));
+		MouseListener mock = injector.resolve(MouseListener.class);
 		assertTrue(isProxyClass(mock.getClass()));
 		assertEquals(EventListener.class.getCanonicalName(), mock.toString());
 	}
-	
+
 	@Test
 	public void bindsCanBeUsedToMockReturnValuesOfMockMethods() {
 		Injector injector = Bootstrap.injector(TestMockingBindsModule.class);
-		Shape shape = injector.resolve(dependency(Shape.class));
+		Shape shape = injector.resolve(Shape.class);
 		Rectangle bounds = shape.getBounds();
 		assertNotNull(bounds);
 		assertTrue(shape instanceof Mock);
 		Mock mock = (Mock) shape;
 		assertEquals(1, mock.timesInvoked());
 	}
-	
+
 	@Test
 	public void methodsOfMocksByDefaultReturnMocksIfPossible() {
 		Injector injector = Bootstrap.injector(TestMockingBindsModule.class);
-		Shape shape = injector.resolve(dependency(Shape.class));
+		Shape shape = injector.resolve(Shape.class);
 		PathIterator iter = shape.getPathIterator(null);
 		assertNotNull(iter);
 		assertTrue(isProxyClass(iter.getClass()));
 		assertFalse(iter.isDone());
 	}
-	
+
 	@Test
 	public void methodOfMocksByDefaultReturnNullOtherwise() { // when no custom binding or mocking available
 		Injector injector = Bootstrap.injector(TestMockingBindsModule.class);
-		Shape shape = injector.resolve(dependency(Shape.class));
+		Shape shape = injector.resolve(Shape.class);
 		assertNull(shape.getBounds2D());
 	}
 }

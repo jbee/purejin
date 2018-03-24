@@ -1,7 +1,6 @@
 package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertEquals;
-import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
@@ -15,7 +14,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
 /**
  * Test illustrates how to inject specific implementation for same interface
  * into the same receiver class.
- * 
+ *
  * @author jan
  */
 public class TestSpecificImplementationBinds {
@@ -23,9 +22,9 @@ public class TestSpecificImplementationBinds {
 	interface Action {
 		String doIt();
 	}
-	
+
 	static class Receiver {
-		
+
 		final Action a;
 		final Action b;
 		final Action c;
@@ -36,20 +35,20 @@ public class TestSpecificImplementationBinds {
 			this.c = c;
 		}
 	}
-	
+
 	static class ActionA implements Action {
 
 		@Override
 		public String doIt() {
 			return "whatever";
 		}
-		
+
 	}
-	
+
 	static class GenericAction implements Action {
 
 		public final String state;
-		
+
 		GenericAction(String state) {
 			this.state = state;
 		}
@@ -60,9 +59,9 @@ public class TestSpecificImplementationBinds {
 		public String doIt() {
 			return state;
 		}
-		
+
 	}
-	
+
 	static class SpecificImplementationBindsModule extends BinderModule {
 
 		@Override
@@ -75,14 +74,14 @@ public class TestSpecificImplementationBinds {
 			bind(c).toConstructor();
 			injectingInto(c).bind(String.class).to("and this is c");
 		}
-		
+
 	}
-	
+
 	@Test
 	public void thatImplementationIsPickedAsSpecified() {
 		Injector injector = Bootstrap.injector(SpecificImplementationBindsModule.class);
-		
-		Receiver r = injector.resolve(dependency(Receiver.class));
+
+		Receiver r = injector.resolve(Receiver.class);
 		assertEquals(ActionA.class, r.a.getClass());
 		assertEquals(GenericAction.class, r.b.getClass());
 		assertEquals(GenericAction.class, r.c.getClass());

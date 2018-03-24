@@ -10,7 +10,6 @@ import java.io.Serializable;
 
 import org.junit.Test;
 
-import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
@@ -20,7 +19,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
 /**
  * A test that demonstrates how to inject a specific instance into another type using the
  * {@link ScopedBinder#injectingInto(se.jbee.inject.Instance)} method.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestTargetedBinds {
@@ -44,7 +43,7 @@ public class TestTargetedBinds {
 			injectingInto( Foo.class ).bind( Bar.class ).to( BAR_IN_FOO );
 			bind( Bar.class ).to( BAR_EVERYWHERE_ELSE );
 			Name special = named( "special" );
-			construct( special, Foo.class ); // if we would use a type bind like to(Foo.class) it wouldn't work since we use a Foo that is not created as special Foo so it got the other Bar 
+			construct( special, Foo.class ); // if we would use a type bind like to(Foo.class) it wouldn't work since we use a Foo that is not created as special Foo so it got the other Bar
 			injectingInto( special, Foo.class ).bind( Bar.class ).to( BAR_EVERYWHERE_ELSE );
 			Name awesome = named( "awesome" );
 			construct( awesome, Foo.class );
@@ -101,14 +100,12 @@ public class TestTargetedBinds {
 
 	@Test
 	public void thatBindWithTargetIsUsedWhenInjectingIntoIt() {
-		Foo foo = injector.resolve( dependency( Foo.class ) );
-		assertSame( BAR_IN_FOO, foo.bar );
+		assertSame( BAR_IN_FOO, injector.resolve( Foo.class ).bar );
 	}
 
 	@Test
 	public void thatBindWithTargetIsNotUsedWhenNotInjectingIntoIt() {
-		Bar bar = injector.resolve( dependency( Bar.class ) );
-		assertSame( BAR_EVERYWHERE_ELSE, bar );
+		assertSame( BAR_EVERYWHERE_ELSE, injector.resolve( Bar.class ) );
 	}
 
 	@Test
@@ -120,22 +117,17 @@ public class TestTargetedBinds {
 
 	@Test
 	public void thatBindWithNamedTargetIsUsedWhenInjectingIntoIt() {
-		Dependency<Foo> fooDependency = dependency( Foo.class );
-		Foo foo = injector.resolve( fooDependency.named( named( "special" ) ) );
-		assertSame( BAR_EVERYWHERE_ELSE, foo.bar );
-		foo = injector.resolve( fooDependency.named( named( "Awesome" ) ) );
-		assertSame( BAR_IN_AWESOME_FOO, foo.bar );
+		assertSame( BAR_EVERYWHERE_ELSE, injector.resolve( "special", Foo.class ).bar );
+		assertSame( BAR_IN_AWESOME_FOO, injector.resolve( "Awesome", Foo.class ).bar );
 	}
 
 	@Test
 	public void thatBindWithInterfaceTargetIsUsedWhenInjectingIntoClassHavingThatInterface() {
-		Baz baz = injector.resolve( dependency( Baz.class ) );
-		assertSame( BAR_IN_SERIALIZABLE, baz.bar );
+		assertSame( BAR_IN_SERIALIZABLE, injector.resolve( Baz.class ).bar );
 	}
 
 	@Test
 	public void thatBindWithExactClassTargetIsUsedWhenInjectingIntoClassHavingThatClassButAlsoAnInterfaceMatching() {
-		Qux qux = injector.resolve( dependency( Qux.class ) );
-		assertSame( BAR_IN_QUX, qux.bar );
+		assertSame( BAR_IN_QUX, injector.resolve( Qux.class ).bar );
 	}
 }

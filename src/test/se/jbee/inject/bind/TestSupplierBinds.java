@@ -1,7 +1,6 @@
 package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertEquals;
-import static se.jbee.inject.Dependency.dependency;
 
 import org.junit.Test;
 
@@ -31,7 +30,7 @@ public class TestSupplierBinds {
 	@Test
 	public void test() {
 		Injector injector = Bootstrap.injector( SupplierBindsModule.class );
-		String value = injector.resolve( dependency( String.class ) );
+		String value = injector.resolve( String.class );
 		assertEquals( "foobar", value );
 	}
 }

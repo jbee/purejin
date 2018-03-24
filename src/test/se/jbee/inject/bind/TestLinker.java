@@ -1,7 +1,6 @@
 package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertEquals;
-import static se.jbee.inject.Dependency.dependency;
 
 import org.junit.Test;
 
@@ -39,6 +38,6 @@ public class TestLinker {
 	@Test
 	public void thatMonomodalModulesCanBeInstalledTwice() {
 		Injector injector = Bootstrap.injector( LinkerBundle.class );
-		assertEquals( 42, injector.resolve( dependency( Integer.class ) ).intValue() );
+		assertEquals( 42, injector.resolve( Integer.class ).intValue() );
 	}
 }

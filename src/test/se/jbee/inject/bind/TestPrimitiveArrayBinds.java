@@ -1,7 +1,6 @@
 package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertArrayEquals;
-import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 
 import org.junit.Test;
@@ -13,7 +12,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
 
 /**
  * This test demonstrates how to add automatic primitive array support.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestPrimitiveArrayBinds {
@@ -33,7 +32,7 @@ public class TestPrimitiveArrayBinds {
 	 * A {@link Supplier} like this would be needed for each of the primitive types to make their
 	 * arrays work like the wrapper arrays do. Since there is little benefit and easy to add in this
 	 * it is not part of the tool Silk.
-	 * 
+	 *
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	private static class IntArraySupplier
@@ -41,7 +40,7 @@ public class TestPrimitiveArrayBinds {
 
 		@Override
 		public int[] supply( Dependency<? super int[]> dependency, Injector injector ) {
-			Integer[] values = injector.resolve( dependency( Integer[].class ) );
+			Integer[] values = injector.resolve( Integer[].class );
 			int[] primitives = new int[values.length];
 			for ( int i = 0; i < primitives.length; i++ ) {
 				primitives[i] = values[i];
@@ -55,6 +54,6 @@ public class TestPrimitiveArrayBinds {
 
 	@Test
 	public void thatPrimitiveArrayIsAvailable() {
-		assertArrayEquals( new int[] { 7, 42 }, injector.resolve( dependency( int[].class ) ) );
+		assertArrayEquals( new int[] { 7, 42 }, injector.resolve( int[].class) );
 	}
 }

@@ -16,6 +16,7 @@ v0.11 (upcoming)
 - moved `Invoke` static methods to `Supply`
 - improved `PresetModule` now also supplies the `Presets` itself
 - added `to` for JDK 8 `Supplier` (method references)
+- added `Injector.resolve` `default` methods for convenience
 - renamed `Array.of` to `Array.array`
 
 v0.10

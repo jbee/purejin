@@ -4,7 +4,6 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static se.jbee.inject.Dependency.dependency;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,9 +25,9 @@ public class AssertInjects {
 	public <T> void assertInjects( T expected, Type<? extends T> dependencyType ) {
 		if (expected instanceof Object[]) {
 			Object[] arr = (Object[]) expected;
-			assertArrayEquals(arr, (Object[]) injector.resolve( dependency( dependencyType ) ) );
+			assertArrayEquals(arr, (Object[]) injector.resolve( dependencyType ) );
 		} else {
-			assertEquals( expected, injector.resolve( dependency( dependencyType ) ) );
+			assertEquals( expected, injector.resolve( dependencyType ) );
 		}
 	}
 
@@ -38,7 +37,7 @@ public class AssertInjects {
 
 	public <E> void assertInjectsItems( Collection<E> expected,
 			Type<? extends Collection<?>> dependencyType ) {
-		assertTrue( injector.resolve( dependency( dependencyType ) ).containsAll( expected ) );
+		assertTrue( injector.resolve( dependencyType ).containsAll( expected ) );
 	}
 
 	public static <E> void assertEqualSets( E[] expected, E[] actual ) {

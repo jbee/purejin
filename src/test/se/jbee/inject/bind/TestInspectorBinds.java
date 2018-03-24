@@ -5,11 +5,11 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
-import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Packages.packageAndSubPackagesOf;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.bootstrap.Inspect.all;
+import static se.jbee.inject.container.Typecast.providerTypeOf;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
@@ -30,15 +30,14 @@ import se.jbee.inject.bootstrap.Inspect;
 import se.jbee.inject.bootstrap.Inspector;
 import se.jbee.inject.container.Provider;
 import se.jbee.inject.container.Scoped;
-import se.jbee.inject.container.Typecast;
 
 /**
  * This test demonstrates the use of an {@link Inspector} to semi-automatically bind
  * {@link Constructor}s and/or {@link Method}s as 'provider' of an instance.
- * 
+ *
  * The example uses the {@link Inspect#all()} util as {@link Inspector}. It allows to narrow what is
  * bound automatically. For example {@link Annotation}s can be specified that need to be present.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestInspectorBinds {
@@ -150,12 +149,12 @@ public class TestInspectorBinds {
 
 	@Test
 	public void thatInstanceFactoryMethodIsAvailable() {
-		assertEquals( 42f, injector.resolve(dependency(float.class)).floatValue(), 0.01f );
+		assertEquals( 42f, injector.resolve(float.class).floatValue(), 0.01f );
 	}
 
 	@Test
 	public void thatStaticFactoryMethodIsAvailable() {
-		assertEquals( 42, injector.resolve( dependency( int.class ) ).intValue() );
+		assertEquals( 42, injector.resolve( int.class).intValue() );
 	}
 
 	/**
@@ -164,12 +163,12 @@ public class TestInspectorBinds {
 	 */
 	@Test
 	public void thatInstanceFactoryMethodWithParametersIsAvailable() {
-		assertEquals( 42d, injector.resolve(dependency(double.class)), 0.01d );
+		assertEquals( 42d, injector.resolve(double.class), 0.01d );
 	}
 
 	@Test
 	public void thatStaticFactoryMethodWithParametersIsAvailable() {
-		assertEquals( 84L, injector.resolve( dependency( long.class ) ).longValue() );
+		assertEquals( 84L, injector.resolve(long.class).longValue() );
 	}
 
 	/**
@@ -180,43 +179,40 @@ public class TestInspectorBinds {
 	 */
 	@Test
 	public void thatNamedWithAnnotationCanBeUsedToGetNamedResources() {
-		assertEquals( 42d,
-				injector.resolve(dependency(double.class).named("foo")), 0.01d );
+		assertEquals( 42d, injector.resolve("foo", double.class), 0.01d );
 	}
 
 	@Test
 	public void thatMethodsAreBoundThatAreAssignableToSpecifiedType() {
-		assertEquals(
-				true,
-				injector.resolve( dependency( Typecast.providerTypeOf( Boolean.class ) ) ).provide() );
+		assertEquals(true, injector.resolve(providerTypeOf(Boolean.class)).provide());
 	}
 
 	@Test ( expected = NoResourceForDependency.class )
 	public void thatNoMethodsAreBoundThatAreNotAssignableToSpecifiedType() {
-		injector.resolve( dependency( Character.class ) );
+		injector.resolve( Character.class );
 	}
 
 	@Test
 	public void thatMethodsAreBoundThatAreInSpecifiedPackagesSet() {
-		assertEquals( named( "foobar" ), injector.resolve( dependency( Name.class ) ) );
+		assertEquals( named( "foobar" ), injector.resolve( Name.class ) );
 	}
 
 	@Test ( expected = NoResourceForDependency.class )
 	public void thatNoMethodsAreBoundThatAreNotInSpecifiedPackagesSet() {
-		injector.resolve( dependency( String.class ) );
+		injector.resolve( String.class );
 	}
 
 	@Test
 	public void thatMethodsAreBoundToSpecificInstance() {
-		assertSame( STATE, injector.resolve( dependency( StringBuffer.class ) ) );
+		assertSame( STATE, injector.resolve( StringBuffer.class ) );
 	}
 
 	@Test
 	public void thatDeclaredScopeIsUsedForInspectedBindings() {
-		byte first = injector.resolve( dependency( byte.class ) );
-		byte second = injector.resolve( dependency( byte.class ) );
+		byte first = injector.resolve( byte.class );
+		byte second = injector.resolve( byte.class );
 		assertEquals( first + 1, second );
-		byte third = injector.resolve( dependency( byte.class ) );
+		byte third = injector.resolve( byte.class );
 		assertEquals( second + 1, third );
 	}
 }

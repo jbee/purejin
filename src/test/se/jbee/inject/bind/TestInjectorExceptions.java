@@ -1,6 +1,5 @@
 package se.jbee.inject.bind;
 
-import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 
 import org.junit.Test;
@@ -27,12 +26,12 @@ public class TestInjectorExceptions {
 
 	@Test ( expected = NoResourceForDependency.class )
 	public void thatExceptionIsThrownWhenResolvingAnUnboundDependency() {
-		injector.resolve( dependency( String.class ) );
+		injector.resolve( String.class );
 	}
 
 	@Test ( expected = NoResourceForDependency.class )
 	public void thatExceptionIsThrownWhenResolvingAnUnboundDependencyWithBoundRawType() {
-		injector.resolve( dependency( Integer.class ).named( Name.DEFAULT ) );
+		injector.resolve( Name.DEFAULT, Integer.class );
 	}
 
 }

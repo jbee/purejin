@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.action;
@@ -40,9 +40,9 @@ import se.jbee.inject.container.Scoped;
 
 /**
  * When binding {@link Action}s this {@link Module} can be extended.
- * 
+ *
  * It provides procedure-related bind methods.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public abstract class ActionModule
@@ -60,12 +60,12 @@ public abstract class ActionModule
 	public static <I,O> Dependency<Action<I,O>> actionDependency(Type<I> input, Type<O> output) {
 		Type type = raw(Action.class).parametized(input, output);
 		return dependency(type);
-	}	
-	
+	}
+
 	protected final void bindActionsIn( Class<?> impl ) {
 		plug(impl).into(Action.class);
 	}
-	
+
 	protected final void discoverActionsBy( Inspector inspector ) {
 		bind( ACTION_INSPECTOR ).to( inspector );
 	}
@@ -85,7 +85,7 @@ public abstract class ActionModule
 		}
 
 	}
-	
+
 	static final class DirectExecutor implements Executor {
 
 		@Override
@@ -122,11 +122,11 @@ public abstract class ActionModule
 		public ActionSupplier( Injector injector ) {
 			super();
 			this.injector = injector;
-			this.executor = injector.resolve(dependency(Executor.class));
+			this.executor = injector.resolve(Executor.class);
 			this.implementationClasses = injector.resolve( pluginsFor(Action.class) );
 			this.inspect = injector.resolve( dependency( ACTION_INSPECTOR ).injectingInto(ActionSupplier.class));
 		}
-		
+
 		@Override
 		public Action<?, ?> supply( Dependency<? super Action<?, ?>> dependency, Injector injector ) {
 			Type<? super Action<?, ?>> type = dependency.type();
@@ -142,7 +142,7 @@ public abstract class ActionModule
 					action = cachedActions.get( key );
 					if ( action == null ) {
 						Method method = resolveAction( input, output );
-						Object impl = injector.resolve( dependency( method.getDeclaringClass() ) );
+						Object impl = injector.resolve( method.getDeclaringClass() );
 						action = new ExecutedAction<>(impl, method, input, output, executor, injector);
 						cachedActions.put( key, action );
 					}
@@ -188,20 +188,20 @@ public abstract class ActionModule
 			return methods;
 		}
 	}
-	
+
 	private static final class ExecutedAction<I,O> implements Action<I, O> {
-		
+
 		private final Object impl;
 		private final Method action;
 		private final Type<I> input;
 		private final Type<O> output;
-		
+
 		private final Executor executor;
 		private final Injector injector;
 
 		private final InjectionSite injection;
 		private final int inputIndex;
-		
+
 		ExecutedAction(Object impl, Method action, Type<I> input, Type<O> output, Executor executor, Injector injector) {
 			super();
 			this.impl = impl;
@@ -214,7 +214,7 @@ public abstract class ActionModule
 			this.injection = new InjectionSite(dependency(output).injectingInto(action.getDeclaringClass()), injector, BoundParameter.bind(types, BoundParameter.constant(input, null)));
 			this.inputIndex = asList(types).indexOf(input);
 		}
-		
+
 		@Override
 		public O exec(I input) throws ActionMalfunction {
 			Object[] args = null;

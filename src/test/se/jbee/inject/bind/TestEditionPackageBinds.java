@@ -3,7 +3,6 @@ package se.jbee.inject.bind;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
-import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Packages.packageAndSubPackagesOf;
 import static se.jbee.inject.Packages.subPackagesOf;
 
@@ -23,7 +22,7 @@ import se.jbee.inject.config.Globals;
  * are located.
  *
  * @see TestEditionFeatureBinds
- * 
+ *
  * @author jan
  */
 public class TestEditionPackageBinds {
@@ -34,38 +33,38 @@ public class TestEditionPackageBinds {
 		protected void declare() {
 			bind(Integer.class).to(42);
 		}
-		
+
 	}
-	
+
 	static final class EditionPackageBindsBundle extends BootstrapperBundle {
 
 		@Override
 		protected void bootstrap() {
 			install(EditionPackageBindsModule.class);
 		}
-		
+
 	}
-	
+
 	@Test
 	public void editionsCanBeUsedToInstallBundlesPackageDependent() {
 		// no edition
 		Injector injector = Bootstrap.injector(EditionPackageBindsBundle.class);
-		assertEquals(42, injector.resolve(dependency(int.class)).intValue());
-		
+		assertEquals(42, injector.resolve(int.class).intValue());
+
 		// an edition without the module in this test
-		injector = Bootstrap.injector(EditionPackageBindsBundle.class, 
+		injector = Bootstrap.injector(EditionPackageBindsBundle.class,
 				Globals.STANDARD.edition(subPackagesOf(TestEditionPackageBinds.class)));
 		try {
-			Integer res = injector.resolve(dependency(int.class));
+			Integer res = injector.resolve(int.class);
 			assertNull(res);
 			fail("Should have thrown exception since EditionPackageBindsModule should not have been installed");
 		} catch (NoResourceForDependency e) {
 			// expected this
 		}
-		
+
 		// an edition including the module in this test
-		injector = Bootstrap.injector(EditionPackageBindsBundle.class, 
+		injector = Bootstrap.injector(EditionPackageBindsBundle.class,
 				Globals.STANDARD.edition(packageAndSubPackagesOf(TestEditionPackageBinds.class)));
-		assertEquals(42, injector.resolve(dependency(int.class)).intValue());
+		assertEquals(42, injector.resolve(int.class).intValue());
 	}
 }

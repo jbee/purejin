@@ -5,6 +5,10 @@
  */
 package se.jbee.inject;
 
+import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Instance.instance;
+import static se.jbee.inject.Name.named;
+import static se.jbee.inject.Type.raw;
 
 /**
  * Knows how to *resolve* an instance for a given {@link Dependency}.
@@ -24,5 +28,31 @@ public interface Injector {
 
 	<T> T resolve( Dependency<T> dependency ) throws UnresolvableDependency;
 
-	//TODO add default methods
+	/*
+	 * Utility methods
+	 */
+
+	default <T> T resolve( Class<T> type ) {
+		return resolve(dependency(type));
+	}
+
+	default <T> T resolve( Type<T> type ) {
+		return resolve(dependency(type));
+	}
+
+	default <T> T resolve( String name, Class<T> type ) {
+		return resolve(named(name), type);
+	}
+
+	default <T> T resolve( Name name, Class<T> type ) {
+		return resolve(name, raw(type));
+	}
+
+	default <T> T resolve( Name name, Type<T> type ) {
+		return resolve(instance(name, type));
+	}
+
+	default <T> T resolve( Instance<T> inst ) {
+		return resolve(dependency(inst));
+	}
 }

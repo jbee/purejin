@@ -28,7 +28,7 @@ import se.jbee.inject.container.Scoped;
  * runtime dependent on a setting in some setting object. This example shows
  * also how to extend the {@link BinderModule} to introduce a custom utility
  * such as {@link ControllerModule#connect(Class)}
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestStateDependentBinds {
@@ -97,9 +97,9 @@ public class TestStateDependentBinds {
 	/*
 	 * Module and Bundle code to setup scenario
 	 */
-	
+
 	public static abstract class ControllerModule extends BinderModule {
-		
+
 		public <T, C> ControllerBinder<T> connect( Class<T> type ) {
 			return connect( raw( type ) );
 		}
@@ -108,7 +108,7 @@ public class TestStateDependentBinds {
 			return new ControllerBinder<>( root, type );
 		}
 	}
-	
+
 	public static class ControllerBinder<T> {
 
 		private final RootBinder binder;
@@ -127,14 +127,14 @@ public class TestStateDependentBinds {
 		public <S> void via(Type<S> state) {
 			binder.per(Scoped.INJECTION).bind( type ).to( stateDependent(type, Dependency.dependency(state)) );
 		}
-		
+
 	}
-	
+
 	/**
 	 * This is a indirection that resolves a {@link Type} dependent on another current
 	 * {@link ValidationStrength} value. This can be understand as a dynamic <i>name</i> switch so that a
 	 * call is resolved to different named instances.
-	 * 
+	 *
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	private static final class StateDependentSupplier<T, S>
@@ -166,7 +166,7 @@ public class TestStateDependentBinds {
 				throw e;
 			}
 		}
-	}	
+	}
 
 	/**
 	 * This module demonstrates state dependent binds on a low level using general binds.
@@ -177,7 +177,7 @@ public class TestStateDependentBinds {
 		@Override
 		protected void declare() {
 			per( Scoped.INJECTION ).bind( Validator.class ).to(	stateDependent(Type.raw(Validator.class), dependency(ValidationStrength.class)) );
-			
+
 			bind( named( ValidationStrength.PERMISSIVE ), Validator.class ).to(	Permissive.class );
 			bind( named( ValidationStrength.STRICT ), Validator.class ).to( Strict.class );
 			bind( named( (Object)null ), Validator.class ).to( Permissive.class );
@@ -194,7 +194,7 @@ public class TestStateDependentBinds {
 	/**
 	 * The same as above using {@link #connect(Class)}s. The important difference is that it is
 	 * not required to manually bind to a {@link ValidationStrength} value.
-	 * 
+	 *
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	private static class StateDependentBindsModule2
@@ -220,7 +220,7 @@ public class TestStateDependentBinds {
 		@Override
 		protected void declare() {
 			connect(String.class).via(Integer.class);
-			
+
 			bind(named(42), String.class).to( "Now it is 42" );
 			bind(named(7), String.class).to( "Now it is 7" );
 			bind(named((Object)null), String.class).to( "Default is undefined" );
@@ -255,24 +255,23 @@ public class TestStateDependentBinds {
 	}
 
 	private static void assertStateChangeIsResolvedToAnotherImplementation( Injector injector ) {
-		Dependency<Validator> dependency = dependency( Validator.class );
-		StatefulObject config = injector.resolve( dependency( StatefulObject.class ) );
-		Validator v = injector.resolve( dependency );
+		StatefulObject config = injector.resolve( StatefulObject.class );
+		Validator v = injector.resolve( Validator.class );
 		String input = "input";
 		assertTrue( v.valid( input ) ); // default was PERMISSIVE
 		config.setValidationStrength( ValidationStrength.STRICT );
-		v = injector.resolve( dependency );
+		v = injector.resolve( Validator.class );
 		assertFalse( v.valid( input ) ); // STRICT
 		config.setValidationStrength( ValidationStrength.PERMISSIVE );
-		v = injector.resolve( dependency );
+		v = injector.resolve( Validator.class );
 		assertTrue( v.valid( input ) ); // PERMISSIVE
 	}
 
 	@Test
 	public void thatStateChangeIsProvidedToAnotherImplementation() {
 		Injector injector = Bootstrap.injector( StateDependentBindsBundle.class );
-		StatefulObject config = injector.resolve( dependency( StatefulObject.class ) );
-		Provider<Validator> v = injector.resolve( dependency( providerTypeOf( Validator.class ) ) );
+		StatefulObject config = injector.resolve( StatefulObject.class );
+		Provider<Validator> v = injector.resolve( providerTypeOf( Validator.class ) );
 		String input = "input";
 		assertTrue( v.provide().valid( input ) );
 		config.setValidationStrength( ValidationStrength.STRICT );
@@ -291,9 +290,9 @@ public class TestStateDependentBinds {
 
 	private static void assertConfigNumberResolvedToStringEnding( Integer actualValue, String ending ) {
 		Injector injector = Bootstrap.injector( StateDependentBindsModule3.class );
-		StatefulObject state = injector.resolve( dependency( StatefulObject.class ) );
+		StatefulObject state = injector.resolve( StatefulObject.class );
 		state.setNumber( actualValue );
-		String v = injector.resolve( dependency( String.class ) );
+		String v = injector.resolve( String.class );
 		assertTrue( v.endsWith( ending ) );
 	}
 }

@@ -3,7 +3,6 @@ package se.jbee.inject.bind;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static se.jbee.inject.Dependency.dependency;
 
 import org.junit.Test;
 
@@ -12,7 +11,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
 
 /**
  * The test demonstrates binds that are 'linked' by type.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestInstanceBinds {
@@ -37,13 +36,13 @@ public class TestInstanceBinds {
 
 	@Test
 	public void thatNumberDependencyIsResolvedToIntegerBoundSupplier() {
-		Number number = injector.resolve( dependency( Number.class ) );
+		Number number = injector.resolve( Number.class );
 		assertTrue(number instanceof Integer);
 		assertEquals( 42, number.intValue() );
 	}
 
 	@Test
 	public void thatTypeLinkedBackToItselfBecomesConstructorBinding() {
-		assertNotNull( injector.resolve( dependency( Foo.class ) ) );
+		assertNotNull( injector.resolve( Foo.class ) );
 	}
 }

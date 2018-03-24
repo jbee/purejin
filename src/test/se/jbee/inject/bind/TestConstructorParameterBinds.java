@@ -2,7 +2,6 @@ package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
@@ -26,17 +25,17 @@ import se.jbee.inject.container.Scoped;
 /**
  * The test illustrates how to use {@link Parameter}s to give hints which resources should be
  * injected as constructor arguments.
- * 
+ *
  * Thereby it is important to notice that the list of {@linkplain Parameter}s does *not* describe
  * which {@link Constructor} to use! Hence the sequence does *not* has to match the parameter
  * sequence in the constructor definition. As long as types are not assignable a
  * {@linkplain Parameter} is tried to used as the next constructor parameter. The first assignable
  * is used.
- * 
+ *
  * @see TestDependencyParameterBinds
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
- * 
+ *
  */
 public class TestConstructorParameterBinds {
 
@@ -138,17 +137,17 @@ public class TestConstructorParameterBinds {
 
 	@Test
 	public void thatClassParameterIsArranged() {
-		assertNotNull( injector.resolve( dependency( Foo.class ) ) );
+		assertNotNull( injector.resolve( Foo.class ) );
 	}
 
 	@Test
 	public void thatTypeParameterIsArranged() {
-		assertNotNull( injector.resolve( dependency( Bar.class ) ) );
+		assertNotNull( injector.resolve( Bar.class ) );
 	}
 
 	@Test
 	public void thatInstanceParameterIsArranged() {
-		Bar bar = injector.resolve( dependency( Bar.class ) );
+		Bar bar = injector.resolve( Bar.class );
 		assertEquals( "y", bar.foo );
 	}
 
@@ -161,7 +160,7 @@ public class TestConstructorParameterBinds {
 	 */
 	@Test
 	public void thatParameterAsAnotherTypeIsArranged() {
-		Qux qux = injector.resolve( dependency( Qux.class ) );
+		Qux qux = injector.resolve( Qux.class );
 		assertEquals( "y", qux.sequence );
 	}
 
@@ -170,13 +169,13 @@ public class TestConstructorParameterBinds {
 	 */
 	@Test
 	public void thatConstantParameterIsArranged() {
-		Qux qux = injector.resolve( dependency( Qux.class ) );
+		Qux qux = injector.resolve( Qux.class );
 		assertEquals( 1980, qux.value );
 	}
 
 	@Test
 	public void thatReoccuringTypesAreArrangedAsOccuringAfterAnother() {
-		Baz baz = injector.resolve( dependency( Baz.class ) );
+		Baz baz = injector.resolve( Baz.class );
 		assertEquals( "y" , baz.foo );
 		assertEquals( "when x alignment after another is broken", "y", baz.bar );
 	}
@@ -193,11 +192,10 @@ public class TestConstructorParameterBinds {
 	 */
 	@Test
 	public void thatCustomParameterIsArranged() {
-		Dependency<Foo> incFooDependency = dependency( Foo.class ).named( "inc" );
-		Foo foo = injector.resolve( incFooDependency );
+		Foo foo = injector.resolve( "inc", Foo.class );
 		assertEquals( 0, foo.baz.intValue() );
 
-		foo = injector.resolve( incFooDependency );
+		foo = injector.resolve( "inc", Foo.class );
 		assertEquals( 1, foo.baz.intValue() );
 	}
 }

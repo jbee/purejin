@@ -2,7 +2,6 @@ package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 
 import org.junit.Test;
@@ -14,9 +13,9 @@ import se.jbee.inject.bootstrap.Bootstrap;
 
 /**
  * In Silk primitives and wrapper {@link Class}es are the same {@link Type}.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
- * 
+ *
  */
 public class TestPrimitiveBinds {
 
@@ -61,53 +60,53 @@ public class TestPrimitiveBinds {
 
 	@Test
 	public void thatIntPrimitivesWorkAsWrapperClasses() {
-		assertEquals( 42, injector.resolve( dependency( Integer.class ) ).intValue() );
-		assertEquals( 42, injector.resolve( dependency( int.class ) ).intValue() );
+		assertEquals( 42, injector.resolve( Integer.class ).intValue() );
+		assertEquals( 42, injector.resolve( int.class ).intValue() );
 	}
 
 	@Test
 	public void thatLongPrimitivesWorkAsWrapperClasses() {
-		assertEquals( 132L, injector.resolve( dependency( Long.class ) ).longValue() );
-		assertEquals( 132L, injector.resolve( dependency( long.class ) ).longValue() );
+		assertEquals( 132L, injector.resolve( Long.class ).longValue() );
+		assertEquals( 132L, injector.resolve( long.class ).longValue() );
 	}
 
 	@Test
 	public void thatBooleanPrimitivesWorkAsWrapperClasses() {
-		assertEquals( true, injector.resolve( dependency( Boolean.class ) ) );
-		assertEquals( true, injector.resolve( dependency( boolean.class ) ) );
+		assertEquals( true, injector.resolve( Boolean.class ) );
+		assertEquals( true, injector.resolve( boolean.class ) );
 	}
 
 	@Test
 	public void thatFloatPrimitivesWorkAsWrapperClasses() {
-		assertEquals( 3.1415f, injector.resolve(dependency(Float.class).named("pi")).floatValue(), 0.01f );
-		assertEquals( 3.1415f, injector.resolve(dependency(float.class).named("pi")).floatValue(), 0.01f );
+		assertEquals( 3.1415f, injector.resolve("pi", Float.class).floatValue(), 0.01f );
+		assertEquals( 3.1415f, injector.resolve("pi", float.class).floatValue(), 0.01f );
 	}
 
 	@Test
 	public void thatDoublePrimitivesWorkAsWrapperClasses() {
-		assertEquals( 2.71828d, injector.resolve(dependency(Double.class).named("e")), 0.01d );
-		assertEquals( 2.71828d, injector.resolve(dependency(double.class).named("e")), 0.01d );
+		assertEquals( 2.71828d, injector.resolve("e", Double.class), 0.01d );
+		assertEquals( 2.71828d, injector.resolve("e", double.class), 0.01d );
 	}
 
 	/**
 	 * To allow such a automatic conversion a bridge could be bound for each of the primitives. Such
 	 * a bind would look like this.
-	 * 
+	 *
 	 * <pre>
 	 * bind( int[].class ).to( new IntToIntergerArrayBridgeSupplier() );
 	 * </pre>
-	 * 
+	 *
 	 * The stated bridge class is not a part of Silk but easy to do. Still a loot of code for all
 	 * the primitives for a little benefit.
 	 */
 	@Test ( expected = NoResourceForDependency.class )
 	public void thatPrimitveArrayNotWorkAsWrapperArrayClasses() {
-		assertArrayEquals( new int[42], injector.resolve( dependency( int[].class ) ) );
+		assertArrayEquals( new int[42], injector.resolve( int[].class ) );
 	}
 
 	@Test
 	public void thatPrimitivesWorkAsPrimitiveOrWrapperClassesWhenInjected() {
-		PrimitiveBindsBean bean = injector.resolve( dependency( PrimitiveBindsBean.class ) );
+		PrimitiveBindsBean bean = injector.resolve( PrimitiveBindsBean.class );
 		assertEquals( 42, bean.i );
 		assertEquals( 3.1415f, bean.f, 0.01f );
 		assertEquals( true, bean.b );

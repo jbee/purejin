@@ -1,7 +1,6 @@
 package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertEquals;
-import static se.jbee.inject.Dependency.dependency;
 
 import org.junit.Test;
 
@@ -65,11 +64,11 @@ public class TestParentTargetBinds {
 
 	@Test
 	public void thatBindWithParentTargetIsUsedWhenInjectionHasParent() {
-		Grandparent grandparent = injector.resolve( dependency( Grandparent.class ) );
+		Grandparent grandparent = injector.resolve( Grandparent.class );
 		assertEquals( "child-with-grandparent", grandparent.parent.child.value );
-		Parent parent = injector.resolve( dependency( Parent.class ) );
+		Parent parent = injector.resolve( Parent.class );
 		assertEquals( "child-with-parent", parent.child.value );
-		assertEquals( "child", injector.resolve( dependency( Child.class ) ).value );
+		assertEquals( "child", injector.resolve( Child.class ).value );
 	}
 
 	/**
@@ -77,8 +76,8 @@ public class TestParentTargetBinds {
 	 */
 	@Test
 	public void thatBindWithParentTargetIsNotUsedWhenInjectionHasNoParent() {
-		assertEquals( "child", injector.resolve( dependency( Child.class ) ).value );
-		assertEquals( "everywhere", injector.resolve( dependency( String.class ) ) );
+		assertEquals( "child", injector.resolve( Child.class ).value );
+		assertEquals( "everywhere", injector.resolve( String.class ) );
 	}
 
 }

@@ -16,7 +16,7 @@ import se.jbee.inject.bootstrap.BootstrapperBundle;
 
 /**
  * Solution for cycle on common interface injecting other implementations into one of them.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestIssue1 {
@@ -97,14 +97,12 @@ public class TestIssue1 {
 	@Test
 	public void thatBundleCanBeBootstrapped() {
 		Injector injector = Bootstrap.injector( Bundle1.class );
-		B b = injector.resolve( dependency( B.class ) );
-		B leftB = injector.resolve( dependency( B.class ).named( left ) );
+		B b = injector.resolve( B.class );
+		B leftB = injector.resolve(left, B.class);
 		assertNotSame( b, leftB );
 		assertEquals( 2, leftB.as.length );
-		C c = injector.resolve( dependency( C.class ).injectingInto(
-				instance( left, raw( B.class ) ) ) );
-		D d = injector.resolve( dependency( D.class ).injectingInto(
-				instance( left, raw( B.class ) ) ) );
+		C c = injector.resolve(dependency(C.class).injectingInto(instance(left, raw(B.class))));
+		D d = injector.resolve(dependency(D.class).injectingInto(instance(left, raw(B.class))));
 		assertEqualSets( new A[] { c, d }, leftB.as );
 	}
 }

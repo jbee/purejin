@@ -68,7 +68,7 @@ public final class Bootstrap {
 	}
 
 	public static void eagerSingletons( Injector injector ) {
-		for ( Injectron<?> i : injector.resolve( dependency( Injectron[].class ) ) ) {
+		for ( Injectron<?> i : injector.resolve( Injectron[].class ) ) {
 			if ( i.info().expiry.isNever() ) {
 				instance( i ); // instantiate to make sure they exist in repository
 			}

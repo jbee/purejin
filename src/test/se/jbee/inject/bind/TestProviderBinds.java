@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
-import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
@@ -118,14 +117,14 @@ public class TestProviderBinds {
 
 	@Test
 	public void providersAreAvailableForArrays() {
-		WorkingStateConsumer state = injector.resolve( dependency( WorkingStateConsumer.class ) );
+		WorkingStateConsumer state = injector.resolve( WorkingStateConsumer.class );
 		assertNotNull(state.strings);
 		String[] strings = state.strings.provide();
 		assertEquals(2, strings.length);
 		assertEquals("foobar", strings[0]);
 		assertEquals("special", strings[1]);
 	}
-	
+
 	@Test
 	public void providersAreAvailableForLists() {
 		List<String> list = asList( "foobar", "special" );
@@ -140,26 +139,26 @@ public class TestProviderBinds {
 
 	@Test
 	public void providersOvercomeExpirationConflicts() {
-		injector.resolve( dependency( WorkingStateConsumer.class ) );
+		injector.resolve(WorkingStateConsumer.class );
 	}
 
 	@Test ( expected = UnstableDependency.class )
 	public void expirationConflictsCauseException() {
-		injector.resolve( dependency( FaultyStateConsumer.class ) );
+		injector.resolve( FaultyStateConsumer.class );
 	}
 
 	@Test
 	public void providersKeepHierarchySoProvidedDependencyIsResolvedAsIfResolvedDirectly() {
-		WorkingStateConsumer a = injector.resolve( dependency( A ) );
+		WorkingStateConsumer a = injector.resolve( A );
 		assertSame( DYNAMIC_STATE_IN_A, a.state() );
-		WorkingStateConsumer b = injector.resolve( dependency( B ) );
+		WorkingStateConsumer b = injector.resolve( B );
 		assertNotSame( a, b );
 		assertSame( DYNAMIC_STATE_IN_B, b.state() );
 	}
-	
+
 	@Test
 	public void providersCanBeCombinedWithOtherBridges() {
-		Provider<List<WorkingStateConsumer>> provider = injector.resolve(dependency(providerTypeOf(listTypeOf(WorkingStateConsumer.class))));
+		Provider<List<WorkingStateConsumer>> provider = injector.resolve(providerTypeOf(listTypeOf(WorkingStateConsumer.class)));
 		assertNotNull(provider);
 		List<WorkingStateConsumer> consumers = provider.provide();
 		assertEquals(3, consumers.size());
@@ -170,7 +169,7 @@ public class TestProviderBinds {
 
 	@Test
 	public void providerCanProvidePerInjectionInstanceWithinAnPerApplicationParent() {
-		WorkingStateConsumer obj = injector.resolve( dependency( WorkingStateConsumer.class ) );
+		WorkingStateConsumer obj = injector.resolve( WorkingStateConsumer.class );
 		assertNotNull( obj.state() ); // if expiry is a problem this will throw an exception
 	}
 
@@ -178,10 +177,8 @@ public class TestProviderBinds {
 		assertInjectsProviderFor( expected, dependencyType, Name.ANY );
 	}
 
-	private <T> void assertInjectsProviderFor( T expected, Type<? extends T> dependencyType,
-			Name name ) {
-		Type<? extends Provider<? extends T>> type = providerTypeOf( dependencyType );
-		Provider<?> provider = injector.resolve( dependency( type ).named( name ) );
+	private <T> void assertInjectsProviderFor( T expected, Type<? extends T> dependencyType, Name name ) {
+		Provider<?> provider = injector.resolve( name, providerTypeOf( dependencyType ) );
 		assertEquals( expected, provider.provide() );
 	}
 }

@@ -1,7 +1,6 @@
 package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertArrayEquals;
-import static se.jbee.inject.Dependency.dependency;
 
 import org.junit.Test;
 
@@ -18,14 +17,14 @@ import se.jbee.inject.config.Options;
  * The test demonstrates how to use {@link Options} to allow different bootstrapping depended on a
  * setting that can be determined before the bootstrapping and that is constant from that moment on.
  * In this example it is the machine the application is running on.
- * 
+ *
  * Again this technique should avoid if-statements in the {@link Bundle}s and {@link Module}s itself
  * to get manageable and predictable sets of configurations that can be composed easily using
  * arguments to the bootstrapping process itself.
- * 
+ *
  * In this example we use {@link Binder#multibind(Class)}s to show that just one of them has been
  * bootstrapped depending on the value we defined in the {@link Options} before bootstrapping.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestOptionBinds {
@@ -103,9 +102,7 @@ public class TestOptionBinds {
 
 	private static void assertOptionResolvedToValue( Machine actualOption, String expected ) {
 		Options options = Options.STANDARD.chosen( actualOption );
-		Injector injector = Bootstrap.injector( ModularBindsBundle.class,
-				Globals.STANDARD.options( options ) );
-		String[] actual = injector.resolve( dependency( String[].class ) );
-		assertArrayEquals( new String[] { expected } , actual );
+		Injector injector = Bootstrap.injector( ModularBindsBundle.class, Globals.STANDARD.options( options ) );
+		assertArrayEquals( new String[] { expected } , injector.resolve( String[].class ) );
 	}
 }

@@ -182,7 +182,7 @@ public class Binder {
 
 		public <C> void withAll(Type<? extends C[]> arguments, BiConsumer<T, C> initialiser) {
 			binder.initbind().to(injector -> {
-				T obj = injector.resolve(dependency(target));
+				T obj = injector.resolve(target);
 				C[] args = injector.resolve(dependency(arguments).injectingInto(target));
 				for (C arg : args)
 					initialiser.accept(obj, arg);
@@ -199,7 +199,7 @@ public class Binder {
 
 		public <C> void with(Instance<? extends C> argument, BiConsumer<T, C> initialiser) {
 			binder.initbind().to(injector -> {
-				T obj = injector.resolve(dependency(target));
+				T obj = injector.resolve(target);
 				C arg = injector.resolve(dependency(argument).injectingInto(target));
 				initialiser.accept(obj, arg);
 			});

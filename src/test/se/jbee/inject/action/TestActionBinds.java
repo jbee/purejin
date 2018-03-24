@@ -9,9 +9,7 @@ import static se.jbee.inject.action.ActionModule.actionDependency;
 
 import org.junit.Test;
 
-import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
-import se.jbee.inject.UnresolvableDependency.SupplyFailed;
 import se.jbee.inject.bootstrap.Bootstrap;
 
 public class TestActionBinds {
@@ -32,7 +30,7 @@ public class TestActionBinds {
 		public Integer negate( Number value ) {
 			return -value.intValue();
 		}
-		
+
 		public Void error() {
 			throw new IllegalStateException("This should be wrapped!");
 		}
@@ -52,22 +50,19 @@ public class TestActionBinds {
 	@Test
 	public void actionsDecoupleConcreteMethods() {
 		Injector injector = Bootstrap.injector( ActionBindsModule.class );
-		Dependency<Action<Integer, Integer>> p1 = actionDependency(raw(Integer.class), raw(Integer.class));
-		Action<Integer, Integer> mul2 = injector.resolve( p1 );
+		Action<Integer, Integer> mul2 = injector.resolve(actionDependency(raw(Integer.class), raw(Integer.class)));
 		assertNotNull( mul2 );
 		assertEquals( 9, mul2.exec( 3 ).intValue() );
-		Dependency<Action<Number, Integer>> p2 = actionDependency(raw(Number.class), raw(Integer.class));
-		Action<Number, Integer> negate = injector.resolve( p2 );
+		Action<Number, Integer> negate = injector.resolve(actionDependency(raw(Number.class), raw(Integer.class)));
 		assertNotNull( mul2 );
 		assertEquals( -3, negate.exec( 3 ).intValue() );
 		assertEquals( 11, mul2.exec( 4 ).intValue() );
 	}
-	
+
 	@Test
 	public void exceptionsAreWrappedInActionMalfunction() {
 		Injector injector = Bootstrap.injector( ActionBindsModule.class );
-		Dependency<Action<Void, Void>> de = actionDependency(raw(Void.class), raw(Void.class));
-		Action<Void, Void> error = injector.resolve( de );
+		Action<Void, Void> error = injector.resolve( actionDependency(raw(Void.class), raw(Void.class)) );
 		try {
 			error.exec(null);
 			fail("Expected an exception...");

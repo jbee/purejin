@@ -3,7 +3,6 @@ package se.jbee.inject.bind;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.container.Typecast.listTypeOf;
 
@@ -99,13 +98,13 @@ public class TestPresetModuleBinds {
 
 	@Test
 	public void thatPresetValuePassedToModule() {
-		assertEquals( "bar", injector.resolve( dependency( String.class ).named( "foo" ) ) );
+		assertEquals( "bar", injector.resolve( "foo", String.class ) );
 	}
 
 	@Test
 	public void thatDifferentParametizedPresetValuesForSameGenericTypeArePosssible() {
-		assertEquals( "b", injector.resolve( dependency( String.class ).named( "list" ) ) );
-		assertEquals( 2, injector.resolve( dependency( Integer.class ).named( "list" ) ).intValue() );
+		assertEquals( "b", injector.resolve( "list", String.class ) );
+		assertEquals( 2, injector.resolve( "list", Integer.class ).intValue() );
 	}
 
 	@Test

@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
@@ -34,7 +34,7 @@ import se.jbee.inject.container.Provider;
 
 /**
  * Utility as a factory to create different kinds of {@link Supplier}s.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Supply {
@@ -81,12 +81,12 @@ public final class Supply {
 	}
 
 	public static <T> Supplier<T> method( BoundMethod<T> method ) {
-		return new MethodSupplier<>(method, 
+		return new MethodSupplier<>(method,
 				bind( parameterTypes(method.factory), method.parameters ));
 	}
 
 	public static <T> Supplier<T> costructor( BoundConstructor<T> constructor ) {
-		return new ConstructorSupplier<>( constructor.constructor, 
+		return new ConstructorSupplier<>( constructor.constructor,
 				bind( parameterTypes(constructor.constructor), constructor.parameters));
 	}
 
@@ -96,7 +96,7 @@ public final class Supply {
 
 	public static <T> Provider<T> lazyProvider( Dependency<T> dependency, Injector injector ) {
 		return dependency.type().arrayDimensions() == 1 // no injectrons for results composed within the Injector
-				? new LazyDirectProvider<>(dependency, injector) 
+				? new LazyDirectProvider<>(dependency, injector)
 				: new LazyProvider<>(dependency, injector);
 	}
 
@@ -126,12 +126,12 @@ public final class Supply {
 
 	/**
 	 * Shows how support for {@link List}s and such works.
-	 * 
+	 *
 	 * Basically we just resolve the array of the element type (generic of the list). Arrays itself
 	 * have build in support that will (if not redefined by a more precise binding) return all known
-	 * 
+	 *
 	 * @author Jan Bernitt (jan@jbee.se)
-	 * 
+	 *
 	 */
 	private static final class ArrayToListBridgeSupplier
 			extends ArrayBridgeSupplier<List<?>> {
@@ -207,7 +207,7 @@ public final class Supply {
 	/**
 	 * A {@link Supplier} uses multiple different separate suppliers to provide the elements of a
 	 * array of the supplied type.
-	 * 
+	 *
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	private static final class PredefinedArraySupplier<E> extends WithParameters<E[]> {
@@ -224,7 +224,7 @@ public final class Supply {
 
 		@Override
 		protected void init(Dependency<? super E[]> dependency, Injector injector) { /*NOOP*/ }
-		
+
 		@Override
 		protected E[] invoke(Object[] args) {
 			System.arraycopy(args, 0, res, 0, res.length);
@@ -281,7 +281,7 @@ public final class Supply {
 		}
 
 	}
-	
+
 	private static final class InstanceSupplier<T>
 			implements Supplier<T> {
 
@@ -321,9 +321,9 @@ public final class Supply {
 			return describe( "supplies", Provider.class );
 		}
 	}
-	
+
 	private static final class LazyDirectProvider<T> implements Provider<T> {
-		
+
 		private final Dependency<T> dependency;
 		private final Injector injector;
 
@@ -336,14 +336,14 @@ public final class Supply {
 		public T provide() throws UnresolvableDependency {
 			return injector.resolve(dependency);
 		}
-		
+
 	}
 
 	private static final class LazyProvider<T> implements Provider<T> {
 
 		private final Dependency<T> dependency;
 		private final Injectron<? extends T> injectron;
-		
+
 		@SuppressWarnings("unchecked")
 		LazyProvider( Dependency<T> dependency, Injector injector ) {
 			super();
@@ -387,7 +387,7 @@ public final class Supply {
 		}
 
 	}
-	
+
 	private static final class ConstructorSupplier<T> extends WithParameters<T> {
 
 		private final Constructor<T> constructor;
@@ -416,7 +416,7 @@ public final class Supply {
 		private final BoundMethod<T> method;
 		private Object owner;
 		private final Class<T> returnType;
-	
+
 		MethodSupplier( BoundMethod<T> method, BoundParameter<?>[] parameters ) {
 			super(parameters);
 			this.method = method;
@@ -427,10 +427,10 @@ public final class Supply {
 		@Override
 		protected void init(Dependency<? super T> dependency, Injector injector) {
 			if ( method.isInstanceMethod && owner == null ) {
-				owner = injector.resolve( Dependency.dependency( method.factory.getDeclaringClass() ) );
+				owner = injector.resolve( method.factory.getDeclaringClass() );
 			}
 		}
-		
+
 		@Override
 		protected T invoke(Object[] args) {
 			return returnType.cast(Supply.method( method.factory, owner, args ));
@@ -453,7 +453,7 @@ public final class Supply {
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
 			throw required(dependency);
 		}
-		
+
 		@SuppressWarnings("unchecked")
 		private static <T> NoResourceForDependency required(Dependency<T> dependency) {
 			return new NoResourceForDependency(dependency, (Injectron<T>[])new Injectron<?>[0], "Should never be called!" );
@@ -490,9 +490,9 @@ public final class Supply {
 	public static String describe( Object behaviour, Object[] variants ) {
 		return describe( behaviour, Arrays.toString( variants ) );
 	}
-	
+
 	public static abstract class WithParameters<T> implements Supplier<T> {
-		
+
 		private final BoundParameter<?>[] params;
 
 		private InjectionSite previous;
@@ -502,11 +502,11 @@ public final class Supply {
 			this.params = params;
 
 		}
-		
+
 		protected abstract void init(Dependency<? super T> dependency, Injector injector);
-		
+
 		protected abstract T invoke(Object[] args);
-		
+
 		@Override
 		public T supply(Dependency<? super T> dependency, Injector injector) throws UnresolvableDependency {
 			InjectionSite local = previous; // this is important so previous might work as a simple cache but never causes trouble for this invocation in face of multiple threads calling
@@ -517,9 +517,9 @@ public final class Supply {
 				local = new InjectionSite(dependency, injector, params);
 				previous = local;
 			}
-			return invoke(local.args(injector));	
+			return invoke(local.args(injector));
 		}
-	
+
 	}
 
 	public static <T> T constructor( Constructor<T> constructor, Object... args ) throws SupplyFailed {

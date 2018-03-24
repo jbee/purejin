@@ -1,6 +1,5 @@
 package se.jbee.inject.bind;
 
-import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.bind.AssertInjects.assertEqualSets;
 
 import org.junit.Test;
@@ -99,6 +98,6 @@ public class TestMultipleOptionChoicesBinds {
 		Options options = Options.STANDARD.chosen( Choices.A, Choices.D );
 		Globals globals = Globals.STANDARD.options( options );
 		Injector injector = Bootstrap.injector( RootBundle.class, globals );
-		assertEqualSets( new String[] { "A", "D" }, injector.resolve( dependency( String[].class ) ) );
+		assertEqualSets(new String[] { "A", "D" }, injector.resolve(String[].class));
 	}
 }

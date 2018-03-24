@@ -38,22 +38,20 @@ public class TestInjectronBinds {
 
 	@Test
 	public void thatInjectronIsAvailableForEveryBoundResource() {
-		Dependency<? extends Injectron<String>> dependency = dependency( injectronTypeOf( String.class ) );
-		Injectron<String> injectron = injector.resolve( dependency );
+		Injectron<String> injectron = injector.resolve( injectronTypeOf( String.class ) );
 		assertNotNull( injectron );
 		assertEquals( "foobar", injectron.instanceFor( dependency( String.class ) ) );
 	}
 
 	@Test
 	public void thatInjectronArrayIsAvailableForEveryBoundResource() {
-		Dependency<? extends Injectron<String>[]> dependency = dependency( injectronsTypeOf( String.class ) );
-		Injectron<String>[] injectrons = injector.resolve( dependency );
+		Injectron<String>[] injectrons = injector.resolve( injectronsTypeOf( String.class ) );
 		assertEquals( 4, injectrons.length );
 	}
 
 	@Test
 	public void thatInjectronArrayIsAvailableForAllResources() {
-		assertEquals( 4, injector.resolve( dependency( Injectron[].class ) ).length );
+		assertEquals( 4, injector.resolve( Injectron[].class ).length );
 	}
 
 	@Test
@@ -68,7 +66,6 @@ public class TestInjectronBinds {
 
 	@Test
 	public void thatInjectorIsAvailableByDefault() {
-		Injector resolved = injector.resolve( dependency( Injector.class ) );
-		assertSame( injector, resolved );
+		assertSame( injector, injector.resolve( Injector.class ) );
 	}
 }

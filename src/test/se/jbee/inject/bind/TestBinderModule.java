@@ -2,12 +2,12 @@ package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.DeclarationType.EXPLICIT;
+import static se.jbee.inject.bootstrap.Bindings.bindings;
 
 import org.junit.Test;
 
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.bootstrap.Binding;
-import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Inspect;
@@ -29,18 +29,18 @@ public class TestBinderModule {
 			bind(String.class).to("2");
 			bind(Float.class).to(3.0f);
 		}
-		
+
 	}
-	
+
 	static class TestBinderModuleModule2 extends BinderModule {
 
 		@Override
 		protected void declare() {
 			bind(Double.class).to(2.0);
 		}
-		
+
 	}
-	
+
 	static class TestBinderModuleBundle extends BootstrapperBundle {
 
 		@Override
@@ -53,22 +53,22 @@ public class TestBinderModule {
 
 	@Test
 	public void thatBindingSourceReflectsTheOrigin() {
-		Binding<?>[] bindings = Bootstrap.bindings(TestBinderModuleBundle.class, Bindings.bindings(Macros.DEFAULT, Inspect.DEFAULT), Globals.STANDARD);
-		
+		Binding<?>[] bindings = Bootstrap.bindings(TestBinderModuleBundle.class, bindings(Macros.DEFAULT, Inspect.DEFAULT), Globals.STANDARD);
+
 		assertEquals(4, bindings.length);
-		
+
 		assertBinding(TestBinderModuleModule1.class, 1, EXPLICIT, forType(Integer.class, bindings));
 		assertBinding(TestBinderModuleModule1.class, 2, EXPLICIT, forType(String.class, bindings));
 		assertBinding(TestBinderModuleModule1.class, 3, EXPLICIT, forType(Float.class, bindings));
 		assertBinding(TestBinderModuleModule2.class, 1, EXPLICIT, forType(Double.class, bindings));
 	}
-	
+
 	static void assertBinding(Class<? extends Module> module, int no, DeclarationType type, Binding<?> binding) {
 		assertEquals(module, binding.source.ident );
 		assertEquals(no, binding.source.declarationNo);
 		assertEquals(type, binding.source.declarationType);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private static <T> Binding<T> forType(Class<T> type, Binding<?>[] bindings) {
 		for (Binding<?> b : bindings) {

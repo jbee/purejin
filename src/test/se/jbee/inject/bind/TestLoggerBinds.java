@@ -1,7 +1,6 @@
 package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertSame;
-import static se.jbee.inject.Dependency.dependency;
 
 import java.util.logging.Logger;
 
@@ -17,10 +16,10 @@ import se.jbee.inject.container.Factory;
 /**
  * A test that demonstrates how to extend the DI so that e.g. a class gets its class-specific-
  * {@link Logger} injected. Have a look how {@link Supply#LOGGER} is implemented.
- * 
+ *
  * You can use {@link Factory}s for simpler cases or {@link Supplier}s when more context information
  * are needed to provide the instance.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestLoggerBinds {
@@ -59,7 +58,7 @@ public class TestLoggerBinds {
 	@Test
 	public void thatEachClassGetsTheLoggerWithItsCanonicalName() {
 		Injector injector = Bootstrap.injector( LoggerBindsBundle.class );
-		Foo foo = injector.resolve( dependency( Foo.class ) );
+		Foo foo = injector.resolve( Foo.class );
 		assertSame( Logger.getLogger( Foo.class.getCanonicalName() ), foo.logger );
 	}
 }

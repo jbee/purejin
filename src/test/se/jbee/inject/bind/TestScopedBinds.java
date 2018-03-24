@@ -1,7 +1,6 @@
 package se.jbee.inject.bind;
 
 import static org.junit.Assert.fail;
-import static se.jbee.inject.Dependency.dependency;
 
 import org.junit.Test;
 
@@ -37,8 +36,8 @@ public class TestScopedBinds {
 	@Test ( expected = UnstableDependency.class )
 	public void thatInjectingAnInjectionScopedInstanceIntoAppScopedInstanceThrowsAnException() {
 		Injector injector = Bootstrap.injector( ScopedBindsModule.class );
-		Foo foo = injector.resolve( dependency( Foo.class ) );
+		Foo foo = injector.resolve( Foo.class );
 		fail( "It should not be possible to create a foo but got one: " + foo );
 	}
-	
+
 }

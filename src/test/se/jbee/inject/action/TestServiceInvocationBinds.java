@@ -3,14 +3,12 @@ package se.jbee.inject.action;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.raw;
 
 import java.lang.reflect.Method;
 
 import org.junit.Test;
 
-import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency.SupplyFailed;
@@ -23,7 +21,7 @@ import se.jbee.inject.bootstrap.Supply;
  * service/action method calls. This had been in the core but as it is easy to
  * add one can build something like {@link ServiceInvocation} specialized to
  * ones needs.
- * 
+ *
  * @author jan
  */
 public class TestServiceInvocationBinds {
@@ -94,15 +92,12 @@ public class TestServiceInvocationBinds {
 	}
 
 	private final Injector injector = Bootstrap.injector( ServiceInvocationBindsBundle.class );
-	private final AssertInvocation inv = injector.resolve( dependency( AssertInvocation.class ) );
+	private final AssertInvocation inv = injector.resolve(AssertInvocation.class);
 
-	@SuppressWarnings ( "unchecked" )
 	@Test
 	public void thatInvocationIsInvokedBeforeAndAfterTheServiceMethodCall() {
-		@SuppressWarnings ( "rawtypes" )
-		Dependency<Action> dependency = dependency( raw( Action.class ).parametized(
-				String.class, Integer.class ) );
-		Action<String, Integer> hashCode = injector.resolve( dependency );
+		@SuppressWarnings ( "unchecked" )
+		Action<String, Integer> hashCode = injector.resolve(raw(Action.class).parametized(String.class, Integer.class));
 		int beforeCount = inv.beforeCount;
 		int afterCount = inv.afterCount;
 		assertEquals( "Foo".hashCode(), hashCode.exec( "Foo" ).intValue() );
@@ -110,13 +105,10 @@ public class TestServiceInvocationBinds {
 		assertEquals( afterCount + 1, inv.afterCount );
 	}
 
-	@SuppressWarnings ( "unchecked" )
 	@Test
 	public void thatInvocationIsInvokedAfterExceptionInTheServiceMethodCall() {
-		@SuppressWarnings ( "rawtypes" )
-		Dependency<Action> dependency = dependency( raw( Action.class ).parametized(
-				String.class, Void.class ) );
-		Action<String, Void> fail = injector.resolve( dependency );
+		@SuppressWarnings ( "unchecked" )
+		Action<String, Void> fail = injector.resolve(raw(Action.class).parametized(String.class, Void.class));
 		int afterExceptionCount = inv.afterExceptionCount;
 		try {
 			fail.exec( "Foo" );
@@ -131,7 +123,7 @@ public class TestServiceInvocationBinds {
 
 	@Test
 	public void thatInvocationHandlersCanBeResolvedDirectly() {
-		ServiceInvocation<?>[] invocations = injector.resolve(dependency(ServiceInvocation[].class));
+		ServiceInvocation<?>[] invocations = injector.resolve(ServiceInvocation[].class);
 		assertEquals(1, invocations.length);
 		assertEquals(invocations[0].getClass(), AssertInvocation.class);
 	}
@@ -208,5 +200,5 @@ public class TestServiceInvocationBinds {
 			}
 		}
 
-	}	
+	}
 }

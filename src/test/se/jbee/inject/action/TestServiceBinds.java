@@ -1,7 +1,6 @@
 package se.jbee.inject.action;
 
 import static org.junit.Assert.assertEquals;
-import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.action.ActionModule.actionDependency;
 import static se.jbee.inject.container.Scoped.DEPENDENCY_TYPE;
@@ -19,7 +18,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
  * the action concept. The benefit is that application code does not become
  * dependent on the {@link Action} abstraction that is part of the DI aspect and
  * should be transparent.
- * 
+ *
  * @author jan
  */
 public class TestServiceBinds {
@@ -93,11 +92,8 @@ public class TestServiceBinds {
 	@Test
 	public void servicesAreResolvable() {
 		Injector injector = Bootstrap.injector( ServiceBindsModule.class );
-		@SuppressWarnings ( { "rawtypes" } )
-		Dependency<Service> dependency = dependency( raw( Service.class ).parametized(
-				Integer.class, Long.class ) );
 		@SuppressWarnings ( "unchecked" )
-		Service<Integer, Long> square = injector.resolve( dependency );
+		Service<Integer, Long> square = injector.resolve(raw(Service.class).parametized(Integer.class, Long.class));
 		assertEquals( 4L, square.calc( 2 ).longValue() );
 	}
 

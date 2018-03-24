@@ -3,7 +3,6 @@ package se.jbee.inject.bind;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.raw;
 
 import java.util.ArrayList;
@@ -21,7 +20,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
  * Tests that demonstrates how to overlay the default behavior of 1-dimensional array types by
  * defining the elements of them explicitly using the
  * {@link TypedElementBinder#toElements(Parameter, Parameter)} methods.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestElementBinds {
@@ -45,18 +44,17 @@ public class TestElementBinds {
 
 	@Test
 	public void thatInstancesAreBoundAsElements() {
-		assertArrayEquals( injector.resolve( dependency( String[].class ) ), new String[] { "foo",
-				"bar" } );
+		assertArrayEquals( new String[] { "foo", "bar" }, injector.resolve( String[].class ) );
 	}
 
 	@Test
 	public void thatSubtypeInstancesAreBoundAsElements() {
-		assertArrayEquals( injector.resolve( dependency( Number[].class ) ), new Number[] { 2, 3f } );
+		assertArrayEquals( new Number[] { 2, 3f }, injector.resolve( Number[].class ) );
 	}
 
 	@Test
 	public void thatTypesAreBoundAsElements() {
-		List<?>[] elems = injector.resolve( dependency( List[].class ) );
+		List<?>[] elems = injector.resolve( List[].class );
 		assertEquals( 2, elems.length );
 		assertTrue( elems[0] instanceof ArrayList );
 		assertTrue( elems[1] instanceof LinkedList );
@@ -64,7 +62,7 @@ public class TestElementBinds {
 
 	@Test
 	public void thatConstantsAreBoundAsElements() {
-		Float[] floats = injector.resolve( dependency( Float[].class ) );
+		Float[] floats = injector.resolve( Float[].class );
 		assertEquals( 2f, floats[0], 0.01f );
 		assertEquals( 4f, floats[1], 0.01f );
 		assertEquals( 7f, floats[2], 0.01f );
@@ -72,7 +70,6 @@ public class TestElementBinds {
 
 	@Test
 	public void thatVarargsConstantsAreBoundAsElements() {
-		assertArrayEquals( new Long[] { 1L, 2L, 3L, 4L },
-				injector.resolve( dependency( Long[].class ) ) );
+		assertArrayEquals( new Long[] { 1L, 2L, 3L, 4L }, injector.resolve( Long[].class ) );
 	}
 }

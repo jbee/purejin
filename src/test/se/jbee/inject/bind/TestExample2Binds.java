@@ -1,10 +1,7 @@
 package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertNotSame;
-import static se.jbee.inject.Dependency.dependency;
-import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Type.raw;
 
 import org.junit.Test;
 
@@ -19,13 +16,13 @@ import se.jbee.inject.bootstrap.Bootstrap;
 public class TestExample2Binds {
 
 	interface Decoupling {
-		
+
 	}
-	
+
 	static class DefaultImpl implements Decoupling {
-		
+
 	}
-	
+
 	static class Example2Module extends BinderModule {
 
 		@Override
@@ -35,17 +32,17 @@ public class TestExample2Binds {
 			bind(named("c"), Decoupling.class).toConstructor(DefaultImpl.class);
 			bind(named("d"), Decoupling.class).toConstructor(DefaultImpl.class);
 		}
-		
+
 	}
-	
+
 	@Test
 	public void thatInstancesAToDAreDifferent() {
 		Injector injector = Bootstrap.injector(Example2Module.class);
-		Decoupling a = injector.resolve(dependency(instance(named("a"), raw(Decoupling.class))));
-		Decoupling b = injector.resolve(dependency(instance(named("b"), raw(Decoupling.class))));
-		Decoupling c = injector.resolve(dependency(instance(named("c"), raw(Decoupling.class))));
-		Decoupling d = injector.resolve(dependency(instance(named("d"), raw(Decoupling.class))));
-		
+		Decoupling a = injector.resolve("a", Decoupling.class);
+		Decoupling b = injector.resolve("b", Decoupling.class);
+		Decoupling c = injector.resolve("c", Decoupling.class);
+		Decoupling d = injector.resolve("d", Decoupling.class);
+
 		assertNotSame(a, b);
 		assertNotSame(a, c);
 		assertNotSame(a, d);

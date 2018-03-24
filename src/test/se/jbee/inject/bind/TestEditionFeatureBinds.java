@@ -1,6 +1,5 @@
 package se.jbee.inject.bind;
 
-import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.bind.AssertInjects.assertEqualSets;
 
 import java.lang.annotation.Annotation;
@@ -25,10 +24,10 @@ import se.jbee.inject.config.Globals;
 /**
  * A test that demonstrates how to use {@link Feature}s and {@link Edition}s to allow composition of
  * different setups without introducing a single if-statement in the binding code.
- * 
+ *
  * The example also shows how {@link Annotation}s like {@link Featured} can be used to mark
  * {@link Bundle}s or {@link Module}s as a specific {@link Feature}.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestEditionFeatureBinds {
@@ -144,7 +143,7 @@ public class TestEditionFeatureBinds {
 	private static void assertEditionInstalls( Edition edition, Integer... expected ) {
 		Injector injector = Bootstrap.injector( RootBundle.class,
 				Globals.STANDARD.edition( edition ) );
-		assertEqualSets( expected, injector.resolve( dependency( Integer[].class ) ) );
+		assertEqualSets( expected, injector.resolve( Integer[].class ) );
 	}
 
 }
