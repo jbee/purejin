@@ -60,25 +60,25 @@ public class TestPluginBinds {
 	private final Injector injector = Bootstrap.injector( TestPluginModule.class );
 
 	@SuppressWarnings("rawtypes")
-	private final Dependency<Class[]> dependency = Dependency.pluginsFor(Callable.class);
+	private final Dependency<Class[]> plugins = Dependency.pluginsFor(Callable.class);
 
 	@Test
 	public void thatJustUntargetedExtensionsAreResolvedGlobally() {
-		Class<?>[] classes = injector.resolve( dependency );
+		Class<?>[] classes = injector.resolve( plugins );
 		assertEquals( 1, classes.length );
 		assertSame( TestExtensionAction.class, classes[0] );
 	}
 
 	@Test
 	public void thatPackageLocalExtensionsAreResolvedWithAppropiateInjection() {
-		Class<?>[] classes = injector.resolve( dependency.injectingInto( Module.class ) );
+		Class<?>[] classes = injector.resolve( plugins.injectingInto( Module.class ) );
 		assertEqualSets( new Class<?>[] { TestExtensionAction.class,
 				TestExtensionPackageLocalAction.class }, classes );
 	}
 
 	@Test
 	public void thatInstanceOfExtensionsAreResolvedWithAppropiateInjection() {
-		Class<?>[] classes = injector.resolve( dependency.injectingInto( String.class ) );
+		Class<?>[] classes = injector.resolve( plugins.injectingInto( String.class ) );
 		assertEqualSets( new Class<?>[] { TestExtensionAction.class,
 				TestExtensionInstanceOfAction.class }, classes );
 	}

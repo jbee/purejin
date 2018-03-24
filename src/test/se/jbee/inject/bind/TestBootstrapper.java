@@ -218,8 +218,7 @@ public class TestBootstrapper {
 	 */
 	@Test(timeout=100)
 	public void thatBundlesAreNotBootstrappedMultipleTimesEvenWhenTheyAreMutual() {
-		Injector injector = Bootstrap.injector( OneMutualDependentBundle.class );
-		assertNotNull( injector );
+		assertNotNull( Bootstrap.injector( OneMutualDependentBundle.class ) );
 	}
 
 	@Test ( expected = InconsistentBinding.class )

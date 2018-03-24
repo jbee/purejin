@@ -176,14 +176,16 @@ public class TestStateDependentBinds {
 
 		@Override
 		protected void declare() {
-			per( Scoped.INJECTION ).bind( Validator.class ).to(	stateDependent(Type.raw(Validator.class), dependency(ValidationStrength.class)) );
+			per(Scoped.INJECTION).bind(Validator.class)
+					.to(stateDependent(Type.raw(Validator.class), dependency(ValidationStrength.class)));
 
-			bind( named( ValidationStrength.PERMISSIVE ), Validator.class ).to(	Permissive.class );
-			bind( named( ValidationStrength.STRICT ), Validator.class ).to( Strict.class );
-			bind( named( (Object)null ), Validator.class ).to( Permissive.class );
+			bind(named(ValidationStrength.PERMISSIVE), Validator.class).to(Permissive.class);
+			bind(named(ValidationStrength.STRICT), Validator.class).to(Strict.class);
+			bind(named((Object) null), Validator.class).to(Permissive.class);
 
-			// the below is just *a* example - it is just important to provide the 'value' per injection
-			per( Scoped.INJECTION ).bind( methodsReturn( raw( ValidationStrength.class ) ) ).in( StatefulObject.class );
+			// the below is just *a* example - it is just important to provide the 'value'
+			// per injection
+			per(Scoped.INJECTION).bind(methodsReturn(raw(ValidationStrength.class))).in(StatefulObject.class);
 		}
 	}
 
@@ -204,12 +206,13 @@ public class TestStateDependentBinds {
 		protected void declare() {
 			connect(Validator.class).via(ValidationStrength.class);
 
-			bind( named( ValidationStrength.PERMISSIVE ), Validator.class ).to(	Permissive.class );
-			bind( named( ValidationStrength.STRICT ), Validator.class ).to( Strict.class );
-			bind( named( (Object)null ), Validator.class ).to( Permissive.class );
+			bind(named(ValidationStrength.PERMISSIVE), Validator.class).to(Permissive.class);
+			bind(named(ValidationStrength.STRICT), Validator.class).to(Strict.class);
+			bind(named((Object) null), Validator.class).to(Permissive.class);
 
-			// the below is just *a* example - it is just important to provide the 'value' per injection
-			per( Scoped.INJECTION ).bind( methodsReturn( raw( ValidationStrength.class ) ) ).in( StatefulObject.class );
+			// the below is just *a* example - it is just important to provide the 'value'
+			// per injection
+			per(Scoped.INJECTION).bind(methodsReturn(raw(ValidationStrength.class))).in(StatefulObject.class);
 		}
 
 	}

@@ -46,10 +46,10 @@ public class TestRobotLegsProblemBinds {
 
 		@Override
 		protected void declare() {
-			bind( left, Leg.class ).toConstructor();
-			bind( right, Leg.class ).toConstructor();
-			injectingInto( left, Leg.class ).bind( Foot.class ).to( left, Foot.class );
-			injectingInto( right, Leg.class ).bind( Foot.class ).to( right, Foot.class );
+			bind(left, Leg.class).toConstructor();
+			bind(right, Leg.class).toConstructor();
+			injectingInto(left, Leg.class).bind(Foot.class).to(left, Foot.class);
+			injectingInto(right, Leg.class).bind(Foot.class).to(right, Foot.class);
 		}
 	}
 

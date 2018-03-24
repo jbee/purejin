@@ -109,7 +109,6 @@ public class TestPresetModuleBinds {
 
 	@Test
 	public void presetItselfCanBePassedToModule() {
-		Injector injector = Bootstrap.injector(PresetModuleBindsModule4.class);
-		assertNotNull(injector);
+		assertNotNull(Bootstrap.injector(PresetModuleBindsModule4.class));
 	}
 }

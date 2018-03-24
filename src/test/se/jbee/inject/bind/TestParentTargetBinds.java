@@ -64,10 +64,8 @@ public class TestParentTargetBinds {
 
 	@Test
 	public void thatBindWithParentTargetIsUsedWhenInjectionHasParent() {
-		Grandparent grandparent = injector.resolve( Grandparent.class );
-		assertEquals( "child-with-grandparent", grandparent.parent.child.value );
-		Parent parent = injector.resolve( Parent.class );
-		assertEquals( "child-with-parent", parent.child.value );
+		assertEquals( "child-with-grandparent", injector.resolve( Grandparent.class ).parent.child.value );
+		assertEquals( "child-with-parent", injector.resolve( Parent.class ).child.value );
 		assertEquals( "child", injector.resolve( Child.class ).value );
 	}
 

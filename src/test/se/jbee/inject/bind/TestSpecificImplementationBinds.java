@@ -68,8 +68,8 @@ public class TestSpecificImplementationBinds {
 		protected void declare() {
 			Instance<GenericAction> b = instance(named("b"), raw(GenericAction.class));
 			Instance<GenericAction> c = instance(named("c"), raw(GenericAction.class));
-			bind( Receiver.class ).toConstructor(raw(ActionA.class), b, c );
-			bind( ActionA.class ).toConstructor();
+			bind(Receiver.class).toConstructor(raw(ActionA.class), b, c);
+			bind(ActionA.class).toConstructor();
 			bind(b).to(new GenericAction("this is b"));
 			bind(c).toConstructor();
 			injectingInto(c).bind(String.class).to("and this is c");

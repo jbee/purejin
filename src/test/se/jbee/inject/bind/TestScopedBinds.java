@@ -28,8 +28,8 @@ public class TestScopedBinds {
 
 		@Override
 		protected void declare() {
-			per( Scoped.APPLICATION ).construct( Foo.class );
-			per( Scoped.INJECTION ).construct( Bar.class );
+			per(Scoped.APPLICATION).construct(Foo.class);
+			per(Scoped.INJECTION).construct(Bar.class);
 		}
 	}
 

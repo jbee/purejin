@@ -30,13 +30,11 @@ public class TestRequiredProvidedBinds {
 		// a classic singleton bean
 	}
 
-	private static class ExampleServiceImpl
-			implements ExampleService {
+	private static class ExampleServiceImpl implements ExampleService {
 		// and its implementation
 	}
 
-	private static class ExplicitExampleService
-			implements ExampleService {
+	private static class ExplicitExampleService implements ExampleService {
 		// this is bound explicit in one test and should replace the provided impl. above
 	}
 
@@ -44,8 +42,7 @@ public class TestRequiredProvidedBinds {
 		// just something we provide but do not require
 	}
 
-	private static class RequirementModule
-			extends BinderModule {
+	private static class RequirementModule extends BinderModule {
 
 		@Override
 		protected void declare() {

@@ -53,7 +53,8 @@ public class TestBinderModule {
 
 	@Test
 	public void thatBindingSourceReflectsTheOrigin() {
-		Binding<?>[] bindings = Bootstrap.bindings(TestBinderModuleBundle.class, bindings(Macros.DEFAULT, Inspect.DEFAULT), Globals.STANDARD);
+		Binding<?>[] bindings = Bootstrap.bindings(TestBinderModuleBundle.class,
+				bindings(Macros.DEFAULT, Inspect.DEFAULT), Globals.STANDARD);
 
 		assertEquals(4, bindings.length);
 
