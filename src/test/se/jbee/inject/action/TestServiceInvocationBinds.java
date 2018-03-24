@@ -133,7 +133,6 @@ public class TestServiceInvocationBinds {
 		private final ServiceInvocation<?>[] invocations;
 
 		InstrumentedExecutor( ServiceInvocation<?>[] invocations ) {
-			super();
 			this.invocations = invocations;
 		}
 

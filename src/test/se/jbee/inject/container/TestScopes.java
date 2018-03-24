@@ -19,7 +19,6 @@ public class TestScopes {
 		private final T instance;
 
 		ConstantProvider( T instance ) {
-			super();
 			this.instance = instance;
 		}
 
@@ -28,7 +27,7 @@ public class TestScopes {
 			return instance;
 		}
 	}
-	
+
 	static class A {
 		// just for test
 	}

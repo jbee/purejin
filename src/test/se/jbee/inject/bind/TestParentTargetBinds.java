@@ -32,7 +32,6 @@ public class TestParentTargetBinds {
 		final Parent parent;
 
 		private Grandparent( Parent parent ) {
-			super();
 			this.parent = parent;
 		}
 
@@ -43,7 +42,6 @@ public class TestParentTargetBinds {
 		final Child child;
 
 		private Parent( Child child ) {
-			super();
 			this.child = child;
 		}
 
@@ -54,7 +52,6 @@ public class TestParentTargetBinds {
 		final String value;
 
 		private Child( String value ) {
-			super();
 			this.value = value;
 		}
 

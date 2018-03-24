@@ -167,7 +167,6 @@ public final class Supply {
 		private final Dependency<T> dependency;
 
 		DependencySupplier( Dependency<T> dependency ) {
-			super();
 			this.dependency = dependency;
 		}
 
@@ -188,7 +187,6 @@ public final class Supply {
 		private final T constant;
 
 		ConstantSupplier( T constant ) {
-			super();
 			this.constant = constant;
 		}
 
@@ -243,7 +241,6 @@ public final class Supply {
 		private final Class<? extends Supplier<? extends T>> type;
 
 		BridgeSupplier( Class<? extends Supplier<? extends T>> type ) {
-			super();
 			this.type = type;
 		}
 
@@ -263,7 +260,6 @@ public final class Supply {
 		private final Instance<? extends T> instance;
 
 		ParametrizedInstanceSupplier( Instance<? extends T> instance ) {
-			super();
 			this.instance = instance;
 		}
 
@@ -288,7 +284,6 @@ public final class Supply {
 		private final Instance<? extends T> instance;
 
 		InstanceSupplier( Instance<? extends T> instance ) {
-			super();
 			this.instance = instance;
 		}
 
@@ -346,7 +341,6 @@ public final class Supply {
 
 		@SuppressWarnings("unchecked")
 		LazyProvider( Dependency<T> dependency, Injector injector ) {
-			super();
 			this.dependency = dependency;
 			this.injectron = injector.resolve(dependency.typed(raw( Injectron.class ).parametized(dependency.type())));
 		}
@@ -372,7 +366,6 @@ public final class Supply {
 		private final Factory<T> factory;
 
 		FactorySupplier( Factory<T> factory ) {
-			super();
 			this.factory = factory;
 		}
 
@@ -498,7 +491,6 @@ public final class Supply {
 		private InjectionSite previous;
 
 		WithParameters(BoundParameter<?>[] params) {
-			super();
 			this.params = params;
 
 		}

@@ -161,7 +161,6 @@ public class TestMacroBinds {
 		private final Supplier<T> decorated;
 
 		InitialisationSupplier( Supplier<T> decorated ) {
-			super();
 			this.decorated = decorated;
 		}
 

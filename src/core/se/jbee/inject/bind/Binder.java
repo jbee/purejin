@@ -59,7 +59,6 @@ public class Binder {
 	private final Bind bind;
 
 	Binder( RootBinder root, Bind bind ) {
-		super();
 		this.root = root == null
 			? (RootBinder) this
 			: root;
@@ -236,7 +235,6 @@ public class Binder {
 		private final ScopedBinder binder;
 
 		InspectBinder( Inspector inspector, RootBinder binder, Scope scope ) {
-			super();
 			this.inspector = inspector;
 			this.binder = binder.on( binder.bind().asAuto() ).on( binder.bind().next() ).per( scope );
 		}

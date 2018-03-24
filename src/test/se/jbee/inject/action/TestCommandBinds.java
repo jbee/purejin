@@ -47,7 +47,6 @@ public class TestCommandBinds {
 			private final Action<P, Long> service;
 
 			CommandToServiceMethodAdapter( Action<P, Long> service ) {
-				super();
 				this.service = service;
 			}
 

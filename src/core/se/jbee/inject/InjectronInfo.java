@@ -1,14 +1,14 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
 
 /**
  * The data part of a {@link Injectron}.
- * 
- * @param <T> type of instances yielded by the {@link Injectron} described by this info 
+ *
+ * @param <T> type of instances yielded by the {@link Injectron} described by this info
  */
 public final class InjectronInfo<T> {
 
@@ -38,14 +38,13 @@ public final class InjectronInfo<T> {
 	 * container.
 	 */
 	public final int count;
-	
+
 	public InjectronInfo(Resource<T> resource, Source source, Expiry expiry, int serialID, int count) {
-		super();
 		this.resource = resource;
 		this.source = source;
 		this.expiry = expiry;
 		this.serialID = serialID;
 		this.count = count;
 	}
-	
+
 }

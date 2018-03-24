@@ -26,7 +26,6 @@ public class TestExample1Binds {
 		final int twelve;
 
 		public MyClass(String abc, int twelve) {
-			super();
 			this.abc = abc;
 			this.twelve = twelve;
 		}

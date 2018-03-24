@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
@@ -22,7 +22,6 @@ public final class BoundConstructor<T>
 	public final Parameter<?>[] parameters;
 
 	private BoundConstructor( Constructor<T> constructor, Parameter<?>[] parameters ) {
-		super();
 		this.constructor = Metaclass.accessible(constructor);
 		this.parameters = parameters;
 	}

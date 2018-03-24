@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -10,7 +10,7 @@ import java.util.Arrays;
 /**
  * A set of {@link Package}s described one or more root packages (on the same hierarchy level/depth)
  * with or without their sub-packages.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Packages
@@ -84,7 +84,6 @@ public final class Packages
 	}
 
 	private Packages( String[] roots, boolean includingSubpackages ) {
-		super();
 		this.roots = roots;
 		this.includingSubpackages = includingSubpackages;
 		this.rootDepth = rootDepth( roots );
@@ -104,12 +103,12 @@ public final class Packages
 
 	/**
 	 * <pre>
-	 * foo.bar.baz -> foo.bar 
+	 * foo.bar.baz -> foo.bar
 	 * foo.bar. -> foo.
 	 * </pre>
 	 */
 	private static String parent( String root ) {
-		return root.substring(0, 
+		return root.substring(0,
 				root.lastIndexOf('.', root.length() - 2)
 				+ (root.endsWith(".") ? 1 : 0));
 	}
@@ -209,7 +208,7 @@ public final class Packages
 	}
 
 	public boolean equalTo( Packages other ) {
-		return other.includingSubpackages == includingSubpackages // 
+		return other.includingSubpackages == includingSubpackages //
 				&& other.rootDepth == rootDepth
 				&& other.roots.length == roots.length
 				&& Arrays.equals( roots, other.roots );

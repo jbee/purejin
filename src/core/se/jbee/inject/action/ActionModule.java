@@ -120,7 +120,6 @@ public abstract class ActionModule
 		private final Class<?>[] implementationClasses;
 
 		public ActionSupplier( Injector injector ) {
-			super();
 			this.injector = injector;
 			this.executor = injector.resolve(Executor.class);
 			this.implementationClasses = injector.resolve( pluginsFor(Action.class) );
@@ -203,7 +202,6 @@ public abstract class ActionModule
 		private final int inputIndex;
 
 		ExecutedAction(Object impl, Method action, Type<I> input, Type<O> output, Executor executor, Injector injector) {
-			super();
 			this.impl = impl;
 			this.action = Metaclass.accessible(action);
 			this.input = input;

@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -10,9 +10,9 @@ import static se.jbee.inject.Type.raw;
 /**
  * Used to tell that we don#t want just one singleton at a time but multiple distinguished by the
  * {@link Name} used.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
- * 
+ *
  */
 public final class Instance<T>
 		implements Parameter<T>, MorePreciseThan<Instance<?>> {
@@ -44,16 +44,15 @@ public final class Instance<T>
 	public final Type<T> type;
 
 	private Instance( Name name, Type<T> type ) {
-		super();
 		this.name = name;
 		this.type = type;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		return obj instanceof Instance && equalTo((Instance<?>) obj);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return name.hashCode() ^ type.hashCode();
@@ -76,10 +75,10 @@ public final class Instance<T>
 	public <E> Instance<E> typed( Type<E> type ) {
 		return new Instance<>( name, type );
 	}
-	
+
 	public Instance<T> named(Name name) {
 		return new Instance<>(name, type);
-	}	
+	}
 
 	@Override
 	public String toString() {
@@ -107,7 +106,7 @@ public final class Instance<T>
 	}
 
 	public static <T extends MorePreciseThan<? super T>, T2 extends MorePreciseThan<? super T2>> boolean morePreciseThan2( T a1, T a2, T2 b1, T2 b2 ) {
-		return      a1.morePreciseThan( a2 ) // 
+		return      a1.morePreciseThan( a2 ) //
 				|| !a2.morePreciseThan( a1 ) && b1.morePreciseThan( b2 );
 	}
 

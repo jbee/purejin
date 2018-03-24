@@ -22,7 +22,6 @@ public class TestDecoratorBinds {
 		final Foo decorated;
 
 		public Decorator(Foo decorated) {
-			super();
 			this.decorated = decorated;
 		}
 

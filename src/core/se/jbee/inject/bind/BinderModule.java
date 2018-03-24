@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bind;
@@ -13,10 +13,10 @@ import se.jbee.inject.container.Scope;
 
 /**
  * The default utility {@link Module} almost always used.
- * 
+ *
  * A {@link BinderModule} is also a {@link Bundle} so it should be used and installed as such. It
  * will than {@link Bundle#bootstrap(Bootstrapper)} itself as a module.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public abstract class BinderModule
@@ -24,9 +24,8 @@ public abstract class BinderModule
 		implements Bundle, Module {
 
 	private final Class<? extends Bundle> basis;
-	
+
 	protected BinderModule() {
-		super();
 		this.basis = null;
 	}
 

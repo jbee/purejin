@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.config;
@@ -12,13 +12,13 @@ import se.jbee.inject.Type;
 
 /**
  * A record containing all configuring data and strategies.
- * 
+ *
  * The is immutable! All methods create new instances that reflect the change.
- * 
+ *
  * @see Presets
  * @see Options
  * @see Edition
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Globals {
@@ -43,7 +43,6 @@ public final class Globals {
 	public final Presets presets;
 
 	private Globals( Edition edition, Options options, Presets presets ) {
-		super();
 		this.edition = edition;
 		this.options = options;
 		this.presets = presets;
@@ -77,7 +76,6 @@ public final class Globals {
 		private final EnumSet<T> featured;
 
 		FeatureEdition( Feature<T> feature, EnumSet<T> featured ) {
-			super();
 			this.feature = feature;
 			this.featured = featured;
 		}
@@ -95,7 +93,6 @@ public final class Globals {
 		private final Packages included;
 
 		PackagesEdition( Packages included ) {
-			super();
 			this.included = included;
 		}
 

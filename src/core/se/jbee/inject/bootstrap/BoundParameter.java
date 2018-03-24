@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
@@ -21,16 +21,16 @@ import se.jbee.inject.Type;
 /**
  * A {@link BoundParameter} is a {@link Supplier} for parameters of
  * {@link Constructor} or {@link Method} invocations.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
- * 
+ *
  * @param <T>
  *            The {@link Type} of the parameter
  */
 public final class BoundParameter<T> implements Parameter<T> {
 
 	public enum ParameterType { INSTANCE, CONSTANT, EXTERNAL }
-	
+
 	private static final BoundParameter<?>[] NO_PARAMS = new BoundParameter<?>[0];
 
 	public static <T> BoundParameter<T> bind( Parameter<T> parameter ) {
@@ -109,11 +109,11 @@ public final class BoundParameter<T> implements Parameter<T> {
 			}
 		}
 		return params;
-	}	
-	
-	
+	}
+
+
 	//------------------------------------------------------
-	
+
 	public final ParameterType type;
 	public final Type<T> asType;
 	public final Instance<? extends T> instance;
@@ -121,7 +121,6 @@ public final class BoundParameter<T> implements Parameter<T> {
 	public final Supplier<? extends T> supplier;
 
 	public BoundParameter(ParameterType type, Type<T> asType, Instance<? extends T> instance, T value, Supplier<? extends T> supplier) {
-		super();
 		this.type = asType.rawType == Injector.class ? ParameterType.EXTERNAL : type;
 		this.asType = asType;
 		this.instance = instance;
@@ -133,7 +132,7 @@ public final class BoundParameter<T> implements Parameter<T> {
 	public Type<T> type() {
 		return asType;
 	}
-	
+
 	public BoundParameter<T> external() {
 		return new BoundParameter<>(ParameterType.EXTERNAL, asType, instance, value, supplier);
 	}
@@ -155,5 +154,5 @@ public final class BoundParameter<T> implements Parameter<T> {
 	public String toString() {
 		return Supply.describe( asType, supplier );
 	}
-	
+
 }

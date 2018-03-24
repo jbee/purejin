@@ -75,7 +75,6 @@ public class Inspect
 	private Inspect( boolean statics, boolean methods, boolean constructors, Packages packages,
 			Type<?> assignable, Class<? extends Annotation> accessible,
 			Class<? extends Annotation> namedBy ) {
-		super();
 		this.methods = methods;
 		this.constructors = constructors;
 		this.statics = statics;

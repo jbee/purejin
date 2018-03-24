@@ -1,13 +1,13 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
 
 /**
  * Where does a bind come from and what type of declaration has it been.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Source
@@ -20,14 +20,13 @@ public final class Source
 	public final Class<?> ident;
 	public final DeclarationType declarationType;
 	public final int declarationNo;
-	
+
 	/**
 	 * Number of declarations from this source in total.
 	 */
 	private int totalDeclarations;
 
 	private Source( Class<?> ident, DeclarationType declarationType, int declarationNo, int totalDeclarations ) {
-		super();
 		this.ident = ident;
 		this.declarationType = declarationType;
 		this.declarationNo = declarationNo;

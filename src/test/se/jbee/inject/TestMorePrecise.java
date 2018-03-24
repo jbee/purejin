@@ -21,7 +21,6 @@ public class TestMorePrecise {
 		final int value;
 
 		HigherNumberIsMorePrecise( int value ) {
-			super();
 			this.value = value;
 		}
 
@@ -133,7 +132,7 @@ public class TestMorePrecise {
 		assertFalse( type.morePreciseThan( type ) );
 		assertEquals( 0, Instance.comparePrecision( type, type ) );
 	}
-	
+
 	public static <T extends MorePreciseThan<? super T>> Comparator<T> comparator(@SuppressWarnings("unused") Class<T> cls) {
 		return new PreciserThanComparator<>();
 	}
@@ -151,5 +150,5 @@ public class TestMorePrecise {
 		}
 
 	}
-	
+
 }

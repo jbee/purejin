@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.container;
@@ -14,7 +14,7 @@ import se.jbee.inject.InjectronInfo;
 
 /**
  * Utility as a factory to create/use {@link Scope}s.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Scoped {
@@ -61,12 +61,12 @@ public final class Scoped {
 	/**
 	 * What is usually called a 'default'-{@link Scope} will ask the {@link Provider} passed each
 	 * time the {@link Repository#serve(Dependency, InjectronInfo, Provider)}}-method is invoked.
-	 * 
+	 *
 	 * The {@link Scope} is also used as {@link Repository} instance since both don#t have any
 	 * state.
-	 * 
+	 *
 	 * @see Scoped#INJECTION
-	 * 
+	 *
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	private static final class InjectionScope
@@ -100,7 +100,6 @@ public final class Scoped {
 		private final Scope repositoryScope;
 
 		ThreadScope( ThreadLocal<Repository> threadRepository, Scope repositoryScope ) {
-			super();
 			this.threadRepository = threadRepository;
 			this.repositoryScope = repositoryScope;
 		}
@@ -131,10 +130,10 @@ public final class Scoped {
 	 * The 'synchronous'-{@link Repository} will be asked first passing a special resolver that will
 	 * ask the 'asynchronous' repository when invoked. Thereby the repository originally bound will
 	 * be asked once. Thereafter the result is stored in the synchronous repository.
-	 * 
+	 *
 	 * Both repositories will remember the resolved instance whereby the repository considered as
 	 * the synchronous-repository will deliver a consistent image of the world as long as it exists.
-	 * 
+	 *
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	private static final class SnapshotRepository
@@ -144,7 +143,6 @@ public final class Scoped {
 		private final Repository dest;
 
 		SnapshotRepository( Repository src, Repository dest ) {
-			super();
 			this.src = src;
 			this.dest = dest;
 		}
@@ -163,7 +161,6 @@ public final class Scoped {
 			private final Repository src;
 
 			SnapshotingProvider(Dependency<? super T> dependency, InjectronInfo<T> info, Provider<T> supplier, Repository src) {
-				super();
 				this.dependency = dependency;
 				this.info = info;
 				this.supplier = supplier;
@@ -184,7 +181,6 @@ public final class Scoped {
 		private final DependencyProperty property;
 
 		DependencyPropertyScope( DependencyProperty property ) {
-			super();
 			this.property = property;
 		}
 
@@ -207,7 +203,6 @@ public final class Scoped {
 		private final DependencyProperty second;
 
 		CombinedProperty( DependencyProperty first, DependencyProperty second ) {
-			super();
 			this.first = first;
 			this.second = second;
 		}
@@ -288,7 +283,6 @@ public final class Scoped {
 		private final DependencyProperty property;
 
 		DependencyPropertyRepository( DependencyProperty injectionKey ) {
-			super();
 			this.property = injectionKey;
 		}
 
@@ -314,9 +308,9 @@ public final class Scoped {
 
 	/**
 	 * Will lead to instances that can be seen as application-wide-singletons.
-	 * 
+	 *
 	 * @author Jan Bernitt (jan@jbee.se)
-	 * 
+	 *
 	 */
 	private static final class ApplicationScope
 			implements Scope {
@@ -340,7 +334,7 @@ public final class Scoped {
 	 * Contains once instance per {@link Injectron}. Instances are never
 	 * updated. This can be used to create a thread, request or application
 	 * {@link Scope}.
-	 * 
+	 *
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	private static final class LazyInjectronRepository
@@ -349,7 +343,6 @@ public final class Scoped {
 		private Object[] instances;
 
 		LazyInjectronRepository() {
-			super();
 		}
 
 		@Override

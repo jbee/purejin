@@ -49,7 +49,6 @@ public final class Binding<T>
 
 	private Binding( Resource<T> resource, BindingType type, Supplier<? extends T> supplier,
 			Scope scope, Source source ) {
-		super();
 		this.resource = resource;
 		this.type = type;
 		this.supplier = supplier;

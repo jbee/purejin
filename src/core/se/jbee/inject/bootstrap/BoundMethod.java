@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
@@ -13,9 +13,9 @@ import se.jbee.inject.Type;
 import se.jbee.inject.Typed;
 
 /**
- * A {@link BoundMethod} is a method bound to a particular instance 
- * (if not static) that yields/produces instances to inject.  
- *  
+ * A {@link BoundMethod} is a method bound to a particular instance
+ * (if not static) that yields/produces instances to inject.
+ *
  * @param <T> type of the value yield by the factory method
  */
 public final class BoundMethod<T>
@@ -32,7 +32,6 @@ public final class BoundMethod<T>
 	public final boolean isInstanceMethod;
 
 	private BoundMethod( Object instance, Method factory, Type<T> returnType, Parameter<?>[] parameters ) {
-		super();
 		this.returnType = returnType;
 		this.factory = Metaclass.accessible(factory);
 		this.parameters = parameters;

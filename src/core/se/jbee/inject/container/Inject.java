@@ -8,6 +8,7 @@ package se.jbee.inject.container;
 import static java.lang.System.identityHashCode;
 import static java.util.Arrays.copyOfRange;
 import static se.jbee.inject.Array.array;
+import static se.jbee.inject.Instance.comparePrecision;
 import static se.jbee.inject.Type.raw;
 
 import java.util.ArrayList;
@@ -27,7 +28,6 @@ import se.jbee.inject.Initialiser;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Injectron;
 import se.jbee.inject.InjectronInfo;
-import se.jbee.inject.Instance;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
@@ -63,7 +63,6 @@ public final class Inject {
 		private final Injectron<?>[] wildcardInjectrons;
 
 		DefaultInjector( Assembly<?>... assemblies ) {
-			super();
 			this.injectrons = initFrom( assemblies );
 			this.wildcardInjectrons = wildcardInjectrons(injectrons);
 			initInitialisers();
@@ -82,16 +81,14 @@ public final class Inject {
 				Assembly<T> assembly = (Assembly<T>) assemblies[i];
 				Scope scope = assembly.scope();
 				Expiry expiry = EXPIRATION.get( scope );
-				if ( expiry == null ) {
+				if ( expiry == null )
 					expiry = Expiry.NEVER;
-				}
 				injectrons[i] = new RepositoryInjectron<>(this, repositories.get( scope ), assembly, expiry, i, assemblies.length);
 			}
 			Arrays.sort( injectrons, COMPARATOR );
 			Map<Class<?>, Injectron<?>[]> map = new IdentityHashMap<>( injectrons.length );
-			if ( injectrons.length == 0 ) {
+			if ( injectrons.length == 0 )
 				return map;
-			}
 			Class<?> lastRawType = injectrons[0].info().resource.type().rawType;
 			int start = 0;
 			for ( int i = 0; i < injectrons.length; i++ ) {
@@ -110,9 +107,8 @@ public final class Inject {
 			List<Injectron<?>> res = new ArrayList<>();
 			for (Injectron<?>[] is : injectrons.values()) {
 				for (Injectron<?> i : is) {
-					if (i.info().resource.type().isUpperBound()) {
+					if (i.info().resource.type().isUpperBound())
 						res.add(i);
-					}
 				}
 			}
 			Collections.sort(res, COMPARATOR);
@@ -124,9 +120,8 @@ public final class Inject {
 			for ( Assembly<?> a : assemblies ) {
 				Scope scope = a.scope();
 				Repository repository = repositories.get( scope );
-				if ( repository == null ) {
+				if ( repository == null )
 					repositories.put( scope, scope.init() );
-				}
 			}
 			return repositories;
 		}
@@ -138,20 +133,16 @@ public final class Inject {
 			final Type<T> type = dependency.type();
 			if ( type.rawType == Injectron.class ) {
 				Injectron<?> res = injectronMatching( dependency.onTypeParameter() );
-				if ( res != null ) {
+				if ( res != null )
 					return (T) res;
-				}
 			}
-			if ( type.rawType == Injector.class ) {
+			if ( type.rawType == Injector.class )
 				return (T) this;
-			}
-			Injectron<T> injectron = injectronMatching( dependency ); //TODO need to test if this also works for preset array types
-			if ( injectron != null ) {
+			Injectron<T> injectron = injectronMatching( dependency );
+			if ( injectron != null )
 				return injectron.instanceFor( dependency );
-			}
-			if ( type.arrayDimensions() == 1 ) {
+			if ( type.arrayDimensions() == 1 )
 				return resolveArray( dependency, type.baseType() );
-			}
 			return resolveFromUpperBound(dependency);
 		}
 
@@ -165,9 +156,8 @@ public final class Inject {
 			if ( wildcardInjectrons != null ) {
 				for (int i = 0; i < wildcardInjectrons.length; i++) {
 					Injectron<?> res = wildcardInjectrons[i];
-					if (type.isAssignableTo(res.info().resource.type())) {
+					if (type.isAssignableTo(res.info().resource.type()))
 						return (T) res.instanceFor((Dependency<Object>) dependency);
-					}
 				}
 			}
 			throw noInjectronFor( dependency );
@@ -178,14 +168,12 @@ public final class Inject {
 		}
 
 		private static <T> Injectron<T> mostPreciseOf( Injectron<T>[] injectrons, Dependency<T> dependency ) {
-			if ( injectrons == null ) {
+			if ( injectrons == null )
 				return null;
-			}
 			for ( int i = 0; i < injectrons.length; i++ ) {
 				Injectron<T> injectron = injectrons[i];
-				if ( injectron.info().resource.isMatching( dependency ) ) {
+				if ( injectron.info().resource.isMatching( dependency ) )
 					return injectron;
-				}
 			}
 			return null;
 		}
@@ -206,9 +194,8 @@ public final class Inject {
 			if (!elementType.isUpperBound()) {
 				List<E> elements = new ArrayList<>();
 				Injectron<E>[] elementInjectrons = injectronsForType( elementType );
-				if ( elementInjectrons != null ) {
+				if ( elementInjectrons != null )
 					addAllMatching( elements, identities, dependency, elementType, elementInjectrons );
-				}
 				return toArray( elements, elementType );
 			}
 			List<E> elements = new ArrayList<>();
@@ -303,7 +290,6 @@ public final class Inject {
 		private final InjectronInfo<T> info;
 
 		RepositoryInjectron(Injector injector, Repository repository, Assembly<T> assembly, Expiry expiry, int serialID, int count) {
-			super();
 			this.injector = injector;
 			this.repository = repository;
 			this.supplier = assembly.supplier();
@@ -354,30 +340,18 @@ public final class Inject {
 		return map;
 	}
 
-	public static final Comparator<Injectron<?>> COMPARATOR = new InjectronComparator();
-
-	private static final class InjectronComparator implements Comparator<Injectron<?>> {
-
-		InjectronComparator() {
-			// make visible
+	public static final Comparator<Injectron<?>> COMPARATOR = (one, other) -> {
+		Resource<?> r1 = one.info().resource;
+		Resource<?> r2 = other.info().resource;
+		Class<?> c1 = r1.type().rawType;
+		Class<?> c2 = r2.type().rawType;
+		if ( c1 != c2 ) {
+			if (c1.isAssignableFrom(c2))
+				return 1;
+			if (c2.isAssignableFrom(c1))
+				return -1;
+			return c1.getCanonicalName().compareTo( c2.getCanonicalName() );
 		}
-
-		@Override
-		public int compare( Injectron<?> one, Injectron<?> other ) {
-			Resource<?> r1 = one.info().resource;
-			Resource<?> r2 = other.info().resource;
-			Class<?> c1 = r1.type().rawType;
-			Class<?> c2 = r2.type().rawType;
-			if ( c1 != c2 ) {
-				if (c1.isAssignableFrom(c2)) {
-					return 1;
-				}
-				if (c2.isAssignableFrom(c1)) {
-					return -1;
-				}
-				return c1.getCanonicalName().compareTo( c2.getCanonicalName() );
-			}
-			return Instance.comparePrecision( r1, r2 );
-		}
-	}
+		return comparePrecision( r1, r2 );
+	};
 }

@@ -100,7 +100,6 @@ public final class Bootstrap {
 		private final Presets presets;
 
 		ModuleToPresetModule( PresetModule<T> module, Presets presets ) {
-			super();
 			this.module = module;
 			this.presets = presets;
 		}
@@ -125,7 +124,6 @@ public final class Bootstrap {
 		private final Globals globals;
 
 		BuildinBootstrapper( Globals globals ) {
-			super();
 			this.globals = globals;
 		}
 

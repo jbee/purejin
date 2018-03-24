@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -12,10 +12,10 @@ import static se.jbee.inject.Type.raw;
 
 /**
  * Describes where a {@link Resource} is available for injection.
- * 
+ *
  * This can be restricted by the {@link Packages} the injected that is injected is defined in or the
  * {@link Type} of the receiving instance.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Target
@@ -40,7 +40,6 @@ public final class Target
 	public final Packages packages;
 
 	private Target( Instances parents, Instance<?> instance, Packages packages ) {
-		super();
 		this.parents = parents;
 		this.instance = instance;
 		this.packages = packages;
@@ -163,12 +162,12 @@ public final class Target
 		return this == other || packages.equalTo( other.packages )
 				&& instance.equalTo( other.instance ) && parents.equalTo( other.parents );
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		return obj instanceof Target && equalTo((Target) obj);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return instance.hashCode() ^ parents.hashCode();

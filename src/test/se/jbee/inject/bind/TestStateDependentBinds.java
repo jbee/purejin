@@ -115,7 +115,6 @@ public class TestStateDependentBinds {
 		private final Type<T> type;
 
 		ControllerBinder( RootBinder binder, Type<T> type ) {
-			super();
 			this.binder = new RootBinder( binder.bind().next() );
 			this.type = type;
 		}
@@ -144,7 +143,6 @@ public class TestStateDependentBinds {
 		private final Dependency<S> state;
 
 		StateDependentSupplier( Type<T> type, Dependency<S> state ) {
-			super();
 			this.type = type;
 			this.state = state;
 		}

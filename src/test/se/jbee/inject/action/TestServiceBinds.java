@@ -58,7 +58,6 @@ public class TestServiceBinds {
 			private final Action<I, O> action;
 
 			ServiceToActionAdapter( Action<I, O> action ) {
-				super();
 				this.action = action;
 			}
 

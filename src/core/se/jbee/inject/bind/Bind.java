@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bind;
@@ -19,7 +19,7 @@ import se.jbee.inject.container.Scope;
 
 /**
  * The data and behavior used to create binds.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Bind {
@@ -34,7 +34,6 @@ public final class Bind {
 	public final Target target;
 
 	private Bind( Bindings bindings, Source source, Scope scope, Target target ) {
-		super();
 		this.bindings = bindings;
 		this.source = source;
 		this.scope = scope;

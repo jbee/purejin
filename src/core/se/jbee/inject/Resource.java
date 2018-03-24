@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -9,9 +9,9 @@ import static se.jbee.inject.Type.raw;
 
 /**
  * Describes WHAT can be injected and WHERE it can be injected.
- * 
+ *
  * It is an {@link Instance} with added information where the bind applies.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Resource<T>
@@ -29,19 +29,18 @@ public final class Resource<T>
 	}
 
 	public Resource( Instance<T> instance, Target target ) {
-		super();
 		this.instance = instance;
 		this.target = target;
 	}
 
 	public boolean isMatching( Dependency<? super T> dependency ) {
-		return isNameCompatibleWith( dependency ) // check names first since default goes sorts first but will not match any named 
+		return isNameCompatibleWith( dependency ) // check names first since default goes sorts first but will not match any named
 				&& isAvailableFor( dependency )//
 				&& isAssignableTo( dependency ); // most 'expensive' check so we do it last
 	}
 
 	public boolean isCompatibleWith( Dependency<? super T> dependency ) {
-		return isNameCompatibleWith( dependency ) 
+		return isNameCompatibleWith( dependency )
 				&& isAssignableTo( dependency );
 	}
 
@@ -87,15 +86,15 @@ public final class Resource<T>
 	}
 
 	public boolean equalTo( Resource<?> other ) {
-		return this == other 
+		return this == other
 				|| instance.equalTo( other.instance ) && target.equalTo( other.target );
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		return obj instanceof Resource && equalTo((Resource<?>) obj);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return instance.hashCode() ^ target.hashCode();

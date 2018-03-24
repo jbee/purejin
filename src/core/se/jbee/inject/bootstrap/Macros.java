@@ -55,7 +55,6 @@ public final class Macros {
 	private final Macro<?>[] macros;
 
 	private Macros( Class<?>[] types, Macro<?>[] macros ) {
-		super();
 		this.types = types;
 		this.macros = macros;
 	}

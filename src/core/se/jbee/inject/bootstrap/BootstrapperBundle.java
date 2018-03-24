@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
@@ -8,7 +8,7 @@ package se.jbee.inject.bootstrap;
 /**
  * The default utility {@link Bundle} that is a {@link Bootstrap} as well so that bindings can be
  * declared nicer.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public abstract class BootstrapperBundle
@@ -98,7 +98,6 @@ public abstract class BootstrapperBundle
 		private final Inspector inspector;
 
 		InspectorModule( Module module, Inspector inspector ) {
-			super();
 			this.module = module;
 			this.inspector = inspector;
 		}

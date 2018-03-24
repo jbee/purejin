@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.config;
@@ -14,7 +14,7 @@ import se.jbee.inject.Type;
  * (including generics) with a value for/of that exact given type. These values act as input
  * <i>parameters</i> to the bootstrapping process. The values are used within modules that depend on
  * data that is given as program input.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Presets {
@@ -24,7 +24,6 @@ public final class Presets {
 	private final IdentityHashMap<String, Object> values;
 
 	private Presets( IdentityHashMap<String, Object> values ) {
-		super();
 		this.values = values;
 	}
 

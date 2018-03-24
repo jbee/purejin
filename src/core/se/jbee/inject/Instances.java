@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 /**
  * A hierarchy of {@link Instance}s.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Instances
@@ -20,7 +20,6 @@ public final class Instances
 	private final Instance<?>[] hierarchy;
 
 	private Instances( Instance<?>... hierarchy ) {
-		super();
 		this.hierarchy = hierarchy;
 	}
 

@@ -18,7 +18,6 @@ public class AssertInjects {
 	private final Injector injector;
 
 	public AssertInjects( Injector injector ) {
-		super();
 		this.injector = injector;
 	}
 

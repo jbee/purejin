@@ -1,13 +1,13 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
 
 /**
  * How frequently do instances expire (become garbage, are not used any longer).
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Expiry {
@@ -30,7 +30,6 @@ public final class Expiry {
 	private final int frequency;
 
 	public Expiry( int frequency ) {
-		super();
 		this.frequency = frequency;
 	}
 

@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
 /**
  * A {@link Name} is used as discriminator in cases where multiple {@link Instance}s are bound for
  * the same {@link Type}.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Name
@@ -37,7 +37,7 @@ public final class Name
 	public static Name named( Object name ) {
 		return named(String.valueOf(name));
 	}
-	
+
 	public static Name named( String name ) {
 		if ( name == null || name.trim().isEmpty() ) {
 			return DEFAULT;
@@ -46,7 +46,6 @@ public final class Name
 	}
 
 	private Name( String value ) {
-		super();
 		this.value = value.intern();
 	}
 
