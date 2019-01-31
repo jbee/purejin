@@ -115,6 +115,11 @@ public class Binder {
 		construct( instance( name, raw( type ) ) );
 	}
 
+	/**
+	 * Bind something that is an {@link Initialiser}.
+	 * 
+	 * @since 19.1
+	 */
 	public TypedBinder<Initialiser> initbind() {
 		return multibind(Initialiser.class);
 	}
@@ -159,6 +164,11 @@ public class Binder {
 		return new Binder( root, bind().with( target ) );
 	}
 
+	/**
+	 * 
+	 * @param target the type whose instances should be initialised by calling some method
+	 * @since 19.1
+	 */
 	public <T> InitBinder<T> init(Class<T> target) {
 		return init(Name.DEFAULT, raw(target));
 	}
@@ -167,6 +177,18 @@ public class Binder {
 		return new InitBinder<>(on(bind()), instance(name, target));
 	}
 
+	/**
+	 * Small utility to make initialisation calls that depend on instances managed
+	 * by the {@link Injector} easier.
+	 * 
+	 * The basic principle is that the {@link #target} {@link Instance} is
+	 * initialised on the basis of some other dependency instance that is resolved
+	 * during initialisation phase and provided to the {@link BiConsumer} function.
+	 * 
+	 * @param <T> type of the instances that should be initialised
+	 * 
+	 * @since 19.1
+	 */
 	public static class InitBinder<T> {
 
 		private final Binder binder;
@@ -177,35 +199,34 @@ public class Binder {
 			this.target = target;
 		}
 
-		public <C> void withEvery(Class<? extends C> arguments, BiConsumer<T, C> initialiser) {
-			withAll(raw(arguments).addArrayDimension().asUpperBound(), initialiser);
+		public <C> void forAny(Class<? extends C> dependency, BiConsumer<T, C> initialiser) {
+			forEach(raw(dependency).addArrayDimension().asUpperBound(), initialiser);
 		}
 
-		public <C> void withAll(Type<? extends C[]> arguments, BiConsumer<T, C> initialiser) {
+		public <C> void forEach(Type<? extends C[]> dependencies, BiConsumer<T, C> initialiser) {
 			binder.initbind().to(injector -> {
 				T obj = injector.resolve(target);
-				C[] args = injector.resolve(dependency(arguments).injectingInto(target));
+				C[] args = injector.resolve(dependency(dependencies).injectingInto(target));
 				for (C arg : args)
 					initialiser.accept(obj, arg);
 			});
 		}
 
-		public <C> void with(Class<? extends C> argument, BiConsumer<T, C> initialiser) {
-			with(defaultInstanceOf(raw(argument)), initialiser);
+		public <C> void by(Class<? extends C> depencency, BiConsumer<T, C> initialiser) {
+			by(defaultInstanceOf(raw(depencency)), initialiser);
 		}
 
-		public <C> void with(Name argName, Class<? extends C> argType, BiConsumer<T, C> initialiser) {
-			with(Instance.instance(argName, raw(argType)), initialiser);
+		public <C> void by(Name depName, Class<? extends C> depType, BiConsumer<T, C> initialiser) {
+			by(Instance.instance(depName, raw(depType)), initialiser);
 		}
 
-		public <C> void with(Instance<? extends C> argument, BiConsumer<T, C> initialiser) {
+		public <C> void by(Instance<? extends C> dependency, BiConsumer<T, C> initialiser) {
 			binder.initbind().to(injector -> {
 				T obj = injector.resolve(target);
-				C arg = injector.resolve(dependency(argument).injectingInto(target));
+				C arg = injector.resolve(dependency(dependency).injectingInto(target));
 				initialiser.accept(obj, arg);
 			});
 		}
-
 	}
 
 	public static class PluginBinder<T> {

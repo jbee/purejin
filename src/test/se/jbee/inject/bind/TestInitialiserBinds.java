@@ -20,8 +20,6 @@ import se.jbee.inject.config.Presets;
  * would automatically close all {@link AutoCloseable}s. Here the
  * "shutdown hook" of course is simulated so we can test for it being invoked.
  * In a real scenario one would use {@link Runtime#addShutdownHook(Thread)}.
- *
- * @author jan
  */
 public class TestInitialiserBinds {
 
@@ -46,7 +44,7 @@ public class TestInitialiserBinds {
 
 	static final class TestInitialiserBindsPresetModule extends BinderModuleWith<Integer> implements Initialiser {
 
-		private Integer setup;
+		Integer setup;
 
 		@Override
 		protected void declare(Integer setup) {

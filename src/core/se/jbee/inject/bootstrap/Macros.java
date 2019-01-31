@@ -211,6 +211,8 @@ public final class Macros {
 
 	private static final class ConstantMacro implements Macro<BoundConstant<?>> {
 
+	    ConstantMacro() { /* make visible */ }
+	    
 		@Override
 		public <T> void expand(BoundConstant<?> value, Binding<T> incomplete, Bindings bindings) {
 			Supplier<T> supplier = Supply.constant( incomplete.type().rawType.cast(value.constant) );

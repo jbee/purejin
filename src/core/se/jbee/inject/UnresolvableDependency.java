@@ -11,8 +11,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import se.jbee.inject.bootstrap.Binding;
-
 /**
  * A {@link Dependency} that should be resolved during the injection or
  * resolution process.

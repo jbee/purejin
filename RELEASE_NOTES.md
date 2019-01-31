@@ -1,8 +1,9 @@
 # Release notes
 
-v0.11 (upcoming)
+v19.1 (upcoming)
 ==============
 
+- changed versioning from _major.minor_ to _year.serial_ (e.g. 19.1 is the first in 2019)
 - fixed `Type` `equals`/`equalTo` now considers `upperBound` flag
 - fixed wild-card array dependencies are honored in presents of same raw type bounds
 - improved `DefaultInjector`, composed arrays contain instances only once

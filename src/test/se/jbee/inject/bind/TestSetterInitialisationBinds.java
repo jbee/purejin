@@ -42,11 +42,11 @@ public class TestSetterInitialisationBinds {
 			construct(AnotherBean.class);
 
 			// link beans via setter
-			init(Bean.class).with(AnotherBean.class, Bean::setBar);
+			init(Bean.class).by(AnotherBean.class, Bean::setBar);
 
 			// link a configuration via setter
 			bind(named("bar"), String.class).to("foo");
-			init(Bean.class).with(named("bar"), String.class, Bean::setFoo);
+			init(Bean.class).by(named("bar"), String.class, Bean::setFoo);
 		}
 
 	}

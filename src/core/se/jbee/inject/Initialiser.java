@@ -5,20 +5,20 @@ package se.jbee.inject;
  * will resolve all of them and call their {@link #init(Injector)} method as
  * soon as the context is done.
  * 
- * This gives users the possibility to run initialization code once and build
+ * This gives users the possibility to run initialisation code once and build
  * more powerful mechanisms on top of it.
  * 
- * @author jan
+ * @since 19.1
  */
 @FunctionalInterface
 public interface Initialiser {
 
 	/**
 	 * Is called by the {@link Injector} as soon as the context itself is
-	 * initialized and ready to be used by the implementation of this interface.
+	 * Initialised and ready to be used by the implementation of this interface.
 	 * 
 	 * @param context
-	 *            use to receive instances that require further initialization
+	 *            use to receive instances that require further initialisation
 	 *            setup
 	 */
 	void init(Injector context);

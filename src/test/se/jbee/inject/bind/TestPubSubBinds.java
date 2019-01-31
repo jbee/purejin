@@ -38,7 +38,7 @@ import se.jbee.inject.bootstrap.Supply;
  * example we rely on implicit reference bindings being made. For example
  * {@code SomeService.class} is linked to the same constant supplied when bound
  * to {@link Service}.
- * {@link InitBinder#withEvery(Class, java.util.function.BiConsumer)} fetches
+ * {@link InitBinder#forAny(Class, java.util.function.BiConsumer)} fetches
  * all bound instances that do implement the target type (here
  * {@link Subscriber}).
  *
@@ -128,14 +128,14 @@ public class TestPubSubBinds {
 			multibind(Subscriber.class).to(predefined);
 
 			bind(Publisher.class).to(PublisherImpl.class);
-			init(PublisherImpl.class).withEvery(Subscriber.class, Publisher::subscribe);
+			init(PublisherImpl.class).forAny(Subscriber.class, Publisher::subscribe);
 		}
 
 	}
 
 	/**
 	 * An alternative way is to use {@link #multibind(Class)} and
-	 * {@link InitBinder#withAll(se.jbee.inject.Type, java.util.function.BiConsumer)}.
+	 * {@link InitBinder#forEach(se.jbee.inject.Type, java.util.function.BiConsumer)}.
 	 */
 	private static class PubSubBindsModule2 extends BinderModule {
 
@@ -159,7 +159,7 @@ public class TestPubSubBinds {
 			multibind(Subscriber.class).to(predefined);
 
 			bind(Publisher.class).to(PublisherImpl.class);
-			init(PublisherImpl.class).withAll(raw(Subscriber[].class), Publisher::subscribe);
+			init(PublisherImpl.class).forEach(raw(Subscriber[].class), Publisher::subscribe);
 		}
 
 	}
