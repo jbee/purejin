@@ -18,8 +18,6 @@ import se.jbee.inject.bootstrap.BoundParameter.ParameterType;
  * Similar to a call-site each {@linkplain InjectionSite} represents the
  * resolution of arguments from a specific site or path that is represented by a
  * {@link Dependency}.
- *
- * @author jan
  */
 public final class InjectionSite {
 

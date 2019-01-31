@@ -34,6 +34,10 @@ public final class Name
 
 	private final String value;
 
+	public static Name pluginFor(Class<?> pluginPoint, String name) {
+		return named(pluginPoint.getCanonicalName()+":"+name);
+	}
+
 	public static Name named( Object name ) {
 		return named(String.valueOf(name));
 	}

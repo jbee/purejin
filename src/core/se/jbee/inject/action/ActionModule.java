@@ -13,6 +13,7 @@ import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.parameterTypes;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Type.returnType;
+import static se.jbee.inject.bootstrap.Metaclass.accessible;
 import static se.jbee.inject.container.Scoped.APPLICATION;
 import static se.jbee.inject.container.Scoped.DEPENDENCY_TYPE;
 
@@ -33,7 +34,6 @@ import se.jbee.inject.bootstrap.BoundParameter;
 import se.jbee.inject.bootstrap.InjectionSite;
 import se.jbee.inject.bootstrap.Inspect;
 import se.jbee.inject.bootstrap.Inspector;
-import se.jbee.inject.bootstrap.Metaclass;
 import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.container.Scoped;
@@ -203,7 +203,7 @@ public abstract class ActionModule
 
 		ExecutedAction(Object impl, Method action, Type<I> input, Type<O> output, Executor executor, Injector injector) {
 			this.impl = impl;
-			this.action = Metaclass.accessible(action);
+			this.action = accessible(action);
 			this.input = input;
 			this.output = output;
 			this.executor = executor;

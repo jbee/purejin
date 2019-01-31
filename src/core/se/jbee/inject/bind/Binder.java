@@ -9,6 +9,9 @@ import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Instance.defaultInstanceOf;
 import static se.jbee.inject.Instance.instance;
+import static se.jbee.inject.Name.pluginFor;
+import static se.jbee.inject.Source.source;
+import static se.jbee.inject.Target.targeting;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.bootstrap.Metaclass.metaclass;
 
@@ -27,7 +30,6 @@ import se.jbee.inject.Name;
 import se.jbee.inject.Packages;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Resource;
-import se.jbee.inject.Source;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.Target;
 import se.jbee.inject.Type;
@@ -62,7 +64,7 @@ public class Binder {
 		this.root = root == null
 			? (RootBinder) this
 			: root;
-		this.bind = bind.source == null ? bind.with(Source.source(getClass())) : bind;
+		this.bind = bind.source == null ? bind.with(source(getClass())) : bind;
 	}
 
 	Bind bind() {
@@ -170,7 +172,7 @@ public class Binder {
 		private final Binder binder;
 		private final Instance<T> target;
 
-		InitBinder(Binder binder, Instance<T> target) {
+		protected InitBinder(Binder binder, Instance<T> target) {
 			this.binder = binder;
 			this.target = target;
 		}
@@ -211,16 +213,20 @@ public class Binder {
 		private final Binder binder;
 		private final Class<T> plugin;
 
-		PluginBinder(Binder binder, Class<T> plugin) {
+		protected PluginBinder(Binder binder, Class<T> plugin) {
 			this.binder = binder;
 			this.plugin = plugin;
 		}
 
 		public void into( Class<?> pluginPoint ) {
-			binder.multibind(Name.named(pluginPoint.getCanonicalName()+":"+plugin.getCanonicalName()), Class.class).to(plugin);
+			into(pluginPoint, plugin.getCanonicalName());
+		}
+
+		public void into( Class<?> pluginPoint, String property ) {
+			binder.bind(pluginFor(pluginPoint, property), Class.class).to(plugin);
 			binder.implicit().construct(plugin);
 			// we allow both collections of classes that have a common super-type or collections that don't
-			if (raw(plugin).isAssignableTo(raw(pluginPoint).asUpperBound())) {
+			if (raw(plugin).isAssignableTo(raw(pluginPoint).asUpperBound()) && !plugin.isAnnotation()) {
 				// if they have a common super-type the plugin is bound as an implementation
 				@SuppressWarnings("unchecked")
 				Class<? super T> pp = (Class<? super T>) pluginPoint;
@@ -234,7 +240,7 @@ public class Binder {
 		private final Inspector inspector;
 		private final ScopedBinder binder;
 
-		InspectBinder( Inspector inspector, RootBinder binder, Scope scope ) {
+		protected InspectBinder( Inspector inspector, RootBinder binder, Scope scope ) {
 			this.inspector = inspector;
 			this.binder = binder.on( binder.bind().asAuto() ).on( binder.bind().next() ).per( scope );
 		}
@@ -347,7 +353,7 @@ public class Binder {
 	public static class ScopedBinder
 			extends TargetedBinder {
 
-		ScopedBinder( RootBinder root, Bind bind ) {
+		protected ScopedBinder( RootBinder root, Bind bind ) {
 			super( root, bind );
 		}
 
@@ -356,7 +362,7 @@ public class Binder {
 		}
 
 		public TargetedBinder injectingInto( Instance<?> target ) {
-			return new TargetedBinder( root, bind().with( Target.targeting( target ) ) );
+			return new TargetedBinder( root, bind().with( targeting( target ) ) );
 		}
 
 		public TargetedBinder injectingInto( Name name, Class<?> type ) {
@@ -380,7 +386,7 @@ public class Binder {
 	public static class TargetedBinder
 			extends Binder {
 
-		TargetedBinder( RootBinder root, Bind bind ) {
+		protected TargetedBinder( RootBinder root, Bind bind ) {
 			super( root, bind );
 		}
 
@@ -426,7 +432,7 @@ public class Binder {
 		private final Bind bind;
 		protected final Resource<T> resource;
 
-		TypedBinder( Bind bind, Instance<T> instance ) {
+		protected TypedBinder( Bind bind, Instance<T> instance ) {
 			this( bind.next(), new Resource<>( instance, bind.target ) );
 		}
 
@@ -566,7 +572,7 @@ public class Binder {
 	public static class TypedElementBinder<E>
 			extends TypedBinder<E[]> {
 
-		TypedElementBinder( Bind bind, Instance<E[]> instance ) {
+		protected TypedElementBinder( Bind bind, Instance<E[]> instance ) {
 			super( bind.asMulti().next(), instance );
 		}
 

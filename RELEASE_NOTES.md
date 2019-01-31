@@ -18,6 +18,10 @@ v0.11 (upcoming)
 - added `to` for JDK 8 `Supplier` (method references)
 - added `Injector.resolve` `default` methods for convenience
 - renamed `Array.of` to `Array.array`
+- added `Name.pluginFor` factory method
+- changed plug-ins use `bind` instead of `multibind` (was unnecessary)
+- changed `Dependency.pluginsFor` no longer uses `parametizedAsUpperBounds`
+- added `Binder.into( Class<?> pluginPoint, String property )` (more control)
 
 v0.10
 ==============
