@@ -70,7 +70,7 @@ public final class Metaclass {
 		return cls.isInterface() || cls.isEnum() || cls.isPrimitive() || cls.isArray()
 				|| Modifier.isAbstract( cls.getModifiers() ) || cls == String.class
 				|| Number.class.isAssignableFrom( cls ) || cls == Boolean.class
-				|| cls == Void.class || cls == void.class
+				|| cls == Void.class || cls == void.class || cls == Class.class
 				|| Collection.class.isAssignableFrom( cls );
 	}
 

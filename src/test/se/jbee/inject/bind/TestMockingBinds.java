@@ -29,10 +29,10 @@ import org.junit.Test;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Name;
-import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.container.Supplier;
 
 /**
  * This test illustrates how to use binds with {@link Type#asUpperBound()} types

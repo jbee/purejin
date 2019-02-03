@@ -5,7 +5,10 @@
  */
 package se.jbee.inject;
 
+import static java.util.Arrays.asList;
+
 import java.util.Arrays;
+import java.util.Iterator;
 
 /**
  * A hierarchy of {@link Instance}s.
@@ -13,7 +16,7 @@ import java.util.Arrays;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Instances
-		implements MorePreciseThan<Instances> {
+		implements MoreApplicableThan<Instances>, Iterable<Instance<?>> {
 
 	public static final Instances ANY = new Instances();
 
@@ -63,12 +66,17 @@ public final class Instances
 			: Arrays.toString( hierarchy );
 	}
 
+	@Override
+	public Iterator<Instance<?>> iterator() {
+		return asList(hierarchy).iterator();
+	}
+	
 	/**
 	 * @return true when this has higher depth or equal depth and the first more precise hierarchy
 	 *         element.
 	 */
 	@Override
-	public boolean morePreciseThan( Instances other ) {
+	public boolean moreApplicableThan( Instances other ) {
 		if ( this == other ) {
 			return false;
 		}
@@ -76,10 +84,10 @@ public final class Instances
 			return hierarchy.length > other.hierarchy.length;
 		}
 		for ( int i = 0; i < hierarchy.length; i++ ) {
-			if ( hierarchy[i].morePreciseThan( other.hierarchy[i] ) ) {
+			if ( hierarchy[i].moreApplicableThan( other.hierarchy[i] ) ) {
 				return true;
 			}
-			if ( other.hierarchy[i].morePreciseThan( hierarchy[i] ) ) {
+			if ( other.hierarchy[i].moreApplicableThan( hierarchy[i] ) ) {
 				return false;
 			}
 		}

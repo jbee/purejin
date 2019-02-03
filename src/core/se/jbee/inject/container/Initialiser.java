@@ -1,4 +1,6 @@
-package se.jbee.inject;
+package se.jbee.inject.container;
+
+import se.jbee.inject.Injector;
 
 /**
  * Users can bind an implementation for this interface. The {@link Injector}
@@ -11,7 +13,7 @@ package se.jbee.inject;
  * @since 19.1
  */
 @FunctionalInterface
-public interface Initialiser {
+public interface Initialiser<T> {
 
 	/**
 	 * Is called by the {@link Injector} as soon as the context itself is
@@ -21,5 +23,5 @@ public interface Initialiser {
 	 *            use to receive instances that require further initialisation
 	 *            setup
 	 */
-	void init(Injector context);
+	void init(T context);
 }

@@ -25,7 +25,6 @@ import java.util.Map;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
-import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.SupplyFailed;
@@ -37,6 +36,7 @@ import se.jbee.inject.bootstrap.Inspector;
 import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.container.Scoped;
+import se.jbee.inject.container.Supplier;
 
 /**
  * When binding {@link Action}s this {@link Module} can be extended.

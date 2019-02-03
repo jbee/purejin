@@ -5,7 +5,6 @@
  */
 package se.jbee.inject.container;
 
-import se.jbee.inject.Supplier;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bootstrap.Bundle;
 

@@ -21,7 +21,6 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Injectron;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Resource;
-import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.bootstrap.Binding;
@@ -35,6 +34,7 @@ import se.jbee.inject.bootstrap.Macro;
 import se.jbee.inject.bootstrap.Macros;
 import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.config.Globals;
+import se.jbee.inject.container.Supplier;
 
 /**
  * Demonstrates how to use {@link Macro}s to customize the and binding

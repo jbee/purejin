@@ -5,7 +5,7 @@
  */
 package se.jbee.inject.bootstrap;
 
-import se.jbee.inject.Supplier;
+import se.jbee.inject.container.Supplier;
 
 /**
  * What is suppling instances for a {@link Binding}?

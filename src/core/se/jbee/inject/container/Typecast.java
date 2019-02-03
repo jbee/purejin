@@ -86,4 +86,15 @@ public final class Typecast {
 	public static <T> Type<Injectron<T>[]> injectronsTypeOf( Type<T> providedType ) {
 		return (Type) raw( Injectron[].class ).parametized( providedType );
 	}
+	
+	@SuppressWarnings ( { "unchecked", "rawtypes" } )
+	public static <T> Type<Initialiser<T>> initialiserTypeOf( Class<T> intialisedType ) {
+		return (Type) raw( Initialiser.class ).parametized( intialisedType );
+	}
+	
+	@SuppressWarnings ( { "unchecked", "rawtypes" } )
+	public static <T> Type<Initialiser<T>> initialiserTypeOf( Type<T> intialisedType ) {
+		return (Type) raw( Initialiser.class ).parametized( intialisedType );
+	}
+	
 }

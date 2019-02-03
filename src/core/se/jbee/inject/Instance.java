@@ -15,7 +15,7 @@ import static se.jbee.inject.Type.raw;
  *
  */
 public final class Instance<T>
-		implements Parameter<T>, MorePreciseThan<Instance<?>> {
+		implements Parameter<T>, MoreApplicableThan<Instance<?>> {
 
 	/**
 	 * When a wildcard-type is used as bound instance type the bind will be added to all concrete
@@ -90,24 +90,20 @@ public final class Instance<T>
 	}
 
 	@Override
-	public boolean morePreciseThan( Instance<?> other ) {
+	public boolean moreApplicableThan( Instance<?> other ) {
 		// sequence in OR is very important!!!
-		return morePreciseThan2( type, other.type, name, other.name );
+		return moreApplicableThan2( type, other.type, name, other.name );
 	}
 
-	public static <T extends MorePreciseThan<? super T>> int comparePrecision( T one, T other ) {
-		if ( one.morePreciseThan( other ) ) {
-			return -1;
-		}
-		if ( other.morePreciseThan( one ) ) {
-			return 1;
-		}
-		return 0;
+	public static <T extends MoreApplicableThan<? super T>> int compareApplicability( T one, T other ) {
+		return one.moreApplicableThan( other ) 
+				? -1
+				: other.moreApplicableThan( one ) ? 1 : 0;
 	}
 
-	public static <T extends MorePreciseThan<? super T>, T2 extends MorePreciseThan<? super T2>> boolean morePreciseThan2( T a1, T a2, T2 b1, T2 b2 ) {
-		return      a1.morePreciseThan( a2 ) //
-				|| !a2.morePreciseThan( a1 ) && b1.morePreciseThan( b2 );
+	public static <T extends MoreApplicableThan<? super T>, T2 extends MoreApplicableThan<? super T2>> boolean moreApplicableThan2( T a1, T a2, T2 b1, T2 b2 ) {
+		return      a1.moreApplicableThan( a2 ) //
+				|| !a2.moreApplicableThan( a1 ) && b1.moreApplicableThan( b2 );
 	}
 
 }

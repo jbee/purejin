@@ -214,26 +214,36 @@ public class Inspect
 	/**
 	 * Returns the constructor usually should be used.
 	 *
-	 * @param declaringClass
-	 *            constructed type
-	 * @return The constructor with the most parameters.
-	 * @throws NoMethodForDependency
-	 *             in case the type is not constructible (has no constructors at all)
+	 * @param declaringClass constructed type
+	 * @return The constructor with the most parameters that does not have the
+	 *         declaring class itself as parameter type (some compiler seam to
+	 *         generate such a synthetic constructor)
+	 * @throws NoMethodForDependency in case the type is not constructible (has no
+	 *                               constructors at all)
 	 */
 	public static <T> Constructor<T> defaultConstructor( Class<T> declaringClass ) throws NoMethodForDependency {
 		Constructor<?>[] constructors = declaringClass.getDeclaredConstructors();
-		if ( constructors.length == 0 ) {
+		if ( constructors.length == 0 )
 			throw new NoMethodForDependency( raw(declaringClass) );
-		}
-		Constructor<?> mostArgConstructor = constructors[0];
-		for ( int i = 0; i < constructors.length; i++ ) {
-			if ( constructors[i].getParameterTypes().length > mostArgConstructor.getParameterTypes().length ) {
-				mostArgConstructor = constructors[i];
+		Constructor<?> mostArgConstructor = null;
+		for (Constructor<?> c : constructors) {
+			if (!hasParameterType(declaringClass, c.getParameterTypes()) 
+					&& (mostArgConstructor == null || c.getParameterCount() > mostArgConstructor.getParameterCount() )) {
+				mostArgConstructor = c;
 			}
 		}
+		if (mostArgConstructor == null)
+			throw new NoMethodForDependency( raw(declaringClass) );
 		@SuppressWarnings ( "unchecked" )
 		Constructor<T> c = (Constructor<T>) mostArgConstructor;
 		return c;
+	}
+	
+	private static boolean hasParameterType(Class<?> t, Class<?>[] parameterTypes) {
+		for (Class<?> paramType : parameterTypes)
+			if (t == paramType)
+				return true;
+		return false;
 	}
 
 	public static <T> Constructor<T> noArgsConstructor( Class<T> declaringClass ) {

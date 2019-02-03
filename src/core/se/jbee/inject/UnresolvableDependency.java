@@ -49,7 +49,7 @@ public abstract class UnresolvableDependency
 			extends UnresolvableDependency {
 
 		public DependencyCycle( Dependency<?> dependency, Resource<?> cycleTarget ) {
-			super( "Cycle detected: " +  dependency + cycleTarget );
+			super( "Cycle detected: " +  dependency + " " + cycleTarget );
 		}
 
 	}

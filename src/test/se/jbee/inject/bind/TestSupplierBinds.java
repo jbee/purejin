@@ -6,8 +6,8 @@ import org.junit.Test;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
-import se.jbee.inject.Supplier;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.container.Supplier;
 
 public class TestSupplierBinds {
 

@@ -4,8 +4,14 @@ v19.1 (upcoming)
 ==============
 
 - changed versioning from _major.minor_ to _year.serial_ (e.g. 19.1 is the first in 2019)
+- renamed `Assembly` to `Injectee`
+- renamed `MorePreciseThan#morePreciseThan` to `MoreApplicableThan#moreApplicableThan`
+- moved `Supplier` into `container` package (was wrongly located in main API)
 - fixed `Type` `equals`/`equalTo` now considers `upperBound` flag
 - fixed wild-card array dependencies are honored in presents of same raw type bounds
+- fixed implicit `construct` for plugin class now only done if class is constructible
+- fixed `Class`es are now also considered `Metaclass#undeterminable`
+- fixed NPE when trying to resolve `Injectron[]` for unbound type 
 - improved `DefaultInjector`, composed arrays contain instances only once
 - added `initbind` and `Initialiser`s (run code when container is ready)
 - added `init` utility methods to link instances during initialisation
@@ -23,6 +29,8 @@ v19.1 (upcoming)
 - changed plug-ins use `bind` instead of `multibind` (was unnecessary)
 - changed `Dependency.pluginsFor` no longer uses `parametizedAsUpperBounds`
 - added `Binder.into( Class<?> pluginPoint, String property )` (more control)
+- added `toString` for `InjectronInfo` and `Injectron` implementation
+- added `Resource#toDependency` method
 
 v0.10
 ==============

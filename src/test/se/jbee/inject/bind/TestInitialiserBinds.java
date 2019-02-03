@@ -5,14 +5,15 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.container.Typecast.initialiserTypeOf;
 
 import org.junit.Test;
 
-import se.jbee.inject.Initialiser;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.config.Globals;
 import se.jbee.inject.config.Presets;
+import se.jbee.inject.container.Initialiser;
 
 /**
  * The tests demonstrates how the {@link Initialiser} and
@@ -23,7 +24,7 @@ import se.jbee.inject.config.Presets;
  */
 public class TestInitialiserBinds {
 
-	static final class TestInitialiserBindsModule extends BinderModule implements Initialiser {
+	static final class TestInitialiserBindsModule extends BinderModule implements Initialiser<Injector> {
 
 		@Override
 		protected void declare() {
@@ -42,7 +43,7 @@ public class TestInitialiserBinds {
 
 	}
 
-	static final class TestInitialiserBindsPresetModule extends BinderModuleWith<Integer> implements Initialiser {
+	static final class TestInitialiserBindsPresetModule extends BinderModuleWith<Integer> implements Initialiser<Injector> {
 
 		Integer setup;
 
@@ -61,7 +62,7 @@ public class TestInitialiserBinds {
 		}
 	}
 
-	static class AutoCloseableInitialiser implements Initialiser {
+	static class AutoCloseableInitialiser implements Initialiser<Injector> {
 
 		public AutoCloseableInitialiser(AutoCloseable[] autoCloseables) {
 			// since this instance is created by the container it is also properly injected.
@@ -132,7 +133,7 @@ public class TestInitialiserBinds {
 		Injector injector = Bootstrap.injector(TestInitialiserBindsPresetModule.class, globals);
 
 		// double check
-		Initialiser initialiser = injector.resolve(Initialiser.class);
+		Initialiser<Injector> initialiser = injector.resolve(initialiserTypeOf(Injector.class));
 		assertTrue(initialiser instanceof TestInitialiserBindsPresetModule);
 		TestInitialiserBindsPresetModule module = (TestInitialiserBindsPresetModule) initialiser;
 		assertNotNull(module.setup);

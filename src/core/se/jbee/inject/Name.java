@@ -16,7 +16,7 @@ import java.lang.reflect.Method;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Name
-		implements MorePreciseThan<Name> {
+		implements MoreApplicableThan<Name> {
 
 	/**
 	 * Character used as wildcard when matching names.
@@ -82,7 +82,7 @@ public final class Name
 	}
 
 	@Override
-	public boolean morePreciseThan( Name other ) {
+	public boolean moreApplicableThan( Name other ) {
 		final boolean thisIsDefault = isDefault();
 		final boolean otherIsDefault = other.isDefault();
 		if ( thisIsDefault || otherIsDefault ) {

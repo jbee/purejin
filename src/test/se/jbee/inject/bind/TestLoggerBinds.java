@@ -7,11 +7,11 @@ import java.util.logging.Logger;
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
-import se.jbee.inject.Supplier;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.container.Factory;
+import se.jbee.inject.container.Supplier;
 
 /**
  * A test that demonstrates how to extend the DI so that e.g. a class gets its class-specific-

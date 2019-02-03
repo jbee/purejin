@@ -14,6 +14,7 @@ import static se.jbee.inject.Source.source;
 import static se.jbee.inject.Target.targeting;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.bootstrap.Metaclass.metaclass;
+import static se.jbee.inject.container.Typecast.initialiserTypeOf;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -23,14 +24,12 @@ import java.util.function.BiConsumer;
 import se.jbee.inject.Array;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.InconsistentBinding;
-import se.jbee.inject.Initialiser;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Packages;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Resource;
-import se.jbee.inject.Supplier;
 import se.jbee.inject.Target;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Binding;
@@ -42,8 +41,10 @@ import se.jbee.inject.bootstrap.BoundMethod;
 import se.jbee.inject.bootstrap.Inspector;
 import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.container.Factory;
+import se.jbee.inject.container.Initialiser;
 import se.jbee.inject.container.Scope;
 import se.jbee.inject.container.Scoped;
+import se.jbee.inject.container.Supplier;
 
 /**
  * The default implementation of a fluent binder interface that provides a lot of utility methods to
@@ -116,12 +117,26 @@ public class Binder {
 	}
 
 	/**
-	 * Bind something that is an {@link Initialiser}.
+	 * Bind something that is an {@link Initialiser} for the {@link Injector}.
 	 * 
 	 * @since 19.1
 	 */
-	public TypedBinder<Initialiser> initbind() {
-		return multibind(Initialiser.class);
+	public TypedBinder<Initialiser<Injector>> initbind() {
+		return initbind(Injector.class);
+	}
+	
+	/**
+	 * @since 19.1
+	 */
+	public <T> TypedBinder<Initialiser<T>> initbind(Class<T> type) {
+		return initbind(raw(type));
+	}
+	
+	/**
+	 * @since 19.1
+	 */
+	public <T> TypedBinder<Initialiser<T>> initbind(Type<T> type) {
+		return multibind(initialiserTypeOf(type));
 	}
 
 	public <T> TypedBinder<T> multibind( Class<T> type ) {
@@ -245,7 +260,9 @@ public class Binder {
 
 		public void into( Class<?> pluginPoint, String property ) {
 			binder.bind(pluginFor(pluginPoint, property), Class.class).to(plugin);
-			binder.implicit().construct(plugin);
+			if (!metaclass(plugin).undeterminable()) {
+				binder.implicit().construct(plugin);
+			}
 			// we allow both collections of classes that have a common super-type or collections that don't
 			if (raw(plugin).isAssignableTo(raw(pluginPoint).asUpperBound()) && !plugin.isAnnotation()) {
 				// if they have a common super-type the plugin is bound as an implementation

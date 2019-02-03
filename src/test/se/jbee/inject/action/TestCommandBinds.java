@@ -9,8 +9,8 @@ import org.junit.Test;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
-import se.jbee.inject.Supplier;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.container.Supplier;
 
 /**
  * This test demonstrates that it is possible to have different higher level 'service' on top of

@@ -3,7 +3,11 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject;
+package se.jbee.inject.container;
+
+import se.jbee.inject.Dependency;
+import se.jbee.inject.Injector;
+import se.jbee.inject.UnresolvableDependency;
 
 /**
  * A {@link Supplier} is a source or factory for specific instances.
@@ -21,5 +25,4 @@ public interface Supplier<T> {
 	 * the given {@link Dependency} (probably with help of the {@link Injector}).
 	 */
 	T supply( Dependency<? super T> dependency, Injector injector ) throws UnresolvableDependency;
-
 }

@@ -15,140 +15,126 @@ import org.junit.Test;
 
 public class TestMorePrecise {
 
-	static class HigherNumberIsMorePrecise
-			implements MorePreciseThan<HigherNumberIsMorePrecise> {
+	static class HigherNumberIsMoreApplicable
+			implements MoreApplicableThan<HigherNumberIsMoreApplicable> {
 
 		final int value;
 
-		HigherNumberIsMorePrecise( int value ) {
+		HigherNumberIsMoreApplicable( int value ) {
 			this.value = value;
 		}
 
 		@Override
-		public boolean morePreciseThan( HigherNumberIsMorePrecise other ) {
+		public boolean moreApplicableThan( HigherNumberIsMoreApplicable other ) {
 			return value > other.value;
 		}
 
 	}
 
-	static HigherNumberIsMorePrecise hip( int value ) {
-		return new HigherNumberIsMorePrecise( value );
+	static HigherNumberIsMoreApplicable hip( int value ) {
+		return new HigherNumberIsMoreApplicable( value );
 	}
 
 	@Test
-	public void thatMorePreciseEvalsToTrue() {
-		assertTrue( hip( 2 ).morePreciseThan( hip( 1 ) ) );
+	public void thatMoreApplicabilityEvalsToTrue() {
+		assertTrue( hip( 2 ).moreApplicableThan( hip( 1 ) ) );
 	}
 
 	@Test
-	public void thatEqualPreciseEvalsToFalse() {
-		assertFalse( hip( 2 ).morePreciseThan( hip( 2 ) ) );
+	public void thatEqualApplicabilityEvalsToFalse() {
+		assertFalse( hip( 2 ).moreApplicableThan( hip( 2 ) ) );
 	}
 
 	@Test
-	public void thatLessPreciseEvalsToFalse() {
-		assertFalse( hip( 1 ).morePreciseThan( hip( 2 ) ) );
+	public void thatLessApplicabilityEvalsToFalse() {
+		assertFalse( hip( 1 ).moreApplicableThan( hip( 2 ) ) );
 	}
 
 	@Test
-	public void thatMorePreciseComesFirstInSortOrder() {
-		HigherNumberIsMorePrecise[] values = new HigherNumberIsMorePrecise[] { hip( 1 ), hip( 2 ) };
-		Arrays.sort( values, comparator(HigherNumberIsMorePrecise.class) );
+	public void thatMoreApplicabilityComesFirstInSortOrder() {
+		HigherNumberIsMoreApplicable[] values = new HigherNumberIsMoreApplicable[] { hip( 1 ), hip( 2 ) };
+		Arrays.sort( values, comparator(HigherNumberIsMoreApplicable.class) );
 		assertTrue( values[0].value == 2 );
 	}
 
 	@Test
-	public void thatSameTypeIsNotMorePrecise() {
-		assertNotMorePreciseThanItself( Type.raw( String.class ) );
+	public void thatSameTypeIsNotMoreApplicable() {
+		assertNotMoreApplicableThanItself( Type.raw( String.class ) );
 	}
 
 	@Test
-	public void thatSameDefaultNameIsNotMorePrecise() {
-		assertNotMorePreciseThanItself( Name.DEFAULT );
+	public void thatSameDefaultNameIsNotMoreApplicable() {
+		assertNotMoreApplicableThanItself( Name.DEFAULT );
 	}
 
 	@Test
-	public void thatUnnamedIsMorePreciseThanNamedInstance() {
+	public void thatUnnamedIsMoreApplicableThanNamedInstance() {
 		Type<Integer> type = raw( Integer.class );
 		Instance<Integer> named = instance( named( "foo" ), type );
 		Instance<Integer> unnamed = defaultInstanceOf( type );
-		assertMorePrecise( unnamed, named );
+		assertMoreApplicable( unnamed, named );
 	}
 
 	@Test
-	public void thatUnnamedIsMorePreciseThanNamed() {
-		assertTrue( Name.DEFAULT.morePreciseThan( named( "foo" ) ) );
+	public void thatUnnamedIsMoreApplicableThanNamed() {
+		assertTrue( Name.DEFAULT.moreApplicableThan( named( "foo" ) ) );
 	}
 
 	@Test
-	public void thatNamedIsNotMorePreciseThanUnnamed() {
-		assertFalse( named( "bar" ).morePreciseThan( Name.DEFAULT ) );
+	public void thatNamedIsNotMoreApplicableThanUnnamed() {
+		assertFalse( named( "bar" ).moreApplicableThan( Name.DEFAULT ) );
 	}
 
 	@Test
-	public void thatSameSpecificPackageIsNotMorePrecise() {
-		assertNotMorePreciseThanItself( Packages.packageOf( String.class ) );
+	public void thatSameSpecificPackageIsNotMoreApplicable() {
+		assertNotMoreApplicableThanItself( Packages.packageOf( String.class ) );
 	}
 
 	@Test
-	public void thatSpecificPackageIsMorePreciseThanGlobal() {
-		assertMorePrecise( Packages.packageOf( String.class ), Packages.ALL );
+	public void thatSpecificPackageIsMoreApplicableThanGlobal() {
+		assertMoreApplicable( Packages.packageOf( String.class ), Packages.ALL );
 	}
 
 	@Test
-	public void thatSpecificPackageIsMorePreciseThanThatPackageWithItsSubPackages() {
-		assertMorePrecise( Packages.packageOf( String.class ),
+	public void thatSpecificPackageIsMoreApplicableThanThatPackageWithItsSubPackages() {
+		assertMoreApplicable( Packages.packageOf( String.class ),
 				Packages.packageAndSubPackagesOf( String.class ) );
 	}
 
 	@Test
-	public void thatSpecificPackageIsMorePreciseThanSubPackagesUnderIt() {
-		assertMorePrecise( Packages.packageOf( String.class ),
+	public void thatSpecificPackageIsMoreApplicableThanSubPackagesUnderIt() {
+		assertMoreApplicable( Packages.packageOf( String.class ),
 				Packages.subPackagesOf( String.class ) );
 	}
 
 	@Test
-	public void thatPrecisionIsGivenByOrdinalStartingWithLowestPrecision() {
+	public void thatApplicablityIsGivenByOrdinalStartingWithLowest() {
 		DeclarationType[] types = DeclarationType.values();
 		for ( int i = 1; i < types.length; i++ ) {
-			assertTrue( types[i].morePreciseThan( types[i - 1] ) );
+			assertTrue( types[i].moreApplicableThan( types[i - 1] ) );
 		}
 	}
 
 	@Test
-	public void thatExplicitSourceIsMorePreciseThanAutoSource() {
+	public void thatExplicitSourceIsMoreApplicableThanAutoSource() {
 		Source source = Source.source( TestMorePrecise.class );
-		assertMorePrecise( source.typed( DeclarationType.EXPLICIT ),
+		assertMoreApplicable( source.typed( DeclarationType.EXPLICIT ),
 				source.typed( DeclarationType.AUTO ) );
 	}
 
-	private static <T extends MorePreciseThan<? super T>> void assertMorePrecise( T morePrecise,
+	private static <T extends MoreApplicableThan<? super T>> void assertMoreApplicable( T morePrecise,
 			T lessPrecise ) {
-		assertTrue( morePrecise.morePreciseThan( lessPrecise ) );
-		assertFalse( lessPrecise.morePreciseThan( morePrecise ) );
+		assertTrue( morePrecise.moreApplicableThan( lessPrecise ) );
+		assertFalse( lessPrecise.moreApplicableThan( morePrecise ) );
 	}
 
-	private static <T extends MorePreciseThan<? super T>> void assertNotMorePreciseThanItself( T type ) {
-		assertFalse( type.morePreciseThan( type ) );
-		assertEquals( 0, Instance.comparePrecision( type, type ) );
+	private static <T extends MoreApplicableThan<? super T>> void assertNotMoreApplicableThanItself( T type ) {
+		assertFalse( type.moreApplicableThan( type ) );
+		assertEquals( 0, Instance.compareApplicability( type, type ) );
 	}
 
-	public static <T extends MorePreciseThan<? super T>> Comparator<T> comparator(@SuppressWarnings("unused") Class<T> cls) {
-		return new PreciserThanComparator<>();
-	}
-
-	private static class PreciserThanComparator<T extends MorePreciseThan<? super T>>
-			implements Comparator<T> {
-
-		PreciserThanComparator() {
-			// make visible
-		}
-
-		@Override
-		public int compare( T one, T other ) {
-			return Instance.comparePrecision( one, other );
-		}
-
+	public static <T extends MoreApplicableThan<? super T>> Comparator<T> comparator(@SuppressWarnings("unused") Class<T> cls) {
+		return (one, other) ->  Instance.compareApplicability( one, other );
 	}
 
 }

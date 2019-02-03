@@ -47,4 +47,8 @@ public final class InjectronInfo<T> {
 		this.count = count;
 	}
 
+	@Override
+	public String toString() {
+		return serialID + " " + resource + " " + source + " " + expiry;
+	}
 }

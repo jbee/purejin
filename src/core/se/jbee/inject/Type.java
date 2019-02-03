@@ -30,7 +30,7 @@ import java.util.Set;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Type<T>
-		implements MorePreciseThan<Type<?>>, Parameter<T> {
+		implements MoreApplicableThan<Type<?>>, Parameter<T> {
 
 	public static final Type<Object> OBJECT = Type.raw( Object.class );
 	public static final Type<Void> VOID = raw( Void.class );
@@ -311,7 +311,7 @@ public final class Type<T>
 	}
 
 	@Override
-	public boolean morePreciseThan( Type<?> other ) {
+	public boolean moreApplicableThan( Type<?> other ) {
 		if ( !rawType.isAssignableFrom( other.rawType ) ) {
 			return true;
 		}
@@ -324,20 +324,20 @@ public final class Type<T>
 			return true;
 		}
 		if ( rawType == other.rawType ) {
-			return morePreciseParametersThan( other );
+			return moreApplicableParametersThan( other );
 		}
 		@SuppressWarnings ( "unchecked" )
 		Type<?> asOther = supertype( rawType, (Type<? extends T>) other );
-		return morePreciseParametersThan( asOther );
+		return moreApplicableParametersThan( asOther );
 	}
 
-	private boolean morePreciseParametersThan( Type<?> other ) {
+	private boolean moreApplicableParametersThan( Type<?> other ) {
 		if ( params.length == 1 ) {
-			return params[0].morePreciseThan( other.params[0] );
+			return params[0].moreApplicableThan( other.params[0] );
 		}
 		int morePrecise = 0;
 		for ( int i = 0; i < params.length; i++ ) {
-			if ( params[i].morePreciseThan( other.params[0] ) ) {
+			if ( params[i].moreApplicableThan( other.params[0] ) ) {
 				morePrecise++;
 			}
 		}

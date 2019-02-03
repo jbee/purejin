@@ -11,7 +11,7 @@ package se.jbee.inject;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Source
-		implements MorePreciseThan<Source> {
+		implements MoreApplicableThan<Source> {
 
 	public static Source source( Class<?> module ) {
 		return new Source( module, DeclarationType.EXPLICIT, 0, 0 );
@@ -39,8 +39,8 @@ public final class Source
 	}
 
 	@Override
-	public boolean morePreciseThan( Source other ) {
-		return declarationType.morePreciseThan( other.declarationType );
+	public boolean moreApplicableThan( Source other ) {
+		return declarationType.moreApplicableThan( other.declarationType );
 	}
 
 	public Source typed( DeclarationType type ) {

@@ -6,7 +6,7 @@
 package se.jbee.inject.bootstrap;
 
 import static se.jbee.inject.Array.array;
-import static se.jbee.inject.Instance.comparePrecision;
+import static se.jbee.inject.Instance.compareApplicability;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,12 +18,12 @@ import se.jbee.inject.DeclarationType;
 import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Source;
-import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 import se.jbee.inject.Typed;
 import se.jbee.inject.UnresolvableDependency;
-import se.jbee.inject.container.Assembly;
+import se.jbee.inject.container.Injectee;
 import se.jbee.inject.container.Scope;
+import se.jbee.inject.container.Supplier;
 
 /**
  * Default data strature to represent a 4-tuple created from {@link Bindings}.
@@ -34,7 +34,7 @@ import se.jbee.inject.container.Scope;
  *            The type of the bound value (instance)
  */
 public final class Binding<T>
-		implements Comparable<Binding<?>>, Assembly<T>, Module, Typed<T> {
+		implements Comparable<Binding<?>>, Injectee<T>, Module, Typed<T> {
 
 	public static <T> Binding<T> binding( Resource<T> resource, BindingType type,
 			Supplier<? extends T> supplier, Scope scope, Source source ) {
@@ -107,15 +107,15 @@ public final class Binding<T>
 		if ( res != 0 ) {
 			return res;
 		}
-		res = comparePrecision( resource.instance, other.resource.instance );
+		res = compareApplicability( resource.instance, other.resource.instance );
 		if ( res != 0 ) {
 			return res;
 		}
-		res = comparePrecision( resource.target, other.resource.target );
+		res = compareApplicability( resource.target, other.resource.target );
 		if ( res != 0 ) {
 			return res;
 		}
-		res = comparePrecision( source, other.source );
+		res = compareApplicability( source, other.source );
 		if ( res != 0 ) {
 			return res;
 		}

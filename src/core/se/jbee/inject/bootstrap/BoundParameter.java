@@ -15,8 +15,8 @@ import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
-import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
+import se.jbee.inject.container.Supplier;
 
 /**
  * A {@link BoundParameter} is a {@link Supplier} for parameters of

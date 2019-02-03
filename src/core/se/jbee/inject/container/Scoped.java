@@ -19,6 +19,7 @@ import se.jbee.inject.InjectronInfo;
  */
 public final class Scoped {
 
+	@FunctionalInterface
 	public interface DependencyProperty {
 
 		<T> String deriveFrom( Dependency<T> dependency );

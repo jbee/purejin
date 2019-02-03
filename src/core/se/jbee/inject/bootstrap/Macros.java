@@ -22,8 +22,8 @@ import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Resource;
-import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
+import se.jbee.inject.container.Supplier;
 
 /**
  * A immutable collection of {@link Macro}s each bound to a specific type handled.

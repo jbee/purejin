@@ -22,7 +22,7 @@ package se.jbee.inject;
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
-public enum DeclarationType implements MorePreciseThan<DeclarationType> {
+public enum DeclarationType implements MoreApplicableThan<DeclarationType> {
 
 	/*
 	 * !!!ATTENTION!!! - the order of constants matters to the logic!
@@ -77,7 +77,7 @@ public enum DeclarationType implements MorePreciseThan<DeclarationType> {
 	REQUIRED;
 
 	@Override
-	public boolean morePreciseThan( DeclarationType other ) {
+	public boolean moreApplicableThan( DeclarationType other ) {
 		return ordinal() > other.ordinal();
 	}
 

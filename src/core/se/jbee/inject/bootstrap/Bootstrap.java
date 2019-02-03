@@ -76,7 +76,7 @@ public final class Bootstrap {
 	}
 
 	public static <T> T instance( Injectron<T> injectron ) {
-		return injectron.instanceFor( dependency( injectron.info().resource.instance ) );
+		return injectron.instanceFor(injectron.info().resource.toDependency());
 	}
 
 	public static void nonnullThrowsReentranceException( Object field ) {

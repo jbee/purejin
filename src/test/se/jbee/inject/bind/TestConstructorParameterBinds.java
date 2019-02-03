@@ -17,10 +17,10 @@ import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
-import se.jbee.inject.Supplier;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BoundParameter;
 import se.jbee.inject.container.Scoped;
+import se.jbee.inject.container.Supplier;
 
 /**
  * The test illustrates how to use {@link Parameter}s to give hints which resources should be

@@ -19,7 +19,7 @@ import static se.jbee.inject.Type.raw;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Target
-		implements MorePreciseThan<Target> {
+		implements MoreApplicableThan<Target> {
 
 	public static final Target ANY = targeting( Instance.ANY );
 
@@ -142,20 +142,20 @@ public final class Target
 	}
 
 	@Override
-	public boolean morePreciseThan( Target other ) {
+	public boolean moreApplicableThan( Target other ) {
 		final int ol = other.parents.depth();
 		final int l = parents.depth();
 		if ( ol != l )
 			return l > ol;
 		if ( l > 0 ) { // length is known to be equal
-			if ( parents.morePreciseThan( other.parents ) ) {
+			if ( parents.moreApplicableThan( other.parents ) ) {
 				return true;
 			}
-			if ( other.parents.morePreciseThan( parents ) ) {
+			if ( other.parents.moreApplicableThan( parents ) ) {
 				return false;
 			}
 		}
-		return Instance.morePreciseThan2( instance, other.instance, packages, other.packages );
+		return Instance.moreApplicableThan2( instance, other.instance, packages, other.packages );
 	}
 
 	public boolean equalTo( Target other ) {

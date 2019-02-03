@@ -154,13 +154,13 @@ public class TestType {
 	public void testMorePreciseThanIndependend() {
 		Type<Integer> integer = Type.raw( Integer.class );
 		Type<String> string = Type.raw( String.class );
-		assertTrue( integer.morePreciseThan( string ) );
-		assertTrue( string.morePreciseThan( integer ) );
+		assertTrue( integer.moreApplicableThan( string ) );
+		assertTrue( string.moreApplicableThan( integer ) );
 	}
 
 	private static void assertMorePrecise( Type<?> morePrecise, Type<?> lessPrecise ) {
-		assertTrue( morePrecise.morePreciseThan( lessPrecise ) );
-		assertFalse( lessPrecise.morePreciseThan( morePrecise ) );
+		assertTrue( morePrecise.moreApplicableThan( lessPrecise ) );
+		assertFalse( lessPrecise.moreApplicableThan( morePrecise ) );
 	}
 
 	@Test

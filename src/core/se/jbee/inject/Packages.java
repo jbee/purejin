@@ -14,7 +14,7 @@ import java.util.Arrays;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Packages
-		implements MorePreciseThan<Packages> {
+		implements MoreApplicableThan<Packages> {
 
 	/**
 	 * Contains all packages including the (default) package.
@@ -179,7 +179,7 @@ public final class Packages
 	}
 
 	@Override
-	public boolean morePreciseThan( Packages other ) {
+	public boolean moreApplicableThan( Packages other ) {
 		if (includingSubpackages != other.includingSubpackages) {
 			return !includingSubpackages;
 		}

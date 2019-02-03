@@ -8,7 +8,7 @@ package se.jbee.inject.bootstrap;
 import java.lang.reflect.Constructor;
 
 import se.jbee.inject.Instance;
-import se.jbee.inject.Supplier;
+import se.jbee.inject.container.Supplier;
 
 /**
  * A {@linkplain Macro} is a prepared set of instructions that transform the

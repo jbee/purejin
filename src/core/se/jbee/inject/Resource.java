@@ -5,6 +5,7 @@
  */
 package se.jbee.inject;
 
+import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.raw;
 
 /**
@@ -15,7 +16,7 @@ import static se.jbee.inject.Type.raw;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Resource<T>
-		implements Typed<T>, MorePreciseThan<Resource<?>> {
+		implements Typed<T>, MoreApplicableThan<Resource<?>> {
 
 	public static <T> Resource<T> resource( Class<T> type ) {
 		return new Resource<>( Instance.anyOf( raw( type ) ) );
@@ -71,8 +72,8 @@ public final class Resource<T>
 	}
 
 	@Override
-	public boolean morePreciseThan( Resource<?> other ) {
-		return Instance.morePreciseThan2( instance, other.instance, target, other.target );
+	public boolean moreApplicableThan( Resource<?> other ) {
+		return Instance.moreApplicableThan2( instance, other.instance, target, other.target );
 	}
 
 	@Override
@@ -98,5 +99,23 @@ public final class Resource<T>
 	@Override
 	public int hashCode() {
 		return instance.hashCode() ^ target.hashCode();
+	}
+
+	/**
+	 * @since 19.1
+	 * @return a {@link Dependency} that {@link #isMatching(Dependency)} this
+	 *         {@link Resource}.
+	 */
+	public Dependency<T> toDependency() {
+		Dependency<T> dep = dependency(instance);
+		if (target != Target.ANY) {
+			if (!target.parents.isAny()) {
+				for (Instance<?> p : target.parents) {
+					dep = dep.injectingInto(p);
+				}
+			}
+			dep = dep.injectingInto(target.instance);
+		}
+		return dep;
 	}
 }

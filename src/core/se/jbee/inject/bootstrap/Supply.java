@@ -24,13 +24,13 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Injectron;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
-import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.UnresolvableDependency.SupplyFailed;
 import se.jbee.inject.container.Factory;
 import se.jbee.inject.container.Provider;
+import se.jbee.inject.container.Supplier;
 
 /**
  * Utility as a factory to create different kinds of {@link Supplier}s.
@@ -39,9 +39,9 @@ import se.jbee.inject.container.Provider;
  */
 public final class Supply {
 
-	public static final Supplier<Provider<?>> PROVIDER_BRIDGE = new ProviderSupplier();
-	public static final Supplier<List<?>> LIST_BRIDGE = new ArrayToListBridgeSupplier();
-	public static final Supplier<Set<?>> SET_BRIDGE = new ArrayToSetBridgeSupplier();
+	public static final Supplier<Provider<?>> PROVIDER_BRIDGE = new ProviderSupplierBridge();
+	public static final Supplier<List<?>> LIST_BRIDGE = new ArrayToListBridge();
+	public static final Supplier<Set<?>> SET_BRIDGE = new ArrayToSetBridge();
 	public static final Factory<Logger> LOGGER = new LoggerFactory();
 
 	private static final Supplier<?> REQUIRED = new RequiredSupplier<>();
@@ -61,7 +61,7 @@ public final class Supply {
 	}
 
 	public static <T> Supplier<T> reference( Class<? extends Supplier<? extends T>> type ) {
-		return new BridgeSupplier<>( type );
+		return new SupplierSupplierBridge<>( type );
 	}
 
 	public static <E> Supplier<E[]> elements( Type<E[]> arrayType, Parameter<? extends E>[] elements ) {
@@ -69,15 +69,15 @@ public final class Supply {
 	}
 
 	public static <T> Supplier<T> instance( Instance<T> instance ) {
-		return new InstanceSupplier<>( instance );
+		return new LazyInstance<>( instance );
 	}
 
 	public static <T> Supplier<T> dependency( Dependency<T> dependency ) {
-		return new DependencySupplier<>( dependency );
+		return new LazyDependency<>( dependency );
 	}
 
 	public static <T> Supplier<T> parametrizedInstance( Instance<T> instance ) {
-		return new ParametrizedInstanceSupplier<>( instance );
+		return new LazyParametrizedInstance<>( instance );
 	}
 
 	public static <T> Supplier<T> method( BoundMethod<T> method ) {
@@ -91,23 +91,22 @@ public final class Supply {
 	}
 
 	public static <T> Supplier<T> factory( Factory<T> factory ) {
-		return new FactorySupplier<>( factory );
+		return new FactorySupplierBridge<>( factory );
 	}
 
 	public static <T> Provider<T> lazyProvider( Dependency<T> dependency, Injector injector ) {
 		return dependency.type().arrayDimensions() == 1 // no injectrons for results composed within the Injector
 				? new LazyDirectProvider<>(dependency, injector)
-				: new LazyProvider<>(dependency, injector);
+				: new LazyPreresolvedProvider<>(dependency, injector);
 	}
 
 	private Supply() {
 		throw new UnsupportedOperationException( "util" );
 	}
 
-	public static abstract class ArrayBridgeSupplier<T>
-			implements Supplier<T> {
+	public static abstract class ArrayBridge<T> implements Supplier<T> {
 
-		ArrayBridgeSupplier() {
+		ArrayBridge() {
 			// make visible
 		}
 
@@ -133,10 +132,9 @@ public final class Supply {
 	 * @author Jan Bernitt (jan@jbee.se)
 	 *
 	 */
-	private static final class ArrayToListBridgeSupplier
-			extends ArrayBridgeSupplier<List<?>> {
+	private static final class ArrayToListBridge extends ArrayBridge<List<?>> {
 
-		ArrayToListBridgeSupplier() {
+		ArrayToListBridge() {
 			//make visible
 		}
 
@@ -147,10 +145,9 @@ public final class Supply {
 
 	}
 
-	private static final class ArrayToSetBridgeSupplier
-			extends ArrayBridgeSupplier<Set<?>> {
+	private static final class ArrayToSetBridge extends ArrayBridge<Set<?>> {
 
-		ArrayToSetBridgeSupplier() {
+		ArrayToSetBridge() {
 			// make visible
 		}
 
@@ -161,12 +158,11 @@ public final class Supply {
 
 	}
 
-	private static final class DependencySupplier<T>
-			implements Supplier<T> {
+	private static final class LazyDependency<T> implements Supplier<T> {
 
 		private final Dependency<T> dependency;
 
-		DependencySupplier( Dependency<T> dependency ) {
+		LazyDependency( Dependency<T> dependency ) {
 			this.dependency = dependency;
 		}
 
@@ -181,8 +177,7 @@ public final class Supply {
 		}
 	}
 
-	private static final class ConstantSupplier<T>
-			implements Supplier<T> {
+	private static final class ConstantSupplier<T> implements Supplier<T> {
 
 		private final T constant;
 
@@ -235,12 +230,11 @@ public final class Supply {
 		}
 	}
 
-	private static final class BridgeSupplier<T>
-			implements Supplier<T> {
+	private static final class SupplierSupplierBridge<T> implements Supplier<T> {
 
 		private final Class<? extends Supplier<? extends T>> type;
 
-		BridgeSupplier( Class<? extends Supplier<? extends T>> type ) {
+		SupplierSupplierBridge( Class<? extends Supplier<? extends T>> type ) {
 			this.type = type;
 		}
 
@@ -254,12 +248,11 @@ public final class Supply {
 	/**
 	 * E.g. used to "forward" Collection<T> to List<T>.
 	 */
-	private static final class ParametrizedInstanceSupplier<T>
-			implements Supplier<T> {
+	private static final class LazyParametrizedInstance<T> implements Supplier<T> {
 
 		private final Instance<? extends T> instance;
 
-		ParametrizedInstanceSupplier( Instance<? extends T> instance ) {
+		LazyParametrizedInstance( Instance<? extends T> instance ) {
 			this.instance = instance;
 		}
 
@@ -278,12 +271,11 @@ public final class Supply {
 
 	}
 
-	private static final class InstanceSupplier<T>
-			implements Supplier<T> {
+	private static final class LazyInstance<T> implements Supplier<T> {
 
 		private final Instance<? extends T> instance;
 
-		InstanceSupplier( Instance<? extends T> instance ) {
+		LazyInstance( Instance<? extends T> instance ) {
 			this.instance = instance;
 		}
 
@@ -299,10 +291,9 @@ public final class Supply {
 		}
 	}
 
-	private static final class ProviderSupplier
-			implements Supplier<Provider<?>> {
+	private static final class ProviderSupplierBridge implements Supplier<Provider<?>> {
 
-		ProviderSupplier() {
+		ProviderSupplierBridge() {
 			//make visible
 		}
 
@@ -334,13 +325,13 @@ public final class Supply {
 
 	}
 
-	private static final class LazyProvider<T> implements Provider<T> {
+	private static final class LazyPreresolvedProvider<T> implements Provider<T> {
 
 		private final Dependency<T> dependency;
 		private final Injectron<? extends T> injectron;
 
 		@SuppressWarnings("unchecked")
-		LazyProvider( Dependency<T> dependency, Injector injector ) {
+		LazyPreresolvedProvider( Dependency<T> dependency, Injector injector ) {
 			this.dependency = dependency;
 			this.injectron = injector.resolve(dependency.typed(raw( Injectron.class ).parametized(dependency.type())));
 		}
@@ -360,12 +351,11 @@ public final class Supply {
 	 * Adapter to a simpler API that will not need any {@link Injector} to supply it's value in any
 	 * case.
 	 */
-	private static final class FactorySupplier<T>
-			implements Supplier<T> {
+	private static final class FactorySupplierBridge<T> implements Supplier<T> {
 
 		private final Factory<T> factory;
 
-		FactorySupplier( Factory<T> factory ) {
+		FactorySupplierBridge( Factory<T> factory ) {
 			this.factory = factory;
 		}
 
@@ -435,8 +425,7 @@ public final class Supply {
 		}
 	}
 
-	private static class RequiredSupplier<T>
-			implements Supplier<T> {
+	private static class RequiredSupplier<T> implements Supplier<T> {
 
 		RequiredSupplier() {
 			// make visible
@@ -458,8 +447,7 @@ public final class Supply {
 		}
 	}
 
-	private static class LoggerFactory
-			implements Factory<Logger> {
+	private static class LoggerFactory implements Factory<Logger> {
 
 		LoggerFactory() {
 			// make visible

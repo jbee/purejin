@@ -19,12 +19,12 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Injectron;
 import se.jbee.inject.Name;
 import se.jbee.inject.Resource;
-import se.jbee.inject.Supplier;
 import se.jbee.inject.UnresolvableDependency.DependencyCycle;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bundle;
 import se.jbee.inject.bootstrap.Inspect;
+import se.jbee.inject.container.Supplier;
 
 /**
  * The tests shows an example of cyclic depended {@link Bundle}s. It shows that a {@link Bundle}

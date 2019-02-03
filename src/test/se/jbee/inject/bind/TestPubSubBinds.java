@@ -10,13 +10,13 @@ import java.util.List;
 
 import org.junit.Test;
 
-import se.jbee.inject.Initialiser;
 import se.jbee.inject.Injector;
-import se.jbee.inject.Supplier;
 import se.jbee.inject.bind.Binder.InitBinder;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Bundle;
 import se.jbee.inject.bootstrap.Supply;
+import se.jbee.inject.container.Initialiser;
+import se.jbee.inject.container.Supplier;
 
 /**
  * A tests the shows how {@link Initialiser}s behind {@link Binder#init(Class)}

@@ -16,7 +16,7 @@ import org.junit.runners.Suite.SuiteClasses;
 		TestBootstrapper.class, TestLinker.class, TestIssue1.class, TestDecoratorBinds.class, TestBinderModule.class,
 		TestExample1Binds.class, TestPluginBinds.class, TestMockingBinds.class, TestLambdaBinds.class,
 		TestInitialiserBinds.class, TestEditionPackageBinds.class, TestPubSubBinds.class,
-		TestSetterInitialisationBinds.class })
+		TestSetterInitialisationBinds.class, TestDynamicInitialiserBinds.class })
 public class SuiteBind {
 	// all tests in the bind package
 }
