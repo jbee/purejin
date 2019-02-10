@@ -24,5 +24,5 @@ public interface Supplier<T> {
 	 * This {@link Supplier} is asked to supply the instance that is used for
 	 * the given {@link Dependency} (probably with help of the {@link Injector}).
 	 */
-	T supply( Dependency<? super T> dependency, Injector injector ) throws UnresolvableDependency;
+	T supply(Dependency<? super T> dep, Injector injector) throws UnresolvableDependency;
 }

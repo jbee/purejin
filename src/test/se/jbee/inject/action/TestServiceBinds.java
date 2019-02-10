@@ -43,8 +43,8 @@ public class TestServiceBinds {
 			implements Supplier<Service<?, ?>> {
 
 		@Override
-		public Service<?, ?> supply( Dependency<? super Service<?, ?>> dependency, Injector injector ) {
-			Type<? super Service<?, ?>> type = dependency.type();
+		public Service<?, ?> supply( Dependency<? super Service<?, ?>> dep, Injector injector ) {
+			Type<? super Service<?, ?>> type = dep.type();
 			return newService( injector.resolve( actionDependency( type.parameter( 0 ), type.parameter( 1 ) ) ));
 		}
 

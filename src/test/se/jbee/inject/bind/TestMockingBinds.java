@@ -98,8 +98,8 @@ public class TestMockingBinds {
 
 		@SuppressWarnings("unchecked")
 		@Override
-		public T supply(Dependency<? super T> dependency, Injector injector) throws UnresolvableDependency {
-			Type<? super T> type = dependency.type();
+		public T supply(Dependency<? super T> dep, Injector injector) throws UnresolvableDependency {
+			Type<? super T> type = dep.type();
 			if (!type.isInterface() || type.isUpperBound())
 				throw new UnresolvableDependency.NoMethodForDependency(type);
 			InvocationHandler handler = new MockInvocationHandler(base, injector);

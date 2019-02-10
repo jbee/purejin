@@ -167,8 +167,8 @@ public class TestBootstrapper {
 		}
 
 		@Override
-		public String supply( Dependency<? super String> dependency, Injector injector ) {
-			if ( !dependency.instance.name.equalTo( named( "lazy" ) ) ) {
+		public String supply( Dependency<? super String> dep, Injector injector ) {
+			if ( !dep.instance.name.equalTo( named( "lazy" ) ) ) {
 				eagers++;
 				return "eager";
 			}

@@ -18,9 +18,8 @@ import static se.jbee.inject.container.Scoped.APPLICATION;
 import static se.jbee.inject.container.Scoped.DEPENDENCY_TYPE;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
@@ -45,16 +44,15 @@ import se.jbee.inject.container.Supplier;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public abstract class ActionModule
-		extends BinderModule {
+public abstract class ActionModule extends BinderModule {
 
 	/**
 	 * The {@link Inspector} picks the {@link Method}s that are used to implement
-	 * {@link Action}s. This abstraction allows to customize what methods are bound as
+	 * {@link Action}s. This abstraction allows to customise what methods are bound as
 	 * {@link Action}s. The {@link Inspector#methodsIn(Class)} should return all methods in
 	 * the given {@link Class} that should be used to implement a {@link Action}.
 	 */
-	static final Instance<Inspector> ACTION_INSPECTOR = instance( named(Action.class), raw( Inspector.class ) );
+	static final Instance<Inspector> ACTION_INSPECTOR = instance(named(Action.class), raw(Inspector.class));
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <I,O> Dependency<Action<I,O>> actionDependency(Type<I> input, Type<O> output) {
@@ -66,21 +64,20 @@ public abstract class ActionModule
 		plug(impl).into(Action.class);
 	}
 
-	protected final void discoverActionsBy( Inspector inspector ) {
-		bind( ACTION_INSPECTOR ).to( inspector );
+	protected final void discoverActionsBy(Inspector inspector) {
+		bind(ACTION_INSPECTOR).to(inspector);
 	}
 
 	protected ActionModule() {
 		super(Scoped.APPLICATION, ActionBaseModule.class);
 	}
 
-	private static final class ActionBaseModule
-			extends BinderModule {
+	private static final class ActionBaseModule extends BinderModule {
 
 		@Override
 		public void declare() {
-			asDefault().per( DEPENDENCY_TYPE ).starbind( Action.class ).toSupplier( ActionSupplier.class );
-			asDefault().per( APPLICATION ).bind( ACTION_INSPECTOR ).to( Inspect.all().methods() );
+			asDefault().per(DEPENDENCY_TYPE).starbind(Action.class).toSupplier(ActionSupplier.class);
+			asDefault().per(APPLICATION).bind(ACTION_INSPECTOR).to(Inspect.all().methods());
 			asDefault().per(APPLICATION).bind(Executor.class).to(DirectExecutor.class);
 		}
 
@@ -102,52 +99,48 @@ public abstract class ActionModule
 		}
 	}
 
-	static final class ActionSupplier
-			implements Supplier<Action<?, ?>> {
+	static final class ActionSupplier implements Supplier<Action<?, ?>> {
 
 		/**
 		 * A list of discovered methods for each implementation class.
 		 */
-		private final Map<Class<?>, Method[]> cachedMethods = new IdentityHashMap<>();
+		private final Map<Class<?>, Method[]> cachedMethods = new ConcurrentHashMap<>();
 		/**
 		 * All already created {@link Action}s identified by a unique function signature.
 		 */
-		private final Map<String, Action<?, ?>> cachedActions = new HashMap<>();
+		private final Map<String, Action<?, ?>> cachedActions = new ConcurrentHashMap<>();
 
 		private final Injector injector;
 		private final Inspector inspect;
 		private final Executor executor;
 		private final Class<?>[] implementationClasses;
 
-		public ActionSupplier( Injector injector ) {
+		public ActionSupplier(Injector injector) {
 			this.injector = injector;
 			this.executor = injector.resolve(Executor.class);
-			this.implementationClasses = injector.resolve( pluginsFor(Action.class) );
-			this.inspect = injector.resolve( dependency( ACTION_INSPECTOR ).injectingInto(ActionSupplier.class));
+			this.implementationClasses = injector.resolve(pluginsFor(Action.class));
+			this.inspect = injector.resolve( 
+					dependency(ACTION_INSPECTOR).injectingInto(ActionSupplier.class));
 		}
 
 		@Override
-		public Action<?, ?> supply( Dependency<? super Action<?, ?>> dependency, Injector injector ) {
-			Type<? super Action<?, ?>> type = dependency.type();
-			return provide( type.parameter( 0 ), type.parameter( 1 ) );
+		public Action<?, ?> supply(Dependency<? super Action<?, ?>> dep, Injector injector) {
+			Type<? super Action<?, ?>> type = dep.type();
+			return provide(type.parameter(0), type.parameter(1));
 		}
 
 		@SuppressWarnings ( "unchecked" )
 		private <I, O> Action<I, O> provide( Type<I> input, Type<O> output ) {
 			final String key = input + "->" + output; // haskell like function signature
-			Action<?, ?> action = cachedActions.get( key );
-			if ( action == null ) {
-				synchronized ( cachedActions ) {
-					action = cachedActions.get( key );
-					if ( action == null ) {
-						Method method = resolveAction( input, output );
-						Object impl = injector.resolve( method.getDeclaringClass() );
-						action = new ExecutedAction<>(impl, method, input, output, executor, injector);
-						cachedActions.put( key, action );
-					}
-				}
-			}
-			return (Action<I, O>) action;
+			return (Action<I, O>) cachedActions.computeIfAbsent(key, k -> newAction(input, output));
+		}
+
+		private <I, O> Action<?, ?> newAction(Type<I> input, Type<O> output) {
+			Action<?, ?> action;
+			Method method = resolveAction( input, output );
+			Object impl = injector.resolve( method.getDeclaringClass() );
+			action = new ExecutorRunAction<>(impl, method, input, output, executor, injector);
+			return action;
 		}
 
 		private <I, O> Method resolveAction( Type<I> input, Type<O> output ) {
@@ -173,22 +166,11 @@ public abstract class ActionModule
 		}
 
 		private Method[] actionsIn( Class<?> impl ) {
-			Method[] methods = cachedMethods.get( impl );
-			if ( methods != null ) {
-				return methods;
-			}
-			synchronized ( cachedMethods ) {
-				methods = cachedMethods.get( impl );
-				if ( methods == null ) {
-					methods = inspect.methodsIn( impl );
-					cachedMethods.put( impl, methods );
-				}
-			}
-			return methods;
+			return cachedMethods.computeIfAbsent(impl, k -> inspect.methodsIn(impl));
 		}
 	}
 
-	private static final class ExecutedAction<I,O> implements Action<I, O> {
+	private static final class ExecutorRunAction<I,O> implements Action<I, O> {
 
 		private final Object impl;
 		private final Method action;
@@ -201,7 +183,7 @@ public abstract class ActionModule
 		private final InjectionSite injection;
 		private final int inputIndex;
 
-		ExecutedAction(Object impl, Method action, Type<I> input, Type<O> output, Executor executor, Injector injector) {
+		ExecutorRunAction(Object impl, Method action, Type<I> input, Type<O> output, Executor executor, Injector injector) {
 			this.impl = impl;
 			this.action = accessible(action);
 			this.input = input;
@@ -209,7 +191,10 @@ public abstract class ActionModule
 			this.executor = executor;
 			this.injector = injector;
 			Type<?>[] types = parameterTypes(action);
-			this.injection = new InjectionSite(dependency(output).injectingInto(action.getDeclaringClass()), injector, BoundParameter.bind(types, BoundParameter.constant(input, null)));
+			this.injection = new InjectionSite(
+					dependency(output).injectingInto(action.getDeclaringClass()), 
+					injector, 
+					BoundParameter.bind(types, BoundParameter.constant(input, null)));
 			this.inputIndex = asList(types).indexOf(input);
 		}
 

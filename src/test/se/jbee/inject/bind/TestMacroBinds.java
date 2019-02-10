@@ -165,8 +165,8 @@ public class TestMacroBinds {
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			T instance = decorated.supply( dependency, injector );
+		public T supply( Dependency<? super T> dep, Injector injector ) {
+			T instance = decorated.supply( dep, injector );
 			for ( Field f : instance.getClass().getDeclaredFields() ) {
 				if ( f.isAnnotationPresent( Initialisation.class ) ) {
 					try {

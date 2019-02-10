@@ -148,9 +148,9 @@ public class TestStateDependentBinds {
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, Injector injector ) {
+		public T supply( Dependency<? super T> dep, Injector injector ) {
 			final S actualState = injector.resolve( state );
-			return supply( dependency, injector, actualState );
+			return supply( dep, injector, actualState );
 		}
 
 		private T supply( Dependency<? super T> dependency, Injector injector, final S actualState ) {

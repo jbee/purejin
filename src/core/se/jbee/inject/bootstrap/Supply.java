@@ -111,9 +111,9 @@ public final class Supply {
 		}
 
 		@Override
-		public final T supply( Dependency<? super T> dependency, Injector injector ) {
-			Type<?> elementType = dependency.type().parameter( 0 );
-			return bridge( supplyArray( dependency.typed( elementType.addArrayDimension() ), injector ) );
+		public final T supply( Dependency<? super T> dep, Injector injector ) {
+			Type<?> elementType = dep.type().parameter( 0 );
+			return bridge( supplyArray( dep.typed( elementType.addArrayDimension() ), injector ) );
 		}
 
 		private static <E> E[] supplyArray( Dependency<E[]> elementType, Injector resolver ) {
@@ -167,7 +167,7 @@ public final class Supply {
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, Injector injector ) {
+		public T supply( Dependency<? super T> dep, Injector injector ) {
 			return injector.resolve( this.dependency );
 		}
 
@@ -186,7 +186,7 @@ public final class Supply {
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, Injector injector ) {
+		public T supply( Dependency<? super T> dep, Injector injector ) {
 			return constant;
 		}
 
@@ -239,9 +239,9 @@ public final class Supply {
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			final Supplier<? extends T> supplier = injector.resolve( dependency.instanced(anyOf(type)));
-			return supplier.supply( dependency, injector );
+		public T supply( Dependency<? super T> dep, Injector injector ) {
+			final Supplier<? extends T> supplier = injector.resolve( dep.instanced(anyOf(type)));
+			return supplier.supply( dep, injector );
 		}
 	}
 
@@ -257,11 +257,11 @@ public final class Supply {
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			Type<? super T> type = dependency.type();
+		public T supply( Dependency<? super T> dep, Injector injector ) {
+			Type<? super T> type = dep.type();
 			Instance<? extends T> parametrized = instance.typed( instance.type().parametized(
-					type.parameters() ).upperBound( dependency.type().isUpperBound() ) );
-			return injector.resolve( dependency.instanced( parametrized ) );
+					type.parameters() ).upperBound( dep.type().isUpperBound() ) );
+			return injector.resolve( dep.instanced( parametrized ) );
 		}
 
 		@Override
@@ -280,9 +280,9 @@ public final class Supply {
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, Injector injector ) {
+		public T supply( Dependency<? super T> dep, Injector injector ) {
 			// Note that this is not "buffered" using specs as it is used to implement the plain resolution
-			return injector.resolve( dependency.instanced( instance ) );
+			return injector.resolve( dep.instanced( instance ) );
 		}
 
 		@Override
@@ -298,8 +298,8 @@ public final class Supply {
 		}
 
 		@Override
-		public Provider<?> supply( Dependency<? super Provider<?>> dependency, Injector injector ) {
-			return lazyProvider( dependency.onTypeParameter().uninject().ignoredExpiry(), injector );
+		public Provider<?> supply( Dependency<? super Provider<?>> dep, Injector injector ) {
+			return lazyProvider( dep.onTypeParameter().uninject().ignoredExpiry(), injector );
 		}
 
 		@Override
@@ -361,8 +361,8 @@ public final class Supply {
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			return factory.fabricate( dependency.instance, dependency.target( 1 ) );
+		public T supply( Dependency<? super T> dep, Injector injector ) {
+			return factory.fabricate( dep.instance, dep.target( 1 ) );
 		}
 
 		@Override
@@ -433,8 +433,8 @@ public final class Supply {
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			throw required(dependency);
+		public T supply( Dependency<? super T> dep, Injector injector ) {
+			throw required(dep);
 		}
 
 		@SuppressWarnings("unchecked")
@@ -489,13 +489,13 @@ public final class Supply {
 		protected abstract T invoke(Object[] args);
 
 		@Override
-		public T supply(Dependency<? super T> dependency, Injector injector) throws UnresolvableDependency {
+		public T supply(Dependency<? super T> dep, Injector injector) throws UnresolvableDependency {
 			InjectionSite local = previous; // this is important so previous might work as a simple cache but never causes trouble for this invocation in face of multiple threads calling
 			if (local == null) {
-				init(dependency, injector);
+				init(dep, injector);
 			}
-			if (local == null || !local.site.equalTo(dependency)) {
-				local = new InjectionSite(dependency, injector, params);
+			if (local == null || !local.site.equalTo(dep)) {
+				local = new InjectionSite(dep, injector, params);
 				previous = local;
 			}
 			return invoke(local.args(injector));

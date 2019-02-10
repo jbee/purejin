@@ -8,6 +8,8 @@ package se.jbee.inject.action;
 /**
  * The low user level representation of an action (a operation or micro-service).
  * 
+ * @see Executor
+ * 
  * @param <I>
  *            The type of the input
  * @param <O>

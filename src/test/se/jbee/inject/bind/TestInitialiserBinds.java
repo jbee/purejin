@@ -34,7 +34,7 @@ public class TestInitialiserBinds {
 		}
 
 		@Override
-		public void init(Injector context) {
+		public void init(Injector target, Injector context) {
 			// just to show that one could use the module itself as well
 			// this e.g. allows to pass down and use setup data by using
 			// PresetModule's as shown with TestInitialiserBindsPresetModule
@@ -56,7 +56,7 @@ public class TestInitialiserBinds {
 		}
 
 		@Override
-		public void init(Injector context) {
+		public void init(Injector target, Injector context) {
 			assertNotNull(setup);
 			// use setup to initialize something
 		}
@@ -77,10 +77,10 @@ public class TestInitialiserBinds {
 		}
 
 		@Override
-		public void init(Injector context) {
+		public void init(Injector target, Injector context) {
 			// by the use of upper bound we receive all implementing classes
 			// even though they have not be bound explicitly for AutoCloseable.
-			AutoCloseable[] autoCloseables = context.resolve(raw(AutoCloseable[].class).asUpperBound());
+			AutoCloseable[] autoCloseables = target.resolve(raw(AutoCloseable[].class).asUpperBound());
 			assertTrue(autoCloseables.length > 0);
 			shutdownHookMock = () -> {
 				for (AutoCloseable a : autoCloseables)

@@ -16,12 +16,13 @@ import se.jbee.inject.Injector;
 public interface Initialiser<T> {
 
 	/**
-	 * Is called by the {@link Injector} as soon as the context itself is
-	 * Initialised and ready to be used by the implementation of this interface.
+	 * Is called when the target instance is created within the {@link Injector}
+	 * context. For {@link Injector} itself as target this is called as soon as its
+	 * state has been initialised.
 	 * 
-	 * @param context
-	 *            use to receive instances that require further initialisation
-	 *            setup
+	 * @param target  instance to initialise
+	 * @param context use to receive instances that require further initialisation
+	 *                setup
 	 */
-	void init(T context);
+	void init(T target, Injector context);
 }

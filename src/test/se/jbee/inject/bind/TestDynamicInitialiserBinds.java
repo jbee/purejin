@@ -54,8 +54,10 @@ public class TestDynamicInitialiserBinds {
 
 		@Override
 		protected void declare() {
-			initbind(MyListener.class).to(l -> l.inc(1));
-			injectingInto(MyServiceExtension.class).initbind(MyListener.class).to(l ->  l.inc(2));
+			initbind(MyListener.class)
+				.to((Initialiser<MyListener>)(l, injector) -> l.inc(1));
+			injectingInto(MyServiceExtension.class).initbind(MyListener.class)
+				.to((Initialiser<MyListener>)(l, injector) ->  l.inc(2));
 			construct(MyService.class);
 			construct(MyOtherService.class);
 			construct(MyServiceExtension.class);

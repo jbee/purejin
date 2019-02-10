@@ -219,7 +219,7 @@ public class Binder {
 		}
 
 		public <C> void forEach(Type<? extends C[]> dependencies, BiConsumer<T, C> initialiser) {
-			binder.initbind().to(injector -> {
+			binder.initbind().to((impl, injector) -> {
 				T obj = injector.resolve(target);
 				C[] args = injector.resolve(dependency(dependencies).injectingInto(target));
 				for (C arg : args)
@@ -236,7 +236,7 @@ public class Binder {
 		}
 
 		public <C> void by(Instance<? extends C> dependency, BiConsumer<T, C> initialiser) {
-			binder.initbind().to(injector -> {
+			binder.initbind().to((impl, injector) -> {
 				T obj = injector.resolve(target);
 				C arg = injector.resolve(dependency(dependency).injectingInto(target));
 				initialiser.accept(obj, arg);

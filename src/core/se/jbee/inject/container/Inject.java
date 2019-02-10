@@ -88,7 +88,7 @@ public final class Inject {
 					resolve(initialiserTypeOf(Injector.class).addArrayDimension());
 			if (initSpecs.length == injectorInitialisers.length) {
 				for (Initialiser<Injector> init : injectorInitialisers)
-					init.init(this);
+					init.init(this, this);
 				return null; // no other dynamic initialisers
 			}
 			List<Specification<? extends Initialiser<?>>> nonInjectorInitialisers = new ArrayList<>();
@@ -99,7 +99,7 @@ public final class Inject {
 			}
 			// run initialisers for the injector
 			for (Initialiser<Injector> init : injectorInitialisers)
-				init.init(this);
+				init.init(this, this);
 			return toArray(nonInjectorInitialisers, raw(Specification.class));
 		}
 
@@ -112,6 +112,7 @@ public final class Inject {
 				Scope scope = injectee.scope();
 				Repository rep = reps.get(scope);
 				Scoping scoping = scopingOf(scope);
+				//IDEA allow supplier to implement Generator and if so use that directly?
 				Generator<T> gen = new InjectorGenerator<>(i, this, rep, injectee, scoping);
 				specs[i] = new Specification<>(i, injectee.source(), scoping, injectee.resource(), gen);
 			}
@@ -347,6 +348,7 @@ public final class Inject {
 			});
 		}
 		
+		//TODO maybe add support for annotation - revolve Initialiser bound for Annotation class.
 		private void dynamicInitialisationOf(T instance, Dependency<?> context) {
 			Class<?> type = instance.getClass();
 			if (type == Class.class || type == Specification.class 
@@ -367,7 +369,7 @@ public final class Inject {
 			}
 			if (cachedInitialisers != null) {
 				for (Initialiser<? super T> i : cachedInitialisers)
-					i.init(instance);
+					i.init(instance, injector);
 			}
 		}
 		

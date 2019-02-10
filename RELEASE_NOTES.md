@@ -42,6 +42,7 @@ v19.1 (upcoming)
 - added `Binder.into( Class<?> pluginPoint, String property )` (more control)
 - added `toString` for `InjectronInfo` and `Injectron` implementation
 - added `Resource#toDependency` method
+- `Action` metadata uses concurrent maps instead of `synchronized` blocks
 
 v0.10
 ==============

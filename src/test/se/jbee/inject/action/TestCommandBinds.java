@@ -33,8 +33,8 @@ public class TestCommandBinds {
 			implements Supplier<Command<?>> {
 
 		@Override
-		public Command<?> supply( Dependency<? super Command<?>> dependency, Injector injector ) {
-			return newCommand( injector.resolve( actionDependency(dependency.type().parameter( 0 ), raw( Long.class )) ) );
+		public Command<?> supply( Dependency<? super Command<?>> dep, Injector injector ) {
+			return newCommand( injector.resolve( actionDependency(dep.type().parameter( 0 ), raw( Long.class )) ) );
 		}
 
 		private static <P> Command<P> newCommand( Action<P, Long> service ) {

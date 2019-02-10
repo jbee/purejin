@@ -13,8 +13,10 @@ import se.jbee.inject.UnresolvableDependency.SupplyFailed;
 /**
  * The {@link Executor} invokes the actual action {@link Method}. It is an
  * abstraction for the inner mechanics of {@link Action}s so that these can be
- * customized by replacing the {@link Executor} by making a bind (see
+ * customised by replacing the {@link Executor} by making a bind (see
  * {@link ActionModule}).
+ * 
+ * @see Action
  */
 @FunctionalInterface
 public interface Executor {
