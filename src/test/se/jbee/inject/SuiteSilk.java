@@ -9,7 +9,7 @@ import se.jbee.inject.bind.SuiteBind;
 import se.jbee.inject.container.SuitContainer;
 
 @RunWith ( Suite.class )
-@SuiteClasses ( { TestName.class, TestType.class, TestPackages.class, TestMorePrecise.class,
+@SuiteClasses ( { TestName.class, TestType.class, TestPackages.class, TestMoreApplicable.class,
 		TestTarget.class, TestDeclarationType.class, TestEqualsHashCode.class,
 		// suits
 		SuitContainer.class, SuiteBind.class, SuiteAction.class } )

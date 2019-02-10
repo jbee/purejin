@@ -3,21 +3,20 @@
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject.container;
+package se.jbee.inject;
 
-import se.jbee.inject.UnresolvableDependency;
-import se.jbee.inject.bootstrap.Bundle;
+import se.jbee.inject.container.Supplier;
 
 /**
- * A indirection that resolves the instance lazily when {@link #provide()} is invoked. This is
- * mainly used to allow the injection and usage of instances that have a more unstable scope into an
- * instance of a more stable scope.
+ * A indirection that resolves the instance lazily when {@link #provide()} is
+ * invoked. This is mainly used to allow the injection and usage of instances
+ * that have a more unstable scope into an instance of a more stable scope.
  * 
- * In contrast to other DI-frameworks this is no core concept. To enable {@linkplain Provider}s
- * install the them through buildin-{@link Bundle}.
+ * Usage of {@link Provider}s to circumvent scoping limitations is explicitly
+ * installed using the buildin-{@link se.jbee.inject.bootstrap.Bundle}.
  * 
- * But it is also very easy to use another similar provider interface by installing a similar bridge
- * {@link Supplier}.
+ * But it is also very easy to use another similar provider interface by
+ * installing a similar bridge {@link Supplier}.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */

@@ -13,11 +13,12 @@ import static java.util.Collections.emptyList;
 import static se.jbee.inject.Array.array;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Dependency.pluginsFor;
+import static se.jbee.inject.Scoping.scopingOf;
 import static se.jbee.inject.Instance.compareApplicability;
 import static se.jbee.inject.Name.DEFAULT;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.container.Typecast.initialiserTypeOf;
-import static se.jbee.inject.container.Typecast.injectronsTypeOf;
+import static se.jbee.inject.container.Typecast.specsTypeOf;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,24 +32,27 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import se.jbee.inject.Dependency;
-import se.jbee.inject.Expiry;
+import se.jbee.inject.Scoping;
 import se.jbee.inject.Injector;
-import se.jbee.inject.Injectron;
-import se.jbee.inject.InjectronInfo;
+import se.jbee.inject.Generator;
+import se.jbee.inject.Specification;
 import se.jbee.inject.Name;
+import se.jbee.inject.Repository;
 import se.jbee.inject.Resource;
+import se.jbee.inject.Scope;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 
 /**
- * Utility to create/use the core containers {@link Injector} and {@link Injectron}.
+ * Utility to create/use the core containers {@link Injector} and {@link Generator}.
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
+@SuppressWarnings("unused")
 public final class Inject {
 
-	public static Injector container( Injectee<?>... assemblies ) {
-		return new InjectorImpl( assemblies );
+	public static Injector container( Injectee<?>... injectees ) {
+		return new InjectorImpl( injectees );
 	}
 
 	private Inject() {
@@ -58,121 +62,119 @@ public final class Inject {
 	/**
 	 * The default {@link Injector}.
 	 *
-	 * For each raw type ({@link Class}) all production rules ({@link Injectron}
+	 * For each raw type ({@link Class}) all production rules ({@link Specification}
 	 * s) are given ordered from most precise to least precise. The first in
 	 * order that matches yields the result instance.
-	 *
-	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	private static final class InjectorImpl implements Injector {
 
-		private final Map<Class<?>, Injectron<?>[]> injectrons;
-		private final Injectron<?>[] wildcardInjectrons;
-		final Injectron<Initialiser<?>>[] initialisersInjectrons;
+		private final Map<Class<?>, Specification<?>[]> specsByType;
+		private final Specification<?>[] wildcardSpecs;
+		final Specification<Initialiser<?>>[] initialisersSpecs;
 
 		InjectorImpl( Injectee<?>... injectees ) {
-			this.injectrons = initFrom( injectees );
-			this.wildcardInjectrons = wildcardInjectrons(injectrons);
-			this.initialisersInjectrons = initInitialisers();
+			this.specsByType = initFrom( injectees );
+			this.wildcardSpecs = wildcardSpecs(specsByType);
+			this.initialisersSpecs = initInitialisers();
 		}
 		
-		private Injectron<Initialiser<?>>[] initInitialisers() {
-			Injectron<? extends Initialiser<?>>[] initialisers = 
-					resolve(injectronsTypeOf(initialiserTypeOf(Type.WILDCARD)));
-			if (initialisers.length == 0) {
+		private Specification<Initialiser<?>>[] initInitialisers() {
+			Specification<? extends Initialiser<?>>[] initSpecs = 
+					resolve(specsTypeOf(initialiserTypeOf(Type.WILDCARD)));
+			if (initSpecs.length == 0) {
 				return null;
 			}
 			Initialiser<Injector>[] injectorInitialisers = 
 					resolve(initialiserTypeOf(Injector.class).addArrayDimension());
-			if (initialisers.length == injectorInitialisers.length) {
-				for (Initialiser<Injector> i : injectorInitialisers)
-					i.init(this);
+			if (initSpecs.length == injectorInitialisers.length) {
+				for (Initialiser<Injector> init : injectorInitialisers)
+					init.init(this);
 				return null; // no other dynamic initialisers
 			}
-			List<Injectron<? extends Initialiser<?>>> nonInjectorInitialisers = new ArrayList<>();
-			for (Injectron<? extends Initialiser<?>> i : initialisers) {
-				if (!i.info().resource.type().equalTo(raw(Initialiser.class).parametized(Injector.class))) {
-					nonInjectorInitialisers.add(i);
+			List<Specification<? extends Initialiser<?>>> nonInjectorInitialisers = new ArrayList<>();
+			for (Specification<? extends Initialiser<?>> spec : initSpecs) {
+				if (!spec.resource.type().equalTo(raw(Initialiser.class).parametized(Injector.class))) {
+					nonInjectorInitialisers.add(spec);
 				}
 			}
 			// run initialisers for the injector
-			for (Initialiser<Injector> i : injectorInitialisers)
-				i.init(this);
-			return toArray(nonInjectorInitialisers, raw(Injectron.class));
+			for (Initialiser<Injector> init : injectorInitialisers)
+				init.init(this);
+			return toArray(nonInjectorInitialisers, raw(Specification.class));
 		}
 
-		private <T> Map<Class<?>, Injectron<?>[]> initFrom( Injectee<?>... injectees ) {
-			Map<Scope, Repository> repositories = initRepositories( injectees );
-			Injectron<?>[] injectrons = new Injectron<?>[injectees.length];
+		private <T> Map<Class<?>, Specification<?>[]> initFrom( Injectee<?>... injectees ) {
+			Map<Scope, Repository> reps = initRepositories( injectees );
+			Specification<?>[] specs = new Specification<?>[injectees.length];
 			for (int i = 0; i < injectees.length; i++) {
 				@SuppressWarnings("unchecked")
 				Injectee<T> injectee = (Injectee<T>) injectees[i];
 				Scope scope = injectee.scope();
-				Expiry expiry = EXPIRATION.get( scope );
-				if ( expiry == null )
-					expiry = Expiry.NEVER;
-				injectrons[i] = new InjectronImpl<>(this, repositories.get( scope ), injectee, expiry, i, injectees.length);
+				Repository rep = reps.get(scope);
+				Scoping scoping = scopingOf(scope);
+				Generator<T> gen = new InjectorGenerator<>(i, this, rep, injectee, scoping);
+				specs[i] = new Specification<>(i, injectee.source(), scoping, injectee.resource(), gen);
 			}
-			Arrays.sort( injectrons, COMPARATOR );
-			Map<Class<?>, Injectron<?>[]> map = new IdentityHashMap<>( injectrons.length );
-			if ( injectrons.length == 0 )
+			Arrays.sort( specs );
+			Map<Class<?>, Specification<?>[]> map = new IdentityHashMap<>( specs.length );
+			if ( specs.length == 0 )
 				return map;
-			Class<?> lastRawType = injectrons[0].info().resource.type().rawType;
+			Class<?> lastRawType = specs[0].resource.type().rawType;
 			int start = 0;
-			for ( int i = 0; i < injectrons.length; i++ ) {
-				Class<?> rawType = injectrons[i].info().resource.type().rawType;
+			for ( int i = 0; i < specs.length; i++ ) {
+				Class<?> rawType = specs[i].resource.type().rawType;
 				if ( rawType != lastRawType ) {
-					map.put( lastRawType, copyOfRange( injectrons, start, i ) );
+					map.put( lastRawType, copyOfRange( specs, start, i ) );
 					start = i;
 				}
 				lastRawType = rawType;
 			}
-			map.put( lastRawType, copyOfRange( injectrons, start, injectrons.length ) );
+			map.put( lastRawType, copyOfRange( specs, start, specs.length ) );
 			return map;
 		}
 
-		private static Injectron<?>[] wildcardInjectrons(Map<Class<?>, Injectron<?>[]> injectrons) {
-			List<Injectron<?>> res = new ArrayList<>();
-			for (Injectron<?>[] is : injectrons.values()) {
-				for (Injectron<?> i : is) {
-					if (i.info().resource.type().isUpperBound())
-						res.add(i);
+		private static Specification<?>[] wildcardSpecs(Map<Class<?>, Specification<?>[]> specs) {
+			List<Specification<?>> res = new ArrayList<>();
+			for (Specification<?>[] typeSpecs : specs.values()) {
+				for (Specification<?> spec : typeSpecs) {
+					if (spec.resource.type().isUpperBound())
+						res.add(spec);
 				}
 			}
-			Collections.sort(res, COMPARATOR);
-			return res.size() == 0 ? null : res.toArray(new Injectron[res.size()]);
+			Collections.sort(res);
+			return res.size() == 0 ? null : res.toArray(new Specification[res.size()]);
 		}
 
-		private static Map<Scope, Repository> initRepositories( Injectee<?>[] assemblies ) {
-			Map<Scope, Repository> repositories = new IdentityHashMap<>();
-			for ( Injectee<?> a : assemblies ) {
-				Scope scope = a.scope();
-				Repository repository = repositories.get( scope );
+		private static Map<Scope, Repository> initRepositories( Injectee<?>[] injectees ) {
+			Map<Scope, Repository> reps = new IdentityHashMap<>();
+			for ( Injectee<?> i : injectees ) {
+				Scope scope = i.scope();
+				Repository repository = reps.get( scope );
 				if ( repository == null )
-					repositories.put( scope, scope.init() );
+					reps.put( scope, scope.init(injectees.length) );
 			}
-			return repositories;
+			return reps;
 		}
 
 
 		@SuppressWarnings ( "unchecked" )
 		@Override
-		public <T> T resolve( Dependency<T> dependency ) {
-			//TODO new feature: resolve by annotation type -> as addon with own API that does its type analysis on basis of Injectrons
-			final Type<T> type = dependency.type();
-			if ( type.rawType == Injectron.class ) {
-				Injectron<?> res = injectronMatching( dependency.onTypeParameter() );
+		public <T> T resolve( Dependency<T> dep ) {
+			//TODO new feature: resolve by annotation type -> as addon with own API that does its type analysis on basis of specs
+			final Type<T> type = dep.type();
+			if ( type.rawType == Specification.class ) {
+				Specification<?> res = specMatching( dep.onTypeParameter() );
 				if ( res != null )
 					return (T) res;
 			}
 			if ( type.rawType == Injector.class )
 				return (T) this;
-			Injectron<T> injectron = injectronMatching( dependency );
-			if ( injectron != null )
-				return injectron.instanceFor( dependency );
+			Specification<T> spec = specMatching( dep );
+			if ( spec != null )
+				return spec.generator.instanceFor( dep );
 			if ( type.arrayDimensions() == 1 )
-				return resolveArray( dependency, type.baseType() );
-			return resolveFromUpperBound(dependency);
+				return resolveArray( dep, type.baseType() );
+			return resolveFromUpperBound(dep);
 		}
 
 		/**
@@ -180,100 +182,99 @@ public final class Inject {
 		 * that is a binding capable of producing all sub-types of a certain super-type.
 		 */
 		@SuppressWarnings ( "unchecked" )
-		private <T> T resolveFromUpperBound(Dependency<T> dependency) {
-			final Type<T> type = dependency.type();
-			if ( wildcardInjectrons != null ) {
-				for (int i = 0; i < wildcardInjectrons.length; i++) {
-					Injectron<?> res = wildcardInjectrons[i];
-					if (type.isAssignableTo(res.info().resource.type()))
-						return (T) res.instanceFor((Dependency<Object>) dependency);
+		private <T> T resolveFromUpperBound(Dependency<T> dep) {
+			final Type<T> type = dep.type();
+			if ( wildcardSpecs != null ) {
+				for (int i = 0; i < wildcardSpecs.length; i++) {
+					Specification<?> res = wildcardSpecs[i];
+					if (type.isAssignableTo(res.resource.type()))
+						return (T) res.generator.instanceFor((Dependency<Object>) dep);
 				}
 			}
-			throw noInjectronFor( dependency );
+			throw noSpecFor( dep );
 		}
 
-		private <T> Injectron<T> injectronMatching( Dependency<T> dependency ) {
-			return mostApplicableOf( injectronsForType( dependency.type() ), dependency );
+		private <T> Specification<T> specMatching( Dependency<T> dep ) {
+			return mostApplicableOf( specsForType( dep.type() ), dep );
 		}
 
-		private static <T> Injectron<T> mostApplicableOf( Injectron<T>[] injectrons, Dependency<T> dependency ) {
-			if ( injectrons == null )
+		private static <T> Specification<T> mostApplicableOf( Specification<T>[] specs, Dependency<T> dep ) {
+			if ( specs == null )
 				return null;
-			for ( int i = 0; i < injectrons.length; i++ ) {
-				Injectron<T> injectron = injectrons[i];
-				if ( injectron.info().resource.isMatching( dependency ) )
-					return injectron;
+			for ( int i = 0; i < specs.length; i++ ) {
+				Specification<T> spec = specs[i];
+				if ( spec.resource.isMatching( dep ) )
+					return spec;
 			}
 			return null;
 		}
 
-		private <T> NoResourceForDependency noInjectronFor( Dependency<T> dependency ) {
-			return new NoResourceForDependency( dependency, injectronsForType( dependency.type() ), "" );
+		private <T> NoResourceForDependency noSpecFor( Dependency<T> dep ) {
+			return new NoResourceForDependency( dep, specsForType( dep.type() ), "" );
 		}
 
-		private <T, E> T resolveArray( Dependency<T> dependency, Type<E> elementType ) {
-			if ( elementType.rawType == Injectron.class ) {
-				return resolveInjectronArray( dependency, elementType.parameter( 0 ) );
+		private <T, E> T resolveArray( Dependency<T> dep, Type<E> elementType ) {
+			if ( elementType.rawType == Specification.class ) {
+				return resolveSpecArray( dep, elementType.parameter( 0 ) );
 			}
-			if ( dependency.type().rawType.getComponentType().isPrimitive() ) {
-				throw new NoResourceForDependency(dependency, null,
+			if ( dep.type().rawType.getComponentType().isPrimitive() ) {
+				throw new NoResourceForDependency(dep, null,
 						"Primitive arrays cannot be used to inject all instances of the wrapper type. Use the wrapper array instead." );
 			}
 			Set<Integer> identities = new HashSet<>();
 			if (!elementType.isUpperBound()) {
 				List<E> elements = new ArrayList<>();
-				Injectron<E>[] elementInjectrons = injectronsForType( elementType );
-				if ( elementInjectrons != null )
-					addAllMatching( elements, identities, dependency, elementType, elementInjectrons );
+				Specification<E>[] elementSpecs = specsForType( elementType );
+				if ( elementSpecs != null )
+					addAllMatching( elements, identities, dep, elementType, elementSpecs );
 				return toArray( elements, elementType );
 			}
 			List<E> elements = new ArrayList<>();
-			for ( Entry<Class<?>, Injectron<?>[]> e : injectrons.entrySet() ) {
+			for ( Entry<Class<?>, Specification<?>[]> e : specsByType.entrySet() ) {
 				if ( Type.raw( e.getKey() ).isAssignableTo( elementType ) ) {
 					@SuppressWarnings ( "unchecked" )
-					Injectron<? extends E>[] value = (Injectron<? extends E>[]) e.getValue();
-					addAllMatching( elements, identities, dependency, elementType, value );
+					Specification<? extends E>[] spec = (Specification<? extends E>[]) e.getValue();
+					addAllMatching( elements, identities, dep, elementType, spec );
 				}
 			}
 			return toArray( elements, elementType );
 		}
 
-		private <T, I> T resolveInjectronArray( Dependency<T> dependency, Type<I> instanceType ) {
-			Dependency<I> instanceDependency = dependency.typed( instanceType );
+		private <T, I> T resolveSpecArray( Dependency<T> dep, Type<I> instanceType ) {
+			Dependency<I> instanceDep = dep.typed( instanceType );
 			if ( instanceType.isUpperBound() ) {
-				List<Injectron<?>> res = new ArrayList<>();
-				for ( Entry<Class<?>, Injectron<?>[]> e : injectrons.entrySet() ) {
+				List<Specification<?>> res = new ArrayList<>();
+				for ( Entry<Class<?>, Specification<?>[]> e : specsByType.entrySet() ) {
 					if ( raw( e.getKey() ).isAssignableTo( instanceType ) ) {
 						@SuppressWarnings ( "unchecked" )
-						Injectron<? extends I>[] typeInjectrons = (Injectron<? extends I>[]) e.getValue();
-						for ( Injectron<? extends I> i : typeInjectrons ) {
-							if ( i.info().resource.isCompatibleWith( instanceDependency ) ) {
-								res.add( i );
+						Specification<? extends I>[] typeSpecs = (Specification<? extends I>[]) e.getValue();
+						for ( Specification<? extends I> spec : typeSpecs ) {
+							if ( spec.resource.isCompatibleWith( instanceDep ) ) {
+								res.add( spec );
 							}
 						}
 					}
 				}
-				return toArray( res, raw( Injectron.class ) );
+				return toArray( res, raw( Specification.class ) );
 			}
-			Injectron<I>[] res = injectronsForType( instanceType );
+			Specification<I>[] res = specsForType(instanceType);
 			if (res == null)
-				return toArray(emptyList(), raw( Injectron.class ));
-			List<Injectron<I>> elements = new ArrayList<>( res.length );
-			for ( Injectron<I> i : res ) {
-				if ( i.info().resource.isCompatibleWith( instanceDependency ) ) {
-					elements.add( i );
-				}
+				return toArray(emptyList(), raw(Specification.class));
+			List<Specification<I>> elements = new ArrayList<>(res.length);
+			for (Specification<I> spec : res) {
+				if (spec.resource.isCompatibleWith(instanceDep))
+					elements.add(spec);
 			}
-			return toArray( elements, raw( Injectron.class ) );
+			return toArray(elements, raw(Specification.class));
 		}
 
 		private static <E, T> void addAllMatching( List<E> elements, Set<Integer> identities,
-				Dependency<T> dependency, Type<E> elementType, Injectron<? extends E>[] elementInjectrons ) {
-			Dependency<E> elementDependency = dependency.typed( elementType );
-			for ( int i = 0; i < elementInjectrons.length; i++ ) {
-				Injectron<? extends E> injectron = elementInjectrons[i];
-				if ( injectron.info().resource.isMatching( elementDependency ) ) {
-					E instance = injectron.instanceFor( elementDependency );
+				Dependency<T> dep, Type<E> elementType, Specification<? extends E>[] elementSpecs ) {
+			Dependency<E> elementDep = dep.typed( elementType );
+			for ( int i = 0; i < elementSpecs.length; i++ ) {
+				Specification<? extends E> spec = elementSpecs[i];
+				if ( spec.resource.isMatching( elementDep ) ) {
+					E instance = spec.generator.instanceFor( elementDep );
 					if (identities.add(identityHashCode(instance)))
 						elements.add( instance );
 				}
@@ -286,63 +287,60 @@ public final class Inject {
 		}
 
 		@SuppressWarnings ( "unchecked" )
-		private <T> Injectron<T>[] injectronsForType( Type<T> type ) {
-			return (Injectron<T>[]) injectrons.get( type.rawType );
+		private <T> Specification<T>[] specsForType( Type<T> type ) {
+			return (Specification<T>[]) specsByType.get( type.rawType );
 		}
 
 		@Override
 		public String toString() {
 			StringBuilder b = new StringBuilder();
-			for ( Entry<Class<?>, Injectron<?>[]> e : injectrons.entrySet() ) {
+			for ( Entry<Class<?>, Specification<?>[]> e : specsByType.entrySet() ) {
 				toString(b, e.getKey().toString(), e.getValue());
 			}
-			if (wildcardInjectrons != null) {
-				toString(b, "? extends *", wildcardInjectrons);
+			if (wildcardSpecs != null) {
+				toString(b, "? extends *", wildcardSpecs);
 			}
 			return b.toString();
 		}
 
-		private static void toString(StringBuilder b, String group, Injectron<?>[] values) {
+		private static void toString(StringBuilder b, String group, Specification<?>[] specs) {
 			b.append( group ).append( '\n' );
-			for ( Injectron<?> i : values ) {
-				Resource<?> r = i.info().resource;
+			for ( Specification<?> spec : specs ) {
+				Resource<?> r = spec.resource;
 				b.append( '\t' ).append( r.type().simpleName() ).append( ' ' ).append(
 						r.instance.name ).append( ' ' ).append( r.target ).append(
-						' ' ).append( i.info().source ).append( '\n' );
+						' ' ).append( spec.source ).append( '\n' );
 			}
 		}
 	}
 	
-	//TODO maybe change so that there is a wrapper class with the info and the interface so that the interface can only have the instanceFor method and become a functional interface
-	private static final class InjectronImpl<T> implements Injectron<T> {
+	private static final class InjectorGenerator<T> implements Generator<T> {
 
 		private final InjectorImpl injector;
+		private final int serialID;
 		private final Repository repository;
 		private final Supplier<? extends T> supplier;
-		private final InjectronInfo<T> info;
+		private final Resource<T> resource;
+		private final Scoping scoping;
 		
 		private Class<?> cachedForType;
 		private List<Initialiser<? super T>> cachedInitialisers;
 
-		InjectronImpl(InjectorImpl injector, Repository repository, Injectee<T> injectee, 
-				Expiry expiry, int serialID, int count) {
+		InjectorGenerator(int serialID, InjectorImpl injector, Repository repository, Injectee<T> injectee,	Scoping scoping) {
+			this.serialID = serialID;
 			this.injector = injector;
 			this.repository = repository;
+			this.scoping = scoping;
 			this.supplier = injectee.supplier();
-			this.info = new InjectronInfo<>(injectee.resource(), injectee.source(), expiry, serialID, count);
+			this.resource = injectee.resource();
 		}
-
+		
 		@Override
-		public InjectronInfo<T> info() {
-			return info;
-		}
-
-		@Override
-		public T instanceFor( Dependency<? super T> dependency ) {
-			final Dependency<? super T> injected = dependency.injectingInto( info.resource, info.expiry );
-			return repository.serve(injected, info, () -> {
+		public T instanceFor( Dependency<? super T> dep ) {
+			final Dependency<? super T> injected = dep.injectingInto( resource, scoping );
+			return repository.serve(serialID, injected, () -> {
 				T instance = supplier.supply(injected, injector);
-				if (instance != null && injector.initialisersInjectrons != null) {
+				if (instance != null && injector.initialisersSpecs != null) {
 					dynamicInitialisationOf(instance, injected);
 				}
 				return instance;
@@ -351,13 +349,13 @@ public final class Inject {
 		
 		private void dynamicInitialisationOf(T instance, Dependency<?> context) {
 			Class<?> type = instance.getClass();
-			if (type == Class.class || type == Injectron.class 
+			if (type == Class.class || type == Specification.class 
 					|| Initialiser.class.isAssignableFrom(type)) {
 				return;
 			}
 			if (type != cachedForType) {
 				cachedForType = type;
-				for (Injectron<? extends Initialiser<?>> i : injector.initialisersInjectrons) {
+				for (Specification<? extends Initialiser<?>> i : injector.initialisersSpecs) {
 					Initialiser<? super T> initialiser = initialiser(type, i, context);
 					if (initialiser != null) {
 						if (cachedInitialisers == null) {
@@ -374,52 +372,16 @@ public final class Inject {
 		}
 		
 		@SuppressWarnings("unchecked")
-		private <I extends Initialiser<?>> Initialiser<? super T> initialiser(Class<?> type, Injectron<I> injectron, Dependency<?> context) {
-			Resource<I> initialiser = injectron.info().resource;
+		private <I extends Initialiser<?>> Initialiser<? super T> initialiser(Class<?> type, Specification<I> spec, Dependency<?> context) {
+			Resource<I> initialiser = spec.resource;
 			if (!initialiser.target.isAvailableFor(context))
 				return null;
 			// this is not 100% generic as instance the type is derived from itself could be generic in a relevant way
 			// e.g. if List<String> should be initialised but not List<Integer> we just check for List here and fail later on
 			if (raw(type).isAssignableTo(initialiser.type().parameter(0))) {
-				return (Initialiser<? super T>) injectron.instanceFor(dependency(initialiser.instance));
+				return (Initialiser<? super T>) spec.generator.instanceFor(dependency(initialiser.instance));
 			}
 			return null;
 		}
-
-		@Override
-		public String toString() {
-			return info.toString();
-		}
 	}
-
-	static final IdentityHashMap<Scope, Expiry> EXPIRATION = defaultExpiration();
-
-	private static IdentityHashMap<Scope, Expiry> defaultExpiration() {
-		//TODO change this so each expiry states if it has a consistent relation to another one and if so if it expires within the other
-		// maybe this can also be a simple method: boolean expiresBefore(Expiry other);
-		// users should be able to create on expirys and define which nestings are fine (whitelist principle) - this way unknown expires are reported as problem. but user has to be able to describe a new expiry's relation to existing ones so nesting becomes no problem if it should not be
-		IdentityHashMap<Scope, Expiry> map = new IdentityHashMap<>();
-		map.put( Scoped.APPLICATION, Expiry.NEVER );
-		map.put( Scoped.INJECTION, Expiry.expires( 1000 ) );
-		map.put( Scoped.THREAD, Expiry.expires( 500 ) );
-		map.put( Scoped.DEPENDENCY_TYPE, Expiry.NEVER );
-		map.put( Scoped.TARGET_INSTANCE, Expiry.NEVER );
-		map.put( Scoped.DEPENDENCY, Expiry.NEVER );
-		return map;
-	}
-
-	public static final Comparator<Injectron<?>> COMPARATOR = (one, other) -> {
-		Resource<?> r1 = one.info().resource;
-		Resource<?> r2 = other.info().resource;
-		Class<?> c1 = r1.type().rawType;
-		Class<?> c2 = r2.type().rawType;
-		if ( c1 != c2 ) {
-			if (c1.isAssignableFrom(c2))
-				return 1;
-			if (c2.isAssignableFrom(c1))
-				return -1;
-			return c1.getCanonicalName().compareTo( c2.getCanonicalName() );
-		}
-		return compareApplicability( r1, r2 );
-	};
 }

@@ -63,7 +63,7 @@ public abstract class UnresolvableDependency
 			extends UnresolvableDependency {
 
 		public UnstableDependency( Injection parent, Injection injection ) {
-			super( "Cannot inject " + injection.target + " " + injection.expiry  + " into " + parent.target+" "+parent.expiry );
+			super( "Cannot inject " + injection.target + " " + injection.scoping  + " into " + parent.target+" "+parent.scoping );
 		}
 
 	}
@@ -75,7 +75,7 @@ public abstract class UnresolvableDependency
 	public static final class NoResourceForDependency
 			extends UnresolvableDependency {
 
-		public <T> NoResourceForDependency( Dependency<T> dependency, Injectron<T>[] available, String msg ) {
+		public <T> NoResourceForDependency( Dependency<T> dependency, Specification<T>[] available, String msg ) {
 			super( "No resource for dependency:\n" + dependency + "\navailable are (for same raw type): "
 					+ describe( available ) + "\n"
 					+ msg);
@@ -86,13 +86,13 @@ public abstract class UnresolvableDependency
 		}
 	}
 
-	public static String describe( Injectron<?>... injectrons ) {
-		if ( injectrons == null || injectrons.length == 0 ) {
+	public static String describe( Specification<?>... specs ) {
+		if ( specs == null || specs.length == 0 ) {
 			return "none";
 		}
 		StringBuilder b = new StringBuilder();
-		for ( Injectron<?> i : injectrons ) {
-			b.append( '\n' ).append( i.info().resource.toString() ).append( " defined " ).append( i.info().source );
+		for ( Specification<?> spec : specs ) {
+			b.append( '\n' ).append( spec.resource.toString() ).append( " defined " ).append( spec.source );
 		}
 		return b.toString();
 	}

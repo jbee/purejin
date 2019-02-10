@@ -6,7 +6,6 @@
 package se.jbee.inject.bootstrap;
 
 import static se.jbee.inject.Array.array;
-import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.raw;
 
 import java.util.ArrayList;
@@ -21,7 +20,7 @@ import java.util.Set;
 
 import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.Injector;
-import se.jbee.inject.Injectron;
+import se.jbee.inject.Specification;
 import se.jbee.inject.Type;
 import se.jbee.inject.config.Globals;
 import se.jbee.inject.config.Options;
@@ -68,15 +67,15 @@ public final class Bootstrap {
 	}
 
 	public static void eagerSingletons( Injector injector ) {
-		for ( Injectron<?> i : injector.resolve( Injectron[].class ) ) {
-			if ( i.info().expiry.isNever() ) {
-				instance( i ); // instantiate to make sure they exist in repository
+		for ( Specification<?> spec : injector.resolve( Specification[].class ) ) {
+			if ( spec.scoping.isStableByDesign() ) {
+				instance( spec ); // instantiate to make sure they exist in repository
 			}
 		}
 	}
 
-	public static <T> T instance( Injectron<T> injectron ) {
-		return injectron.instanceFor(injectron.info().resource.toDependency());
+	public static <T> T instance( Specification<T> spec ) {
+		return spec.generator.instanceFor(spec.resource.toDependency());
 	}
 
 	public static void nonnullThrowsReentranceException( Object field ) {

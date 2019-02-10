@@ -6,11 +6,11 @@
 package se.jbee.inject.bootstrap;
 
 import static se.jbee.inject.Instance.anyOf;
-import static se.jbee.inject.container.Typecast.injectronTypeOf;
+import static se.jbee.inject.container.Typecast.specTypeOf;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
-import se.jbee.inject.Injectron;
+import se.jbee.inject.Specification;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bootstrap.BoundParameter.ParameterType;
 
@@ -24,7 +24,7 @@ public final class InjectionSite {
 	public final Dependency<?> site;
 
 	private final BoundParameter<?>[] parameters;
-	private final Injectron<?>[] injectrons;
+	private final Specification<?>[] specs;
 	private final Object[] args;
 
 	private final int[] dynamics;
@@ -33,7 +33,7 @@ public final class InjectionSite {
 	public InjectionSite(Dependency<?> site, Injector injector, BoundParameter<?>[] parameters) {
 		this.site = site;
 		this.parameters = parameters;
-		this.injectrons = new Injectron<?>[parameters.length];
+		this.specs = new Specification<?>[parameters.length];
 		this.dynamics = new int[parameters.length];
 		this.args = initNonDynamicParameters(injector);
 	}
@@ -49,7 +49,7 @@ public final class InjectionSite {
 			BoundParameter<?> p = parameters[i];
 			switch (p.type) {
 			case INSTANCE:
-				args[i] = instance(injectrons[i], site.instanced(parameters[i].instance)); break;
+				args[i] = instance(specs[i], site.instanced(parameters[i].instance)); break;
 			default:
 			case EXTERNAL:
 				args[i] = supply(p, site, injector);
@@ -61,23 +61,23 @@ public final class InjectionSite {
 	private Object[] initNonDynamicParameters(Injector injector) {
 		Object[] args = new Object[parameters.length];
 		dynamicsLength = 0;
-		for (int i = 0; i < injectrons.length; i++)  {
+		for (int i = 0; i < specs.length; i++)  {
 			args[i] = null;
 			BoundParameter<?> p = parameters[i];
 			if (p.type == ParameterType.INSTANCE && p.type().arrayDimensions() == 1) {
-				// in this case there is no single injectron, the injector composes the result array from multiple injectrons
+				// in this case there is no single spec, the injector composes the result array from multiple specs
 				p = p.external();
 				parameters[i] = p;
 			}
 			switch (p.type) {
 			case INSTANCE:
-				Dependency<? extends Injectron<?>> injDep = site.typed( injectronTypeOf(p.instance.type )).named(p.instance.name);
-				Injectron<?> inj = injector.resolve(injDep);
-				if (inj.info().expiry.isNever()) {
-					args[i] = instance(inj, site.instanced(p.instance));
+				Dependency<? extends Specification<?>> specDep = site.typed( specTypeOf(p.instance.type )).named(p.instance.name);
+				Specification<?> spec = injector.resolve(specDep);
+				if (spec.scoping.isStableByDesign()) {
+					args[i] = instance(spec, site.instanced(p.instance));
 				}else {
 					dynamics[dynamicsLength++] = i;
-					injectrons[i] = inj;
+					specs[i] = spec;
 				}
 				break;
 			case CONSTANT:
@@ -96,7 +96,7 @@ public final class InjectionSite {
 	}
 
 	@SuppressWarnings ( "unchecked" )
-	private static <I> I instance( Injectron<I> injectron, Dependency<?> dependency ) {
-		return injectron.instanceFor( (Dependency<? super I>) dependency );
+	private static <I> I instance( Specification<I> spec, Dependency<?> dependency ) {
+		return spec.generator.instanceFor( (Dependency<? super I>) dependency );
 	}
 }

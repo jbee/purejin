@@ -133,7 +133,7 @@ public final class Dependency<T>
 		}
 		Injection[] ignored = new Injection[hierarchy.length];
 		for ( int i = 0; i < ignored.length; i++ ) {
-			ignored[i] = hierarchy[i].ignoredExpiry();
+			ignored[i] = hierarchy[i].ignoredScoping();
 		}
 		return dependency( instance, ignored );
 	}
@@ -168,15 +168,15 @@ public final class Dependency<T>
 	}
 
 	public <I> Dependency<T> injectingInto( Instance<I> target ) throws DependencyCycle, UnstableDependency {
-		return injectingInto( new Resource<>(target), Expiry.NEVER );
+		return injectingInto( new Resource<>(target), Scoping.IGNORE );
 	}
 
-	public Dependency<T> injectingInto( Resource<?> target, Expiry expiry ) throws DependencyCycle, UnstableDependency {
-		Injection injection = new Injection( instance, target, expiry );
+	public Dependency<T> injectingInto( Resource<?> target, Scoping scoping ) throws DependencyCycle, UnstableDependency {
+		Injection injection = new Injection( instance, target, scoping );
 		if ( hierarchy.length == 0 ) {
 			return new Dependency<>( instance, injection );
 		}
-		ensureNotMoreFrequentExpiry( injection );
+		ensureStableScopeNesting( injection );
 		ensureNoDependencyCycle( injection );
 		return new Dependency<>( instance, Array.append( hierarchy, injection ) );
 	}
@@ -197,11 +197,11 @@ public final class Dependency<T>
 		}
 	}
 
-	private void ensureNotMoreFrequentExpiry( Injection injection ) throws UnstableDependency {
-		final Expiry expiry = injection.expiry;
+	private void ensureStableScopeNesting( Injection injection ) throws UnstableDependency {
+		final Scoping scoping = injection.scoping;
 		for ( int i = 0; i < hierarchy.length; i++ ) {
 			Injection parent = hierarchy[i];
-			if ( expiry.moreFrequent( parent.expiry ) ) {
+			if ( !scoping.isStableIn( parent.scoping ) ) {
 				throw new UnstableDependency( parent, injection );
 			}
 		}

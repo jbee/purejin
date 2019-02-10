@@ -6,6 +6,7 @@
 package se.jbee.inject.container;
 
 import se.jbee.inject.Instance;
+import se.jbee.inject.Provider;
 import se.jbee.inject.UnresolvableDependency;
 
 /**

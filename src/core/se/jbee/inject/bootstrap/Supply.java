@@ -21,15 +21,15 @@ import java.util.logging.Logger;
 import se.jbee.inject.Array;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
-import se.jbee.inject.Injectron;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
+import se.jbee.inject.Provider;
+import se.jbee.inject.Specification;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.UnresolvableDependency.SupplyFailed;
 import se.jbee.inject.container.Factory;
-import se.jbee.inject.container.Provider;
 import se.jbee.inject.container.Supplier;
 
 /**
@@ -95,7 +95,7 @@ public final class Supply {
 	}
 
 	public static <T> Provider<T> lazyProvider( Dependency<T> dependency, Injector injector ) {
-		return dependency.type().arrayDimensions() == 1 // no injectrons for results composed within the Injector
+		return dependency.type().arrayDimensions() == 1 // no specs for results composed within the Injector
 				? new LazyDirectProvider<>(dependency, injector)
 				: new LazyPreresolvedProvider<>(dependency, injector);
 	}
@@ -281,7 +281,7 @@ public final class Supply {
 
 		@Override
 		public T supply( Dependency<? super T> dependency, Injector injector ) {
-			// Note that this is not "buffered" using Injectrons as it is used to implement the plain resolution
+			// Note that this is not "buffered" using specs as it is used to implement the plain resolution
 			return injector.resolve( dependency.instanced( instance ) );
 		}
 
@@ -328,17 +328,18 @@ public final class Supply {
 	private static final class LazyPreresolvedProvider<T> implements Provider<T> {
 
 		private final Dependency<T> dependency;
-		private final Injectron<? extends T> injectron;
+		private final Specification<? extends T> spec;
 
 		@SuppressWarnings("unchecked")
 		LazyPreresolvedProvider( Dependency<T> dependency, Injector injector ) {
 			this.dependency = dependency;
-			this.injectron = injector.resolve(dependency.typed(raw( Injectron.class ).parametized(dependency.type())));
+			this.spec = injector.resolve(
+					dependency.typed(raw(Specification.class).parametized(dependency.type())));
 		}
 
 		@Override
 		public T provide() {
-			return injectron.instanceFor(dependency);
+			return spec.generator.instanceFor(dependency);
 		}
 
 		@Override
@@ -438,7 +439,7 @@ public final class Supply {
 
 		@SuppressWarnings("unchecked")
 		private static <T> NoResourceForDependency required(Dependency<T> dependency) {
-			return new NoResourceForDependency(dependency, (Injectron<T>[])new Injectron<?>[0], "Should never be called!" );
+			return new NoResourceForDependency(dependency, (Specification<T>[])new Specification<?>[0], "Should never be called!" );
 		}
 
 		@Override

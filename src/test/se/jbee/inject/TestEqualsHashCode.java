@@ -57,11 +57,6 @@ public class TestEqualsHashCode {
 	}
 	
 	@Test
-	public void expiry() throws Exception {
-		assertValidEqualsAndHashCodeContract(Expiry.class);
-	}
-	
-	@Test
 	public void dependency() throws Exception {
 		assertValidEqualsAndHashCodeContract(Dependency.class);
 	}

@@ -30,6 +30,7 @@ import se.jbee.inject.Name;
 import se.jbee.inject.Packages;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Resource;
+import se.jbee.inject.Scope;
 import se.jbee.inject.Target;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Binding;
@@ -42,7 +43,6 @@ import se.jbee.inject.bootstrap.Inspector;
 import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.container.Factory;
 import se.jbee.inject.container.Initialiser;
-import se.jbee.inject.container.Scope;
 import se.jbee.inject.container.Scoped;
 import se.jbee.inject.container.Supplier;
 

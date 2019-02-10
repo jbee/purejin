@@ -13,13 +13,13 @@ import org.junit.Test;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
+import se.jbee.inject.Provider;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.bind.Binder.RootBinder;
 import se.jbee.inject.bind.TestInspectorBinds.Resource;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.container.Provider;
 import se.jbee.inject.container.Scoped;
 import se.jbee.inject.container.Supplier;
 

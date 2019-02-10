@@ -18,9 +18,9 @@ import org.junit.Test;
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
-import se.jbee.inject.Injectron;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Resource;
+import se.jbee.inject.Specification;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.bootstrap.Binding;
@@ -107,7 +107,7 @@ public class TestMacroBinds {
 		CountMacro count = new CountMacro();
 		Injector injector = injectorWithMacro( MacroBindsModule.class, count );
 		assertEquals( 6, count.expands );
-		assertEquals( 0, injector.resolve( Injectron[].class ).length );
+		assertEquals( 0, injector.resolve( Specification[].class ).length );
 	}
 
 	private static Injector injectorWithMacro( Class<? extends Bundle> root, Macro<?> macro ) {

@@ -11,7 +11,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import se.jbee.inject.Injectron;
+import se.jbee.inject.Provider;
+import se.jbee.inject.Specification;
 import se.jbee.inject.Type;
 
 /**
@@ -69,22 +70,22 @@ public final class Typecast {
 		return (Type) raw( Factory.class ).parametized( providedType );
 	}
 
-	public static <T> Type<Injectron<T>> injectronTypeOf( Class<T> providedType ) {
-		return injectronTypeOf( raw( providedType ) );
+	public static <T> Type<Specification<T>> specTypeOf( Class<T> generatedType ) {
+		return specTypeOf( raw( generatedType ) );
 	}
 
 	@SuppressWarnings ( { "unchecked", "rawtypes" } )
-	public static <T> Type<Injectron<T>> injectronTypeOf( Type<T> providedType ) {
-		return (Type) raw( Injectron.class ).parametized( providedType );
+	public static <T> Type<Specification<T>> specTypeOf( Type<T> generatorType ) {
+		return (Type) raw( Specification.class ).parametized( generatorType );
 	}
 
-	public static <T> Type<Injectron<T>[]> injectronsTypeOf( Class<T> providedType ) {
-		return injectronsTypeOf( raw( providedType ) );
+	public static <T> Type<Specification<T>[]> specsTypeOf( Class<T> generatedType ) {
+		return specsTypeOf( raw( generatedType ) );
 	}
 
 	@SuppressWarnings ( { "unchecked", "rawtypes" } )
-	public static <T> Type<Injectron<T>[]> injectronsTypeOf( Type<T> providedType ) {
-		return (Type) raw( Injectron[].class ).parametized( providedType );
+	public static <T> Type<Specification<T>[]> specsTypeOf( Type<T> generatedType ) {
+		return (Type) raw( Specification[].class ).parametized( generatedType );
 	}
 	
 	@SuppressWarnings ( { "unchecked", "rawtypes" } )

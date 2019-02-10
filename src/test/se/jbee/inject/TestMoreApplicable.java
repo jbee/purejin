@@ -13,7 +13,7 @@ import java.util.Comparator;
 
 import org.junit.Test;
 
-public class TestMorePrecise {
+public class TestMoreApplicable {
 
 	static class HigherNumberIsMoreApplicable
 			implements MoreApplicableThan<HigherNumberIsMoreApplicable> {
@@ -117,7 +117,7 @@ public class TestMorePrecise {
 
 	@Test
 	public void thatExplicitSourceIsMoreApplicableThanAutoSource() {
-		Source source = Source.source( TestMorePrecise.class );
+		Source source = Source.source( TestMoreApplicable.class );
 		assertMoreApplicable( source.typed( DeclarationType.EXPLICIT ),
 				source.typed( DeclarationType.AUTO ) );
 	}

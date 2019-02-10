@@ -20,11 +20,11 @@ import org.junit.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
+import se.jbee.inject.Provider;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency.UnstableDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.container.Provider;
 import se.jbee.inject.container.Scoped;
 
 public class TestProviderBinds {

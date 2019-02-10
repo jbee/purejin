@@ -8,8 +8,9 @@ package se.jbee.inject.container;
 import java.util.List;
 
 import se.jbee.inject.Injector;
-import se.jbee.inject.Injectron;
+import se.jbee.inject.Generator;
 import se.jbee.inject.Resource;
+import se.jbee.inject.Scope;
 import se.jbee.inject.Source;
 
 /**
@@ -19,7 +20,7 @@ import se.jbee.inject.Source;
  * A {@link List} would be a generic {@link Injectee}, some singleton "service"
  * a non-generic one.
  * 
- * Each {@link Injectee} becomes an {@link Injectron} with the {@link Injector}.
+ * Each {@link Injectee} becomes an {@link Generator} with the {@link Injector}.
  * 
  * The interface is mainly introduced to decouple the everything on top of the
  * container module (which is the core) from the container implementation
@@ -34,9 +35,9 @@ public interface Injectee<T> {
 
 	Source source();
 	
-	Resource<T> resource();
-	
 	Scope scope();
+
+	Resource<T> resource();
 	
 	Supplier<? extends T> supplier();
 	

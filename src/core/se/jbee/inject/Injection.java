@@ -15,12 +15,12 @@ public final class Injection {
 
 	public final Instance<?> dependency;
 	public final Resource<?> target;
-	public final Expiry expiry;
+	public final Scoping scoping;
 
-	public Injection(Instance<?> dependency, Resource<?> target, Expiry expiry) {
+	public Injection(Instance<?> dependency, Resource<?> target, Scoping scoping) {
 		this.dependency = dependency;
 		this.target = target;
-		this.expiry = expiry;
+		this.scoping = scoping;
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public final class Injection {
 		return dependency + " for " + target+" ?";
 	}
 
-	public Injection ignoredExpiry() {
-		return new Injection( dependency, target, Expiry.IGNORE );
+	public Injection ignoredScoping() {
+		return new Injection( dependency, target, Scoping.IGNORE );
 	}
 }

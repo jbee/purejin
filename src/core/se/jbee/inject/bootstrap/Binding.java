@@ -17,12 +17,12 @@ import java.util.Set;
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.Resource;
+import se.jbee.inject.Scope;
 import se.jbee.inject.Source;
 import se.jbee.inject.Type;
 import se.jbee.inject.Typed;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.container.Injectee;
-import se.jbee.inject.container.Scope;
 import se.jbee.inject.container.Supplier;
 
 /**

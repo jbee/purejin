@@ -5,67 +5,115 @@
  */
 package se.jbee.inject;
 
+import static se.jbee.inject.Array.append;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import se.jbee.inject.Scope.SingletonScope;
+
 /**
- * How frequently do instances expire (become garbage, are not used any longer).
+ * The relation of a {@link Scope} to other {@link Scope}s is captured by a
+ * {@link Scoping} instance for each {@link Scope}.
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public final class Expiry {
+public final class Scoping {
 
-	public static final Expiry NEVER = new Expiry( 0 );
-	public static final Expiry IGNORE = new Expiry( Integer.MAX_VALUE );
+	public static final Scoping IGNORE = new Scoping( SingletonScope.class );
+	private static final Map<Class<? extends Scope>, Scoping> EXPIRY_BY_SCOPE 
+		= new ConcurrentHashMap<>(); 
 
-	public static Expiry expires( int frequency ) {
-		if ( frequency < 0 ) {
-			throw new IllegalArgumentException( Expiry.class.getSimpleName()
-					+ " frequency cannot be negative but was: " + frequency );
-		}
-		if ( frequency == Integer.MAX_VALUE ) {
-			throw new IllegalArgumentException( Expiry.class.getSimpleName()
-					+ "frequency cannot be Imteger.MAX_VALUE. This is reserved for IGNORE" );
-		}
-		return new Expiry( frequency );
+	public static Scoping scopingOf(Scope s) {
+		return scopingOf(s.getClass());
+	}
+	
+	public static Scoping scopingOf(Class<? extends Scope> s) {
+		return EXPIRY_BY_SCOPE.computeIfAbsent(s, k -> new Scoping(k));
+	}
+	
+	private final boolean stableByDesign;
+	private final Class<? extends Scope> scope;
+	private Class<? extends Scope>[] unstableInScopes;
+
+	@SafeVarargs
+	private Scoping(Class<? extends Scope> scope, Class<? extends Scope>... unstableInScopes) {
+		this.stableByDesign = SingletonScope.class.isAssignableFrom(scope);
+		this.scope = scope;
+		this.unstableInScopes = unstableInScopes;
+	}
+	
+	/**
+	 * Declares the given parent {@link Scope} as less stable as this scope. This
+	 * means this {@link Scope} cannot be injected into the given parent
+	 * {@link Scope}.
+	 * 
+	 * @see #notStableIn(Class)
+	 * 
+	 * @param parent another {@link Scope}
+	 * @return this for chaining
+	 */
+	public Scoping notStableIn(Scope parent) {
+		return notStableIn(parent.getClass());
 	}
 
-	private final int frequency;
-
-	public Expiry( int frequency ) {
-		this.frequency = frequency;
+	/**
+	 * Declares the given parent {@link Scope} as less stable as this scope. This
+	 * means this {@link Scope} cannot be injected into the given parent
+	 * {@link Scope}.
+	 * 
+	 * @param parent another {@link Scope} type
+	 * @return this for chaining
+	 */
+	public Scoping notStableIn(Class<? extends Scope> parent) {
+		unstableInScopes = append(unstableInScopes, parent);
+		return this;
+	}
+	
+	public boolean equalTo( Scoping other ) {
+		return scope == other.scope;
 	}
 
-	public boolean equalTo( Expiry other ) {
-		return frequency == other.frequency;
+	public boolean isStableIn(Scope parent) {
+		return isStableIn(scopingOf(parent));
 	}
-
-	public boolean moreFrequent( Expiry other ) {
-		return frequency > other.frequency;
+	
+	public boolean isStableIn(Scoping parent) {
+		if (isStable())
+			return true;
+		for (int i = 0; i < unstableInScopes.length; i++)
+			if (unstableInScopes[i] == parent.scope)
+				return false;
+		return true;
+	}
+	
+	public boolean isStable() {
+		return unstableInScopes == null || unstableInScopes.length == 0;
 	}
 
 	@Override
 	public String toString() {
 		return isIgnore()
-			? "x"
-			: isNever()
-				? "∞"
-				: String.valueOf( frequency );
+			? "*"
+			: String.valueOf(scope.getSimpleName().replaceAll("Scope", ""));
 	}
 
 	@Override
 	public boolean equals( Object obj ) {
-		return obj instanceof Expiry && ( (Expiry) obj ).frequency == frequency;
+		return obj instanceof Scoping && equalTo((Scoping) obj);
 	}
 
 	@Override
 	public int hashCode() {
-		return frequency;
-	}
-
-	public boolean isNever() {
-		return frequency == 0;
+		return scope.hashCode();
 	}
 
 	public boolean isIgnore() {
-		return frequency == IGNORE.frequency;
+		return scope == SingletonScope.class;
+	}
+
+	public boolean isStableByDesign() {
+		return stableByDesign;
 	}
 
 }

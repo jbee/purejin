@@ -3,15 +3,26 @@
 v19.1 (upcoming)
 ==============
 
+> Mechanics of Scope/Scoping as well as Injectrons were refined.
+> Initialisers were added.
+
 - changed versioning from _major.minor_ to _year.serial_ (e.g. 19.1 is the first in 2019)
-- renamed `Assembly` to `Injectee`
-- renamed `MorePreciseThan#morePreciseThan` to `MoreApplicableThan#moreApplicableThan`
+- renamed class `Assembly` to `Injectee`
+- redesign of `Injectron`/`InjectronInfo` to `Specification`/`Generator`
+- renamed class and method `MorePreciseThan#morePreciseThan` to `MoreApplicableThan#moreApplicableThan`
+- replaced `Expiry` with `Scoping` concept that is based on `Scope`  
+- renamed field `Injection#expiry` to `Injection#scoping`
+- renamed method `Injection#ignoredExpiry()` to `Injection#ignoredScoping()`
+- renamed field `InjectronInfo#expiry` to `InjectronInfo#scoping`
 - moved `Supplier` into `container` package (was wrongly located in main API)
+- moved `Scope`, `Repository` and `Provider` into root package `se.jbee.inject`
+- added `SingletonScope` to mark singleton `Scope` implementations
 - fixed `Type` `equals`/`equalTo` now considers `upperBound` flag
-- fixed wild-card array dependencies are honored in presents of same raw type bounds
+- fixed wild-card array dependencies are honoured in presents of same raw type bounds
 - fixed implicit `construct` for plugin class now only done if class is constructible
 - fixed `Class`es are now also considered `Metaclass#undeterminable`
 - fixed NPE when trying to resolve `Injectron[]` for unbound type 
+- fixed `toString()` of dependency instance scope that wrongly stated `per-dependency-type`
 - improved `DefaultInjector`, composed arrays contain instances only once
 - added `initbind` and `Initialiser`s (run code when container is ready)
 - added `init` utility methods to link instances during initialisation
