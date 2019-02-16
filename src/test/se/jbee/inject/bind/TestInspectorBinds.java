@@ -1,8 +1,5 @@
 package se.jbee.inject.bind;
 
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.PARAMETER;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static se.jbee.inject.Name.named;
@@ -12,12 +9,8 @@ import static se.jbee.inject.bootstrap.Inspect.all;
 import static se.jbee.inject.container.Typecast.providerTypeOf;
 
 import java.lang.annotation.Annotation;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-
-import javax.jws.WebMethod;
 
 import org.junit.Test;
 
@@ -30,6 +23,8 @@ import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Inspect;
 import se.jbee.inject.bootstrap.Inspector;
 import se.jbee.inject.container.Scoped;
+import se.jbee.inject.util.Resource;
+import se.jbee.inject.util.WebMethod;
 
 /**
  * This test demonstrates the use of an {@link Inspector} to semi-automatically bind
@@ -41,13 +36,6 @@ import se.jbee.inject.container.Scoped;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestInspectorBinds {
-
-	@Target ( { METHOD, PARAMETER } )
-	@Retention ( RUNTIME )
-	public @interface Resource {
-
-		String value();
-	}
 
 	static final StringBuffer STATE = new StringBuffer();
 

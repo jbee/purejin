@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import se.jbee.inject.bootstrap.Bootstrapper.OptionBootstrapper;
 import se.jbee.inject.Provider;
+import se.jbee.inject.bootstrap.Bootstrapper.OptionBootstrapper;
 import se.jbee.inject.bootstrap.OptionBundle;
 import se.jbee.inject.bootstrap.Supply;
 

@@ -17,11 +17,11 @@ import se.jbee.inject.Provider;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.bind.Binder.RootBinder;
-import se.jbee.inject.bind.TestInspectorBinds.Resource;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.container.Scoped;
 import se.jbee.inject.container.Supplier;
+import se.jbee.inject.util.Resource;
 
 /**
  * This test demonstrates how to switch between different implementations during
@@ -83,7 +83,7 @@ public class TestStateDependentBinds {
 		/**
 		 * Will be detected as service method and thereby used
 		 */
-		@Resource ( "answer" )
+		@Resource( "answer" )
 		public Integer getNumber() {
 			return number;
 		}

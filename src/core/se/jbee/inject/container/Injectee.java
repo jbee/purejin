@@ -7,8 +7,8 @@ package se.jbee.inject.container;
 
 import java.util.List;
 
-import se.jbee.inject.Injector;
 import se.jbee.inject.Generator;
+import se.jbee.inject.Injector;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Scope;
 import se.jbee.inject.Source;

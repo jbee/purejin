@@ -6,16 +6,11 @@
 package se.jbee.inject.container;
 
 import static java.lang.System.identityHashCode;
-import static java.util.Arrays.asList;
-import static java.util.Arrays.copyOf;
 import static java.util.Arrays.copyOfRange;
 import static java.util.Collections.emptyList;
 import static se.jbee.inject.Array.array;
 import static se.jbee.inject.Dependency.dependency;
-import static se.jbee.inject.Dependency.pluginsFor;
 import static se.jbee.inject.Scoping.scopingOf;
-import static se.jbee.inject.Instance.compareApplicability;
-import static se.jbee.inject.Name.DEFAULT;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.container.Typecast.initialiserTypeOf;
 import static se.jbee.inject.container.Typecast.specsTypeOf;
@@ -23,7 +18,6 @@ import static se.jbee.inject.container.Typecast.specsTypeOf;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -32,14 +26,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import se.jbee.inject.Dependency;
-import se.jbee.inject.Scoping;
-import se.jbee.inject.Injector;
 import se.jbee.inject.Generator;
-import se.jbee.inject.Specification;
-import se.jbee.inject.Name;
+import se.jbee.inject.Injector;
 import se.jbee.inject.Repository;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Scope;
+import se.jbee.inject.Scoping;
+import se.jbee.inject.Specification;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 

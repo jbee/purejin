@@ -14,9 +14,9 @@ import org.junit.Test;
 
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Dependency;
+import se.jbee.inject.Generator;
 import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.Injector;
-import se.jbee.inject.Generator;
 import se.jbee.inject.Name;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Specification;

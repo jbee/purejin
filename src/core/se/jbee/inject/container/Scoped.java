@@ -14,9 +14,9 @@ import se.jbee.inject.Dependency;
 import se.jbee.inject.Generator;
 import se.jbee.inject.Provider;
 import se.jbee.inject.Repository;
+import se.jbee.inject.Scope;
 import se.jbee.inject.Specification;
 import se.jbee.inject.UnresolvableDependency;
-import se.jbee.inject.Scope;
 
 /**
  * Utility as a factory to create/use {@link Scope}s.

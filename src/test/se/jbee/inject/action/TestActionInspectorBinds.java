@@ -4,14 +4,13 @@ import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.action.ActionModule.actionDependency;
 
-import javax.annotation.Resource;
-
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Inspect;
 import se.jbee.inject.bootstrap.Inspector;
+import se.jbee.inject.util.Resource;
 
 /**
  * The tests illustrates how to change the way service methods are identified by
