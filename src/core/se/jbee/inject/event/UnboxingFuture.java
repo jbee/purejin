@@ -2,6 +2,7 @@ package se.jbee.inject.event;
 
 import static java.lang.System.currentTimeMillis;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static se.jbee.inject.event.EventException.getFuture;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -41,8 +42,8 @@ class UnboxingFuture<T> implements Future<T> {
 	}
 
 	@Override
-	public T get() throws InterruptedException, ExecutionException {
-		return boxed.get().get();
+	public T get() throws EventException {
+		return getFuture(getFuture(boxed));
 	}
 
 	@Override

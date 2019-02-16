@@ -2,7 +2,7 @@ package se.jbee.inject.event;
 
 import java.util.concurrent.Future;
 
-public interface EventProcessor {
+public interface EventProcessor extends AutoCloseable {
 
 	/**
 	 * This will cause the calling thread to wait until there is a implementation
@@ -15,7 +15,7 @@ public interface EventProcessor {
 	 * 
 	 * @param event type of event handler to wait for.
 	 */
-	<E> void await(Class<E> event);
+	<E> void await(Class<E> event) throws InterruptedException;
 	
 	<E> void register(Class<E> event, E handler);
 
@@ -28,4 +28,7 @@ public interface EventProcessor {
 	<E, T> T compute(Event<E, T> event) throws EventException;
 	
 	<E, T extends Future<V>, V> Future<V> computeEventually(Event<E, T> event) throws EventException;
+	
+	@Override
+	void close();
 }

@@ -1,7 +1,5 @@
 package se.jbee.inject.event;
 
-import java.lang.reflect.Method;
-
 import se.jbee.inject.bind.BinderModule;
 import se.jbee.inject.container.Initialiser;
 import se.jbee.inject.container.Scoped;
@@ -38,24 +36,9 @@ public abstract class EventModule extends BinderModule {
 		@Override
 		protected void declare() {
 			asDefault().bind(EventProcessor.class).to(ConcurrentEventProcessor.class);
-			asDefault().bind(EventHandlerReflector.class).to(AutoEventHandlerReflector.class);
+			asDefault().bind(EventReflector.class).to(event -> EventProperties.DEFAULT);
 		}
 		
 	}
 
-	private static final class AutoEventHandlerReflector implements EventHandlerReflector {
-
-		@Override
-		public <E> EventHandlerProperties getProperties(Class<E> event, E handler) {
-			Method[] ms = event.getMethods();
-			int voids = 0;
-			for (Method m : ms) {
-				Class<?> returnType = m.getReturnType();
-				if (returnType == void.class || returnType == Void.class)
-					voids++;
-			}
-			boolean onlyVoids = voids == ms.length;
-			return new EventHandlerProperties(onlyVoids ? Integer.MAX_VALUE : 1);
-		}
-	}
 }

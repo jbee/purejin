@@ -2,6 +2,7 @@ package se.jbee.inject.event;
 
 import static java.lang.reflect.Proxy.newProxyInstance;
 import static se.jbee.inject.Type.returnType;
+import static se.jbee.inject.event.EventException.getFuture;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationHandler;
@@ -13,46 +14,39 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import se.jbee.inject.Type;
-import se.jbee.inject.event.EventHandlerReflector.EventHandlerProperties;
 
 public class ConcurrentEventProcessor implements EventProcessor {
 
 	private final static class EventHandler extends WeakReference<Object> {
  
 		/**
-		 * How many threads are allowed to call any of the handlers methods
-		 * concurrently.
-		 */
-		final EventHandlerProperties properties;
-		/**
 		 * How many threads are currently calling one of the handlers methods.
 		 */
 		final AtomicInteger concurrentUsage = new AtomicInteger(0);
 		
-		EventHandler(Object handler, EventHandlerProperties properties) {
+		EventHandler(Object handler) {
 			super(handler);
-			this.properties = properties;
 		}
 		
 		/**
 		 * If the use succeeds (result is true) the end of usage should be marked by
-		 * calling {@link #unuse()} so that this handler can continue to keep track of
+		 * calling {@link #free()} so that this handler can continue to keep track of
 		 * the concurrent using threads.
 		 * 
 		 * @return true if this handler could be reserved for usage by the calling
 		 *         thread, else false.
 		 */
-		boolean use() {
+		boolean allocateFor(Event<?, ?> e) {
 			while (true) {
 				int currentUsage = concurrentUsage.get();
-				if (currentUsage >= properties.maxConcurrentUsage)
+				if (currentUsage >= e.properties.maxConcurrentUsage)
 					return false;
 				boolean success = concurrentUsage.compareAndSet(currentUsage, currentUsage + 1);
 				if (success)
@@ -60,7 +54,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 			}
 		}
 		
-		void unuse() {
+		void free() {
 			concurrentUsage.decrementAndGet();
 		}
 	}
@@ -69,20 +63,20 @@ public class ConcurrentEventProcessor implements EventProcessor {
 		
 		/**
 		 * Tries to find a handler that can be used to process the event. A successfully
-		 * received handler has to be marked {@link #done(EventHandler)} right after
+		 * received handler has to be marked {@link #free(EventHandler)} right after
 		 * usage ends unless its handler reference became collected. In that case the
 		 * handler became out-dated.
 		 * 
 		 * @return a free handler to use or null if there is no such handler
 		 */
-		EventHandler next() {
+		EventHandler allocateFor(Event<?, ?> e) {
 			// either we run out of handler to poll
 			// or we find a handler to use
 			while (true) {
 				EventHandler h = pollFirst();
 				if (h == null) 
 					return null;
-				if (h.use()) {
+				if (h.allocateFor(e)) {
 					if (h.get() != null)					
 						return h;
 				} else {
@@ -91,27 +85,39 @@ public class ConcurrentEventProcessor implements EventProcessor {
 			}
 		}
 		
-		void done(EventHandler h) {
-			h.unuse();
+		void free(EventHandler h) {
+			h.free();
 			addLast(h);
 		}
 	}
 	
 	private final Map<Class<?>, Object> proxies = new ConcurrentHashMap<>();
 	private final Map<Class<?>, EventHandlers> handlers = new ConcurrentHashMap<>();
-	
-	//TODO handle shutdown properly
+	private final Map<Class<?>, EventProperties> properties = new ConcurrentHashMap<>();
 	private final ExecutorService executor = Executors.newWorkStealingPool();
-	private final EventHandlerReflector reflector;
+	private final EventReflector reflector;
 	
-	ConcurrentEventProcessor(EventHandlerReflector reflector) {
+	ConcurrentEventProcessor(EventReflector reflector) {
 		this.reflector = reflector;
 	}
 	
 	@Override
-	public <E> void await(Class<E> event) {
-		// TODO Auto-generated method stub
-		
+	public void close() {
+		executor.shutdown();
+	}
+	
+	@Override
+	public <E> void await(Class<E> event) throws InterruptedException {
+		EventHandlers hs = getHandlers(event);
+		if (!hs.isEmpty())
+			return;
+		synchronized (hs) {
+			hs.wait();
+		}
+	}
+	
+	private EventProperties getProperties(Class<?> event) {
+		return properties.computeIfAbsent(event, e -> reflector.getProperties(e));
 	}
 	
 	@Override
@@ -120,16 +126,22 @@ public class ConcurrentEventProcessor implements EventProcessor {
 				&& Proxy.getInvocationHandler(handler).getClass() == ProxyEventHandler.class) {
 			return; // prevent own proxies to be registered as this causes multi-threaded endless loops
 		}
-		handlers.computeIfAbsent(event, k -> new EventHandlers()).addFirst(
-				new EventHandler(handler, reflector.getProperties(event, handler)));
+		EventHandlers hs = getHandlers(event);
+		hs.addFirst(new EventHandler(handler));
+		synchronized (hs) {
+			hs.notifyAll();
+		}
+	}
+
+	private <E> EventHandlers getHandlers(Class<E> event) {
+		return handlers.computeIfAbsent(event, k -> new EventHandlers());
 	}
 	
 	@Override
 	public <E> void deregister(Class<E> event, E handler) {
 		EventHandlers hs = handlers.get(event);
-		if (hs != null && !hs.isEmpty()) {
+		if (hs != null && !hs.isEmpty())
 			hs.removeIf(h -> h.get() == handler);
-		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -137,12 +149,16 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	public <E> E getProxy(Class<E> event) {
 		return (E) proxies.computeIfAbsent(event, e -> 
 			newProxyInstance(e.getClassLoader(), new Class[] { e }, 
-					new ProxyEventHandler<>(e, this)));
+					new ProxyEventHandler<>(e, getProperties(e), this)));
 	}
 	
 	@Override
 	public <E, T> void dispatch(Event<E, T> event) {
-		executor.submit(() -> doDispatch(event));
+		if (event.properties.multiDispatchVoids) {
+			executor.submit((Runnable)() -> doDispatch(event));
+		} else {
+			executor.submit(() -> doCompute(event));
+		}
 	}
 
 	// - when should I give up?
@@ -152,16 +168,12 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	//       as long as there is a clear contract: namely that failure is always indicated by a EventEception
 	@Override
 	public <E, T> T compute(Event<E, T> event) {
-		try {
-			return executor.submit(() -> doCompute(event)).get();
-		} catch (ExecutionException e) {
-			if (e.getCause() instanceof EventException) {
-				throw (EventException)e.getCause();
-			}
-			throw new EventException(e);
-		} catch (InterruptedException e) {
-			throw new EventException(e);
+		if (event.returnsBoolean() && event.properties.multiDispatchBooleans) {
+			@SuppressWarnings("unchecked")
+			T res = (T) Boolean.valueOf(getFuture(executor.submit(() -> doDispatch(event))) > 0);
+			return res;
 		}
+		return getFuture(executor.submit(() -> doCompute(event)));
 	}
 	
 	@Override
@@ -170,37 +182,43 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	}
 
 	private <E, T> T doCompute(Event<E, T> event) {
+		if (event.isOutdated())
+			throw new EventException(new TimeoutException());
 		EventHandlers hs = handlers.get(event.type);
 		if (hs == null)
 			throw new EventException(null);
 		while (true) {
-			EventHandler h = hs.next();
+			EventHandler h = hs.allocateFor(event);
 			if (h == null)
 				throw new EventException(null);
 			@SuppressWarnings("unchecked")
 			E handler = (E) h.get();
 			if (handler != null) {
 				T res = invoke(event, handler);
-				hs.done(h);
+				hs.free(h);
 				return res;
 			}
 		}
 	}
 	
-	private <E, T> void doDispatch(Event<E, T> event) {
+	private <E, T> int doDispatch(Event<E, T> event) {
+		if (event.isOutdated())
+			throw new EventException(new TimeoutException());
 		EventHandlers hs = handlers.get(event.type);
 		if (hs == null || hs.isEmpty())
-			return;
+			return 0;
 		Iterator<EventHandler> iter = hs.iterator();
 		LinkedList<EventHandler> retry = null;
+		int c = 0;
 		while (iter.hasNext()) {
 			EventHandler h = iter.next();
 			@SuppressWarnings("unchecked")
 			E handler = (E) h.get();
 			if (handler != null) {
-				if (h.use()) {
-					invoke(event, handler);
-					h.unuse();
+				if (h.allocateFor(event)) {
+					if (invoke(event, handler) == Boolean.TRUE)
+						c++;
+					h.free();
 				} else {
 					if (retry == null)
 						retry = new LinkedList<>();
@@ -216,15 +234,17 @@ public class ConcurrentEventProcessor implements EventProcessor {
 				@SuppressWarnings("unchecked")
 				E handler = (E) h.get();
 				if (handler != null) {
-					if (h.use()) {
-						invoke(event, handler);
-						h.unuse();
+					if (h.allocateFor(event)) {
+						if (invoke(event, handler) == Boolean.TRUE)
+							c++;
+						h.free();
 					} else {
 						retry.addLast(h);
 					}
 				}
 			}
 		}
+		return c;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -239,10 +259,12 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	static class ProxyEventHandler<E> implements InvocationHandler {
 
 		final Class<E> event;
+		final EventProperties properties;
 		final EventProcessor processor;
 
-		public ProxyEventHandler(Class<E> event, EventProcessor processor) {
+		public ProxyEventHandler(Class<E> event, EventProperties properties, EventProcessor processor) {
 			this.event = event;
+			this.properties = properties;
 			this.processor = processor;
 		}
 
@@ -254,8 +276,8 @@ public class ConcurrentEventProcessor implements EventProcessor {
 		@SuppressWarnings("unchecked")
 		private <T> Object invoke(Method method, Object[] args, Type<T> result) {
 			Class<T> raw = result.rawType;
-			Event<E, T> e = new Event<>(event, result, method, args);
-			if (raw == void.class || raw == Void.class) {
+			Event<E, T> e = new Event<>(event, properties, result, method, args);
+			if (e.returnsVoid()) {
 				processor.dispatch(e);
 				return null;
 			}

@@ -16,7 +16,7 @@ import org.junit.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
 
-public class TestEvents {
+public class TestEventBasics {
 
 	static interface MyListener {
 
