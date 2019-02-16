@@ -7,5 +7,6 @@ cache:
 jdk:
   - oraclejdk8
   - oraclejdk9
+  - oraclejdk11
 
 install: ant

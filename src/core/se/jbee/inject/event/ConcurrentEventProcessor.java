@@ -117,7 +117,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	}
 	
 	private EventProperties getProperties(Class<?> event) {
-		return properties.computeIfAbsent(event, e -> reflector.getProperties(e));
+		return properties.computeIfAbsent(event, e -> reflector.reflect(e));
 	}
 	
 	@Override
