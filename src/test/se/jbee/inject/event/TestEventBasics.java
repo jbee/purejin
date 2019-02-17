@@ -2,6 +2,7 @@ package se.jbee.inject.event;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -16,9 +17,16 @@ import org.junit.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
 
+/**
+ * Most basic test for the bare functionality provided by the event system.
+ * 
+ * This test only validates the expected output but does not care about the
+ * processing restrictions that control correct processing of events with
+ * regards to isolation/threading.
+ */
 public class TestEventBasics {
 
-	static interface MyListener {
+	private interface Handler {
 
 		void onChange(String msg);
 		
@@ -28,7 +36,7 @@ public class TestEventBasics {
 		
 	}
 	
-	static class MyService implements MyListener {
+	private static class Service implements Handler {
 
 		List<String> messages = new ArrayList<>();
 		
@@ -39,7 +47,7 @@ public class TestEventBasics {
 
 		@Override
 		public Future<String> computeEventually(int x) {
-			return completedFuture("42"+x);
+			return completedFuture("42" + x);
 		}
 		
 		@Override
@@ -53,8 +61,8 @@ public class TestEventBasics {
 
 		@Override
 		protected void declare() {
-			handle(MyListener.class);
-			construct(MyService.class);
+			handle(Handler.class);
+			construct(Service.class);
 		}
 	}
 	
@@ -62,10 +70,10 @@ public class TestEventBasics {
 	
 	@Test
 	public void thatNonReturnDisptachIsNonBlockingForTheCaller() throws InterruptedException {
-		MyListener proxy = injector.resolve(MyListener.class);
-		MyService service = injector.resolve(MyService.class);
+		Handler proxy = injector.resolve(Handler.class);
+		Service service = injector.resolve(Service.class);
+		assertEquals(0, service.messages.size());
 		proxy.onChange("foo");
-		assertEquals(service.messages.size(), 0); // this might fail if the processing was very fast
 		Thread.sleep(50); // give time for the message to arrive
 		assertEquals(1, service.messages.size());
 		assertEquals("foo", service.messages.get(0));
@@ -77,15 +85,16 @@ public class TestEventBasics {
 	
 	@Test
 	public void thatHandledInterfacesInjectProxy() {
-		MyListener proxy = injector.resolve(MyListener.class);
+		Handler proxy = injector.resolve(Handler.class);
 		assertTrue(Proxy.isProxyClass(proxy.getClass()));
-		assertSame(injector.resolve(MyListener.class), proxy); // should be "cached and reused"
+		assertSame(injector.resolve(Handler.class), proxy); // should be "cached and reused"
 	}
 	
 	@Test
 	public void thatComputationDispatchWorks() {
-		MyListener proxy = injector.resolve(MyListener.class);
-		MyService service = injector.resolve(MyService.class); // need to exist
+		Handler proxy = injector.resolve(Handler.class);
+		Service service = injector.resolve(Service.class); // need to exist
+		assertNotNull(service);
 		assertEquals("1:2", proxy.compute(1, 2));
 		assertEquals("3:4", proxy.compute(3, 4));
 		assertEquals("5:6", proxy.compute(5, 6));
@@ -93,8 +102,9 @@ public class TestEventBasics {
 	
 	@Test
 	public void thatEventualComputationDispatchWorks() {
-		MyListener proxy = injector.resolve(MyListener.class);
-		MyService service = injector.resolve(MyService.class); // need to exist
+		Handler proxy = injector.resolve(Handler.class);
+		Service service = injector.resolve(Service.class); // need to exist
+		assertNotNull(service);
 		try {
 			Future<String> fc = proxy.computeEventually(3);
 			assertSame(UnboxingFuture.class, fc.getClass());

@@ -41,7 +41,6 @@ import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-@SuppressWarnings("unused")
 public final class Inject {
 
 	public static Injector container( Injectee<?>... injectees ) {
