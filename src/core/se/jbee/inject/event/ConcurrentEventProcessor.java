@@ -155,12 +155,12 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	@Override
 	public <E> void dispatch(Event<E, ?> event) {
 		Future<?> res;
-		if (event.properties.multiDispatchVoids) {
+		if (event.properties.isMultiDispatch()) {
 			res = executor.submit((Runnable)() -> doDispatch(event));
 		} else {
 			res = executor.submit(() -> doCompute(event));
 		}
-		if (event.properties.synchroniseVoids) {
+		if (event.properties.isSyncMultiDispatch()) {
 			try {
 				EventException.unwrap(event, () -> res.get());
 			} catch (EventException e) {
@@ -180,7 +180,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	//       as long as there is a clear contract: namely that failure is always indicated by a EventEception
 	@Override
 	public <E, T> T compute(Event<E, T> event) throws Throwable {
-		if (event.returnsBoolean() && event.properties.multiDispatchBooleans) {
+		if (event.returnsBoolean() && event.properties.isMultiDispatchBooleans()) {
 			@SuppressWarnings("unchecked")
 			T res = unwrapGet(event, executor.submit(() -> (T) Boolean.valueOf(doDispatch(event) > 0)));
 			return res;

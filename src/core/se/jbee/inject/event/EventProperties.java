@@ -2,6 +2,7 @@ package se.jbee.inject.event;
 
 import static java.lang.Math.max;
 
+import java.util.EnumSet;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -10,10 +11,39 @@ import java.util.concurrent.TimeoutException;
  */
 public final class EventProperties {
 	
+	public enum Flags {
+		
+		/* Multi-Dispatch Handling */
+		/**
+		 * Whether or not to use multi-dispatch for methods with return type
+		 * {@link Void} or {@code void}. Default should be {@code true}.
+		 */
+		MULTI_DISPATCH,
+
+		/**
+		 * Whether or not to synchronise after a multi-dispatch so that the call to the
+		 * handler method completes when the dispatch is done. Default should be
+		 * {@code false}.
+		 */
+		MULTI_DISPATCH_SYNC,
+		
+		/**
+		 * Whether or not to use multi-dispatch for methods with return type
+		 * {@link Boolean} or {@code boolean}. Default should be {@code false}.
+		 */
+		MULTI_DISPATCH_BOOLEAN,
+		
+		/* Exception Handling */
+		/**
+		 * Whether or not to return {@code null} or zero or {@code false} in case there
+		 * is no handler for the event instead of throwing an {@link EventException}.
+		 */
+		RETURN_NO_HANDLER_AS_NULL;
+	}
+	
 	public static final EventProperties DEFAULT = new EventProperties(
 			Runtime.getRuntime().availableProcessors(), 0, 
-			false, true, 
-			false, false);
+			EnumSet.of(Flags.MULTI_DISPATCH));
 	
 	/**
 	 * The maximum number of threads that should be allowed to run *any* of the
@@ -38,53 +68,36 @@ public final class EventProperties {
 	 */
 	public final int ttl;
 	
-	/**
-	 * Whether or not to synchronise after a multi-dispatch so that the call to the
-	 * handler method completes when the dispatch is done. Default should be
-	 * {@code false}.
-	 */
-	public final boolean synchroniseVoids;
+	private final EnumSet<Flags> flags;
 	
-	/**
-	 * Whether or not to use multi-dispatch for methods with return type
-	 * {@link Void} or {@code void}. Default should be {@code true}.
-	 */
-	public final boolean multiDispatchVoids;
-	
-	/**
-	 * Whether or not to use multi-dispatch for methods with return type
-	 * {@link Boolean} or {@code boolean}. Default should be {@code false}.
-	 */
-	public final boolean multiDispatchBooleans;
-	
-	/**
-	 * Whether or not to return {@code null} or zero or {@code false} in case there
-	 * is no handler for the event instead of throwing an {@link EventException}.
-	 */
-	public final boolean noHandlerAsNullZeroFalse;
-	
-	public EventProperties(int maxConcurrentUsage, int ttl, 
-			boolean synchroniseVoids, boolean multiDispatchVoids, 
-			boolean multiDispatchBooleans, 
-			boolean noHandlerAsNullZeroFalse) {
+	public EventProperties(int maxConcurrentUsage, int ttl, EnumSet<Flags> flags) {
 		this.maxConcurrentUsage = max(1, maxConcurrentUsage);
 		this.ttl = ttl;
-		this.synchroniseVoids = synchroniseVoids;
-		this.multiDispatchVoids = multiDispatchVoids;
-		this.multiDispatchBooleans = multiDispatchBooleans;
-		this.noHandlerAsNullZeroFalse = noHandlerAsNullZeroFalse;
+		this.flags = flags;
+	}
+	
+	public boolean isSyncMultiDispatch() {
+		return flags.contains(Flags.MULTI_DISPATCH_SYNC);
+	}
+	
+	public boolean isMultiDispatch() {
+		return flags.contains(Flags.MULTI_DISPATCH);
+	}
+	
+	public boolean isMultiDispatchBooleans() {
+		return flags.contains(Flags.MULTI_DISPATCH_BOOLEAN);
+	}
+	
+	public boolean isReturnNoHandlerAsNull() {
+		return flags.contains(Flags.RETURN_NO_HANDLER_AS_NULL);
 	}
 	
 	public EventProperties withTTL(int ttl) {
-		return new EventProperties(maxConcurrentUsage, ttl, 
-				synchroniseVoids, multiDispatchVoids, 
-				multiDispatchBooleans, noHandlerAsNullZeroFalse);
+		return new EventProperties(maxConcurrentUsage, ttl, flags);
 	}
 	
 	public EventProperties withMaxConcurrentUsage(int n) {
-		return new EventProperties(n, ttl, 
-				synchroniseVoids, multiDispatchVoids, 
-				multiDispatchBooleans, noHandlerAsNullZeroFalse);
+		return new EventProperties(n, ttl, flags);
 	}
 	
 }

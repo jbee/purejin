@@ -36,7 +36,7 @@ public final class EventException extends RuntimeException {
 				EventException ee = (EventException) e.getCause();
 				if (ee.isCausedByHandlerException())
 					throw ((InvocationTargetException)ee.getCause()).getTargetException();
-				if (ee.isCausedByNoHandler() && event.properties.noHandlerAsNullZeroFalse)
+				if (ee.isCausedByNoHandler() && event.properties.isReturnNoHandlerAsNull())
 					return null;
 				if (ee.isCausedByTimeout())
 					for (Class<?> et : event.handler.getExceptionTypes())

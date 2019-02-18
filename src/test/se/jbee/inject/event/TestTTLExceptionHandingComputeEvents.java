@@ -109,6 +109,7 @@ public class TestTTLExceptionHandingComputeEvents {
 		assertThrowsTimeoutException(() ->  handler.slowMethodThatThrowsException());
 	}
 	
+	//TODO flaky test
 	@Test
 	public void thatTimeoutExceptionIsThrownIfHandlerMethodThrowsTimeoutException() {
 		assertThrowsTimeoutException(() -> handler.slowMethodThatThrowsTineoutException());
