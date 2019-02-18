@@ -16,15 +16,15 @@ import se.jbee.inject.container.Scoped;
 /**
  * This test illustrates the most basic scenario of a classic "event listener"
  * case where calls/messages are dispatched to multiple listeners for different
- * events here as {@link Listener#onX(int)} and {@link Listener#onY(int)}.
+ * events (here {@link Listener#onX(int)} and {@link Listener#onY(int)}).
  * 
  * While the dispatch is asynchronous the test setting uses a
  * {@link EventProperties#maxConcurrentUsage} of 1 which only allows one thread
  * calling any of the two methods at the same time which means the other message
  * can only be delivered after the first has been delivered successful.
  * 
- * Indirectly this test also makes sure the multi dispatch for void returning
- * method is asynchronously processed as the event processors worker threads
+ * Indirectly this test also makes sure the multi-dispatch for void returning
+ * methods is asynchronously processed as the event processors worker threads
  * both will be waiting in the {@link Service} methods to allow to check state
  * which will only resolve if the main thread continues in the test method to
  * the point where it notifies the waiting worker threads.
@@ -86,8 +86,8 @@ public class TestNonConcurrentVoidMultiDispatchEvents {
 		protected void declare() {
 			handle(Listener.class);
 			per(Scoped.INJECTION).construct(Service.class);
-			int maxConcurrentUsage = 1; // makes observed calls "single threaded"
-			bind(EventReflector.class).to(event -> new EventProperties(maxConcurrentUsage, 0, true, false));
+			// makes observed calls "single threaded"
+			bind(EventReflector.class).to(event -> EventProperties.DEFAULT.withMaxConcurrentUsage(1));
 		}
 		
 	}
@@ -119,7 +119,7 @@ public class TestNonConcurrentVoidMultiDispatchEvents {
 		}
 		notifyAll(a); // let a continue
 		giveSomeTime();
-		// no change as b is blocked
+		// no change as b is still in the handler method and thereby blocks the other event from sending it to b
 		if (a.xs.isEmpty()) { 
 			assertMessages(a.xs);
 			assertMessages(a.ys, 13);

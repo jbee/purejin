@@ -2,7 +2,6 @@ package se.jbee.inject.event;
 
 import static java.lang.System.currentTimeMillis;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static se.jbee.inject.event.EventException.getFuture;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -18,11 +17,13 @@ import java.util.concurrent.TimeoutException;
  * 
  * @param <T> type of the plain {@link Future}s value type
  */
-class UnboxingFuture<T> implements Future<T> {
+final class UnboxingFuture<T> implements Future<T> {
 
-	final Future<? extends Future<T>> boxed;
+	private final Event<?, ? extends Future<T>> event;
+	private final Future<? extends Future<T>> boxed;
 	
-	UnboxingFuture(Future<? extends Future<T>> boxed) {
+	UnboxingFuture(Event<?, ? extends Future<T>> event, Future<? extends Future<T>> boxed) {
+		this.event = event;
 		this.boxed = boxed;
 	}
 
@@ -42,8 +43,20 @@ class UnboxingFuture<T> implements Future<T> {
 	}
 
 	@Override
-	public T get() throws EventException {
-		return getFuture(getFuture(boxed));
+	public T get() throws InterruptedException, ExecutionException  {
+		Future<T> unboxed;
+		try {
+			 unboxed = EventException.unwrap(event, () -> boxed.get());
+		} catch (ExecutionException | InterruptedException e) {
+			throw e;
+		} catch (EventException e) {
+			if (e.isCausedByHandlerException())
+				throw (ExecutionException)e.getCause();
+			throw e;
+		} catch (Throwable e) {
+			throw new ExecutionException(e);
+		}
+		return unboxed.get();
 	}
 
 	@Override
@@ -51,8 +64,26 @@ class UnboxingFuture<T> implements Future<T> {
 			throws InterruptedException, ExecutionException, TimeoutException {
 		long waitMillis = unit.toMillis(timeout);
 		long start = currentTimeMillis();
-		return boxed.get(timeout, unit)
-				.get(waitMillis - (currentTimeMillis() - start), MILLISECONDS);	
+		Future<T> unboxed;
+		try {
+			unboxed = EventException.unwrap(event, () -> boxed.get(timeout, unit));
+		} catch (ExecutionException | InterruptedException | TimeoutException e) {
+			throw e;
+		} catch (EventException e) {
+			if (e.isCausedByHandlerException())
+				throw (ExecutionException)e.getCause();
+			if (e.isCausedByTimeout())
+				throw (TimeoutException)e.getCause();
+			throw e;
+		} catch (Throwable e) {
+			throw new ExecutionException(e);
+		}
+		long left = waitMillis - (currentTimeMillis() - start);
+		if (left <= 0) {
+			unboxed.cancel(false);
+			throw new TimeoutException();
+		}
+		return unboxed.get(left, MILLISECONDS);	
 	}
 	
 }

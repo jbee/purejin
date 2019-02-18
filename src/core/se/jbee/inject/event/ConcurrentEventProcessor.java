@@ -2,7 +2,7 @@ package se.jbee.inject.event;
 
 import static java.lang.reflect.Proxy.newProxyInstance;
 import static se.jbee.inject.Type.returnType;
-import static se.jbee.inject.event.EventException.getFuture;
+import static se.jbee.inject.event.EventException.unwrapGet;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationHandler;
@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -94,11 +93,12 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	private final Map<Class<?>, Object> proxies = new ConcurrentHashMap<>();
 	private final Map<Class<?>, EventHandlers> handlers = new ConcurrentHashMap<>();
 	private final Map<Class<?>, EventProperties> properties = new ConcurrentHashMap<>();
-	private final ExecutorService executor = Executors.newWorkStealingPool();
+	private final ExecutorService executor;
 	private final EventReflector reflector;
 	
-	ConcurrentEventProcessor(EventReflector reflector) {
+	ConcurrentEventProcessor(EventReflector reflector, ExecutorService executor) {
 		this.reflector = reflector;
+		this.executor = executor;
 	}
 	
 	@Override
@@ -151,13 +151,25 @@ public class ConcurrentEventProcessor implements EventProcessor {
 			newProxyInstance(e.getClassLoader(), new Class[] { e }, 
 					new ProxyEventHandler<>(e, getProperties(e), this)));
 	}
-	
+
 	@Override
-	public <E, T> void dispatch(Event<E, T> event) {
+	public <E> void dispatch(Event<E, ?> event) {
+		Future<?> res;
 		if (event.properties.multiDispatchVoids) {
-			executor.submit((Runnable)() -> doDispatch(event));
+			res = executor.submit((Runnable)() -> doDispatch(event));
 		} else {
-			executor.submit(() -> doCompute(event));
+			res = executor.submit(() -> doCompute(event));
+		}
+		if (event.properties.synchroniseVoids) {
+			try {
+				EventException.unwrap(event, () -> res.get());
+			} catch (EventException e) {
+				throw e;
+			} catch (Throwable e) {
+				if (e instanceof Exception)
+					throw new EventException(event, (Exception) e);
+				throw new RuntimeException(e);
+			}
 		}
 	}
 
@@ -167,30 +179,29 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	// note: these can be programmed as a utility on top with basically the same effect and little extra overhead for a corner case
 	//       as long as there is a clear contract: namely that failure is always indicated by a EventEception
 	@Override
-	public <E, T> T compute(Event<E, T> event) {
+	public <E, T> T compute(Event<E, T> event) throws Throwable {
 		if (event.returnsBoolean() && event.properties.multiDispatchBooleans) {
 			@SuppressWarnings("unchecked")
-			T res = (T) Boolean.valueOf(getFuture(executor.submit(() -> doDispatch(event))) > 0);
+			T res = unwrapGet(event, executor.submit(() -> (T) Boolean.valueOf(doDispatch(event) > 0)));
 			return res;
 		}
-		return getFuture(executor.submit(() -> doCompute(event)));
+		return unwrapGet(event, executor.submit(() -> doCompute(event)));
 	}
 	
 	@Override
 	public <E, T extends Future<V>, V> Future<V> computeEventually(Event<E, T> event) {
-		return new UnboxingFuture<>(executor.submit(() -> doCompute(event)));
+		return new UnboxingFuture<>(event, executor.submit(() -> doCompute(event)));
 	}
 
-	private <E, T> T doCompute(Event<E, T> event) {
-		if (event.isOutdated())
-			throw new EventException(new TimeoutException());
+	private <E, T> T doCompute(Event<E, T> event) throws EventException {
+		ensureNoTimeout(event);
 		EventHandlers hs = handlers.get(event.type);
 		if (hs == null)
-			throw new EventException(null);
+			throw new EventException(event, null);
 		while (true) {
 			EventHandler h = hs.allocateFor(event);
 			if (h == null)
-				throw new EventException(null);
+				throw new EventException(event, null);
 			@SuppressWarnings("unchecked")
 			E handler = (E) h.get();
 			if (handler != null) {
@@ -201,9 +212,8 @@ public class ConcurrentEventProcessor implements EventProcessor {
 		}
 	}
 	
-	private <E, T> int doDispatch(Event<E, T> event) {
-		if (event.isOutdated())
-			throw new EventException(new TimeoutException());
+	private <E, T> int doDispatch(Event<E, T> event) throws EventException {
+		ensureNoTimeout(event);
 		EventHandlers hs = handlers.get(event.type);
 		if (hs == null || hs.isEmpty())
 			return 0;
@@ -247,12 +257,17 @@ public class ConcurrentEventProcessor implements EventProcessor {
 		return c;
 	}
 
+	private static <E, T> void ensureNoTimeout(Event<E, T> event) throws EventException {
+		if (event.isOutdated())
+			throw new EventException(event, new TimeoutException());
+	}
+
 	@SuppressWarnings("unchecked")
-	private static <E, T> T invoke(Event<E, T> event, E listener) {
+	private static <E, T> T invoke(Event<E, T> event, E listener) throws EventException {
 		try {
 			return (T) event.handler.invoke(listener, event.args);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			throw new EventException(e);
+			throw new EventException(event, e);
 		}
 	}
 	
@@ -274,11 +289,11 @@ public class ConcurrentEventProcessor implements EventProcessor {
 		}
 		
 		@SuppressWarnings("unchecked")
-		private <T> Object invoke(Method method, Object[] args, Type<T> result) {
+		private <T> Object invoke(Method method, Object[] args, Type<T> result) throws Throwable {
 			Class<T> raw = result.rawType;
 			Event<E, T> e = new Event<>(event, properties, result, method, args);
 			if (e.returnsVoid()) {
-				processor.dispatch(e);
+				processor.dispatch((Event<E, Void>)e);
 				return null;
 			}
 			if (raw == Future.class) {

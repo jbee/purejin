@@ -4,10 +4,16 @@ import static java.lang.Math.max;
 
 import java.util.concurrent.TimeoutException;
 
-public class EventProperties {
+/**
+ * Properties that control how the {@link Event}s are processed by a
+ * {@link EventProcessor}.
+ */
+public final class EventProperties {
 	
 	public static final EventProperties DEFAULT = new EventProperties(
-			Runtime.getRuntime().availableProcessors(), 0, true, false);
+			Runtime.getRuntime().availableProcessors(), 0, 
+			false, true, 
+			false, false);
 	
 	/**
 	 * The maximum number of threads that should be allowed to run *any* of the
@@ -33,6 +39,13 @@ public class EventProperties {
 	public final int ttl;
 	
 	/**
+	 * Whether or not to synchronise after a multi-dispatch so that the call to the
+	 * handler method completes when the dispatch is done. Default should be
+	 * {@code false}.
+	 */
+	public final boolean synchroniseVoids;
+	
+	/**
 	 * Whether or not to use multi-dispatch for methods with return type
 	 * {@link Void} or {@code void}. Default should be {@code true}.
 	 */
@@ -44,12 +57,34 @@ public class EventProperties {
 	 */
 	public final boolean multiDispatchBooleans;
 	
+	/**
+	 * Whether or not to return {@code null} or zero or {@code false} in case there
+	 * is no handler for the event instead of throwing an {@link EventException}.
+	 */
+	public final boolean noHandlerAsNullZeroFalse;
+	
 	public EventProperties(int maxConcurrentUsage, int ttl, 
-			boolean multiDispatchVoids, boolean multiDispatchBooleans) {
+			boolean synchroniseVoids, boolean multiDispatchVoids, 
+			boolean multiDispatchBooleans, 
+			boolean noHandlerAsNullZeroFalse) {
 		this.maxConcurrentUsage = max(1, maxConcurrentUsage);
 		this.ttl = ttl;
+		this.synchroniseVoids = synchroniseVoids;
 		this.multiDispatchVoids = multiDispatchVoids;
 		this.multiDispatchBooleans = multiDispatchBooleans;
+		this.noHandlerAsNullZeroFalse = noHandlerAsNullZeroFalse;
+	}
+	
+	public EventProperties withTTL(int ttl) {
+		return new EventProperties(maxConcurrentUsage, ttl, 
+				synchroniseVoids, multiDispatchVoids, 
+				multiDispatchBooleans, noHandlerAsNullZeroFalse);
+	}
+	
+	public EventProperties withMaxConcurrentUsage(int n) {
+		return new EventProperties(n, ttl, 
+				synchroniseVoids, multiDispatchVoids, 
+				multiDispatchBooleans, noHandlerAsNullZeroFalse);
 	}
 	
 }

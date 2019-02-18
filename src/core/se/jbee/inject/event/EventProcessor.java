@@ -23,11 +23,11 @@ public interface EventProcessor extends AutoCloseable {
 	
 	<E> E getProxy(Class<E> event);
 
-	<E, T> void dispatch(Event<E, T> event);
+	<E> void dispatch(Event<E, ?> event);
 	
-	<E, T> T compute(Event<E, T> event) throws EventException;
+	<E, T> T compute(Event<E, T> event) throws Throwable;
 	
-	<E, T extends Future<V>, V> Future<V> computeEventually(Event<E, T> event) throws EventException;
+	<E, T extends Future<V>, V> Future<V> computeEventually(Event<E, T> event);
 	
 	@Override
 	void close();
