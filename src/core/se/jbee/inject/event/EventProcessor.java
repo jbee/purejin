@@ -23,7 +23,7 @@ public interface EventProcessor extends AutoCloseable {
 	
 	<E> E getProxy(Class<E> event);
 
-	<E> void dispatch(Event<E, ?> event);
+	<E> void dispatch(Event<E, ?> event) throws Throwable;
 	
 	<E, T> T compute(Event<E, T> event) throws Throwable;
 	

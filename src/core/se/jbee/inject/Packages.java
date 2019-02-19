@@ -5,6 +5,7 @@
  */
 package se.jbee.inject;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
@@ -14,7 +15,7 @@ import java.util.Arrays;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Packages
-		implements MoreApplicableThan<Packages> {
+		implements MoreApplicableThan<Packages>, Serializable {
 
 	/**
 	 * Contains all packages including the (default) package.

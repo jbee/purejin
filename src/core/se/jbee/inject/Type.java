@@ -5,6 +5,7 @@
  */
 package se.jbee.inject;
 
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
@@ -30,7 +31,7 @@ import java.util.Set;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Type<T>
-		implements MoreApplicableThan<Type<?>>, Parameter<T> {
+		implements MoreApplicableThan<Type<?>>, Parameter<T>, Serializable {
 
 	public static final Type<Object> OBJECT = Type.raw( Object.class );
 	public static final Type<Void> VOID = raw( Void.class );

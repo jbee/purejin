@@ -7,6 +7,7 @@ package se.jbee.inject;
 
 import static se.jbee.inject.Array.append;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,7 +19,7 @@ import se.jbee.inject.Scope.SingletonScope;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public final class Scoping {
+public final class Scoping implements Serializable {
 
 	public static final Scoping IGNORE = new Scoping( SingletonScope.class );
 	private static final Map<Class<? extends Scope>, Scoping> EXPIRY_BY_SCOPE 

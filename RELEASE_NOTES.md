@@ -14,6 +14,9 @@ v19.1 (upcoming)
 - renamed field `Injection#expiry` to `Injection#scoping`
 - renamed method `Injection#ignoredExpiry()` to `Injection#ignoredScoping()`
 - renamed field `InjectronInfo#expiry` to `InjectronInfo#scoping`
+- added `Serializable` to `Type`, `Name`, `Instance`, `Instances`, `Packages`, 
+  `Target`, `Resource`, `Source`, `Scoping`, `Injection`, `Dependency`
+- `Source` implements `equals` and `hashCode`  
 - moved `Supplier` into `container` package (was wrongly located in main API)
 - moved `Scope`, `Repository` and `Provider` into root package `se.jbee.inject`
 - added `SingletonScope` to mark singleton `Scope` implementations

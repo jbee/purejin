@@ -5,13 +5,15 @@
  */
 package se.jbee.inject;
 
+import java.io.Serializable;
+
 /**
  * Where does a bind come from and what type of declaration has it been.
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Source
-		implements MoreApplicableThan<Source> {
+		implements MoreApplicableThan<Source>, Serializable {
 
 	public static Source source( Class<?> module ) {
 		return new Source( module, DeclarationType.EXPLICIT, 0, 0 );
@@ -36,6 +38,24 @@ public final class Source
 	@Override
 	public String toString() {
 		return ident.getSimpleName() + "#" + declarationNo + "[" + declarationType.name() + "]";
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof Source && equalTo((Source) obj);
+	}
+
+	public boolean equalTo(Source other) {
+		return ident == other.ident 
+				&& declarationType == other.declarationType
+				&& declarationNo == other.declarationNo;
+	}
+	
+	@Override
+	public int hashCode() {
+		// declarationType should not play a role as there should only be 
+		// one Source with same declarationNo in an ident
+		return ident.hashCode() ^ declarationNo;
 	}
 
 	@Override

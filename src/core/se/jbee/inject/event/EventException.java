@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -36,7 +37,7 @@ public final class EventException extends RuntimeException {
 				EventException ee = (EventException) e.getCause();
 				if (ee.isCausedByHandlerException())
 					throw ((InvocationTargetException)ee.getCause()).getTargetException();
-				if (ee.isCausedByNoHandler() && event.properties.isReturnNoHandlerAsNull())
+				if (ee.isCausedByNoHandler() && event.prefs.isReturnNoHandlerAsNull())
 					return null;
 				if (ee.isCausedByTimeout())
 					for (Class<?> et : event.handler.getExceptionTypes())
@@ -78,8 +79,16 @@ public final class EventException extends RuntimeException {
 	}
 	
 	/**
+	 * @return true if the cause of the exception was {@link EventProcessor}
+	 *         rejecting to process the event.
+	 */
+	public boolean isCausedByRejection() {
+		return getCause() instanceof RejectedExecutionException;
+	}
+	
+	/**
 	 * @return true if the event should be processed after its
-	 *         {@link EventProperties#ttl} period already has passed.
+	 *         {@link EventPreferences#ttl} period already has passed.
 	 */
 	public boolean isCausedByTimeout() {
 		return getCause() instanceof TimeoutException;

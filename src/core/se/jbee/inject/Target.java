@@ -10,6 +10,8 @@ import static se.jbee.inject.Packages.packageOf;
 import static se.jbee.inject.Packages.subPackagesOf;
 import static se.jbee.inject.Type.raw;
 
+import java.io.Serializable;
+
 /**
  * Describes where a {@link Resource} is available for injection.
  *
@@ -19,7 +21,7 @@ import static se.jbee.inject.Type.raw;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Target
-		implements MoreApplicableThan<Target> {
+		implements MoreApplicableThan<Target>, Serializable {
 
 	public static final Target ANY = targeting( Instance.ANY );
 

@@ -12,15 +12,21 @@ import java.lang.reflect.Proxy;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import se.jbee.inject.Type;
 
+/**
+ * Default implementation of the {@link EventProcessor} supporting all
+ * {@link EventPreferences}.
+ */
 public class ConcurrentEventProcessor implements EventProcessor {
 
 	private final static class EventHandler extends WeakReference<Object> {
@@ -45,7 +51,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 		boolean allocateFor(Event<?, ?> e) {
 			while (true) {
 				int currentUsage = concurrentUsage.get();
-				if (currentUsage >= e.properties.maxConcurrentUsage)
+				if (currentUsage >= e.prefs.maxConcurrentUsage)
 					return false;
 				boolean success = concurrentUsage.compareAndSet(currentUsage, currentUsage + 1);
 				if (success)
@@ -92,7 +98,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	
 	private final Map<Class<?>, Object> proxies = new ConcurrentHashMap<>();
 	private final Map<Class<?>, EventHandlers> handlers = new ConcurrentHashMap<>();
-	private final Map<Class<?>, EventProperties> properties = new ConcurrentHashMap<>();
+	private final Map<Class<?>, EventPreferences> properties = new ConcurrentHashMap<>();
 	private final ExecutorService executor;
 	private final EventReflector reflector;
 	
@@ -116,7 +122,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 		}
 	}
 	
-	private EventProperties getProperties(Class<?> event) {
+	private EventPreferences getProperties(Class<?> event) {
 		return properties.computeIfAbsent(event, e -> reflector.reflect(e));
 	}
 	
@@ -152,25 +158,24 @@ public class ConcurrentEventProcessor implements EventProcessor {
 					new ProxyEventHandler<>(e, getProperties(e), this)));
 	}
 
+	private <T> Future<T> submit(Event<?, ?> event, Callable<T> f) {
+		try {
+		return executor.submit(f);
+		} catch (RejectedExecutionException e) {
+			throw new EventException(event, e);
+		}
+	}
+	
 	@Override
-	public <E> void dispatch(Event<E, ?> event) {
+	public <E> void dispatch(Event<E, ?> event) throws Throwable {
 		Future<?> res;
-		if (event.properties.isMultiDispatch()) {
-			res = executor.submit((Runnable)() -> doDispatch(event));
+		if (event.prefs.isMultiDispatch()) {
+			res = submit(event, () -> doDispatch(event));
 		} else {
-			res = executor.submit(() -> doCompute(event));
+			res = submit(event, () -> doCompute(event));
 		}
-		if (event.properties.isSyncMultiDispatch()) {
-			try {
-				EventException.unwrap(event, () -> res.get());
-			} catch (EventException e) {
-				throw e;
-			} catch (Throwable e) {
-				if (e instanceof Exception)
-					throw new EventException(event, (Exception) e);
-				throw new RuntimeException(e);
-			}
-		}
+		if (event.prefs.isSyncMultiDispatch())
+			EventException.unwrap(event, () -> res.get());
 	}
 
 	// - when should I give up?
@@ -180,17 +185,17 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	//       as long as there is a clear contract: namely that failure is always indicated by a EventEception
 	@Override
 	public <E, T> T compute(Event<E, T> event) throws Throwable {
-		if (event.returnsBoolean() && event.properties.isMultiDispatchBooleans()) {
+		if (event.returnsBoolean() && event.prefs.isMultiDispatchBooleans()) {
 			@SuppressWarnings("unchecked")
-			T res = unwrapGet(event, executor.submit(() -> (T) Boolean.valueOf(doDispatch(event) > 0)));
+			T res = unwrapGet(event, submit(event, () -> (T) Boolean.valueOf(doDispatch(event) > 0)));
 			return res;
 		}
-		return unwrapGet(event, executor.submit(() -> doCompute(event)));
+		return unwrapGet(event, submit(event, () -> doCompute(event)));
 	}
 	
 	@Override
 	public <E, T extends Future<V>, V> Future<V> computeEventually(Event<E, T> event) {
-		return new UnboxingFuture<>(event, executor.submit(() -> doCompute(event)));
+		return new UnboxingFuture<>(event, submit(event, () -> doCompute(event)));
 	}
 
 	private <E, T> T doCompute(Event<E, T> event) throws EventException {
@@ -274,10 +279,10 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	static class ProxyEventHandler<E> implements InvocationHandler {
 
 		final Class<E> event;
-		final EventProperties properties;
+		final EventPreferences properties;
 		final EventProcessor processor;
 
-		public ProxyEventHandler(Class<E> event, EventProperties properties, EventProcessor processor) {
+		public ProxyEventHandler(Class<E> event, EventPreferences properties, EventProcessor processor) {
 			this.event = event;
 			this.properties = properties;
 			this.processor = processor;

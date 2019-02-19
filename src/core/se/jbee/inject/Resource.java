@@ -8,6 +8,8 @@ package se.jbee.inject;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Type.raw;
 
+import java.io.Serializable;
+
 /**
  * Describes WHAT can be injected and WHERE it can be injected.
  *
@@ -16,7 +18,7 @@ import static se.jbee.inject.Type.raw;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Resource<T>
-		implements Typed<T>, MoreApplicableThan<Resource<?>> {
+		implements Typed<T>, MoreApplicableThan<Resource<?>>, Serializable {
 
 	public static <T> Resource<T> resource( Class<T> type ) {
 		return new Resource<>( Instance.anyOf( raw( type ) ) );

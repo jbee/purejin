@@ -5,6 +5,7 @@
  */
 package se.jbee.inject;
 
+import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
@@ -16,7 +17,7 @@ import java.lang.reflect.Method;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Name
-		implements MoreApplicableThan<Name> {
+		implements MoreApplicableThan<Name>, Serializable {
 
 	/**
 	 * Character used as wildcard when matching names.
@@ -50,7 +51,7 @@ public final class Name
 	}
 
 	private Name( String value ) {
-		this.value = value.intern();
+		this.value = value;
 	}
 
 	@Override
@@ -64,10 +65,9 @@ public final class Name
 	}
 
 	public boolean equalTo( Name other ) {
-		//noinspection StringEquality
-		return value == other.value; // we use intern() so this is fine
+		return value.equals(other.value); 
 	}
-
+	
 	@Override
 	public boolean equals( Object obj ) {
 		return obj instanceof Name && equalTo( (Name) obj );

@@ -7,6 +7,8 @@ package se.jbee.inject;
 
 import static se.jbee.inject.Type.raw;
 
+import java.io.Serializable;
+
 /**
  * Used to tell that we don#t want just one singleton at a time but multiple distinguished by the
  * {@link Name} used.
@@ -15,7 +17,7 @@ import static se.jbee.inject.Type.raw;
  *
  */
 public final class Instance<T>
-		implements Parameter<T>, MoreApplicableThan<Instance<?>> {
+		implements Parameter<T>, MoreApplicableThan<Instance<?>>, Serializable {
 
 	/**
 	 * When a wildcard-type is used as bound instance type the bind will be added to all concrete

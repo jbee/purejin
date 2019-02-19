@@ -9,6 +9,7 @@ import static se.jbee.inject.Instance.defaultInstanceOf;
 import static se.jbee.inject.Name.pluginFor;
 import static se.jbee.inject.Type.raw;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -21,7 +22,7 @@ import se.jbee.inject.UnresolvableDependency.UnstableDependency;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Dependency<T>
-		implements Parameter<T>, Iterable<Injection> {
+		implements Parameter<T>, Iterable<Injection>, Serializable {
 
 	/**
 	 * A empty {@link Injection} hierarchy. It is used whenever the {@link Dependency} does not

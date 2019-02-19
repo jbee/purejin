@@ -6,6 +6,12 @@ import java.lang.reflect.Method;
 
 import se.jbee.inject.Type;
 
+/**
+ * The message describing the handler interface method invocation as data.
+ * 
+ * @param <E> type of the event handler interface
+ * @param <T> return type of the {@link #handler} method
+ */
 public final class Event<E, T> {
 
 	/**
@@ -13,15 +19,15 @@ public final class Event<E, T> {
 	 */
 	public final long created;
 	public final Class<E> type;
-	public final EventProperties properties;
+	public final EventPreferences prefs;
 	public final Type<T> result;
 	public final Method handler;
 	public final Object[] args;
 
-	public Event(Class<E> event, EventProperties properties, Type<T> result, 
+	public Event(Class<E> event, EventPreferences prefs, Type<T> result, 
 			Method handler, Object[] args) {
 		this.type = event;
-		this.properties = properties;
+		this.prefs = prefs;
 		this.result = result;
 		this.handler = handler;
 		this.args = args;
@@ -34,13 +40,13 @@ public final class Event<E, T> {
 	}
 
 	public boolean isNonConcurrent() {
-		return properties.maxConcurrentUsage == 1;
+		return prefs.maxConcurrentUsage == 1;
 	}
 	
 	public boolean isOutdated() {
-		return properties.ttl <= 0 
+		return prefs.ttl <= 0 
 				? false 
-				: currentTimeMillis() > created + properties.ttl;
+				: currentTimeMillis() > created + prefs.ttl;
 	}
 	
 	public boolean returnsVoid() {

@@ -7,6 +7,7 @@ package se.jbee.inject;
 
 import static java.util.Arrays.asList;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -16,7 +17,7 @@ import java.util.Iterator;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Instances
-		implements MoreApplicableThan<Instances>, Iterable<Instance<?>> {
+		implements MoreApplicableThan<Instances>, Iterable<Instance<?>>, Serializable {
 
 	public static final Instances ANY = new Instances();
 

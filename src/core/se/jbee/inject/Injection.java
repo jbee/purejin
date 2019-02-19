@@ -5,13 +5,14 @@
  */
 package se.jbee.inject;
 
+import java.io.Serializable;
 
 /**
  * Describes a "stack-frame" within the injection process.
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public final class Injection {
+public final class Injection implements Serializable {
 
 	public final Instance<?> dependency;
 	public final Resource<?> target;

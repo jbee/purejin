@@ -2,6 +2,8 @@ package se.jbee.inject.event;
 
 import static java.lang.Math.max;
 
+import java.io.Serializable;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.concurrent.TimeoutException;
 
@@ -9,7 +11,7 @@ import java.util.concurrent.TimeoutException;
  * Properties that control how the {@link Event}s are processed by a
  * {@link EventProcessor}.
  */
-public final class EventProperties {
+public final class EventPreferences implements Serializable {
 	
 	public enum Flags {
 		
@@ -41,7 +43,7 @@ public final class EventProperties {
 		RETURN_NO_HANDLER_AS_NULL;
 	}
 	
-	public static final EventProperties DEFAULT = new EventProperties(
+	public static final EventPreferences DEFAULT = new EventPreferences(
 			Runtime.getRuntime().availableProcessors(), 0, 
 			EnumSet.of(Flags.MULTI_DISPATCH));
 	
@@ -70,7 +72,7 @@ public final class EventProperties {
 	
 	private final EnumSet<Flags> flags;
 	
-	public EventProperties(int maxConcurrentUsage, int ttl, EnumSet<Flags> flags) {
+	public EventPreferences(int maxConcurrentUsage, int ttl, EnumSet<Flags> flags) {
 		this.maxConcurrentUsage = max(1, maxConcurrentUsage);
 		this.ttl = ttl;
 		this.flags = flags;
@@ -92,12 +94,29 @@ public final class EventProperties {
 		return flags.contains(Flags.RETURN_NO_HANDLER_AS_NULL);
 	}
 	
-	public EventProperties withTTL(int ttl) {
-		return new EventProperties(maxConcurrentUsage, ttl, flags);
+	public EventPreferences withTTL(int ttl) {
+		return new EventPreferences(maxConcurrentUsage, ttl, flags);
 	}
 	
-	public EventProperties withMaxConcurrentUsage(int n) {
-		return new EventProperties(n, ttl, flags);
+	public EventPreferences withMaxConcurrentUsage(int n) {
+		return new EventPreferences(n, ttl, flags);
+	}
+	
+	public EventPreferences with(Flags flag) {
+		EnumSet<Flags> flags = EnumSet.copyOf(this.flags);
+		flags.add(flag);
+		return new EventPreferences(maxConcurrentUsage, ttl, flags);
+	}
+	
+	public EventPreferences with(Flags...flags) {
+		EnumSet<Flags> fs = EnumSet.copyOf(this.flags);
+		fs.addAll(Arrays.asList(flags));
+		return new EventPreferences(maxConcurrentUsage, ttl, fs);
+	}
+	
+	@Override
+	public String toString() {
+		return maxConcurrentUsage + ":"+ttl+" "+flags;
 	}
 	
 }
