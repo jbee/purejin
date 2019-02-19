@@ -3,6 +3,7 @@ package se.jbee.inject.event;
 import static java.lang.System.currentTimeMillis;
 
 import java.lang.reflect.Method;
+import java.util.function.BinaryOperator;
 
 import se.jbee.inject.Type;
 
@@ -23,14 +24,16 @@ public final class Event<E, T> {
 	public final Type<T> result;
 	public final Method handler;
 	public final Object[] args;
+	public final BinaryOperator<T> aggregator;
 
 	public Event(Class<E> event, EventPreferences prefs, Type<T> result, 
-			Method handler, Object[] args) {
+			Method handler, Object[] args, BinaryOperator<T> aggregator) {
 		this.type = event;
 		this.prefs = prefs;
 		this.result = result;
 		this.handler = handler;
 		this.args = args;
+		this.aggregator = aggregator;
 		this.created = currentTimeMillis();
 	}
 	
@@ -55,5 +58,9 @@ public final class Event<E, T> {
 	
 	public boolean returnsBoolean() {
 		return result.rawType == boolean.class || result.rawType == Boolean.class;
+	}
+	
+	public boolean returnsInt() {
+		return result.rawType == int.class || result.rawType == Integer.class;
 	}
 }

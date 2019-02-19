@@ -31,9 +31,10 @@ public final class EventPreferences implements Serializable {
 		
 		/**
 		 * Whether or not to use multi-dispatch for methods with return type
-		 * {@link Boolean} or {@code boolean}. Default should be {@code false}.
+		 * {@link Boolean} or {@code boolean} and combine their result with OR operator.
+		 * Default should be {@code false}.
 		 */
-		MULTI_DISPATCH_BOOLEAN,
+		MULTI_DISPATCH_AGGREGATED,
 		
 		/* Exception Handling */
 		/**
@@ -86,8 +87,8 @@ public final class EventPreferences implements Serializable {
 		return flags.contains(Flags.MULTI_DISPATCH);
 	}
 	
-	public boolean isMultiDispatchBooleans() {
-		return flags.contains(Flags.MULTI_DISPATCH_BOOLEAN);
+	public boolean isAggregatedMultiDispatch() {
+		return flags.contains(Flags.MULTI_DISPATCH_AGGREGATED);
 	}
 	
 	public boolean isReturnNoHandlerAsNull() {

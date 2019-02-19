@@ -20,6 +20,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BinaryOperator;
 
 import se.jbee.inject.Type;
 
@@ -96,9 +97,9 @@ public class ConcurrentEventProcessor implements EventProcessor {
 		}
 	}
 	
-	private final Map<Class<?>, Object> proxies = new ConcurrentHashMap<>();
-	private final Map<Class<?>, EventHandlers> handlers = new ConcurrentHashMap<>();
-	private final Map<Class<?>, EventPreferences> properties = new ConcurrentHashMap<>();
+	private final Map<Class<?>, Object> proxiesByEventType = new ConcurrentHashMap<>();
+	private final Map<Class<?>, EventHandlers> handlersByEventType = new ConcurrentHashMap<>();
+	private final Map<Class<?>, EventPreferences> prefsByEventType = new ConcurrentHashMap<>();
 	private final ExecutorService executor;
 	private final EventReflector reflector;
 	
@@ -122,8 +123,8 @@ public class ConcurrentEventProcessor implements EventProcessor {
 		}
 	}
 	
-	private EventPreferences getProperties(Class<?> event) {
-		return properties.computeIfAbsent(event, e -> reflector.reflect(e));
+	private EventPreferences getPrefs(Class<?> event) {
+		return prefsByEventType.computeIfAbsent(event, e -> reflector.reflect(e));
 	}
 	
 	@Override
@@ -140,12 +141,12 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	}
 
 	private <E> EventHandlers getHandlers(Class<E> event) {
-		return handlers.computeIfAbsent(event, k -> new EventHandlers());
+		return handlersByEventType.computeIfAbsent(event, k -> new EventHandlers());
 	}
 	
 	@Override
 	public <E> void deregister(Class<E> event, E handler) {
-		EventHandlers hs = handlers.get(event);
+		EventHandlers hs = handlersByEventType.get(event);
 		if (hs != null && !hs.isEmpty())
 			hs.removeIf(h -> h.get() == handler);
 	}
@@ -153,14 +154,14 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <E> E getProxy(Class<E> event) {
-		return (E) proxies.computeIfAbsent(event, e -> 
+		return (E) proxiesByEventType.computeIfAbsent(event, e -> 
 			newProxyInstance(e.getClassLoader(), new Class[] { e }, 
-					new ProxyEventHandler<>(e, getProperties(e), this)));
+					new ProxyEventHandler<>(e, getPrefs(e), this)));
 	}
 
 	private <T> Future<T> submit(Event<?, ?> event, Callable<T> f) {
 		try {
-		return executor.submit(f);
+			return executor.submit(f);
 		} catch (RejectedExecutionException e) {
 			throw new EventException(event, e);
 		}
@@ -185,22 +186,23 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	//       as long as there is a clear contract: namely that failure is always indicated by a EventEception
 	@Override
 	public <E, T> T compute(Event<E, T> event) throws Throwable {
-		if (event.returnsBoolean() && event.prefs.isMultiDispatchBooleans()) {
-			@SuppressWarnings("unchecked")
-			T res = unwrapGet(event, submit(event, () -> (T) Boolean.valueOf(doDispatch(event) > 0)));
-			return res;
-		}
-		return unwrapGet(event, submit(event, () -> doCompute(event)));
+		return unwrapGet(event, submit(event, () -> doProcess(event)));
 	}
 	
 	@Override
 	public <E, T extends Future<V>, V> Future<V> computeEventually(Event<E, T> event) {
-		return new UnboxingFuture<>(event, submit(event, () -> doCompute(event)));
+		return new UnboxingFuture<>(event, submit(event, () -> doProcess(event)));
 	}
-
+	
+	private <E, T> T doProcess(Event<E, T> event) throws EventException {
+		return event.prefs.isAggregatedMultiDispatch() && event.aggregator != null
+				? doDispatch(event)
+				: doCompute(event);
+	}
+	
 	private <E, T> T doCompute(Event<E, T> event) throws EventException {
 		ensureNoTimeout(event);
-		EventHandlers hs = handlers.get(event.type);
+		EventHandlers hs = handlersByEventType.get(event.type);
 		if (hs == null)
 			throw new EventException(event, null);
 		while (true) {
@@ -217,22 +219,24 @@ public class ConcurrentEventProcessor implements EventProcessor {
 		}
 	}
 	
-	private <E, T> int doDispatch(Event<E, T> event) throws EventException {
+	private <E, T> T doDispatch(Event<E, T> event) throws EventException {
 		ensureNoTimeout(event);
-		EventHandlers hs = handlers.get(event.type);
+		EventHandlers hs = handlersByEventType.get(event.type);
 		if (hs == null || hs.isEmpty())
-			return 0;
+			return null;
 		Iterator<EventHandler> iter = hs.iterator();
 		LinkedList<EventHandler> retry = null;
-		int c = 0;
+		final BinaryOperator<T> aggregator = event.aggregator;
+		T res = null;
 		while (iter.hasNext()) {
 			EventHandler h = iter.next();
 			@SuppressWarnings("unchecked")
 			E handler = (E) h.get();
 			if (handler != null) {
 				if (h.allocateFor(event)) {
-					if (invoke(event, handler) == Boolean.TRUE)
-						c++;
+					T hres = invoke(event, handler);
+					if (aggregator != null)
+						res = res == null ? hres : aggregator.apply(res, hres);
 					h.free();
 				} else {
 					if (retry == null)
@@ -250,8 +254,9 @@ public class ConcurrentEventProcessor implements EventProcessor {
 				E handler = (E) h.get();
 				if (handler != null) {
 					if (h.allocateFor(event)) {
-						if (invoke(event, handler) == Boolean.TRUE)
-							c++;
+						T hres = invoke(event, handler);
+						if (aggregator != null)
+							res = res == null ? hres : aggregator.apply(res, hres);
 						h.free();
 					} else {
 						retry.addLast(h);
@@ -259,7 +264,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 				}
 			}
 		}
-		return c;
+		return res;
 	}
 
 	private static <E, T> void ensureNoTimeout(Event<E, T> event) throws EventException {
@@ -279,12 +284,12 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	static class ProxyEventHandler<E> implements InvocationHandler {
 
 		final Class<E> event;
-		final EventPreferences properties;
+		final EventPreferences prefs;
 		final EventProcessor processor;
 
-		public ProxyEventHandler(Class<E> event, EventPreferences properties, EventProcessor processor) {
+		public ProxyEventHandler(Class<E> event, EventPreferences prefs, EventProcessor processor) {
 			this.event = event;
-			this.properties = properties;
+			this.prefs = prefs;
 			this.processor = processor;
 		}
 
@@ -296,7 +301,17 @@ public class ConcurrentEventProcessor implements EventProcessor {
 		@SuppressWarnings("unchecked")
 		private <T> Object invoke(Method method, Object[] args, Type<T> result) throws Throwable {
 			Class<T> raw = result.rawType;
-			Event<E, T> e = new Event<>(event, properties, result, method, args);
+			BinaryOperator<T> aggregator = args != null && args.length > 0 && args[args.length-1] != null
+					&& BinaryOperator.class.isAssignableFrom(args.getClass()) 
+					? (BinaryOperator<T>) args[args.length-1] : null;
+			if (aggregator == null) {
+				if (raw == boolean.class || raw == Boolean.class) {
+					aggregator = (BinaryOperator<T>)((BinaryOperator<Boolean>)(a,b) -> a || b);
+				} else if (raw == int.class || raw == Integer.class) {
+					aggregator = (BinaryOperator<T>)((BinaryOperator<Integer>)(a,b) -> a + b);
+				}
+			}
+			Event<E, T> e = new Event<>(event, prefs, result, method, args, aggregator);
 			if (e.returnsVoid()) {
 				processor.dispatch((Event<E, Void>)e);
 				return null;

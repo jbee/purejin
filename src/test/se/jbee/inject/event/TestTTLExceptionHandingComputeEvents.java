@@ -133,7 +133,7 @@ public class TestTTLExceptionHandingComputeEvents {
 	private void assertThrowsEventExceptionCausedByTimeout(Callable<Boolean> f) {
 		handler.slowMethodReturnsFuture(); // blocks the single thread for 20ms
 		try {
-			assertFalse("should throw exception", f.call());
+			assertFalse("should throw EventException ", f.call());
 		} catch (EventException e) {
 			assertSame(TimeoutException.class, e.getCause().getClass());
 		} catch (Exception e) {
@@ -145,7 +145,7 @@ public class TestTTLExceptionHandingComputeEvents {
 		assertNotNull(service);
 		handler.slowMethodReturnsFuture(); // blocks the single thread for 20ms
 		try {
-			assertFalse("should throw exception", f.call());
+			assertFalse("should throw TimeoutException", f.call());
 		} catch (Exception e) {
 			assertSame(TimeoutException.class, e.getClass());
 		}

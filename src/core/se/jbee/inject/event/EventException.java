@@ -25,9 +25,9 @@ public final class EventException extends RuntimeException {
 	 * @param func the function that may throw an {@link Exception}
 	 * @return the functions value
 	 * @throws Throwable This is either the exception thrown by the hander method or
-	 *                   an {@link EventException} in case the problem was not
-	 *                   within the handler method but a problem of processing the
-	 *                   event in the {@link EventProcessor}.
+	 *     an {@link EventException} in case the problem was not within the handler
+	 *     method but a problem of processing the event in the
+	 *     {@link EventProcessor}.
 	 */
 	public static <T> T unwrap(Event<?, ? extends T> event, Callable<T> func) throws Throwable {
 		try {
