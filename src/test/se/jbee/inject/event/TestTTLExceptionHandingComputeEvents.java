@@ -36,9 +36,9 @@ import se.jbee.inject.bootstrap.Bootstrap;
  * {@link TimeoutException}.
  * 
  * The tests simulate timeout by implementing all {@link Handler} methods with
- * {@link Thread#sleep(long)} of 20ms and using a {@link ExecutorService} with a
+ * {@link Thread#sleep(long)} of 40ms and using a {@link ExecutorService} with a
  * single thread. Thereby a already running event will stop further processing
- * of other events for about 20ms. This gives a window in which further added
+ * of other events for about 40ms. This gives a window in which further added
  * events (calls) can time out. The TTL is set to just 5ms which causes every
  * second call to time out.
  */
@@ -80,7 +80,7 @@ public class TestTTLExceptionHandingComputeEvents {
 
 		private static boolean beSlow() {
 			try {
-				Thread.sleep(20);
+				Thread.sleep(40);
 				return true;
 			} catch (InterruptedException e) {
 				return false;
@@ -131,7 +131,8 @@ public class TestTTLExceptionHandingComputeEvents {
 	}
 	
 	private void assertThrowsEventExceptionCausedByTimeout(Callable<Boolean> f) {
-		handler.slowMethodReturnsFuture(); // blocks the single thread for 20ms
+		assertNotNull(service);
+		blockProcessorWithTask();
 		try {
 			assertFalse("should throw EventException ", f.call());
 		} catch (EventException e) {
@@ -143,11 +144,19 @@ public class TestTTLExceptionHandingComputeEvents {
 	
 	private void assertThrowsTimeoutException(Callable<Boolean> f) {
 		assertNotNull(service);
-		handler.slowMethodReturnsFuture(); // blocks the single thread for 20ms
+		blockProcessorWithTask();
 		try {
 			assertFalse("should throw TimeoutException", f.call());
 		} catch (Exception e) {
 			assertSame(TimeoutException.class, e.getClass());
 		}
+	}
+
+	private void blockProcessorWithTask() {
+		try {
+			Thread.sleep(20); // make sure the task really get started before we add the 2nd one
+		} catch (InterruptedException e1) {
+		}
+		handler.slowMethodReturnsFuture(); // blocks the single thread for 20ms
 	}
 }

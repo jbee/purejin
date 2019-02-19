@@ -234,9 +234,9 @@ public class ConcurrentEventProcessor implements EventProcessor {
 			E handler = (E) h.get();
 			if (handler != null) {
 				if (h.allocateFor(event)) {
-					T hres = invoke(event, handler);
+					T res1 = invoke(event, handler);
 					if (aggregator != null)
-						res = res == null ? hres : aggregator.apply(res, hres);
+						res = res == null ? res1 : aggregator.apply(res, res1);
 					h.free();
 				} else {
 					if (retry == null)
@@ -254,9 +254,9 @@ public class ConcurrentEventProcessor implements EventProcessor {
 				E handler = (E) h.get();
 				if (handler != null) {
 					if (h.allocateFor(event)) {
-						T hres = invoke(event, handler);
+						T res1 = invoke(event, handler);
 						if (aggregator != null)
-							res = res == null ? hres : aggregator.apply(res, hres);
+							res = res == null ? res1 : aggregator.apply(res, res1);
 						h.free();
 					} else {
 						retry.addLast(h);
