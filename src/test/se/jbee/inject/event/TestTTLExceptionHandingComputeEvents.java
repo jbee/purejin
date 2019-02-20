@@ -153,10 +153,10 @@ public class TestTTLExceptionHandingComputeEvents {
 	}
 
 	private void blockProcessorWithTask() {
+		handler.slowMethodReturnsFuture(); // blocks the single thread for 20ms
 		try {
 			Thread.sleep(20); // make sure the task really get started before we add the 2nd one
 		} catch (InterruptedException e1) {
 		}
-		handler.slowMethodReturnsFuture(); // blocks the single thread for 20ms
 	}
 }
