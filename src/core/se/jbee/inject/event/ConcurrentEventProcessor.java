@@ -301,17 +301,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 		@SuppressWarnings("unchecked")
 		private <T> Object invoke(Method method, Object[] args, Type<T> result) throws Throwable {
 			Class<T> raw = result.rawType;
-			BinaryOperator<T> aggregator = args != null && args.length > 0 && args[args.length-1] != null
-					&& BinaryOperator.class.isAssignableFrom(args.getClass()) 
-					? (BinaryOperator<T>) args[args.length-1] : null;
-			if (aggregator == null) {
-				if (raw == boolean.class || raw == Boolean.class) {
-					aggregator = (BinaryOperator<T>)((BinaryOperator<Boolean>)(a,b) -> a || b);
-				} else if (raw == int.class || raw == Integer.class) {
-					aggregator = (BinaryOperator<T>)((BinaryOperator<Integer>)(a,b) -> a + b);
-				}
-			}
-			Event<E, T> e = new Event<>(event, prefs, result, method, args, aggregator);
+			Event<E, T> e = new Event<>(event, prefs, result, method, args, defaultAggregator(raw, args));
 			if (e.returnsVoid()) {
 				processor.dispatch((Event<E, Void>)e);
 				return null;
@@ -321,6 +311,24 @@ public class ConcurrentEventProcessor implements EventProcessor {
 			}
 			return processor.compute(e);
 		}
-		
+
+		@SuppressWarnings("unchecked")
+		private static <T> BinaryOperator<T> defaultAggregator(Class<T> raw, Object[] args) {
+			BinaryOperator<T> aggregator = args != null 
+					&& args.length > 0 && args[args.length - 1] != null
+					&& BinaryOperator.class.isAssignableFrom(args.getClass())
+							? (BinaryOperator<T>) args[args.length - 1]
+							: null;
+			if (aggregator != null)
+				return aggregator;
+			if (raw == boolean.class || raw == Boolean.class) {
+				return (BinaryOperator<T>) ((BinaryOperator<Boolean>) (a, b) -> a || b);
+			}
+			if (raw == int.class || raw == Integer.class) {
+				return (BinaryOperator<T>) ((BinaryOperator<Integer>) (a, b) -> a + b);
+			}
+			return null;
+		}
+
 	}
 }

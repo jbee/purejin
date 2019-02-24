@@ -6,7 +6,7 @@
 package se.jbee.inject;
 
 /**
- * A {@link Generator} creates the instance(s) for the generators {@link Specification}.
+ * A {@link Generator} creates the instance(s) for the generators {@link InjectionCase}.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */

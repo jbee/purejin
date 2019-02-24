@@ -152,7 +152,7 @@ public class TestNonConcurrentVoidMultiDispatchEvents {
 	 * expected events.
 	 */
 	private static void giveSomeTime() throws InterruptedException {
-		Thread.sleep(100);
+		Thread.sleep(40);
 	}
 	
 	private static void notifyAll(Service a) {

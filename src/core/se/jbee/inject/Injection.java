@@ -8,7 +8,7 @@ package se.jbee.inject;
 import java.io.Serializable;
 
 /**
- * Describes a "stack-frame" within the injection process.
+ * Describes a "stack-frame" or "layer" within the injection process.
  *
  * @author Jan Bernitt (jan@jbee.se)
  */

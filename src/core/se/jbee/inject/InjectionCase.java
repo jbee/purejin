@@ -8,12 +8,15 @@ package se.jbee.inject;
 import static se.jbee.inject.Instance.compareApplicability;
 
 /**
- * The data part of a {@link Generator}.
- *
+ * A {@link InjectionCase} describes a injection situation through its
+ * {@link #resource} and {@link #scoping}. If the {@link InjectionCase} applies to a
+ * actual situation its {@link #generator} is used to create the instance
+ * injected should it not exist already.
+ * 
  * @param <T> type of instances yielded by the {@link #generator}.
  */
-public final class Specification<T> implements Comparable<Specification<?>>, 
-	MoreApplicableThan<Specification<?>> {
+public final class InjectionCase<T> implements Comparable<InjectionCase<?>>, 
+	MoreApplicableThan<InjectionCase<?>> {
 
 	public final Generator<T> generator;
 	
@@ -39,7 +42,7 @@ public final class Specification<T> implements Comparable<Specification<?>>,
 	 */
 	public final int serialID;
 
-	public Specification(int serialID, Source source, Scoping scoping, Resource<T> resource, Generator<T> generator) {
+	public InjectionCase(int serialID, Source source, Scoping scoping, Resource<T> resource, Generator<T> generator) {
 		this.generator = generator;
 		this.resource = resource;
 		this.source = source;
@@ -53,7 +56,7 @@ public final class Specification<T> implements Comparable<Specification<?>>,
 	}
 	
 	@Override
-	public int compareTo(Specification<?> other) {
+	public int compareTo(InjectionCase<?> other) {
 		Resource<?> r1 = resource;
 		Resource<?> r2 = other.resource;
 		Class<?> c1 = r1.type().rawType;
@@ -69,7 +72,7 @@ public final class Specification<T> implements Comparable<Specification<?>>,
 	}
 	
 	@Override
-	public boolean moreApplicableThan(Specification<?> other) {
+	public boolean moreApplicableThan(InjectionCase<?> other) {
 		return resource.moreApplicableThan(other.resource);
 	}
 }

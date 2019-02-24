@@ -26,8 +26,7 @@ import java.util.List;
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
-public abstract class UnresolvableDependency
-		extends RuntimeException {
+public abstract class UnresolvableDependency extends RuntimeException {
 
 	protected UnresolvableDependency( String message ) {
 		super( message );
@@ -75,7 +74,7 @@ public abstract class UnresolvableDependency
 	public static final class NoResourceForDependency
 			extends UnresolvableDependency {
 
-		public <T> NoResourceForDependency( Dependency<T> dependency, Specification<T>[] available, String msg ) {
+		public <T> NoResourceForDependency( Dependency<T> dependency, InjectionCase<T>[] available, String msg ) {
 			super( "No resource for dependency:\n" + dependency + "\navailable are (for same raw type): "
 					+ describe( available ) + "\n"
 					+ msg);
@@ -86,13 +85,13 @@ public abstract class UnresolvableDependency
 		}
 	}
 
-	public static String describe( Specification<?>... specs ) {
-		if ( specs == null || specs.length == 0 ) {
+	public static String describe( InjectionCase<?>... cases ) {
+		if ( cases == null || cases.length == 0 ) {
 			return "none";
 		}
 		StringBuilder b = new StringBuilder();
-		for ( Specification<?> spec : specs ) {
-			b.append( '\n' ).append( spec.resource.toString() ).append( " defined " ).append( spec.source );
+		for ( InjectionCase<?> c : cases ) {
+			b.append( '\n' ).append( c.resource.toString() ).append( " defined " ).append( c.source );
 		}
 		return b.toString();
 	}

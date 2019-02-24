@@ -6,7 +6,7 @@ import static org.junit.Assert.fail;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.container.Scoped.INJECTION;
-import static se.jbee.inject.container.Typecast.specsTypeOf;
+import static se.jbee.inject.container.Typecast.injectionCasesTypeFor;
 
 import java.beans.ConstructorProperties;
 
@@ -19,7 +19,7 @@ import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Name;
 import se.jbee.inject.Resource;
-import se.jbee.inject.Specification;
+import se.jbee.inject.InjectionCase;
 import se.jbee.inject.UnresolvableDependency.DependencyCycle;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
@@ -250,13 +250,13 @@ public class TestBootstrapper {
 	public void thatBindingsAreReplacedByMorePreciseOnes() {
 		Injector injector = Bootstrap.injector( ReplacingBindsModule.class );
 		assertEquals( 6, injector.resolve( Number.class ));
-		Specification<?>[] specs = injector.resolve( Specification[].class );
-		assertEquals( 7, specs.length ); // 3x Comparable, Float, Double, Integer and Number (3x Serializable has been nullified)
-		Specification<Number>[] numberSpecs = injector.resolve( specsTypeOf( Number.class ) );
-		assertEquals( 1, numberSpecs.length );
+		InjectionCase<?>[] cases = injector.resolve( InjectionCase[].class );
+		assertEquals( 7, cases.length ); // 3x Comparable, Float, Double, Integer and Number (3x Serializable has been nullified)
+		InjectionCase<Number>[] casesForNumber = injector.resolve( injectionCasesTypeFor( Number.class ) );
+		assertEquals( 1, casesForNumber.length );
 		@SuppressWarnings ( "rawtypes" )
-		Specification<Comparable>[] compareableSpecs = injector.resolve( specsTypeOf( Comparable.class ) );
-		assertEquals( 3, compareableSpecs.length );
+		InjectionCase<Comparable>[] casesForCompareable = injector.resolve( injectionCasesTypeFor( Comparable.class ) );
+		assertEquals( 3, casesForCompareable.length );
 	}
 
 	@Test

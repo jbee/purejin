@@ -9,7 +9,7 @@ import org.junit.runners.Suite.SuiteClasses;
 		TestSupplierBinds.class, TestInstanceBinds.class, TestPackageLocalisedBinds.class,
 		TestEditionFeatureBinds.class, TestOptionBinds.class, TestTargetedBinds.class, TestLoggerBinds.class,
 		TestRobotLegsProblemBinds.class, TestConstructorParameterBinds.class, TestDependencyParameterBinds.class,
-		TestScopedBinds.class, TestSpecificationBinds.class, TestProviderBinds.class, TestPrimitiveBinds.class,
+		TestScopedBinds.class, TestInjectionCaseBinds.class, TestProviderBinds.class, TestPrimitiveBinds.class,
 		TestInjectorExceptions.class, TestCollectionBinds.class, TestInspectorBinds.class, TestParentTargetBinds.class,
 		TestPresetModuleBinds.class, TestRequiredProvidedBinds.class, TestStateDependentBinds.class,
 		TestPrimitiveArrayBinds.class, TestMultipleOptionChoicesBinds.class, TestMacroBinds.class,

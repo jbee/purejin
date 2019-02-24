@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import se.jbee.inject.Provider;
-import se.jbee.inject.Specification;
+import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Type;
 
 /**
@@ -70,22 +70,22 @@ public final class Typecast {
 		return (Type) raw( Factory.class ).parametized( providedType );
 	}
 
-	public static <T> Type<Specification<T>> specTypeOf( Class<T> generatedType ) {
-		return specTypeOf( raw( generatedType ) );
+	public static <T> Type<InjectionCase<T>> injectionCaseTypeFor( Class<T> generatedType ) {
+		return injectionCaseTypeFor( raw( generatedType ) );
 	}
 
 	@SuppressWarnings ( { "unchecked", "rawtypes" } )
-	public static <T> Type<Specification<T>> specTypeOf( Type<T> generatorType ) {
-		return (Type) raw( Specification.class ).parametized( generatorType );
+	public static <T> Type<InjectionCase<T>> injectionCaseTypeFor( Type<T> generatorType ) {
+		return (Type) raw( InjectionCase.class ).parametized( generatorType );
 	}
 
-	public static <T> Type<Specification<T>[]> specsTypeOf( Class<T> generatedType ) {
-		return specsTypeOf( raw( generatedType ) );
+	public static <T> Type<InjectionCase<T>[]> injectionCasesTypeFor( Class<T> generatedType ) {
+		return injectionCasesTypeFor( raw( generatedType ) );
 	}
 
 	@SuppressWarnings ( { "unchecked", "rawtypes" } )
-	public static <T> Type<Specification<T>[]> specsTypeOf( Type<T> generatedType ) {
-		return (Type) raw( Specification[].class ).parametized( generatedType );
+	public static <T> Type<InjectionCase<T>[]> injectionCasesTypeFor( Type<T> generatedType ) {
+		return (Type) raw( InjectionCase[].class ).parametized( generatedType );
 	}
 	
 	@SuppressWarnings ( { "unchecked", "rawtypes" } )

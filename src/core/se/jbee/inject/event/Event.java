@@ -24,6 +24,11 @@ public final class Event<E, T> {
 	public final Type<T> result;
 	public final Method handler;
 	public final Object[] args;
+	/**
+	 * The function used to aggregate multiple values if a computation is dispatched
+	 * to more then one handler using
+	 * {@link EventPreferences#isAggregatedMultiDispatch()}.
+	 */
 	public final BinaryOperator<T> aggregator;
 
 	public Event(Class<E> event, EventPreferences prefs, Type<T> result, 

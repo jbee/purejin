@@ -24,7 +24,7 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Provider;
-import se.jbee.inject.Specification;
+import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
@@ -328,18 +328,18 @@ public final class Supply {
 	private static final class LazyPreresolvedProvider<T> implements Provider<T> {
 
 		private final Dependency<T> dependency;
-		private final Specification<? extends T> spec;
+		private final InjectionCase<? extends T> icase;
 
 		@SuppressWarnings("unchecked")
 		LazyPreresolvedProvider( Dependency<T> dependency, Injector injector ) {
 			this.dependency = dependency;
-			this.spec = injector.resolve(
-					dependency.typed(raw(Specification.class).parametized(dependency.type())));
+			this.icase = injector.resolve(
+					dependency.typed(raw(InjectionCase.class).parametized(dependency.type())));
 		}
 
 		@Override
 		public T provide() {
-			return spec.generator.instanceFor(dependency);
+			return icase.generator.instanceFor(dependency);
 		}
 
 		@Override
@@ -439,7 +439,7 @@ public final class Supply {
 
 		@SuppressWarnings("unchecked")
 		private static <T> NoResourceForDependency required(Dependency<T> dependency) {
-			return new NoResourceForDependency(dependency, (Specification<T>[])new Specification<?>[0], "Should never be called!" );
+			return new NoResourceForDependency(dependency, new InjectionCase[0], "Should never be called!" );
 		}
 
 		@Override

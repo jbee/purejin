@@ -15,7 +15,7 @@ import se.jbee.inject.Generator;
 import se.jbee.inject.Provider;
 import se.jbee.inject.Repository;
 import se.jbee.inject.Scope;
-import se.jbee.inject.Specification;
+import se.jbee.inject.InjectionCase;
 import se.jbee.inject.UnresolvableDependency;
 
 /**
@@ -69,7 +69,7 @@ public final class Scoped {
 	/**
 	 * What is usually called a 'default'-{@link Scope} will ask the
 	 * {@link Provider} passed each time the
-	 * {@link Repository#serve(Dependency, Specification, Provider)}}-method is
+	 * {@link Repository#serve(Dependency, InjectionCase, Provider)}}-method is
 	 * invoked.
 	 *
 	 * The {@link Scope} is also used as {@link Repository} instance since both

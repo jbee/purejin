@@ -55,7 +55,10 @@ public final class EventPreferences implements Serializable {
 	 * So any threading issue within any of the methods can be avoided by setting
 	 * this to 1 which assures isolation across *all* methods of the event
 	 * interface. That means if any thread calls any of the methods no other method
-	 * will be called until the call is complete.
+	 * will be called until the call is complete. The effect is as if all method
+	 * would have been marked {@code synchronized}. However, this is only true as
+	 * long as the user does not manually call the implementation methods as only
+	 * the calls made by the {@link EventProcessor} will be coordinated.
 	 */
 	public final int maxConcurrentUsage;
 	

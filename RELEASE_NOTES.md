@@ -6,46 +6,56 @@ v19.1 (upcoming)
 > Mechanics of Scope/Scoping as well as Injectrons were refined.
 > Initialisers were added.
 
+**General Notes**
 - changed versioning from _major.minor_ to _year.serial_ (e.g. 19.1 is the first in 2019)
+
+**Additions**
+- added `Serializable` to `Type`, `Name`, `Instance`, `Instances`, `Packages`, 
+  `Target`, `Resource`, `Source`, `Scoping`, `Injection`, `Dependency`
+- `Source` implements `equals` and `hashCode`  
+- added `initbind` and `Initialiser`s (run code when container is ready)
+- added `init` utility methods to link instances during initialisation
+- added `Binder.into( Class<?> pluginPoint, String property )` (more control)
+- added `toString` for `InjectronInfo` and `Injectron` implementation
+- added `Resource#toDependency` method
+- added `Injector.resolve` `default` methods for convenience
+- added `to` for `java.util.function.Supplier` (method references)
+- added `Name.pluginFor` factory method
+- added `SingletonScope` to mark singleton `Scope` implementations
+
+**API changes**
 - renamed class `Assembly` to `Injectee`
-- redesign of `Injectron`/`InjectronInfo` to `Specification`/`Generator`
+- redesign of `Injectron`/`InjectronInfo` to `Generator` and `InjectionCase`
 - renamed class and method `MorePreciseThan#morePreciseThan` to `MoreApplicableThan#moreApplicableThan`
 - replaced `Expiry` with `Scoping` concept that is based on `Scope`  
 - renamed field `Injection#expiry` to `Injection#scoping`
 - renamed method `Injection#ignoredExpiry()` to `Injection#ignoredScoping()`
 - renamed field `InjectronInfo#expiry` to `InjectronInfo#scoping`
-- added `Serializable` to `Type`, `Name`, `Instance`, `Instances`, `Packages`, 
-  `Target`, `Resource`, `Source`, `Scoping`, `Injection`, `Dependency`
-- `Source` implements `equals` and `hashCode`  
+- renamed `Array.of` to `Array.array`
 - moved `Supplier` into `container` package (was wrongly located in main API)
 - moved `Scope`, `Repository` and `Provider` into root package `se.jbee.inject`
-- added `SingletonScope` to mark singleton `Scope` implementations
-- fixed `Type` `equals`/`equalTo` now considers `upperBound` flag
-- fixed wild-card array dependencies are honoured in presents of same raw type bounds
-- fixed implicit `construct` for plugin class now only done if class is constructible
-- fixed `Class`es are now also considered `Metaclass#undeterminable`
-- fixed NPE when trying to resolve `Injectron[]` for unbound type 
-- fixed `toString()` of dependency instance scope that wrongly stated `per-dependency-type`
-- improved `DefaultInjector`, composed arrays contain instances only once
-- added `initbind` and `Initialiser`s (run code when container is ready)
-- added `init` utility methods to link instances during initialisation
-- macros are now replaced when defined for same type (no behaviour change)
-- supplied constant are now expanded via macros as `BoundConstant`
-- improved explicit `BoundConstant`s implicitly bind to constant's actual type too
-- improved value objects in `se.jbee.inject` that implement `equalTo` also
-  implement `equals` and `hashCode` (for convenience, no library requirement)
 - moved `Invoke` static methods to `Supply`
+- plug-ins use `bind` instead of `multibind` (was unnecessary)
+- `Dependency.pluginsFor` no longer uses `parametizedAsUpperBounds`
+- value objects in `se.jbee.inject` that implement `equalTo` also
+  implement `equals` and `hashCode` (for convenience, no library requirement)
+
+**Fixes**
+- `Type` `equals`/`equalTo` now considers `upperBound` flag
+- wild-card array dependencies are honoured in presents of same raw type bounds
+- implicit `construct(...)` for plugin class now only done if class is constructible
+- `Class.class` is now also considered `Metaclass#undeterminable`
+- fixed NPE when trying to resolve `InjectionCase[]` for unbound type 
+- fixed `toString()` of dependency instance scope that wrongly stated `per-dependency-type`
+
+**Improvements**
+- arrays composed by `InjectorImpl` contain instances only once in any case
+- macros are now replaced when defined for same type (no behaviour change)
+- supplied constants are now expanded via macros as `BoundConstant`
+- explicit `BoundConstant`s implicitly bind to constant's actual type too
 - improved `PresetModule` now also supplies the `Presets` itself
-- added `to` for JDK 8 `Supplier` (method references)
-- added `Injector.resolve` `default` methods for convenience
-- renamed `Array.of` to `Array.array`
-- added `Name.pluginFor` factory method
-- changed plug-ins use `bind` instead of `multibind` (was unnecessary)
-- changed `Dependency.pluginsFor` no longer uses `parametizedAsUpperBounds`
-- added `Binder.into( Class<?> pluginPoint, String property )` (more control)
-- added `toString` for `InjectronInfo` and `Injectron` implementation
-- added `Resource#toDependency` method
 - `Action` metadata uses concurrent maps instead of `synchronized` blocks
+
 
 v0.10
 ==============

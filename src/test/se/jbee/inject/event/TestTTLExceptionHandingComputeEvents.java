@@ -109,7 +109,6 @@ public class TestTTLExceptionHandingComputeEvents {
 		assertThrowsTimeoutException(() ->  handler.slowMethodThatThrowsException());
 	}
 	
-	//TODO flaky test
 	@Test
 	public void thatTimeoutExceptionIsThrownIfHandlerMethodThrowsTimeoutException() {
 		assertThrowsTimeoutException(() -> handler.slowMethodThatThrowsTineoutException());
@@ -155,7 +154,7 @@ public class TestTTLExceptionHandingComputeEvents {
 	private void blockProcessorWithTask() {
 		handler.slowMethodReturnsFuture(); // blocks the single thread for 20ms
 		try {
-			Thread.sleep(20); // make sure the task really get started before we add the 2nd one
+			Thread.sleep(20); // make sure the task really gets started before we add the 2nd one
 		} catch (InterruptedException e1) {
 		}
 	}

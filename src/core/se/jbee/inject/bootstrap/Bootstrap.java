@@ -20,7 +20,7 @@ import java.util.Set;
 
 import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.Injector;
-import se.jbee.inject.Specification;
+import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Type;
 import se.jbee.inject.config.Globals;
 import se.jbee.inject.config.Options;
@@ -67,15 +67,15 @@ public final class Bootstrap {
 	}
 
 	public static void eagerSingletons( Injector injector ) {
-		for ( Specification<?> spec : injector.resolve( Specification[].class ) ) {
-			if ( spec.scoping.isStableByDesign() ) {
-				instance( spec ); // instantiate to make sure they exist in repository
+		for ( InjectionCase<?> icase : injector.resolve( InjectionCase[].class ) ) {
+			if ( icase.scoping.isStableByDesign() ) {
+				instance( icase ); // instantiate to make sure they exist in repository
 			}
 		}
 	}
 
-	public static <T> T instance( Specification<T> spec ) {
-		return spec.generator.instanceFor(spec.resource.toDependency());
+	public static <T> T instance( InjectionCase<T> icase ) {
+		return icase.generator.instanceFor(icase.resource.toDependency());
 	}
 
 	public static void nonnullThrowsReentranceException( Object field ) {
