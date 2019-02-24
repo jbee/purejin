@@ -8,8 +8,8 @@ package se.jbee.inject.bootstrap;
 /**
  * A bundle installs sub-bundles and {@link Module}s.
  * 
- * All {@link Bundle}s are real singletons. A bundle means you get X without a when or but. X all
- * the time.
+ * All {@link Bundle}s are real singletons. A bundle means you get X without a
+ * when or but. X all the time.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
@@ -17,8 +17,8 @@ package se.jbee.inject.bootstrap;
 public interface Bundle {
 
 	/**
-	 * @param bootstrap
-	 *            The {@link Bootstrapper} this {@link Bundle} should install itself to.
+	 * @param bootstrap The {@link Bootstrapper} this {@link Bundle} should
+	 *            install itself to.
 	 */
-	void bootstrap( Bootstrapper bootstrap );
+	void bootstrap(Bootstrapper bootstrap);
 }

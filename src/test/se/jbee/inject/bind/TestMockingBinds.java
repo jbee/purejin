@@ -53,11 +53,13 @@ public class TestMockingBinds {
 			mockAnyUnbound(EventListener.class);
 			mockAnyUnbound(Shape.class);
 			// bind some values returned from mock methods
-			within(Mock.class).bind(anyOf(Rectangle.class)).to(new Rectangle(0, 0, 42, 42));
+			within(Mock.class).bind(anyOf(Rectangle.class)).to(
+					new Rectangle(0, 0, 42, 42));
 		}
 
 		/**
-		 * The unbound types mocks are limited to interfaces in this example implementation.
+		 * The unbound types mocks are limited to interfaces in this example
+		 * implementation.
 		 */
 		private <B> void mockAnyUnbound(Class<? super B> base) {
 			// type safety is essentially gone here as wild-card binds work the other way around:
@@ -75,7 +77,7 @@ public class TestMockingBinds {
 	 * be used to build "rich" mocks that have a common interface to
 	 * check/verify mock interaction.
 	 */
-    interface Mock {
+	interface Mock {
 
 		/**
 		 * Here the mocks just count invocations but this could be as
@@ -98,11 +100,13 @@ public class TestMockingBinds {
 
 		@SuppressWarnings("unchecked")
 		@Override
-		public T supply(Dependency<? super T> dep, Injector injector) throws UnresolvableDependency {
+		public T supply(Dependency<? super T> dep, Injector injector)
+				throws UnresolvableDependency {
 			Type<? super T> type = dep.type();
 			if (!type.isInterface() || type.isUpperBound())
 				throw new UnresolvableDependency.NoMethodForDependency(type);
-			InvocationHandler handler = new MockInvocationHandler(base, injector);
+			InvocationHandler handler = new MockInvocationHandler(base,
+					injector);
 			ClassLoader cl = type.getClass().getClassLoader();
 			Class<?>[] interfaces = new Class[] { Mock.class, type.rawType };
 			return (T) Proxy.newProxyInstance(cl, interfaces, handler);
@@ -121,7 +125,8 @@ public class TestMockingBinds {
 		}
 
 		@Override
-		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+		public Object invoke(Object proxy, Method method, Object[] args)
+				throws Throwable {
 			if (method.getDeclaringClass() == Mock.class) {
 				return timesInvoked;
 			}
@@ -130,10 +135,13 @@ public class TestMockingBinds {
 			}
 			++timesInvoked;
 			try {
-				Name name = named(method.getDeclaringClass().getCanonicalName()+"#"+method.getName());
-				Dependency<?> dependency = dependency(instance(name, returnType(method)));
+				Name name = named(method.getDeclaringClass().getCanonicalName()
+					+ "#" + method.getName());
+				Dependency<?> dependency = dependency(
+						instance(name, returnType(method)));
 				// this hierarchy is used to allow bindings meant for mocks without risk of collisions
-				dependency = dependency.injectingInto(Mock.class).injectingInto(method.getDeclaringClass()).ignoredExpiry();
+				dependency = dependency.injectingInto(Mock.class).injectingInto(
+						method.getDeclaringClass()).ignoredExpiry();
 				return injector.resolve(dependency);
 			} catch (UnresolvableDependency e) {
 				Class<?> rt = method.getReturnType();

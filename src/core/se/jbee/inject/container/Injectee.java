@@ -36,11 +36,11 @@ import se.jbee.inject.Source;
 public interface Injectee<T> {
 
 	Source source();
-	
+
 	Scope scope();
 
 	Resource<T> resource();
-	
+
 	Supplier<? extends T> supplier();
-	
+
 }

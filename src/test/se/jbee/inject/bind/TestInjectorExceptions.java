@@ -11,27 +11,27 @@ import se.jbee.inject.bootstrap.Bootstrap;
 
 public class TestInjectorExceptions {
 
-	private static class TestInjectorBundle
-			extends BinderModule {
+	private static class TestInjectorBundle extends BinderModule {
 
 		@Override
 		protected void declare() {
-			bind( named( "foo" ), Integer.class ).to( 7 );
-			bind( named( "bar" ), Integer.class ).to( 8 );
+			bind(named("foo"), Integer.class).to(7);
+			bind(named("bar"), Integer.class).to(8);
 		}
 
 	}
 
-	private final Injector injector = Bootstrap.injector( TestInjectorBundle.class );
+	private final Injector injector = Bootstrap.injector(
+			TestInjectorBundle.class);
 
-	@Test ( expected = NoResourceForDependency.class )
+	@Test(expected = NoResourceForDependency.class)
 	public void thatExceptionIsThrownWhenResolvingAnUnboundDependency() {
-		injector.resolve( String.class );
+		injector.resolve(String.class);
 	}
 
-	@Test ( expected = NoResourceForDependency.class )
+	@Test(expected = NoResourceForDependency.class)
 	public void thatExceptionIsThrownWhenResolvingAnUnboundDependencyWithBoundRawType() {
-		injector.resolve( Name.DEFAULT, Integer.class );
+		injector.resolve(Name.DEFAULT, Integer.class);
 	}
 
 }

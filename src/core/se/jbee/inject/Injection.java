@@ -18,7 +18,8 @@ public final class Injection implements Serializable {
 	public final Resource<?> target;
 	public final Scoping scoping;
 
-	public Injection(Instance<?> dependency, Resource<?> target, Scoping scoping) {
+	public Injection(Instance<?> dependency, Resource<?> target,
+			Scoping scoping) {
 		this.dependency = dependency;
 		this.target = target;
 		this.scoping = scoping;
@@ -34,17 +35,17 @@ public final class Injection implements Serializable {
 		return dependency.hashCode() ^ target.hashCode();
 	}
 
-	public boolean equalTo( Injection other ) {
-		return this == other || dependency.equalTo( other.dependency )
-				&& target.equalTo( other.target );
+	public boolean equalTo(Injection other) {
+		return this == other || dependency.equalTo(other.dependency)
+			&& target.equalTo(other.target);
 	}
 
 	@Override
 	public String toString() {
-		return dependency + " for " + target+" ?";
+		return dependency + " for " + target + " ?";
 	}
 
 	public Injection ignoredScoping() {
-		return new Injection( dependency, target, Scoping.IGNORE );
+		return new Injection(dependency, target, Scoping.IGNORE);
 	}
 }

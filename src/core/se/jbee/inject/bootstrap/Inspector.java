@@ -15,36 +15,38 @@ import se.jbee.inject.Parameter;
 import se.jbee.inject.bind.Binder;
 
 /**
- * A strategy to extract missing information from types that is used within the {@link Binder} to
- * allow semi-automatic bindings.
+ * A strategy to extract missing information from types that is used within the
+ * {@link Binder} to allow semi-automatic bindings.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
 public interface Inspector {
 
 	/**
-	 * Picks the {@link Constructor} to use to construct objects of a given {@link Class}.
+	 * Picks the {@link Constructor} to use to construct objects of a given
+	 * {@link Class}.
 	 * 
-	 * @return The {@link Constructor} considered to be the reasonable or right way to construct a
-	 *         object of the given type. In case one with parameters is returned the process will
-	 *         try to resolve them.
+	 * @return The {@link Constructor} considered to be the reasonable or right
+	 *         way to construct a object of the given type. In case one with
+	 *         parameters is returned the process will try to resolve them.
 	 */
-	<T> Constructor<T> constructorFor( Class<T> type );
+	<T> Constructor<T> constructorFor(Class<T> type);
 
 	/**
-	 * @return The {@link Member}s that should be bound from the given implementor.
+	 * @return The {@link Member}s that should be bound from the given
+	 *         implementor.
 	 */
-	<T> Method[] methodsIn( Class<T> implementor );
+	<T> Method[] methodsIn(Class<T> implementor);
 
 	/**
-	 * @return The {@link Name} of the instance provided by the given object. Use
-	 *         {@link Name#DEFAULT} for no specific name.
+	 * @return The {@link Name} of the instance provided by the given object.
+	 *         Use {@link Name#DEFAULT} for no specific name.
 	 */
-	Name nameFor( AccessibleObject obj );
+	Name nameFor(AccessibleObject obj);
 
 	/**
-	 * @return The {@link Parameter} hints for the construction/invocation of the given object. Use
-	 *         a zero length array if there are no hits.
+	 * @return The {@link Parameter} hints for the construction/invocation of
+	 *         the given object. Use a zero length array if there are no hits.
 	 */
-	Parameter<?>[] parametersFor( AccessibleObject obj );
+	Parameter<?>[] parametersFor(AccessibleObject obj);
 }

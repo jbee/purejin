@@ -21,32 +21,32 @@ import se.jbee.inject.Scope.SingletonScope;
  */
 public final class Scoping implements Serializable {
 
-	public static final Scoping IGNORE = new Scoping( SingletonScope.class );
-	private static final Map<Class<? extends Scope>, Scoping> EXPIRY_BY_SCOPE 
-		= new ConcurrentHashMap<>(); 
+	public static final Scoping IGNORE = new Scoping(SingletonScope.class);
+	private static final Map<Class<? extends Scope>, Scoping> EXPIRY_BY_SCOPE = new ConcurrentHashMap<>();
 
 	public static Scoping scopingOf(Scope s) {
 		return scopingOf(s.getClass());
 	}
-	
+
 	public static Scoping scopingOf(Class<? extends Scope> s) {
 		return EXPIRY_BY_SCOPE.computeIfAbsent(s, k -> new Scoping(k));
 	}
-	
+
 	private final boolean stableByDesign;
 	private final Class<? extends Scope> scope;
 	private Class<? extends Scope>[] unstableInScopes;
 
 	@SafeVarargs
-	private Scoping(Class<? extends Scope> scope, Class<? extends Scope>... unstableInScopes) {
+	private Scoping(Class<? extends Scope> scope,
+			Class<? extends Scope>... unstableInScopes) {
 		this.stableByDesign = SingletonScope.class.isAssignableFrom(scope);
 		this.scope = scope;
 		this.unstableInScopes = unstableInScopes;
 	}
-	
+
 	/**
-	 * Declares the given parent {@link Scope} as less stable as this scope. This
-	 * means this {@link Scope} cannot be injected into the given parent
+	 * Declares the given parent {@link Scope} as less stable as this scope.
+	 * This means this {@link Scope} cannot be injected into the given parent
 	 * {@link Scope}.
 	 * 
 	 * @see #notStableIn(Class)
@@ -59,8 +59,8 @@ public final class Scoping implements Serializable {
 	}
 
 	/**
-	 * Declares the given parent {@link Scope} as less stable as this scope. This
-	 * means this {@link Scope} cannot be injected into the given parent
+	 * Declares the given parent {@link Scope} as less stable as this scope.
+	 * This means this {@link Scope} cannot be injected into the given parent
 	 * {@link Scope}.
 	 * 
 	 * @param parent another {@link Scope} type
@@ -70,15 +70,15 @@ public final class Scoping implements Serializable {
 		unstableInScopes = append(unstableInScopes, parent);
 		return this;
 	}
-	
-	public boolean equalTo( Scoping other ) {
+
+	public boolean equalTo(Scoping other) {
 		return scope == other.scope;
 	}
 
 	public boolean isStableIn(Scope parent) {
 		return isStableIn(scopingOf(parent));
 	}
-	
+
 	public boolean isStableIn(Scoping parent) {
 		if (isStable())
 			return true;
@@ -87,7 +87,7 @@ public final class Scoping implements Serializable {
 				return false;
 		return true;
 	}
-	
+
 	public boolean isStable() {
 		return unstableInScopes == null || unstableInScopes.length == 0;
 	}
@@ -100,7 +100,7 @@ public final class Scoping implements Serializable {
 	}
 
 	@Override
-	public boolean equals( Object obj ) {
+	public boolean equals(Object obj) {
 		return obj instanceof Scoping && equalTo((Scoping) obj);
 	}
 
@@ -115,9 +115,9 @@ public final class Scoping implements Serializable {
 
 	/**
 	 * @return {@code true} in case the {@link Scope} represented implements the
-	 *         {@link Scope.SingletonScope} interface which is a marker for scopes
-	 *         that create instances that, once created, exist throughout the
-	 *         life-span of the application.
+	 *         {@link Scope.SingletonScope} interface which is a marker for
+	 *         scopes that create instances that, once created, exist throughout
+	 *         the life-span of the application.
 	 */
 	public boolean isStableByDesign() {
 		return stableByDesign;

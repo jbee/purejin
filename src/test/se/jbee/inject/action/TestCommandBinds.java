@@ -13,12 +13,13 @@ import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.container.Supplier;
 
 /**
- * This test demonstrates that it is possible to have different higher level 'service' on top of
- * {@link Action}s.
+ * This test demonstrates that it is possible to have different higher level
+ * 'service' on top of {@link Action}s.
  *
- * While the {@link TestServiceBinds} shows how do build a generic service this test shows a simpler
- * version {@link Command} of such generic service having a fix return type. Thereby it is very well
- * possible to use different higher level services in the same time.
+ * While the {@link TestServiceBinds} shows how do build a generic service this
+ * test shows a simpler version {@link Command} of such generic service having a
+ * fix return type. Thereby it is very well possible to use different higher
+ * level services in the same time.
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
@@ -26,61 +27,62 @@ public class TestCommandBinds {
 
 	private interface Command<P> {
 
-		Long calc( P param );
+		Long calc(P param);
 	}
 
-	private static class CommandSupplier
-			implements Supplier<Command<?>> {
+	private static class CommandSupplier implements Supplier<Command<?>> {
 
 		@Override
-		public Command<?> supply( Dependency<? super Command<?>> dep, Injector injector ) {
-			return newCommand( injector.resolve( actionDependency(dep.type().parameter( 0 ), raw( Long.class )) ) );
+		public Command<?> supply(Dependency<? super Command<?>> dep,
+				Injector injector) {
+			return newCommand(injector.resolve(actionDependency(
+					dep.type().parameter(0), raw(Long.class))));
 		}
 
-		private static <P> Command<P> newCommand( Action<P, Long> service ) {
-			return new CommandToServiceMethodAdapter<>( service );
+		private static <P> Command<P> newCommand(Action<P, Long> service) {
+			return new CommandToServiceMethodAdapter<>(service);
 		}
 
-		static class CommandToServiceMethodAdapter<P>
-				implements Command<P> {
+		static class CommandToServiceMethodAdapter<P> implements Command<P> {
 
 			private final Action<P, Long> service;
 
-			CommandToServiceMethodAdapter( Action<P, Long> service ) {
+			CommandToServiceMethodAdapter(Action<P, Long> service) {
 				this.service = service;
 			}
 
 			@Override
-			public Long calc( P param ) {
-				return service.exec( param );
+			public Long calc(P param) {
+				return service.exec(param);
 			}
 
 		}
 	}
 
-	private static class CommandBindsModule
-			extends ActionModule {
+	private static class CommandBindsModule extends ActionModule {
 
 		@Override
 		protected void declare() {
-			bindActionsIn( MathService.class );
-			per( DEPENDENCY_TYPE ).starbind( Command.class ).toSupplier( CommandSupplier.class );
+			bindActionsIn(MathService.class);
+			per(DEPENDENCY_TYPE).starbind(Command.class).toSupplier(
+					CommandSupplier.class);
 		}
 
 	}
 
 	static class MathService {
 
-		Long square( Integer value ) {
+		Long square(Integer value) {
 			return value.longValue() * value;
 		}
 	}
 
 	@Test
 	public void thatServiceCanBeResolvedWhenHavingJustOneGeneric() {
-		Injector injector = Bootstrap.injector( CommandBindsModule.class );
-		@SuppressWarnings ( "unchecked" )
-		Command<Integer> square = injector.resolve(raw(Command.class).parametized(Integer.class));
-		assertEquals(  9L, square.calc( 3 ).longValue() );
+		Injector injector = Bootstrap.injector(CommandBindsModule.class);
+		@SuppressWarnings("unchecked")
+		Command<Integer> square = injector.resolve(
+				raw(Command.class).parametized(Integer.class));
+		assertEquals(9L, square.calc(3).longValue());
 	}
 }

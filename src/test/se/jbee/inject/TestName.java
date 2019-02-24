@@ -9,41 +9,41 @@ public class TestName {
 
 	@Test
 	public void exactSameNameShouldBeCompatible() {
-		assertTrue( named( "foo" ).isCompatibleWith( named( "foo" ) ) );
+		assertTrue(named("foo").isCompatibleWith(named("foo")));
 	}
 
 	@Test
 	public void wildcardShouldBeCompatibleToAnyName() {
-		assertTrue( named( "foo" ).isCompatibleWith( Name.ANY ) );
+		assertTrue(named("foo").isCompatibleWith(Name.ANY));
 	}
 
 	@Test
 	public void exactSameNameFollowedByWildcardShouldBeCompatible() {
-		assertTrue( named( "foo" ).isCompatibleWith( named( "foo*" ) ) );
+		assertTrue(named("foo").isCompatibleWith(named("foo*")));
 	}
 
 	@Test
 	public void letterFollwoedByWildcardShouldBeCompatible() {
-		assertTrue( named( "foo" ).isCompatibleWith( named( "f*" ) ) );
+		assertTrue(named("foo").isCompatibleWith(named("f*")));
 	}
 
 	@Test
 	public void startOfNameFollowedByWildcardShouldBeCompatible() {
-		assertTrue( named( "foo" ).isCompatibleWith( named( "fo*" ) ) );
+		assertTrue(named("foo").isCompatibleWith(named("fo*")));
 	}
 
 	@Test
 	public void defaultShouldBeCompatibleToAnyName() {
-		assertTrue( Name.DEFAULT.isCompatibleWith( Name.ANY ) );
+		assertTrue(Name.DEFAULT.isCompatibleWith(Name.ANY));
 	}
 
 	@Test
 	public void anyShouldBeCompatibleToDefaultName() {
-		assertTrue( Name.ANY.isCompatibleWith( Name.DEFAULT ) );
+		assertTrue(Name.ANY.isCompatibleWith(Name.DEFAULT));
 	}
 
 	@Test
 	public void anyShouldBeCompatibleToWhateverName() {
-		assertTrue( Name.ANY.isCompatibleWith( named( "foo" ) ) );
+		assertTrue(Name.ANY.isCompatibleWith(named("foo")));
 	}
 }

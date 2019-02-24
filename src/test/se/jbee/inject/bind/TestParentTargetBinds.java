@@ -10,20 +10,20 @@ import se.jbee.inject.container.Scoped;
 
 public class TestParentTargetBinds {
 
-	private static class ParentTargetBindsModule
-			extends BinderModule {
+	private static class ParentTargetBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			bind( String.class ).to( "everywhere" );
-			per( Scoped.TARGET_INSTANCE ).construct( Child.class );
-			injectingInto( Child.class ).bind( String.class ).to( "child" );
-			per( Scoped.TARGET_INSTANCE ).construct( Parent.class );
-			injectingInto( Child.class ).within( Parent.class ) //
-			.bind( String.class ).to( "child-with-parent" );
-			construct( Grandparent.class );
-			injectingInto( Child.class ).within( Parent.class ).within( Grandparent.class ) //
-			.bind( String.class ).to( "child-with-grandparent" );
+			bind(String.class).to("everywhere");
+			per(Scoped.TARGET_INSTANCE).construct(Child.class);
+			injectingInto(Child.class).bind(String.class).to("child");
+			per(Scoped.TARGET_INSTANCE).construct(Parent.class);
+			injectingInto(Child.class).within(Parent.class) //
+					.bind(String.class).to("child-with-parent");
+			construct(Grandparent.class);
+			injectingInto(Child.class).within(Parent.class).within(
+					Grandparent.class) //
+					.bind(String.class).to("child-with-grandparent");
 		}
 	}
 
@@ -31,7 +31,7 @@ public class TestParentTargetBinds {
 
 		final Parent parent;
 
-		private Grandparent( Parent parent ) {
+		private Grandparent(Parent parent) {
 			this.parent = parent;
 		}
 
@@ -41,7 +41,7 @@ public class TestParentTargetBinds {
 
 		final Child child;
 
-		private Parent( Child child ) {
+		private Parent(Child child) {
 			this.child = child;
 		}
 
@@ -51,19 +51,22 @@ public class TestParentTargetBinds {
 
 		final String value;
 
-		private Child( String value ) {
+		private Child(String value) {
 			this.value = value;
 		}
 
 	}
 
-	private final Injector injector = Bootstrap.injector( ParentTargetBindsModule.class );
+	private final Injector injector = Bootstrap.injector(
+			ParentTargetBindsModule.class);
 
 	@Test
 	public void thatBindWithParentTargetIsUsedWhenInjectionHasParent() {
-		assertEquals( "child-with-grandparent", injector.resolve( Grandparent.class ).parent.child.value );
-		assertEquals( "child-with-parent", injector.resolve( Parent.class ).child.value );
-		assertEquals( "child", injector.resolve( Child.class ).value );
+		assertEquals("child-with-grandparent",
+				injector.resolve(Grandparent.class).parent.child.value);
+		assertEquals("child-with-parent",
+				injector.resolve(Parent.class).child.value);
+		assertEquals("child", injector.resolve(Child.class).value);
 	}
 
 	/**
@@ -71,8 +74,8 @@ public class TestParentTargetBinds {
 	 */
 	@Test
 	public void thatBindWithParentTargetIsNotUsedWhenInjectionHasNoParent() {
-		assertEquals( "child", injector.resolve( Child.class ).value );
-		assertEquals( "everywhere", injector.resolve( String.class ) );
+		assertEquals("child", injector.resolve(Child.class).value);
+		assertEquals("everywhere", injector.resolve(String.class));
 	}
 
 }

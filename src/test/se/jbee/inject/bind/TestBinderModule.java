@@ -58,20 +58,26 @@ public class TestBinderModule {
 
 		assertEquals(4, bindings.length);
 
-		assertBinding(TestBinderModuleModule1.class, 1, EXPLICIT, forType(Integer.class, bindings));
-		assertBinding(TestBinderModuleModule1.class, 2, EXPLICIT, forType(String.class, bindings));
-		assertBinding(TestBinderModuleModule1.class, 3, EXPLICIT, forType(Float.class, bindings));
-		assertBinding(TestBinderModuleModule2.class, 1, EXPLICIT, forType(Double.class, bindings));
+		assertBinding(TestBinderModuleModule1.class, 1, EXPLICIT,
+				forType(Integer.class, bindings));
+		assertBinding(TestBinderModuleModule1.class, 2, EXPLICIT,
+				forType(String.class, bindings));
+		assertBinding(TestBinderModuleModule1.class, 3, EXPLICIT,
+				forType(Float.class, bindings));
+		assertBinding(TestBinderModuleModule2.class, 1, EXPLICIT,
+				forType(Double.class, bindings));
 	}
 
-	static void assertBinding(Class<? extends Module> module, int no, DeclarationType type, Binding<?> binding) {
-		assertEquals(module, binding.source.ident );
+	static void assertBinding(Class<? extends Module> module, int no,
+			DeclarationType type, Binding<?> binding) {
+		assertEquals(module, binding.source.ident);
 		assertEquals(no, binding.source.declarationNo);
 		assertEquals(type, binding.source.declarationType);
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <T> Binding<T> forType(Class<T> type, Binding<?>[] bindings) {
+	private static <T> Binding<T> forType(Class<T> type,
+			Binding<?>[] bindings) {
 		for (Binding<?> b : bindings) {
 			if (b.type().rawType == type)
 				return (Binding<T>) b;

@@ -13,9 +13,10 @@ public class TestTarget {
 
 	@Test
 	public void thatTargetInstancesNeedsToBeMatchedByDependencies() {
-		Target target = targeting( List.class );
-		Dependency<String> dependency = dependency( String.class );
-		assertFalse( target.isAvailableFor( dependency ) );
-		assertTrue( target.isAccessibleFor( dependency.injectingInto( List.class ) ) );
+		Target target = targeting(List.class);
+		Dependency<String> dependency = dependency(String.class);
+		assertFalse(target.isAvailableFor(dependency));
+		assertTrue(
+				target.isAccessibleFor(dependency.injectingInto(List.class)));
 	}
 }

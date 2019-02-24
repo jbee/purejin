@@ -17,8 +17,8 @@ import se.jbee.inject.bootstrap.Bootstrapper.OptionBootstrapper;
 public interface OptionBundle<O> {
 
 	/**
-	 * @param bootstrapper
-	 *            the {@link OptionBootstrapper} this bundle should install itself in.
+	 * @param bootstrapper the {@link OptionBootstrapper} this bundle should
+	 *            install itself in.
 	 */
-	void bootstrap( OptionBootstrapper<O> bootstrapper );
+	void bootstrap(OptionBootstrapper<O> bootstrapper);
 }

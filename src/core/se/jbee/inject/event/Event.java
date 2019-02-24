@@ -27,13 +27,13 @@ public final class Event<E, T> {
 	public final Method handler;
 	public final Object[] args;
 	/**
-	 * The function used to aggregate multiple values if a computation is dispatched
-	 * to more then one handler using
+	 * The function used to aggregate multiple values if a computation is
+	 * dispatched to more then one handler using
 	 * {@link EventPreferences#isAggregatedMultiDispatch()}.
 	 */
 	public final BinaryOperator<T> aggregator;
 
-	public Event(Class<E> event, EventPreferences prefs, Type<T> result, 
+	public Event(Class<E> event, EventPreferences prefs, Type<T> result,
 			Method handler, Object[] args, BinaryOperator<T> aggregator) {
 		this.type = event;
 		this.prefs = prefs;
@@ -43,7 +43,7 @@ public final class Event<E, T> {
 		this.aggregator = aggregator;
 		this.created = currentTimeMillis();
 	}
-	
+
 	@Override
 	public String toString() {
 		return "[" + type.getSimpleName() + "]:" + handler.getName();
@@ -52,21 +52,22 @@ public final class Event<E, T> {
 	public boolean isNonConcurrent() {
 		return prefs.maxConcurrentUsage == 1;
 	}
-	
+
 	public boolean isOutdated() {
-		return prefs.ttl <= 0 
-				? false 
-				: currentTimeMillis() > created + prefs.ttl;
+		return prefs.ttl <= 0
+			? false
+			: currentTimeMillis() > created + prefs.ttl;
 	}
-	
+
 	public boolean returnsVoid() {
 		return result.rawType == void.class || result.rawType == Void.class;
 	}
-	
+
 	public boolean returnsBoolean() {
-		return result.rawType == boolean.class || result.rawType == Boolean.class;
+		return result.rawType == boolean.class
+			|| result.rawType == Boolean.class;
 	}
-	
+
 	public boolean returnsInt() {
 		return result.rawType == int.class || result.rawType == Integer.class;
 	}

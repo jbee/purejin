@@ -14,13 +14,13 @@ import se.jbee.inject.bootstrap.Module;
 /**
  * The default utility {@link Module} almost always used.
  *
- * A {@link BinderModule} is also a {@link Bundle} so it should be used and installed as such. It
- * will than {@link Bundle#bootstrap(Bootstrapper)} itself as a module.
+ * A {@link BinderModule} is also a {@link Bundle} so it should be used and
+ * installed as such. It will than {@link Bundle#bootstrap(Bootstrapper)} itself
+ * as a module.
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public abstract class BinderModule
-		extends InitializedBinder
+public abstract class BinderModule extends InitializedBinder
 		implements Bundle, Module {
 
 	private final Class<? extends Bundle> basis;
@@ -29,22 +29,22 @@ public abstract class BinderModule
 		this.basis = null;
 	}
 
-	protected BinderModule( Scope inital, Class<? extends Bundle> basis) {
-		super( inital );
+	protected BinderModule(Scope inital, Class<? extends Bundle> basis) {
+		super(inital);
 		this.basis = basis;
 	}
 
 	@Override
-	public final void bootstrap( Bootstrapper bootstrap ) {
+	public final void bootstrap(Bootstrapper bootstrap) {
 		if (basis != null) {
 			bootstrap.install(basis);
 		}
-		bootstrap.install( this );
+		bootstrap.install(this);
 	}
 
 	@Override
-	public final void declare( Bindings bindings ) {
-		__init__( bindings );
+	public final void declare(Bindings bindings) {
+		__init__(bindings);
 		declare();
 	}
 

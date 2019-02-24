@@ -20,29 +20,29 @@ public class TestInstanceBinds {
 
 	}
 
-	private static class InstanceBindsModule
-			extends BinderModule {
+	private static class InstanceBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			bind( Number.class ).to( Integer.class );
-			bind( Integer.class ).to( 42 );
-			bind( Foo.class ).to( Foo.class );
+			bind(Number.class).to(Integer.class);
+			bind(Integer.class).to(42);
+			bind(Foo.class).to(Foo.class);
 		}
 
 	}
 
-	private final Injector injector = Bootstrap.injector( InstanceBindsModule.class );
+	private final Injector injector = Bootstrap.injector(
+			InstanceBindsModule.class);
 
 	@Test
 	public void thatNumberDependencyIsResolvedToIntegerBoundSupplier() {
-		Number number = injector.resolve( Number.class );
+		Number number = injector.resolve(Number.class);
 		assertTrue(number instanceof Integer);
-		assertEquals( 42, number.intValue() );
+		assertEquals(42, number.intValue());
 	}
 
 	@Test
 	public void thatTypeLinkedBackToItselfBecomesConstructorBinding() {
-		assertNotNull( injector.resolve( Foo.class ) );
+		assertNotNull(injector.resolve(Foo.class));
 	}
 }

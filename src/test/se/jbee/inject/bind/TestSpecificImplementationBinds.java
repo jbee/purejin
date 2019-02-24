@@ -53,8 +53,6 @@ public class TestSpecificImplementationBinds {
 			this.state = state;
 		}
 
-
-
 		@Override
 		public String doIt() {
 			return state;
@@ -66,8 +64,10 @@ public class TestSpecificImplementationBinds {
 
 		@Override
 		protected void declare() {
-			Instance<GenericAction> b = instance(named("b"), raw(GenericAction.class));
-			Instance<GenericAction> c = instance(named("c"), raw(GenericAction.class));
+			Instance<GenericAction> b = instance(named("b"),
+					raw(GenericAction.class));
+			Instance<GenericAction> c = instance(named("c"),
+					raw(GenericAction.class));
 			bind(Receiver.class).toConstructor(raw(ActionA.class), b, c);
 			bind(ActionA.class).toConstructor();
 			bind(b).to(new GenericAction("this is b"));
@@ -79,7 +79,8 @@ public class TestSpecificImplementationBinds {
 
 	@Test
 	public void thatImplementationIsPickedAsSpecified() {
-		Injector injector = Bootstrap.injector(SpecificImplementationBindsModule.class);
+		Injector injector = Bootstrap.injector(
+				SpecificImplementationBindsModule.class);
 
 		Receiver r = injector.resolve(Receiver.class);
 		assertEquals(ActionA.class, r.a.getClass());

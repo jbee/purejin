@@ -21,14 +21,14 @@ import se.jbee.inject.bootstrap.Supply;
 /**
  * Installs all the build-in functionality by using the core API.
  */
-public enum BuildinBundle
-		implements OptionBundle<BuildinBundle> {
+public enum BuildinBundle implements OptionBundle<BuildinBundle> {
 	/**
 	 * Adds: {@link Provider}s can be injected for all bound types.
 	 */
 	PROVIDER,
 	/**
-	 * Adds: {@link List}s can be injected for all bound types (via array bridge)
+	 * Adds: {@link List}s can be injected for all bound types (via array
+	 * bridge)
 	 */
 	LIST,
 	/**
@@ -36,7 +36,8 @@ public enum BuildinBundle
 	 */
 	SET,
 	/**
-	 * Adds: {@link Collection} can be injected instead of {@link List} (needs explicit List bind).
+	 * Adds: {@link Collection} can be injected instead of {@link List} (needs
+	 * explicit List bind).
 	 */
 	COLLECTION,
 	/**
@@ -45,60 +46,56 @@ public enum BuildinBundle
 	LOGGER;
 
 	@Override
-	public void bootstrap( OptionBootstrapper<BuildinBundle> bootstrapper ) {
-		bootstrapper.install( ListBridgeModule.class, LIST );
-		bootstrapper.install( SetBridgeModule.class, SET );
-		bootstrapper.install( CollectionBridgeModule.class, COLLECTION );
-		bootstrapper.install( ProviderBridgeModule.class, PROVIDER );
-		bootstrapper.install( LoggerModule.class, LOGGER );
+	public void bootstrap(OptionBootstrapper<BuildinBundle> bootstrapper) {
+		bootstrapper.install(ListBridgeModule.class, LIST);
+		bootstrapper.install(SetBridgeModule.class, SET);
+		bootstrapper.install(CollectionBridgeModule.class, COLLECTION);
+		bootstrapper.install(ProviderBridgeModule.class, PROVIDER);
+		bootstrapper.install(LoggerModule.class, LOGGER);
 	}
 
-	private static class LoggerModule
-			extends BinderModule {
+	private static class LoggerModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			per( TARGET_INSTANCE ).starbind( Logger.class ).to( Supply.LOGGER );
+			per(TARGET_INSTANCE).starbind(Logger.class).to(Supply.LOGGER);
 		}
 
 	}
 
-	private static class ProviderBridgeModule
-			extends BinderModule {
+	private static class ProviderBridgeModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			per( DEPENDENCY ).starbind( Provider.class ).to( Supply.PROVIDER_BRIDGE );
+			per(DEPENDENCY).starbind(Provider.class).to(Supply.PROVIDER_BRIDGE);
 		}
 
 	}
 
-	private static class ListBridgeModule
-			extends BinderModule {
+	private static class ListBridgeModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			per( DEPENDENCY ).starbind( List.class ).to( Supply.LIST_BRIDGE );
+			per(DEPENDENCY).starbind(List.class).to(Supply.LIST_BRIDGE);
 		}
 
 	}
 
-	private static class SetBridgeModule
-			extends BinderModule {
+	private static class SetBridgeModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			per( DEPENDENCY ).starbind( Set.class ).to( Supply.SET_BRIDGE );
+			per(DEPENDENCY).starbind(Set.class).to(Supply.SET_BRIDGE);
 		}
 
 	}
 
-	private static class CollectionBridgeModule
-			extends BinderModule {
+	private static class CollectionBridgeModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			asDefault().per( DEPENDENCY ).starbind( Collection.class ).toParametrized( List.class );
+			asDefault().per(DEPENDENCY).starbind(
+					Collection.class).toParametrized(List.class);
 		}
 	}
 

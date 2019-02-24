@@ -24,8 +24,8 @@ import se.jbee.inject.InconsistentBinding;
  */
 public final class Bindings {
 
-	public static Bindings bindings( Macros macros, Inspector inspector ) {
-		return new Bindings( macros, inspector, new ArrayList<>(128) );
+	public static Bindings bindings(Macros macros, Inspector inspector) {
+		return new Bindings(macros, inspector, new ArrayList<>(128));
 	}
 
 	public final Macros macros;
@@ -33,25 +33,27 @@ public final class Bindings {
 
 	private final List<Binding<?>> bindings;
 
-	private Bindings( Macros macros, Inspector inspector, List<Binding<?>> bindings) {
+	private Bindings(Macros macros, Inspector inspector,
+			List<Binding<?>> bindings) {
 		this.macros = macros;
 		this.inspector = inspector;
 		this.bindings = bindings;
 	}
 
-	public Bindings using( Inspector inspector ) {
-		return new Bindings( macros, inspector, bindings );
+	public Bindings using(Inspector inspector) {
+		return new Bindings(macros, inspector, bindings);
 	}
 
 	/**
 	 * Add (accumulate) a binding described by the 4-tuple given.
 	 */
-	public <T> void add( Binding<T> complete ) {
+	public <T> void add(Binding<T> complete) {
 		if (!complete.isComplete()) {
-			throw new InconsistentBinding("Incomplete binding added: "+complete);
+			throw new InconsistentBinding(
+					"Incomplete binding added: " + complete);
 		}
-		//NB. #64 here we can inform post binding that about the new binding
-		bindings.add( complete );
+		// NB. #64 here we can inform post binding that about the new binding
+		bindings.add(complete);
 	}
 
 	public void expandInto(Binding<?> binding) {
@@ -59,23 +61,23 @@ public final class Bindings {
 	}
 
 	public Binding<?>[] toArray() {
-		return array( bindings, Binding.class );
+		return array(bindings, Binding.class);
 	}
 
-	public Binding<?>[] declareFrom( Module... modules ) {
+	public Binding<?>[] declareFrom(Module... modules) {
 		Set<Class<?>> declared = new HashSet<>();
 		Set<Class<?>> multimodals = new HashSet<>();
-		for ( Module m : modules ) {
+		for (Module m : modules) {
 			Class<? extends Module> ns = m.getClass();
-			final boolean hasBeenDeclared = declared.contains( ns );
-			if ( hasBeenDeclared ) {
-				if ( !metaclass( ns ).monomodal() ) {
-					multimodals.add( ns );
+			final boolean hasBeenDeclared = declared.contains(ns);
+			if (hasBeenDeclared) {
+				if (!metaclass(ns).monomodal()) {
+					multimodals.add(ns);
 				}
 			}
-			if ( !hasBeenDeclared || multimodals.contains( ns ) ) {
-				m.declare( this );
-				declared.add( ns );
+			if (!hasBeenDeclared || multimodals.contains(ns)) {
+				m.declare(this);
+				declared.add(ns);
 			}
 		}
 		return toArray();

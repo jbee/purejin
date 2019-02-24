@@ -15,12 +15,11 @@ import se.jbee.inject.Scoping;
 
 public class TestScopes {
 
-	private static class ConstantProvider<T>
-			implements Provider<T> {
+	private static class ConstantProvider<T> implements Provider<T> {
 
 		private final T instance;
 
-		ConstantProvider( T instance ) {
+		ConstantProvider(T instance) {
 			this.instance = instance;
 		}
 
@@ -43,14 +42,14 @@ public class TestScopes {
 		Repository r = Scoped.DEPENDENCY_TYPE.init(2);
 		A a = new A();
 		B b = new B();
-		Provider<A> ia = new ConstantProvider<>( a );
-		Provider<B> ib = new ConstantProvider<>( b );
-		assertSame( r.serve(1, dependency( A.class ), ia ), a );
-		assertSame( r.serve(1, dependency( A.class ), null ), a ); // the null Provider shouldn't be called now
-		assertSame( r.serve(2, dependency( B.class ), ib ), b );
-		assertSame( r.serve(2, dependency( B.class ), null ), b ); // the null Provider shouldn't be called now
+		Provider<A> ia = new ConstantProvider<>(a);
+		Provider<B> ib = new ConstantProvider<>(b);
+		assertSame(r.serve(1, dependency(A.class), ia), a);
+		assertSame(r.serve(1, dependency(A.class), null), a); // the null Provider shouldn't be called now
+		assertSame(r.serve(2, dependency(B.class), ib), b);
+		assertSame(r.serve(2, dependency(B.class), null), b); // the null Provider shouldn't be called now
 	}
-	
+
 	@Test
 	public void injectionScopeIsNotStableInAnyOtherScope() {
 		Scoping injection = scopingOf(Scoped.INJECTION);
@@ -61,7 +60,7 @@ public class TestScopes {
 		assertFalse(injection.isStableIn(Scoped.TARGET_INSTANCE));
 		assertTrue(injection.isStableIn(injection));
 	}
-	
+
 	@Test
 	public void threadScopeIsNotStableInAnyOtherScopeExceptInjection() {
 		Scoping thread = scopingOf(Scoped.THREAD);
@@ -73,12 +72,12 @@ public class TestScopes {
 		assertTrue(thread.isStableIn(thread));
 		assertTrue(thread.isStableIn(Scoped.INJECTION));
 	}
-	
+
 	@Test
 	public void applicationIsStableInAnyOtherScope() {
 		assertStableScope(Scoped.APPLICATION);
 	}
-	
+
 	@Test
 	public void dependencyBasedIsStableInAnyOtherScope() {
 		assertStableScope(Scoped.DEPENDENCY);
@@ -98,5 +97,5 @@ public class TestScopes {
 		assertTrue(s.isStableIn(Scoped.THREAD));
 		assertTrue(s.isStableIn(Scoped.INJECTION));
 	}
-	
+
 }

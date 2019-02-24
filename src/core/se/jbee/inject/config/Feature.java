@@ -6,21 +6,20 @@
 package se.jbee.inject.config;
 
 /**
- * {@link Feature}s can be used to model more fine grained {@link Edition} by using
- * <code>enum</code>s as the options to chose from.
+ * {@link Feature}s can be used to model more fine grained {@link Edition} by
+ * using <code>enum</code>s as the options to chose from.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  * 
- * @param <T>
- *            The enum used as different features/options to chose from.
+ * @param <T> The enum used as different features/options to chose from.
  */
 @FunctionalInterface
 public interface Feature<T extends Enum<T>> {
 
 	/**
 	 * @return The feature this given bundle or module class represents or
-	 *         <code>null</code> is it doesn't represent any special feature (so it will be install
-	 *         in any case).
+	 *         <code>null</code> is it doesn't represent any special feature (so
+	 *         it will be install in any case).
 	 */
-	T featureOf( Class<?> bundleOrModule );
+	T featureOf(Class<?> bundleOrModule);
 }

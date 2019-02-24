@@ -16,24 +16,25 @@ import se.jbee.inject.bootstrap.Macros;
 import se.jbee.inject.container.Scoped;
 
 /**
- * A {@link RootBinder} that can be initialized using the {@link #__init__(Bindings)} method.
+ * A {@link RootBinder} that can be initialized using the
+ * {@link #__init__(Bindings)} method.
  *
  * This allows to change the start {@link Bind} once.
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public abstract class InitializedBinder
-		extends RootBinder {
+public abstract class InitializedBinder extends RootBinder {
 
 	private Bind bind;
 	private Boolean initialized;
 
 	protected InitializedBinder() {
-		this( Scoped.APPLICATION );
+		this(Scoped.APPLICATION);
 	}
 
-	protected InitializedBinder( Scope inital ) {
-		super( Bind.create( bindings( Macros.DEFAULT, Inspect.DEFAULT ), null, inital ) );
+	protected InitializedBinder(Scope inital) {
+		super(Bind.create(bindings(Macros.DEFAULT, Inspect.DEFAULT), null,
+				inital));
 		this.bind = super.bind();
 	}
 
@@ -42,9 +43,9 @@ public abstract class InitializedBinder
 		return bind;
 	}
 
-	protected final void __init__( Bindings bindings ) {
-		Bootstrap.nonnullThrowsReentranceException( initialized );
-		this.bind = bind.into( bindings );
+	protected final void __init__(Bindings bindings) {
+		Bootstrap.nonnullThrowsReentranceException(initialized);
+		this.bind = bind.into(bindings);
 		initialized = true;
 	}
 

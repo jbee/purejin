@@ -23,8 +23,9 @@ final class UnboxingFuture<T> implements Future<T> {
 
 	private final Event<?, ? extends Future<T>> event;
 	private final Future<? extends Future<T>> boxed;
-	
-	UnboxingFuture(Event<?, ? extends Future<T>> event, Future<? extends Future<T>> boxed) {
+
+	UnboxingFuture(Event<?, ? extends Future<T>> event,
+			Future<? extends Future<T>> boxed) {
 		this.event = event;
 		this.boxed = boxed;
 	}
@@ -45,15 +46,15 @@ final class UnboxingFuture<T> implements Future<T> {
 	}
 
 	@Override
-	public T get() throws InterruptedException, ExecutionException  {
+	public T get() throws InterruptedException, ExecutionException {
 		Future<T> unboxed;
 		try {
-			 unboxed = EventException.unwrap(event, () -> boxed.get());
+			unboxed = EventException.unwrap(event, () -> boxed.get());
 		} catch (ExecutionException | InterruptedException e) {
 			throw e;
 		} catch (EventException e) {
 			if (e.isCausedByHandlerException())
-				throw (ExecutionException)e.getCause();
+				throw (ExecutionException) e.getCause();
 			throw e;
 		} catch (Throwable e) {
 			throw new ExecutionException(e);
@@ -62,20 +63,22 @@ final class UnboxingFuture<T> implements Future<T> {
 	}
 
 	@Override
-	public T get(long timeout, TimeUnit unit) 
+	public T get(long timeout, TimeUnit unit)
 			throws InterruptedException, ExecutionException, TimeoutException {
 		long waitMillis = unit.toMillis(timeout);
 		long start = currentTimeMillis();
 		Future<T> unboxed;
 		try {
-			unboxed = EventException.unwrap(event, () -> boxed.get(timeout, unit));
-		} catch (ExecutionException | InterruptedException | TimeoutException e) {
+			unboxed = EventException.unwrap(event,
+					() -> boxed.get(timeout, unit));
+		} catch (ExecutionException | InterruptedException
+				| TimeoutException e) {
 			throw e;
 		} catch (EventException e) {
 			if (e.isCausedByHandlerException())
-				throw (ExecutionException)e.getCause();
+				throw (ExecutionException) e.getCause();
 			if (e.isCausedByTimeout())
-				throw (TimeoutException)e.getCause();
+				throw (TimeoutException) e.getCause();
 			throw e;
 		} catch (Throwable e) {
 			throw new ExecutionException(e);
@@ -85,7 +88,7 @@ final class UnboxingFuture<T> implements Future<T> {
 			unboxed.cancel(false);
 			throw new TimeoutException();
 		}
-		return unboxed.get(left, MILLISECONDS);	
+		return unboxed.get(left, MILLISECONDS);
 	}
-	
+
 }

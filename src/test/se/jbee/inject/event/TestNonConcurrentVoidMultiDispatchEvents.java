@@ -32,27 +32,27 @@ import se.jbee.inject.container.Scoped;
 public class TestNonConcurrentVoidMultiDispatchEvents {
 
 	private interface Listener {
-		
+
 		void onX(int x);
-		
+
 		void onY(int y);
 	}
-	
+
 	private static final class Service implements Listener {
 
 		static char nextName = 'a';
-		
+
 		/**
 		 * Need volatile as the test thread should insect the changes
 		 */
 		volatile List<Integer> xs = new ArrayList<>();
 		volatile List<Integer> ys = new ArrayList<>();
-		
+
 		/**
 		 * For distinction of a and b during debugging only
 		 */
 		private final char name = nextName++;
-		
+
 		@Override
 		public void onX(int x) {
 			xs.add(x);
@@ -73,35 +73,40 @@ public class TestNonConcurrentVoidMultiDispatchEvents {
 				}
 			}
 		}
-		
+
 		@Override
 		public String toString() {
 			return name + ": " + xs.toString() + ys.toString();
 		}
 	}
-	
-	private static final class TestMultiDispatchEventsModule extends EventModule {
+
+	private static final class TestMultiDispatchEventsModule
+			extends EventModule {
 
 		@Override
 		protected void declare() {
 			handle(Listener.class);
 			per(Scoped.INJECTION).construct(Service.class);
 			// makes observed calls "single threaded"
-			bind(EventReflector.class).to(event -> EventPreferences.DEFAULT.withMaxConcurrentUsage(1));
+			bind(EventReflector.class).to(
+					event -> EventPreferences.DEFAULT.withMaxConcurrentUsage(
+							1));
 		}
-		
+
 	}
-	
-	private final Injector injector = Bootstrap.injector(TestMultiDispatchEventsModule.class);
-	
+
+	private final Injector injector = Bootstrap.injector(
+			TestMultiDispatchEventsModule.class);
+
 	@Test
-	public void onlyOneThreadAtATimeCallsSameListersMethods() throws InterruptedException {
+	public void onlyOneThreadAtATimeCallsSameListersMethods()
+			throws InterruptedException {
 		Listener listener = injector.resolve(Listener.class);
 		Service a = injector.resolve(Service.class);
 		Service b = injector.resolve(Service.class);
 		assertNotNull(listener);
 		assertNotSame(a, b);
-		
+
 		listener.onX(42);
 		listener.onY(13);
 		giveSomeTime();
@@ -120,7 +125,7 @@ public class TestNonConcurrentVoidMultiDispatchEvents {
 		notifyAll(a); // let a continue
 		giveSomeTime();
 		// no change as b is still in the handler method and thereby blocks the other event from sending it to b
-		if (a.xs.isEmpty()) { 
+		if (a.xs.isEmpty()) {
 			assertMessages(a.xs);
 			assertMessages(a.ys, 13);
 			assertMessages(b.xs, 42);
@@ -148,20 +153,20 @@ public class TestNonConcurrentVoidMultiDispatchEvents {
 	}
 
 	/**
-	 * Called when the {@link EventProcessor} should be given some time to run the
-	 * expected events.
+	 * Called when the {@link EventProcessor} should be given some time to run
+	 * the expected events.
 	 */
 	private static void giveSomeTime() throws InterruptedException {
 		Thread.sleep(40);
 	}
-	
+
 	private static void notifyAll(Service a) {
 		synchronized (a) {
 			a.notifyAll();
 		}
 	}
-	
-	private static void assertMessages(List<Integer> actual, int...expected) {
+
+	private static void assertMessages(List<Integer> actual, int... expected) {
 		assertEquals(expected.length, actual.size());
 		for (int i = 0; i < expected.length; i++)
 			assertEquals(expected[i], actual.get(i).intValue());

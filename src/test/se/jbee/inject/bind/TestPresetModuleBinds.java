@@ -20,24 +20,23 @@ import se.jbee.inject.config.Globals;
 import se.jbee.inject.config.Presets;
 
 /**
- * This test demonstrates how to use {@link Presets} to pass input data to the {@link Bootstrap}
- * that can be accessed in any {@link PresetModule} class. The value passed into
- * {@link BinderModuleWith#declare(Object)} is determined by the type of the generic. This has to be
- * the same {@link Type} as the one used when declaring the value via
- * {@link Presets#preset(Class, Object)}.
+ * This test demonstrates how to use {@link Presets} to pass input data to the
+ * {@link Bootstrap} that can be accessed in any {@link PresetModule} class. The
+ * value passed into {@link BinderModuleWith#declare(Object)} is determined by
+ * the type of the generic. This has to be the same {@link Type} as the one used
+ * when declaring the value via {@link Presets#preset(Class, Object)}.
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestPresetModuleBinds {
 
-	private static class PresetModuleBindsBundle
-			extends BootstrapperBundle {
+	private static class PresetModuleBindsBundle extends BootstrapperBundle {
 
 		@Override
 		protected void bootstrap() {
-			install( PresetModuleBindsModule1.class );
-			install( PresetModuleBindsModule2.class );
-			install( PresetModuleBindsModule3.class );
+			install(PresetModuleBindsModule1.class);
+			install(PresetModuleBindsModule2.class);
+			install(PresetModuleBindsModule3.class);
 		}
 
 	}
@@ -46,8 +45,8 @@ public class TestPresetModuleBinds {
 			extends BinderModuleWith<Properties> {
 
 		@Override
-		protected void declare( Properties preset ) {
-			bind( named( "foo" ), String.class ).to( preset.getProperty( "foo.text" ) );
+		protected void declare(Properties preset) {
+			bind(named("foo"), String.class).to(preset.getProperty("foo.text"));
 		}
 	}
 
@@ -55,8 +54,8 @@ public class TestPresetModuleBinds {
 			extends BinderModuleWith<List<String>> {
 
 		@Override
-		protected void declare( List<String> preset ) {
-			bind( named( "list" ), String.class ).to( preset.get( 1 ) );
+		protected void declare(List<String> preset) {
+			bind(named("list"), String.class).to(preset.get(1));
 		}
 
 	}
@@ -65,13 +64,14 @@ public class TestPresetModuleBinds {
 			extends BinderModuleWith<List<Integer>> {
 
 		@Override
-		protected void declare( List<Integer> preset ) {
-			bind( named( "list" ), Integer.class ).to( preset.get( 1 ) );
+		protected void declare(List<Integer> preset) {
+			bind(named("list"), Integer.class).to(preset.get(1));
 		}
 
 	}
 
-	private static class PresetModuleBindsModule4 extends BinderModuleWith<Presets> {
+	private static class PresetModuleBindsModule4
+			extends BinderModuleWith<Presets> {
 
 		@Override
 		protected void declare(Presets preset) {
@@ -83,28 +83,29 @@ public class TestPresetModuleBinds {
 	private final Injector injector = injector();
 
 	private static Injector injector() {
-		Presets presets = Presets.EMPTY.preset( Properties.class, exampleProperties() )
-			.preset( listTypeOf( String.class ), asList( "a", "b" ) )
-			.preset( listTypeOf( Integer.class ), asList( 1, 2 ) );
-		return Bootstrap.injector( PresetModuleBindsBundle.class,
-				Globals.STANDARD.presets( presets ) );
+		Presets presets = Presets.EMPTY.preset(Properties.class,
+				exampleProperties()).preset(listTypeOf(String.class),
+						asList("a", "b")).preset(listTypeOf(Integer.class),
+								asList(1, 2));
+		return Bootstrap.injector(PresetModuleBindsBundle.class,
+				Globals.STANDARD.presets(presets));
 	}
 
 	private static Properties exampleProperties() {
 		Properties props = new Properties();
-		props.put( "foo.text", "bar" );
+		props.put("foo.text", "bar");
 		return props;
 	}
 
 	@Test
 	public void thatPresetValuePassedToModule() {
-		assertEquals( "bar", injector.resolve( "foo", String.class ) );
+		assertEquals("bar", injector.resolve("foo", String.class));
 	}
 
 	@Test
 	public void thatDifferentParametizedPresetValuesForSameGenericTypeArePosssible() {
-		assertEquals( "b", injector.resolve( "list", String.class ) );
-		assertEquals( 2, injector.resolve( "list", Integer.class ).intValue() );
+		assertEquals("b", injector.resolve("list", String.class));
+		assertEquals(2, injector.resolve("list", Integer.class).intValue());
 	}
 
 	@Test

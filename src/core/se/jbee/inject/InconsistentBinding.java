@@ -6,10 +6,10 @@
 package se.jbee.inject;
 
 /**
- * If there is a statically resolvable problem with a binding (resource in
- * the context of a container) this exception is thrown during
- * bootstrapping. It is never thrown after the bootstrapping step has
- * finished (a {@link Injector} was created successfully).
+ * If there is a statically resolvable problem with a binding (resource in the
+ * context of a container) this exception is thrown during bootstrapping. It is
+ * never thrown after the bootstrapping step has finished (a {@link Injector}
+ * was created successfully).
  * 
  * @see UnresolvableDependency
  */
@@ -18,5 +18,5 @@ public final class InconsistentBinding extends RuntimeException {
 	public InconsistentBinding(String message) {
 		super(message);
 	}
-	
+
 }

@@ -13,16 +13,16 @@ import se.jbee.inject.Type;
 import se.jbee.inject.Typed;
 
 /**
- * A {@link BoundMethod} is a method bound to a particular instance
- * (if not static) that yields/produces instances to inject.
+ * A {@link BoundMethod} is a method bound to a particular instance (if not
+ * static) that yields/produces instances to inject.
  *
  * @param <T> type of the value yield by the factory method
  */
-public final class BoundMethod<T>
-		implements Typed<T> {
+public final class BoundMethod<T> implements Typed<T> {
 
-	public static <T> BoundMethod<T> bind( Object instance, Method factory, Type<T> returnType, Parameter<?>... parameters ) {
-		return new BoundMethod<>( instance, factory, returnType, parameters );
+	public static <T> BoundMethod<T> bind(Object instance, Method factory,
+			Type<T> returnType, Parameter<?>... parameters) {
+		return new BoundMethod<>(instance, factory, returnType, parameters);
 	}
 
 	public final Object instance;
@@ -31,19 +31,21 @@ public final class BoundMethod<T>
 	public final Parameter<?>[] parameters;
 	public final boolean isInstanceMethod;
 
-	private BoundMethod( Object instance, Method factory, Type<T> returnType, Parameter<?>[] parameters ) {
+	private BoundMethod(Object instance, Method factory, Type<T> returnType,
+			Parameter<?>[] parameters) {
 		this.returnType = returnType;
 		this.factory = Metaclass.accessible(factory);
 		this.parameters = parameters;
 		this.instance = instance;
-		this.isInstanceMethod = !Modifier.isStatic( factory.getModifiers() );
-		final Type<?> actualReturnType = Type.returnType( factory );
-		actualReturnType.toSupertype(returnType ); // make sure types are compatible
-		if ( instance != null && factory.getDeclaringClass() != instance.getClass() ) {
+		this.isInstanceMethod = !Modifier.isStatic(factory.getModifiers());
+		final Type<?> actualReturnType = Type.returnType(factory);
+		actualReturnType.toSupertype(returnType); // make sure types are compatible
+		if (instance != null
+			&& factory.getDeclaringClass() != instance.getClass()) {
 			throw new IllegalArgumentException(
-					"The producer method and the instance it is invoked on have to be the same class." );
+					"The producer method and the instance it is invoked on have to be the same class.");
 		}
-		Metaclass.accessible( factory );
+		Metaclass.accessible(factory);
 	}
 
 	@Override
@@ -51,10 +53,11 @@ public final class BoundMethod<T>
 		return returnType;
 	}
 
-	@SuppressWarnings ( "unchecked" )
+	@SuppressWarnings("unchecked")
 	@Override
-	public <E> BoundMethod<E> typed( Type<E> supertype ) throws ClassCastException {
-		type().castTo( supertype ); // make sure is valid
+	public <E> BoundMethod<E> typed(Type<E> supertype)
+			throws ClassCastException {
+		type().castTo(supertype); // make sure is valid
 		return (BoundMethod<E>) this;
 	}
 }

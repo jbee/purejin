@@ -43,38 +43,39 @@ import se.jbee.inject.bootstrap.Bootstrap;
  * second call to time out.
  */
 public class TestTTLExceptionHandingComputeEvents {
-	
+
 	private interface Handler {
-		
+
 		boolean slowMethod();
-		
+
 		Future<Boolean> slowMethodReturnsFuture();
-		
+
 		boolean slowMethodThatThrowsException() throws Exception;
-		
+
 		boolean slowMethodThatThrowsTineoutException() throws TimeoutException;
 	}
-	
+
 	private static final class SlowService implements Handler {
 
 		@Override
 		public boolean slowMethod() {
 			return beSlow();
 		}
-		
+
 		@Override
 		public Future<Boolean> slowMethodReturnsFuture() {
 			beSlow();
 			return CompletableFuture.completedFuture(true);
 		}
-		
+
 		@Override
 		public boolean slowMethodThatThrowsException() throws Exception {
 			return beSlow();
 		}
-		
+
 		@Override
-		public boolean slowMethodThatThrowsTineoutException() throws TimeoutException {
+		public boolean slowMethodThatThrowsTineoutException()
+				throws TimeoutException {
 			return beSlow();
 		}
 
@@ -87,49 +88,58 @@ public class TestTTLExceptionHandingComputeEvents {
 			}
 		}
 	}
-	
-	private static final class TestTTLExceptionHandingComputeEventsModule extends EventModule {
+
+	private static final class TestTTLExceptionHandingComputeEventsModule
+			extends EventModule {
 
 		@Override
 		protected void declare() {
 			handle(Handler.class);
 			construct(SlowService.class);
-			injectingInto(EventProcessor.class)
-				.bind(ExecutorService.class).to(() -> Executors.newSingleThreadExecutor());
-			bind(EventReflector.class).to(event -> EventPreferences.DEFAULT.withTTL(5));
+			injectingInto(EventProcessor.class).bind(ExecutorService.class).to(
+					() -> Executors.newSingleThreadExecutor());
+			bind(EventReflector.class).to(
+					event -> EventPreferences.DEFAULT.withTTL(5));
 		}
 	}
-	
-	private final Injector injector = Bootstrap.injector(TestTTLExceptionHandingComputeEventsModule.class);
+
+	private final Injector injector = Bootstrap.injector(
+			TestTTLExceptionHandingComputeEventsModule.class);
 	private final Handler handler = injector.resolve(Handler.class);
 	private final SlowService service = injector.resolve(SlowService.class);
-	
+
 	@Test
 	public void thatTimeoutExceptionIsThrownIfHandlerMethodThrowsSuperclassException() {
-		assertThrowsTimeoutException(() ->  handler.slowMethodThatThrowsException());
+		assertThrowsTimeoutException(
+				() -> handler.slowMethodThatThrowsException());
 	}
-	
+
 	@Test
 	public void thatTimeoutExceptionIsThrownIfHandlerMethodThrowsTimeoutException() {
-		assertThrowsTimeoutException(() -> handler.slowMethodThatThrowsTineoutException());
+		assertThrowsTimeoutException(
+				() -> handler.slowMethodThatThrowsTineoutException());
 	}
-	
+
 	@Test
 	public void thatTimeoutExceptionIsThrownIfFutureGetWithTimeoutIsUsed() {
-		assertThrowsTimeoutException(() -> handler.slowMethodReturnsFuture().get(5, TimeUnit.MICROSECONDS));
+		assertThrowsTimeoutException(
+				() -> handler.slowMethodReturnsFuture().get(5,
+						TimeUnit.MICROSECONDS));
 	}
-	
+
 	@Test
 	public void thatEventExceptionCausedByTimeoutIsThrownIfFutureGet() {
-		assertThrowsEventExceptionCausedByTimeout(() -> handler.slowMethodReturnsFuture().get());
+		assertThrowsEventExceptionCausedByTimeout(
+				() -> handler.slowMethodReturnsFuture().get());
 	}
-	
+
 	@Test
 	public void thatEventExceptionCausedByTimeoutIsThrownIfHandlerMethodNotThrowsException() {
 		assertThrowsEventExceptionCausedByTimeout(() -> handler.slowMethod());
 	}
-	
-	private void assertThrowsEventExceptionCausedByTimeout(Callable<Boolean> f) {
+
+	private void assertThrowsEventExceptionCausedByTimeout(
+			Callable<Boolean> f) {
 		assertNotNull(service);
 		blockProcessorWithTask();
 		try {
@@ -140,7 +150,7 @@ public class TestTTLExceptionHandingComputeEvents {
 			fail("should be EventException");
 		}
 	}
-	
+
 	private void assertThrowsTimeoutException(Callable<Boolean> f) {
 		assertNotNull(service);
 		blockProcessorWithTask();

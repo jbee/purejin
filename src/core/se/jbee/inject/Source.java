@@ -12,11 +12,10 @@ import java.io.Serializable;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public final class Source
-		implements MoreApplicableThan<Source>, Serializable {
+public final class Source implements MoreApplicableThan<Source>, Serializable {
 
-	public static Source source( Class<?> module ) {
-		return new Source( module, DeclarationType.EXPLICIT, 0, 0 );
+	public static Source source(Class<?> module) {
+		return new Source(module, DeclarationType.EXPLICIT, 0, 0);
 	}
 
 	public final Class<?> ident;
@@ -28,7 +27,8 @@ public final class Source
 	 */
 	private int totalDeclarations;
 
-	private Source( Class<?> ident, DeclarationType declarationType, int declarationNo, int totalDeclarations ) {
+	private Source(Class<?> ident, DeclarationType declarationType,
+			int declarationNo, int totalDeclarations) {
 		this.ident = ident;
 		this.declarationType = declarationType;
 		this.declarationNo = declarationNo;
@@ -37,20 +37,20 @@ public final class Source
 
 	@Override
 	public String toString() {
-		return ident.getSimpleName() + "#" + declarationNo + "[" + declarationType.name() + "]";
+		return ident.getSimpleName() + "#" + declarationNo + "["
+			+ declarationType.name() + "]";
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		return obj instanceof Source && equalTo((Source) obj);
 	}
 
 	public boolean equalTo(Source other) {
-		return ident == other.ident 
-				&& declarationType == other.declarationType
-				&& declarationNo == other.declarationNo;
+		return ident == other.ident && declarationType == other.declarationType
+			&& declarationNo == other.declarationNo;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		// declarationType should not play a role as there should only be 
@@ -59,20 +59,20 @@ public final class Source
 	}
 
 	@Override
-	public boolean moreApplicableThan( Source other ) {
-		return declarationType.moreApplicableThan( other.declarationType );
+	public boolean moreApplicableThan(Source other) {
+		return declarationType.moreApplicableThan(other.declarationType);
 	}
 
-	public Source typed( DeclarationType type ) {
+	public Source typed(DeclarationType type) {
 		return declarationType == type
 			? this
-			: new Source( ident, type, declarationNo, totalDeclarations );
+			: new Source(ident, type, declarationNo, totalDeclarations);
 	}
 
 	public Source next() {
 		totalDeclarations++;
 		return declarationNo > 0
 			? this
-			: new Source( ident, declarationType, totalDeclarations, 0 );
+			: new Source(ident, declarationType, totalDeclarations, 0);
 	}
 }

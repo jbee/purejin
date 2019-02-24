@@ -27,11 +27,13 @@ import se.jbee.inject.util.Resource;
 import se.jbee.inject.util.WebMethod;
 
 /**
- * This test demonstrates the use of an {@link Inspector} to semi-automatically bind
- * {@link Constructor}s and/or {@link Method}s as 'provider' of an instance.
+ * This test demonstrates the use of an {@link Inspector} to semi-automatically
+ * bind {@link Constructor}s and/or {@link Method}s as 'provider' of an
+ * instance.
  *
- * The example uses the {@link Inspect#all()} util as {@link Inspector}. It allows to narrow what is
- * bound automatically. For example {@link Annotation}s can be specified that need to be present.
+ * The example uses the {@link Inspect#all()} util as {@link Inspector}. It
+ * allows to narrow what is bound automatically. For example {@link Annotation}s
+ * can be specified that need to be present.
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
@@ -39,28 +41,28 @@ public class TestInspectorBinds {
 
 	static final StringBuffer STATE = new StringBuffer();
 
-	static class InspectorBindsModule
-			extends BinderModule {
+	static class InspectorBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			bind( all().methods() ).inModule();
-			bind( all().methods().annotatedWith( WebMethod.class ).namedBy( Resource.class ) ).in(
-					InspectorBindsImplementor1.class );
-			bind( all().methods().returnTypeAssignableTo( raw( Provider.class ) ) ).in(
-					InspectorBindsImplementor2.class );
-			bind( all().methods().returnTypeIn( packageAndSubPackagesOf( Injector.class ) ) ).in(
-					InspectorBindsImplementor3.class );
-			per( Scoped.APPLICATION ).bind( all().methods() ).in(
-					new InspectorBindsImplementor4( STATE ) );
-			per( Scoped.INJECTION ).bind( all().methods() ).in( FactoryImpl.class );
+			bind(all().methods()).inModule();
+			bind(all().methods().annotatedWith(WebMethod.class).namedBy(
+					Resource.class)).in(InspectorBindsImplementor1.class);
+			bind(all().methods().returnTypeAssignableTo(
+					raw(Provider.class))).in(InspectorBindsImplementor2.class);
+			bind(all().methods().returnTypeIn(
+					packageAndSubPackagesOf(Injector.class))).in(
+							InspectorBindsImplementor3.class);
+			per(Scoped.APPLICATION).bind(all().methods()).in(
+					new InspectorBindsImplementor4(STATE));
+			per(Scoped.INJECTION).bind(all().methods()).in(FactoryImpl.class);
 		}
 
 		static int staticFactoryMethod() {
 			return 42;
 		}
 
-		static long staticFactoryMethodWithParameters( int factor ) {
+		static long staticFactoryMethodWithParameters(int factor) {
 			return factor * 2L;
 		}
 	}
@@ -82,14 +84,15 @@ public class TestInspectorBinds {
 		}
 
 		@WebMethod
-		@Resource ( "twentyone" )
+		@Resource("twentyone")
 		float instanceFactoryMethodWithName() {
 			return 21f;
 		}
 
 		@WebMethod
-		@Resource ( "Foo" )
-		double instanceFactoryMethodWithParameters( @Resource ( "twentyone" ) float factor ) {
+		@Resource("Foo")
+		double instanceFactoryMethodWithParameters(
+				@Resource("twentyone") float factor) {
 			return factor * 2d;
 		}
 
@@ -112,7 +115,7 @@ public class TestInspectorBinds {
 	static class InspectorBindsImplementor3 {
 
 		Name typeInProjectPackage() {
-			return Name.named( "foobar" );
+			return Name.named("foobar");
 		}
 
 		String shouldNotBeBoundSinceItDoesNotReturnTypeThatIsInProjectPackage() {
@@ -124,7 +127,7 @@ public class TestInspectorBinds {
 
 		final StringBuffer state;
 
-		InspectorBindsImplementor4( StringBuffer state ) {
+		InspectorBindsImplementor4(StringBuffer state) {
 			this.state = state;
 		}
 
@@ -133,74 +136,76 @@ public class TestInspectorBinds {
 		}
 	}
 
-	private final Injector injector = Bootstrap.injector( InspectorBindsModule.class );
+	private final Injector injector = Bootstrap.injector(
+			InspectorBindsModule.class);
 
 	@Test
 	public void thatInstanceFactoryMethodIsAvailable() {
-		assertEquals( 42f, injector.resolve(float.class).floatValue(), 0.01f );
+		assertEquals(42f, injector.resolve(float.class).floatValue(), 0.01f);
 	}
 
 	@Test
 	public void thatStaticFactoryMethodIsAvailable() {
-		assertEquals( 42, injector.resolve( int.class).intValue() );
+		assertEquals(42, injector.resolve(int.class).intValue());
 	}
 
 	/**
-	 * Through the float parameter annotation {@link Resource} the double producing factory method
-	 * gets 21f injected instead of 42f.
+	 * Through the float parameter annotation {@link Resource} the double
+	 * producing factory method gets 21f injected instead of 42f.
 	 */
 	@Test
 	public void thatInstanceFactoryMethodWithParametersIsAvailable() {
-		assertEquals( 42d, injector.resolve(double.class), 0.01d );
+		assertEquals(42d, injector.resolve(double.class), 0.01d);
 	}
 
 	@Test
 	public void thatStaticFactoryMethodWithParametersIsAvailable() {
-		assertEquals( 84L, injector.resolve(long.class).longValue() );
+		assertEquals(84L, injector.resolve(long.class).longValue());
 	}
 
 	/**
 	 * The provider method
-	 * {@link InspectorBindsImplementor1#instanceFactoryMethodWithParameters(float)} uses the
-	 * {@link Resource} annotation to specify the name. As a result there is a named
-	 * {@link Instance} that can be resolved.
+	 * {@link InspectorBindsImplementor1#instanceFactoryMethodWithParameters(float)}
+	 * uses the {@link Resource} annotation to specify the name. As a result
+	 * there is a named {@link Instance} that can be resolved.
 	 */
 	@Test
 	public void thatNamedWithAnnotationCanBeUsedToGetNamedResources() {
-		assertEquals( 42d, injector.resolve("foo", double.class), 0.01d );
+		assertEquals(42d, injector.resolve("foo", double.class), 0.01d);
 	}
 
 	@Test
 	public void thatMethodsAreBoundThatAreAssignableToSpecifiedType() {
-		assertEquals(true, injector.resolve(providerTypeOf(Boolean.class)).provide());
+		assertEquals(true,
+				injector.resolve(providerTypeOf(Boolean.class)).provide());
 	}
 
-	@Test ( expected = NoResourceForDependency.class )
+	@Test(expected = NoResourceForDependency.class)
 	public void thatNoMethodsAreBoundThatAreNotAssignableToSpecifiedType() {
-		injector.resolve( Character.class );
+		injector.resolve(Character.class);
 	}
 
 	@Test
 	public void thatMethodsAreBoundThatAreInSpecifiedPackagesSet() {
-		assertEquals( named( "foobar" ), injector.resolve( Name.class ) );
+		assertEquals(named("foobar"), injector.resolve(Name.class));
 	}
 
-	@Test ( expected = NoResourceForDependency.class )
+	@Test(expected = NoResourceForDependency.class)
 	public void thatNoMethodsAreBoundThatAreNotInSpecifiedPackagesSet() {
-		injector.resolve( String.class );
+		injector.resolve(String.class);
 	}
 
 	@Test
 	public void thatMethodsAreBoundToSpecificInstance() {
-		assertSame( STATE, injector.resolve( StringBuffer.class ) );
+		assertSame(STATE, injector.resolve(StringBuffer.class));
 	}
 
 	@Test
 	public void thatDeclaredScopeIsUsedForInspectedBindings() {
-		byte first = injector.resolve( byte.class );
-		byte second = injector.resolve( byte.class );
-		assertEquals( first + 1, second );
-		byte third = injector.resolve( byte.class );
-		assertEquals( second + 1, third );
+		byte first = injector.resolve(byte.class);
+		byte second = injector.resolve(byte.class);
+		assertEquals(first + 1, second);
+		byte third = injector.resolve(byte.class);
+		assertEquals(second + 1, third);
 	}
 }

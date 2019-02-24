@@ -20,12 +20,12 @@ public interface Initialiser<T> {
 
 	/**
 	 * Is called when the target instance is created within the {@link Injector}
-	 * context. For {@link Injector} itself as target this is called as soon as its
-	 * state has been initialised.
+	 * context. For {@link Injector} itself as target this is called as soon as
+	 * its state has been initialised.
 	 * 
-	 * @param target  the newly created instance to initialise
-	 * @param context use to receive instances that require further initialisation
-	 *                setup
+	 * @param target the newly created instance to initialise
+	 * @param context use to receive instances that require further
+	 *            initialisation setup
 	 */
 	void init(T target, Injector context);
 }

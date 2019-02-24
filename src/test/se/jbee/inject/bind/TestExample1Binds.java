@@ -37,8 +37,10 @@ public class TestExample1Binds {
 		@Override
 		protected void declare(Properties properties) {
 			bind(MyClass.class).toConstructor(
-					BoundParameter.constant(String.class, properties.getProperty("x")),
-					BoundParameter.constant(Integer.class, (Integer)properties.get("y")));
+					BoundParameter.constant(String.class,
+							properties.getProperty("x")),
+					BoundParameter.constant(Integer.class,
+							(Integer) properties.get("y")));
 		}
 	}
 
@@ -48,8 +50,7 @@ public class TestExample1Binds {
 		protected void declare() {
 			bind(MyClass.class).toConstructor(
 					instance(named("foo"), raw(String.class)),
-					instance(named("bar"), raw(int.class))
-					);
+					instance(named("bar"), raw(int.class)));
 			// the below may of course appear in any other module
 			bind(named("foo"), String.class).to("abc");
 			bind(named("bar"), int.class).to(12);

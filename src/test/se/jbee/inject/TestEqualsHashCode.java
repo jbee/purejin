@@ -25,50 +25,53 @@ public class TestEqualsHashCode {
 	public void type() throws Exception {
 		assertValidEqualsAndHashCodeContract(Type.class);
 	}
-	
+
 	@Test
 	public void instance() throws Exception {
 		assertValidEqualsAndHashCodeContract(Instance.class);
 	}
-	
+
 	@Test
 	public void instances() throws Exception {
 		assertValidEqualsAndHashCodeContract(Instances.class);
 	}
-	
+
 	@Test
 	public void resource() throws Exception {
 		assertValidEqualsAndHashCodeContract(Resource.class);
 	}
-	
+
 	@Test
 	public void target() throws Exception {
 		assertValidEqualsAndHashCodeContract(Target.class);
 	}
-	
+
 	@Test
 	public void packages() throws Exception {
 		assertValidEqualsAndHashCodeContract(Packages.class);
 	}
-	
+
 	@Test
 	public void name() throws Exception {
 		assertValidEqualsAndHashCodeContract(Name.class);
 	}
-	
+
 	@Test
 	public void dependency() throws Exception {
 		assertValidEqualsAndHashCodeContract(Dependency.class);
 	}
 
 	static int base = 42;
-	
-	private static void assertValidEqualsAndHashCodeContract(Class<?> cls) throws Exception {
+
+	private static void assertValidEqualsAndHashCodeContract(Class<?> cls)
+			throws Exception {
 		Method equals = cls.getMethod("equals", Object.class);
-		assertEquals(cls.getSimpleName()+" does not implement equals", cls, equals.getDeclaringClass());
+		assertEquals(cls.getSimpleName() + " does not implement equals", cls,
+				equals.getDeclaringClass());
 		Method hashCode = cls.getMethod("hashCode");
-		assertEquals(cls.getSimpleName()+" does not implement hashCode", cls, hashCode.getDeclaringClass());
-		
+		assertEquals(cls.getSimpleName() + " does not implement hashCode", cls,
+				hashCode.getDeclaringClass());
+
 		int baseA = base++;
 		Object a = newInstance(cls, baseA);
 		Object b = newInstance(cls, base++);
@@ -84,11 +87,12 @@ public class TestEqualsHashCode {
 		assertFalse(b.equals(a));
 		assertFalse(a.equals(null));
 		assertFalse(b.equals(null));
-		
+
 		assertTrue("Value type is not final.", isFinal(cls.getModifiers()));
 		for (Field f : cls.getDeclaredFields()) {
 			if (!f.isSynthetic()) {
-				assertTrue("Field "+f.getName()+" is not final.", isFinal(f.getModifiers()));
+				assertTrue("Field " + f.getName() + " is not final.",
+						isFinal(f.getModifiers()));
 			}
 		}
 		// while we are at it - cover toString as well
@@ -96,7 +100,7 @@ public class TestEqualsHashCode {
 		assertEquals(a.toString(), a2.toString());
 		assertFalse(a.toString().equals(b.toString()));
 	}
-	
+
 	private static Object newInstance(Class<?> cls, int base) throws Exception {
 		if (cls == int.class || cls == Integer.class)
 			return Integer.valueOf(base);
@@ -107,7 +111,7 @@ public class TestEqualsHashCode {
 		if (cls == Class.class)
 			return cls;
 		if (cls.isArray()) {
-			Object[] res=Array.newInstance(cls.getComponentType(), 1);
+			Object[] res = Array.newInstance(cls.getComponentType(), 1);
 			res[0] = newInstance(cls.getComponentType(), base++);
 			return res;
 		}

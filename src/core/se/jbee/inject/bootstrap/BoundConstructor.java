@@ -11,30 +11,31 @@ import se.jbee.inject.Parameter;
 import se.jbee.inject.Type;
 import se.jbee.inject.Typed;
 
-public final class BoundConstructor<T>
-		implements Typed<T> {
+public final class BoundConstructor<T> implements Typed<T> {
 
-	public static <T> BoundConstructor<T> bind( Constructor<T> constructor, Parameter<?>... parameters ) {
-		return new BoundConstructor<>( constructor, parameters );
+	public static <T> BoundConstructor<T> bind(Constructor<T> constructor,
+			Parameter<?>... parameters) {
+		return new BoundConstructor<>(constructor, parameters);
 	}
 
 	public final Constructor<T> constructor;
 	public final Parameter<?>[] parameters;
 
-	private BoundConstructor( Constructor<T> constructor, Parameter<?>[] parameters ) {
+	private BoundConstructor(Constructor<T> constructor,
+			Parameter<?>[] parameters) {
 		this.constructor = Metaclass.accessible(constructor);
 		this.parameters = parameters;
 	}
 
 	@Override
 	public Type<T> type() {
-		return Type.raw( constructor.getDeclaringClass() );
+		return Type.raw(constructor.getDeclaringClass());
 	}
 
-	@SuppressWarnings ( "unchecked" )
+	@SuppressWarnings("unchecked")
 	@Override
-	public <E> BoundConstructor<E> typed( Type<E> supertype ) {
-		type().castTo( supertype );
+	public <E> BoundConstructor<E> typed(Type<E> supertype) {
+		type().castTo(supertype);
 		return (BoundConstructor<E>) this;
 	}
 

@@ -34,23 +34,29 @@ public abstract class EventModule extends BinderModule {
 	 */
 	protected <T> void handle(Class<T> event) {
 		if (!event.isInterface())
-			throw new IllegalArgumentException("Event type has to be an interface but was: " + event);
-		initbind(event).to((Initialiser<T>) (listener, injector) ->
-			injector.resolve(EventProcessor.class).register(event, listener));
-		bind(event).to((Supplier<T>)(dep, injector) ->
-			injector.resolve(EventProcessor.class).getProxy(event));
+			throw new IllegalArgumentException(
+					"Event type has to be an interface but was: " + event);
+		initbind(event).to((Initialiser<T>) (listener,
+				injector) -> injector.resolve(EventProcessor.class).register(
+						event, listener));
+		bind(event).to((Supplier<T>) (dep,
+				injector) -> injector.resolve(EventProcessor.class).getProxy(
+						event));
 	}
-	
+
 	private static final class EventBaseModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			asDefault().bind(EventProcessor.class).to(ConcurrentEventProcessor.class);
-			asDefault().bind(EventReflector.class).to(event -> EventPreferences.DEFAULT);
-			asDefault().injectingInto(EventProcessor.class)
-				.bind(ExecutorService.class).to(() -> Executors.newWorkStealingPool());
+			asDefault().bind(EventProcessor.class).to(
+					ConcurrentEventProcessor.class);
+			asDefault().bind(EventReflector.class).to(
+					event -> EventPreferences.DEFAULT);
+			asDefault().injectingInto(EventProcessor.class).bind(
+					ExecutorService.class).to(
+							() -> Executors.newWorkStealingPool());
 		}
-		
+
 	}
 
 }

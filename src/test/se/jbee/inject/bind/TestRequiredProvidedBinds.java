@@ -46,19 +46,18 @@ public class TestRequiredProvidedBinds {
 
 		@Override
 		protected void declare() {
-			bind( Integer.class ).to( 42 );
-			require( ExampleService.class );
+			bind(Integer.class).to(42);
+			require(ExampleService.class);
 		}
 
 	}
 
-	private static class ProvidingModule
-			extends BinderModule {
+	private static class ProvidingModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			provide( ExampleServiceImpl.class );
-			provide( UnusedImpl.class );
+			provide(ExampleServiceImpl.class);
+			provide(UnusedImpl.class);
 		}
 
 	}
@@ -68,59 +67,59 @@ public class TestRequiredProvidedBinds {
 
 		@Override
 		protected void bootstrap() {
-			install( RequirementModule.class );
-			install( ProvidingModule.class );
+			install(RequirementModule.class);
+			install(ProvidingModule.class);
 		}
 	}
 
-	private static class ExplicitBindModule
-			extends BinderModule {
+	private static class ExplicitBindModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			bind( ExampleService.class ).to( ExplicitExampleService.class );
+			bind(ExampleService.class).to(ExplicitExampleService.class);
 		}
 	}
 
-	private static class ExplicitBindBundle
-			extends BootstrapperBundle {
+	private static class ExplicitBindBundle extends BootstrapperBundle {
 
 		@Override
 		protected void bootstrap() {
-			install( RequiredProvidedBindsBundle.class );
-			install( ExplicitBindModule.class );
+			install(RequiredProvidedBindsBundle.class);
+			install(ExplicitBindModule.class);
 		}
 
 	}
 
-	@Test ( expected = NoResourceForDependency.class )
+	@Test(expected = NoResourceForDependency.class)
 	public void thatNotProvidedRequiredBindThrowsException() {
-		Bootstrap.injector( RequirementModule.class );
+		Bootstrap.injector(RequirementModule.class);
 	}
 
 	@Test
 	public void thatRequirementIsFulfilledByProvidedBind() {
-		Injector injector = Bootstrap.injector( RequiredProvidedBindsBundle.class );
-		assertNotNull( injector.resolve( ExampleService.class ) );
+		Injector injector = Bootstrap.injector(
+				RequiredProvidedBindsBundle.class);
+		assertNotNull(injector.resolve(ExampleService.class));
 	}
 
 	@Test
 	public void thatUnusedProvidedBindIsNotAddedToInjectorContext() {
-		Injector injector = Bootstrap.injector( RequiredProvidedBindsBundle.class );
+		Injector injector = Bootstrap.injector(
+				RequiredProvidedBindsBundle.class);
 		try {
-			injector.resolve( UnusedImpl.class );
-			fail( "Should not be bound and therefore throw below exception" );
-		} catch ( NoResourceForDependency e ) {
+			injector.resolve(UnusedImpl.class);
+			fail("Should not be bound and therefore throw below exception");
+		} catch (NoResourceForDependency e) {
 			// expected this
-		} catch ( Throwable e ) {
-			fail( "Expected another exception but got: " + e );
+		} catch (Throwable e) {
+			fail("Expected another exception but got: " + e);
 		}
 	}
 
 	@Test
 	public void thatAnExplicitBindReplacesTheProvidedImplementation() {
-		Injector injector = Bootstrap.injector( ExplicitBindBundle.class );
-		ExampleService s = injector.resolve( ExampleService.class );
-		assertTrue( s instanceof ExplicitExampleService );
+		Injector injector = Bootstrap.injector(ExplicitBindBundle.class);
+		ExampleService s = injector.resolve(ExampleService.class);
+		assertTrue(s instanceof ExplicitExampleService);
 	}
 }

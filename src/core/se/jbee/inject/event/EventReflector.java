@@ -16,13 +16,14 @@ package se.jbee.inject.event;
  */
 @FunctionalInterface
 public interface EventReflector {
-	
+
 	/**
 	 * Extracts the {@link EventPreferences} to use for the given event type.
 	 * 
-	 * The implementation uses reflection to look at signatures and/or annotations
-	 * to derive the {@link EventPreferences} which are used by the
-	 * {@link EventProcessor} to control the processing of events of the given type.
+	 * The implementation uses reflection to look at signatures and/or
+	 * annotations to derive the {@link EventPreferences} which are used by the
+	 * {@link EventProcessor} to control the processing of events of the given
+	 * type.
 	 * 
 	 * @param event the type of the event (the event interface)
 	 * @return the {@link EventPreferences} to use.

@@ -51,57 +51,63 @@ public final class Supply {
 	 * provided it is still bound to this supplier that will throw an exception
 	 * should it ever be called.
 	 */
-	@SuppressWarnings ( "unchecked" )
+	@SuppressWarnings("unchecked")
 	public static <T> Supplier<T> required() {
 		return (Supplier<T>) REQUIRED;
 	}
 
-	public static <T> Supplier<T> constant( T constant ) {
-		return new ConstantSupplier<>( constant );
+	public static <T> Supplier<T> constant(T constant) {
+		return new ConstantSupplier<>(constant);
 	}
 
-	public static <T> Supplier<T> reference( Class<? extends Supplier<? extends T>> type ) {
-		return new SupplierSupplierBridge<>( type );
+	public static <T> Supplier<T> reference(
+			Class<? extends Supplier<? extends T>> type) {
+		return new SupplierSupplierBridge<>(type);
 	}
 
-	public static <E> Supplier<E[]> elements( Type<E[]> arrayType, Parameter<? extends E>[] elements ) {
-		return new PredefinedArraySupplier<>( arrayType, BoundParameter.bind( elements ) );
+	public static <E> Supplier<E[]> elements(Type<E[]> arrayType,
+			Parameter<? extends E>[] elements) {
+		return new PredefinedArraySupplier<>(arrayType,
+				BoundParameter.bind(elements));
 	}
 
-	public static <T> Supplier<T> instance( Instance<T> instance ) {
-		return new LazyInstance<>( instance );
+	public static <T> Supplier<T> instance(Instance<T> instance) {
+		return new LazyInstance<>(instance);
 	}
 
-	public static <T> Supplier<T> dependency( Dependency<T> dependency ) {
-		return new LazyDependency<>( dependency );
+	public static <T> Supplier<T> dependency(Dependency<T> dependency) {
+		return new LazyDependency<>(dependency);
 	}
 
-	public static <T> Supplier<T> parametrizedInstance( Instance<T> instance ) {
-		return new LazyParametrizedInstance<>( instance );
+	public static <T> Supplier<T> parametrizedInstance(Instance<T> instance) {
+		return new LazyParametrizedInstance<>(instance);
 	}
 
-	public static <T> Supplier<T> method( BoundMethod<T> method ) {
+	public static <T> Supplier<T> method(BoundMethod<T> method) {
 		return new MethodSupplier<>(method,
-				bind( parameterTypes(method.factory), method.parameters ));
+				bind(parameterTypes(method.factory), method.parameters));
 	}
 
-	public static <T> Supplier<T> costructor( BoundConstructor<T> constructor ) {
-		return new ConstructorSupplier<>( constructor.constructor,
-				bind( parameterTypes(constructor.constructor), constructor.parameters));
+	public static <T> Supplier<T> costructor(BoundConstructor<T> constructor) {
+		return new ConstructorSupplier<>(constructor.constructor,
+				bind(parameterTypes(constructor.constructor),
+						constructor.parameters));
 	}
 
-	public static <T> Supplier<T> factory( Factory<T> factory ) {
-		return new FactorySupplierBridge<>( factory );
+	public static <T> Supplier<T> factory(Factory<T> factory) {
+		return new FactorySupplierBridge<>(factory);
 	}
 
-	public static <T> Provider<T> lazyProvider( Dependency<T> dependency, Injector injector ) {
-		return dependency.type().arrayDimensions() == 1 // no specs for results composed within the Injector
-				? new LazyDirectProvider<>(dependency, injector)
-				: new LazyPreresolvedProvider<>(dependency, injector);
+	public static <T> Provider<T> lazyProvider(Dependency<T> dependency,
+			Injector injector) {
+		return dependency.type().arrayDimensions() == 1 // no specs for results
+			// composed within the Injector
+			? new LazyDirectProvider<>(dependency, injector)
+			: new LazyPreresolvedProvider<>(dependency, injector);
 	}
 
 	private Supply() {
-		throw new UnsupportedOperationException( "util" );
+		throw new UnsupportedOperationException("util");
 	}
 
 	public static abstract class ArrayBridge<T> implements Supplier<T> {
@@ -111,23 +117,26 @@ public final class Supply {
 		}
 
 		@Override
-		public final T supply( Dependency<? super T> dep, Injector injector ) {
-			Type<?> elementType = dep.type().parameter( 0 );
-			return bridge( supplyArray( dep.typed( elementType.addArrayDimension() ), injector ) );
+		public final T supply(Dependency<? super T> dep, Injector injector) {
+			Type<?> elementType = dep.type().parameter(0);
+			return bridge(supplyArray(
+					dep.typed(elementType.addArrayDimension()), injector));
 		}
 
-		private static <E> E[] supplyArray( Dependency<E[]> elementType, Injector resolver ) {
-			return resolver.resolve( elementType );
+		private static <E> E[] supplyArray(Dependency<E[]> elementType,
+				Injector resolver) {
+			return resolver.resolve(elementType);
 		}
 
-		abstract <E> T bridge( E[] elements );
+		abstract <E> T bridge(E[] elements);
 	}
 
 	/**
 	 * Shows how support for {@link List}s and such works.
 	 *
-	 * Basically we just resolve the array of the element type (generic of the list). Arrays itself
-	 * have build in support that will (if not redefined by a more precise binding) return all known
+	 * Basically we just resolve the array of the element type (generic of the
+	 * list). Arrays itself have build in support that will (if not redefined by
+	 * a more precise binding) return all known
 	 *
 	 * @author Jan Bernitt (jan@jbee.se)
 	 *
@@ -135,12 +144,12 @@ public final class Supply {
 	private static final class ArrayToListBridge extends ArrayBridge<List<?>> {
 
 		ArrayToListBridge() {
-			//make visible
+			// make visible
 		}
 
 		@Override
-		<E> List<E> bridge( E[] elements ) {
-			return Arrays.asList( elements );
+		<E> List<E> bridge(E[] elements) {
+			return Arrays.asList(elements);
 		}
 
 	}
@@ -152,8 +161,8 @@ public final class Supply {
 		}
 
 		@Override
-		<E> Set<E> bridge( E[] elements ) {
-			return new HashSet<>( Arrays.asList( elements ) );
+		<E> Set<E> bridge(E[] elements) {
+			return new HashSet<>(Arrays.asList(elements));
 		}
 
 	}
@@ -162,18 +171,18 @@ public final class Supply {
 
 		private final Dependency<T> dependency;
 
-		LazyDependency( Dependency<T> dependency ) {
+		LazyDependency(Dependency<T> dependency) {
 			this.dependency = dependency;
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dep, Injector injector ) {
-			return injector.resolve( this.dependency );
+		public T supply(Dependency<? super T> dep, Injector injector) {
+			return injector.resolve(this.dependency);
 		}
 
 		@Override
 		public String toString() {
-			return describe( "supplies", dependency );
+			return describe("supplies", dependency);
 		}
 	}
 
@@ -181,42 +190,47 @@ public final class Supply {
 
 		private final T constant;
 
-		ConstantSupplier( T constant ) {
+		ConstantSupplier(T constant) {
 			this.constant = constant;
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dep, Injector injector ) {
+		public T supply(Dependency<? super T> dep, Injector injector) {
 			return constant;
 		}
 
 		@Override
 		public String toString() {
-			return describe( "supplies", constant );
+			return describe("supplies", constant);
 		}
 
 	}
 
 	/**
-	 * A {@link Supplier} uses multiple different separate suppliers to provide the elements of a
-	 * array of the supplied type.
+	 * A {@link Supplier} uses multiple different separate suppliers to provide
+	 * the elements of a array of the supplied type.
 	 *
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	private static final class PredefinedArraySupplier<E> extends WithParameters<E[]> {
+	private static final class PredefinedArraySupplier<E>
+			extends WithParameters<E[]> {
 
 		private final Type<E[]> arrayType;
 		private final E[] res;
 
-		@SuppressWarnings ( "unchecked" )
-		PredefinedArraySupplier( Type<E[]> arrayType, BoundParameter<? extends E>[] elements ) {
+		@SuppressWarnings("unchecked")
+		PredefinedArraySupplier(Type<E[]> arrayType,
+				BoundParameter<? extends E>[] elements) {
 			super(elements);
 			this.arrayType = arrayType;
-			this.res = (E[]) Array.newInstance( arrayType.baseType().rawType, elements.length );
+			this.res = (E[]) Array.newInstance(arrayType.baseType().rawType,
+					elements.length);
 		}
 
 		@Override
-		protected void init(Dependency<? super E[]> dependency, Injector injector) { /*NOOP*/ }
+		protected void init(Dependency<? super E[]> dependency,
+				Injector injector) {
+			/* NOOP */ }
 
 		@Override
 		protected E[] invoke(Object[] args) {
@@ -226,47 +240,51 @@ public final class Supply {
 
 		@Override
 		public String toString() {
-			return describe( "supplies", arrayType );
+			return describe("supplies", arrayType);
 		}
 	}
 
-	private static final class SupplierSupplierBridge<T> implements Supplier<T> {
+	private static final class SupplierSupplierBridge<T>
+			implements Supplier<T> {
 
 		private final Class<? extends Supplier<? extends T>> type;
 
-		SupplierSupplierBridge( Class<? extends Supplier<? extends T>> type ) {
+		SupplierSupplierBridge(Class<? extends Supplier<? extends T>> type) {
 			this.type = type;
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dep, Injector injector ) {
-			final Supplier<? extends T> supplier = injector.resolve( dep.instanced(anyOf(type)));
-			return supplier.supply( dep, injector );
+		public T supply(Dependency<? super T> dep, Injector injector) {
+			final Supplier<? extends T> supplier = injector.resolve(
+					dep.instanced(anyOf(type)));
+			return supplier.supply(dep, injector);
 		}
 	}
 
 	/**
 	 * E.g. used to "forward" Collection<T> to List<T>.
 	 */
-	private static final class LazyParametrizedInstance<T> implements Supplier<T> {
+	private static final class LazyParametrizedInstance<T>
+			implements Supplier<T> {
 
 		private final Instance<? extends T> instance;
 
-		LazyParametrizedInstance( Instance<? extends T> instance ) {
+		LazyParametrizedInstance(Instance<? extends T> instance) {
 			this.instance = instance;
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dep, Injector injector ) {
+		public T supply(Dependency<? super T> dep, Injector injector) {
 			Type<? super T> type = dep.type();
-			Instance<? extends T> parametrized = instance.typed( instance.type().parametized(
-					type.parameters() ).upperBound( dep.type().isUpperBound() ) );
-			return injector.resolve( dep.instanced( parametrized ) );
+			Instance<? extends T> parametrized = instance.typed(
+					instance.type().parametized(type.parameters()).upperBound(
+							dep.type().isUpperBound()));
+			return injector.resolve(dep.instanced(parametrized));
 		}
 
 		@Override
 		public String toString() {
-			return describe( "supplies", instance );
+			return describe("supplies", instance);
 		}
 
 	}
@@ -275,36 +293,40 @@ public final class Supply {
 
 		private final Instance<? extends T> instance;
 
-		LazyInstance( Instance<? extends T> instance ) {
+		LazyInstance(Instance<? extends T> instance) {
 			this.instance = instance;
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dep, Injector injector ) {
-			// Note that this is not "buffered" using specs as it is used to implement the plain resolution
-			return injector.resolve( dep.instanced( instance ) );
+		public T supply(Dependency<? super T> dep, Injector injector) {
+			// Note that this is not "buffered" using specs as it is used to
+			// implement the plain resolution
+			return injector.resolve(dep.instanced(instance));
 		}
 
 		@Override
 		public String toString() {
-			return describe( "supplies", instance );
+			return describe("supplies", instance);
 		}
 	}
 
-	private static final class ProviderSupplierBridge implements Supplier<Provider<?>> {
+	private static final class ProviderSupplierBridge
+			implements Supplier<Provider<?>> {
 
 		ProviderSupplierBridge() {
-			//make visible
+			// make visible
 		}
 
 		@Override
-		public Provider<?> supply( Dependency<? super Provider<?>> dep, Injector injector ) {
-			return lazyProvider( dep.onTypeParameter().uninject().ignoredExpiry(), injector );
+		public Provider<?> supply(Dependency<? super Provider<?>> dep,
+				Injector injector) {
+			return lazyProvider(
+					dep.onTypeParameter().uninject().ignoredExpiry(), injector);
 		}
 
 		@Override
 		public String toString() {
-			return describe( "supplies", Provider.class );
+			return describe("supplies", Provider.class);
 		}
 	}
 
@@ -325,16 +347,17 @@ public final class Supply {
 
 	}
 
-	private static final class LazyPreresolvedProvider<T> implements Provider<T> {
+	private static final class LazyPreresolvedProvider<T>
+			implements Provider<T> {
 
 		private final Dependency<T> dependency;
 		private final InjectionCase<? extends T> icase;
 
 		@SuppressWarnings("unchecked")
-		LazyPreresolvedProvider( Dependency<T> dependency, Injector injector ) {
+		LazyPreresolvedProvider(Dependency<T> dependency, Injector injector) {
 			this.dependency = dependency;
-			this.icase = injector.resolve(
-					dependency.typed(raw(InjectionCase.class).parametized(dependency.type())));
+			this.icase = injector.resolve(dependency.typed(
+					raw(InjectionCase.class).parametized(dependency.type())));
 		}
 
 		@Override
@@ -344,45 +367,49 @@ public final class Supply {
 
 		@Override
 		public String toString() {
-			return describe( "provides", dependency );
+			return describe("provides", dependency);
 		}
 	}
 
 	/**
-	 * Adapter to a simpler API that will not need any {@link Injector} to supply it's value in any
-	 * case.
+	 * Adapter to a simpler API that will not need any {@link Injector} to
+	 * supply it's value in any case.
 	 */
 	private static final class FactorySupplierBridge<T> implements Supplier<T> {
 
 		private final Factory<T> factory;
 
-		FactorySupplierBridge( Factory<T> factory ) {
+		FactorySupplierBridge(Factory<T> factory) {
 			this.factory = factory;
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dep, Injector injector ) {
-			return factory.fabricate( dep.instance, dep.target( 1 ) );
+		public T supply(Dependency<? super T> dep, Injector injector) {
+			return factory.fabricate(dep.instance, dep.target(1));
 		}
 
 		@Override
 		public String toString() {
-			return describe( "supplies", factory );
+			return describe("supplies", factory);
 		}
 
 	}
 
-	private static final class ConstructorSupplier<T> extends WithParameters<T> {
+	private static final class ConstructorSupplier<T>
+			extends WithParameters<T> {
 
 		private final Constructor<T> constructor;
 
-		ConstructorSupplier( Constructor<T> constructor, BoundParameter<?>[] params) {
+		ConstructorSupplier(Constructor<T> constructor,
+				BoundParameter<?>[] params) {
 			super(params);
 			this.constructor = constructor;
 		}
 
 		@Override
-		protected void init(Dependency<? super T> dependency, Injector injector) { /*NOOP*/}
+		protected void init(Dependency<? super T> dependency,
+				Injector injector) {
+			/* NOOP */}
 
 		@Override
 		protected T invoke(Object[] args) {
@@ -391,7 +418,7 @@ public final class Supply {
 
 		@Override
 		public String toString() {
-			return describe( constructor );
+			return describe(constructor);
 		}
 	}
 
@@ -401,7 +428,7 @@ public final class Supply {
 		private Object owner;
 		private final Class<T> returnType;
 
-		MethodSupplier( BoundMethod<T> method, BoundParameter<?>[] parameters ) {
+		MethodSupplier(BoundMethod<T> method, BoundParameter<?>[] parameters) {
 			super(parameters);
 			this.method = method;
 			this.returnType = method.returnType.rawType;
@@ -409,20 +436,21 @@ public final class Supply {
 		}
 
 		@Override
-		protected void init(Dependency<? super T> dependency, Injector injector) {
-			if ( method.isInstanceMethod && owner == null ) {
-				owner = injector.resolve( method.factory.getDeclaringClass() );
+		protected void init(Dependency<? super T> dependency,
+				Injector injector) {
+			if (method.isInstanceMethod && owner == null) {
+				owner = injector.resolve(method.factory.getDeclaringClass());
 			}
 		}
 
 		@Override
 		protected T invoke(Object[] args) {
-			return returnType.cast(Supply.method( method.factory, owner, args ));
+			return returnType.cast(Supply.method(method.factory, owner, args));
 		}
 
 		@Override
 		public String toString() {
-			return describe( method.factory );
+			return describe(method.factory);
 		}
 	}
 
@@ -433,18 +461,20 @@ public final class Supply {
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dep, Injector injector ) {
+		public T supply(Dependency<? super T> dep, Injector injector) {
 			throw required(dep);
 		}
 
 		@SuppressWarnings("unchecked")
-		private static <T> NoResourceForDependency required(Dependency<T> dependency) {
-			return new NoResourceForDependency(dependency, new InjectionCase[0], "Should never be called!" );
+		private static <T> NoResourceForDependency required(
+				Dependency<T> dependency) {
+			return new NoResourceForDependency(dependency, new InjectionCase[0],
+					"Should never be called!");
 		}
 
 		@Override
 		public String toString() {
-			return Supply.describe( "required" );
+			return Supply.describe("required");
 		}
 	}
 
@@ -455,22 +485,23 @@ public final class Supply {
 		}
 
 		@Override
-		public <P> Logger fabricate( Instance<? super Logger> created, Instance<P> receiver ) {
-			return Logger.getLogger( receiver.type().rawType.getCanonicalName() );
+		public <P> Logger fabricate(Instance<? super Logger> created,
+				Instance<P> receiver) {
+			return Logger.getLogger(receiver.type().rawType.getCanonicalName());
 		}
 
 	}
 
-	public static String describe( Object behaviour ) {
+	public static String describe(Object behaviour) {
 		return "<" + behaviour + ">";
 	}
 
-	public static String describe( Object behaviour, Object variant ) {
+	public static String describe(Object behaviour, Object variant) {
 		return "<" + behaviour + ":" + variant + ">";
 	}
 
-	public static String describe( Object behaviour, Object[] variants ) {
-		return describe( behaviour, Arrays.toString( variants ) );
+	public static String describe(Object behaviour, Object[] variants) {
+		return describe(behaviour, Arrays.toString(variants));
 	}
 
 	public static abstract class WithParameters<T> implements Supplier<T> {
@@ -484,13 +515,19 @@ public final class Supply {
 
 		}
 
-		protected abstract void init(Dependency<? super T> dependency, Injector injector);
+		protected abstract void init(Dependency<? super T> dependency,
+				Injector injector);
 
 		protected abstract T invoke(Object[] args);
 
 		@Override
-		public T supply(Dependency<? super T> dep, Injector injector) throws UnresolvableDependency {
-			InjectionSite local = previous; // this is important so previous might work as a simple cache but never causes trouble for this invocation in face of multiple threads calling
+		public T supply(Dependency<? super T> dep, Injector injector)
+				throws UnresolvableDependency {
+			InjectionSite local = previous; // this is important so previous
+											// might work as a simple cache but
+											// never causes trouble for this
+											// invocation in face of multiple
+											// threads calling
 			if (local == null) {
 				init(dep, injector);
 			}
@@ -503,18 +540,20 @@ public final class Supply {
 
 	}
 
-	public static <T> T constructor( Constructor<T> constructor, Object... args ) throws SupplyFailed {
+	public static <T> T constructor(Constructor<T> constructor, Object... args)
+			throws SupplyFailed {
 		try {
-			return constructor.newInstance( args );
-		} catch ( Exception e ) {
+			return constructor.newInstance(args);
+		} catch (Exception e) {
 			throw SupplyFailed.valueOf(e, constructor);
 		}
 	}
 
-	public static Object method( Method method, Object owner, Object... args ) throws SupplyFailed {
+	public static Object method(Method method, Object owner, Object... args)
+			throws SupplyFailed {
 		try {
-			return method.invoke( owner, args );
-		} catch ( Exception e ) {
+			return method.invoke(owner, args);
+		} catch (Exception e) {
 			throw SupplyFailed.valueOf(e, method);
 		}
 	}

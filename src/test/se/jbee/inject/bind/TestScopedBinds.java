@@ -13,8 +13,8 @@ public class TestScopedBinds {
 
 	private static class Foo {
 
-		@SuppressWarnings ( "unused" )
-		Foo( Bar bar ) {
+		@SuppressWarnings("unused")
+		Foo(Bar bar) {
 			// it is just about the instances
 		}
 	}
@@ -23,8 +23,7 @@ public class TestScopedBinds {
 		// just to demo
 	}
 
-	private static class ScopedBindsModule
-			extends BinderModule {
+	private static class ScopedBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
@@ -33,11 +32,11 @@ public class TestScopedBinds {
 		}
 	}
 
-	@Test ( expected = UnstableDependency.class )
+	@Test(expected = UnstableDependency.class)
 	public void thatInjectingAnInjectionScopedInstanceIntoAppScopedInstanceThrowsAnException() {
-		Injector injector = Bootstrap.injector( ScopedBindsModule.class );
-		Foo foo = injector.resolve( Foo.class );
-		fail( "It should not be possible to create a foo but got one: " + foo );
+		Injector injector = Bootstrap.injector(ScopedBindsModule.class);
+		Foo foo = injector.resolve(Foo.class);
+		fail("It should not be possible to create a foo but got one: " + foo);
 	}
 
 }

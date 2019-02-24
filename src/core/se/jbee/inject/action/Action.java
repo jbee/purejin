@@ -6,14 +6,13 @@
 package se.jbee.inject.action;
 
 /**
- * The low user level representation of an action (a operation or micro-service).
+ * The low user level representation of an action (a operation or
+ * micro-service).
  * 
  * @see Executor
  * 
- * @param <I>
- *            The type of the input
- * @param <O>
- *            The type of the output
+ * @param <I> The type of the input
+ * @param <O> The type of the output
  */
 @FunctionalInterface
 public interface Action<I, O> {
@@ -23,13 +22,11 @@ public interface Action<I, O> {
 	 * not change any inner state but it might in rare cases be part of an
 	 * action to do such a thing.
 	 * 
-	 * @param input
-	 *            might be null for {@link Void} arguments or when argument was
-	 *            resolved to null
+	 * @param input might be null for {@link Void} arguments or when argument
+	 *            was resolved to null
 	 * @return might be null
-	 * @throws ActionMalfunction
-	 *             wraps all {@link RuntimeException}s
+	 * @throws ActionMalfunction wraps all {@link RuntimeException}s
 	 */
-	O exec( I input ) throws ActionMalfunction;
+	O exec(I input) throws ActionMalfunction;
 
 }

@@ -11,17 +11,17 @@ import se.jbee.inject.container.Supplier;
 
 public class TestSupplierBinds {
 
-	public static class SupplierBindsModule
-			extends BinderModule
+	public static class SupplierBindsModule extends BinderModule
 			implements Supplier<String> {
 
 		@Override
 		protected void declare() {
-			bind( String.class ).toSupplier( SupplierBindsModule.class );
+			bind(String.class).toSupplier(SupplierBindsModule.class);
 		}
 
 		@Override
-		public String supply( Dependency<? super String> dep, Injector injector ) {
+		public String supply(Dependency<? super String> dep,
+				Injector injector) {
 			return "foobar";
 		}
 
@@ -29,8 +29,8 @@ public class TestSupplierBinds {
 
 	@Test
 	public void test() {
-		Injector injector = Bootstrap.injector( SupplierBindsModule.class );
-		String value = injector.resolve( String.class );
-		assertEquals( "foobar", value );
+		Injector injector = Bootstrap.injector(SupplierBindsModule.class);
+		String value = injector.resolve(String.class);
+		assertEquals("foobar", value);
 	}
 }

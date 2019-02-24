@@ -33,47 +33,50 @@ import se.jbee.inject.Type;
 public class ConcurrentEventProcessor implements EventProcessor {
 
 	private final static class EventHandler extends WeakReference<Object> {
- 
+
 		/**
 		 * How many threads are currently calling one of the handlers methods.
 		 */
 		final AtomicInteger concurrentUsage = new AtomicInteger(0);
-		
+
 		EventHandler(Object handler) {
 			super(handler);
 		}
-		
+
 		/**
-		 * If the use succeeds (result is true) the end of usage should be marked by
-		 * calling {@link #free()} so that this handler can continue to keep track of
-		 * the concurrent using threads.
+		 * If the use succeeds (result is true) the end of usage should be
+		 * marked by calling {@link #free()} so that this handler can continue
+		 * to keep track of the concurrent using threads.
 		 * 
-		 * @return true if this handler could be reserved for usage by the calling
-		 *         thread, else false.
+		 * @return true if this handler could be reserved for usage by the
+		 *         calling thread, else false.
 		 */
 		boolean allocateFor(Event<?, ?> e) {
 			while (true) {
 				int currentUsage = concurrentUsage.get();
 				if (currentUsage >= e.prefs.maxConcurrentUsage)
 					return false;
-				boolean success = concurrentUsage.compareAndSet(currentUsage, currentUsage + 1);
+				boolean success = concurrentUsage.compareAndSet(currentUsage,
+						currentUsage + 1);
 				if (success)
 					return true;
 			}
 		}
-		
+
 		void free() {
 			concurrentUsage.decrementAndGet();
 		}
 	}
-	
-	static final class EventHandlers extends ConcurrentLinkedDeque<EventHandler> {
-		
+
+	static final class EventHandlers
+			extends ConcurrentLinkedDeque<EventHandler> {
+
 		/**
-		 * Tries to find a handler that can be used to process the event. A successfully
-		 * received handler has to be marked {@link #free(EventHandler)} right after
-		 * usage ends unless its handler reference became collected. In that case the
-		 * handler became out-dated.
+		 * Tries to find a handler that can be used to process the event. A
+		 * successfully received handler has to be marked
+		 * {@link #free(EventHandler)} right after usage ends unless its handler
+		 * reference became collected. In that case the handler became
+		 * out-dated.
 		 * 
 		 * @return a free handler to use or null if there is no such handler
 		 */
@@ -82,39 +85,40 @@ public class ConcurrentEventProcessor implements EventProcessor {
 			// or we find a handler to use
 			while (true) {
 				EventHandler h = pollFirst();
-				if (h == null) 
+				if (h == null)
 					return null;
 				if (h.allocateFor(e)) {
-					if (h.get() != null)					
+					if (h.get() != null)
 						return h;
 				} else {
 					addLast(h);
 				}
 			}
 		}
-		
+
 		void free(EventHandler h) {
 			h.free();
 			addLast(h);
 		}
 	}
-	
+
 	private final Map<Class<?>, Object> proxiesByEventType = new ConcurrentHashMap<>();
 	private final Map<Class<?>, EventHandlers> handlersByEventType = new ConcurrentHashMap<>();
 	private final Map<Class<?>, EventPreferences> prefsByEventType = new ConcurrentHashMap<>();
 	private final ExecutorService executor;
 	private final EventReflector reflector;
-	
-	ConcurrentEventProcessor(EventReflector reflector, ExecutorService executor) {
+
+	ConcurrentEventProcessor(EventReflector reflector,
+			ExecutorService executor) {
 		this.reflector = reflector;
 		this.executor = executor;
 	}
-	
+
 	@Override
 	public void close() {
 		executor.shutdown();
 	}
-	
+
 	@Override
 	public <E> void await(Class<E> event) throws InterruptedException {
 		EventHandlers hs = getHandlers(event);
@@ -124,15 +128,17 @@ public class ConcurrentEventProcessor implements EventProcessor {
 			hs.wait();
 		}
 	}
-	
+
 	private EventPreferences getPrefs(Class<?> event) {
-		return prefsByEventType.computeIfAbsent(event, e -> reflector.reflect(e));
+		return prefsByEventType.computeIfAbsent(event,
+				e -> reflector.reflect(e));
 	}
-	
+
 	@Override
 	public <E> void register(Class<E> event, E handler) {
-		if (Proxy.isProxyClass(handler.getClass()) 
-				&& Proxy.getInvocationHandler(handler).getClass() == ProxyEventHandler.class) {
+		if (Proxy.isProxyClass(handler.getClass())
+			&& Proxy.getInvocationHandler(
+					handler).getClass() == ProxyEventHandler.class) {
 			return; // prevent own proxies to be registered as this causes multi-threaded endless loops
 		}
 		EventHandlers hs = getHandlers(event);
@@ -143,9 +149,10 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	}
 
 	private <E> EventHandlers getHandlers(Class<E> event) {
-		return handlersByEventType.computeIfAbsent(event, k -> new EventHandlers());
+		return handlersByEventType.computeIfAbsent(event,
+				k -> new EventHandlers());
 	}
-	
+
 	@Override
 	public <E> void deregister(Class<E> event, E handler) {
 		EventHandlers hs = handlersByEventType.get(event);
@@ -156,9 +163,9 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <E> E getProxy(Class<E> event) {
-		return (E) proxiesByEventType.computeIfAbsent(event, e -> 
-			newProxyInstance(e.getClassLoader(), new Class[] { e }, 
-					new ProxyEventHandler<>(e, getPrefs(e), this)));
+		return (E) proxiesByEventType.computeIfAbsent(event,
+				e -> newProxyInstance(e.getClassLoader(), new Class[] { e },
+						new ProxyEventHandler<>(e, getPrefs(e), this)));
 	}
 
 	private <T> Future<T> submit(Event<?, ?> event, Callable<T> f) {
@@ -168,7 +175,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 			throw new EventException(event, e);
 		}
 	}
-	
+
 	@Override
 	public <E> void dispatch(Event<E, ?> event) throws Throwable {
 		Future<?> res;
@@ -190,18 +197,19 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	public <E, T> T compute(Event<E, T> event) throws Throwable {
 		return unwrapGet(event, submit(event, () -> doProcess(event)));
 	}
-	
+
 	@Override
-	public <E, T extends Future<V>, V> Future<V> computeEventually(Event<E, T> event) {
-		return new UnboxingFuture<>(event, submit(event, () -> doProcess(event)));
+	public <E, T extends Future<V>, V> Future<V> computeEventually(
+			Event<E, T> event) {
+		return new UnboxingFuture<>(event,
+				submit(event, () -> doProcess(event)));
 	}
-	
+
 	private <E, T> T doProcess(Event<E, T> event) throws EventException {
-		return event.prefs.isAggregatedMultiDispatch() && event.aggregator != null
-				? doDispatch(event)
-				: doCompute(event);
+		return event.prefs.isAggregatedMultiDispatch()
+			&& event.aggregator != null ? doDispatch(event) : doCompute(event);
 	}
-	
+
 	private <E, T> T doCompute(Event<E, T> event) throws EventException {
 		ensureNoTimeout(event);
 		EventHandlers hs = handlersByEventType.get(event.type);
@@ -220,7 +228,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 			}
 		}
 	}
-	
+
 	private <E, T> T doDispatch(Event<E, T> event) throws EventException {
 		ensureNoTimeout(event);
 		EventHandlers hs = handlersByEventType.get(event.type);
@@ -258,7 +266,9 @@ public class ConcurrentEventProcessor implements EventProcessor {
 					if (h.allocateFor(event)) {
 						T res1 = invoke(event, handler);
 						if (aggregator != null)
-							res = res == null ? res1 : aggregator.apply(res, res1);
+							res = res == null
+								? res1
+								: aggregator.apply(res, res1);
 						h.free();
 					} else {
 						retry.addLast(h);
@@ -269,65 +279,76 @@ public class ConcurrentEventProcessor implements EventProcessor {
 		return res;
 	}
 
-	private static <E, T> void ensureNoTimeout(Event<E, T> event) throws EventException {
+	private static <E, T> void ensureNoTimeout(Event<E, T> event)
+			throws EventException {
 		if (event.isOutdated())
 			throw new EventException(event, new TimeoutException());
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <E, T> T invoke(Event<E, T> event, E listener) throws EventException {
+	private static <E, T> T invoke(Event<E, T> event, E listener)
+			throws EventException {
 		try {
 			return (T) event.handler.invoke(listener, event.args);
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+		} catch (IllegalAccessException | IllegalArgumentException
+				| InvocationTargetException e) {
 			throw new EventException(event, e);
 		}
 	}
-	
+
 	static class ProxyEventHandler<E> implements InvocationHandler {
 
 		final Class<E> event;
 		final EventPreferences prefs;
 		final EventProcessor processor;
 
-		public ProxyEventHandler(Class<E> event, EventPreferences prefs, EventProcessor processor) {
+		public ProxyEventHandler(Class<E> event, EventPreferences prefs,
+				EventProcessor processor) {
 			this.event = event;
 			this.prefs = prefs;
 			this.processor = processor;
 		}
 
 		@Override
-		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+		public Object invoke(Object proxy, Method method, Object[] args)
+				throws Throwable {
 			return invoke(method, args, returnType(method));
 		}
-		
+
 		@SuppressWarnings("unchecked")
-		private <T> Object invoke(Method method, Object[] args, Type<T> result) throws Throwable {
+		private <T> Object invoke(Method method, Object[] args, Type<T> result)
+				throws Throwable {
 			Class<T> raw = result.rawType;
-			Event<E, T> e = new Event<>(event, prefs, result, method, args, defaultAggregator(raw, args));
+			Event<E, T> e = new Event<>(event, prefs, result, method, args,
+					defaultAggregator(raw, args));
 			if (e.returnsVoid()) {
-				processor.dispatch((Event<E, Void>)e);
+				processor.dispatch((Event<E, Void>) e);
 				return null;
 			}
 			if (raw == Future.class) {
-				return processor.computeEventually((Event<E, Future<Object>>)e);
+				return processor.computeEventually(
+						(Event<E, Future<Object>>) e);
 			}
 			return processor.compute(e);
 		}
 
 		@SuppressWarnings("unchecked")
-		private static <T> BinaryOperator<T> defaultAggregator(Class<T> raw, Object[] args) {
-			BinaryOperator<T> aggregator = args != null 
-					&& args.length > 0 && args[args.length - 1] != null
-					&& BinaryOperator.class.isAssignableFrom(args.getClass())
-							? (BinaryOperator<T>) args[args.length - 1]
-							: null;
+		private static <T> BinaryOperator<T> defaultAggregator(Class<T> raw,
+				Object[] args) {
+			BinaryOperator<T> aggregator = args != null && args.length > 0
+				&& args[args.length - 1] != null
+				&& BinaryOperator.class.isAssignableFrom(args.getClass())
+					? (BinaryOperator<T>) args[args.length - 1]
+					: null;
 			if (aggregator != null)
 				return aggregator;
 			if (raw == boolean.class || raw == Boolean.class) {
-				return (BinaryOperator<T>) ((BinaryOperator<Boolean>) (a, b) -> a || b);
+				return (BinaryOperator<T>) ((BinaryOperator<Boolean>) (a,
+						b) -> a || b);
 			}
 			if (raw == int.class || raw == Integer.class) {
-				return (BinaryOperator<T>) ((BinaryOperator<Integer>) (a, b) -> a + b);
+				return (BinaryOperator<T>) ((BinaryOperator<Integer>) (a,
+						b) -> a + b);
 			}
 			return null;
 		}

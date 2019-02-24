@@ -32,41 +32,39 @@ public class TestProviderBinds {
 	static final DynamicState DYNAMIC_STATE_IN_A = new DynamicState();
 	static final DynamicState DYNAMIC_STATE_IN_B = new DynamicState();
 
-	static final Instance<WorkingStateConsumer> A = instance( named( "A" ),
-			raw( WorkingStateConsumer.class ) );
-	static final Instance<WorkingStateConsumer> B = instance( named( "B" ),
-			raw( WorkingStateConsumer.class ) );
+	static final Instance<WorkingStateConsumer> A = instance(named("A"),
+			raw(WorkingStateConsumer.class));
+	static final Instance<WorkingStateConsumer> B = instance(named("B"),
+			raw(WorkingStateConsumer.class));
 
-	private static class ProviderBindsModule
-			extends BinderModule {
+	private static class ProviderBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			bind( String.class ).to( "foobar" );
-			bind( named("special"), String.class ).to( "special" );
-			bind( CharSequence.class ).to( "bar" );
-			bind( Integer.class ).to( 42 );
-			bind( named( "foo" ), Integer.class ).to( 846 );
-			bind( Float.class ).to( 42.0f );
-			per( Scoped.INJECTION ).bind( DynamicState.class ).toConstructor();
-			construct( FaultyStateConsumer.class );
-			construct( WorkingStateConsumer.class );
+			bind(String.class).to("foobar");
+			bind(named("special"), String.class).to("special");
+			bind(CharSequence.class).to("bar");
+			bind(Integer.class).to(42);
+			bind(named("foo"), Integer.class).to(846);
+			bind(Float.class).to(42.0f);
+			per(Scoped.INJECTION).bind(DynamicState.class).toConstructor();
+			construct(FaultyStateConsumer.class);
+			construct(WorkingStateConsumer.class);
 
-			injectingInto( A ).bind( DynamicState.class ).to( DYNAMIC_STATE_IN_A );
-			injectingInto( B ).bind( DynamicState.class ).to( DYNAMIC_STATE_IN_B );
-			construct( A );
-			construct( B );
+			injectingInto(A).bind(DynamicState.class).to(DYNAMIC_STATE_IN_A);
+			injectingInto(B).bind(DynamicState.class).to(DYNAMIC_STATE_IN_B);
+			construct(A);
+			construct(B);
 		}
 
 	}
 
-	private static class ProviderBindsBundle
-			extends BootstrapperBundle {
+	private static class ProviderBindsBundle extends BootstrapperBundle {
 
 		@Override
 		protected void bootstrap() {
-			installAll( BuildinBundle.class );
-			install( ProviderBindsModule.class );
+			installAll(BuildinBundle.class);
+			install(ProviderBindsModule.class);
 		}
 
 	}
@@ -80,8 +78,8 @@ public class TestProviderBinds {
 
 	private static class FaultyStateConsumer {
 
-		@SuppressWarnings ( "unused" )
-		FaultyStateConsumer( DynamicState state ) {
+		@SuppressWarnings("unused")
+		FaultyStateConsumer(DynamicState state) {
 			// using the state directly is faulty since the state changes.
 		}
 	}
@@ -91,8 +89,9 @@ public class TestProviderBinds {
 		final Provider<DynamicState> state;
 		final Provider<String[]> strings;
 
-		@SuppressWarnings ( "unused" )
-		WorkingStateConsumer( Provider<DynamicState> state, Provider<String[]> strings ) {
+		@SuppressWarnings("unused")
+		WorkingStateConsumer(Provider<DynamicState> state,
+				Provider<String[]> strings) {
 			this.state = state;
 			this.strings = strings;
 		}
@@ -102,22 +101,24 @@ public class TestProviderBinds {
 		}
 	}
 
-	private final Injector injector = Bootstrap.injector( ProviderBindsBundle.class );
+	private final Injector injector = Bootstrap.injector(
+			ProviderBindsBundle.class);
 
 	@Test
 	public void providersAreAvailableForAnyBoundType() {
-		assertInjectsProviderFor( "foobar", raw( String.class ) );
-		assertInjectsProviderFor( 42, raw( Integer.class ) );
+		assertInjectsProviderFor("foobar", raw(String.class));
+		assertInjectsProviderFor(42, raw(Integer.class));
 	}
 
 	@Test
 	public void providersAreAvailableForAnyNamedBoundType() {
-		assertInjectsProviderFor( 846, raw( Integer.class ), named( "foo" ) );
+		assertInjectsProviderFor(846, raw(Integer.class), named("foo"));
 	}
 
 	@Test
 	public void providersAreAvailableForArrays() {
-		WorkingStateConsumer state = injector.resolve( WorkingStateConsumer.class );
+		WorkingStateConsumer state = injector.resolve(
+				WorkingStateConsumer.class);
 		assertNotNull(state.strings);
 		String[] strings = state.strings.provide();
 		assertEquals(2, strings.length);
@@ -127,38 +128,40 @@ public class TestProviderBinds {
 
 	@Test
 	public void providersAreAvailableForLists() {
-		List<String> list = asList( "foobar", "special" );
-		assertInjectsProviderFor( list, raw( List.class ).parametized( String.class ) );
+		List<String> list = asList("foobar", "special");
+		assertInjectsProviderFor(list,
+				raw(List.class).parametized(String.class));
 	}
 
 	@Test
 	public void providersAreAvailableForSets() {
-		Set<String> set = new HashSet<>(asList( "foobar", "special" ));
-		assertInjectsProviderFor( set, raw( Set.class ).parametized( String.class ) );
+		Set<String> set = new HashSet<>(asList("foobar", "special"));
+		assertInjectsProviderFor(set, raw(Set.class).parametized(String.class));
 	}
 
 	@Test
 	public void providersOvercomeExpirationConflicts() {
-		injector.resolve(WorkingStateConsumer.class );
+		injector.resolve(WorkingStateConsumer.class);
 	}
 
-	@Test ( expected = UnstableDependency.class )
+	@Test(expected = UnstableDependency.class)
 	public void expirationConflictsCauseException() {
-		injector.resolve( FaultyStateConsumer.class );
+		injector.resolve(FaultyStateConsumer.class);
 	}
 
 	@Test
 	public void providersKeepHierarchySoProvidedDependencyIsResolvedAsIfResolvedDirectly() {
-		WorkingStateConsumer a = injector.resolve( A );
-		assertSame( DYNAMIC_STATE_IN_A, a.state() );
-		WorkingStateConsumer b = injector.resolve( B );
-		assertNotSame( a, b );
-		assertSame( DYNAMIC_STATE_IN_B, b.state() );
+		WorkingStateConsumer a = injector.resolve(A);
+		assertSame(DYNAMIC_STATE_IN_A, a.state());
+		WorkingStateConsumer b = injector.resolve(B);
+		assertNotSame(a, b);
+		assertSame(DYNAMIC_STATE_IN_B, b.state());
 	}
 
 	@Test
 	public void providersCanBeCombinedWithOtherBridges() {
-		Provider<List<WorkingStateConsumer>> provider = injector.resolve(providerTypeOf(listTypeOf(WorkingStateConsumer.class)));
+		Provider<List<WorkingStateConsumer>> provider = injector.resolve(
+				providerTypeOf(listTypeOf(WorkingStateConsumer.class)));
 		assertNotNull(provider);
 		List<WorkingStateConsumer> consumers = provider.provide();
 		assertEquals(3, consumers.size());
@@ -169,16 +172,19 @@ public class TestProviderBinds {
 
 	@Test
 	public void providerCanProvidePerInjectionInstanceWithinAnPerApplicationParent() {
-		WorkingStateConsumer obj = injector.resolve( WorkingStateConsumer.class );
-		assertNotNull( obj.state() ); // if expiry is a problem this will throw an exception
+		WorkingStateConsumer obj = injector.resolve(WorkingStateConsumer.class);
+		assertNotNull(obj.state()); // if expiry is a problem this will throw an exception
 	}
 
-	private <T> void assertInjectsProviderFor( T expected, Type<? extends T> dependencyType ) {
-		assertInjectsProviderFor( expected, dependencyType, Name.ANY );
+	private <T> void assertInjectsProviderFor(T expected,
+			Type<? extends T> dependencyType) {
+		assertInjectsProviderFor(expected, dependencyType, Name.ANY);
 	}
 
-	private <T> void assertInjectsProviderFor( T expected, Type<? extends T> dependencyType, Name name ) {
-		Provider<?> provider = injector.resolve( name, providerTypeOf( dependencyType ) );
-		assertEquals( expected, provider.provide() );
+	private <T> void assertInjectsProviderFor(T expected,
+			Type<? extends T> dependencyType, Name name) {
+		Provider<?> provider = injector.resolve(name,
+				providerTypeOf(dependencyType));
+		assertEquals(expected, provider.provide());
 	}
 }

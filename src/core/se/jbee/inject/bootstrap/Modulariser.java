@@ -17,5 +17,5 @@ public interface Modulariser {
 	 * @return All {@link Module}s that result from expanding the given root
 	 *         {@link Bundle} to the module level.
 	 */
-	Module[] modularise( Class<? extends Bundle> root );
+	Module[] modularise(Class<? extends Bundle> root);
 }

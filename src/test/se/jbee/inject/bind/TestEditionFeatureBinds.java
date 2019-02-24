@@ -22,128 +22,123 @@ import se.jbee.inject.config.Feature;
 import se.jbee.inject.config.Globals;
 
 /**
- * A test that demonstrates how to use {@link Feature}s and {@link Edition}s to allow composition of
- * different setups without introducing a single if-statement in the binding code.
+ * A test that demonstrates how to use {@link Feature}s and {@link Edition}s to
+ * allow composition of different setups without introducing a single
+ * if-statement in the binding code.
  *
- * The example also shows how {@link Annotation}s like {@link Featured} can be used to mark
- * {@link Bundle}s or {@link Module}s as a specific {@link Feature}.
+ * The example also shows how {@link Annotation}s like {@link Featured} can be
+ * used to mark {@link Bundle}s or {@link Module}s as a specific
+ * {@link Feature}.
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestEditionFeatureBinds {
 
-	public enum AnnotatedFeature
-			implements Feature<AnnotatedFeature> {
-		FOO,
-		BAR,
-		BAZ;
+	public enum AnnotatedFeature implements Feature<AnnotatedFeature> {
+		FOO, BAR, BAZ;
 
 		@Override
-		public AnnotatedFeature featureOf( Class<?> bundleOrModule ) {
-			Featured featured = bundleOrModule.getAnnotation( Featured.class );
-			return featured == null
-				? null
-				: featured.value();
+		public AnnotatedFeature featureOf(Class<?> bundleOrModule) {
+			Featured featured = bundleOrModule.getAnnotation(Featured.class);
+			return featured == null ? null : featured.value();
 		}
 	}
 
-	@Target ( ElementType.TYPE )
-	@Retention ( RetentionPolicy.RUNTIME )
+	@Target(ElementType.TYPE)
+	@Retention(RetentionPolicy.RUNTIME)
 	public @interface Featured {
 
 		AnnotatedFeature value();
 	}
 
-	private static class RootBundle
-			extends BootstrapperBundle {
+	private static class RootBundle extends BootstrapperBundle {
 
 		@Override
 		protected void bootstrap() {
-			install( FeaturedBundle.class );
-			install( FeaturedModule.class );
-			install( FeaturedOptionBundle.QUX );
+			install(FeaturedBundle.class);
+			install(FeaturedModule.class);
+			install(FeaturedOptionBundle.QUX);
 		}
 
 	}
 
-	@Featured ( AnnotatedFeature.FOO )
-	private static class FeaturedBundle
-			extends BootstrapperBundle {
+	@Featured(AnnotatedFeature.FOO)
+	private static class FeaturedBundle extends BootstrapperBundle {
 
 		@Override
 		protected void bootstrap() {
-			install( SomeModule.class );
+			install(SomeModule.class);
 		}
 	}
 
-	private static class SomeModule
-			extends BinderModule {
+	private static class SomeModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			multibind( Integer.class ).to( 42 );
+			multibind(Integer.class).to(42);
 		}
 
 	}
 
-	@Featured ( AnnotatedFeature.BAR )
-	private static class FeaturedModule
-			extends BinderModule {
+	@Featured(AnnotatedFeature.BAR)
+	private static class FeaturedModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			multibind( Integer.class ).to( 8 );
+			multibind(Integer.class).to(8);
 		}
 
 	}
 
-	@Featured ( AnnotatedFeature.BAZ )
+	@Featured(AnnotatedFeature.BAZ)
 	private enum FeaturedOptionBundle
 			implements OptionBundle<FeaturedOptionBundle> {
 		QUX;
 
 		@Override
-		public void bootstrap( OptionBootstrapper<FeaturedOptionBundle> bootstrapper ) {
-			bootstrapper.install( AnotherModule.class, QUX );
+		public void bootstrap(
+				OptionBootstrapper<FeaturedOptionBundle> bootstrapper) {
+			bootstrapper.install(AnotherModule.class, QUX);
 		}
 
 	}
 
-	private static class AnotherModule
-			extends BinderModule {
+	private static class AnotherModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			multibind( Integer.class ).to( 128 );
+			multibind(Integer.class).to(128);
 		}
 
 	}
 
 	@Test
 	public void thatJustTheFeaturedBundleIsInstalled() {
-		assertEditionInstalls( Globals.featureEdition( AnnotatedFeature.FOO ), 42 );
+		assertEditionInstalls(Globals.featureEdition(AnnotatedFeature.FOO), 42);
 	}
 
 	@Test
 	public void thatJustTheFeaturedModuleIsInstalled() {
-		assertEditionInstalls( Globals.featureEdition( AnnotatedFeature.BAR ), 8 );
+		assertEditionInstalls(Globals.featureEdition(AnnotatedFeature.BAR), 8);
 	}
 
 	@Test
 	public void thatJustTheFeaturedModularBundleIsInstalled() {
-		assertEditionInstalls( Globals.featureEdition( AnnotatedFeature.BAZ ), 128 );
+		assertEditionInstalls(Globals.featureEdition(AnnotatedFeature.BAZ),
+				128);
 	}
 
 	@Test
 	public void thatTheFeaturedBundlesAndModulesAreInstalled() {
-		assertEditionInstalls(
-				Globals.featureEdition( AnnotatedFeature.BAR, AnnotatedFeature.BAZ ), 8, 128 );
+		assertEditionInstalls(Globals.featureEdition(AnnotatedFeature.BAR,
+				AnnotatedFeature.BAZ), 8, 128);
 	}
 
-	private static void assertEditionInstalls( Edition edition, Integer... expected ) {
-		Injector injector = Bootstrap.injector( RootBundle.class,
-				Globals.STANDARD.edition( edition ) );
-		assertEqualSets( expected, injector.resolve( Integer[].class ) );
+	private static void assertEditionInstalls(Edition edition,
+			Integer... expected) {
+		Injector injector = Bootstrap.injector(RootBundle.class,
+				Globals.STANDARD.edition(edition));
+		assertEqualSets(expected, injector.resolve(Integer[].class));
 	}
 
 }

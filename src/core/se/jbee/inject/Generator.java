@@ -14,6 +14,7 @@ package se.jbee.inject;
 @FunctionalInterface
 public interface Generator<T> {
 
-	T instanceFor( Dependency<? super T> dependency ) throws UnresolvableDependency;
-	
+	T instanceFor(Dependency<? super T> dependency)
+			throws UnresolvableDependency;
+
 }

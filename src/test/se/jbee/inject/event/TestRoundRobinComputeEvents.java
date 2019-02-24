@@ -13,14 +13,14 @@ import se.jbee.inject.bootstrap.Bootstrap;
 public class TestRoundRobinComputeEvents {
 
 	private interface Handler {
-		
+
 		int compute(int x);
 	}
-	
+
 	private static final class Service implements Handler {
 
 		private final int inc;
-		
+
 		public Service(int inc) {
 			this.inc = inc;
 		}
@@ -29,10 +29,11 @@ public class TestRoundRobinComputeEvents {
 		public int compute(int x) {
 			return x + inc;
 		}
-		
+
 	}
-	
-	private static final class TestRoundRobinComputeEventsModule extends EventModule {
+
+	private static final class TestRoundRobinComputeEventsModule
+			extends EventModule {
 
 		@Override
 		protected void declare() {
@@ -42,29 +43,30 @@ public class TestRoundRobinComputeEvents {
 			bind(named("c"), Service.class).to(new Service(3));
 		}
 	}
-	
-	private final Injector injector = Bootstrap.injector(TestRoundRobinComputeEventsModule.class);
-	
+
+	private final Injector injector = Bootstrap.injector(
+			TestRoundRobinComputeEventsModule.class);
+
 	@Test
 	public void computationUsesAllAvailableServices() {
 		Handler h = injector.resolve(Handler.class);
 		Service a = injector.resolve("a", Service.class);
 		Service b = injector.resolve("b", Service.class);
 		Service c = injector.resolve("c", Service.class);
-		
+
 		assertNotNull(a);
 		assertNotNull(b);
 		assertNotNull(c);
 		assertNotSame(a, b);
 		assertNotSame(b, c);
 		assertNotSame(a, c);
-		
+
 		int sum = 0;
 		sum += h.compute(1);
 		sum += h.compute(1);
 		sum += h.compute(1);
 		assertEquals(18, sum); // 5+1 + 7+1 + 3+1 = 18 (no guarantee for order) 
-		
+
 		// next round
 		sum += h.compute(3);
 		sum += h.compute(3);

@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2017, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -24,10 +24,8 @@ package se.jbee.inject;
  */
 public enum DeclarationType implements MoreApplicableThan<DeclarationType> {
 
-	/*
-	 * !!!ATTENTION!!! - the order of constants matters to the logic!
-	 */
-	
+	/* !!!ATTENTION!!! - the order of constants matters to the logic! */
+
 	/**
 	 * Has been added by the binder as a fall-back since some bind-calls can
 	 * have ambiguous intentions.
@@ -55,13 +53,13 @@ public enum DeclarationType implements MoreApplicableThan<DeclarationType> {
 	 * -interfaces as a AUTO bound bind.
 	 */
 	AUTO,
-	
+
 	/**
 	 * A bind that is meant to co-exist with others that might have the same
 	 * {@link Resource}. Those have to be defined as MULTI!
 	 */
 	MULTI,
-	
+
 	/**
 	 * The bind has been made explicitly by a module (should be a unique
 	 * {@link Resource})
@@ -77,21 +75,22 @@ public enum DeclarationType implements MoreApplicableThan<DeclarationType> {
 	REQUIRED;
 
 	@Override
-	public boolean moreApplicableThan( DeclarationType other ) {
+	public boolean moreApplicableThan(DeclarationType other) {
 		return ordinal() > other.ordinal();
 	}
 
-	public boolean clashesWith( DeclarationType other ) {
-		return ordinal() + other.ordinal() > MULTI.ordinal() * 2 && this != REQUIRED
-				|| ( this == DEFAULT && other == DEFAULT );
+	public boolean clashesWith(DeclarationType other) {
+		return ordinal() + other.ordinal() > MULTI.ordinal() * 2
+			&& this != REQUIRED || (this == DEFAULT && other == DEFAULT);
 	}
 
-	public boolean replacedBy( DeclarationType other ) {
-		return other.ordinal() > ordinal() || ( this == IMPLICIT && other == IMPLICIT );
+	public boolean replacedBy(DeclarationType other) {
+		return other.ordinal() > ordinal()
+			|| (this == IMPLICIT && other == IMPLICIT);
 	}
 
-	public boolean droppedWith( DeclarationType other ) {
-		return this == other && ( this == AUTO || this == PROVIDED );
+	public boolean droppedWith(DeclarationType other) {
+		return this == other && (this == AUTO || this == PROVIDED);
 	}
 
 }

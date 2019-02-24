@@ -5,8 +5,10 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ TestEventBasics.class, TestNonConcurrentVoidMultiDispatchEvents.class,
-		TestExceptionHandlingComputeEvents.class, TestTTLExceptionHandingComputeEvents.class })
+@SuiteClasses({ TestEventBasics.class,
+		TestNonConcurrentVoidMultiDispatchEvents.class,
+		TestExceptionHandlingComputeEvents.class,
+		TestTTLExceptionHandingComputeEvents.class })
 public class SuiteEvent {
 	// suite class
 }

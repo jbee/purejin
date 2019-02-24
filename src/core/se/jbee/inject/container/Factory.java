@@ -19,21 +19,18 @@ import se.jbee.inject.UnresolvableDependency;
  * 
  * @author Jan Bernitt (jan@jbee.se)
  * 
- * @param <T>
- *            The type of value created
+ * @param <T> The type of value created
  */
 @FunctionalInterface
 public interface Factory<T> {
 
 	/**
-	 * @param <P>
-	 *            The type of the receiving instance.
-	 * @param created
-	 *            Describes what should be created.
-	 * @param receiver
-	 *            Describes the instance that receives the created instance.
+	 * @param <P> The type of the receiving instance.
+	 * @param created Describes what should be created.
+	 * @param receiver Describes the instance that receives the created
+	 *            instance.
 	 * @return created instance (note that is does not throw an
 	 *         {@link UnresolvableDependency} exception!)
 	 */
-	<P> T fabricate( Instance<? super T> created, Instance<P> receiver );
+	<P> T fabricate(Instance<? super T> created, Instance<P> receiver);
 }

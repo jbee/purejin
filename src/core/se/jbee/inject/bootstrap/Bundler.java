@@ -14,10 +14,9 @@ package se.jbee.inject.bootstrap;
 public interface Bundler {
 
 	/**
-	 * @param root
-	 *            origin of reachable computation
+	 * @param root origin of reachable computation
 	 * @return All {@link Bundle}s (their {@link Class}es) that are reachable
 	 *         (installed) when starting from the given root {@link Bundle}.
 	 */
-	Class<? extends Bundle>[] bundle( Class<? extends Bundle> root );
+	Class<? extends Bundle>[] bundle(Class<? extends Bundle> root);
 }

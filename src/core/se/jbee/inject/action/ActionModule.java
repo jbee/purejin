@@ -47,20 +47,23 @@ import se.jbee.inject.container.Supplier;
 public abstract class ActionModule extends BinderModule {
 
 	/**
-	 * The {@link Inspector} picks the {@link Method}s that are used to implement
-	 * {@link Action}s. This abstraction allows to customise what methods are bound as
-	 * {@link Action}s. The {@link Inspector#methodsIn(Class)} should return all methods in
-	 * the given {@link Class} that should be used to implement a {@link Action}.
+	 * The {@link Inspector} picks the {@link Method}s that are used to
+	 * implement {@link Action}s. This abstraction allows to customise what
+	 * methods are bound as {@link Action}s. The
+	 * {@link Inspector#methodsIn(Class)} should return all methods in the given
+	 * {@link Class} that should be used to implement a {@link Action}.
 	 */
-	static final Instance<Inspector> ACTION_INSPECTOR = instance(named(Action.class), raw(Inspector.class));
+	static final Instance<Inspector> ACTION_INSPECTOR = instance(
+			named(Action.class), raw(Inspector.class));
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static <I,O> Dependency<Action<I,O>> actionDependency(Type<I> input, Type<O> output) {
+	public static <I, O> Dependency<Action<I, O>> actionDependency(
+			Type<I> input, Type<O> output) {
 		Type type = raw(Action.class).parametized(input, output);
 		return dependency(type);
 	}
 
-	protected final void bindActionsIn( Class<?> impl ) {
+	protected final void bindActionsIn(Class<?> impl) {
 		plug(impl).into(Action.class);
 	}
 
@@ -76,9 +79,12 @@ public abstract class ActionModule extends BinderModule {
 
 		@Override
 		public void declare() {
-			asDefault().per(DEPENDENCY_TYPE).starbind(Action.class).toSupplier(ActionSupplier.class);
-			asDefault().per(APPLICATION).bind(ACTION_INSPECTOR).to(Inspect.all().methods());
-			asDefault().per(APPLICATION).bind(Executor.class).to(DirectExecutor.class);
+			asDefault().per(DEPENDENCY_TYPE).starbind(Action.class).toSupplier(
+					ActionSupplier.class);
+			asDefault().per(APPLICATION).bind(ACTION_INSPECTOR).to(
+					Inspect.all().methods());
+			asDefault().per(APPLICATION).bind(Executor.class).to(
+					DirectExecutor.class);
 		}
 
 	}
@@ -86,15 +92,17 @@ public abstract class ActionModule extends BinderModule {
 	static final class DirectExecutor implements Executor {
 
 		@Override
-		public <I, O> O exec(Object impl, Method action, Object[] args,	Type<O> output, Type<I> input, I value) {
+		public <I, O> O exec(Object impl, Method action, Object[] args,
+				Type<O> output, Type<I> input, I value) {
 			try {
 				return output.rawType.cast(Supply.method(action, impl, args));
 			} catch (SupplyFailed e) {
 				Exception ex = e;
-				if ( e.getCause() instanceof Exception ) {
+				if (e.getCause() instanceof Exception) {
 					ex = (Exception) e.getCause();
 				}
-				throw new ActionMalfunction("Exception on invocation of the action", ex);
+				throw new ActionMalfunction(
+						"Exception on invocation of the action", ex);
 			}
 		}
 	}
@@ -106,7 +114,8 @@ public abstract class ActionModule extends BinderModule {
 		 */
 		private final Map<Class<?>, Method[]> cachedMethods = new ConcurrentHashMap<>();
 		/**
-		 * All already created {@link Action}s identified by a unique function signature.
+		 * All already created {@link Action}s identified by a unique function
+		 * signature.
 		 */
 		private final Map<String, Action<?, ?>> cachedActions = new ConcurrentHashMap<>();
 
@@ -118,43 +127,49 @@ public abstract class ActionModule extends BinderModule {
 		public ActionSupplier(Injector injector) {
 			this.injector = injector;
 			this.executor = injector.resolve(Executor.class);
-			this.implementationClasses = injector.resolve(pluginsFor(Action.class));
-			this.inspect = injector.resolve( 
-					dependency(ACTION_INSPECTOR).injectingInto(ActionSupplier.class));
+			this.implementationClasses = injector.resolve(
+					pluginsFor(Action.class));
+			this.inspect = injector.resolve(
+					dependency(ACTION_INSPECTOR).injectingInto(
+							ActionSupplier.class));
 		}
 
 		@Override
-		public Action<?, ?> supply(Dependency<? super Action<?, ?>> dep, Injector injector) {
+		public Action<?, ?> supply(Dependency<? super Action<?, ?>> dep,
+				Injector injector) {
 			Type<? super Action<?, ?>> type = dep.type();
 			return provide(type.parameter(0), type.parameter(1));
 		}
 
-		@SuppressWarnings ( "unchecked" )
-		private <I, O> Action<I, O> provide( Type<I> input, Type<O> output ) {
-			final String key = input + "->" + output; // haskell like function signature
-			return (Action<I, O>) cachedActions.computeIfAbsent(key, k -> newAction(input, output));
+		@SuppressWarnings("unchecked")
+		private <I, O> Action<I, O> provide(Type<I> input, Type<O> output) {
+			final String key = input + "->" + output; // haskell like function
+														// signature
+			return (Action<I, O>) cachedActions.computeIfAbsent(key,
+					k -> newAction(input, output));
 		}
 
 		private <I, O> Action<?, ?> newAction(Type<I> input, Type<O> output) {
 			Action<?, ?> action;
-			Method method = resolveAction( input, output );
-			Object impl = injector.resolve( method.getDeclaringClass() );
-			action = new ExecutorRunAction<>(impl, method, input, output, executor, injector);
+			Method method = resolveAction(input, output);
+			Object impl = injector.resolve(method.getDeclaringClass());
+			action = new ExecutorRunAction<>(impl, method, input, output,
+					executor, injector);
 			return action;
 		}
 
-		private <I, O> Method resolveAction( Type<I> input, Type<O> output ) {
-			for ( Class<?> impl : implementationClasses ) {
-				for ( Method action : actionsIn( impl ) ) {
-					Type<?> rt = returnType( action );
-					if ( rt.equalTo( output ) ) {
-						if ( input.equalTo( Type.VOID ) ) {
-							if ( action.getParameterTypes().length == 0 ) {
+		private <I, O> Method resolveAction(Type<I> input, Type<O> output) {
+			for (Class<?> impl : implementationClasses) {
+				for (Method action : actionsIn(impl)) {
+					Type<?> rt = returnType(action);
+					if (rt.equalTo(output)) {
+						if (input.equalTo(Type.VOID)) {
+							if (action.getParameterTypes().length == 0) {
 								return action;
 							}
 						} else {
-							for ( Type<?> pt : parameterTypes( action ) ) {
-								if ( pt.equalTo( input ) ) {
+							for (Type<?> pt : parameterTypes(action)) {
+								if (pt.equalTo(input)) {
 									return action;
 								}
 							}
@@ -162,15 +177,17 @@ public abstract class ActionModule extends BinderModule {
 					}
 				}
 			}
-			throw new UnresolvableDependency.NoMethodForDependency( output, input );
+			throw new UnresolvableDependency.NoMethodForDependency(output,
+					input);
 		}
 
-		private Method[] actionsIn( Class<?> impl ) {
-			return cachedMethods.computeIfAbsent(impl, k -> inspect.methodsIn(impl));
+		private Method[] actionsIn(Class<?> impl) {
+			return cachedMethods.computeIfAbsent(impl,
+					k -> inspect.methodsIn(impl));
 		}
 	}
 
-	private static final class ExecutorRunAction<I,O> implements Action<I, O> {
+	private static final class ExecutorRunAction<I, O> implements Action<I, O> {
 
 		private final Object impl;
 		private final Method action;
@@ -183,7 +200,8 @@ public abstract class ActionModule extends BinderModule {
 		private final InjectionSite injection;
 		private final int inputIndex;
 
-		ExecutorRunAction(Object impl, Method action, Type<I> input, Type<O> output, Executor executor, Injector injector) {
+		ExecutorRunAction(Object impl, Method action, Type<I> input,
+				Type<O> output, Executor executor, Injector injector) {
 			this.impl = impl;
 			this.action = accessible(action);
 			this.input = input;
@@ -192,9 +210,10 @@ public abstract class ActionModule extends BinderModule {
 			this.injector = injector;
 			Type<?>[] types = parameterTypes(action);
 			this.injection = new InjectionSite(
-					dependency(output).injectingInto(action.getDeclaringClass()), 
-					injector, 
-					BoundParameter.bind(types, BoundParameter.constant(input, null)));
+					dependency(output).injectingInto(
+							action.getDeclaringClass()),
+					injector, BoundParameter.bind(types,
+							BoundParameter.constant(input, null)));
 			this.inputIndex = asList(types).indexOf(input);
 		}
 
@@ -204,7 +223,8 @@ public abstract class ActionModule extends BinderModule {
 			try {
 				args = injection.args(injector);
 			} catch (UnresolvableDependency e) {
-				throw new ActionMalfunction("Failed to provide all implicit arguments", e);
+				throw new ActionMalfunction(
+						"Failed to provide all implicit arguments", e);
 			}
 			if (inputIndex >= 0) {
 				args[inputIndex] = input;

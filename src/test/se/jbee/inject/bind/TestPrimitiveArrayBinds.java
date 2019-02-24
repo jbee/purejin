@@ -17,32 +17,31 @@ import se.jbee.inject.container.Supplier;
  */
 public class TestPrimitiveArrayBinds {
 
-	private static class PrimitiveArrayBindsModule
-			extends BinderModule {
+	private static class PrimitiveArrayBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			bind( Integer.class ).to( 7 );
-			bind( named( "answer" ), Integer.class ).to( 42 );
-			bind( int[].class ).toSupplier( IntArraySupplier.class );
+			bind(Integer.class).to(7);
+			bind(named("answer"), Integer.class).to(42);
+			bind(int[].class).toSupplier(IntArraySupplier.class);
 		}
 	}
 
 	/**
-	 * A {@link Supplier} like this would be needed for each of the primitive types to make their
-	 * arrays work like the wrapper arrays do. Since there is little benefit and easy to add in this
-	 * it is not part of the tool Silk.
+	 * A {@link Supplier} like this would be needed for each of the primitive
+	 * types to make their arrays work like the wrapper arrays do. Since there
+	 * is little benefit and easy to add in this it is not part of the tool
+	 * Silk.
 	 *
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	private static class IntArraySupplier
-			implements Supplier<int[]> {
+	private static class IntArraySupplier implements Supplier<int[]> {
 
 		@Override
-		public int[] supply( Dependency<? super int[]> dep, Injector injector ) {
-			Integer[] values = injector.resolve( Integer[].class );
+		public int[] supply(Dependency<? super int[]> dep, Injector injector) {
+			Integer[] values = injector.resolve(Integer[].class);
 			int[] primitives = new int[values.length];
-			for ( int i = 0; i < primitives.length; i++ ) {
+			for (int i = 0; i < primitives.length; i++) {
 				primitives[i] = values[i];
 			}
 			return primitives;
@@ -50,10 +49,11 @@ public class TestPrimitiveArrayBinds {
 
 	}
 
-	private final Injector injector = Bootstrap.injector( PrimitiveArrayBindsModule.class );
+	private final Injector injector = Bootstrap.injector(
+			PrimitiveArrayBindsModule.class);
 
 	@Test
 	public void thatPrimitiveArrayIsAvailable() {
-		assertArrayEquals( new int[] { 7, 42 }, injector.resolve( int[].class) );
+		assertArrayEquals(new int[] { 7, 42 }, injector.resolve(int[].class));
 	}
 }

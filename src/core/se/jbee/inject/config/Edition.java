@@ -22,6 +22,6 @@ public interface Edition {
 	 * @return true if the given {@link Class} of a module or bundle should be
 	 *         included in the context created (should be installed).
 	 */
-	boolean featured( Class<?> bundleOrModule );
+	boolean featured(Class<?> bundleOrModule);
 
 }

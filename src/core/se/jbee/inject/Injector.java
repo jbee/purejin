@@ -26,33 +26,31 @@ import static se.jbee.inject.Type.raw;
 @FunctionalInterface
 public interface Injector {
 
-	<T> T resolve( Dependency<T> dependency ) throws UnresolvableDependency;
+	<T> T resolve(Dependency<T> dependency) throws UnresolvableDependency;
 
-	/*
-	 * Utility methods
-	 */
+	/* Utility methods */
 
-	default <T> T resolve( Class<T> type ) {
+	default <T> T resolve(Class<T> type) {
 		return resolve(dependency(type));
 	}
 
-	default <T> T resolve( Type<T> type ) {
+	default <T> T resolve(Type<T> type) {
 		return resolve(dependency(type));
 	}
 
-	default <T> T resolve( String name, Class<T> type ) {
+	default <T> T resolve(String name, Class<T> type) {
 		return resolve(named(name), type);
 	}
 
-	default <T> T resolve( Name name, Class<T> type ) {
+	default <T> T resolve(Name name, Class<T> type) {
 		return resolve(name, raw(type));
 	}
 
-	default <T> T resolve( Name name, Type<T> type ) {
+	default <T> T resolve(Name name, Type<T> type) {
 		return resolve(instance(name, type));
 	}
 
-	default <T> T resolve( Instance<T> inst ) {
+	default <T> T resolve(Instance<T> inst) {
 		return resolve(dependency(inst));
 	}
 }

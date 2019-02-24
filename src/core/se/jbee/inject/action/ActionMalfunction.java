@@ -8,7 +8,7 @@ package se.jbee.inject.action;
 public class ActionMalfunction extends RuntimeException {
 
 	public ActionMalfunction(String message, Throwable cause) {
-		super(message+": "+cause.getMessage(), cause);
+		super(message + ": " + cause.getMessage(), cause);
 	}
-	
+
 }

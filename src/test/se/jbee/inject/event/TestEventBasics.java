@@ -29,17 +29,17 @@ public class TestEventBasics {
 	private interface Handler {
 
 		void onChange(String msg);
-		
+
 		String compute(int x, int y);
-		
+
 		Future<String> computeEventually(int x);
-		
+
 	}
-	
+
 	private static class Service implements Handler {
 
 		List<String> messages = new ArrayList<>();
-		
+
 		@Override
 		public String compute(int x, int y) {
 			return x + ":" + y;
@@ -49,14 +49,14 @@ public class TestEventBasics {
 		public Future<String> computeEventually(int x) {
 			return completedFuture("42" + x);
 		}
-		
+
 		@Override
 		public void onChange(String msg) {
 			messages.add(msg);
 		}
-		
+
 	}
-	
+
 	private static class TestEventsModule extends EventModule {
 
 		@Override
@@ -65,11 +65,13 @@ public class TestEventBasics {
 			construct(Service.class);
 		}
 	}
-	
-	private final Injector injector = Bootstrap.injector(TestEventsModule.class);
-	
+
+	private final Injector injector = Bootstrap.injector(
+			TestEventsModule.class);
+
 	@Test
-	public void thatNonReturnDisptachIsNonBlockingForTheCaller() throws InterruptedException {
+	public void thatNonReturnDisptachIsNonBlockingForTheCaller()
+			throws InterruptedException {
 		Handler proxy = injector.resolve(Handler.class);
 		Service service = injector.resolve(Service.class);
 		assertEquals(0, service.messages.size());
@@ -82,14 +84,14 @@ public class TestEventBasics {
 		assertEquals(2, service.messages.size());
 		assertEquals("bar", service.messages.get(1));
 	}
-	
+
 	@Test
 	public void thatHandledInterfacesInjectProxy() {
 		Handler proxy = injector.resolve(Handler.class);
 		assertTrue(Proxy.isProxyClass(proxy.getClass()));
 		assertSame(injector.resolve(Handler.class), proxy); // should be "cached and reused"
 	}
-	
+
 	@Test
 	public void thatComputationDispatchWorks() {
 		Handler proxy = injector.resolve(Handler.class);
@@ -99,7 +101,7 @@ public class TestEventBasics {
 		assertEquals("3:4", proxy.compute(3, 4));
 		assertEquals("5:6", proxy.compute(5, 6));
 	}
-	
+
 	@Test
 	public void thatEventualComputationDispatchWorks() {
 		Handler proxy = injector.resolve(Handler.class);

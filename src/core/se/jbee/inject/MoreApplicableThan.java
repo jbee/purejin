@@ -11,8 +11,7 @@ package se.jbee.inject;
  * 
  * @author Jan Bernitt (jan@jbee.se)
  * 
- * @param <T>
- *            The type of objects that are compared
+ * @param <T> The type of objects that are compared
  */
 @FunctionalInterface
 public interface MoreApplicableThan<T extends MoreApplicableThan<T>> {
@@ -20,9 +19,9 @@ public interface MoreApplicableThan<T extends MoreApplicableThan<T>> {
 	/**
 	 * @return Whether or not this object or more applicable than the given one.
 	 *         Equal objects are not more applicable! Also objects that have no
-	 *         common context or relationship are never more applicable. For example
-	 *         two {@link Type}s with no common super-type do not define one of them
-	 *         as more applicable.
+	 *         common context or relationship are never more applicable. For
+	 *         example two {@link Type}s with no common super-type do not define
+	 *         one of them as more applicable.
 	 */
 	boolean moreApplicableThan(T other);
 

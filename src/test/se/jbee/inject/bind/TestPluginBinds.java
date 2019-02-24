@@ -23,8 +23,8 @@ import se.jbee.inject.bootstrap.Module;
  *
  * The set than can be received from the {@link Injector} using
  * {@link Dependency#pluginsFor(Class)}. This allows to easily build
- * abstractions like actions that use this to collect the set of classes
- * used to look for action methods.
+ * abstractions like actions that use this to collect the set of classes used to
+ * look for action methods.
  *
  * The sets are just ordinary bindings on {@link Class}. That means the sets can
  * contain different members depending on the actual {@link Dependency} if the
@@ -37,8 +37,10 @@ public class TestPluginBinds {
 		@Override
 		protected void declare() {
 			asDefault().plug(TestExtensionAction.class).into(Callable.class);
-			inPackageOf( Module.class ).plug(TestExtensionPackageLocalAction.class).into(Callable.class);
-			injectingInto( Serializable.class ).plug(TestExtensionInstanceOfAction.class).into(Callable.class);
+			inPackageOf(Module.class).plug(
+					TestExtensionPackageLocalAction.class).into(Callable.class);
+			injectingInto(Serializable.class).plug(
+					TestExtensionInstanceOfAction.class).into(Callable.class);
 		}
 	}
 
@@ -54,28 +56,32 @@ public class TestPluginBinds {
 		// just to see that it is resolved as action class
 	}
 
-	private final Injector injector = Bootstrap.injector( TestPluginModule.class );
+	private final Injector injector = Bootstrap.injector(
+			TestPluginModule.class);
 
-	private final Dependency<Class<?>[]> plugins = Dependency.pluginsFor(Callable.class);
+	private final Dependency<Class<?>[]> plugins = Dependency.pluginsFor(
+			Callable.class);
 
 	@Test
 	public void thatJustUntargetedExtensionsAreResolvedGlobally() {
-		Class<?>[] classes = injector.resolve( plugins );
-		assertEquals( 1, classes.length );
-		assertSame( TestExtensionAction.class, classes[0] );
+		Class<?>[] classes = injector.resolve(plugins);
+		assertEquals(1, classes.length);
+		assertSame(TestExtensionAction.class, classes[0]);
 	}
 
 	@Test
 	public void thatPackageLocalExtensionsAreResolvedWithAppropiateInjection() {
-		Class<?>[] classes = injector.resolve( plugins.injectingInto( Module.class ) );
-		assertEqualSets( new Class<?>[] { TestExtensionAction.class,
-				TestExtensionPackageLocalAction.class }, classes );
+		Class<?>[] classes = injector.resolve(
+				plugins.injectingInto(Module.class));
+		assertEqualSets(new Class<?>[] { TestExtensionAction.class,
+				TestExtensionPackageLocalAction.class }, classes);
 	}
 
 	@Test
 	public void thatInstanceOfExtensionsAreResolvedWithAppropiateInjection() {
-		Class<?>[] classes = injector.resolve( plugins.injectingInto( String.class ) );
-		assertEqualSets( new Class<?>[] { TestExtensionAction.class,
-				TestExtensionInstanceOfAction.class }, classes );
+		Class<?>[] classes = injector.resolve(
+				plugins.injectingInto(String.class));
+		assertEqualSets(new Class<?>[] { TestExtensionAction.class,
+				TestExtensionInstanceOfAction.class }, classes);
 	}
 }

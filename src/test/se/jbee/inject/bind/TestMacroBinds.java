@@ -52,16 +52,16 @@ import se.jbee.inject.container.Supplier;
  */
 public class TestMacroBinds {
 
-	@Target ( { METHOD, FIELD } )
-	@Retention ( RUNTIME )
+	@Target({ METHOD, FIELD })
+	@Retention(RUNTIME)
 	private @interface Initialisation {
 
 	}
 
 	private static class Foo {
 
-		@SuppressWarnings ( "unused" )
-		Foo( Integer i, Float f ) {
+		@SuppressWarnings("unused")
+		Foo(Integer i, Float f) {
 			// no further useage
 		}
 	}
@@ -69,25 +69,23 @@ public class TestMacroBinds {
 	private static class Bar {
 
 		@Initialisation
-        String s;
+		String s;
 	}
 
-	private static class MacroBindsModule
-			extends BinderModule {
+	private static class MacroBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			bind( String.class ).to( "answer" );
-			bind( Integer.class ).to( 42 );
-			bind( Boolean.class ).to( true );
-			bind( Foo.class ).toConstructor();
-			bind( Number.class ).to( Integer.class );
-			bind( Bar.class ).toConstructor();
+			bind(String.class).to("answer");
+			bind(Integer.class).to(42);
+			bind(Boolean.class).to(true);
+			bind(Foo.class).toConstructor();
+			bind(Number.class).to(Integer.class);
+			bind(Bar.class).toConstructor();
 		}
 	}
 
-	private static final class CountMacro
-			implements Macro<Binding<?>> {
+	private static final class CountMacro implements Macro<Binding<?>> {
 
 		int expands = 0;
 
@@ -96,7 +94,8 @@ public class TestMacroBinds {
 		}
 
 		@Override
-		public <T> void expand(Binding<?> value, Binding<T> incomplete, Bindings bindings) {
+		public <T> void expand(Binding<?> value, Binding<T> incomplete,
+				Bindings bindings) {
 			expands++;
 		}
 
@@ -105,14 +104,16 @@ public class TestMacroBinds {
 	@Test
 	public void thatBindingsCanJustBeCounted() {
 		CountMacro count = new CountMacro();
-		Injector injector = injectorWithMacro( MacroBindsModule.class, count );
-		assertEquals( 6, count.expands );
-		assertEquals( 0, injector.resolve( InjectionCase[].class ).length );
+		Injector injector = injectorWithMacro(MacroBindsModule.class, count);
+		assertEquals(6, count.expands);
+		assertEquals(0, injector.resolve(InjectionCase[].class).length);
 	}
 
-	private static Injector injectorWithMacro( Class<? extends Bundle> root, Macro<?> macro ) {
-		return Bootstrap.injector( root,
-				Bindings.bindings( Macros.DEFAULT.with( macro ), Inspect.DEFAULT ), Globals.STANDARD );
+	private static Injector injectorWithMacro(Class<? extends Bundle> root,
+			Macro<?> macro) {
+		return Bootstrap.injector(root,
+				Bindings.bindings(Macros.DEFAULT.with(macro), Inspect.DEFAULT),
+				Globals.STANDARD);
 	}
 
 	/**
@@ -125,54 +126,56 @@ public class TestMacroBinds {
 			implements Macro<BoundConstructor<?>> {
 
 		@Override
-		public <T> void expand(BoundConstructor<?> value, Binding<T> incomplete, Bindings bindings) {
-			Macros.CONSTRUCTOR.expand( value, incomplete, bindings );
-			Type<?>[] params = Type.parameterTypes( value.constructor );
-			for ( int i = 0; i < params.length; i++ ) {
-				bindings.expandInto(required( params[i], incomplete ));
+		public <T> void expand(BoundConstructor<?> value, Binding<T> incomplete,
+				Bindings bindings) {
+			Macros.CONSTRUCTOR.expand(value, incomplete, bindings);
+			Type<?>[] params = Type.parameterTypes(value.constructor);
+			for (int i = 0; i < params.length; i++) {
+				bindings.expandInto(required(params[i], incomplete));
 			}
 		}
 
-		private static <T> Binding<T> required( Type<T> type, Binding<?> binding ) {
-			return Binding.binding( new Resource<>( Instance.anyOf( type ) ),
+		private static <T> Binding<T> required(Type<T> type,
+				Binding<?> binding) {
+			return Binding.binding(new Resource<>(Instance.anyOf(type)),
 					BindingType.REQUIRED, Supply.required(), binding.scope,
-					binding.source.typed( DeclarationType.REQUIRED ) );
+					binding.source.typed(DeclarationType.REQUIRED));
 		}
 	}
 
-	@Test ( expected = NoResourceForDependency.class )
+	@Test(expected = NoResourceForDependency.class)
 	public void thatAllConstructorParameterTypesCanBeMadeRequired() {
 		Macro<?> required = new RequiredConstructorParametersMacro();
-		Injector injector = injectorWithMacro( MacroBindsModule.class, required );
-		assertNull("we should not get here", injector );
+		Injector injector = injectorWithMacro(MacroBindsModule.class, required);
+		assertNull("we should not get here", injector);
 	}
 
 	/**
-	 * A simple example-wise {@link Supplier} that allows to initialized newly created instances.
+	 * A simple example-wise {@link Supplier} that allows to initialized newly
+	 * created instances.
 	 *
-	 * In this example a very basic field injection is build but it could be any kind of context
-	 * dependent instance initialization.
+	 * In this example a very basic field injection is build but it could be any
+	 * kind of context dependent instance initialization.
 	 *
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	static final class InitialisationSupplier<T>
-			implements Supplier<T> {
+	static final class InitialisationSupplier<T> implements Supplier<T> {
 
 		private final Supplier<T> decorated;
 
-		InitialisationSupplier( Supplier<T> decorated ) {
+		InitialisationSupplier(Supplier<T> decorated) {
 			this.decorated = decorated;
 		}
 
 		@Override
-		public T supply( Dependency<? super T> dep, Injector injector ) {
-			T instance = decorated.supply( dep, injector );
-			for ( Field f : instance.getClass().getDeclaredFields() ) {
-				if ( f.isAnnotationPresent( Initialisation.class ) ) {
+		public T supply(Dependency<? super T> dep, Injector injector) {
+			T instance = decorated.supply(dep, injector);
+			for (Field f : instance.getClass().getDeclaredFields()) {
+				if (f.isAnnotationPresent(Initialisation.class)) {
 					try {
 						f.set(instance, injector.resolve(fieldType(f)));
-					} catch ( Exception e ) {
-						throw new RuntimeException( e );
+					} catch (Exception e) {
+						throw new RuntimeException(e);
 					}
 				}
 			}
@@ -189,17 +192,19 @@ public class TestMacroBinds {
 			implements Macro<BoundConstructor<?>> {
 
 		@Override
-		public <T> void expand(BoundConstructor<?> constructor, Binding<T> incomplete, Bindings bindings) {
+		public <T> void expand(BoundConstructor<?> constructor,
+				Binding<T> incomplete, Bindings bindings) {
 			Supplier<T> supplier = new InitialisationSupplier<>(
-					Supply.costructor( constructor.typed( incomplete.type() ) ) );
-			bindings.expandInto(incomplete.complete( CONSTRUCTOR, supplier ));
+					Supply.costructor(constructor.typed(incomplete.type())));
+			bindings.expandInto(incomplete.complete(CONSTRUCTOR, supplier));
 		}
 
 	}
 
 	@Test
 	public void thatCustomInitialisationCanBeAdded() {
-		Injector injector = injectorWithMacro( MacroBindsModule.class, new InitialisationMacro() );
+		Injector injector = injectorWithMacro(MacroBindsModule.class,
+				new InitialisationMacro());
 		assertEquals("answer", injector.resolve(Bar.class).s);
 	}
 }

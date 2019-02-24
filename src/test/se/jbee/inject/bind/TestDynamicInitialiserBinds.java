@@ -27,46 +27,49 @@ import se.jbee.inject.container.Initialiser;
 public class TestDynamicInitialiserBinds {
 
 	private static interface MyListener {
-		
+
 		void inc(int n);
 	}
-	
+
 	static class MyService implements MyListener {
 
 		int sum;
-		
+
 		@Override
 		public void inc(int n) {
 			sum += n;
 		}
-		
+
 	}
-	
+
 	private static class MyServiceExtension extends MyService {
-		
+
 	}
-	
+
 	private static class MyOtherService {
-		
+
 	}
-	
+
 	private static class DynamicInitialiserBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			initbind(MyListener.class)
-				.to((Initialiser<MyListener>)(l, injector) -> l.inc(1));
-			injectingInto(MyServiceExtension.class).initbind(MyListener.class)
-				.to((Initialiser<MyListener>)(l, injector) ->  l.inc(2));
+			initbind(MyListener.class).to(
+					(Initialiser<MyListener>) (l, injector) -> l.inc(1));
+			injectingInto(MyServiceExtension.class).initbind(
+					MyListener.class).to(
+							(Initialiser<MyListener>) (l,
+									injector) -> l.inc(2));
 			construct(MyService.class);
 			construct(MyOtherService.class);
 			construct(MyServiceExtension.class);
 		}
 	}
-	
+
 	@Test
 	public void thatDynamicInitialisationTookPlace() {
-		Injector injector = Bootstrap.injector(DynamicInitialiserBindsModule.class);
+		Injector injector = Bootstrap.injector(
+				DynamicInitialiserBindsModule.class);
 		assertEquals(1, injector.resolve(MyService.class).sum);
 		assertEquals(3, injector.resolve(MyServiceExtension.class).sum);
 		assertNotNull(injector.resolve(MyOtherService.class));

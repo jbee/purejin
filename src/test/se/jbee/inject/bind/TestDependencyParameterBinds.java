@@ -15,12 +15,13 @@ import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
 
 /**
- * This test demonstrates the most powerful {@link Parameter} hint: a {@link Dependency}.
+ * This test demonstrates the most powerful {@link Parameter} hint: a
+ * {@link Dependency}.
  *
- * It allows to also describe what {@link Instance} should be used dependent on its parent(s) it
- * would be {@link Dependency#injectingInto(Class)}. Though this we can tell to inject the
- * {@link Logger} that would be injected into the {@link BinderModule} class into our test object
- * {@link LoggerInspector}.
+ * It allows to also describe what {@link Instance} should be used dependent on
+ * its parent(s) it would be {@link Dependency#injectingInto(Class)}. Though
+ * this we can tell to inject the {@link Logger} that would be injected into the
+ * {@link BinderModule} class into our test object {@link LoggerInspector}.
  *
  * @see TestConstructorParameterBinds
  *
@@ -33,19 +34,18 @@ public class TestDependencyParameterBinds {
 
 		@Override
 		protected void bootstrap() {
-			install( BuildinBundle.LOGGER );
-			install( DependencyParameterBindsModule.class );
+			install(BuildinBundle.LOGGER);
+			install(DependencyParameterBindsModule.class);
 		}
 
 	}
 
-	private static class DependencyParameterBindsModule
-			extends BinderModule {
+	private static class DependencyParameterBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			bind( LoggerInspector.class ).toConstructor(
-					dependency( Logger.class ).injectingInto( BinderModule.class ) );
+			bind(LoggerInspector.class).toConstructor(
+					dependency(Logger.class).injectingInto(BinderModule.class));
 		}
 
 	}
@@ -54,16 +54,18 @@ public class TestDependencyParameterBinds {
 
 		final Logger logger;
 
-		@SuppressWarnings ( "unused" )
-		LoggerInspector( Logger logger ) {
+		@SuppressWarnings("unused")
+		LoggerInspector(Logger logger) {
 			this.logger = logger;
 		}
 	}
 
 	@Test
 	public void thatDependencyParameterIsUnderstood() {
-		Injector resolver = Bootstrap.injector( DependencyParameterBindsBundle.class );
-		LoggerInspector inspector = resolver.resolve( LoggerInspector.class );
-		assertSame( Logger.getLogger( BinderModule.class.getCanonicalName() ) , inspector.logger );
+		Injector resolver = Bootstrap.injector(
+				DependencyParameterBindsBundle.class);
+		LoggerInspector inspector = resolver.resolve(LoggerInspector.class);
+		assertSame(Logger.getLogger(BinderModule.class.getCanonicalName()),
+				inspector.logger);
 	}
 }

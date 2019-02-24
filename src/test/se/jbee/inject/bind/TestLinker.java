@@ -10,34 +10,32 @@ import se.jbee.inject.bootstrap.BootstrapperBundle;
 
 public class TestLinker {
 
-	static class TwiceInstalledModule
-			extends BinderModule {
+	static class TwiceInstalledModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			bind( Integer.class ).to( 42 );
+			bind(Integer.class).to(42);
 		}
 
 	}
 
-	private static class LinkerBundle
-			extends BootstrapperBundle {
+	private static class LinkerBundle extends BootstrapperBundle {
 
 		@Override
 		protected void bootstrap() {
-			install( new TwiceInstalledModule() );
-			install( new TwiceInstalledModule() );
+			install(new TwiceInstalledModule());
+			install(new TwiceInstalledModule());
 		}
 
 	}
 
 	/**
-	 * A monomodal module has just one initial state (or no state). Therefore it can be determined
-	 * that installing it twice or more does not make sense.
+	 * A monomodal module has just one initial state (or no state). Therefore it
+	 * can be determined that installing it twice or more does not make sense.
 	 */
 	@Test
 	public void thatMonomodalModulesCanBeInstalledTwice() {
-		Injector injector = Bootstrap.injector( LinkerBundle.class );
-		assertEquals( 42, injector.resolve( Integer.class ).intValue() );
+		Injector injector = Bootstrap.injector(LinkerBundle.class);
+		assertEquals(42, injector.resolve(Integer.class).intValue());
 	}
 }

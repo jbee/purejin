@@ -38,9 +38,8 @@ import se.jbee.inject.container.Supplier;
  * example we rely on implicit reference bindings being made. For example
  * {@code SomeService.class} is linked to the same constant supplied when bound
  * to {@link Service}.
- * {@link InitBinder#forAny(Class, java.util.function.BiConsumer)} fetches
- * all bound instances that do implement the target type (here
- * {@link Subscriber}).
+ * {@link InitBinder#forAny(Class, java.util.function.BiConsumer)} fetches all
+ * bound instances that do implement the target type (here {@link Subscriber}).
  *
  * In both examples it is important to end up with reference bindings to the
  * very same instance of the 3 {@link Service} implementations. Otherwise the
@@ -76,9 +75,10 @@ public class TestPubSubBinds {
 		}
 	}
 
-	static interface Service { }
+	static interface Service {
+	}
 
-	static class SomeService implements Service, Subscriber  {
+	static class SomeService implements Service, Subscriber {
 
 		boolean event;
 
@@ -123,12 +123,14 @@ public class TestPubSubBinds {
 			bind(named("ref"), Service.class).to(AnotherService.class);
 
 			// a predefined (unknown constant) with aid of explicit multibind to Subscriber
-			Supplier<PredefinedService> predefined = Supply.constant(new PredefinedService());
+			Supplier<PredefinedService> predefined = Supply.constant(
+					new PredefinedService());
 			bind(named("pre"), Service.class).to(predefined);
 			multibind(Subscriber.class).to(predefined);
 
 			bind(Publisher.class).to(PublisherImpl.class);
-			init(PublisherImpl.class).forAny(Subscriber.class, Publisher::subscribe);
+			init(PublisherImpl.class).forAny(Subscriber.class,
+					Publisher::subscribe);
 		}
 
 	}
@@ -154,12 +156,14 @@ public class TestPubSubBinds {
 			multibind(Subscriber.class).to(AnotherService.class);
 
 			// a predefined (unknown constant) with aid of explicit multibind to Subscriber
-			Supplier<PredefinedService> predefined = Supply.constant(new PredefinedService());
+			Supplier<PredefinedService> predefined = Supply.constant(
+					new PredefinedService());
 			bind(named("pre"), Service.class).to(predefined);
 			multibind(Subscriber.class).to(predefined);
 
 			bind(Publisher.class).to(PublisherImpl.class);
-			init(PublisherImpl.class).forEach(raw(Subscriber[].class), Publisher::subscribe);
+			init(PublisherImpl.class).forEach(raw(Subscriber[].class),
+					Publisher::subscribe);
 		}
 
 	}
@@ -174,12 +178,14 @@ public class TestPubSubBinds {
 		assertSubscribedToPublisher(PubSubBindsModule2.class);
 	}
 
-	private static void assertSubscribedToPublisher(Class<? extends Bundle> bundle) {
+	private static void assertSubscribedToPublisher(
+			Class<? extends Bundle> bundle) {
 		Injector injector = Bootstrap.injector(bundle);
 		Publisher pub = injector.resolve(Publisher.class);
 		SomeService sub = injector.resolve(SomeService.class);
 		AnotherService sub2 = injector.resolve(AnotherService.class);
-		PredefinedService sub3 = (PredefinedService)injector.resolve("pre", Service.class);
+		PredefinedService sub3 = (PredefinedService) injector.resolve("pre",
+				Service.class);
 
 		assertFalse(sub.event);
 		assertFalse(sub2.event);

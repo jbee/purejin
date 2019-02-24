@@ -10,13 +10,16 @@ public class TestTypecast {
 
 	@Test
 	public void thatReturnTypeConformsToModelledType() {
-		Type<java.util.List<java.lang.String>> listString = Typecast.listTypeOf( String.class );
-		assertEquals( "java.util.List<java.lang.String>", listString.toString() );
+		Type<java.util.List<java.lang.String>> listString = Typecast.listTypeOf(
+				String.class);
+		assertEquals("java.util.List<java.lang.String>", listString.toString());
 	}
 
 	@Test
 	public void thatReturnTypeConformsToNestedModelledType() {
-		Type<java.util.List<java.util.List<java.lang.String>>> listListString = Typecast.listTypeOf( Typecast.listTypeOf( String.class ) );
-		assertEquals( "java.util.List<java.util.List<java.lang.String>>", listListString.toString() );
+		Type<java.util.List<java.util.List<java.lang.String>>> listListString = Typecast.listTypeOf(
+				Typecast.listTypeOf(String.class));
+		assertEquals("java.util.List<java.util.List<java.lang.String>>",
+				listListString.toString());
 	}
 }

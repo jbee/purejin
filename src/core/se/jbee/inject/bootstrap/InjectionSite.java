@@ -30,7 +30,8 @@ public final class InjectionSite {
 	private final int[] dynamics;
 	private int dynamicsLength = 0;
 
-	public InjectionSite(Dependency<?> site, Injector injector, BoundParameter<?>[] parameters) {
+	public InjectionSite(Dependency<?> site, Injector injector,
+			BoundParameter<?>[] parameters) {
 		this.site = site;
 		this.parameters = parameters;
 		this.cases = new InjectionCase<?>[parameters.length];
@@ -49,7 +50,9 @@ public final class InjectionSite {
 			BoundParameter<?> p = parameters[i];
 			switch (p.type) {
 			case INSTANCE:
-				args[i] = instance(cases[i], site.instanced(parameters[i].instance)); break;
+				args[i] = instance(cases[i],
+						site.instanced(parameters[i].instance));
+				break;
 			default:
 			case EXTERNAL:
 				args[i] = supply(p, site, injector);
@@ -61,22 +64,25 @@ public final class InjectionSite {
 	private Object[] initNonDynamicParameters(Injector injector) {
 		Object[] args = new Object[parameters.length];
 		dynamicsLength = 0;
-		for (int i = 0; i < cases.length; i++)  {
+		for (int i = 0; i < cases.length; i++) {
 			args[i] = null;
 			BoundParameter<?> p = parameters[i];
-			if (p.type == ParameterType.INSTANCE && p.type().arrayDimensions() == 1) {
-				// in this case there is no single spec, the injector composes the result array from multiple specs
+			if (p.type == ParameterType.INSTANCE
+				&& p.type().arrayDimensions() == 1) {
+				// in this case there is no single spec, the injector composes
+				// the result array from multiple specs
 				p = p.external();
 				parameters[i] = p;
 			}
 			switch (p.type) {
 			case INSTANCE:
-				Dependency<? extends InjectionCase<?>> caseDep = 
-					site.typed( injectionCaseTypeFor(p.instance.type )).named(p.instance.name);
+				Dependency<? extends InjectionCase<?>> caseDep = site.typed(
+						injectionCaseTypeFor(p.instance.type)).named(
+								p.instance.name);
 				InjectionCase<?> icase = injector.resolve(caseDep);
 				if (icase.scoping.isStableByDesign()) {
 					args[i] = instance(icase, site.instanced(p.instance));
-				}else {
+				} else {
 					dynamics[dynamicsLength++] = i;
 					cases[i] = icase;
 				}
@@ -92,12 +98,13 @@ public final class InjectionSite {
 		return args;
 	}
 
-	private static <T> T supply(BoundParameter<T> p, Dependency<?> dep, Injector injector) {
-		return p.supplier.supply( dep.instanced( anyOf( p.type() ) ), injector );
+	private static <T> T supply(BoundParameter<T> p, Dependency<?> dep,
+			Injector injector) {
+		return p.supplier.supply(dep.instanced(anyOf(p.type())), injector);
 	}
 
-	@SuppressWarnings ( "unchecked" )
-	private static <I> I instance( InjectionCase<I> icase, Dependency<?> dep ) {
-		return icase.generator.instanceFor( (Dependency<? super I>) dep );
+	@SuppressWarnings("unchecked")
+	private static <I> I instance(InjectionCase<I> icase, Dependency<?> dep) {
+		return icase.generator.instanceFor((Dependency<? super I>) dep);
 	}
 }

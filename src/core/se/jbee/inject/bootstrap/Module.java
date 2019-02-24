@@ -6,9 +6,9 @@
 package se.jbee.inject.bootstrap;
 
 /**
- * {@link Bindings} are defined with {@link Module}s while {@link Bundle}s are used to group
- * multiple {@link Module}s and {@link Bundle}s what allows to build graphs of {@link Bundle}s with
- * {@link Module}s as leafs.
+ * {@link Bindings} are defined with {@link Module}s while {@link Bundle}s are
+ * used to group multiple {@link Module}s and {@link Bundle}s what allows to
+ * build graphs of {@link Bundle}s with {@link Module}s as leafs.
  * 
  * @see Bundle
  * @see PresetModule
@@ -19,9 +19,8 @@ package se.jbee.inject.bootstrap;
 public interface Module {
 
 	/**
-	 * @param bindings
-	 *            use to declare made bound within this {@link Module}.
+	 * @param bindings use to declare made bound within this {@link Module}.
 	 */
-	void declare( Bindings bindings );
+	void declare(Bindings bindings);
 
 }

@@ -18,13 +18,14 @@ import se.jbee.inject.container.Initialiser;
 /**
  * The tests demonstrates how the {@link Initialiser} and
  * {@link Binder#initbind()} can be used to e.g. install a "shutdown hook" that
- * would automatically close all {@link AutoCloseable}s. Here the
- * "shutdown hook" of course is simulated so we can test for it being invoked.
- * In a real scenario one would use {@link Runtime#addShutdownHook(Thread)}.
+ * would automatically close all {@link AutoCloseable}s. Here the "shutdown
+ * hook" of course is simulated so we can test for it being invoked. In a real
+ * scenario one would use {@link Runtime#addShutdownHook(Thread)}.
  */
 public class TestInitialiserBinds {
 
-	static final class TestInitialiserBindsModule extends BinderModule implements Initialiser<Injector> {
+	static final class TestInitialiserBindsModule extends BinderModule
+			implements Initialiser<Injector> {
 
 		@Override
 		protected void declare() {
@@ -43,7 +44,8 @@ public class TestInitialiserBinds {
 
 	}
 
-	static final class TestInitialiserBindsPresetModule extends BinderModuleWith<Integer> implements Initialiser<Injector> {
+	static final class TestInitialiserBindsPresetModule
+			extends BinderModuleWith<Integer> implements Initialiser<Injector> {
 
 		Integer setup;
 
@@ -80,7 +82,8 @@ public class TestInitialiserBinds {
 		public void init(Injector target, Injector context) {
 			// by the use of upper bound we receive all implementing classes
 			// even though they have not be bound explicitly for AutoCloseable.
-			AutoCloseable[] autoCloseables = target.resolve(raw(AutoCloseable[].class).asUpperBound());
+			AutoCloseable[] autoCloseables = target.resolve(
+					raw(AutoCloseable[].class).asUpperBound());
 			assertTrue(autoCloseables.length > 0);
 			shutdownHookMock = () -> {
 				for (AutoCloseable a : autoCloseables)
@@ -114,7 +117,8 @@ public class TestInitialiserBinds {
 
 	@Test
 	public void initialisersCanBeUsedToCloseAnyAutoCloseable() {
-		Injector injector = Bootstrap.injector(TestInitialiserBindsModule.class);
+		Injector injector = Bootstrap.injector(
+				TestInitialiserBindsModule.class);
 
 		assertNotNull(shutdownHookMock);
 		@SuppressWarnings("resource")
@@ -129,11 +133,14 @@ public class TestInitialiserBinds {
 
 	@Test
 	public void initialisersCanMakeUseOfParammetersUsingPresetModules() {
-		Globals globals = Globals.STANDARD.presets(Presets.EMPTY.preset(Integer.class, 42)); // setup some parameter
-		Injector injector = Bootstrap.injector(TestInitialiserBindsPresetModule.class, globals);
+		Globals globals = Globals.STANDARD.presets(
+				Presets.EMPTY.preset(Integer.class, 42)); // setup some parameter
+		Injector injector = Bootstrap.injector(
+				TestInitialiserBindsPresetModule.class, globals);
 
 		// double check
-		Initialiser<Injector> initialiser = injector.resolve(initialiserTypeOf(Injector.class));
+		Initialiser<Injector> initialiser = injector.resolve(
+				initialiserTypeOf(Injector.class));
 		assertTrue(initialiser instanceof TestInitialiserBindsPresetModule);
 		TestInitialiserBindsPresetModule module = (TestInitialiserBindsPresetModule) initialiser;
 		assertNotNull(module.setup);

@@ -53,7 +53,8 @@ public class TestEditionPackageBinds {
 
 		// an edition without the module in this test
 		injector = Bootstrap.injector(EditionPackageBindsBundle.class,
-				Globals.STANDARD.edition(subPackagesOf(TestEditionPackageBinds.class)));
+				Globals.STANDARD.edition(
+						subPackagesOf(TestEditionPackageBinds.class)));
 		try {
 			Integer res = injector.resolve(int.class);
 			assertNull(res);
@@ -64,7 +65,8 @@ public class TestEditionPackageBinds {
 
 		// an edition including the module in this test
 		injector = Bootstrap.injector(EditionPackageBindsBundle.class,
-				Globals.STANDARD.edition(packageAndSubPackagesOf(TestEditionPackageBinds.class)));
+				Globals.STANDARD.edition(packageAndSubPackagesOf(
+						TestEditionPackageBinds.class)));
 		assertEquals(42, injector.resolve(int.class).intValue());
 	}
 }

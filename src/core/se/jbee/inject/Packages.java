@@ -9,8 +9,8 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 /**
- * A set of {@link Package}s described one or more root packages (on the same hierarchy level/depth)
- * with or without their sub-packages.
+ * A set of {@link Package}s described one or more root packages (on the same
+ * hierarchy level/depth) with or without their sub-packages.
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
@@ -20,86 +20,85 @@ public final class Packages
 	/**
 	 * Contains all packages including the (default) package.
 	 */
-	public static final Packages ALL = new Packages( new String[0], true );
+	public static final Packages ALL = new Packages(new String[0], true);
 
 	/**
 	 * The (default) package.
 	 */
-	public static final Packages DEFAULT = new Packages( new String[0], false );
+	public static final Packages DEFAULT = new Packages(new String[0], false);
 
-	public static Packages packageAndSubPackagesOf( Class<?> type ) {
-		return new Packages( packageNameOf( type ), true );
+	public static Packages packageAndSubPackagesOf(Class<?> type) {
+		return new Packages(packageNameOf(type), true);
 	}
 
-	public static Packages packageAndSubPackagesOf( Class<?> type, Class<?>... types ) {
-		commonPackageDepth( type, types );
-		return new Packages( packageNamesOf( type, "", types ), true );
+	public static Packages packageAndSubPackagesOf(Class<?> type,
+			Class<?>... types) {
+		commonPackageDepth(type, types);
+		return new Packages(packageNamesOf(type, "", types), true);
 	}
 
-	public static Packages packageOf( Class<?> type ) {
-		return new Packages( packageNameOf( type ), false );
+	public static Packages packageOf(Class<?> type) {
+		return new Packages(packageNameOf(type), false);
 	}
 
-	public static Packages packageOf( Class<?> type, Class<?>... types ) {
-		return new Packages( packageNamesOf( type, "", types ), false );
+	public static Packages packageOf(Class<?> type, Class<?>... types) {
+		return new Packages(packageNamesOf(type, "", types), false);
 	}
 
-	public static Packages subPackagesOf( Class<?> type ) {
-		return new Packages( packageNameOf( type ) + ".", true );
+	public static Packages subPackagesOf(Class<?> type) {
+		return new Packages(packageNameOf(type) + ".", true);
 	}
 
-	public static Packages subPackagesOf( Class<?> type, Class<?>... types ) {
-		commonPackageDepth( type, types );
-		return new Packages( packageNamesOf( type, ".", types ), true );
+	public static Packages subPackagesOf(Class<?> type, Class<?>... types) {
+		commonPackageDepth(type, types);
+		return new Packages(packageNamesOf(type, ".", types), true);
 	}
 
-	private static String[] packageNamesOf( Class<?> packageOf, String suffix,
-			Class<?>... packagesOf ) {
+	private static String[] packageNamesOf(Class<?> packageOf, String suffix,
+			Class<?>... packagesOf) {
 		String[] names = new String[packagesOf.length + 1];
-		names[0] = packageNameOf( packageOf ) + suffix;
-		for ( int i = 1; i <= packagesOf.length; i++ ) {
-			names[i] = packageNameOf( packagesOf[i - 1] ) + suffix;
+		names[0] = packageNameOf(packageOf) + suffix;
+		for (int i = 1; i <= packagesOf.length; i++) {
+			names[i] = packageNameOf(packagesOf[i - 1]) + suffix;
 		}
 		return names;
 	}
 
-	private static String packageNameOf( Class<?> packageOf ) {
+	private static String packageNameOf(Class<?> packageOf) {
 		Package pkg = packageOf.getPackage();
-		return pkg == null
-			? "(default)"
-			: pkg.getName();
+		return pkg == null ? "(default)" : pkg.getName();
 	}
 
-	private static String packageNameOf( Type<?> packageOf ) {
+	private static String packageNameOf(Type<?> packageOf) {
 		return packageOf.isUpperBound()
 			? "-NONE-"
-			: packageNameOf( packageOf.rawType );
+			: packageNameOf(packageOf.rawType);
 	}
 
 	private final String[] roots;
 	private final boolean includingSubpackages;
 	private final int rootDepth;
 
-	private Packages( String root, boolean includingSubpackages ) {
-		this( new String[] { root }, includingSubpackages );
+	private Packages(String root, boolean includingSubpackages) {
+		this(new String[] { root }, includingSubpackages);
 	}
 
-	private Packages( String[] roots, boolean includingSubpackages ) {
+	private Packages(String[] roots, boolean includingSubpackages) {
 		this.roots = roots;
 		this.includingSubpackages = includingSubpackages;
-		this.rootDepth = rootDepth( roots );
+		this.rootDepth = rootDepth(roots);
 	}
 
 	public Packages parents() {
-		if ( rootDepth == 0 )
+		if (rootDepth == 0)
 			return this;
-		if ( rootDepth == 1 )
+		if (rootDepth == 1)
 			return includingSubpackages ? ALL : DEFAULT;
 		String[] parentRoots = new String[roots.length];
-		for ( int i = 0; i < roots.length; i++ ) {
-			parentRoots[i] = parent( roots[i] );
+		for (int i = 0; i < roots.length; i++) {
+			parentRoots[i] = parent(roots[i]);
 		}
-		return new Packages( parentRoots, includingSubpackages );
+		return new Packages(parentRoots, includingSubpackages);
 	}
 
 	/**
@@ -108,44 +107,44 @@ public final class Packages
 	 * foo.bar. -> foo.
 	 * </pre>
 	 */
-	private static String parent( String root ) {
-		return root.substring(0,
-				root.lastIndexOf('.', root.length() - 2)
-				+ (root.endsWith(".") ? 1 : 0));
+	private static String parent(String root) {
+		return root.substring(0, root.lastIndexOf('.', root.length() - 2)
+			+ (root.endsWith(".") ? 1 : 0));
 	}
 
-	private static void commonPackageDepth( Class<?> type, Class<?>[] types ) {
-		int p0 = dotsIn( type.getPackage().getName() );
-		for ( int i = 0; i < types.length; i++ ) {
-			if ( dotsIn( types[i].getPackage().getName() ) != p0 ) {
+	private static void commonPackageDepth(Class<?> type, Class<?>[] types) {
+		int p0 = dotsIn(type.getPackage().getName());
+		for (int i = 0; i < types.length; i++) {
+			if (dotsIn(types[i].getPackage().getName()) != p0) {
 				throw new IllegalArgumentException(
-						"All classes of a packages set have to be on same depth level." );
+						"All classes of a packages set have to be on same depth level.");
 			}
 		}
 	}
 
-	private static int rootDepth( String[] roots ) {
+	private static int rootDepth(String[] roots) {
 		return roots.length == 0 ? 0 : dotsIn(roots[0]);
 	}
 
-	private static int dotsIn( String s ) {
+	private static int dotsIn(String s) {
 		int c = 0;
-		for ( int i = s.length() - 1; i > 0; i-- ) {
-			if ( s.charAt( i ) == '.' ) {
+		for (int i = s.length() - 1; i > 0; i--) {
+			if (s.charAt(i) == '.') {
 				c++;
 			}
 		}
 		return c;
 	}
 
-	public boolean contains( Type<?> type ) {
-		if ( includesAll() )
+	public boolean contains(Type<?> type) {
+		if (includesAll())
 			return true;
-		final String packageNameOfType = packageNameOf( type );
-		for ( String root : roots ) {
-			if ( regionEqual( root, packageNameOfType, includingSubpackages
-				? root.length()
-				: packageNameOfType.length() ) ) {
+		final String packageNameOfType = packageNameOf(type);
+		for (String root : roots) {
+			if (regionEqual(root, packageNameOfType,
+					includingSubpackages
+						? root.length()
+						: packageNameOfType.length())) {
 				return true;
 			}
 		}
@@ -153,13 +152,13 @@ public final class Packages
 	}
 
 	private static boolean regionEqual(String p1, String p2, int length) {
-		if ( p1.length() < length || p2.length() < length )
+		if (p1.length() < length || p2.length() < length)
 			return false;
 		//noinspection StringEquality
-		if ( p1 == p2 )
+		if (p1 == p2)
 			return true;
-		for ( int i = length - 1; i > 0; i-- ) {
-			if ( p1.charAt( i ) != p2.charAt( i ) )
+		for (int i = length - 1; i > 0; i--) {
+			if (p1.charAt(i) != p2.charAt(i))
 				return false;
 		}
 		return true;
@@ -170,17 +169,17 @@ public final class Packages
 	}
 
 	@Override
-	public boolean equals( Object obj ) {
-		return obj instanceof Packages && equalTo( ( (Packages) obj ) );
+	public boolean equals(Object obj) {
+		return obj instanceof Packages && equalTo(((Packages) obj));
 	}
 
 	@Override
 	public int hashCode() {
-		return Arrays.hashCode( roots );
+		return Arrays.hashCode(roots);
 	}
 
 	@Override
-	public boolean moreApplicableThan( Packages other ) {
+	public boolean moreApplicableThan(Packages other) {
 		if (includingSubpackages != other.includingSubpackages) {
 			return !includingSubpackages;
 		}
@@ -189,30 +188,28 @@ public final class Packages
 
 	@Override
 	public String toString() {
-		if ( roots.length == 0 ) {
-			return includingSubpackages
-				? "*"
-				: "(default)";
+		if (roots.length == 0) {
+			return includingSubpackages ? "*" : "(default)";
 		}
-		if ( roots.length == 1 ) {
-			return toString( roots[0] );
+		if (roots.length == 1) {
+			return toString(roots[0]);
 		}
 		StringBuilder b = new StringBuilder();
-		for ( int i = 0; i < roots.length; i++ ) {
-			b.append( '+' ).append( toString( roots[i] ) );
+		for (int i = 0; i < roots.length; i++) {
+			b.append('+').append(toString(roots[i]));
 		}
-		return b.substring( 1 );
+		return b.substring(1);
 	}
 
 	private String toString(String root) {
 		return root + (includingSubpackages ? "*" : "");
 	}
 
-	public boolean equalTo( Packages other ) {
+	public boolean equalTo(Packages other) {
 		return other.includingSubpackages == includingSubpackages //
-				&& other.rootDepth == rootDepth
-				&& other.roots.length == roots.length
-				&& Arrays.equals( roots, other.roots );
+			&& other.rootDepth == rootDepth
+			&& other.roots.length == roots.length
+			&& Arrays.equals(roots, other.roots);
 	}
 
 }

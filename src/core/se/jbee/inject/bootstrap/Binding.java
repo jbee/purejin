@@ -30,15 +30,14 @@ import se.jbee.inject.container.Supplier;
  *
  * @author Jan Bernitt (jan@jbee.se)
  *
- * @param <T>
- *            The type of the bound value (instance)
+ * @param <T> The type of the bound value (instance)
  */
 public final class Binding<T>
 		implements Comparable<Binding<?>>, Injectee<T>, Module, Typed<T> {
 
-	public static <T> Binding<T> binding( Resource<T> resource, BindingType type,
-			Supplier<? extends T> supplier, Scope scope, Source source ) {
-		return new Binding<>( resource, type, supplier, scope, source );
+	public static <T> Binding<T> binding(Resource<T> resource, BindingType type,
+			Supplier<? extends T> supplier, Scope scope, Source source) {
+		return new Binding<>(resource, type, supplier, scope, source);
 	}
 
 	public final Resource<T> resource;
@@ -47,8 +46,8 @@ public final class Binding<T>
 	public final Scope scope;
 	public final Source source;
 
-	private Binding( Resource<T> resource, BindingType type, Supplier<? extends T> supplier,
-			Scope scope, Source source ) {
+	private Binding(Resource<T> resource, BindingType type,
+			Supplier<? extends T> supplier, Scope scope, Source source) {
 		this.resource = resource;
 		this.type = type;
 		this.supplier = supplier;
@@ -81,42 +80,44 @@ public final class Binding<T>
 		return resource.type();
 	}
 
-	@SuppressWarnings ( "unchecked" )
+	@SuppressWarnings("unchecked")
 	@Override
-	public <E> Binding<E> typed( Type<E> type ) {
-		return new Binding<>( resource.typed( type().toSupertype(type) ), this.type, (Supplier<? extends E>) supplier,	scope, source );
+	public <E> Binding<E> typed(Type<E> type) {
+		return new Binding<>(resource.typed(type().toSupertype(type)),
+				this.type, (Supplier<? extends E>) supplier, scope, source);
 	}
 
 	public boolean isComplete() {
 		return supplier != null;
 	}
 
-	public Binding<T> complete( BindingType type, Supplier<? extends T> supplier ) {
-		return new Binding<>( resource, type, supplier, scope, source );
+	public Binding<T> complete(BindingType type,
+			Supplier<? extends T> supplier) {
+		return new Binding<>(resource, type, supplier, scope, source);
 	}
 
 	@Override
-	public void declare( Bindings bindings ) {
-		bindings.add( this );
+	public void declare(Bindings bindings) {
+		bindings.add(this);
 	}
 
 	@Override
-	public int compareTo( Binding<?> other ) {
+	public int compareTo(Binding<?> other) {
 		int res = resource.type().rawType.getCanonicalName().compareTo(
-				other.resource.type().rawType.getCanonicalName() );
-		if ( res != 0 ) {
+				other.resource.type().rawType.getCanonicalName());
+		if (res != 0) {
 			return res;
 		}
-		res = compareApplicability( resource.instance, other.resource.instance );
-		if ( res != 0 ) {
+		res = compareApplicability(resource.instance, other.resource.instance);
+		if (res != 0) {
 			return res;
 		}
-		res = compareApplicability( resource.target, other.resource.target );
-		if ( res != 0 ) {
+		res = compareApplicability(resource.target, other.resource.target);
+		if (res != 0) {
 			return res;
 		}
-		res = compareApplicability( source, other.source );
-		if ( res != 0 ) {
+		res = compareApplicability(source, other.source);
+		if (res != 0) {
 			return res;
 		}
 		return -1; // keep order
@@ -128,56 +129,61 @@ public final class Binding<T>
 	}
 
 	/**
-	 * Removes those bindings that are ambiguous but also do not clash because of different
-	 * {@link DeclarationType}s that replace each other.
+	 * Removes those bindings that are ambiguous but also do not clash because
+	 * of different {@link DeclarationType}s that replace each other.
 	 */
-	public static Binding<?>[] disambiguate( Binding<?>[] bindings ) {
-		if ( bindings.length <= 1 ) {
+	public static Binding<?>[] disambiguate(Binding<?>[] bindings) {
+		if (bindings.length <= 1) {
 			return bindings;
 		}
-		List<Binding<?>> uniques = new ArrayList<>( bindings.length );
-		Arrays.sort( bindings );
-		uniques.add( bindings[0] );
+		List<Binding<?>> uniques = new ArrayList<>(bindings.length);
+		Arrays.sort(bindings);
+		uniques.add(bindings[0]);
 		int lastUniqueIndex = 0;
 		Set<Type<?>> required = new HashSet<>();
 		List<Binding<?>> dropped = new ArrayList<>();
-		for ( int i = 1; i < bindings.length; i++ ) {
+		for (int i = 1; i < bindings.length; i++) {
 			Binding<?> b_d = bindings[lastUniqueIndex];
 			Binding<?> b_i = bindings[i];
-			final boolean equalResource = b_d.resource.equalTo( b_i.resource );
+			final boolean equalResource = b_d.resource.equalTo(b_i.resource);
 			DeclarationType t_d = b_d.source.declarationType;
 			DeclarationType t_i = b_i.source.declarationType;
-			if ( equalResource && t_d.clashesWith( t_i ) ) {
-				throw new InconsistentBinding( "Duplicate binds:\n" + b_d + "\n" + b_i );
+			if (equalResource && t_d.clashesWith(t_i)) {
+				throw new InconsistentBinding(
+						"Duplicate binds:\n" + b_d + "\n" + b_i);
 			}
-			if ( t_i == DeclarationType.REQUIRED ) {
-				required.add( b_i.resource.type() );
-			} else if ( equalResource && t_d.droppedWith( t_i ) ) {
-				if ( i - 1 == lastUniqueIndex ) {
-					dropped.add(uniques.remove( uniques.size() - 1 ));
+			if (t_i == DeclarationType.REQUIRED) {
+				required.add(b_i.resource.type());
+			} else if (equalResource && t_d.droppedWith(t_i)) {
+				if (i - 1 == lastUniqueIndex) {
+					dropped.add(uniques.remove(uniques.size() - 1));
 				}
 				dropped.add(b_i);
-			} else if ( !equalResource || !t_i.replacedBy( t_d ) ) {
-				uniques.add( b_i );
+			} else if (!equalResource || !t_i.replacedBy(t_d)) {
+				uniques.add(b_i);
 				lastUniqueIndex = i;
 			}
 		}
 		return withoutProvidedThatAreNotRequiredIn(uniques, required, dropped);
 	}
 
-	private static Binding<?>[] withoutProvidedThatAreNotRequiredIn(List<Binding<?>> bindings, Set<Type<?>> required, List<Binding<?>> dropped) {
-		List<Binding<?>> res = new ArrayList<>( bindings.size() );
-		for ( Binding<?> b : bindings ) {
+	private static Binding<?>[] withoutProvidedThatAreNotRequiredIn(
+			List<Binding<?>> bindings, Set<Type<?>> required,
+			List<Binding<?>> dropped) {
+		List<Binding<?>> res = new ArrayList<>(bindings.size());
+		for (Binding<?> b : bindings) {
 			Type<?> type = b.resource.type();
-			if ( b.source.declarationType != DeclarationType.PROVIDED || required.contains(type) ) {
-				res.add( b );
+			if (b.source.declarationType != DeclarationType.PROVIDED
+				|| required.contains(type)) {
+				res.add(b);
 				required.remove(type);
 			}
 		}
-		if (!required.isEmpty() ) {
-			throw new UnresolvableDependency.NoResourceForDependency( required, dropped );
+		if (!required.isEmpty()) {
+			throw new UnresolvableDependency.NoResourceForDependency(required,
+					dropped);
 		}
-		return array( res, Binding.class );
+		return array(res, Binding.class);
 	}
 
 }

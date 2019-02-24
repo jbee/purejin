@@ -21,20 +21,21 @@ public abstract class OptionBootstrapperBundle<O>
 	private OptionBootstrapper<O> bootstrapper;
 
 	@Override
-	public void bootstrap( OptionBootstrapper<O> bs ) {
-		Bootstrap.nonnullThrowsReentranceException( bootstrapper );
+	public void bootstrap(OptionBootstrapper<O> bs) {
+		Bootstrap.nonnullThrowsReentranceException(bootstrapper);
 		this.bootstrapper = bs;
 		bootstrap();
 	}
 
 	@Override
-	public void install( Class<? extends Bundle> bundle, O onOption ) {
-		bootstrapper.install( bundle, onOption );
+	public void install(Class<? extends Bundle> bundle, O onOption) {
+		bootstrapper.install(bundle, onOption);
 	}
 
 	@Override
 	public String toString() {
-		Type<?> module = Type.supertype( OptionBundle.class, Type.raw( getClass() ) ).parameter( 0 );
+		Type<?> module = Type.supertype(OptionBundle.class,
+				Type.raw(getClass())).parameter(0);
 		return "bundle " + getClass().getSimpleName() + "[" + module + "]";
 	}
 

@@ -19,13 +19,13 @@ import se.jbee.inject.util.Resource;
  */
 public class TestActionInspectorBinds {
 
-	private static class TestServiceInspectorModule
-			extends ActionModule {
+	private static class TestServiceInspectorModule extends ActionModule {
 
 		@Override
 		protected void declare() {
-			discoverActionsBy( Inspect.all().methods().annotatedWith( Resource.class ) );
-			bindActionsIn( ActionInspectorBindsActions.class );
+			discoverActionsBy(
+					Inspect.all().methods().annotatedWith(Resource.class));
+			bindActionsIn(ActionInspectorBindsActions.class);
 		}
 
 	}
@@ -42,11 +42,13 @@ public class TestActionInspectorBinds {
 		}
 	}
 
-	private final Injector injector = Bootstrap.injector( TestServiceInspectorModule.class );
+	private final Injector injector = Bootstrap.injector(
+			TestServiceInspectorModule.class);
 
 	@Test
 	public void actionInspectorCanBeCustomized() {
-		Action<Void, Integer> answer = injector.resolve( actionDependency(raw( Void.class), raw(Integer.class ) ) );
-		assertEquals( 42, answer.exec( null ).intValue() );
+		Action<Void, Integer> answer = injector.resolve(
+				actionDependency(raw(Void.class), raw(Integer.class)));
+		assertEquals(42, answer.exec(null).intValue());
 	}
 }

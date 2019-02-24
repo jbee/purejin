@@ -8,8 +8,9 @@ package se.jbee.inject;
 /**
  * A {@linkplain Scope} describes a particular lifecycle.
  * 
- * Thereby the {@linkplain Scope} itself acts as a factory for {@link Repository}s. Each
- * {@link Injector} has a single {@linkplain Repository} for each {@linkplain Scope}.
+ * Thereby the {@linkplain Scope} itself acts as a factory for
+ * {@link Repository}s. Each {@link Injector} has a single
+ * {@linkplain Repository} for each {@linkplain Scope}.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
@@ -21,20 +22,21 @@ public interface Scope {
 	 * {@link Scope}.
 	 * 
 	 * @param generators the total number of {@link Generator}s in the
-	 *                   {@link Injector} context
+	 *            {@link Injector} context
 	 * 
 	 * @return a empty instance in this {@linkplain Scope}.
 	 */
 	Repository init(int generators);
-	
+
 	/**
-	 * Should be implemented by all {@link Scope}s that produce stable "singleton"
-	 * instances. That means for a particular {@link Dependency} the {@link Scope}'s
-	 * {@link Repository} will always yield the same instance {@link Object} which
-	 * does not become out-dated at some point like something scoped per session,
-	 * request or thread.
+	 * Should be implemented by all {@link Scope}s that produce stable
+	 * "singleton" instances. That means for a particular {@link Dependency} the
+	 * {@link Scope}'s {@link Repository} will always yield the same instance
+	 * {@link Object} which does not become out-dated at some point like
+	 * something scoped per session, request or thread.
 	 * 
 	 * @since 19.1
 	 */
-	interface SingletonScope extends Scope { }
+	interface SingletonScope extends Scope {
+	}
 }
