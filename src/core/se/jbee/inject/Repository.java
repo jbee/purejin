@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2012-2017, Jan Bernitt 
+ *  Copyright (c) 2012-2019, Jan Bernitt 
  *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
