@@ -6,9 +6,10 @@
 package se.jbee.inject;
 
 /**
- * A {@link Generator} creates the instance(s) for the generators {@link InjectionCase}.
+ * A {@link Generator} creates the instance(s) for the generators
+ * {@link InjectionCase}.
  * 
- * @author Jan Bernitt (jan@jbee.se)
+ * @since 19.1
  */
 @FunctionalInterface
 public interface Generator<T> {

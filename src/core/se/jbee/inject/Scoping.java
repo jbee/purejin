@@ -16,8 +16,8 @@ import se.jbee.inject.Scope.SingletonScope;
 /**
  * The relation of a {@link Scope} to other {@link Scope}s is captured by a
  * {@link Scoping} instance for each {@link Scope}.
- *
- * @author Jan Bernitt (jan@jbee.se)
+ * 
+ * @serial 19.1
  */
 public final class Scoping implements Serializable {
 
@@ -113,6 +113,12 @@ public final class Scoping implements Serializable {
 		return scope == SingletonScope.class;
 	}
 
+	/**
+	 * @return {@code true} in case the {@link Scope} represented implements the
+	 *         {@link Scope.SingletonScope} interface which is a marker for scopes
+	 *         that create instances that, once created, exist throughout the
+	 *         life-span of the application.
+	 */
 	public boolean isStableByDesign() {
 		return stableByDesign;
 	}

@@ -33,6 +33,8 @@ public interface Scope {
 	 * {@link Repository} will always yield the same instance {@link Object} which
 	 * does not become out-dated at some point like something scoped per session,
 	 * request or thread.
+	 * 
+	 * @since 19.1
 	 */
 	interface SingletonScope extends Scope { }
 }

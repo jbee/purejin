@@ -12,6 +12,8 @@ import java.util.concurrent.TimeoutException;
  * to the caller.
  * 
  * It {@link #getCause()} indicates what went wrong.
+ * 
+ * @since 19.1
  */
 public final class EventException extends RuntimeException {
 

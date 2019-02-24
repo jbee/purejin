@@ -27,6 +27,8 @@ import se.jbee.inject.Type;
 /**
  * Default implementation of the {@link EventProcessor} supporting all
  * {@link EventPreferences}.
+ * 
+ * @since 19.1
  */
 public class ConcurrentEventProcessor implements EventProcessor {
 

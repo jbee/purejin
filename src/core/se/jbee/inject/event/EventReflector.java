@@ -11,6 +11,8 @@ package se.jbee.inject.event;
  * To substitute the default behaviour (which used
  * {@link EventPreferences#DEFAULT}) simply bind {@link EventReflector} to a
  * custom supplier having the behaviour you want.
+ * 
+ * @since 19.1
  */
 @FunctionalInterface
 public interface EventReflector {

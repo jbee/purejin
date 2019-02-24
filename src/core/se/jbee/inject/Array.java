@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * Silks array util.
+ * Library's array utility.
  *
  * @author Jan Bernitt (jan@jbee.se)
  */

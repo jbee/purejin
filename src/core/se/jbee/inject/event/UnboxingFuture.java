@@ -15,6 +15,8 @@ import java.util.concurrent.TimeoutException;
  * computational unboxing will first occur when {@link #get()} or
  * {@link #get(long, TimeUnit)} is called.
  * 
+ * @since 19.1
+ * 
  * @param <T> type of the plain {@link Future}s value type
  */
 final class UnboxingFuture<T> implements Future<T> {

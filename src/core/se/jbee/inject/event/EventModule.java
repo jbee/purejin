@@ -12,6 +12,8 @@ import se.jbee.inject.container.Supplier;
 /**
  * Base {@link Module} for modules that want to make known a handler to the
  * event system using {@link #handle(Class)}.
+ * 
+ * @since 19.1
  */
 public abstract class EventModule extends BinderModule {
 

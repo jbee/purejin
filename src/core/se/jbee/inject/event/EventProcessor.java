@@ -35,6 +35,8 @@ import se.jbee.inject.container.Initialiser;
  * uses {@link java.lang.ref.WeakReference}s so that handlers automatically are
  * "deregistered" if they no longer are required by any other part of the
  * application.
+ * 
+ * @since 19.1
  */
 public interface EventProcessor extends AutoCloseable {
 

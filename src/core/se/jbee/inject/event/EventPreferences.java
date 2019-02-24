@@ -10,6 +10,8 @@ import java.util.concurrent.TimeoutException;
 /**
  * Properties that control how the {@link Event}s are processed by a
  * {@link EventProcessor}.
+ * 
+ * @since 19.1
  */
 public final class EventPreferences implements Serializable {
 	

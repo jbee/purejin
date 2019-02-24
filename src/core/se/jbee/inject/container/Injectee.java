@@ -29,6 +29,8 @@ import se.jbee.inject.Source;
  * (utility) packages as only contract is a consistent list of {@link Injectee}
  * is produced to build a {@link Injector}s context.
  * 
+ * @since 19.1
+ * 
  * @param <T> Type of instances assembled.
  */
 public interface Injectee<T> {

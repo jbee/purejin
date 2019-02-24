@@ -8,10 +8,12 @@ package se.jbee.inject;
 import static se.jbee.inject.Instance.compareApplicability;
 
 /**
- * A {@link InjectionCase} describes a injection situation through its
- * {@link #resource} and {@link #scoping}. If the {@link InjectionCase} applies to a
- * actual situation its {@link #generator} is used to create the instance
- * injected should it not exist already.
+ * A {@link InjectionCase} describes a injection situation or scenario through
+ * its {@link #resource} and {@link #scoping}. If the {@link InjectionCase}
+ * applies to a actual {@link Dependency} situation its {@link #generator} is
+ * used to create the instance injected should it not exist already.
+ * 
+ * @since 19.1
  * 
  * @param <T> type of instances yielded by the {@link #generator}.
  */
@@ -38,7 +40,9 @@ public final class InjectionCase<T> implements Comparable<InjectionCase<?>>,
 	public final Scoping scoping;
 
 	/**
-	 * the serial ID of the {@link Generator} being injected.
+	 * The serial ID of this {@link InjectionCase}. It is unique within the same
+	 * {@link Injector} context and assigned by the {@link Injector} implementation
+	 * when it creates the cases during initialisation.
 	 */
 	public final int serialID;
 

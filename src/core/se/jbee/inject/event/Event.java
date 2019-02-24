@@ -10,6 +10,8 @@ import se.jbee.inject.Type;
 /**
  * The message describing the handler interface method invocation as data.
  * 
+ * @since 19.1
+ * 
  * @param <E> type of the event handler interface
  * @param <T> return type of the {@link #handler} method
  */
