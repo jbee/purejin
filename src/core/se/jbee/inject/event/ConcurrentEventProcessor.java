@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.event;
@@ -194,7 +194,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	}
 
 	// - when should I give up?
-	// - what to do when giving up? 
+	// - what to do when giving up?
 	// - how often should I retry?
 	// note: these can be programmed as a utility on top with basically the same effect and little extra overhead for a corner case
 	//       as long as there is a clear contract: namely that failure is always indicated by a EventEception
