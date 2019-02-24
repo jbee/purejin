@@ -9,8 +9,8 @@ import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.container.Typecast.injectionCaseTypeFor;
 
 import se.jbee.inject.Dependency;
-import se.jbee.inject.Injector;
 import se.jbee.inject.InjectionCase;
+import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bootstrap.BoundParameter.ParameterType;
 

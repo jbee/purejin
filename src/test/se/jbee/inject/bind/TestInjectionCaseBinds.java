@@ -13,9 +13,9 @@ import java.util.List;
 import org.junit.Test;
 
 import se.jbee.inject.Dependency;
+import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Name;
-import se.jbee.inject.InjectionCase;
 import se.jbee.inject.bootstrap.Bootstrap;
 
 public class TestInjectionCaseBinds {

@@ -20,11 +20,11 @@ import java.util.logging.Logger;
 
 import se.jbee.inject.Array;
 import se.jbee.inject.Dependency;
+import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Provider;
-import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;

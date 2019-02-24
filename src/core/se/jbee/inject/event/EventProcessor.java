@@ -4,7 +4,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeoutException;
-import java.util.function.BinaryOperator;
 
 import se.jbee.inject.container.Initialiser;
 

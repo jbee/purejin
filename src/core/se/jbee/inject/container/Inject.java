@@ -27,12 +27,12 @@ import java.util.Set;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Generator;
+import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Repository;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Scope;
 import se.jbee.inject.Scoping;
-import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 

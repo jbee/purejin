@@ -12,10 +12,10 @@ import java.util.Map;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Generator;
+import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Provider;
 import se.jbee.inject.Repository;
 import se.jbee.inject.Scope;
-import se.jbee.inject.InjectionCase;
 import se.jbee.inject.UnresolvableDependency;
 
 /**

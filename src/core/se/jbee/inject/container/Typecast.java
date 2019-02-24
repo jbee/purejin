@@ -11,8 +11,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import se.jbee.inject.Provider;
 import se.jbee.inject.InjectionCase;
+import se.jbee.inject.Provider;
 import se.jbee.inject.Type;
 
 /**
