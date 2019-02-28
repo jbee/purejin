@@ -1,18 +1,14 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bind;
-
-import static se.jbee.inject.bootstrap.Bindings.bindings;
 
 import se.jbee.inject.Scope;
 import se.jbee.inject.bind.Binder.RootBinder;
 import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Inspect;
-import se.jbee.inject.bootstrap.Macros;
 import se.jbee.inject.container.Scoped;
 
 /**
@@ -33,8 +29,7 @@ public abstract class InitializedBinder extends RootBinder {
 	}
 
 	protected InitializedBinder(Scope inital) {
-		super(Bind.create(bindings(Macros.DEFAULT, Inspect.DEFAULT), null,
-				inital));
+		super(Bind.create(Bindings.newBindings(), null, inital));
 		this.bind = super.bind();
 	}
 

@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -154,7 +154,6 @@ public final class Packages
 	private static boolean regionEqual(String p1, String p2, int length) {
 		if (p1.length() < length || p2.length() < length)
 			return false;
-		//noinspection StringEquality
 		if (p1 == p2)
 			return true;
 		for (int i = length - 1; i > 0; i--) {

@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.container;
@@ -321,9 +321,12 @@ public final class Inject {
 			b.append(group).append('\n');
 			for (InjectionCase<?> icase : cases) {
 				Resource<?> r = icase.resource;
-				b.append('\t').append(r.type().simpleName()).append(' ').append(
-						r.instance.name).append(' ').append(r.target).append(
-								' ').append(icase.source).append('\n');
+				b.append("\t#").append(icase.serialID).append(' ');
+				b.append(r.type().simpleName()).append(' ');
+				b.append(r.instance.name).append(' ');
+				b.append(r.target).append(' ');
+				b.append(icase.scoping).append(' ');
+				b.append(icase.source).append('\n');
 			}
 		}
 	}

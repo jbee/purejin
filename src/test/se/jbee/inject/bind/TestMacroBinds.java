@@ -29,7 +29,6 @@ import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BoundConstructor;
 import se.jbee.inject.bootstrap.Bundle;
-import se.jbee.inject.bootstrap.Inspect;
 import se.jbee.inject.bootstrap.Macro;
 import se.jbee.inject.bootstrap.Macros;
 import se.jbee.inject.bootstrap.Supply;
@@ -112,7 +111,7 @@ public class TestMacroBinds {
 	private static Injector injectorWithMacro(Class<? extends Bundle> root,
 			Macro<?> macro) {
 		return Bootstrap.injector(root,
-				Bindings.bindings(Macros.DEFAULT.with(macro), Inspect.DEFAULT),
+				Bindings.newBindings().with(Macros.DEFAULT.with(macro)),
 				Globals.STANDARD);
 	}
 

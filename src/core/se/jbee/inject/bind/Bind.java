@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bind;
@@ -14,7 +14,6 @@ import se.jbee.inject.Target;
 import se.jbee.inject.bootstrap.Binding;
 import se.jbee.inject.bootstrap.BindingType;
 import se.jbee.inject.bootstrap.Bindings;
-import se.jbee.inject.bootstrap.Inspector;
 import se.jbee.inject.container.Supplier;
 
 /**
@@ -68,10 +67,6 @@ public final class Bind {
 		return with(source.typed(type));
 	}
 
-	public Bind using(Inspector inspector) {
-		return new Bind(bindings.using(inspector), source, scope, target);
-	}
-
 	public Bind per(Scope scope) {
 		return new Bind(bindings, source, scope, target);
 	}
@@ -96,10 +91,6 @@ public final class Bind {
 		return source == null
 			? this
 			: new Bind(bindings, source.next(), scope, target);
-	}
-
-	public Inspector inspector() {
-		return bindings.inspector;
 	}
 
 	public <T> Binding<T> asType(Resource<T> resource, BindingType type,

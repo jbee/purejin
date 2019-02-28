@@ -98,7 +98,7 @@ public class TestTTLExceptionHandingComputeEvents {
 			construct(SlowService.class);
 			injectingInto(EventProcessor.class).bind(ExecutorService.class).to(
 					() -> Executors.newSingleThreadExecutor());
-			bind(EventReflector.class).to(
+			bind(EventMirror.class).to(
 					event -> EventPreferences.DEFAULT.withTTL(5));
 		}
 	}

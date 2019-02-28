@@ -2,16 +2,14 @@ package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.DeclarationType.EXPLICIT;
-import static se.jbee.inject.bootstrap.Bindings.bindings;
 
 import org.junit.Test;
 
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.bootstrap.Binding;
+import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.bootstrap.Inspect;
-import se.jbee.inject.bootstrap.Macros;
 import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.config.Globals;
 
@@ -54,7 +52,7 @@ public class TestBinderModule {
 	@Test
 	public void thatBindingSourceReflectsTheOrigin() {
 		Binding<?>[] bindings = Bootstrap.bindings(TestBinderModuleBundle.class,
-				bindings(Macros.DEFAULT, Inspect.DEFAULT), Globals.STANDARD);
+				Bindings.newBindings(), Globals.STANDARD);
 
 		assertEquals(4, bindings.length);
 

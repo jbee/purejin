@@ -21,7 +21,7 @@ import se.jbee.inject.bootstrap.BootstrapperBundle;
  * It allows to also describe what {@link Instance} should be used dependent on
  * its parent(s) it would be {@link Dependency#injectingInto(Class)}. Though
  * this we can tell to inject the {@link Logger} that would be injected into the
- * {@link BinderModule} class into our test object {@link LoggerInspector}.
+ * {@link BinderModule} class into our test object {@link Bean}.
  *
  * @see TestConstructorParameterBinds
  *
@@ -44,18 +44,18 @@ public class TestDependencyParameterBinds {
 
 		@Override
 		protected void declare() {
-			bind(LoggerInspector.class).toConstructor(
+			bind(Bean.class).toConstructor(
 					dependency(Logger.class).injectingInto(BinderModule.class));
 		}
 
 	}
 
-	private static class LoggerInspector {
+	private static class Bean {
 
 		final Logger logger;
 
 		@SuppressWarnings("unused")
-		LoggerInspector(Logger logger) {
+		Bean(Logger logger) {
 			this.logger = logger;
 		}
 	}
@@ -64,8 +64,8 @@ public class TestDependencyParameterBinds {
 	public void thatDependencyParameterIsUnderstood() {
 		Injector resolver = Bootstrap.injector(
 				DependencyParameterBindsBundle.class);
-		LoggerInspector inspector = resolver.resolve(LoggerInspector.class);
+		Bean bean = resolver.resolve(Bean.class);
 		assertSame(Logger.getLogger(BinderModule.class.getCanonicalName()),
-				inspector.logger);
+				bean.logger);
 	}
 }

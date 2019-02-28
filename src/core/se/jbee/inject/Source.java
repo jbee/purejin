@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -37,8 +37,8 @@ public final class Source implements MoreApplicableThan<Source>, Serializable {
 
 	@Override
 	public String toString() {
-		return ident.getSimpleName() + "#" + declarationNo + "["
-			+ declarationType.name() + "]";
+		return ident.getSimpleName() + "#" + declarationNo
+			+ declarationType.name().charAt(0);
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public final class Source implements MoreApplicableThan<Source>, Serializable {
 
 	@Override
 	public int hashCode() {
-		// declarationType should not play a role as there should only be 
+		// declarationType should not play a role as there should only be
 		// one Source with same declarationNo in an ident
 		return ident.hashCode() ^ declarationNo;
 	}

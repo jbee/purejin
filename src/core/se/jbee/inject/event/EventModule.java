@@ -55,7 +55,7 @@ public abstract class EventModule extends BinderModule {
 		protected void declare() {
 			asDefault().bind(EventProcessor.class).to(
 					ConcurrentEventProcessor.class);
-			asDefault().bind(EventReflector.class).to(
+			asDefault().bind(EventMirror.class).to(
 					event -> EventPreferences.DEFAULT);
 			asDefault().injectingInto(EventProcessor.class).bind(
 					ExecutorService.class).to(

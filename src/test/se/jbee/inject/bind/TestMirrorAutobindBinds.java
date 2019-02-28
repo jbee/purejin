@@ -5,10 +5,9 @@ import static org.junit.Assert.assertSame;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Packages.packageAndSubPackagesOf;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.bootstrap.Inspect.all;
+import static se.jbee.inject.config.ProductionMirror.allMethods;
 import static se.jbee.inject.container.Typecast.providerTypeOf;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
@@ -20,42 +19,42 @@ import se.jbee.inject.Name;
 import se.jbee.inject.Provider;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Inspect;
-import se.jbee.inject.bootstrap.Inspector;
+import se.jbee.inject.config.NamingMirror;
+import se.jbee.inject.config.ParameterisationMirror;
 import se.jbee.inject.container.Scoped;
 import se.jbee.inject.util.Resource;
 import se.jbee.inject.util.WebMethod;
 
 /**
- * This test demonstrates the use of an {@link Inspector} to semi-automatically
- * bind {@link Constructor}s and/or {@link Method}s as 'provider' of an
- * instance.
- *
- * The example uses the {@link Inspect#all()} util as {@link Inspector}. It
- * allows to narrow what is bound automatically. For example {@link Annotation}s
- * can be specified that need to be present.
+ * This test demonstrates the use of mirrors to semi-automatically bind
+ * {@link Constructor}s and/or {@link Method}s as 'providers' of an instance.
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public class TestInspectorBinds {
+public class TestMirrorAutobindBinds {
 
 	static final StringBuffer STATE = new StringBuffer();
 
-	static class InspectorBindsModule extends BinderModule {
+	static class ReflectorAutobindBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			bind(all().methods()).inModule();
-			bind(all().methods().annotatedWith(WebMethod.class).namedBy(
-					Resource.class)).in(InspectorBindsImplementor1.class);
-			bind(all().methods().returnTypeAssignableTo(
-					raw(Provider.class))).in(InspectorBindsImplementor2.class);
-			bind(all().methods().returnTypeIn(
-					packageAndSubPackagesOf(Injector.class))).in(
-							InspectorBindsImplementor3.class);
-			per(Scoped.APPLICATION).bind(all().methods()).in(
-					new InspectorBindsImplementor4(STATE));
-			per(Scoped.INJECTION).bind(all().methods()).in(FactoryImpl.class);
+			produces(allMethods).autobind().inModule();
+			// @formatter:off
+			produces(allMethods.annotatedWith(WebMethod.class))
+				.names(NamingMirror.namedBy(Resource.class))
+				.parameterises(ParameterisationMirror.namedBy(Resource.class))
+				.autobind().in(Implementor1.class);
+			// @formatter:on
+			produces(allMethods.returnTypeAssignableTo(
+					raw(Provider.class))).autobind().in(Implementor2.class);
+			produces(allMethods.returnTypeIn(
+					packageAndSubPackagesOf(Injector.class))).autobind().in(
+							Implementor3.class);
+			produces(allMethods).per(Scoped.APPLICATION).autobind().in(
+					new Implementor4(STATE));
+			produces(allMethods).per(Scoped.INJECTION).autobind().in(
+					FactoryImpl.class);
 		}
 
 		static int staticFactoryMethod() {
@@ -76,7 +75,7 @@ public class TestInspectorBinds {
 		}
 	}
 
-	static class InspectorBindsImplementor1 {
+	static class Implementor1 {
 
 		@WebMethod
 		float instanceFactoryMethod() {
@@ -101,7 +100,7 @@ public class TestInspectorBinds {
 		}
 	}
 
-	static class InspectorBindsImplementor2 {
+	static class Implementor2 {
 
 		Provider<Boolean> assignableToProvider() {
 			return () -> true;
@@ -112,7 +111,7 @@ public class TestInspectorBinds {
 		}
 	}
 
-	static class InspectorBindsImplementor3 {
+	static class Implementor3 {
 
 		Name typeInProjectPackage() {
 			return Name.named("foobar");
@@ -123,21 +122,21 @@ public class TestInspectorBinds {
 		}
 	}
 
-	static class InspectorBindsImplementor4 {
+	static class Implementor4 {
 
 		final StringBuffer state;
 
-		InspectorBindsImplementor4(StringBuffer state) {
+		Implementor4(StringBuffer state) {
 			this.state = state;
 		}
 
-		StringBuffer valueFromStatefullInspectedObject() {
+		StringBuffer valueFromStatefullMirrorObject() {
 			return state;
 		}
 	}
 
 	private final Injector injector = Bootstrap.injector(
-			InspectorBindsModule.class);
+			ReflectorAutobindBindsModule.class);
 
 	@Test
 	public void thatInstanceFactoryMethodIsAvailable() {
@@ -165,9 +164,9 @@ public class TestInspectorBinds {
 
 	/**
 	 * The provider method
-	 * {@link InspectorBindsImplementor1#instanceFactoryMethodWithParameters(float)}
-	 * uses the {@link Resource} annotation to specify the name. As a result
-	 * there is a named {@link Instance} that can be resolved.
+	 * {@link Implementor1#instanceFactoryMethodWithParameters(float)} uses the
+	 * {@link Resource} annotation to specify the name. As a result there is a
+	 * named {@link Instance} that can be resolved.
 	 */
 	@Test
 	public void thatNamedWithAnnotationCanBeUsedToGetNamedResources() {
@@ -201,7 +200,7 @@ public class TestInspectorBinds {
 	}
 
 	@Test
-	public void thatDeclaredScopeIsUsedForInspectedBindings() {
+	public void thatDeclaredScopeIsUsedForMirrorBindings() {
 		byte first = injector.resolve(byte.class);
 		byte second = injector.resolve(byte.class);
 		assertEquals(first + 1, second);

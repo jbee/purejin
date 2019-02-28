@@ -14,7 +14,7 @@ import org.junit.runners.Suite.SuiteClasses;
 		TestDependencyParameterBinds.class, TestScopedBinds.class,
 		TestInjectionCaseBinds.class, TestProviderBinds.class,
 		TestPrimitiveBinds.class, TestInjectorExceptions.class,
-		TestCollectionBinds.class, TestInspectorBinds.class,
+		TestCollectionBinds.class, TestMirrorAutobindBinds.class,
 		TestParentTargetBinds.class, TestPresetModuleBinds.class,
 		TestRequiredProvidedBinds.class, TestStateDependentBinds.class,
 		TestPrimitiveArrayBinds.class, TestMultipleOptionChoicesBinds.class,

@@ -14,13 +14,13 @@ package se.jbee.inject.event;
  * universal description {@link EventPreferences}.
  * 
  * To substitute the default behaviour (which used
- * {@link EventPreferences#DEFAULT}) simply bind {@link EventReflector} to a
+ * {@link EventPreferences#DEFAULT}) simply bind {@link EventMirror} to a
  * custom supplier having the behaviour you want.
  * 
  * @since 19.1
  */
 @FunctionalInterface
-public interface EventReflector {
+public interface EventMirror {
 
 	/**
 	 * Extracts the {@link EventPreferences} to use for the given event type.

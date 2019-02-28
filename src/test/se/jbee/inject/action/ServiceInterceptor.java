@@ -15,9 +15,9 @@ import se.jbee.inject.Type;
  * The result of first will be passed to the second as an argument. This allows
  * them stay stateless.
  * 
- * A {@link ServiceInvocation} intentionally doesn't give any control or access
+ * A {@link ServiceInterceptor} intentionally doesn't give any control or access
  * over/to the invoked {@linkplain Action} in order to be able to grant the same
- * actual function invocation even with faulty {@linkplain ServiceInvocation}s
+ * actual function invocation even with faulty {@linkplain ServiceInterceptor}s
  * in place. That includes catching all exceptions thrown in
  * {@link #before(Type, Object, Type)} or
  * {@link #after(Type, Object, Type, Object, Object)}.
@@ -28,7 +28,7 @@ import se.jbee.inject.Type;
  *            {@link #before(Type, Object, Type)} and
  *            {@link #after(Type, Object, Type, Object, Object)}.
  */
-public interface ServiceInvocation<T> {
+public interface ServiceInterceptor<T> {
 
 	<P, R> T before(Type<P> parameter, P value, Type<R> returnType);
 

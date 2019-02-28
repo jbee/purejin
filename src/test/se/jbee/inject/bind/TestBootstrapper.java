@@ -24,7 +24,7 @@ import se.jbee.inject.UnresolvableDependency.DependencyCycle;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bundle;
-import se.jbee.inject.bootstrap.Inspect;
+import se.jbee.inject.config.ConstructionMirror;
 import se.jbee.inject.container.Supplier;
 
 /**
@@ -175,17 +175,16 @@ public class TestBootstrapper {
 
 	}
 
-	private static class CustomInspectedBundle extends BootstrapperBundle {
+	private static class CustomMirrorBundle extends BootstrapperBundle {
 
 		@Override
 		protected void bootstrap() {
-			install(CustomInspectedModule.class,
-					Inspect.all().constructors().annotatedWith(
-							ConstructorProperties.class));
+			install(CustomMirrorModule.class, ConstructionMirror.annotatedWith(
+					ConstructorProperties.class));
 		}
 	}
 
-	private static class CustomInspectedModule extends BinderModule {
+	private static class CustomMirrorModule extends BinderModule {
 
 		@Override
 		protected void declare() {
@@ -269,8 +268,8 @@ public class TestBootstrapper {
 	}
 
 	@Test
-	public void thatCustomInspectorIsUsedToPickConstructor() {
-		Injector injector = Bootstrap.injector(CustomInspectedBundle.class);
+	public void thatCustomMirrorIsUsedToPickConstructor() {
+		Injector injector = Bootstrap.injector(CustomMirrorBundle.class);
 		assertEquals("will be passed to D", injector.resolve(D.class).s);
 	}
 }

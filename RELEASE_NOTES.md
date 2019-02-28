@@ -24,6 +24,9 @@ v19.1 (upcoming)
 - added `SingletonScope` to mark singleton `Scope` implementations
 
 **API changes**
+- `Inspector` split in (and replaced by) `*Mirror` functional interfaces
+- `InspectorBinder` replaced by `AutoBinder`
+- `Bindings` are created via `newBindings` and modified using the `with` methods
 - renamed class `Assembly` to `Injectee`
 - redesign of `Injectron`/`InjectronInfo` to `Generator` and `InjectionCase`
 - renamed class and method `MorePreciseThan#morePreciseThan` to `MoreApplicableThan#moreApplicableThan`

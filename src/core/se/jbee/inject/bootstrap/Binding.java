@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
@@ -26,7 +26,9 @@ import se.jbee.inject.container.Injectee;
 import se.jbee.inject.container.Supplier;
 
 /**
- * Default data strature to represent a 4-tuple created from {@link Bindings}.
+ * A {@link Binding} is implements the {@link Injectee} created during the
+ * bootstrapping process based on {@link Bindings}, {@link Bundle}s and
+ * {@link Module}s.
  *
  * @author Jan Bernitt (jan@jbee.se)
  *
@@ -105,21 +107,17 @@ public final class Binding<T>
 	public int compareTo(Binding<?> other) {
 		int res = resource.type().rawType.getCanonicalName().compareTo(
 				other.resource.type().rawType.getCanonicalName());
-		if (res != 0) {
+		if (res != 0)
 			return res;
-		}
 		res = compareApplicability(resource.instance, other.resource.instance);
-		if (res != 0) {
+		if (res != 0)
 			return res;
-		}
 		res = compareApplicability(resource.target, other.resource.target);
-		if (res != 0) {
+		if (res != 0)
 			return res;
-		}
 		res = compareApplicability(source, other.source);
-		if (res != 0) {
+		if (res != 0)
 			return res;
-		}
 		return -1; // keep order
 	}
 

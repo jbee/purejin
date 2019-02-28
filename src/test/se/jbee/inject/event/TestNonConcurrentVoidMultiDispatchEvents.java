@@ -88,7 +88,7 @@ public class TestNonConcurrentVoidMultiDispatchEvents {
 			handle(Listener.class);
 			per(Scoped.INJECTION).construct(Service.class);
 			// makes observed calls "single threaded"
-			bind(EventReflector.class).to(
+			bind(EventMirror.class).to(
 					event -> EventPreferences.DEFAULT.withMaxConcurrentUsage(
 							1));
 		}

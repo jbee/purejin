@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bind;
@@ -39,8 +39,11 @@ import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.BoundConstant;
 import se.jbee.inject.bootstrap.BoundConstructor;
 import se.jbee.inject.bootstrap.BoundMethod;
-import se.jbee.inject.bootstrap.Inspector;
 import se.jbee.inject.bootstrap.Supply;
+import se.jbee.inject.config.ConstructionMirror;
+import se.jbee.inject.config.NamingMirror;
+import se.jbee.inject.config.ParameterisationMirror;
+import se.jbee.inject.config.ProductionMirror;
 import se.jbee.inject.container.Factory;
 import se.jbee.inject.container.Initialiser;
 import se.jbee.inject.container.Scoped;
@@ -286,56 +289,58 @@ public class Binder {
 		}
 	}
 
-	public static class InspectBinder {
+	/**
+	 * The {@link AutoBinder} makes use of the reflectors defined in
+	 * {@link Bindings} to select and bind constructors for beans and methods as
+	 * factories and {@link Name} these instances as well as provide
+	 * {@link Parameter} hints.
+	 * 
+	 * @since 19.1
+	 */
+	public static class AutoBinder {
 
-		private final Inspector inspector;
 		private final ScopedBinder binder;
 
-		protected InspectBinder(Inspector inspector, RootBinder binder,
-				Scope scope) {
-			this.inspector = inspector;
+		protected AutoBinder(RootBinder binder, Scope scope) {
 			this.binder = binder.on(binder.bind().asAuto()).on(
 					binder.bind().next()).per(scope);
 		}
 
-		public void in(Class<?> implementor) {
-			in(implementor, new Parameter<?>[0]);
+		private Bindings bindings() {
+			return binder.bind().bindings;
 		}
 
-		public void in(Object implementingInstance,
-				Parameter<?>... parameters) {
-			bindMethodsIn(implementingInstance.getClass(), implementingInstance,
-					parameters);
+		public void in(Class<?> service) {
+			in(service, new Parameter<?>[0]);
 		}
 
-		public void in(Class<?> implementer, Parameter<?>... parameters) {
-			boolean instanceMethods = bindMethodsIn(implementer, null,
-					parameters);
-			Constructor<?> c = inspector.constructorFor(implementer);
-			if (c == null) {
-				if (instanceMethods) {
-					binder.root.per(Scoped.APPLICATION).implicit().construct(
-							implementer);
-				}
-			} else {
-				if (parameters.length == 0) {
-					parameters = inspector.parametersFor(c);
-				}
-				bind(c, parameters);
+		public void in(Object service, Parameter<?>... params) {
+			bindMethodsIn(service.getClass(), service, params);
+		}
+
+		public void in(Class<?> service, Parameter<?>... params) {
+			boolean boundInstanceMethods = bindMethodsIn(service, null, params);
+			if (!boundInstanceMethods)
+				return; // do not try to construct the class
+			Constructor<?> c = bindings().construction.reflect(service);
+			if (c != null) {
+				bind(c, params);
 			}
 		}
 
 		private boolean bindMethodsIn(Class<?> implementer, Object instance,
-				Parameter<?>[] parameters) {
+				Parameter<?>[] params) {
 			boolean instanceMethods = false;
-			for (Method method : inspector.methodsIn(implementer)) {
+			Bindings bindings = bindings();
+			for (Method method : bindings.production.reflect(implementer)) {
 				Type<?> returnType = Type.returnType(method);
+				//TODO why do this check below???
 				if (!Type.VOID.equalTo(returnType)) {
-					if (parameters.length == 0) {
-						parameters = inspector.parametersFor(method);
+					if (params.length == 0) {
+						params = bindings.parameterisation.reflect(method);
 					}
-					binder.bind(inspector.nameFor(method), returnType).to(
-							instance, method, parameters);
+					binder.bind(bindings.naming.reflect(method), returnType).to(
+							instance, method, params);
 					instanceMethods = instanceMethods
 						|| !Modifier.isStatic(method.getModifiers());
 				}
@@ -343,18 +348,19 @@ public class Binder {
 			return instanceMethods;
 		}
 
-		private <T> void bind(Constructor<T> constructor,
-				Parameter<?>... parameters) {
-			// isn#t this a bit like provide?
-			Name name = inspector.nameFor(constructor);
-			Class<T> impl = constructor.getDeclaringClass();
+		private <T> void bind(Constructor<T> c, Parameter<?>... params) {
+			Name name = bindings().naming.reflect(c);
+			if (params.length == 0)
+				params = bindings().parameterisation.reflect(c);
+			Class<T> impl = c.getDeclaringClass();
+			Binder appBinder = binder.root.per(Scoped.APPLICATION).implicit();
 			if (name.isDefault()) {
-				binder.autobind(impl).to(constructor, parameters);
+				appBinder.autobind(impl).to(c, params);
 			} else {
-				binder.bind(name, impl).to(constructor, parameters);
+				appBinder.bind(name, impl).to(c, params);
 				for (Type<? super T> st : Type.raw(impl).supertypes()) {
 					if (st.isInterface()) {
-						binder.implicit().bind(name, st).to(name, impl);
+						appBinder.implicit().bind(name, st).to(name, impl);
 					}
 				}
 			}
@@ -380,6 +386,34 @@ public class Binder {
 
 		public ScopedBinder per(Scope scope) {
 			return new ScopedBinder(root, bind().per(scope));
+		}
+
+		/**
+		 * @since 19.1
+		 */
+		public RootBinder constructs(ConstructionMirror reflector) {
+			return on(bind().into(bind().bindings.with(reflector)));
+		}
+
+		/**
+		 * @since 19.1
+		 */
+		public RootBinder produces(ProductionMirror reflector) {
+			return on(bind().into(bind().bindings.with(reflector)));
+		}
+
+		/**
+		 * @since 19.1
+		 */
+		public RootBinder parameterises(ParameterisationMirror reflector) {
+			return on(bind().into(bind().bindings.with(reflector)));
+		}
+
+		/**
+		 * @since 19.1
+		 */
+		public RootBinder names(NamingMirror reflector) {
+			return on(bind().into(bind().bindings.with(reflector)));
 		}
 
 		public RootBinder asDefault() {
@@ -437,10 +471,12 @@ public class Binder {
 			return injectingInto(defaultInstanceOf(target));
 		}
 
-		public InspectBinder bind(Inspector inspector) {
-			return new InspectBinder(inspector, root, bind().scope);
+		/**
+		 * @since 19.1
+		 */
+		public AutoBinder autobind() {
+			return new AutoBinder(root, bind().scope);
 		}
-
 	}
 
 	public static class TargetedBinder extends Binder {
@@ -566,20 +602,20 @@ public class Binder {
 		}
 
 		public void toConstructor() {
-			to(bind().inspector().constructorFor(resource.type().rawType));
+			to(bind().bindings.construction.reflect(resource.type().rawType));
 		}
 
 		public void toConstructor(Class<? extends T> impl,
-				Parameter<?>... parameters) {
+				Parameter<?>... params) {
 			if (metaclass(impl).undeterminable()) {
 				throw new InconsistentBinding(
 						"Not a constructable type: " + impl);
 			}
-			to(bind().inspector().constructorFor(impl), parameters);
+			to(bind().bindings.construction.reflect(impl), params);
 		}
 
-		public void toConstructor(Parameter<?>... parameters) {
-			toConstructor(getType().rawType, parameters);
+		public void toConstructor(Parameter<?>... params) {
+			toConstructor(getType().rawType, params);
 		}
 
 		public <I extends T> void to(Name name, Class<I> type) {

@@ -1,11 +1,17 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
 
+import static se.jbee.inject.Array.array;
+import static se.jbee.inject.Instance.instance;
+
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * {@linkplain Parameter}s are *not* about to find/identify the
@@ -37,4 +43,17 @@ import java.lang.reflect.Constructor;
  */
 public interface Parameter<T> extends Typed<T> {
 
+	Parameter<?>[] NO_PARAMETERS = new Parameter<?>[0];
+
+	static Parameter<?>[] parametersFor(Type<?>[] types,
+			Annotation[][] annotations, Class<? extends Annotation> namedby) {
+		List<Parameter<?>> res = new ArrayList<>();
+		for (int i = 0; i < annotations.length; i++) {
+			Name name = Name.namedBy(namedby, annotations[i]);
+			if (!name.isDefault()) {
+				res.add(instance(name, types[i]));
+			}
+		}
+		return array(res, Parameter.class);
+	}
 }

@@ -19,10 +19,8 @@ import se.jbee.inject.bootstrap.Supply;
 /**
  * This test show how to bring back custom behaviour before or after
  * service/action method calls. This had been in the core but as it is easy to
- * add one can build something like {@link ServiceInvocation} specialized to
+ * add one can build something like {@link ServiceInterceptor} specialized to
  * ones needs.
- *
- * @author jan
  */
 public class TestServiceInvocationBinds {
 
@@ -31,7 +29,7 @@ public class TestServiceInvocationBinds {
 		@Override
 		protected void declare() {
 			bindActionsIn(ServiceInvocationBindsService.class);
-			plug(AssertInvocation.class).into(ServiceInvocation.class);
+			plug(AssertInvocation.class).into(ServiceInterceptor.class);
 			bind(Executor.class).to(InstrumentedExecutor.class);
 		}
 
@@ -59,7 +57,7 @@ public class TestServiceInvocationBinds {
 		}
 	}
 
-	private static class AssertInvocation implements ServiceInvocation<Long> {
+	private static class AssertInvocation implements ServiceInterceptor<Long> {
 
 		int afterCount;
 		int beforeCount;
@@ -128,17 +126,17 @@ public class TestServiceInvocationBinds {
 
 	@Test
 	public void thatInvocationHandlersCanBeResolvedDirectly() {
-		ServiceInvocation<?>[] invocations = injector.resolve(
-				ServiceInvocation[].class);
+		ServiceInterceptor<?>[] invocations = injector.resolve(
+				ServiceInterceptor[].class);
 		assertEquals(1, invocations.length);
 		assertEquals(invocations[0].getClass(), AssertInvocation.class);
 	}
 
 	static final class InstrumentedExecutor implements Executor {
 
-		private final ServiceInvocation<?>[] invocations;
+		private final ServiceInterceptor<?>[] invocations;
 
-		InstrumentedExecutor(ServiceInvocation<?>[] invocations) {
+		InstrumentedExecutor(ServiceInterceptor<?>[] invocations) {
 			this.invocations = invocations;
 		}
 
@@ -173,7 +171,7 @@ public class TestServiceInvocationBinds {
 			}
 			for (int i = 0; i < invocations.length; i++) {
 				try {
-					ServiceInvocation<T> inv = (ServiceInvocation<T>) invocations[i];
+					ServiceInterceptor<T> inv = (ServiceInterceptor<T>) invocations[i];
 					inv.afterException(input, value, output, e, (T) states[i]);
 				} catch (RuntimeException re) {
 					// warn that invocation before had thrown an exception
@@ -205,7 +203,7 @@ public class TestServiceInvocationBinds {
 			}
 			for (int i = 0; i < invocations.length; i++) {
 				try {
-					ServiceInvocation<T> inv = (ServiceInvocation<T>) invocations[i];
+					ServiceInterceptor<T> inv = (ServiceInterceptor<T>) invocations[i];
 					inv.after(input, value, output, res, (T) states[i]);
 				} catch (RuntimeException e) {
 					// warn that invocation before had thrown an exception

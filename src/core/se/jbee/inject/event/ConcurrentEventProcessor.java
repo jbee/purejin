@@ -111,9 +111,9 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	private final Map<Class<?>, EventHandlers> handlersByEventType = new ConcurrentHashMap<>();
 	private final Map<Class<?>, EventPreferences> prefsByEventType = new ConcurrentHashMap<>();
 	private final ExecutorService executor;
-	private final EventReflector reflector;
+	private final EventMirror reflector;
 
-	ConcurrentEventProcessor(EventReflector reflector,
+	ConcurrentEventProcessor(EventMirror reflector,
 			ExecutorService executor) {
 		this.reflector = reflector;
 		this.executor = executor;

@@ -1,9 +1,14 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
+
+import se.jbee.inject.config.ConstructionMirror;
+import se.jbee.inject.config.NamingMirror;
+import se.jbee.inject.config.ParameterisationMirror;
+import se.jbee.inject.config.ProductionMirror;
 
 /**
  * The default utility {@link Bundle} that is a {@link Bootstrap} as well so
@@ -72,17 +77,40 @@ public abstract class BootstrapperBundle implements Bundle, Bootstrapper {
 		uninstall(optionsOfType.getEnumConstants());
 	}
 
-	/**
-	 * Installs the given {@link Module} using the given {@link Inspector} when
-	 * declaring binds.
-	 */
-	protected final void install(Module module, Inspector inspector) {
-		install(new InspectorModule(module, inspector));
+	protected final void install(Module module, ConstructionMirror mirror) {
+		install(bindings -> module.declare(bindings.with(mirror)));
 	}
 
 	protected final void install(Class<? extends Module> module,
-			Inspector inspector) {
-		install(newInstance(module), inspector);
+			ConstructionMirror mirror) {
+		install(newInstance(module), mirror);
+	}
+
+	protected final void install(Module module, NamingMirror mirror) {
+		install(bindings -> module.declare(bindings.with(mirror)));
+	}
+
+	protected final void install(Class<? extends Module> module,
+			NamingMirror mirror) {
+		install(newInstance(module), mirror);
+	}
+
+	protected final void install(Module module, ProductionMirror mirror) {
+		install(bindings -> module.declare(bindings.with(mirror)));
+	}
+
+	protected final void install(Class<? extends Module> module,
+			ProductionMirror mirror) {
+		install(newInstance(module), mirror);
+	}
+
+	protected final void install(Module module, ParameterisationMirror mirror) {
+		install(bindings -> module.declare(bindings.with(mirror)));
+	}
+
+	protected final void install(Class<? extends Module> module,
+			ParameterisationMirror mirror) {
+		install(newInstance(module), mirror);
 	}
 
 	protected static Module newInstance(Class<? extends Module> module) {
@@ -96,24 +124,4 @@ public abstract class BootstrapperBundle implements Bundle, Bootstrapper {
 
 	protected abstract void bootstrap();
 
-	private static final class InspectorModule implements Module {
-
-		private final Module module;
-		private final Inspector inspector;
-
-		InspectorModule(Module module, Inspector inspector) {
-			this.module = module;
-			this.inspector = inspector;
-		}
-
-		@Override
-		public void declare(Bindings bindings) {
-			module.declare(bindings.using(inspector));
-		}
-
-		@Override
-		public String toString() {
-			return module + "[" + inspector + "]";
-		}
-	}
 }

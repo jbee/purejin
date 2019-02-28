@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
@@ -14,6 +14,10 @@ import java.util.List;
 import java.util.Set;
 
 import se.jbee.inject.InconsistentBinding;
+import se.jbee.inject.config.ConstructionMirror;
+import se.jbee.inject.config.NamingMirror;
+import se.jbee.inject.config.ParameterisationMirror;
+import se.jbee.inject.config.ProductionMirror;
 
 /**
  * {@link Bindings} accumulate the {@link Binding} 4-tuples.
@@ -24,24 +28,54 @@ import se.jbee.inject.InconsistentBinding;
  */
 public final class Bindings {
 
-	public static Bindings bindings(Macros macros, Inspector inspector) {
-		return new Bindings(macros, inspector, new ArrayList<>(128));
+	public static Bindings newBindings() {
+		return new Bindings(new ArrayList<>(128), Macros.DEFAULT,
+				ConstructionMirror.mostParams, NamingMirror.DEFAULT,
+				ProductionMirror.DEFAULT, ParameterisationMirror.DEFAULT);
 	}
-
-	public final Macros macros;
-	public final Inspector inspector;
 
 	private final List<Binding<?>> bindings;
+	public final Macros macros;
+	public final ConstructionMirror construction;
+	public final NamingMirror naming;
+	public final ProductionMirror production;
+	public final ParameterisationMirror parameterisation;
 
-	private Bindings(Macros macros, Inspector inspector,
-			List<Binding<?>> bindings) {
-		this.macros = macros;
-		this.inspector = inspector;
+	private Bindings(List<Binding<?>> bindings, Macros macros,
+			ConstructionMirror construction, NamingMirror naming,
+			ProductionMirror production,
+			ParameterisationMirror parameterisation) {
 		this.bindings = bindings;
+		this.macros = macros;
+		this.construction = construction;
+		this.naming = naming;
+		this.production = production;
+		this.parameterisation = parameterisation;
 	}
 
-	public Bindings using(Inspector inspector) {
-		return new Bindings(macros, inspector, bindings);
+	public Bindings with(ConstructionMirror mirror) {
+		return new Bindings(bindings, macros, mirror, naming, production,
+				parameterisation);
+	}
+
+	public Bindings with(NamingMirror mirror) {
+		return new Bindings(bindings, macros, construction, mirror,
+				production, parameterisation);
+	}
+
+	public Bindings with(ProductionMirror mirror) {
+		return new Bindings(bindings, macros, construction, naming, mirror,
+				parameterisation);
+	}
+
+	public Bindings with(ParameterisationMirror mirror) {
+		return new Bindings(bindings, macros, construction, naming, production,
+				mirror);
+	}
+
+	public Bindings with(Macros macros) {
+		return new Bindings(bindings, macros, construction, naming, production,
+				parameterisation);
 	}
 
 	/**

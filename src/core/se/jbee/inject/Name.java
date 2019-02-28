@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -24,11 +24,11 @@ public final class Name implements MoreApplicableThan<Name>, Serializable {
 	public static final String WILDCARD = "*";
 
 	/**
-	 * Used when no name is specified. It is the most precise name of all.
+	 * Used when no name is specified. It is the most applicable name of all.
 	 */
 	public static final Name DEFAULT = new Name("");
 	/**
-	 * It is the least precise name of all.
+	 * It is the least applicable name of all.
 	 */
 	public static final Name ANY = new Name(WILDCARD);
 
@@ -97,8 +97,7 @@ public final class Name implements MoreApplicableThan<Name>, Serializable {
 	}
 
 	public boolean isCompatibleWith(Name other) {
-		//noinspection StringEquality
-		return isAny() || other.isAny() || other.value == value
+		return isAny() || other.isAny() || other.value.equals(value)
 			|| (value.matches(other.value.replace(WILDCARD, ".*")));
 	}
 

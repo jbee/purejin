@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -61,7 +61,15 @@ public final class Instances implements MoreApplicableThan<Instances>,
 
 	@Override
 	public String toString() {
-		return isAny() ? "*" : Arrays.toString(hierarchy);
+		if (isAny())
+			return "*";
+		StringBuilder b = new StringBuilder();
+		for (int i = 0; i < hierarchy.length; i++) {
+			if (i > 0)
+				b.append(" => ");
+			b.append(hierarchy[i]);
+		}
+		return b.toString();
 	}
 
 	@Override

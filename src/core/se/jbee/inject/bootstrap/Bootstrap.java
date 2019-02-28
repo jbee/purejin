@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
@@ -22,6 +22,7 @@ import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
+import se.jbee.inject.config.ConstructionMirror;
 import se.jbee.inject.config.Globals;
 import se.jbee.inject.config.Options;
 import se.jbee.inject.config.Presets;
@@ -41,8 +42,7 @@ public final class Bootstrap {
 
 	public static Injector injector(Class<? extends Bundle> root,
 			Globals globals) {
-		return injector(root,
-				Bindings.bindings(Macros.DEFAULT, Inspect.DEFAULT), globals);
+		return injector(root, Bindings.newBindings(), globals);
 	}
 
 	public static Injector injector(Class<? extends Bundle> root,
@@ -70,7 +70,7 @@ public final class Bootstrap {
 	}
 
 	public static <T> Module module(PresetModule<T> module, Presets presets) {
-		return new ModuleToPresetModule<>(module, presets);
+		return new PresetModuleBridge<>(module, presets);
 	}
 
 	public static void eagerSingletons(Injector injector) {
@@ -93,20 +93,27 @@ public final class Bootstrap {
 	}
 
 	public static <T> T instance(Class<T> type) {
-		return Supply.constructor(
-				Metaclass.accessible(Inspect.noArgsConstructor(type)));
+		return Supply.constructor(Metaclass.accessible(
+				ConstructionMirror.noArgsConstructor(type)));
 	}
 
 	private Bootstrap() {
 		throw new UnsupportedOperationException("util");
 	}
 
-	private static final class ModuleToPresetModule<T> implements Module {
+	/**
+	 * Implements the {@link PresetModule} abstraction by presenting them as
+	 * {@link Module}.
+	 * 
+	 * @param <T> type of the {@link Presets} value injected into the
+	 *            {@link PresetModule}
+	 */
+	private static final class PresetModuleBridge<T> implements Module {
 
 		private final PresetModule<T> module;
 		private final Presets presets;
 
-		ModuleToPresetModule(PresetModule<T> module, Presets presets) {
+		PresetModuleBridge(PresetModule<T> module, Presets presets) {
 			this.module = module;
 			this.presets = presets;
 		}
@@ -176,11 +183,8 @@ public final class Bootstrap {
 			final Options options = globals.options;
 			Bootstrap.instance(bundle).bootstrap(
 					(bundleForOption, onOption) -> {
-						if (options.isChosen(property, onOption)) { // null is a valid
-																	// value to define
-																	// what happens when
-																	// no configuration
-																	// is present
+						// NB: null is a valid value to define what happens when no configuration is present
+						if (options.isChosen(property, onOption)) {
 							BuildinBootstrapper.this.install(bundleForOption);
 						}
 					});
@@ -261,8 +265,7 @@ public final class Bootstrap {
 			for (Set<Class<? extends Bundle>> c : bundleChildren.values()) {
 				c.remove(bundle);
 			}
-			bundleModules.remove(bundle); // we are sure we don't need its
-											// modules
+			bundleModules.remove(bundle); // we are sure we don't need its modules
 		}
 
 		@Override

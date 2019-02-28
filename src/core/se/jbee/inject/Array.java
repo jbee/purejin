@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -9,6 +9,8 @@ import static java.lang.System.arraycopy;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 /**
  * Library's array utility.
@@ -16,6 +18,19 @@ import java.util.Collection;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Array {
+
+	public static <T> T[] filter(T[] array, Predicate<T> filter) {
+		if (array == null || array.length == 0)
+			return array;
+		@SuppressWarnings("unchecked")
+		T[] filtered = (T[]) newInstance(array.getClass().getComponentType(),
+				array.length);
+		int j = 0;
+		for (int i = 0; i < array.length; i++)
+			if (filter.test(array[i]))
+				filtered[j++] = array[i];
+		return j == array.length ? array : Arrays.copyOf(filtered, j);
+	}
 
 	public static <T> T[] append(T[] array, T value) {
 		T[] copy = Arrays.copyOf(array, array.length + 1);
@@ -39,6 +54,15 @@ public final class Array {
 
 	public static <T> T[] array(Collection<? extends T> list, Class<T> type) {
 		return list.toArray(newInstance(type, list.size()));
+	}
+
+	public static <T> boolean contains(T[] array, T e, BiPredicate<T, T> test) {
+		if (array == null || array.length == 0)
+			return false;
+		for (int i = 0; i < array.length; i++)
+			if (test.test(array[i], e))
+				return true;
+		return false;
 	}
 
 }

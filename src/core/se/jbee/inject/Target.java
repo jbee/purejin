@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -119,12 +119,9 @@ public final class Target implements MoreApplicableThan<Target>, Serializable {
 
 	@Override
 	public String toString() {
-		String res = "[";
-		res += parents.toString() + " ";
-		res += instance.isAny() ? "anything" : instance.toString();
-		res += " ";
-		res += packages.includesAll() ? "anywhere" : packages.toString();
-		return res + "]";
+		return "{" + parents + " => "
+			+ (instance.isAny() ? "*" : instance.toString()) + ", [" + packages
+			+ "] }";
 	}
 
 	public Target inPackageAndSubPackagesOf(Class<?> type) {

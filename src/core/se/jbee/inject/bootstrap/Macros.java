@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
@@ -279,7 +279,7 @@ public final class Macros {
 						"Interface type linked in a loop: " + bound + " > "
 							+ linked);
 			}
-			bindToInspectedConstructor(bindings, binding, type.rawType);
+			bindToMirrorConstructor(bindings, binding, type.rawType);
 		}
 
 	}
@@ -291,14 +291,13 @@ public final class Macros {
 			Binding<T> binding = Binding.binding(new Resource<>(instance),
 					BindingType.CONSTRUCTOR, null, incomplete.scope,
 					incomplete.source.typed(DeclarationType.IMPLICIT));
-			bindToInspectedConstructor(bindings, binding, impl);
+			bindToMirrorConstructor(bindings, binding, impl);
 		}
 	}
 
-	static <T> void bindToInspectedConstructor(Bindings bindings,
-			Binding<T> binding, Class<? extends T> implementer) {
-		Constructor<? extends T> c = bindings.inspector.constructorFor(
-				implementer);
+	static <T> void bindToMirrorConstructor(Bindings bindings,
+			Binding<T> binding, Class<? extends T> impl) {
+		Constructor<? extends T> c = bindings.construction.reflect(impl);
 		if (c != null) {
 			bindings.macros.expandInto(bindings, binding,
 					BoundConstructor.bind(c));

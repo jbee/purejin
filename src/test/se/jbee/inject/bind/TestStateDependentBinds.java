@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.bootstrap.Inspect.methodsReturn;
+import static se.jbee.inject.config.ProductionMirror.allMethods;
 import static se.jbee.inject.container.Typecast.providerTypeOf;
 
 import org.junit.Test;
@@ -19,6 +19,8 @@ import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.bind.Binder.RootBinder;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
+import se.jbee.inject.config.NamingMirror;
+import se.jbee.inject.config.ParameterisationMirror;
 import se.jbee.inject.container.Scoped;
 import se.jbee.inject.container.Supplier;
 import se.jbee.inject.util.Resource;
@@ -184,11 +186,11 @@ public class TestStateDependentBinds {
 					Strict.class);
 			bind(named((Object) null), Validator.class).to(Permissive.class);
 
-			// the below is just *a* example - it is just important to provide the 'value'
-			// per injection
-			per(Scoped.INJECTION).bind(
-					methodsReturn(raw(ValidationStrength.class))).in(
-							StatefulObject.class);
+			// the below is just *a* example - it is just important to provide the 'value' per injection
+			produces(allMethods.returnTypeAssignableTo(
+					raw(ValidationStrength.class))).per(
+							Scoped.INJECTION).autobind().in(
+									StatefulObject.class);
 		}
 	}
 
@@ -216,11 +218,11 @@ public class TestStateDependentBinds {
 					Strict.class);
 			bind(named((Object) null), Validator.class).to(Permissive.class);
 
-			// the below is just *a* example - it is just important to provide the 'value'
-			// per injection
-			per(Scoped.INJECTION).bind(
-					methodsReturn(raw(ValidationStrength.class))).in(
-							StatefulObject.class);
+			// the below is just *a* example - it is just important to provide the 'value' per injection
+			produces(allMethods.returnTypeAssignableTo(
+					raw(ValidationStrength.class))).per(
+							Scoped.INJECTION).autobind().in(
+									StatefulObject.class);
 		}
 
 	}
@@ -236,9 +238,13 @@ public class TestStateDependentBinds {
 			bind(named((Object) null), String.class).to("Default is undefined");
 
 			// the below is just *a* example - it is just important to provide the 'value' per injection
-			per(Scoped.INJECTION).bind(
-					methodsReturn(raw(int.class)).namedBy(Resource.class)).in(
-							StatefulObject.class);
+			// @formatter:off
+			produces(allMethods.returnTypeAssignableTo(raw(int.class)))
+				.names(NamingMirror.namedBy(Resource.class))
+				.parameterises(ParameterisationMirror.namedBy(Resource.class))
+				.per(Scoped.INJECTION)
+				.autobind().in(StatefulObject.class);
+			// @formatter:on
 		}
 
 	}
