@@ -54,8 +54,7 @@ public interface ProductionMirror {
 		return filter(method -> filter.test(method.getModifiers()));
 	}
 
-	default ProductionMirror annotatedWith(
-			Class<? extends Annotation> marker) {
+	default ProductionMirror annotatedWith(Class<? extends Annotation> marker) {
 		return filter(method -> method.isAnnotationPresent(marker));
 	}
 

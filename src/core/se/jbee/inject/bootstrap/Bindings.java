@@ -31,7 +31,8 @@ public final class Bindings {
 	public static Bindings newBindings() {
 		return new Bindings(new ArrayList<>(128), Macros.DEFAULT,
 				ConstructionMirror.mostParams, NamingMirror.defaultName,
-				ProductionMirror.noMethods, ParameterisationMirror.noParameters);
+				ProductionMirror.noMethods,
+				ParameterisationMirror.noParameters);
 	}
 
 	private final List<Binding<?>> bindings;
@@ -59,8 +60,8 @@ public final class Bindings {
 	}
 
 	public Bindings with(NamingMirror mirror) {
-		return new Bindings(bindings, macros, construction, mirror,
-				production, parameterisation);
+		return new Bindings(bindings, macros, construction, mirror, production,
+				parameterisation);
 	}
 
 	public Bindings with(ProductionMirror mirror) {

@@ -37,8 +37,7 @@ import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 
 /**
- * Utility to create/use the core containers {@link Injector} and
- * {@link Generator}.
+ * Implements the {@link Injector} container and its {@link Generator}s.
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
@@ -174,7 +173,7 @@ public final class Inject {
 				return (T) this;
 			InjectionCase<T> match = injectionCaseMatching(dep);
 			if (match != null)
-				return match.generator.instanceFor(dep);
+				return match.generator.yield(dep);
 			if (type.arrayDimensions() == 1)
 				return resolveArray(dep, type.baseType());
 			return resolveFromUpperBound(dep);
@@ -192,7 +191,7 @@ public final class Inject {
 				for (int i = 0; i < wildcardCases.length; i++) {
 					InjectionCase<?> res = wildcardCases[i];
 					if (type.isAssignableTo(res.resource.type()))
-						return (T) res.generator.instanceFor(
+						return (T) res.generator.yield(
 								(Dependency<Object>) dep);
 				}
 			}
@@ -286,7 +285,7 @@ public final class Inject {
 			for (int i = 0; i < elemCases.length; i++) {
 				InjectionCase<? extends E> elemCase = elemCases[i];
 				if (elemCase.resource.isMatching(elemDep)) {
-					E instance = elemCase.generator.instanceFor(elemDep);
+					E instance = elemCase.generator.yield(elemDep);
 					if (identities.add(identityHashCode(instance)))
 						elements.add(instance);
 				}
@@ -354,7 +353,7 @@ public final class Inject {
 		}
 
 		@Override
-		public T instanceFor(Dependency<? super T> dep) {
+		public T yield(Dependency<? super T> dep) {
 			final Dependency<? super T> injected = dep.injectingInto(resource,
 					scoping);
 			return repository.serve(serialID, injected, () -> {
@@ -402,7 +401,7 @@ public final class Inject {
 			// this is not 100% generic as instance the type is derived from itself could be generic in a relevant way
 			// e.g. if List<String> should be initialised but not List<Integer> we just check for List here and fail later on
 			if (raw(type).isAssignableTo(initialiser.type().parameter(0))) {
-				return (Initialiser<? super T>) icase.generator.instanceFor(
+				return (Initialiser<? super T>) icase.generator.yield(
 						dependency(initialiser.instance));
 			}
 			return null;

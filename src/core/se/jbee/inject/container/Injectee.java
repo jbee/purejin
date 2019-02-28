@@ -1,13 +1,13 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.container;
 
 import java.util.List;
 
-import se.jbee.inject.Generator;
+import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Scope;
@@ -20,7 +20,8 @@ import se.jbee.inject.Source;
  * A {@link List} would be a generic {@link Injectee}, some singleton "service"
  * a non-generic one.
  * 
- * Each {@link Injectee} becomes an {@link Generator} with the {@link Injector}.
+ * Each {@link Injectee} becomes an {@link InjectionCase} with the
+ * {@link Injector}.
  * 
  * The interface is mainly introduced to decouple the everything on top of the
  * container module (which is the core) from the container implementation

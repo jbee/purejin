@@ -14,8 +14,8 @@ package se.jbee.inject.event;
  * universal description {@link EventPreferences}.
  * 
  * To substitute the default behaviour (which used
- * {@link EventPreferences#DEFAULT}) simply bind {@link EventMirror} to a
- * custom supplier having the behaviour you want.
+ * {@link EventPreferences#DEFAULT}) simply bind {@link EventMirror} to a custom
+ * supplier having the behaviour you want.
  * 
  * @since 19.1
  */

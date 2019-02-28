@@ -16,7 +16,8 @@ public interface NamingMirror {
 
 	NamingMirror defaultName = obj -> Name.DEFAULT;
 
-	static NamingMirror annotatedAsValueOf(Class<? extends Annotation> annotation) {
+	static NamingMirror annotatedAsValueOf(
+			Class<? extends Annotation> annotation) {
 		return obj -> Name.namedBy(annotation, obj);
 	}
 

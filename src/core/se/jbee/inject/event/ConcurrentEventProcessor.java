@@ -113,8 +113,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	private final ExecutorService executor;
 	private final EventMirror reflector;
 
-	ConcurrentEventProcessor(EventMirror reflector,
-			ExecutorService executor) {
+	ConcurrentEventProcessor(EventMirror reflector, ExecutorService executor) {
 		this.reflector = reflector;
 		this.executor = executor;
 	}

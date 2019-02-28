@@ -105,6 +105,6 @@ public final class InjectionSite {
 
 	@SuppressWarnings("unchecked")
 	private static <I> I instance(InjectionCase<I> icase, Dependency<?> dep) {
-		return icase.generator.instanceFor((Dependency<? super I>) dep);
+		return icase.generator.yield((Dependency<? super I>) dep);
 	}
 }
