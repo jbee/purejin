@@ -17,7 +17,7 @@ import se.jbee.inject.Type;
 @FunctionalInterface
 public interface ProductionMirror {
 
-	Method[] noMethods = new Method[0];
+	Method[] __noMethodsArray = new Method[0];
 
 	/**
 	 * @return The {@link Member}s that should be used in the context this
@@ -25,7 +25,7 @@ public interface ProductionMirror {
 	 */
 	Method[] reflect(Class<?> impl);
 
-	ProductionMirror DEFAULT = impl -> noMethods;
+	ProductionMirror noMethods = impl -> __noMethodsArray;
 
 	ProductionMirror allMethods = impl -> impl.getDeclaredMethods();
 
@@ -66,7 +66,7 @@ public interface ProductionMirror {
 	default ProductionMirror in(Packages filter) {
 		return impl -> filter.contains(raw(impl))
 			? this.reflect(impl)
-			: noMethods;
+			: __noMethodsArray;
 	}
 
 }

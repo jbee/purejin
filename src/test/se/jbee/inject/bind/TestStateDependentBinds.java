@@ -5,6 +5,8 @@ import static org.junit.Assert.assertTrue;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.config.NamingMirror.annotatedAsValueOf;
+import static se.jbee.inject.config.ParameterisationMirror.namesAnnotatedAsValueOf;
 import static se.jbee.inject.config.ProductionMirror.allMethods;
 import static se.jbee.inject.container.Typecast.providerTypeOf;
 
@@ -19,8 +21,6 @@ import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.bind.Binder.RootBinder;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.config.NamingMirror;
-import se.jbee.inject.config.ParameterisationMirror;
 import se.jbee.inject.container.Scoped;
 import se.jbee.inject.container.Supplier;
 import se.jbee.inject.util.Resource;
@@ -240,8 +240,8 @@ public class TestStateDependentBinds {
 			// the below is just *a* example - it is just important to provide the 'value' per injection
 			// @formatter:off
 			produces(allMethods.returnTypeAssignableTo(raw(int.class)))
-				.names(NamingMirror.namedBy(Resource.class))
-				.parameterises(ParameterisationMirror.namedBy(Resource.class))
+				.names(annotatedAsValueOf(Resource.class))
+				.parameterises(namesAnnotatedAsValueOf(Resource.class))
 				.per(Scoped.INJECTION)
 				.autobind().in(StatefulObject.class);
 			// @formatter:on

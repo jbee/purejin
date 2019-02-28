@@ -5,6 +5,8 @@ import static org.junit.Assert.assertSame;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Packages.packageAndSubPackagesOf;
 import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.config.NamingMirror.annotatedAsValueOf;
+import static se.jbee.inject.config.ParameterisationMirror.namesAnnotatedAsValueOf;
 import static se.jbee.inject.config.ProductionMirror.allMethods;
 import static se.jbee.inject.container.Typecast.providerTypeOf;
 
@@ -19,8 +21,6 @@ import se.jbee.inject.Name;
 import se.jbee.inject.Provider;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.config.NamingMirror;
-import se.jbee.inject.config.ParameterisationMirror;
 import se.jbee.inject.container.Scoped;
 import se.jbee.inject.util.Resource;
 import se.jbee.inject.util.WebMethod;
@@ -42,8 +42,8 @@ public class TestMirrorAutobindBinds {
 			produces(allMethods).autobind().inModule();
 			// @formatter:off
 			produces(allMethods.annotatedWith(WebMethod.class))
-				.names(NamingMirror.namedBy(Resource.class))
-				.parameterises(ParameterisationMirror.namedBy(Resource.class))
+				.names(annotatedAsValueOf(Resource.class))
+				.parameterises(namesAnnotatedAsValueOf(Resource.class))
 				.autobind().in(Implementor1.class);
 			// @formatter:on
 			produces(allMethods.returnTypeAssignableTo(

@@ -30,8 +30,8 @@ public final class Bindings {
 
 	public static Bindings newBindings() {
 		return new Bindings(new ArrayList<>(128), Macros.DEFAULT,
-				ConstructionMirror.mostParams, NamingMirror.DEFAULT,
-				ProductionMirror.DEFAULT, ParameterisationMirror.DEFAULT);
+				ConstructionMirror.mostParams, NamingMirror.defaultName,
+				ProductionMirror.noMethods, ParameterisationMirror.noParameters);
 	}
 
 	private final List<Binding<?>> bindings;

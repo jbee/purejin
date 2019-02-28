@@ -23,27 +23,27 @@ public interface ParameterisationMirror {
 	 */
 	Parameter<?>[] reflect(AccessibleObject obj);
 
-	ParameterisationMirror DEFAULT = obj -> Parameter.NO_PARAMETERS;
+	ParameterisationMirror noParameters = obj -> Parameter.NO_PARAMETERS;
 
 	/**
 	 * A {@link ParameterisationMirror} that allows to specify the
 	 * {@link Annotation} which is used to indicate the instance {@link Name} of
 	 * a method parameter.
 	 */
-	static ParameterisationMirror namedBy(
-			Class<? extends Annotation> annotation) {
+	static ParameterisationMirror namesAnnotatedAsValueOf(
+			Class<? extends Annotation> naming) {
 		return obj -> {
-			if (annotation == null)
+			if (naming == null)
 				return Parameter.NO_PARAMETERS;
 			if (obj instanceof Method) {
 				Method method = (Method) obj;
 				return parametersFor(parameterTypes(method),
-						method.getParameterAnnotations(), annotation);
+						method.getParameterAnnotations(), naming);
 			}
 			if (obj instanceof Constructor<?>) {
 				Constructor<?> constructor = (Constructor<?>) obj;
 				return parametersFor(parameterTypes(constructor),
-						constructor.getParameterAnnotations(), annotation);
+						constructor.getParameterAnnotations(), naming);
 			}
 			return Parameter.NO_PARAMETERS;
 
