@@ -15,8 +15,8 @@ package se.jbee.inject;
  * 
  * @param <T> type of instances yielded by the {@link #generator}.
  */
-public final class InjectionCase<T>
-		implements Comparable<InjectionCase<?>>, Qualifying<InjectionCase<?>> {
+public final class InjectionCase<T> implements Comparable<InjectionCase<?>>,
+		Qualifying<InjectionCase<?>>, Generator<T> {
 
 	public final Generator<T> generator;
 
@@ -51,6 +51,11 @@ public final class InjectionCase<T>
 		this.source = source;
 		this.scoping = scoping;
 		this.serialID = serialID;
+	}
+
+	@Override
+	public T yield(Dependency<? super T> dep) throws UnresolvableDependency {
+		return generator.yield(dep);
 	}
 
 	public Type<T> type() {

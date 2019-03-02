@@ -82,7 +82,7 @@ public final class Bootstrap {
 	}
 
 	public static <T> T instance(InjectionCase<T> icase) {
-		return icase.generator.yield(icase.resource.toDependency());
+		return icase.yield(icase.resource.toDependency());
 	}
 
 	public static void nonnullThrowsReentranceException(Object field) {

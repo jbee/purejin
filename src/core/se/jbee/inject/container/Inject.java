@@ -13,7 +13,6 @@ import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.arrayFilter;
 import static se.jbee.inject.Utils.arrayFindFirst;
 import static se.jbee.inject.Utils.arrayFlatmap;
-import static se.jbee.inject.Utils.arrayMap;
 import static se.jbee.inject.Utils.arrayOf;
 import static se.jbee.inject.container.Typecast.initialiserTypeOf;
 import static se.jbee.inject.container.Typecast.injectionCasesTypeFor;
@@ -46,7 +45,7 @@ import se.jbee.inject.UnresolvableDependency.NoCaseForDependency;
  */
 public final class Inject {
 
-	private static final InjectionCase<?>[] noCases = new InjectionCase[0];
+	static final InjectionCase<?>[] noCases = new InjectionCase[0];
 
 	public static Injector container(Injectee<?>... injectees) {
 		return new InjectorImpl(injectees);
@@ -162,23 +161,17 @@ public final class Inject {
 			//TODO new feature: resolve by annotation type -> as addon with own API that does its type analysis on basis of specs
 			final Type<T> type = dep.type();
 			final Class<T> rawType = type.rawType;
-			if (rawType == InjectionCase.class) {
+			if (rawType == InjectionCase.class || rawType == Generator.class) {
 				InjectionCase<?> res = injectionCaseMatching(
 						dep.onTypeParameter());
 				if (res != null)
 					return (T) res;
 			}
-			if (rawType == Generator.class) {
-				InjectionCase<?> res = injectionCaseMatching(
-						dep.onTypeParameter());
-				if (res != null)
-					return (T) res.generator;
-			}
 			if (rawType == Injector.class)
 				return (T) this;
 			InjectionCase<T> match = injectionCaseMatching(dep);
 			if (match != null)
-				return match.generator.yield(dep);
+				return match.yield(dep);
 			if (type.arrayDimensions() == 1)
 				return resolveArray(dep, type.baseType());
 			return resolveFromUpperBound(dep);
@@ -194,7 +187,7 @@ public final class Inject {
 			InjectionCase<?> match = arrayFindFirst(wildcardCases,
 					c -> dep.type().isAssignableTo(c.type()));
 			if (match != null)
-				return (T) match.generator.yield((Dependency<Object>) dep);
+				return (T) match.yield((Dependency<Object>) dep);
 			throw noCaseFor(dep);
 		}
 
@@ -216,12 +209,9 @@ public final class Inject {
 		@SuppressWarnings("unchecked")
 		private <T, E> T resolveArray(Dependency<T> dep, Type<E> elemType) {
 			final Class<E> rawElemType = elemType.rawType;
-			if (rawElemType == InjectionCase.class)
+			if (rawElemType == InjectionCase.class
+				|| rawElemType == Generator.class) {
 				return (T) resolveCaseArray(dep, elemType.parameter(0));
-			if (rawElemType == Generator.class) {
-				return (T) arrayMap(
-						resolveCaseArray(dep, elemType.parameter(0)),
-						Generator.class, c -> c.generator);
 			}
 			if (dep.type().rawType.getComponentType().isPrimitive()) {
 				throw new NoCaseForDependency(dep, null,
@@ -246,6 +236,7 @@ public final class Inject {
 			return toArray(elements, elemType);
 		}
 
+		@SuppressWarnings("unchecked")
 		private <T, G> InjectionCase<G>[] resolveCaseArray(Dependency<T> dep,
 				Type<G> generatedType) {
 			Dependency<G> generatedTypeDep = dep.typed(generatedType);
@@ -253,7 +244,6 @@ public final class Inject {
 				List<InjectionCase<?>> res = new ArrayList<>();
 				for (Entry<Class<?>, InjectionCase<?>[]> e : casesByType.entrySet()) {
 					if (raw(e.getKey()).isAssignableTo(generatedType)) {
-						@SuppressWarnings("unchecked")
 						InjectionCase<? extends G>[] casesForType = (InjectionCase<? extends G>[]) e.getValue();
 						for (InjectionCase<? extends G> icase : casesForType) {
 							if (icase.resource.isCompatibleWith(
@@ -278,7 +268,7 @@ public final class Inject {
 			for (int i = 0; i < elemCases.length; i++) {
 				InjectionCase<? extends E> elemCase = elemCases[i];
 				if (elemCase.resource.isMatching(elemDep)) {
-					E instance = elemCase.generator.yield(elemDep);
+					E instance = elemCase.yield(elemDep);
 					if (identities.add(identityHashCode(instance)))
 						elements.add(instance);
 				}
@@ -355,7 +345,7 @@ public final class Inject {
 			});
 		}
 
-		//TODO maybe add support for annotation - revolve Initialiser bound for Annotation class.
+		//TODO add support for annotation based initialisers - resolve Initialiser bound for Annotation class.
 
 		@SuppressWarnings("unchecked")
 		private void dynamicInitialisationOf(T instance,
@@ -385,7 +375,7 @@ public final class Inject {
 			// this is not 100% generic as instance the type is derived from itself could be generic in a relevant way
 			// e.g. if List<String> should be initialised but not List<Integer> we just check for List here and fail later on
 			if (raw(type).isAssignableTo(initialiser.type().parameter(0)))
-				return (Initialiser<? super T>) icase.generator.yield(
+				return (Initialiser<? super T>) icase.yield(
 						dependency(initialiser.instance));
 			return null;
 		}

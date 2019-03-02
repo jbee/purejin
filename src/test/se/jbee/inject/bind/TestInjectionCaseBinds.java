@@ -46,7 +46,7 @@ public class TestInjectionCaseBinds {
 		InjectionCase<String> icase = injector.resolve(
 				injectionCaseTypeFor(String.class));
 		assertNotNull(icase);
-		assertEquals("foobar", icase.generator.yield(dependency(String.class)));
+		assertEquals("foobar", icase.yield(dependency(String.class)));
 	}
 
 	@Test
@@ -67,10 +67,8 @@ public class TestInjectionCaseBinds {
 				injectionCasesTypeFor(String.class)).named("special");
 		InjectionCase<String>[] cases = injector.resolve(dependency);
 		assertEquals(2, cases.length);
-		assertEquals("special-list",
-				cases[0].generator.yield(dependency(String.class)));
-		assertEquals("special",
-				cases[1].generator.yield(dependency(String.class)));
+		assertEquals("special-list", cases[0].yield(dependency(String.class)));
+		assertEquals("special", cases[1].yield(dependency(String.class)));
 	}
 
 	@Test

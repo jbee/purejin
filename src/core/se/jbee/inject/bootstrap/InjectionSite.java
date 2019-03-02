@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
@@ -105,6 +105,6 @@ public final class InjectionSite {
 
 	@SuppressWarnings("unchecked")
 	private static <I> I instance(InjectionCase<I> icase, Dependency<?> dep) {
-		return icase.generator.yield((Dependency<? super I>) dep);
+		return icase.yield((Dependency<? super I>) dep);
 	}
 }

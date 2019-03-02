@@ -362,7 +362,7 @@ public final class Supply {
 
 		@Override
 		public T provide() {
-			return icase.generator.yield(dependency);
+			return icase.yield(dependency);
 		}
 
 		@Override
