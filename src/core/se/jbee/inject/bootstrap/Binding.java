@@ -178,7 +178,7 @@ public final class Binding<T>
 			}
 		}
 		if (!required.isEmpty()) {
-			throw new UnresolvableDependency.NoResourceForDependency(required,
+			throw new UnresolvableDependency.NoCaseForDependency(required,
 					dropped);
 		}
 		return arrayOf(res, Binding.class);

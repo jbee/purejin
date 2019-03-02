@@ -39,10 +39,10 @@ public final class Utils {
 
 	/* Arrays */
 
-	public static <T> T[] arrayFilter(T[] arr, Predicate<T> accept) {
+	public static <A> A[] arrayFilter(A[] arr, Predicate<A> accept) {
 		if (arr == null || arr.length == 0)
 			return arr;
-		T[] accepted = newArray(arr, arr.length);
+		A[] accepted = newArray(arr, arr.length);
 		int j = 0;
 		for (int i = 0; i < arr.length; i++)
 			if (accept.test(arr[i]))
@@ -50,37 +50,55 @@ public final class Utils {
 		return j == arr.length ? arr : copyOf(accepted, j);
 	}
 
-	public static <T> T[] arrayAppend(T[] arr, T e) {
-		T[] copy = copyOf(arr, arr.length + 1);
+	public static <A> A[] arrayAppend(A[] arr, A e) {
+		A[] copy = copyOf(arr, arr.length + 1);
 		copy[arr.length] = e;
 		return copy;
 	}
 
-	public static <T> T[] arrayPrepand(T e, T[] arr) {
-		T[] copy = newArray(arr, arr.length + 1);
+	public static <A> A[] arrayPrepand(A e, A[] arr) {
+		A[] copy = newArray(arr, arr.length + 1);
 		arraycopy(arr, 0, copy, 1, arr.length);
 		copy[0] = e;
 		return copy;
 	}
 
-	public static <T> T[] arrayInsert(T e, T[] arr, Eq<T> eq) {
+	public static <A> A[] arrayInsert(A e, A[] arr, Eq<A> eq) {
 		if (arr.length == 0)
 			return arrayPrepand(e, arr);
 		int i = arrayIndex(arr, e, eq);
 		if (i >= 0) {
 			if (e == arr[i]) // already very same
 				return arr;
-			T[] tmp = arr.clone();
+			A[] tmp = arr.clone();
 			tmp[i] = e;
 			return tmp;
 		}
 		return arrayPrepand(e, arr);
 	}
 
-	public static <T> T[] arrayDropTail(T[] arr, int n) {
+	public static <A> A[] arrayDropTail(A[] arr, int n) {
 		if (arr.length <= n)
 			return newArray(arr, 0);
 		return copyOf(arr, arr.length - n);
+	}
+
+	/**
+	 * This is a special form of flatmap where the mapping does not return zero
+	 * to n Bs but always returns a B. If {@code null} is returned this means
+	 * "zero" or remove the B. So length of {@code B[]} is always {@code <=}
+	 * length of {@code A[]}.
+	 */
+	public static <A, B> B[] arrayFlatmap(A[] as, Class<B> to,
+			Function<A, B> flatmapOp) {
+		B[] bs = newArray(to, as.length);
+		int j = 0;
+		for (int i = 0; i < as.length; i++) {
+			B b = flatmapOp.apply(as[i]);
+			if (b != null)
+				bs[j++] = b;
+		}
+		return j == as.length ? bs : copyOf(bs, j);
 	}
 
 	public static <A, B> B[] arrayMap(A[] as, Class<B> to,
@@ -91,16 +109,16 @@ public final class Utils {
 		return bs;
 	}
 
-	public static <T> T[] arrayMap(T[] arr, UnaryOperator<T> mapOp) {
-		if (arr.length == 0)
+	public static <A> A[] arrayMap(A[] arr, UnaryOperator<A> mapOp) {
+		if (arr == null || arr.length == 0)
 			return arr;
-		T[] mapped = newArray(arr, arr.length);
+		A[] mapped = newArray(arr, arr.length);
 		for (int i = 0; i < arr.length; i++)
 			mapped[i] = mapOp.apply(arr[i]);
 		return mapped;
 	}
 
-	public static <T> int arrayIndex(T[] arr, T e, Eq<T> eq) {
+	public static <A> int arrayIndex(A[] arr, A e, Eq<A> eq) {
 		if (arr == null || arr.length == 0)
 			return -1;
 		for (int i = 0; i < arr.length; i++) {
@@ -111,7 +129,7 @@ public final class Utils {
 		return -1;
 	}
 
-	public static <T> T arrayFirst(T[] arr, Predicate<T> test) {
+	public static <A> A arrayFindFirst(A[] arr, Predicate<A> test) {
 		if (arr == null || arr.length == 0)
 			return null;
 		for (int i = 0; i < arr.length; i++)
@@ -120,11 +138,11 @@ public final class Utils {
 		return null;
 	}
 
-	public static <T> boolean arrayContains(T[] arr, Predicate<T> test) {
-		return arrayFirst(arr, test) != null;
+	public static <A> boolean arrayContains(A[] arr, Predicate<A> test) {
+		return arrayFindFirst(arr, test) != null;
 	}
 
-	public static <T> boolean arrayContains(T[] arr, T e, Eq<T> eq) {
+	public static <A> boolean arrayContains(A[] arr, A e, Eq<A> eq) {
 		if (arr == null || arr.length == 0)
 			return false;
 		for (int i = 0; i < arr.length; i++)
@@ -133,8 +151,10 @@ public final class Utils {
 		return false;
 	}
 
-	public static <T> boolean arrayEquals(T[] a, T[] b, Eq<T> eq) {
-		if (a.length != b.length)
+	public static <A> boolean arrayEquals(A[] a, A[] b, Eq<A> eq) {
+		if (a == b)
+			return true;
+		if (b == null || a == null || a.length != b.length)
 			return false;
 		for (int i = 0; i < a.length; i++)
 			if (!eq.test(a[i], b[i]))
@@ -143,16 +163,16 @@ public final class Utils {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> T[] newArray(T[] proto, int length) {
-		return (T[]) newArray(proto.getClass().getComponentType(), length);
+	public static <A> A[] newArray(A[] proto, int length) {
+		return (A[]) newArray(proto.getClass().getComponentType(), length);
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> T[] newArray(Class<T> componentType, int length) {
-		return (T[]) newInstance(componentType, length);
+	public static <A> A[] newArray(Class<A> componentType, int length) {
+		return (A[]) newInstance(componentType, length);
 	}
 
-	public static <T> T[] arrayOf(Collection<? extends T> list, Class<T> type) {
+	public static <A> A[] arrayOf(Collection<? extends A> list, Class<A> type) {
 		return list.toArray(newArray(type, list.size()));
 	}
 
@@ -160,7 +180,7 @@ public final class Utils {
 
 	public static Method annotationPropertyByType(Class<?> type,
 			Class<? extends Annotation> annotation) {
-		return arrayFirst(annotation.getDeclaredMethods(),
+		return arrayFindFirst(annotation.getDeclaredMethods(),
 				m -> m.getReturnType() == type);
 	}
 
@@ -221,22 +241,22 @@ public final class Utils {
 
 	/* Sequences */
 
-	public static boolean seqRegionEquals(CharSequence p1, CharSequence p2,
+	public static boolean seqRegionEquals(CharSequence s1, CharSequence s2,
 			int length) {
-		if (p1.length() < length || p2.length() < length)
+		if (s1.length() < length || s2.length() < length)
 			return false;
-		if (p1 == p2)
+		if (s1 == s2)
 			return true;
 		for (int i = length - 1; i > 0; i--)
-			if (p1.charAt(i) != p2.charAt(i))
+			if (s1.charAt(i) != s2.charAt(i))
 				return false;
 		return true;
 	}
 
-	public static <T> int seqCount(CharSequence arr, char match) {
+	public static int seqCount(CharSequence seq, char match) {
 		int c = 0;
-		for (int i = arr.length() - 1; i > 0; i--)
-			if (arr.charAt(i) == match)
+		for (int i = seq.length() - 1; i > 0; i--)
+			if (seq.charAt(i) == match)
 				c++;
 		return c;
 	}

@@ -11,7 +11,8 @@ v19.1 (upcoming)
 
 **Additions**
 - added `Serializable` to `Type`, `Name`, `Instance`, `Instances`, `Packages`, 
-  `Target`, `Resource`, `Source`, `Scoping`, `Injection`, `Dependency`
+  `Target`, `Resource`, `Source`, `Scoping`, `Injection`, `Dependency`,
+  `Options`
 - `Source` implements `equals` and `hashCode`  
 - added `initbind` and `Initialiser`s (run code when container is ready)
 - added `init` utility methods to link instances during initialisation
@@ -27,6 +28,7 @@ v19.1 (upcoming)
 - `InspectorBinder` replaced by `AutoBinder` and `autobind()` (no args)
 - `Bindings` are created via `newBindings` and modified using the `with` methods
 - renamed class `Assembly` to `Injectee`
+- renamed class `NoResourceForDependency` to `NoCaseForDependency`
 - renamed class and method `MorePreciseThan#morePreciseThan` to `Qualifying#moreQualiedThan`
 - redesign of `Injectron`/`InjectronInfo` to `Generator` and `InjectionCase`
 - renamed field `Injection#expiry` to `Injection#scoping`

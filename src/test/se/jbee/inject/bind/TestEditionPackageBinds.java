@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.Packages;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import se.jbee.inject.UnresolvableDependency.NoCaseForDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bundle;
@@ -59,7 +59,7 @@ public class TestEditionPackageBinds {
 			Integer res = injector.resolve(int.class);
 			assertNull(res);
 			fail("Should have thrown exception since EditionPackageBindsModule should not have been installed");
-		} catch (NoResourceForDependency e) {
+		} catch (NoCaseForDependency e) {
 			// expected this
 		}
 

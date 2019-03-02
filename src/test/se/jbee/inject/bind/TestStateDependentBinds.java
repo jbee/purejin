@@ -17,7 +17,7 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Provider;
 import se.jbee.inject.Type;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import se.jbee.inject.UnresolvableDependency.NoCaseForDependency;
 import se.jbee.inject.bind.Binder.RootBinder;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
@@ -159,7 +159,7 @@ public class TestStateDependentBinds {
 					named(actualState), type);
 			try {
 				return injector.resolve(dependency.instanced(actualToInject));
-			} catch (NoResourceForDependency e) {
+			} catch (NoCaseForDependency e) {
 				if (actualState != null) { // when not trying default
 					return supply(dependency, injector, null); // try default
 				}

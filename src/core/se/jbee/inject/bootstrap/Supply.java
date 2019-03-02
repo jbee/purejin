@@ -27,7 +27,7 @@ import se.jbee.inject.Parameter;
 import se.jbee.inject.Provider;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import se.jbee.inject.UnresolvableDependency.NoCaseForDependency;
 import se.jbee.inject.UnresolvableDependency.SupplyFailed;
 import se.jbee.inject.container.Factory;
 import se.jbee.inject.container.Supplier;
@@ -466,9 +466,9 @@ public final class Supply {
 		}
 
 		@SuppressWarnings("unchecked")
-		private static <T> NoResourceForDependency required(
+		private static <T> NoCaseForDependency required(
 				Dependency<T> dependency) {
-			return new NoResourceForDependency(dependency, new InjectionCase[0],
+			return new NoCaseForDependency(dependency, new InjectionCase[0],
 					"Should never be called!");
 		}
 

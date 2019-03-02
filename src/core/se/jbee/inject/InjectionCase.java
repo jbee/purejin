@@ -53,6 +53,10 @@ public final class InjectionCase<T>
 		this.serialID = serialID;
 	}
 
+	public Type<T> type() {
+		return resource.type();
+	}
+
 	@Override
 	public String toString() {
 		return "#" + serialID + " " + resource + " " + source + " " + scoping;

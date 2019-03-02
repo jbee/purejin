@@ -14,6 +14,7 @@ import static se.jbee.inject.Type.parameterTypes;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Type.returnType;
 import static se.jbee.inject.Utils.accessible;
+import static se.jbee.inject.Utils.arrayFindFirst;
 import static se.jbee.inject.config.ProductionMirror.allMethods;
 import static se.jbee.inject.container.Scoped.APPLICATION;
 import static se.jbee.inject.container.Scoped.DEPENDENCY_TYPE;
@@ -162,15 +163,14 @@ public abstract class ActionModule extends BinderModule {
 					Type<?> rt = returnType(action);
 					if (rt.equalTo(output)) {
 						if (input.equalTo(Type.VOID)) {
-							if (action.getParameterTypes().length == 0) {
+							if (action.getParameterTypes().length == 0)
 								return action;
-							}
 						} else {
-							for (Type<?> pt : parameterTypes(action)) {
-								if (pt.equalTo(input)) {
-									return action;
-								}
-							}
+							Type<?> param = arrayFindFirst(
+									parameterTypes(action),
+									t -> t.equalTo(input));
+							if (param != null)
+								return action;
 						}
 					}
 				}
@@ -224,9 +224,8 @@ public abstract class ActionModule extends BinderModule {
 				throw new ActionMalfunction(
 						"Failed to provide all implicit arguments", e);
 			}
-			if (inputIndex >= 0) {
+			if (inputIndex >= 0)
 				args[inputIndex] = input;
-			}
 			return executor.exec(impl, action, args, output, this.input, input);
 		}
 	}

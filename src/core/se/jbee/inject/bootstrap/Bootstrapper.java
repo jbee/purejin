@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
@@ -101,6 +101,7 @@ public interface Bootstrapper {
 		 * {@link Bootstrapper#install(Enum...)}ed the call will be ignored.
 		 */
 		void install(Class<? extends Bundle> bundle, O onOption);
+
 	}
 
 }

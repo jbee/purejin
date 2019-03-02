@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -20,7 +20,7 @@ import java.util.List;
  * 
  * @see DependencyCycle
  * @see UnstableDependency
- * @see NoResourceForDependency
+ * @see NoCaseForDependency
  * @see NoMethodForDependency
  * @see SupplyFailed
  * 
@@ -71,21 +71,20 @@ public abstract class UnresolvableDependency extends RuntimeException {
 	}
 
 	/**
-	 * An {@link Injector} couldn't find a {@link Resource} that matches a
+	 * An {@link Injector} couldn't find a {@link InjectionCase} that matches a
 	 * {@link Dependency} to resolve.
 	 */
-	public static final class NoResourceForDependency
+	public static final class NoCaseForDependency
 			extends UnresolvableDependency {
 
-		public <T> NoResourceForDependency(Dependency<T> dependency,
+		public <T> NoCaseForDependency(Dependency<T> dependency,
 				InjectionCase<T>[] available, String msg) {
 			super("No resource for dependency:\n" + dependency
 				+ "\navailable are (for same raw type): " + describe(available)
 				+ "\n" + msg);
 		}
 
-		public NoResourceForDependency(Collection<Type<?>> types,
-				List<?> dropped) {
+		public NoCaseForDependency(Collection<Type<?>> types, List<?> dropped) {
 			super("No resource for required type(s): " + types
 				+ "\ndrobbed bindings:\n" + dropped);
 		}
@@ -132,9 +131,8 @@ public abstract class UnresolvableDependency extends RuntimeException {
 				AccessibleObject invoked) {
 			if (e instanceof InvocationTargetException) {
 				Throwable t = ((InvocationTargetException) e).getTargetException();
-				if (t instanceof Exception) {
+				if (t instanceof Exception)
 					e = (Exception) t;
-				}
 			}
 			return new SupplyFailed("Failed to invoke: " + invoked, e);
 		}

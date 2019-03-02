@@ -116,10 +116,9 @@ public final class Macros {
 	private <V> Macro<? super V> macroForValueOf(
 			final Class<? extends V> type) {
 		int index = index(type);
-		if (index < 0) {
+		if (index < 0)
 			throw new InconsistentBinding(
 					"No macro for type:" + type.getCanonicalName());
-		}
 		return (Macro<? super V>) macros[index];
 	}
 
@@ -139,16 +138,12 @@ public final class Macros {
 			bindings.add(binding);
 			DeclarationType declarationType = binding.source.declarationType;
 			if (declarationType != DeclarationType.AUTO
-				&& declarationType != DeclarationType.PROVIDED) {
+				&& declarationType != DeclarationType.PROVIDED)
 				return;
-			}
-			for (Type<? super T> supertype : binding.type().supertypes()) {
-				// Object is of course a superclass but not indented when doing
-				// auto-binds
-				if (supertype.rawType != Object.class) {
+			for (Type<? super T> supertype : binding.type().supertypes())
+				// Object is of course a superclass but not indented when doing auto-binds
+				if (supertype.rawType != Object.class)
 					bindings.add(binding.typed(supertype));
-				}
-			}
 		}
 	}
 

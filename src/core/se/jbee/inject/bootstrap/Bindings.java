@@ -105,11 +105,8 @@ public final class Bindings {
 		for (Module m : modules) {
 			Class<? extends Module> ns = m.getClass();
 			final boolean hasBeenDeclared = declared.contains(ns);
-			if (hasBeenDeclared) {
-				if (!isClassMonomodal(ns)) {
-					multimodals.add(ns);
-				}
-			}
+			if (hasBeenDeclared && !isClassMonomodal(ns))
+				multimodals.add(ns);
 			if (!hasBeenDeclared || multimodals.contains(ns)) {
 				m.declare(this);
 				declared.add(ns);

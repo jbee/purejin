@@ -328,9 +328,8 @@ public class Binder {
 			if (!boundInstanceMethods)
 				return; // do not try to construct the class
 			Constructor<?> c = bindings().construction.reflect(service);
-			if (c != null) {
+			if (c != null)
 				bind(c, params);
-			}
 		}
 
 		private boolean bindMirrorMethodsIn(Class<?> impl, Object instance,
@@ -618,10 +617,9 @@ public class Binder {
 
 		public void toConstructor(Class<? extends T> impl,
 				Parameter<?>... params) {
-			if (isClassVirtual(impl)) {
+			if (isClassVirtual(impl))
 				throw new InconsistentBinding(
 						"Not a constructable type: " + impl);
-			}
 			to(bindings().construction.reflect(impl), params);
 		}
 
@@ -738,13 +736,12 @@ public class Binder {
 		@SuppressWarnings("unchecked")
 		private E[] array(Object... elements) {
 			Class<E[]> rawType = getType().rawType;
-			if (elements.getClass() == rawType) {
+			if (elements.getClass() == rawType)
 				return (E[]) elements;
-			}
-			Object[] a = newArray(getType().baseType().rawType,
+			Object[] res = newArray(getType().baseType().rawType,
 					elements.length);
-			System.arraycopy(elements, 0, a, 0, a.length);
-			return (E[]) a;
+			System.arraycopy(elements, 0, res, 0, res.length);
+			return (E[]) res;
 		}
 	}
 

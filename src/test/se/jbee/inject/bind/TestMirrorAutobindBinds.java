@@ -19,7 +19,7 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Provider;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import se.jbee.inject.UnresolvableDependency.NoCaseForDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.container.Scoped;
 import se.jbee.inject.util.Resource;
@@ -179,7 +179,7 @@ public class TestMirrorAutobindBinds {
 				injector.resolve(providerTypeOf(Boolean.class)).provide());
 	}
 
-	@Test(expected = NoResourceForDependency.class)
+	@Test(expected = NoCaseForDependency.class)
 	public void thatNoMethodsAreBoundThatAreNotAssignableToSpecifiedType() {
 		injector.resolve(Character.class);
 	}
@@ -189,7 +189,7 @@ public class TestMirrorAutobindBinds {
 		assertEquals(named("foobar"), injector.resolve(Name.class));
 	}
 
-	@Test(expected = NoResourceForDependency.class)
+	@Test(expected = NoCaseForDependency.class)
 	public void thatNoMethodsAreBoundThatAreNotInSpecifiedPackagesSet() {
 		injector.resolve(String.class);
 	}

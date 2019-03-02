@@ -1,10 +1,11 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.config;
 
+import java.io.Serializable;
 import java.util.EnumSet;
 import java.util.IdentityHashMap;
 
@@ -23,7 +24,7 @@ import java.util.IdentityHashMap;
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
-public final class Options {
+public final class Options implements Serializable {
 
 	public static final Options STANDARD = new Options(new IdentityHashMap<>());
 
@@ -42,9 +43,8 @@ public final class Options {
 	}
 
 	public <C extends Enum<C>> Options chosen(C option) {
-		if (option == null) {
+		if (option == null)
 			return this;
-		}
 		return with(option.getDeclaringClass(), EnumSet.of(option));
 	}
 
@@ -57,9 +57,8 @@ public final class Options {
 
 	@SafeVarargs
 	public final <C extends Enum<C>> Options chosen(C... options) {
-		if (options.length == 0) {
+		if (options.length == 0)
 			return this;
-		}
 		return with(options[0].getDeclaringClass(),
 				EnumSet.of(options[0], options));
 	}

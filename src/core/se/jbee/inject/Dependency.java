@@ -13,7 +13,7 @@ import static se.jbee.inject.Utils.arrayAppend;
 import static se.jbee.inject.Utils.arrayContains;
 import static se.jbee.inject.Utils.arrayDropTail;
 import static se.jbee.inject.Utils.arrayEquals;
-import static se.jbee.inject.Utils.arrayFirst;
+import static se.jbee.inject.Utils.arrayFindFirst;
 import static se.jbee.inject.Utils.arrayMap;
 
 import java.io.Serializable;
@@ -201,7 +201,7 @@ public final class Dependency<T>
 
 	private void ensureStableScopeNesting(Injection injection)
 			throws UnstableDependency {
-		Injection unstable = arrayFirst(hierarchy,
+		Injection unstable = arrayFindFirst(hierarchy,
 				e -> !injection.scoping.isStableIn(e.scoping));
 		if (unstable != null)
 			throw new UnstableDependency(unstable, injection);

@@ -23,7 +23,7 @@ public final class InjectionSite {
 
 	public final Dependency<?> site;
 
-	private final BoundParameter<?>[] parameters;
+	private final BoundParameter<?>[] params;
 	private final InjectionCase<?>[] cases;
 	private final Object[] args;
 
@@ -31,11 +31,11 @@ public final class InjectionSite {
 	private int dynamicsLength = 0;
 
 	public InjectionSite(Dependency<?> site, Injector injector,
-			BoundParameter<?>[] parameters) {
+			BoundParameter<?>[] params) {
 		this.site = site;
-		this.parameters = parameters;
-		this.cases = new InjectionCase<?>[parameters.length];
-		this.dynamics = new int[parameters.length];
+		this.params = params;
+		this.cases = new InjectionCase<?>[params.length];
+		this.dynamics = new int[params.length];
 		this.args = initNonDynamicParameters(injector);
 	}
 
@@ -47,11 +47,11 @@ public final class InjectionSite {
 		Object[] args = this.args.clone();
 		for (int j = 0; j < dynamicsLength; j++) {
 			int i = dynamics[j];
-			BoundParameter<?> p = parameters[i];
+			BoundParameter<?> p = params[i];
 			switch (p.type) {
 			case INSTANCE:
 				args[i] = instance(cases[i],
-						site.instanced(parameters[i].instance));
+						site.instanced(params[i].instance));
 				break;
 			default:
 			case EXTERNAL:
@@ -62,17 +62,17 @@ public final class InjectionSite {
 	}
 
 	private Object[] initNonDynamicParameters(Injector injector) {
-		Object[] args = new Object[parameters.length];
+		Object[] args = new Object[params.length];
 		dynamicsLength = 0;
 		for (int i = 0; i < cases.length; i++) {
 			args[i] = null;
-			BoundParameter<?> p = parameters[i];
+			BoundParameter<?> p = params[i];
 			if (p.type == ParameterType.INSTANCE
 				&& p.type().arrayDimensions() == 1) {
 				// in this case there is no single spec, the injector composes
 				// the result array from multiple specs
 				p = p.external();
-				parameters[i] = p;
+				params[i] = p;
 			}
 			switch (p.type) {
 			case INSTANCE:

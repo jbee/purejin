@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.Name;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import se.jbee.inject.UnresolvableDependency.NoCaseForDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
 
 public class TestInjectorExceptions {
@@ -24,12 +24,12 @@ public class TestInjectorExceptions {
 	private final Injector injector = Bootstrap.injector(
 			TestInjectorBundle.class);
 
-	@Test(expected = NoResourceForDependency.class)
+	@Test(expected = NoCaseForDependency.class)
 	public void thatExceptionIsThrownWhenResolvingAnUnboundDependency() {
 		injector.resolve(String.class);
 	}
 
-	@Test(expected = NoResourceForDependency.class)
+	@Test(expected = NoCaseForDependency.class)
 	public void thatExceptionIsThrownWhenResolvingAnUnboundDependencyWithBoundRawType() {
 		injector.resolve(Name.DEFAULT, Integer.class);
 	}

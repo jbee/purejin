@@ -5,7 +5,7 @@ import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.parameterTypes;
 import static se.jbee.inject.Utils.annotationPropertyByType;
-import static se.jbee.inject.Utils.arrayFirst;
+import static se.jbee.inject.Utils.arrayFindFirst;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Executable;
@@ -48,7 +48,7 @@ public interface ParameterisationMirror {
 			int named = 0;
 			for (int i = 0; i < res.length; i++) {
 				res[i] = tis[i]; // default
-				Annotation instance = arrayFirst(ais[i],
+				Annotation instance = arrayFindFirst(ais[i],
 						a -> naming == a.annotationType());
 				if (instance != null) {
 					//TODO nicer exception handling for invoke

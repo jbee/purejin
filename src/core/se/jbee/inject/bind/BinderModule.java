@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bind;
@@ -36,9 +36,8 @@ public abstract class BinderModule extends InitializedBinder
 
 	@Override
 	public final void bootstrap(Bootstrapper bootstrap) {
-		if (basis != null) {
+		if (basis != null)
 			bootstrap.install(basis);
-		}
 		bootstrap.install(this);
 	}
 

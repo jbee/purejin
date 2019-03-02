@@ -346,14 +346,12 @@ public class ConcurrentEventProcessor implements EventProcessor {
 					: null;
 			if (aggregator != null)
 				return aggregator;
-			if (raw == boolean.class || raw == Boolean.class) {
+			if (raw == boolean.class || raw == Boolean.class)
 				return (BinaryOperator<T>) ((BinaryOperator<Boolean>) (a,
 						b) -> a || b);
-			}
-			if (raw == int.class || raw == Integer.class) {
+			if (raw == int.class || raw == Integer.class)
 				return (BinaryOperator<T>) ((BinaryOperator<Integer>) (a,
 						b) -> a + b);
-			}
 			return null;
 		}
 

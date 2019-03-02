@@ -7,7 +7,7 @@ package se.jbee.inject;
 
 import static se.jbee.inject.Utils.arrayContains;
 import static se.jbee.inject.Utils.arrayEquals;
-import static se.jbee.inject.Utils.arrayFirst;
+import static se.jbee.inject.Utils.arrayFindFirst;
 import static se.jbee.inject.Utils.arrayMap;
 import static se.jbee.inject.Utils.newArray;
 
@@ -451,7 +451,7 @@ public final class Type<T>
 		if (supertype.getTypeParameters().length == 0)
 			return raw(supertype); // just for better performance 
 		@SuppressWarnings("unchecked")
-		Type<? extends S> res = (Type<? extends S>) arrayFirst(
+		Type<? extends S> res = (Type<? extends S>) arrayFindFirst(
 				type.supertypes(), s -> s.rawType == supertype);
 		if (res == null)
 			throw new IllegalArgumentException("`" + supertype

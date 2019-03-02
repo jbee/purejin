@@ -7,10 +7,12 @@ package se.jbee.inject.container;
 
 import static java.lang.System.identityHashCode;
 import static java.util.Arrays.copyOfRange;
-import static java.util.Collections.emptyList;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Scoping.scopingOf;
 import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.Utils.arrayFilter;
+import static se.jbee.inject.Utils.arrayFindFirst;
+import static se.jbee.inject.Utils.arrayFlatmap;
 import static se.jbee.inject.Utils.arrayOf;
 import static se.jbee.inject.container.Typecast.initialiserTypeOf;
 import static se.jbee.inject.container.Typecast.injectionCasesTypeFor;
@@ -34,7 +36,7 @@ import se.jbee.inject.Resource;
 import se.jbee.inject.Scope;
 import se.jbee.inject.Scoping;
 import se.jbee.inject.Type;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import se.jbee.inject.UnresolvableDependency.NoCaseForDependency;
 
 /**
  * Implements the {@link Injector} container and its {@link Generator}s.
@@ -42,6 +44,8 @@ import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Inject {
+
+	private static final InjectionCase<?>[] noCases = new InjectionCase[0];
 
 	public static Injector container(Injectee<?>... injectees) {
 		return new InjectorImpl(injectees);
@@ -62,38 +66,30 @@ public final class Inject {
 
 		private final Map<Class<?>, InjectionCase<?>[]> casesByType;
 		private final InjectionCase<?>[] wildcardCases;
-		final InjectionCase<Initialiser<?>>[] initialisersCases;
+		final InjectionCase<? extends Initialiser<?>>[] initialisersCases;
 
 		InjectorImpl(Injectee<?>... injectees) {
 			this.casesByType = initFrom(injectees);
-			this.wildcardCases = wildcardSpecs(casesByType);
+			this.wildcardCases = wildcardCases(casesByType);
 			this.initialisersCases = initInitialisers();
 		}
 
-		private InjectionCase<Initialiser<?>>[] initInitialisers() {
+		private InjectionCase<? extends Initialiser<?>>[] initInitialisers() {
 			InjectionCase<? extends Initialiser<?>>[] initCases = resolve(
 					injectionCasesTypeFor(initialiserTypeOf(Type.WILDCARD)));
-			if (initCases.length == 0) {
+			if (initCases.length == 0)
 				return null;
-			}
+			Type<Initialiser<Injector>> injectorInitType = initialiserTypeOf(
+					Injector.class);
 			Initialiser<Injector>[] injectorInitialisers = resolve(
-					initialiserTypeOf(Injector.class).addArrayDimension());
-			if (initCases.length == injectorInitialisers.length) {
-				for (Initialiser<Injector> init : injectorInitialisers)
-					init.init(this, this);
-				return null; // no other dynamic initialisers
-			}
-			List<InjectionCase<? extends Initialiser<?>>> nonInjectorInitialisers = new ArrayList<>();
-			for (InjectionCase<? extends Initialiser<?>> icase : initCases) {
-				if (!icase.resource.type().equalTo(
-						raw(Initialiser.class).parametized(Injector.class))) {
-					nonInjectorInitialisers.add(icase);
-				}
-			}
+					injectorInitType.addArrayDimension());
 			// run initialisers for the injector
 			for (Initialiser<Injector> init : injectorInitialisers)
 				init.init(this, this);
-			return toArray(nonInjectorInitialisers, raw(InjectionCase.class));
+			if (initCases.length == injectorInitialisers.length)
+				return null; // no other dynamic initialisers
+			return arrayFilter(initCases,
+					c -> !c.type().equalTo(injectorInitType));
 		}
 
 		private <T> Map<Class<?>, InjectionCase<?>[]> initFrom(
@@ -113,30 +109,31 @@ public final class Inject {
 						injectee.resource(), gen);
 			}
 			Arrays.sort(cases);
-			Map<Class<?>, InjectionCase<?>[]> map = new IdentityHashMap<>(
+			Map<Class<?>, InjectionCase<?>[]> casesByType = new IdentityHashMap<>(
 					cases.length);
 			if (cases.length == 0)
-				return map;
-			Class<?> lastRawType = cases[0].resource.type().rawType;
+				return casesByType;
+			Class<?> lastRawType = cases[0].type().rawType;
 			int start = 0;
 			for (int i = 0; i < cases.length; i++) {
-				Class<?> rawType = cases[i].resource.type().rawType;
+				Class<?> rawType = cases[i].type().rawType;
 				if (rawType != lastRawType) {
-					map.put(lastRawType, copyOfRange(cases, start, i));
+					casesByType.put(lastRawType, copyOfRange(cases, start, i));
 					start = i;
 				}
 				lastRawType = rawType;
 			}
-			map.put(lastRawType, copyOfRange(cases, start, cases.length));
-			return map;
+			casesByType.put(lastRawType,
+					copyOfRange(cases, start, cases.length));
+			return casesByType;
 		}
 
-		private static InjectionCase<?>[] wildcardSpecs(
+		private static InjectionCase<?>[] wildcardCases(
 				Map<Class<?>, InjectionCase<?>[]> cases) {
 			List<InjectionCase<?>> res = new ArrayList<>();
 			for (InjectionCase<?>[] casesForType : cases.values()) {
 				for (InjectionCase<?> icase : casesForType) {
-					if (icase.resource.type().isUpperBound())
+					if (icase.type().isUpperBound())
 						res.add(icase);
 				}
 			}
@@ -162,6 +159,7 @@ public final class Inject {
 		@Override
 		public <T> T resolve(Dependency<T> dep) {
 			//TODO new feature: resolve by annotation type -> as addon with own API that does its type analysis on basis of specs
+			//TODO new feature: allow to resolve Generator and Generator[] by first resolving the case/cases and mapping that to generator(s)
 			final Type<T> type = dep.type();
 			if (type.rawType == InjectionCase.class) {
 				InjectionCase<?> res = injectionCaseMatching(
@@ -186,15 +184,10 @@ public final class Inject {
 		 */
 		@SuppressWarnings("unchecked")
 		private <T> T resolveFromUpperBound(Dependency<T> dep) {
-			final Type<T> type = dep.type();
-			if (wildcardCases != null) {
-				for (int i = 0; i < wildcardCases.length; i++) {
-					InjectionCase<?> res = wildcardCases[i];
-					if (type.isAssignableTo(res.resource.type()))
-						return (T) res.generator.yield(
-								(Dependency<Object>) dep);
-				}
-			}
+			InjectionCase<?> match = arrayFindFirst(wildcardCases,
+					c -> dep.type().isAssignableTo(c.type()));
+			if (match != null)
+				return (T) match.generator.yield((Dependency<Object>) dep);
 			throw noCaseFor(dep);
 		}
 
@@ -204,27 +197,21 @@ public final class Inject {
 
 		private static <T> InjectionCase<T> mostQualifiedMatch(
 				InjectionCase<T>[] cases, Dependency<T> dep) {
-			if (cases == null)
-				return null;
-			for (int i = 0; i < cases.length; i++) {
-				InjectionCase<T> icase = cases[i];
-				if (icase.resource.isMatching(dep))
-					return icase;
-			}
-			return null;
+			return arrayFindFirst(cases,
+					icase -> icase.resource.isMatching(dep));
 		}
 
-		private <T> NoResourceForDependency noCaseFor(Dependency<T> dep) {
-			return new NoResourceForDependency(dep,
+		private <T> NoCaseForDependency noCaseFor(Dependency<T> dep) {
+			return new NoCaseForDependency(dep,
 					injectionCasesForType(dep.type()), "");
 		}
 
+		@SuppressWarnings("unchecked")
 		private <T, E> T resolveArray(Dependency<T> dep, Type<E> elemType) {
-			if (elemType.rawType == InjectionCase.class) {
-				return resolveCaseArray(dep, elemType.parameter(0));
-			}
+			if (elemType.rawType == InjectionCase.class)
+				return (T) resolveCaseArray(dep, elemType.parameter(0));
 			if (dep.type().rawType.getComponentType().isPrimitive()) {
-				throw new NoResourceForDependency(dep, null,
+				throw new NoCaseForDependency(dep, null,
 						"Primitive arrays cannot be used to inject all instances of the wrapper type. Use the wrapper array instead.");
 			}
 			Set<Integer> identities = new HashSet<>();
@@ -239,7 +226,6 @@ public final class Inject {
 			List<E> elements = new ArrayList<>();
 			for (Entry<Class<?>, InjectionCase<?>[]> e : casesByType.entrySet()) {
 				if (Type.raw(e.getKey()).isAssignableTo(elemType)) {
-					@SuppressWarnings("unchecked")
 					InjectionCase<? extends E>[] icase = (InjectionCase<? extends E>[]) e.getValue();
 					addAllMatching(elements, identities, dep, elemType, icase);
 				}
@@ -247,33 +233,29 @@ public final class Inject {
 			return toArray(elements, elemType);
 		}
 
-		private <T, I> T resolveCaseArray(Dependency<T> dep,
-				Type<I> instanceType) {
-			Dependency<I> instanceDep = dep.typed(instanceType);
-			if (instanceType.isUpperBound()) {
+		private <T, G> InjectionCase<G>[] resolveCaseArray(Dependency<T> dep,
+				Type<G> generatedType) {
+			Dependency<G> generatedTypeDep = dep.typed(generatedType);
+			if (generatedType.isUpperBound()) {
 				List<InjectionCase<?>> res = new ArrayList<>();
 				for (Entry<Class<?>, InjectionCase<?>[]> e : casesByType.entrySet()) {
-					if (raw(e.getKey()).isAssignableTo(instanceType)) {
+					if (raw(e.getKey()).isAssignableTo(generatedType)) {
 						@SuppressWarnings("unchecked")
-						InjectionCase<? extends I>[] casesForType = (InjectionCase<? extends I>[]) e.getValue();
-						for (InjectionCase<? extends I> icase : casesForType) {
-							if (icase.resource.isCompatibleWith(instanceDep)) {
+						InjectionCase<? extends G>[] casesForType = (InjectionCase<? extends G>[]) e.getValue();
+						for (InjectionCase<? extends G> icase : casesForType) {
+							if (icase.resource.isCompatibleWith(
+									generatedTypeDep))
 								res.add(icase);
-							}
 						}
 					}
 				}
 				return toArray(res, raw(InjectionCase.class));
 			}
-			InjectionCase<I>[] res = injectionCasesForType(instanceType);
-			if (res == null)
-				return toArray(emptyList(), raw(InjectionCase.class));
-			List<InjectionCase<I>> elements = new ArrayList<>(res.length);
-			for (InjectionCase<I> s : res) {
-				if (s.resource.isCompatibleWith(instanceDep))
-					elements.add(s);
-			}
-			return toArray(elements, raw(InjectionCase.class));
+			InjectionCase<G>[] cases = injectionCasesForType(generatedType);
+			if (cases == null)
+				return (InjectionCase<G>[]) noCases;
+			return arrayFilter(cases,
+					c -> c.resource.isCompatibleWith(generatedTypeDep));
 		}
 
 		private static <E, T> void addAllMatching(List<E> elements,
@@ -290,6 +272,7 @@ public final class Inject {
 			}
 		}
 
+		@Deprecated // TODO replace with Utils
 		@SuppressWarnings("unchecked")
 		private static <T, E> T toArray(List<? extends E> elements,
 				Type<E> elementType) {
@@ -304,12 +287,10 @@ public final class Inject {
 		@Override
 		public String toString() {
 			StringBuilder b = new StringBuilder();
-			for (Entry<Class<?>, InjectionCase<?>[]> e : casesByType.entrySet()) {
+			for (Entry<Class<?>, InjectionCase<?>[]> e : casesByType.entrySet())
 				toString(b, e.getKey().toString(), e.getValue());
-			}
-			if (wildcardCases != null) {
+			if (wildcardCases != null)
 				toString(b, "? extends *", wildcardCases);
-			}
 			return b.toString();
 		}
 
@@ -338,7 +319,7 @@ public final class Inject {
 		private final Scoping scoping;
 
 		private Class<?> cachedForType;
-		private List<Initialiser<? super T>> cachedInitialisers;
+		private Initialiser<? super T>[] cachedInitialisers;
 
 		InjectorGenerator(int serialID, InjectorImpl injector,
 				Repository repository, Injectee<T> injectee, Scoping scoping) {
@@ -356,14 +337,15 @@ public final class Inject {
 					scoping);
 			return repository.serve(serialID, injected, () -> {
 				T instance = supplier.supply(injected, injector);
-				if (instance != null && injector.initialisersCases != null) {
+				if (instance != null && injector.initialisersCases != null)
 					dynamicInitialisationOf(instance, injected);
-				}
 				return instance;
 			});
 		}
 
 		//TODO maybe add support for annotation - revolve Initialiser bound for Annotation class.
+
+		@SuppressWarnings("unchecked")
 		private void dynamicInitialisationOf(T instance,
 				Dependency<?> context) {
 			Class<?> type = instance.getClass();
@@ -373,21 +355,13 @@ public final class Inject {
 			}
 			if (type != cachedForType) {
 				cachedForType = type;
-				for (InjectionCase<? extends Initialiser<?>> icase : injector.initialisersCases) {
-					Initialiser<? super T> initialiser = initialiser(type,
-							icase, context);
-					if (initialiser != null) {
-						if (cachedInitialisers == null) {
-							cachedInitialisers = new ArrayList<>();
-						}
-						cachedInitialisers.add(initialiser);
-					}
-				}
+				cachedInitialisers = arrayFlatmap(injector.initialisersCases,
+						Initialiser.class,
+						icase -> initialiser(type, icase, context));
 			}
-			if (cachedInitialisers != null) {
+			if (cachedInitialisers.length > 0)
 				for (Initialiser<? super T> i : cachedInitialisers)
 					i.init(instance, injector);
-			}
 		}
 
 		@SuppressWarnings("unchecked")
@@ -398,10 +372,9 @@ public final class Inject {
 				return null;
 			// this is not 100% generic as instance the type is derived from itself could be generic in a relevant way
 			// e.g. if List<String> should be initialised but not List<Integer> we just check for List here and fail later on
-			if (raw(type).isAssignableTo(initialiser.type().parameter(0))) {
+			if (raw(type).isAssignableTo(initialiser.type().parameter(0)))
 				return (Initialiser<? super T>) icase.generator.yield(
 						dependency(initialiser.instance));
-			}
 			return null;
 		}
 	}

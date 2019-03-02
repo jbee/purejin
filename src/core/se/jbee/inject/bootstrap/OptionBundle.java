@@ -1,14 +1,16 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
 
 import se.jbee.inject.bootstrap.Bootstrapper.OptionBootstrapper;
+import se.jbee.inject.config.Options;
 
 /**
- * A {@link Bundle} that does different installation for different options.
+ * A {@link Bundle} that does different installation for different
+ * {@link Options}.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  * 
