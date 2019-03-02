@@ -28,7 +28,6 @@ public class TestSerializable {
 	public void nameIsSerializable() {
 		assertSerializable(Name.ANY);
 		assertSerializable(Name.DEFAULT);
-		assertSerializable(Name.WILDCARD);
 		assertSerializable(Name.named("foo"));
 	}
 

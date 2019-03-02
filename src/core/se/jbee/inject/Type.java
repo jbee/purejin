@@ -1,12 +1,12 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
 
 import java.io.Serializable;
-import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
@@ -33,7 +33,7 @@ import java.util.Set;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Type<T>
-		implements MoreApplicableThan<Type<?>>, Parameter<T>, Serializable {
+		implements Qualifying<Type<?>>, Parameter<T>, Serializable {
 
 	public static final Type<Object> OBJECT = Type.raw(Object.class);
 	public static final Type<Void> VOID = raw(Void.class);
@@ -47,12 +47,8 @@ public final class Type<T>
 		return type(method.getGenericReturnType());
 	}
 
-	public static Type<?>[] parameterTypes(Constructor<?> constructor) {
-		return parameterTypes(constructor.getGenericParameterTypes());
-	}
-
-	public static Type<?>[] parameterTypes(Method method) {
-		return parameterTypes(method.getGenericParameterTypes());
+	public static Type<?>[] parameterTypes(Executable methodOrConstructor) {
+		return parameterTypes(methodOrConstructor.getGenericParameterTypes());
 	}
 
 	private static Type<?>[] parameterTypes(
@@ -325,7 +321,7 @@ public final class Type<T>
 	}
 
 	@Override
-	public boolean moreApplicableThan(Type<?> other) {
+	public boolean moreQualiedThan(Type<?> other) {
 		if (!rawType.isAssignableFrom(other.rawType)) {
 			return true;
 		}
@@ -347,11 +343,11 @@ public final class Type<T>
 
 	private boolean moreApplicableParametersThan(Type<?> other) {
 		if (params.length == 1) {
-			return params[0].moreApplicableThan(other.params[0]);
+			return params[0].moreQualiedThan(other.params[0]);
 		}
 		int morePrecise = 0;
 		for (int i = 0; i < params.length; i++) {
-			if (params[i].moreApplicableThan(other.params[0])) {
+			if (params[i].moreQualiedThan(other.params[0])) {
 				morePrecise++;
 			}
 		}

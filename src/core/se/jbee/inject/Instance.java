@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -17,7 +17,7 @@ import java.io.Serializable;
  *
  */
 public final class Instance<T>
-		implements Parameter<T>, MoreApplicableThan<Instance<?>>, Serializable {
+		implements Parameter<T>, Qualifying<Instance<?>>, Serializable {
 
 	/**
 	 * When a wildcard-type is used as bound instance type the bind will be
@@ -92,22 +92,9 @@ public final class Instance<T>
 	}
 
 	@Override
-	public boolean moreApplicableThan(Instance<?> other) {
-		// sequence in OR is very important!!!
-		return moreApplicableThan2(type, other.type, name, other.name);
-	}
-
-	public static <T extends MoreApplicableThan<? super T>> int compareApplicability(
-			T one, T other) {
-		return one.moreApplicableThan(other)
-			? -1
-			: other.moreApplicableThan(one) ? 1 : 0;
-	}
-
-	public static <T extends MoreApplicableThan<? super T>, T2 extends MoreApplicableThan<? super T2>> boolean moreApplicableThan2(
-			T a1, T a2, T2 b1, T2 b2) {
-		return a1.moreApplicableThan(a2) //
-			|| !a2.moreApplicableThan(a1) && b1.moreApplicableThan(b2);
+	public boolean moreQualiedThan(Instance<?> other) {
+		return Qualifying.compareRelated(type, other.type,
+				name, other.name);
 	}
 
 }

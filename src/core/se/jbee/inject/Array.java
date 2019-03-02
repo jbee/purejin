@@ -17,7 +17,7 @@ import java.util.function.Predicate;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public final class Array {
+public final class Array { //TODO rename to Utils and collect all lang level utility functions 
 
 	public static <T> T[] filter(T[] array, Predicate<T> filter) {
 		if (array == null || array.length == 0)
@@ -54,6 +54,15 @@ public final class Array {
 
 	public static <T> T[] array(Collection<? extends T> list, Class<T> type) {
 		return list.toArray(newInstance(type, list.size()));
+	}
+
+	public static <T> T first(T[] array, Predicate<T> test) {
+		if (array == null || array.length == 0)
+			return null;
+		for (int i = 0; i < array.length; i++)
+			if (test.test(array[i]))
+				return array[i];
+		return null;
 	}
 
 	public static <T> boolean contains(T[] array, T e, BiPredicate<T, T> test) {

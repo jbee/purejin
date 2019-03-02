@@ -5,8 +5,8 @@ import static org.junit.Assert.assertTrue;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.config.NamingMirror.annotatedAsValueOf;
-import static se.jbee.inject.config.ParameterisationMirror.namesAnnotatedAsValueOf;
+import static se.jbee.inject.config.NamingMirror.defaultName;
+import static se.jbee.inject.config.ParameterisationMirror.noParameters;
 import static se.jbee.inject.config.ProductionMirror.allMethods;
 import static se.jbee.inject.container.Typecast.providerTypeOf;
 
@@ -187,7 +187,7 @@ public class TestStateDependentBinds {
 			bind(named((Object) null), Validator.class).to(Permissive.class);
 
 			// the below is just *a* example - it is just important to provide the 'value' per injection
-			produces(allMethods.returnTypeAssignableTo(
+			produceBy(allMethods.returnTypeAssignableTo(
 					raw(ValidationStrength.class))).per(
 							Scoped.INJECTION).autobind().in(
 									StatefulObject.class);
@@ -219,7 +219,7 @@ public class TestStateDependentBinds {
 			bind(named((Object) null), Validator.class).to(Permissive.class);
 
 			// the below is just *a* example - it is just important to provide the 'value' per injection
-			produces(allMethods.returnTypeAssignableTo(
+			produceBy(allMethods.returnTypeAssignableTo(
 					raw(ValidationStrength.class))).per(
 							Scoped.INJECTION).autobind().in(
 									StatefulObject.class);
@@ -239,9 +239,9 @@ public class TestStateDependentBinds {
 
 			// the below is just *a* example - it is just important to provide the 'value' per injection
 			// @formatter:off
-			produces(allMethods.returnTypeAssignableTo(raw(int.class)))
-				.names(annotatedAsValueOf(Resource.class))
-				.parameterises(namesAnnotatedAsValueOf(Resource.class))
+			produceBy(allMethods.returnTypeAssignableTo(raw(int.class)))
+				.nameBy(defaultName.orAnnotatedBy(Resource.class))
+				.parameteriseBy(noParameters.orNamesAnnotatedBy(Resource.class))
 				.per(Scoped.INJECTION)
 				.autobind().in(StatefulObject.class);
 			// @formatter:on

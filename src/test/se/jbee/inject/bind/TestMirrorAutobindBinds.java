@@ -5,8 +5,8 @@ import static org.junit.Assert.assertSame;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Packages.packageAndSubPackagesOf;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.config.NamingMirror.annotatedAsValueOf;
-import static se.jbee.inject.config.ParameterisationMirror.namesAnnotatedAsValueOf;
+import static se.jbee.inject.config.NamingMirror.defaultName;
+import static se.jbee.inject.config.ParameterisationMirror.noParameters;
 import static se.jbee.inject.config.ProductionMirror.allMethods;
 import static se.jbee.inject.container.Typecast.providerTypeOf;
 
@@ -39,21 +39,21 @@ public class TestMirrorAutobindBinds {
 
 		@Override
 		protected void declare() {
-			produces(allMethods).autobind().inModule();
+			produceBy(allMethods).autobind().inModule();
 			// @formatter:off
-			produces(allMethods.annotatedWith(WebMethod.class))
-				.names(annotatedAsValueOf(Resource.class))
-				.parameterises(namesAnnotatedAsValueOf(Resource.class))
+			produceBy(allMethods.annotatedWith(WebMethod.class))
+				.nameBy(defaultName.orAnnotatedBy(Resource.class))
+				.parameteriseBy(noParameters.orNamesAnnotatedBy(Resource.class))
 				.autobind().in(Implementor1.class);
 			// @formatter:on
-			produces(allMethods.returnTypeAssignableTo(
+			produceBy(allMethods.returnTypeAssignableTo(
 					raw(Provider.class))).autobind().in(Implementor2.class);
-			produces(allMethods.returnTypeIn(
+			produceBy(allMethods.returnTypeIn(
 					packageAndSubPackagesOf(Injector.class))).autobind().in(
 							Implementor3.class);
-			produces(allMethods).per(Scoped.APPLICATION).autobind().in(
+			produceBy(allMethods).per(Scoped.APPLICATION).autobind().in(
 					new Implementor4(STATE));
-			produces(allMethods).per(Scoped.INJECTION).autobind().in(
+			produceBy(allMethods).per(Scoped.INJECTION).autobind().in(
 					FactoryImpl.class);
 		}
 

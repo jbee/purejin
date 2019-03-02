@@ -6,7 +6,6 @@
 package se.jbee.inject.bootstrap;
 
 import static se.jbee.inject.Array.array;
-import static se.jbee.inject.Instance.compareApplicability;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +15,7 @@ import java.util.Set;
 
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.InconsistentBinding;
+import se.jbee.inject.Qualifying;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Scope;
 import se.jbee.inject.Source;
@@ -109,13 +109,15 @@ public final class Binding<T>
 				other.resource.type().rawType.getCanonicalName());
 		if (res != 0)
 			return res;
-		res = compareApplicability(resource.instance, other.resource.instance);
+		res = Qualifying.compare(resource.instance,
+				other.resource.instance);
 		if (res != 0)
 			return res;
-		res = compareApplicability(resource.target, other.resource.target);
+		res = Qualifying.compare(resource.target,
+				other.resource.target);
 		if (res != 0)
 			return res;
-		res = compareApplicability(source, other.source);
+		res = Qualifying.compare(source, other.source);
 		if (res != 0)
 			return res;
 		return -1; // keep order

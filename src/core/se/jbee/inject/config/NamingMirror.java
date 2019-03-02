@@ -1,7 +1,11 @@
 package se.jbee.inject.config;
 
+import static se.jbee.inject.InconsistentBinding.noSuchAnnotationProperty;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import se.jbee.inject.Name;
 
@@ -16,9 +20,27 @@ public interface NamingMirror {
 
 	NamingMirror defaultName = obj -> Name.DEFAULT;
 
-	static NamingMirror annotatedAsValueOf(
-			Class<? extends Annotation> annotation) {
-		return obj -> Name.namedBy(annotation, obj);
+	default NamingMirror orAnnotatedBy(Class<? extends Annotation> naming) {
+		if (naming == null)
+			return this;
+		Method nameProperty = Annotations.methodReturning(String.class, naming);
+		if (nameProperty == null)
+			throw noSuchAnnotationProperty(String.class, naming);
+		return obj -> {
+			try {
+				if (!obj.isAnnotationPresent(naming))
+					return this.reflect(obj);
+				String name = (String) nameProperty.invoke(
+						obj.getAnnotation(naming));
+				if (!name.isEmpty()
+					&& !name.equals(nameProperty.getDefaultValue()))
+					return Name.named(name);
+				return this.reflect(obj);
+			} catch (IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException e) {
+				return this.reflect(obj);
+			}
+		};
 	}
 
 }

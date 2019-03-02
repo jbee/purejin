@@ -20,7 +20,7 @@ import java.io.Serializable;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public final class Target implements MoreApplicableThan<Target>, Serializable {
+public final class Target implements Qualifying<Target>, Serializable {
 
 	public static final Target ANY = targeting(Instance.ANY);
 
@@ -137,20 +137,20 @@ public final class Target implements MoreApplicableThan<Target>, Serializable {
 	}
 
 	@Override
-	public boolean moreApplicableThan(Target other) {
+	public boolean moreQualiedThan(Target other) {
 		final int ol = other.parents.depth();
 		final int l = parents.depth();
 		if (ol != l)
 			return l > ol;
 		if (l > 0) { // length is known to be equal
-			if (parents.moreApplicableThan(other.parents)) {
+			if (parents.moreQualiedThan(other.parents)) {
 				return true;
 			}
-			if (other.parents.moreApplicableThan(parents)) {
+			if (other.parents.moreQualiedThan(parents)) {
 				return false;
 			}
 		}
-		return Instance.moreApplicableThan2(instance, other.instance, packages,
+		return Qualifying.compareRelated(instance, other.instance, packages,
 				other.packages);
 	}
 

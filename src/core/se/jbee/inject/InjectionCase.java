@@ -5,8 +5,6 @@
  */
 package se.jbee.inject;
 
-import static se.jbee.inject.Instance.compareApplicability;
-
 /**
  * A {@link InjectionCase} describes a injection situation or scenario through
  * its {@link #resource} and {@link #scoping}. If the {@link InjectionCase}
@@ -18,7 +16,7 @@ import static se.jbee.inject.Instance.compareApplicability;
  * @param <T> type of instances yielded by the {@link #generator}.
  */
 public final class InjectionCase<T> implements Comparable<InjectionCase<?>>,
-		MoreApplicableThan<InjectionCase<?>> {
+		Qualifying<InjectionCase<?>> {
 
 	public final Generator<T> generator;
 
@@ -73,11 +71,11 @@ public final class InjectionCase<T> implements Comparable<InjectionCase<?>>,
 				return -1;
 			return c1.getCanonicalName().compareTo(c2.getCanonicalName());
 		}
-		return compareApplicability(r1, r2);
+		return Qualifying.compare(r1, r2);
 	}
 
 	@Override
-	public boolean moreApplicableThan(InjectionCase<?> other) {
-		return resource.moreApplicableThan(other.resource);
+	public boolean moreQualiedThan(InjectionCase<?> other) {
+		return resource.moreQualiedThan(other.resource);
 	}
 }

@@ -5,13 +5,7 @@
  */
 package se.jbee.inject;
 
-import static se.jbee.inject.Array.array;
-import static se.jbee.inject.Instance.instance;
-
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * {@linkplain Parameter}s are *not* about to find/identify the
@@ -43,17 +37,6 @@ import java.util.List;
  */
 public interface Parameter<T> extends Typed<T> {
 
-	Parameter<?>[] NO_PARAMETERS = new Parameter<?>[0];
+	Parameter<?>[] noParameters = new Parameter<?>[0];
 
-	static Parameter<?>[] parametersFor(Type<?>[] types,
-			Annotation[][] annotations, Class<? extends Annotation> namedby) {
-		List<Parameter<?>> res = new ArrayList<>();
-		for (int i = 0; i < annotations.length; i++) {
-			Name name = Name.namedBy(namedby, annotations[i]);
-			if (!name.isDefault()) {
-				res.add(instance(name, types[i]));
-			}
-		}
-		return array(res, Parameter.class);
-	}
 }

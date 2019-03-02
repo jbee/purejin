@@ -1,9 +1,11 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
+
+import java.lang.annotation.Annotation;
 
 /**
  * If there is a statically resolvable problem with a binding (resource in the
@@ -15,8 +17,14 @@ package se.jbee.inject;
  */
 public final class InconsistentBinding extends RuntimeException {
 
-	public InconsistentBinding(String message) {
-		super(message);
+	public InconsistentBinding(String msg) {
+		super(msg);
 	}
 
+	public static InconsistentBinding noSuchAnnotationProperty(
+			Class<?> property, Class<? extends Annotation> type) {
+		return new InconsistentBinding(type.getSimpleName()
+			+ " was expected to have a property of type: "
+			+ property.getSimpleName());
+	}
 }

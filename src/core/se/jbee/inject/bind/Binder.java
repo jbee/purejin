@@ -74,6 +74,10 @@ public class Binder {
 					// Bind properties - do not access field directly
 	}
 
+	protected final Bindings bindings() {
+		return bind().bindings;
+	}
+
 	public <E> TypedElementBinder<E> arraybind(Class<E[]> type) {
 		return new TypedElementBinder<>(bind(), defaultInstanceOf(raw(type)));
 	}
@@ -307,7 +311,7 @@ public class Binder {
 		}
 
 		private Bindings bindings() {
-			return binder.bind().bindings;
+			return binder.bindings();
 		}
 
 		public void in(Class<?> service) {
@@ -315,11 +319,11 @@ public class Binder {
 		}
 
 		public void in(Object service, Parameter<?>... params) {
-			bindMethodsIn(service.getClass(), service, params);
+			bindMirrorMethodsIn(service.getClass(), service, params);
 		}
 
 		public void in(Class<?> service, Parameter<?>... params) {
-			boolean boundInstanceMethods = bindMethodsIn(service, null, params);
+			boolean boundInstanceMethods = bindMirrorMethodsIn(service, null, params);
 			if (!boundInstanceMethods)
 				return; // do not try to construct the class
 			Constructor<?> c = bindings().construction.reflect(service);
@@ -328,11 +332,11 @@ public class Binder {
 			}
 		}
 
-		private boolean bindMethodsIn(Class<?> implementer, Object instance,
+		private boolean bindMirrorMethodsIn(Class<?> impl, Object instance,
 				Parameter<?>[] params) {
 			boolean instanceMethods = false;
 			Bindings bindings = bindings();
-			for (Method method : bindings.production.reflect(implementer)) {
+			for (Method method : bindings.production.reflect(impl)) {
 				Type<?> returnType = Type.returnType(method);
 				//TODO why do this check below???
 				if (!Type.VOID.equalTo(returnType)) {
@@ -368,9 +372,8 @@ public class Binder {
 
 		public void in(Class<?> impl, Class<?>... more) {
 			in(impl);
-			for (Class<?> i : more) {
+			for (Class<?> i : more)
 				in(i);
-			}
 		}
 
 		public void inModule() {
@@ -391,29 +394,36 @@ public class Binder {
 		/**
 		 * @since 19.1
 		 */
-		public RootBinder constructs(ConstructionMirror reflector) {
-			return on(bind().into(bind().bindings.with(reflector)));
+		public RootBinder constructBy(ConstructionMirror reflector) {
+			return into(bindings().with(reflector));
 		}
 
 		/**
 		 * @since 19.1
 		 */
-		public RootBinder produces(ProductionMirror reflector) {
-			return on(bind().into(bind().bindings.with(reflector)));
+		public RootBinder produceBy(ProductionMirror reflector) {
+			return into(bindings().with(reflector));
 		}
 
 		/**
 		 * @since 19.1
 		 */
-		public RootBinder parameterises(ParameterisationMirror reflector) {
-			return on(bind().into(bind().bindings.with(reflector)));
+		public RootBinder parameteriseBy(ParameterisationMirror reflector) {
+			return into(bindings().with(reflector));
 		}
 
 		/**
 		 * @since 19.1
 		 */
-		public RootBinder names(NamingMirror reflector) {
-			return on(bind().into(bind().bindings.with(reflector)));
+		public RootBinder nameBy(NamingMirror reflector) {
+			return into(bindings().with(reflector));
+		}
+
+		/**
+		 * @since 19.1
+		 */
+		public RootBinder into(Bindings bindings) {
+			return on(bind().into(bindings));
 		}
 
 		public RootBinder asDefault() {
@@ -563,7 +573,7 @@ public class Binder {
 		}
 
 		private void declareBindingsIn(Binding<?> binding, Object value) {
-			Bindings bindings = bind().bindings;
+			Bindings bindings = bindings();
 			bindings.macros.expandInto(bindings, binding, value);
 		}
 
@@ -602,7 +612,7 @@ public class Binder {
 		}
 
 		public void toConstructor() {
-			to(bind().bindings.construction.reflect(resource.type().rawType));
+			to(bindings().construction.reflect(resource.type().rawType));
 		}
 
 		public void toConstructor(Class<? extends T> impl,
@@ -611,7 +621,7 @@ public class Binder {
 				throw new InconsistentBinding(
 						"Not a constructable type: " + impl);
 			}
-			to(bind().bindings.construction.reflect(impl), params);
+			to(bindings().construction.reflect(impl), params);
 		}
 
 		public void toConstructor(Parameter<?>... params) {
@@ -651,6 +661,10 @@ public class Binder {
 
 		final Bind bind() {
 			return bind;
+		}
+
+		protected final Bindings bindings() {
+			return bind().bindings;
 		}
 
 		protected final Type<T> getType() {

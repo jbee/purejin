@@ -16,7 +16,7 @@ import org.junit.Test;
 public class TestMoreApplicable {
 
 	static class HigherNumberIsMoreApplicable
-			implements MoreApplicableThan<HigherNumberIsMoreApplicable> {
+			implements Qualifying<HigherNumberIsMoreApplicable> {
 
 		final int value;
 
@@ -25,7 +25,7 @@ public class TestMoreApplicable {
 		}
 
 		@Override
-		public boolean moreApplicableThan(HigherNumberIsMoreApplicable other) {
+		public boolean moreQualiedThan(HigherNumberIsMoreApplicable other) {
 			return value > other.value;
 		}
 
@@ -37,17 +37,17 @@ public class TestMoreApplicable {
 
 	@Test
 	public void thatMoreApplicabilityEvalsToTrue() {
-		assertTrue(hip(2).moreApplicableThan(hip(1)));
+		assertTrue(hip(2).moreQualiedThan(hip(1)));
 	}
 
 	@Test
 	public void thatEqualApplicabilityEvalsToFalse() {
-		assertFalse(hip(2).moreApplicableThan(hip(2)));
+		assertFalse(hip(2).moreQualiedThan(hip(2)));
 	}
 
 	@Test
 	public void thatLessApplicabilityEvalsToFalse() {
-		assertFalse(hip(1).moreApplicableThan(hip(2)));
+		assertFalse(hip(1).moreQualiedThan(hip(2)));
 	}
 
 	@Test
@@ -78,12 +78,12 @@ public class TestMoreApplicable {
 
 	@Test
 	public void thatUnnamedIsMoreApplicableThanNamed() {
-		assertTrue(Name.DEFAULT.moreApplicableThan(named("foo")));
+		assertTrue(Name.DEFAULT.moreQualiedThan(named("foo")));
 	}
 
 	@Test
 	public void thatNamedIsNotMoreApplicableThanUnnamed() {
-		assertFalse(named("bar").moreApplicableThan(Name.DEFAULT));
+		assertFalse(named("bar").moreQualiedThan(Name.DEFAULT));
 	}
 
 	@Test
@@ -112,7 +112,7 @@ public class TestMoreApplicable {
 	public void thatApplicablityIsGivenByOrdinalStartingWithLowest() {
 		DeclarationType[] types = DeclarationType.values();
 		for (int i = 1; i < types.length; i++) {
-			assertTrue(types[i].moreApplicableThan(types[i - 1]));
+			assertTrue(types[i].moreQualiedThan(types[i - 1]));
 		}
 	}
 
@@ -123,21 +123,21 @@ public class TestMoreApplicable {
 				source.typed(DeclarationType.AUTO));
 	}
 
-	private static <T extends MoreApplicableThan<? super T>> void assertMoreApplicable(
+	private static <T extends Qualifying<? super T>> void assertMoreApplicable(
 			T morePrecise, T lessPrecise) {
-		assertTrue(morePrecise.moreApplicableThan(lessPrecise));
-		assertFalse(lessPrecise.moreApplicableThan(morePrecise));
+		assertTrue(morePrecise.moreQualiedThan(lessPrecise));
+		assertFalse(lessPrecise.moreQualiedThan(morePrecise));
 	}
 
-	private static <T extends MoreApplicableThan<? super T>> void assertNotMoreApplicableThanItself(
+	private static <T extends Qualifying<? super T>> void assertNotMoreApplicableThanItself(
 			T type) {
-		assertFalse(type.moreApplicableThan(type));
-		assertEquals(0, Instance.compareApplicability(type, type));
+		assertFalse(type.moreQualiedThan(type));
+		assertEquals(0, Qualifying.compare(type, type));
 	}
 
-	public static <T extends MoreApplicableThan<? super T>> Comparator<T> comparator(
+	public static <T extends Qualifying<? super T>> Comparator<T> comparator(
 			@SuppressWarnings("unused") Class<T> cls) {
-		return (one, other) -> Instance.compareApplicability(one, other);
+		return (one, other) -> Qualifying.compare(one, other);
 	}
 
 }

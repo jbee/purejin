@@ -199,10 +199,10 @@ public final class Inject {
 		}
 
 		private <T> InjectionCase<T> injectionCaseMatching(Dependency<T> dep) {
-			return mostApplicableMatch(injectionCasesForType(dep.type()), dep);
+			return mostQualifiedMatch(injectionCasesForType(dep.type()), dep);
 		}
 
-		private static <T> InjectionCase<T> mostApplicableMatch(
+		private static <T> InjectionCase<T> mostQualifiedMatch(
 				InjectionCase<T>[] cases, Dependency<T> dep) {
 			if (cases == null)
 				return null;
@@ -219,34 +219,32 @@ public final class Inject {
 					injectionCasesForType(dep.type()), "");
 		}
 
-		private <T, E> T resolveArray(Dependency<T> dep, Type<E> elementType) {
-			if (elementType.rawType == InjectionCase.class) {
-				return resolveCaseArray(dep, elementType.parameter(0));
+		private <T, E> T resolveArray(Dependency<T> dep, Type<E> elemType) {
+			if (elemType.rawType == InjectionCase.class) {
+				return resolveCaseArray(dep, elemType.parameter(0));
 			}
 			if (dep.type().rawType.getComponentType().isPrimitive()) {
 				throw new NoResourceForDependency(dep, null,
 						"Primitive arrays cannot be used to inject all instances of the wrapper type. Use the wrapper array instead.");
 			}
 			Set<Integer> identities = new HashSet<>();
-			if (!elementType.isUpperBound()) {
+			if (!elemType.isUpperBound()) {
 				List<E> elements = new ArrayList<>();
-				InjectionCase<E>[] elementCases = injectionCasesForType(
-						elementType);
-				if (elementCases != null)
-					addAllMatching(elements, identities, dep, elementType,
-							elementCases);
-				return toArray(elements, elementType);
+				InjectionCase<E>[] elemCases = injectionCasesForType(elemType);
+				if (elemCases != null)
+					addAllMatching(elements, identities, dep, elemType,
+							elemCases);
+				return toArray(elements, elemType);
 			}
 			List<E> elements = new ArrayList<>();
 			for (Entry<Class<?>, InjectionCase<?>[]> e : casesByType.entrySet()) {
-				if (Type.raw(e.getKey()).isAssignableTo(elementType)) {
+				if (Type.raw(e.getKey()).isAssignableTo(elemType)) {
 					@SuppressWarnings("unchecked")
 					InjectionCase<? extends E>[] icase = (InjectionCase<? extends E>[]) e.getValue();
-					addAllMatching(elements, identities, dep, elementType,
-							icase);
+					addAllMatching(elements, identities, dep, elemType, icase);
 				}
 			}
-			return toArray(elements, elementType);
+			return toArray(elements, elemType);
 		}
 
 		private <T, I> T resolveCaseArray(Dependency<T> dep,

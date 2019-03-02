@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -18,7 +18,7 @@ import java.io.Serializable;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Resource<T>
-		implements Typed<T>, MoreApplicableThan<Resource<?>>, Serializable {
+		implements Typed<T>, Qualifying<Resource<?>>, Serializable {
 
 	public static <T> Resource<T> resource(Class<T> type) {
 		return new Resource<>(Instance.anyOf(raw(type)));
@@ -76,9 +76,9 @@ public final class Resource<T>
 	}
 
 	@Override
-	public boolean moreApplicableThan(Resource<?> other) {
-		return Instance.moreApplicableThan2(instance, other.instance, target,
-				other.target);
+	public boolean moreQualiedThan(Resource<?> other) {
+		return Qualifying.compareRelated(instance,
+				other.instance, target, other.target);
 	}
 
 	@Override

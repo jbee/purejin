@@ -12,7 +12,7 @@ import java.io.Serializable;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public final class Source implements MoreApplicableThan<Source>, Serializable {
+public final class Source implements Qualifying<Source>, Serializable {
 
 	public static Source source(Class<?> module) {
 		return new Source(module, DeclarationType.EXPLICIT, 0, 0);
@@ -59,8 +59,8 @@ public final class Source implements MoreApplicableThan<Source>, Serializable {
 	}
 
 	@Override
-	public boolean moreApplicableThan(Source other) {
-		return declarationType.moreApplicableThan(other.declarationType);
+	public boolean moreQualiedThan(Source other) {
+		return declarationType.moreQualiedThan(other.declarationType);
 	}
 
 	public Source typed(DeclarationType type) {

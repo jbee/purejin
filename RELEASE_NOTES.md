@@ -16,7 +16,6 @@ v19.1 (upcoming)
 - added `initbind` and `Initialiser`s (run code when container is ready)
 - added `init` utility methods to link instances during initialisation
 - added `Binder.into( Class<?> pluginPoint, String property )` (more control)
-- added `toString` for `InjectronInfo` and `Injectron` implementation
 - added `Resource#toDependency` method
 - added `Injector.resolve` `default` methods for convenience
 - added `to` for `java.util.function.Supplier` (method references)
@@ -25,19 +24,19 @@ v19.1 (upcoming)
 
 **API changes**
 - `Inspector` split in (and replaced by) `*Mirror` functional interfaces
-- `InspectorBinder` replaced by `AutoBinder`
+- `InspectorBinder` replaced by `AutoBinder` and `autobind()` (no args)
 - `Bindings` are created via `newBindings` and modified using the `with` methods
 - renamed class `Assembly` to `Injectee`
+- renamed class and method `MorePreciseThan#morePreciseThan` to `Qualifying#moreQualiedThan`
 - redesign of `Injectron`/`InjectronInfo` to `Generator` and `InjectionCase`
-- renamed class and method `MorePreciseThan#morePreciseThan` to `MoreApplicableThan#moreApplicableThan`
-- replaced `Expiry` with `Scoping` concept that is based on `Scope`  
 - renamed field `Injection#expiry` to `Injection#scoping`
 - renamed method `Injection#ignoredExpiry()` to `Injection#ignoredScoping()`
-- renamed field `InjectronInfo#expiry` to `InjectronInfo#scoping`
-- renamed `Array.of` to `Array.array`
+- renamed field `InjectronInfo#expiry` to `InjectionCase#scoping`
+- replaced `Expiry` with `Scoping` concept that is based on `Scope`  
 - moved `Supplier` into `container` package (was wrongly located in main API)
 - moved `Scope`, `Repository` and `Provider` into root package `se.jbee.inject`
-- moved `Invoke` static methods to `Supply`
+- moved `Invoke`'s static methods to `Supply` (`Invoke` got removed)
+- renamed `Array.of` to `Array.array`
 - plug-ins use `bind` instead of `multibind` (was unnecessary)
 - `Dependency.pluginsFor` no longer uses `parametizedAsUpperBounds`
 - value objects in `se.jbee.inject` that implement `equalTo` also

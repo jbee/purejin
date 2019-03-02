@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
@@ -18,7 +18,7 @@ import java.util.Collection;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public final class Metaclass {
+public final class Metaclass { //TODO move to Utils
 
 	public static Metaclass metaclass(Class<?> cls) {
 		return new Metaclass(cls);

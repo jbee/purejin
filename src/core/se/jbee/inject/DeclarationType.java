@@ -22,7 +22,7 @@ package se.jbee.inject;
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
-public enum DeclarationType implements MoreApplicableThan<DeclarationType> {
+public enum DeclarationType implements Qualifying<DeclarationType> {
 
 	/* !!!ATTENTION!!! - the order of constants matters to the logic! */
 
@@ -75,7 +75,7 @@ public enum DeclarationType implements MoreApplicableThan<DeclarationType> {
 	REQUIRED;
 
 	@Override
-	public boolean moreApplicableThan(DeclarationType other) {
+	public boolean moreQualiedThan(DeclarationType other) {
 		return ordinal() > other.ordinal();
 	}
 

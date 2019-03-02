@@ -6,9 +6,6 @@
 package se.jbee.inject;
 
 import java.io.Serializable;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Method;
 
 /**
  * A {@link Name} is used as discriminator in cases where multiple
@@ -16,19 +13,25 @@ import java.lang.reflect.Method;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public final class Name implements MoreApplicableThan<Name>, Serializable {
+public final class Name implements Qualifying<Name>, Serializable {
 
 	/**
 	 * Character used as wildcard when matching names.
 	 */
-	public static final String WILDCARD = "*";
+	private static final String WILDCARD = "*";
 
 	/**
-	 * Used when no name is specified. It is the most applicable name of all.
+	 * Used when no name is specified. Maybe at first counter-intuitively this
+	 * is the most qualified name of all because it is the first to try. If the
+	 * dependency asks for a specific name the default name will not match an
+	 * thus continue trying less qualifying names.
+	 * 
+	 * @see #ANY
 	 */
 	public static final Name DEFAULT = new Name("");
 	/**
-	 * It is the least applicable name of all.
+	 * It is the least qualified name of all so it is the last name that will be
+	 * tried and as it matches any name asked for it the match is found.
 	 */
 	public static final Name ANY = new Name(WILDCARD);
 
@@ -81,7 +84,7 @@ public final class Name implements MoreApplicableThan<Name>, Serializable {
 	}
 
 	@Override
-	public boolean moreApplicableThan(Name other) {
+	public boolean moreQualiedThan(Name other) {
 		final boolean thisIsDefault = isDefault();
 		final boolean otherIsDefault = other.isDefault();
 		if (thisIsDefault || otherIsDefault) {
@@ -101,39 +104,4 @@ public final class Name implements MoreApplicableThan<Name>, Serializable {
 			|| (value.matches(other.value.replace(WILDCARD, ".*")));
 	}
 
-	public static Name namedBy(Class<? extends Annotation> annotation,
-			AnnotatedElement obj) {
-		return annotation == null || !obj.isAnnotationPresent(annotation)
-			? Name.DEFAULT
-			: namedBy(annotation, obj.getAnnotation(annotation));
-	}
-
-	public static Name namedBy(Class<? extends Annotation> annotation,
-			Annotation... instances) {
-		for (Annotation i : instances) {
-			if (i.annotationType() == annotation) {
-				return namedBy(annotation, i);
-			}
-		}
-		return Name.DEFAULT;
-	}
-
-	private static Name namedBy(Class<? extends Annotation> annotation,
-			Annotation instance) {
-		for (Method m : annotation.getDeclaredMethods()) {
-			if (String.class == m.getReturnType()) {
-				String name = null;
-				try {
-					name = (String) m.invoke(instance);
-				} catch (Exception e) {
-					// try next...
-				}
-				if (name != null && !name.isEmpty()
-					&& !name.equals(m.getDefaultValue())) {
-					return Name.named(name);
-				}
-			}
-		}
-		return Name.DEFAULT;
-	}
 }

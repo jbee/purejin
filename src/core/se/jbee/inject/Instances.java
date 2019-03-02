@@ -16,7 +16,7 @@ import java.util.Iterator;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public final class Instances implements MoreApplicableThan<Instances>,
+public final class Instances implements Qualifying<Instances>,
 		Iterable<Instance<?>>, Serializable {
 
 	public static final Instances ANY = new Instances();
@@ -82,16 +82,16 @@ public final class Instances implements MoreApplicableThan<Instances>,
 	 *         precise hierarchy element.
 	 */
 	@Override
-	public boolean moreApplicableThan(Instances other) {
+	public boolean moreQualiedThan(Instances other) {
 		if (this == other)
 			return false;
 		if (hierarchy.length != other.hierarchy.length) {
 			return hierarchy.length > other.hierarchy.length;
 		}
 		for (int i = 0; i < hierarchy.length; i++) {
-			if (hierarchy[i].moreApplicableThan(other.hierarchy[i]))
+			if (hierarchy[i].moreQualiedThan(other.hierarchy[i]))
 				return true;
-			if (other.hierarchy[i].moreApplicableThan(hierarchy[i]))
+			if (other.hierarchy[i].moreQualiedThan(hierarchy[i]))
 				return false;
 		}
 		return false;

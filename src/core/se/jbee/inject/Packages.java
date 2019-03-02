@@ -15,7 +15,7 @@ import java.util.Arrays;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Packages
-		implements MoreApplicableThan<Packages>, Serializable {
+		implements Qualifying<Packages>, Serializable {
 
 	/**
 	 * Contains all packages including the (default) package.
@@ -58,9 +58,8 @@ public final class Packages
 			Class<?>... packagesOf) {
 		String[] names = new String[packagesOf.length + 1];
 		names[0] = packageNameOf(packageOf) + suffix;
-		for (int i = 1; i <= packagesOf.length; i++) {
+		for (int i = 1; i <= packagesOf.length; i++)
 			names[i] = packageNameOf(packagesOf[i - 1]) + suffix;
-		}
 		return names;
 	}
 
@@ -95,9 +94,8 @@ public final class Packages
 		if (rootDepth == 1)
 			return includingSubpackages ? ALL : DEFAULT;
 		String[] parentRoots = new String[roots.length];
-		for (int i = 0; i < roots.length; i++) {
+		for (int i = 0; i < roots.length; i++)
 			parentRoots[i] = parent(roots[i]);
-		}
 		return new Packages(parentRoots, includingSubpackages);
 	}
 
@@ -129,9 +127,8 @@ public final class Packages
 	private static int dotsIn(String s) {
 		int c = 0;
 		for (int i = s.length() - 1; i > 0; i--) {
-			if (s.charAt(i) == '.') {
+			if (s.charAt(i) == '.')
 				c++;
-			}
 		}
 		return c;
 	}
@@ -178,25 +175,21 @@ public final class Packages
 	}
 
 	@Override
-	public boolean moreApplicableThan(Packages other) {
-		if (includingSubpackages != other.includingSubpackages) {
+	public boolean moreQualiedThan(Packages other) {
+		if (includingSubpackages != other.includingSubpackages)
 			return !includingSubpackages;
-		}
 		return rootDepth != other.rootDepth && rootDepth > other.rootDepth;
 	}
 
 	@Override
 	public String toString() {
-		if (roots.length == 0) {
+		if (roots.length == 0)
 			return includingSubpackages ? "*" : "(default)";
-		}
-		if (roots.length == 1) {
+		if (roots.length == 1)
 			return toString(roots[0]);
-		}
 		StringBuilder b = new StringBuilder();
-		for (int i = 0; i < roots.length; i++) {
+		for (int i = 0; i < roots.length; i++)
 			b.append('+').append(toString(roots[i]));
-		}
 		return b.substring(1);
 	}
 
