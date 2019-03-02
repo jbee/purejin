@@ -5,6 +5,8 @@
  */
 package se.jbee.inject;
 
+import static se.jbee.inject.Utils.newArray;
+
 import java.io.Serializable;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
@@ -182,7 +184,7 @@ public final class Type<T>
 
 	@SuppressWarnings("unchecked")
 	public Type<T[]> addArrayDimension() {
-		Object proto = Array.newInstance(rawType, 0);
+		Object proto = newArray(rawType, 0);
 		return new Type<>(upperBound, (Class<T[]>) proto.getClass(), params);
 	}
 

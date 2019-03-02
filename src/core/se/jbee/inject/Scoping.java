@@ -5,7 +5,7 @@
  */
 package se.jbee.inject;
 
-import static se.jbee.inject.Array.append;
+import static se.jbee.inject.Utils.arrayAppend;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -67,7 +67,7 @@ public final class Scoping implements Serializable {
 	 * @return this for chaining
 	 */
 	public Scoping notStableIn(Class<? extends Scope> parent) {
-		unstableInScopes = append(unstableInScopes, parent);
+		unstableInScopes = arrayAppend(unstableInScopes, parent);
 		return this;
 	}
 

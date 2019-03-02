@@ -4,12 +4,13 @@ import static se.jbee.inject.InconsistentBinding.noSuchAnnotationProperty;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.parameterTypes;
+import static se.jbee.inject.Utils.annotationPropertyByType;
+import static se.jbee.inject.Utils.arrayFirst;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 
-import se.jbee.inject.Array;
 import se.jbee.inject.Name;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Type;
@@ -37,7 +38,7 @@ public interface ParameterisationMirror {
 			Class<? extends Annotation> naming) {
 		if (naming == null)
 			return this;
-		Method nameProperty = Annotations.methodReturning(String.class, naming);
+		Method nameProperty = annotationPropertyByType(String.class, naming);
 		if (nameProperty == null)
 			throw noSuchAnnotationProperty(String.class, naming);
 		return obj -> {
@@ -47,9 +48,10 @@ public interface ParameterisationMirror {
 			int named = 0;
 			for (int i = 0; i < res.length; i++) {
 				res[i] = tis[i]; // default
-				Annotation instance = Array.first(ais[i],
+				Annotation instance = arrayFirst(ais[i],
 						a -> naming == a.annotationType());
 				if (instance != null) {
+					//TODO nicer exception handling for invoke
 					try {
 						String name = (String) nameProperty.invoke(instance);
 						if (!name.isEmpty()

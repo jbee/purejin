@@ -5,8 +5,10 @@
  */
 package se.jbee.inject.bootstrap;
 
-import static se.jbee.inject.Array.array;
 import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.Utils.accessible;
+import static se.jbee.inject.Utils.arrayOf;
+import static se.jbee.inject.config.ConstructionMirror.noArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -22,7 +24,6 @@ import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
-import se.jbee.inject.config.ConstructionMirror;
 import se.jbee.inject.config.Globals;
 import se.jbee.inject.config.Options;
 import se.jbee.inject.config.Presets;
@@ -93,8 +94,7 @@ public final class Bootstrap {
 	}
 
 	public static <T> T instance(Class<T> type) {
-		return Supply.constructor(Metaclass.accessible(
-				ConstructionMirror.noArgsConstructor(type)));
+		return Supply.constructor(accessible(noArgsConstructor(type)));
 	}
 
 	private Bootstrap() {
@@ -241,7 +241,7 @@ public final class Bootstrap {
 			}
 			Set<Class<? extends Bundle>> installed = new LinkedHashSet<>();
 			addAllInstalledIn(root, installed);
-			return array(installed, Class.class);
+			return arrayOf(installed, Class.class);
 		}
 
 		private Module[] modulesOf(Class<? extends Bundle>[] bundles) {
@@ -252,7 +252,7 @@ public final class Bootstrap {
 					installed.addAll(modules);
 				}
 			}
-			return array(installed, Module.class);
+			return arrayOf(installed, Module.class);
 		}
 
 		@Override

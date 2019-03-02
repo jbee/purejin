@@ -13,7 +13,8 @@ import static se.jbee.inject.Name.pluginFor;
 import static se.jbee.inject.Source.source;
 import static se.jbee.inject.Target.targeting;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.bootstrap.Metaclass.metaclass;
+import static se.jbee.inject.Utils.isClassVirtual;
+import static se.jbee.inject.Utils.newArray;
 import static se.jbee.inject.container.Typecast.initialiserTypeOf;
 
 import java.lang.reflect.Constructor;
@@ -21,7 +22,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.function.BiConsumer;
 
-import se.jbee.inject.Array;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.Injector;
@@ -277,7 +277,7 @@ public class Binder {
 		public void into(Class<?> pluginPoint, String property) {
 			binder.bind(pluginFor(pluginPoint, property), Class.class).to(
 					plugin);
-			if (!metaclass(plugin).undeterminable()) {
+			if (!isClassVirtual(plugin)) {
 				binder.implicit().construct(plugin);
 			}
 			// we allow both collections of classes that have a common
@@ -323,7 +323,8 @@ public class Binder {
 		}
 
 		public void in(Class<?> service, Parameter<?>... params) {
-			boolean boundInstanceMethods = bindMirrorMethodsIn(service, null, params);
+			boolean boundInstanceMethods = bindMirrorMethodsIn(service, null,
+					params);
 			if (!boundInstanceMethods)
 				return; // do not try to construct the class
 			Constructor<?> c = bindings().construction.reflect(service);
@@ -617,7 +618,7 @@ public class Binder {
 
 		public void toConstructor(Class<? extends T> impl,
 				Parameter<?>... params) {
-			if (metaclass(impl).undeterminable()) {
+			if (isClassVirtual(impl)) {
 				throw new InconsistentBinding(
 						"Not a constructable type: " + impl);
 			}
@@ -740,7 +741,7 @@ public class Binder {
 			if (elements.getClass() == rawType) {
 				return (E[]) elements;
 			}
-			Object[] a = Array.newInstance(getType().baseType().rawType,
+			Object[] a = newArray(getType().baseType().rawType,
 					elements.length);
 			System.arraycopy(elements, 0, a, 0, a.length);
 			return (E[]) a;

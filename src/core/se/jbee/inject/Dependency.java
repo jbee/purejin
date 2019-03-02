@@ -8,6 +8,7 @@ package se.jbee.inject;
 import static se.jbee.inject.Instance.defaultInstanceOf;
 import static se.jbee.inject.Name.pluginFor;
 import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.Utils.arrayAppend;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -189,7 +190,7 @@ public final class Dependency<T>
 		}
 		ensureStableScopeNesting(injection);
 		ensureNoDependencyCycle(injection);
-		return new Dependency<>(instance, Array.append(hierarchy, injection));
+		return new Dependency<>(instance, arrayAppend(hierarchy, injection));
 	}
 
 	public Dependency<T> uninject() {

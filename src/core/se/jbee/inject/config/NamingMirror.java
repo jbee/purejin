@@ -1,6 +1,7 @@
 package se.jbee.inject.config;
 
 import static se.jbee.inject.InconsistentBinding.noSuchAnnotationProperty;
+import static se.jbee.inject.Utils.annotationPropertyByType;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
@@ -23,7 +24,7 @@ public interface NamingMirror {
 	default NamingMirror orAnnotatedBy(Class<? extends Annotation> naming) {
 		if (naming == null)
 			return this;
-		Method nameProperty = Annotations.methodReturning(String.class, naming);
+		Method nameProperty = annotationPropertyByType(String.class, naming);
 		if (nameProperty == null)
 			throw noSuchAnnotationProperty(String.class, naming);
 		return obj -> {

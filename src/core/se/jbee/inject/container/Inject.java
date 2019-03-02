@@ -8,10 +8,10 @@ package se.jbee.inject.container;
 import static java.lang.System.identityHashCode;
 import static java.util.Arrays.copyOfRange;
 import static java.util.Collections.emptyList;
-import static se.jbee.inject.Array.array;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Scoping.scopingOf;
 import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.Utils.arrayOf;
 import static se.jbee.inject.container.Typecast.initialiserTypeOf;
 import static se.jbee.inject.container.Typecast.injectionCasesTypeFor;
 
@@ -293,7 +293,7 @@ public final class Inject {
 		@SuppressWarnings("unchecked")
 		private static <T, E> T toArray(List<? extends E> elements,
 				Type<E> elementType) {
-			return (T) array(elements, elementType.rawType);
+			return (T) arrayOf(elements, elementType.rawType);
 		}
 
 		@SuppressWarnings("unchecked")

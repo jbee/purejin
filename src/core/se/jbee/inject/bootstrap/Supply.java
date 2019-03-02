@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
@@ -8,6 +8,7 @@ package se.jbee.inject.bootstrap;
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Type.parameterTypes;
 import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.Utils.newArray;
 import static se.jbee.inject.bootstrap.BoundParameter.bind;
 
 import java.lang.reflect.Constructor;
@@ -18,7 +19,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import se.jbee.inject.Array;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Injector;
@@ -223,7 +223,7 @@ public final class Supply {
 				BoundParameter<? extends E>[] elements) {
 			super(elements);
 			this.arrayType = arrayType;
-			this.res = (E[]) Array.newInstance(arrayType.baseType().rawType,
+			this.res = (E[]) newArray(arrayType.baseType().rawType,
 					elements.length);
 		}
 

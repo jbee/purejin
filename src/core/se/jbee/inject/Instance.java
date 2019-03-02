@@ -93,8 +93,7 @@ public final class Instance<T>
 
 	@Override
 	public boolean moreQualiedThan(Instance<?> other) {
-		return Qualifying.compareRelated(type, other.type,
-				name, other.name);
+		return Qualifying.compareRelated(type, other.type, name, other.name);
 	}
 
 }

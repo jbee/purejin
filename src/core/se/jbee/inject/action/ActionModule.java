@@ -13,7 +13,7 @@ import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.parameterTypes;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Type.returnType;
-import static se.jbee.inject.bootstrap.Metaclass.accessible;
+import static se.jbee.inject.Utils.accessible;
 import static se.jbee.inject.config.ProductionMirror.allMethods;
 import static se.jbee.inject.container.Scoped.APPLICATION;
 import static se.jbee.inject.container.Scoped.DEPENDENCY_TYPE;

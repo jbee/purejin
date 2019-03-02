@@ -5,7 +5,7 @@
  */
 package se.jbee.inject.bootstrap;
 
-import static se.jbee.inject.Array.array;
+import static se.jbee.inject.Utils.arrayOf;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -109,12 +109,10 @@ public final class Binding<T>
 				other.resource.type().rawType.getCanonicalName());
 		if (res != 0)
 			return res;
-		res = Qualifying.compare(resource.instance,
-				other.resource.instance);
+		res = Qualifying.compare(resource.instance, other.resource.instance);
 		if (res != 0)
 			return res;
-		res = Qualifying.compare(resource.target,
-				other.resource.target);
+		res = Qualifying.compare(resource.target, other.resource.target);
 		if (res != 0)
 			return res;
 		res = Qualifying.compare(source, other.source);
@@ -183,7 +181,7 @@ public final class Binding<T>
 			throw new UnresolvableDependency.NoResourceForDependency(required,
 					dropped);
 		}
-		return array(res, Binding.class);
+		return arrayOf(res, Binding.class);
 	}
 
 }

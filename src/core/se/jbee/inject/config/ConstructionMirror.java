@@ -1,11 +1,11 @@
 package se.jbee.inject.config;
 
 import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.Utils.arrayContains;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 
-import se.jbee.inject.Array;
 import se.jbee.inject.Packages;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency.NoMethodForDependency;
@@ -76,7 +76,7 @@ public interface ConstructionMirror {
 			throw new NoMethodForDependency(raw(type));
 		Constructor<?> mostParamsConstructor = null;
 		for (Constructor<?> c : cs) {
-			if (!Array.contains(c.getParameterTypes(), type, (a, b) -> a == b) // avoid self referencing constructors (synthetic) as they cause endless loop
+			if (!arrayContains(c.getParameterTypes(), type, (a, b) -> a == b) // avoid self referencing constructors (synthetic) as they cause endless loop
 				&& (mostParamsConstructor == null
 					|| c.getParameterCount() > mostParamsConstructor.getParameterCount())) {
 				mostParamsConstructor = c;

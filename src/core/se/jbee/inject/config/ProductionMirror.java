@@ -2,6 +2,7 @@ package se.jbee.inject.config;
 
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Type.returnType;
+import static se.jbee.inject.Utils.arrayFilter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
@@ -10,7 +11,6 @@ import java.lang.reflect.TypeVariable;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 
-import se.jbee.inject.Array;
 import se.jbee.inject.Packages;
 import se.jbee.inject.Type;
 
@@ -43,7 +43,7 @@ public interface ProductionMirror {
 	}
 
 	default ProductionMirror filter(Predicate<Method> filter) {
-		return impl -> Array.filter(this.reflect(impl), filter);
+		return impl -> arrayFilter(this.reflect(impl), filter);
 	}
 
 	default ProductionMirror returnTypeAssignableTo(Type<?> supertype) {

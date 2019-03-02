@@ -6,6 +6,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
+import static se.jbee.inject.Utils.newArray;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -111,7 +112,7 @@ public class TestEqualsHashCode {
 		if (cls == Class.class)
 			return cls;
 		if (cls.isArray()) {
-			Object[] res = Array.newInstance(cls.getComponentType(), 1);
+			Object[] res = newArray(cls.getComponentType(), 1);
 			res[0] = newInstance(cls.getComponentType(), base++);
 			return res;
 		}
@@ -130,7 +131,7 @@ public class TestEqualsHashCode {
 		for (int i = 0; i < args.length; i++) {
 			if (pTypes[i] != cls) {
 				if (pTypes[i].getComponentType() == cls) {
-					args[i] = Array.newInstance(cls, 0);
+					args[i] = Utils.newArray(cls, 0);
 				} else {
 					args[i] = newInstance(pTypes[i], base++);
 				}

@@ -14,8 +14,7 @@ import java.util.Arrays;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public final class Packages
-		implements Qualifying<Packages>, Serializable {
+public final class Packages implements Qualifying<Packages>, Serializable {
 
 	/**
 	 * Contains all packages including the (default) package.

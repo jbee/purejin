@@ -1,9 +1,11 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
+
+import static se.jbee.inject.Utils.accessible;
 
 import java.lang.reflect.Constructor;
 
@@ -23,7 +25,7 @@ public final class BoundConstructor<T> implements Typed<T> {
 
 	private BoundConstructor(Constructor<T> constructor,
 			Parameter<?>[] parameters) {
-		this.constructor = Metaclass.accessible(constructor);
+		this.constructor = accessible(constructor);
 		this.parameters = parameters;
 	}
 

@@ -7,16 +7,17 @@ package se.jbee.inject.bootstrap;
 
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.Utils.arrayIndex;
+import static se.jbee.inject.Utils.arrayPrepand;
+import static se.jbee.inject.Utils.isClassVirtual;
 import static se.jbee.inject.bootstrap.BindingType.LINK;
 import static se.jbee.inject.bootstrap.BindingType.METHOD;
 import static se.jbee.inject.bootstrap.BindingType.PREDEFINED;
-import static se.jbee.inject.bootstrap.Metaclass.metaclass;
 import static se.jbee.inject.bootstrap.Supply.costructor;
 import static se.jbee.inject.bootstrap.Supply.parametrizedInstance;
 
 import java.lang.reflect.Constructor;
 
-import se.jbee.inject.Array;
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.Instance;
@@ -88,8 +89,8 @@ public final class Macros {
 			tmp[index] = macro;
 			return new Macros(types, tmp);
 		}
-		return new Macros(Array.prepand(type, types),
-				Array.prepand(macro, macros));
+		return new Macros(arrayPrepand(type, types),
+				arrayPrepand(macro, macros));
 	}
 
 	/**
@@ -123,12 +124,7 @@ public final class Macros {
 	}
 
 	private int index(final Class<?> type) {
-		for (int i = 0; i < types.length; i++) {
-			if (types[i] == type) {
-				return i;
-			}
-		}
-		return -1;
+		return arrayIndex(types, type, (a, b) -> a == b);
 	}
 
 	private static final class AutoInheritanceMacro
@@ -287,7 +283,7 @@ public final class Macros {
 	static <T> void implicitlyBindToConstructor(Binding<?> incomplete,
 			Instance<T> instance, Bindings bindings) {
 		Class<T> impl = instance.type().rawType;
-		if (!metaclass(impl).undeterminable()) {
+		if (!isClassVirtual(impl)) {
 			Binding<T> binding = Binding.binding(new Resource<>(instance),
 					BindingType.CONSTRUCTOR, null, incomplete.scope,
 					incomplete.source.typed(DeclarationType.IMPLICIT));

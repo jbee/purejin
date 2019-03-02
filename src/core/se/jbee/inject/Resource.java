@@ -77,8 +77,8 @@ public final class Resource<T>
 
 	@Override
 	public boolean moreQualiedThan(Resource<?> other) {
-		return Qualifying.compareRelated(instance,
-				other.instance, target, other.target);
+		return Qualifying.compareRelated(instance, other.instance, target,
+				other.target);
 	}
 
 	@Override

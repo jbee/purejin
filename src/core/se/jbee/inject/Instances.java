@@ -6,6 +6,7 @@
 package se.jbee.inject;
 
 import static java.util.Arrays.asList;
+import static se.jbee.inject.Utils.arrayPrepand;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -16,8 +17,8 @@ import java.util.Iterator;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public final class Instances implements Qualifying<Instances>,
-		Iterable<Instance<?>>, Serializable {
+public final class Instances
+		implements Qualifying<Instances>, Iterable<Instance<?>>, Serializable {
 
 	public static final Instances ANY = new Instances();
 
@@ -42,7 +43,7 @@ public final class Instances implements Qualifying<Instances>,
 	public Instances push(Instance<?> top) {
 		if (isAny())
 			return new Instances(top);
-		return new Instances(Array.prepand(top, hierarchy));
+		return new Instances(arrayPrepand(top, hierarchy));
 	}
 
 	public boolean equalTo(Instances other) {

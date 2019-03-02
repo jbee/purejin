@@ -35,8 +35,7 @@ public interface Qualifying<T extends Qualifying<T>> {
 			|| !a2.moreQualiedThan(a1) && b1.moreQualiedThan(b2);
 	}
 
-	static <A extends Qualifying<? super A>> int compare(A one,
-			A other) {
+	static <A extends Qualifying<? super A>> int compare(A one, A other) {
 		return one.moreQualiedThan(other)
 			? -1
 			: other.moreQualiedThan(one) ? 1 : 0;

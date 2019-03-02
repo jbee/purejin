@@ -5,8 +5,8 @@
  */
 package se.jbee.inject.bootstrap;
 
-import static se.jbee.inject.Array.array;
-import static se.jbee.inject.bootstrap.Metaclass.metaclass;
+import static se.jbee.inject.Utils.arrayOf;
+import static se.jbee.inject.Utils.isClassMonomodal;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -96,7 +96,7 @@ public final class Bindings {
 	}
 
 	public Binding<?>[] toArray() {
-		return array(bindings, Binding.class);
+		return arrayOf(bindings, Binding.class);
 	}
 
 	public Binding<?>[] declareFrom(Module... modules) {
@@ -106,7 +106,7 @@ public final class Bindings {
 			Class<? extends Module> ns = m.getClass();
 			final boolean hasBeenDeclared = declared.contains(ns);
 			if (hasBeenDeclared) {
-				if (!metaclass(ns).monomodal()) {
+				if (!isClassMonomodal(ns)) {
 					multimodals.add(ns);
 				}
 			}

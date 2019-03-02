@@ -1,9 +1,11 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
+
+import static se.jbee.inject.Utils.accessible;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -11,6 +13,7 @@ import java.lang.reflect.Modifier;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Type;
 import se.jbee.inject.Typed;
+import se.jbee.inject.Utils;
 
 /**
  * A {@link BoundMethod} is a method bound to a particular instance (if not
@@ -34,7 +37,7 @@ public final class BoundMethod<T> implements Typed<T> {
 	private BoundMethod(Object instance, Method factory, Type<T> returnType,
 			Parameter<?>[] parameters) {
 		this.returnType = returnType;
-		this.factory = Metaclass.accessible(factory);
+		this.factory = accessible(factory);
 		this.parameters = parameters;
 		this.instance = instance;
 		this.isInstanceMethod = !Modifier.isStatic(factory.getModifiers());
@@ -45,7 +48,7 @@ public final class BoundMethod<T> implements Typed<T> {
 			throw new IllegalArgumentException(
 					"The producer method and the instance it is invoked on have to be the same class.");
 		}
-		Metaclass.accessible(factory);
+		Utils.accessible(factory);
 	}
 
 	@Override
