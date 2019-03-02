@@ -5,6 +5,11 @@
  */
 package se.jbee.inject;
 
+import static se.jbee.inject.Utils.arrayContains;
+import static se.jbee.inject.Utils.arrayMap;
+import static se.jbee.inject.Utils.seqCount;
+import static se.jbee.inject.Utils.seqRegionEquals;
+
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -92,10 +97,8 @@ public final class Packages implements Qualifying<Packages>, Serializable {
 			return this;
 		if (rootDepth == 1)
 			return includingSubpackages ? ALL : DEFAULT;
-		String[] parentRoots = new String[roots.length];
-		for (int i = 0; i < roots.length; i++)
-			parentRoots[i] = parent(roots[i]);
-		return new Packages(parentRoots, includingSubpackages);
+		return new Packages(arrayMap(roots, Packages::parent),
+				includingSubpackages);
 	}
 
 	/**
@@ -110,13 +113,10 @@ public final class Packages implements Qualifying<Packages>, Serializable {
 	}
 
 	private static void commonPackageDepth(Class<?> type, Class<?>[] types) {
-		int p0 = dotsIn(type.getPackage().getName());
-		for (int i = 0; i < types.length; i++) {
-			if (dotsIn(types[i].getPackage().getName()) != p0) {
-				throw new IllegalArgumentException(
-						"All classes of a packages set have to be on same depth level.");
-			}
-		}
+		if (arrayContains(types, type, (a, b) -> dotsIn(
+				a.getPackage().getName()) != dotsIn(b.getPackage().getName())))
+			throw new IllegalArgumentException(
+					"All classes of a packages set have to be on same depth level.");
 	}
 
 	private static int rootDepth(String[] roots) {
@@ -124,39 +124,18 @@ public final class Packages implements Qualifying<Packages>, Serializable {
 	}
 
 	private static int dotsIn(String s) {
-		int c = 0;
-		for (int i = s.length() - 1; i > 0; i--) {
-			if (s.charAt(i) == '.')
-				c++;
-		}
-		return c;
+		return seqCount(s, '.');
 	}
 
 	public boolean contains(Type<?> type) {
 		if (includesAll())
 			return true;
 		final String packageNameOfType = packageNameOf(type);
-		for (String root : roots) {
-			if (regionEqual(root, packageNameOfType,
-					includingSubpackages
-						? root.length()
-						: packageNameOfType.length())) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private static boolean regionEqual(String p1, String p2, int length) {
-		if (p1.length() < length || p2.length() < length)
-			return false;
-		if (p1 == p2)
-			return true;
-		for (int i = length - 1; i > 0; i--) {
-			if (p1.charAt(i) != p2.charAt(i))
-				return false;
-		}
-		return true;
+		return arrayContains(roots,
+				root -> seqRegionEquals(root, packageNameOfType,
+						includingSubpackages
+							? root.length()
+							: packageNameOfType.length()));
 	}
 
 	public boolean includesAll() {

@@ -5,10 +5,16 @@
  */
 package se.jbee.inject;
 
+import static java.util.Arrays.asList;
 import static se.jbee.inject.Instance.defaultInstanceOf;
 import static se.jbee.inject.Name.pluginFor;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.arrayAppend;
+import static se.jbee.inject.Utils.arrayContains;
+import static se.jbee.inject.Utils.arrayDropTail;
+import static se.jbee.inject.Utils.arrayEquals;
+import static se.jbee.inject.Utils.arrayFirst;
+import static se.jbee.inject.Utils.arrayMap;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -85,22 +91,15 @@ public final class Dependency<T>
 
 	public boolean equalTo(Dependency<?> other) {
 		// cheapest first...
-		if (hierarchy.length != other.hierarchy.length
-			|| !instance.equalTo(other.instance))
-			return false;
-		for (int i = 0; i < hierarchy.length; i++) {
-			if (!hierarchy[i].equalTo(other.hierarchy[i]))
-				return false;
-		}
-		return true;
+		return instance.equalTo(other.instance)
+			&& arrayEquals(hierarchy, other.hierarchy, Injection::equalTo);
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder b = new StringBuilder();
-		for (Injection i : hierarchy) {
+		for (Injection i : hierarchy)
 			b.append(i.target).append(" -> ");
-		}
 		b.append(instance);
 		return b.toString();
 	}
@@ -136,14 +135,10 @@ public final class Dependency<T>
 	}
 
 	public Dependency<T> ignoredExpiry() {
-		if (hierarchy.length == 0) {
-			return this;
-		}
-		Injection[] ignored = new Injection[hierarchy.length];
-		for (int i = 0; i < ignored.length; i++) {
-			ignored[i] = hierarchy[i].ignoredScoping();
-		}
-		return dependency(instance, ignored);
+		return hierarchy.length == 0
+			? this
+			: dependency(instance,
+					arrayMap(hierarchy, Injection::ignoredScoping));
 	}
 
 	public boolean isUntargeted() {
@@ -185,45 +180,35 @@ public final class Dependency<T>
 	public Dependency<T> injectingInto(Resource<?> target, Scoping scoping)
 			throws DependencyCycle, UnstableDependency {
 		Injection injection = new Injection(instance, target, scoping);
-		if (hierarchy.length == 0) {
+		if (hierarchy.length == 0)
 			return new Dependency<>(instance, injection);
-		}
 		ensureStableScopeNesting(injection);
 		ensureNoDependencyCycle(injection);
 		return new Dependency<>(instance, arrayAppend(hierarchy, injection));
 	}
 
 	public Dependency<T> uninject() {
-		if (hierarchy.length <= 1) {
-			return untargeted();
-		}
-		return new Dependency<>(instance,
-				Arrays.copyOf(hierarchy, hierarchy.length - 1));
+		return hierarchy.length <= 1
+			? untargeted()
+			: new Dependency<>(instance, arrayDropTail(hierarchy, 1));
 	}
 
 	private void ensureNoDependencyCycle(Injection injection)
 			throws DependencyCycle {
-		for (int i = 0; i < hierarchy.length; i++) {
-			Injection parent = hierarchy[i];
-			if (parent.equalTo(injection)) {
-				throw new DependencyCycle(this, injection.target);
-			}
-		}
+		if (arrayContains(hierarchy, injection, Injection::equalTo))
+			throw new DependencyCycle(this, injection.target);
 	}
 
 	private void ensureStableScopeNesting(Injection injection)
 			throws UnstableDependency {
-		final Scoping scoping = injection.scoping;
-		for (int i = 0; i < hierarchy.length; i++) {
-			Injection parent = hierarchy[i];
-			if (!scoping.isStableIn(parent.scoping)) {
-				throw new UnstableDependency(parent, injection);
-			}
-		}
+		Injection unstable = arrayFirst(hierarchy,
+				e -> !injection.scoping.isStableIn(e.scoping));
+		if (unstable != null)
+			throw new UnstableDependency(unstable, injection);
 	}
 
 	@Override
 	public Iterator<Injection> iterator() {
-		return Arrays.asList(hierarchy).iterator();
+		return asList(hierarchy).iterator();
 	}
 }

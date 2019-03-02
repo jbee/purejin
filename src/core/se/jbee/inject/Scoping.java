@@ -1,11 +1,12 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
 
 import static se.jbee.inject.Utils.arrayAppend;
+import static se.jbee.inject.Utils.arrayContains;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -80,12 +81,8 @@ public final class Scoping implements Serializable {
 	}
 
 	public boolean isStableIn(Scoping parent) {
-		if (isStable())
-			return true;
-		for (int i = 0; i < unstableInScopes.length; i++)
-			if (unstableInScopes[i] == parent.scope)
-				return false;
-		return true;
+		return isStable()
+			|| !arrayContains(unstableInScopes, e -> e == parent.scope);
 	}
 
 	public boolean isStable() {

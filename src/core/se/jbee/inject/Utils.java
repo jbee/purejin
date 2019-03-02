@@ -18,7 +18,9 @@ import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
 /**
  * Language level utility methods for the library.
@@ -34,6 +36,8 @@ public final class Utils {
 	 */
 	public interface Eq<T> extends BiPredicate<T, T> {
 	}
+
+	/* Arrays */
 
 	public static <T> T[] arrayFilter(T[] arr, Predicate<T> accept) {
 		if (arr == null || arr.length == 0)
@@ -73,6 +77,29 @@ public final class Utils {
 		return arrayPrepand(e, arr);
 	}
 
+	public static <T> T[] arrayDropTail(T[] arr, int n) {
+		if (arr.length <= n)
+			return newArray(arr, 0);
+		return copyOf(arr, arr.length - n);
+	}
+
+	public static <A, B> B[] arrayMap(A[] as, Class<B> to,
+			Function<A, B> mapOp) {
+		B[] bs = newArray(to, as.length);
+		for (int i = 0; i < as.length; i++)
+			bs[i] = mapOp.apply(as[i]);
+		return bs;
+	}
+
+	public static <T> T[] arrayMap(T[] arr, UnaryOperator<T> mapOp) {
+		if (arr.length == 0)
+			return arr;
+		T[] mapped = newArray(arr, arr.length);
+		for (int i = 0; i < arr.length; i++)
+			mapped[i] = mapOp.apply(arr[i]);
+		return mapped;
+	}
+
 	public static <T> int arrayIndex(T[] arr, T e, Eq<T> eq) {
 		if (arr == null || arr.length == 0)
 			return -1;
@@ -82,6 +109,37 @@ public final class Utils {
 			}
 		}
 		return -1;
+	}
+
+	public static <T> T arrayFirst(T[] arr, Predicate<T> test) {
+		if (arr == null || arr.length == 0)
+			return null;
+		for (int i = 0; i < arr.length; i++)
+			if (test.test(arr[i]))
+				return arr[i];
+		return null;
+	}
+
+	public static <T> boolean arrayContains(T[] arr, Predicate<T> test) {
+		return arrayFirst(arr, test) != null;
+	}
+
+	public static <T> boolean arrayContains(T[] arr, T e, Eq<T> eq) {
+		if (arr == null || arr.length == 0)
+			return false;
+		for (int i = 0; i < arr.length; i++)
+			if (eq.test(arr[i], e))
+				return true;
+		return false;
+	}
+
+	public static <T> boolean arrayEquals(T[] a, T[] b, Eq<T> eq) {
+		if (a.length != b.length)
+			return false;
+		for (int i = 0; i < a.length; i++)
+			if (!eq.test(a[i], b[i]))
+				return false;
+		return true;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -98,29 +156,15 @@ public final class Utils {
 		return list.toArray(newArray(type, list.size()));
 	}
 
-	public static <T> T arrayFirst(T[] arr, Predicate<T> test) {
-		if (arr == null || arr.length == 0)
-			return null;
-		for (int i = 0; i < arr.length; i++)
-			if (test.test(arr[i]))
-				return arr[i];
-		return null;
-	}
-
-	public static <T> boolean arrayContains(T[] arr, T e, Eq<T> eq) {
-		if (arr == null || arr.length == 0)
-			return false;
-		for (int i = 0; i < arr.length; i++)
-			if (eq.test(arr[i], e))
-				return true;
-		return false;
-	}
+	/* Annotations */
 
 	public static Method annotationPropertyByType(Class<?> type,
 			Class<? extends Annotation> annotation) {
 		return arrayFirst(annotation.getDeclaredMethods(),
 				m -> m.getReturnType() == type);
 	}
+
+	/* Classes */
 
 	/**
 	 * @return the given object made accessible.
@@ -131,14 +175,14 @@ public final class Utils {
 	}
 
 	/**
-	 * @return A {@link Class} is "virtual" when there is no typical "injection"
-	 *         style way to create instances. This is true for all value types,
+	 * @return A {@link Class} counts as "virtual" when it is known that its not
+	 *         a type handled by an {@link Injector} context, either because it
+	 *         cannot be constructed at all or it does not make sense to let the
+	 *         {@link Injector} take care of it. This includes value types,
 	 *         enums, collection types (including arrays) or any type than
 	 *         cannot be instantiated by its nature (abstract types).
 	 *
-	 *         Note that this method just covers those types that are *known* to
-	 *         be "virtual". There will be a lot of user defined types that are
-	 *         "virtual" as well but which will not return true.
+	 *         Note that this method just covers JRE types.
 	 */
 	public static boolean isClassVirtual(Class<?> cls) {
 		return cls == null || cls.isInterface() || cls.isEnum()
@@ -164,17 +208,36 @@ public final class Utils {
 		if (cls == Object.class)
 			return true;
 		for (Field f : cls.getDeclaredFields()) {
-			if (!Modifier.isStatic(f.getModifiers())) {
+			if (!Modifier.isStatic(f.getModifiers()))
 				return false;
-			}
 		}
 		for (Constructor<?> c : cls.getDeclaredConstructors()) {
-			if (c.getParameterTypes().length > 0) {
-				// maybe arguments are passed to super-type so we check it too
+			// maybe arguments are passed to super-type so we check it too
+			if (c.getParameterTypes().length > 0)
 				return isClassMonomodal(cls.getSuperclass());
-			}
 		}
 		return true;
 	}
 
+	/* Sequences */
+
+	public static boolean seqRegionEquals(CharSequence p1, CharSequence p2,
+			int length) {
+		if (p1.length() < length || p2.length() < length)
+			return false;
+		if (p1 == p2)
+			return true;
+		for (int i = length - 1; i > 0; i--)
+			if (p1.charAt(i) != p2.charAt(i))
+				return false;
+		return true;
+	}
+
+	public static <T> int seqCount(CharSequence arr, char match) {
+		int c = 0;
+		for (int i = arr.length() - 1; i > 0; i--)
+			if (arr.charAt(i) == match)
+				c++;
+		return c;
+	}
 }

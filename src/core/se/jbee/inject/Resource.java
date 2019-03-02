@@ -115,9 +115,8 @@ public final class Resource<T>
 		Dependency<T> dep = dependency(instance);
 		if (target != Target.ANY) {
 			if (!target.parents.isAny()) {
-				for (Instance<?> p : target.parents) {
+				for (Instance<?> p : target.parents)
 					dep = dep.injectingInto(p);
-				}
 			}
 			dep = dep.injectingInto(target.instance);
 		}

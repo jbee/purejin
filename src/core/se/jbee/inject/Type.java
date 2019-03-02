@@ -5,6 +5,10 @@
  */
 package se.jbee.inject;
 
+import static se.jbee.inject.Utils.arrayContains;
+import static se.jbee.inject.Utils.arrayEquals;
+import static se.jbee.inject.Utils.arrayFirst;
+import static se.jbee.inject.Utils.arrayMap;
 import static se.jbee.inject.Utils.newArray;
 
 import java.io.Serializable;
@@ -189,19 +193,9 @@ public final class Type<T>
 	}
 
 	public boolean equalTo(Type<?> other) {
-		if (this == other) {
-			return true;
-		}
-		if (rawType != other.rawType || params.length != other.params.length
-			|| upperBound != other.upperBound) {
-			return false;
-		}
-		for (int i = 0; i < params.length; i++) {
-			if (!params[i].equalTo(other.params[i])) {
-				return false;
-			}
-		}
-		return true;
+		return this == other
+			|| rawType == other.rawType && upperBound == other.upperBound
+				&& arrayEquals(params, other.params, Type::equalTo);
 	}
 
 	@Override
@@ -238,23 +232,19 @@ public final class Type<T>
 	}
 
 	public Type<?> parameter(int index) {
-		if (index < 0 || index >= rawType.getTypeParameters().length) {
+		if (index < 0 || index >= rawType.getTypeParameters().length)
 			throw new IndexOutOfBoundsException("The type " + this
 				+ " has no type parameter at index: " + index);
-		}
 		return isRawType() ? WILDCARD : params[index];
 	}
 
 	public boolean isAssignableTo(Type<?> other) {
-		if (!other.rawType.isAssignableFrom(rawType)) {
+		if (!other.rawType.isAssignableFrom(rawType))
 			return false;
-		}
-		if (!isParameterized() || other.isRawType()) {
+		if (!isParameterized() || other.isRawType())
 			return true; //raw type is ok - no parameters to check
-		}
-		if (other.rawType == rawType) { // both have the same rawType
+		if (other.rawType == rawType) // both have the same rawType
 			return allParametersAreAssignableTo(other);
-		}
 		@SuppressWarnings("unchecked")
 		Class<? super T> commonRawType = (Class<? super T>) other.rawType;
 		Type<?> asOther = supertype(commonRawType, this);
@@ -262,18 +252,12 @@ public final class Type<T>
 	}
 
 	private boolean allParametersAreAssignableTo(Type<?> other) {
-		for (int i = 0; i < params.length; i++) {
-			if (!params[i].asParameterAssignableTo(other.params[i])) {
-				return false;
-			}
-		}
-		return true;
+		return arrayEquals(params, other.params, Type::asParameterAssignableTo);
 	}
 
 	private boolean asParameterAssignableTo(Type<?> other) {
-		if (rawType == other.rawType) {
+		if (rawType == other.rawType)
 			return !isParameterized() || allParametersAreAssignableTo(other);
-		}
 		return other.isUpperBound() && isAssignableTo(other.asExactType());
 	}
 
@@ -324,35 +308,28 @@ public final class Type<T>
 
 	@Override
 	public boolean moreQualiedThan(Type<?> other) {
-		if (!rawType.isAssignableFrom(other.rawType)) {
+		if (!rawType.isAssignableFrom(other.rawType))
 			return true;
-		}
 		if ((hasTypeParameter() && !isParameterized())
-			|| (isUpperBound() && !other.isUpperBound())) {
+			|| (isUpperBound() && !other.isUpperBound()))
 			return false; // equal or other is a subtype of this
-		}
 		if ((other.hasTypeParameter() && !other.isParameterized())
-			|| (!isUpperBound() && other.isUpperBound())) {
+			|| (!isUpperBound() && other.isUpperBound()))
 			return true;
-		}
-		if (rawType == other.rawType) {
+		if (rawType == other.rawType)
 			return moreApplicableParametersThan(other);
-		}
 		@SuppressWarnings("unchecked")
 		Type<?> asOther = supertype(rawType, (Type<? extends T>) other);
 		return moreApplicableParametersThan(asOther);
 	}
 
 	private boolean moreApplicableParametersThan(Type<?> other) {
-		if (params.length == 1) {
+		if (params.length == 1)
 			return params[0].moreQualiedThan(other.params[0]);
-		}
 		int morePrecise = 0;
-		for (int i = 0; i < params.length; i++) {
-			if (params[i].moreQualiedThan(other.params[0])) {
+		for (int i = 0; i < params.length; i++)
+			if (params[i].moreQualiedThan(other.params[0]))
 				morePrecise++;
-			}
-		}
 		return morePrecise > params.length - morePrecise;
 	}
 
@@ -368,20 +345,14 @@ public final class Type<T>
 	 *         generic.
 	 */
 	public Type<T> parametizedAsUpperBounds() {
-		if (!isParameterized()) {
-			if (isRawType()) {
-				return parametized(wildcards(rawType.getTypeParameters()));
-			}
+		if (!isParameterized())
+			return isRawType()
+				? parametized(wildcards(rawType.getTypeParameters()))
+				: this;
+		if (areAllTypeParametersAreUpperBounds())
 			return this;
-		}
-		if (areAllTypeParametersAreUpperBounds()) {
-			return this;
-		}
-		Type<?>[] parameters = new Type<?>[params.length];
-		for (int i = 0; i < params.length; i++) {
-			parameters[i] = params[i].asUpperBound();
-		}
-		return new Type<>(upperBound, rawType, parameters);
+		return new Type<>(upperBound, rawType,
+				arrayMap(params, Type::asUpperBound));
 	}
 
 	/**
@@ -396,25 +367,16 @@ public final class Type<T>
 	 * @return True when all type parameters are upper bounds.
 	 */
 	public boolean areAllTypeParametersAreUpperBounds() {
-		for (int i = 0; i < params.length; i++) {
-			if (!params[i].isUpperBound()) {
-				return false;
-			}
-		}
-		return true;
+		return !arrayContains(params, p -> !p.isUpperBound());
 	}
 
-	public Type<T> parametized(Class<?>... arguments) {
-		Type<?>[] typeArgs = new Type<?>[arguments.length];
-		for (int i = 0; i < arguments.length; i++) {
-			typeArgs[i] = raw(arguments[i]);
-		}
-		return parametized(typeArgs);
+	public Type<T> parametized(Class<?>... typeParams) {
+		return parametized(arrayMap(typeParams, Type.class, Type::raw));
 	}
 
-	public Type<T> parametized(Type<?>... parameters) {
-		checkTypeParameters(parameters);
-		return new Type<>(upperBound, rawType, parameters);
+	public Type<T> parametized(Type<?>... params) {
+		checkTypeParameters(params);
+		return new Type<>(upperBound, rawType, params);
 	}
 
 	@Override
@@ -460,45 +422,41 @@ public final class Type<T>
 		return b.toString();
 	}
 
-	private void checkTypeParameters(Type<?>... parameters) {
-		if (parameters.length == 0) {
+	private void checkTypeParameters(Type<?>... params) {
+		if (params.length == 0)
 			return; // is treated as raw-type
-		}
 		if (arrayDimensions() > 0) {
-			baseType().checkTypeParameters(parameters);
+			baseType().checkTypeParameters(params);
 			return;
 		}
 		TypeVariable<Class<T>>[] vars = rawType.getTypeParameters();
-		if (vars.length != parameters.length) {
+		if (vars.length != params.length)
 			throw new IllegalArgumentException(
 					"Invalid nuber of type arguments - " + rawType
 						+ " has type variables " + Arrays.toString(vars)
-						+ " but got:" + Arrays.toString(parameters));
-		}
+						+ " but got:" + Arrays.toString(params));
 		for (int i = 0; i < vars.length; i++) {
 			for (java.lang.reflect.Type t : vars[i].getBounds()) {
-				Type<?> vt = type(t, new HashMap<>());
-				if (t != Object.class && !parameters[i].isAssignableTo(vt)) {
-					throw new IllegalArgumentException(parameters[i]
-						+ " is not assignable to the type variable: " + vt);
+				Type<?> var = type(t, new HashMap<>());
+				if (t != Object.class && !params[i].isAssignableTo(var)) {
+					throw new IllegalArgumentException(params[i]
+						+ " is not assignable to the type variable: " + var);
 				}
 			}
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public static <S> Type<? extends S> supertype(Class<S> supertype,
 			Type<? extends S> type) {
-		if (supertype.getTypeParameters().length == 0) {
+		if (supertype.getTypeParameters().length == 0)
 			return raw(supertype); // just for better performance 
-		}
-		for (Type<?> s : type.supertypes()) {
-			if (s.rawType == supertype) {
-				return (Type<? extends S>) s;
-			}
-		}
-		throw new IllegalArgumentException(
-				"`" + supertype + "` is not a supertype of: `" + type + "`");
+		@SuppressWarnings("unchecked")
+		Type<? extends S> res = (Type<? extends S>) arrayFirst(
+				type.supertypes(), s -> s.rawType == supertype);
+		if (res == null)
+			throw new IllegalArgumentException("`" + supertype
+				+ "` is not a supertype of: `" + type + "`");
+		return res;
 	}
 
 	/**
@@ -512,9 +470,8 @@ public final class Type<T>
 		java.lang.reflect.Type genericSupertype = null;
 		Type<?> type = this;
 		Map<String, Type<?>> actualTypeArguments = actualTypeArguments(type);
-		if (!isInterface()) {
+		if (!isInterface())
 			res.add(OBJECT);
-		}
 		while (supertype != null) {
 			if (genericSupertype != null) {
 				type = type(genericSupertype, actualTypeArguments);
@@ -533,11 +490,10 @@ public final class Type<T>
 
 	private static <V> Map<String, Type<?>> actualTypeArguments(Type<V> type) {
 		Map<String, Type<?>> actualTypeArguments = new HashMap<>();
-		TypeVariable<Class<V>>[] typeParameters = type.rawType.getTypeParameters();
-		for (int i = 0; i < typeParameters.length; i++) {
+		TypeVariable<Class<V>>[] typeParams = type.rawType.getTypeParameters();
+		for (int i = 0; i < typeParams.length; i++) {
 			// it would be correct to use the joint type of the bounds but since it is not possible to create a type with illegal parameters it is ok to just use Object since there is no way to model a joint type
-			actualTypeArguments.put(typeParameters[i].getName(),
-					type.parameter(i));
+			actualTypeArguments.put(typeParams[i].getName(), type.parameter(i));
 		}
 		return actualTypeArguments;
 	}

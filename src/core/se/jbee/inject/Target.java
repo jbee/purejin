@@ -66,39 +66,35 @@ public final class Target implements Qualifying<Target>, Serializable {
 		return injectingInto(raw(type));
 	}
 
-	public boolean isAvailableFor(Dependency<?> dependency) {
-		return isAccessibleFor(dependency) && isCompatibleWith(dependency);
+	public boolean isAvailableFor(Dependency<?> dep) {
+		return isAccessibleFor(dep) && isCompatibleWith(dep);
 	}
 
 	/**
 	 * @return true in case the actual types of the injection hierarchy are
 	 *         assignable with the ones demanded by this target.
 	 */
-	public boolean isCompatibleWith(Dependency<?> dependency) {
-		if (!areParentsCompatibleWith(dependency)) {
-			return false;
-		}
-		if (instance.isAny()) {
-			return true;
-		}
-		final Instance<?> target = dependency.target();
+	public boolean isCompatibleWith(Dependency<?> dep) {
+		return areParentsCompatibleWith(dep)
+			&& (instance.isAny() || isCompatibleWith(dep.target()));
+	}
+
+	private boolean isCompatibleWith(Instance<?> target) {
 		return instance.name.isCompatibleWith(target.name)
 			&& isAssingableTo(instance.type(), target.type());
 	}
 
-	private boolean areParentsCompatibleWith(Dependency<?> dependency) {
-		if (parents.isAny()) {
+	private boolean areParentsCompatibleWith(Dependency<?> dep) {
+		if (parents.isAny())
 			return true;
-		}
 		int pl = parents.depth();
-		int il = dependency.injectionDepth() - 1;
+		int il = dep.injectionDepth() - 1;
 		if (pl > il) {
 			return false;
 		}
 		int pi = 0;
 		while (pl <= il && pl > 0) {
-			if (isAssingableTo(parents.at(pi).type(),
-					dependency.target(il).type())) {
+			if (isAssingableTo(parents.at(pi).type(), dep.target(il).type())) {
 				pl--;
 				pi++;
 			}
@@ -143,12 +139,10 @@ public final class Target implements Qualifying<Target>, Serializable {
 		if (ol != l)
 			return l > ol;
 		if (l > 0) { // length is known to be equal
-			if (parents.moreQualiedThan(other.parents)) {
+			if (parents.moreQualiedThan(other.parents))
 				return true;
-			}
-			if (other.parents.moreQualiedThan(parents)) {
+			if (other.parents.moreQualiedThan(parents))
 				return false;
-			}
 		}
 		return Qualifying.compareRelated(instance, other.instance, packages,
 				other.packages);
