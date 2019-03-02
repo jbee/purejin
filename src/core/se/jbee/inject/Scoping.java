@@ -23,14 +23,14 @@ import se.jbee.inject.Scope.SingletonScope;
 public final class Scoping implements Serializable {
 
 	public static final Scoping IGNORE = new Scoping(SingletonScope.class);
-	private static final Map<Class<? extends Scope>, Scoping> EXPIRY_BY_SCOPE = new ConcurrentHashMap<>();
+	private static final Map<Class<? extends Scope>, Scoping> SCOPING_BY_SCOPE = new ConcurrentHashMap<>();
 
 	public static Scoping scopingOf(Scope s) {
 		return scopingOf(s.getClass());
 	}
 
 	public static Scoping scopingOf(Class<? extends Scope> s) {
-		return EXPIRY_BY_SCOPE.computeIfAbsent(s, k -> new Scoping(k));
+		return SCOPING_BY_SCOPE.computeIfAbsent(s, k -> new Scoping(k));
 	}
 
 	private final boolean stableByDesign;

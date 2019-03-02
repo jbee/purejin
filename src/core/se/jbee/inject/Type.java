@@ -33,8 +33,8 @@ import java.util.Set;
  * model. The key difference is that this model just describes concrete types.
  * So there is no representation for a {@link TypeVariable}.
  * 
- * There are some generic cases that are not supported right now because they
- * haven't been needed.
+ * There are some generic cases ({@code ? super X} types) that are not supported
+ * right now because they haven't been needed.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */

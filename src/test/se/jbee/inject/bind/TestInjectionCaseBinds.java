@@ -5,6 +5,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
+import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.container.Typecast.generatorTypeOf;
+import static se.jbee.inject.container.Typecast.generatorsTypeFor;
 import static se.jbee.inject.container.Typecast.injectionCaseTypeFor;
 import static se.jbee.inject.container.Typecast.injectionCasesTypeFor;
 
@@ -13,6 +16,7 @@ import java.util.List;
 import org.junit.Test;
 
 import se.jbee.inject.Dependency;
+import se.jbee.inject.Generator;
 import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Name;
@@ -67,6 +71,26 @@ public class TestInjectionCaseBinds {
 				cases[0].generator.yield(dependency(String.class)));
 		assertEquals("special",
 				cases[1].generator.yield(dependency(String.class)));
+	}
+
+	@Test
+	public void thatGeneratorIsAvailableForEveryBoundResource() {
+		Generator<String> generator = injector.resolve(
+				generatorTypeOf(raw(String.class)));
+		assertNotNull(generator);
+		assertEquals("foobar", generator.yield(dependency(String.class)));
+	}
+
+	@Test
+	public void thatGeneratorArrayIsAvailableForEveryBoundResource() {
+		Generator<String>[] gens = injector.resolve(
+				generatorsTypeFor(raw(String.class)));
+		assertEquals(4, gens.length);
+	}
+
+	@Test
+	public void thatGeneratorArrayIsAvailableForAllResources() {
+		assertEquals(4, injector.resolve(Generator[].class).length);
 	}
 
 	@Test

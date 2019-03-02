@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.container;
@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import se.jbee.inject.Generator;
 import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Provider;
 import se.jbee.inject.Type;
@@ -24,13 +25,13 @@ import se.jbee.inject.Type;
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public final class Typecast {
 
 	public static <T> Type<List<T>> listTypeOf(Class<T> elementType) {
 		return listTypeOf(raw(elementType));
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <T> Type<List<T>> listTypeOf(Type<T> elementType) {
 		return (Type) raw(List.class).parametized(elementType);
 	}
@@ -39,7 +40,6 @@ public final class Typecast {
 		return setTypeOf(raw(elementType));
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <T> Type<Set<T>> setTypeOf(Type<T> elementType) {
 		return (Type) raw(Set.class).parametized(elementType);
 	}
@@ -49,7 +49,6 @@ public final class Typecast {
 		return collectionTypeOf(raw(elementType));
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <T> Type<Collection<T>> collectionTypeOf(
 			Type<T> elementType) {
 		return (Type) raw(Collection.class).parametized(elementType);
@@ -59,7 +58,6 @@ public final class Typecast {
 		return providerTypeOf(raw(providedType));
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <T> Type<Provider<T>> providerTypeOf(Type<T> providedType) {
 		return (Type) raw(Provider.class).parametized(providedType);
 	}
@@ -68,9 +66,17 @@ public final class Typecast {
 		return factoryTypeOf(raw(providedType));
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <T> Type<Factory<T>> factoryTypeOf(Type<T> providedType) {
 		return (Type) raw(Factory.class).parametized(providedType);
+	}
+
+	public static <T> Type<Generator<T>> generatorTypeOf(Type<T> providedType) {
+		return (Type) raw(Generator.class).parametized(providedType);
+	}
+
+	public static <T> Type<Generator<T>[]> generatorsTypeFor(
+			Type<T> generatedType) {
+		return (Type) raw(Generator[].class).parametized(generatedType);
 	}
 
 	public static <T> Type<InjectionCase<T>> injectionCaseTypeFor(
@@ -78,7 +84,6 @@ public final class Typecast {
 		return injectionCaseTypeFor(raw(generatedType));
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <T> Type<InjectionCase<T>> injectionCaseTypeFor(
 			Type<T> generatorType) {
 		return (Type) raw(InjectionCase.class).parametized(generatorType);
@@ -89,19 +94,16 @@ public final class Typecast {
 		return injectionCasesTypeFor(raw(generatedType));
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <T> Type<InjectionCase<T>[]> injectionCasesTypeFor(
 			Type<T> generatedType) {
 		return (Type) raw(InjectionCase[].class).parametized(generatedType);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <T> Type<Initialiser<T>> initialiserTypeOf(
 			Class<T> intialisedType) {
 		return (Type) raw(Initialiser.class).parametized(intialisedType);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <T> Type<Initialiser<T>> initialiserTypeOf(
 			Type<T> intialisedType) {
 		return (Type) raw(Initialiser.class).parametized(intialisedType);

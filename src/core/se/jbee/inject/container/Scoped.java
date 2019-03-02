@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.container;
@@ -52,13 +52,19 @@ public final class Scoped {
 	}
 
 	static {
-		scopingOf(INJECTION).notStableIn(THREAD).notStableIn(
-				APPLICATION).notStableIn(DEPENDENCY).notStableIn(
-						DEPENDENCY_INSTANCE).notStableIn(
-								DEPENDENCY_TYPE).notStableIn(TARGET_INSTANCE);
-		scopingOf(THREAD).notStableIn(APPLICATION).notStableIn(
-				DEPENDENCY).notStableIn(DEPENDENCY_INSTANCE).notStableIn(
-						DEPENDENCY_TYPE).notStableIn(TARGET_INSTANCE);
+		scopingOf(INJECTION) // (trick formatter)
+				.notStableIn(THREAD) //
+				.notStableIn(APPLICATION) //
+				.notStableIn(DEPENDENCY) //
+				.notStableIn(DEPENDENCY_INSTANCE) //
+				.notStableIn(DEPENDENCY_TYPE) //
+				.notStableIn(TARGET_INSTANCE);
+		scopingOf(THREAD) //
+				.notStableIn(APPLICATION) //
+				.notStableIn(DEPENDENCY) //
+				.notStableIn(DEPENDENCY_INSTANCE) //
+				.notStableIn(DEPENDENCY_TYPE) //
+				.notStableIn(TARGET_INSTANCE);
 	}
 
 	/**
@@ -236,9 +242,8 @@ public final class Scoped {
 
 	public static <T> String targetInstanceOf(Dependency<T> dep) {
 		StringBuilder b = new StringBuilder();
-		for (int i = dep.injectionDepth() - 1; i >= 0; i--) {
+		for (int i = dep.injectionDepth() - 1; i >= 0; i--)
 			b.append(dep.target(i));
-		}
 		return b.toString();
 	}
 
@@ -287,9 +292,8 @@ public final class Scoped {
 				Provider<T> provider) throws UnresolvableDependency {
 			final String key = scope.instanceKeyFor(dep);
 			T instance = (T) instances.get(key);
-			if (instance != null) {
+			if (instance != null)
 				return instance;
-			}
 			synchronized (instances) {
 				instance = (T) instances.get(key);
 				if (instance == null) {
@@ -340,13 +344,11 @@ public final class Scoped {
 		@SuppressWarnings("unchecked")
 		public <T> T serve(int serialID, Dependency<? super T> dep,
 				Provider<T> provider) throws UnresolvableDependency {
-			if (instances == null) {
+			if (instances == null)
 				instances = new Object[generators];
-			}
 			T res = (T) instances[serialID];
-			if (res != null) {
+			if (res != null)
 				return res;
-			}
 			// just sync the (later) unexpected path that is executed once
 			synchronized (instances) {
 				res = (T) instances[serialID];

@@ -13,6 +13,7 @@ import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.arrayFilter;
 import static se.jbee.inject.Utils.arrayFindFirst;
 import static se.jbee.inject.Utils.arrayFlatmap;
+import static se.jbee.inject.Utils.arrayMap;
 import static se.jbee.inject.Utils.arrayOf;
 import static se.jbee.inject.container.Typecast.initialiserTypeOf;
 import static se.jbee.inject.container.Typecast.injectionCasesTypeFor;
@@ -159,15 +160,21 @@ public final class Inject {
 		@Override
 		public <T> T resolve(Dependency<T> dep) {
 			//TODO new feature: resolve by annotation type -> as addon with own API that does its type analysis on basis of specs
-			//TODO new feature: allow to resolve Generator and Generator[] by first resolving the case/cases and mapping that to generator(s)
 			final Type<T> type = dep.type();
-			if (type.rawType == InjectionCase.class) {
+			final Class<T> rawType = type.rawType;
+			if (rawType == InjectionCase.class) {
 				InjectionCase<?> res = injectionCaseMatching(
 						dep.onTypeParameter());
 				if (res != null)
 					return (T) res;
 			}
-			if (type.rawType == Injector.class)
+			if (rawType == Generator.class) {
+				InjectionCase<?> res = injectionCaseMatching(
+						dep.onTypeParameter());
+				if (res != null)
+					return (T) res.generator;
+			}
+			if (rawType == Injector.class)
 				return (T) this;
 			InjectionCase<T> match = injectionCaseMatching(dep);
 			if (match != null)
@@ -208,8 +215,14 @@ public final class Inject {
 
 		@SuppressWarnings("unchecked")
 		private <T, E> T resolveArray(Dependency<T> dep, Type<E> elemType) {
-			if (elemType.rawType == InjectionCase.class)
+			final Class<E> rawElemType = elemType.rawType;
+			if (rawElemType == InjectionCase.class)
 				return (T) resolveCaseArray(dep, elemType.parameter(0));
+			if (rawElemType == Generator.class) {
+				return (T) arrayMap(
+						resolveCaseArray(dep, elemType.parameter(0)),
+						Generator.class, c -> c.generator);
+			}
 			if (dep.type().rawType.getComponentType().isPrimitive()) {
 				throw new NoCaseForDependency(dep, null,
 						"Primitive arrays cannot be used to inject all instances of the wrapper type. Use the wrapper array instead.");
@@ -272,7 +285,6 @@ public final class Inject {
 			}
 		}
 
-		@Deprecated // TODO replace with Utils
 		@SuppressWarnings("unchecked")
 		private static <T, E> T toArray(List<? extends E> elements,
 				Type<E> elementType) {
