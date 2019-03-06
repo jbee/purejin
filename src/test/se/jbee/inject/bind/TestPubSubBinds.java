@@ -125,8 +125,8 @@ public class TestPubSubBinds {
 			// a predefined (unknown constant) with aid of explicit multibind to Subscriber
 			Supplier<PredefinedService> predefined = Supply.constant(
 					new PredefinedService());
-			bind(named("pre"), Service.class).to(predefined);
-			multibind(Subscriber.class).to(predefined);
+			bind(named("pre"), Service.class).toSupplier(predefined);
+			multibind(Subscriber.class).toSupplier(predefined);
 
 			bind(Publisher.class).to(PublisherImpl.class);
 			init(PublisherImpl.class).forAny(Subscriber.class,
@@ -158,8 +158,8 @@ public class TestPubSubBinds {
 			// a predefined (unknown constant) with aid of explicit multibind to Subscriber
 			Supplier<PredefinedService> predefined = Supply.constant(
 					new PredefinedService());
-			bind(named("pre"), Service.class).to(predefined);
-			multibind(Subscriber.class).to(predefined);
+			bind(named("pre"), Service.class).toSupplier(predefined);
+			multibind(Subscriber.class).toSupplier(predefined);
 
 			bind(Publisher.class).to(PublisherImpl.class);
 			init(PublisherImpl.class).forEach(raw(Subscriber[].class),

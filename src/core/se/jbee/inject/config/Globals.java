@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.config;
@@ -15,8 +15,8 @@ import se.jbee.inject.Type;
  *
  * The is immutable! All methods create new instances that reflect the change.
  *
- * @see Presets
  * @see Options
+ * @see Choices
  * @see Edition
  *
  * @author Jan Bernitt (jan@jbee.se)
@@ -35,42 +35,42 @@ public final class Globals {
 	}
 
 	/**
-	 * The standard configuration with no special {@link Options} or
-	 * {@link Presets} including all features.
+	 * The standard configuration with no special {@link Choices} or
+	 * {@link Options} including all features.
 	 */
 	public static final Globals STANDARD = new Globals(Edition.FULL,
-			Options.STANDARD, Presets.EMPTY);
+			Choices.STANDARD, Options.EMPTY);
 
 	public final Edition edition;
+	public final Choices choices;
 	public final Options options;
-	public final Presets presets;
 
-	private Globals(Edition edition, Options options, Presets presets) {
+	private Globals(Edition edition, Choices choices, Options options) {
 		this.edition = edition;
+		this.choices = choices;
 		this.options = options;
-		this.presets = presets;
 	}
 
-	public Globals edition(Edition edition) {
-		return new Globals(edition, options, presets);
+	public Globals with(Edition edition) {
+		return new Globals(edition, choices, options);
 	}
 
-	public Globals edition(Packages included) {
-		return edition(packagesEdition(included));
+	public Globals withEditionIncluding(Packages included) {
+		return with(packagesEdition(included));
 	}
 
 	@SafeVarargs
-	public final <T extends Enum<T> & Feature<T>> Globals edition(
+	public final <T extends Enum<T> & Feature<T>> Globals withEditionInclduing(
 			T... featured) {
-		return edition(featureEdition(featured));
+		return with(featureEdition(featured));
 	}
 
-	public Globals options(Options options) {
-		return new Globals(edition, options, presets);
+	public Globals with(Choices choices) {
+		return new Globals(edition, choices, options);
 	}
 
-	public Globals presets(Presets presets) {
-		return new Globals(edition, options, presets);
+	public Globals with(Options options) {
+		return new Globals(edition, choices, options);
 	}
 
 	private static class FeatureEdition<T extends Enum<T>> implements Edition {

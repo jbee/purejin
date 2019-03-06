@@ -5,9 +5,9 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
+import se.jbee.inject.Scope;
 import se.jbee.inject.UnresolvableDependency.UnstableDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.container.Scoped;
 
 public class TestScopedBinds {
 
@@ -27,8 +27,8 @@ public class TestScopedBinds {
 
 		@Override
 		protected void declare() {
-			per(Scoped.APPLICATION).construct(Foo.class);
-			per(Scoped.INJECTION).construct(Bar.class);
+			per(Scope.application).construct(Foo.class);
+			per(Scope.injection).construct(Bar.class);
 		}
 	}
 

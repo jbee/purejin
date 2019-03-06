@@ -10,8 +10,8 @@ import java.util.List;
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
+import se.jbee.inject.Scope;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.container.Scoped;
 
 /**
  * This test illustrates the most basic scenario of a classic "event listener"
@@ -86,7 +86,7 @@ public class TestNonConcurrentVoidMultiDispatchEvents {
 		@Override
 		protected void declare() {
 			handle(Listener.class);
-			per(Scoped.INJECTION).construct(Service.class);
+			per(Scope.injection).construct(Service.class);
 			// makes observed calls "single threaded"
 			bind(EventMirror.class).to(
 					event -> EventPreferences.DEFAULT.withMaxConcurrentUsage(
@@ -110,7 +110,7 @@ public class TestNonConcurrentVoidMultiDispatchEvents {
 		listener.onX(42);
 		listener.onY(13);
 		giveSomeTime();
-		// there are two scenarios as we cannot be sure which message is first processed to the point where the onX/onY is called 
+		// there are two scenarios as we cannot be sure which message is first processed to the point where the onX/onY is called
 		if (a.xs.isEmpty()) {
 			assertMessages(a.xs);
 			assertMessages(a.ys, 13);

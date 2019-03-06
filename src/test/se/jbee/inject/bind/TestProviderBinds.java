@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
@@ -21,11 +22,11 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Provider;
+import se.jbee.inject.Scope;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency.UnstableDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.container.Scoped;
 
 public class TestProviderBinds {
 
@@ -47,7 +48,7 @@ public class TestProviderBinds {
 			bind(Integer.class).to(42);
 			bind(named("foo"), Integer.class).to(846);
 			bind(Float.class).to(42.0f);
-			per(Scoped.INJECTION).bind(DynamicState.class).toConstructor();
+			per(Scope.injection).bind(DynamicState.class).toConstructor();
 			construct(FaultyStateConsumer.class);
 			construct(WorkingStateConsumer.class);
 
@@ -140,13 +141,20 @@ public class TestProviderBinds {
 	}
 
 	@Test
-	public void providersOvercomeExpirationConflicts() {
-		injector.resolve(WorkingStateConsumer.class);
+	public void providersOvercomeScopingConflicts() {
+		assertNotNull(injector.resolve(WorkingStateConsumer.class));
 	}
 
-	@Test(expected = UnstableDependency.class)
-	public void expirationConflictsCauseException() {
-		injector.resolve(FaultyStateConsumer.class);
+	@Test
+	public void scopingConflictsCauseException() {
+		try {
+			injector.resolve(FaultyStateConsumer.class);
+			fail("expected " + UnstableDependency.class.getSimpleName());
+		} catch (UnstableDependency e) {
+			assertEquals(
+					"Cannot inject se.jbee.inject.bind.TestProviderBinds.DynamicState  {* => *, [*] } injection into se.jbee.inject.bind.TestProviderBinds.FaultyStateConsumer  {* => *, [*] } application",
+					e.getMessage());
+		}
 	}
 
 	@Test

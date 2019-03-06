@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -46,6 +46,6 @@ public final class Injection implements Serializable {
 	}
 
 	public Injection ignoredScoping() {
-		return new Injection(dependency, target, Scoping.IGNORE);
+		return new Injection(dependency, target, Scoping.ignore);
 	}
 }

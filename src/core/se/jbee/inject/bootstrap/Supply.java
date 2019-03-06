@@ -100,7 +100,7 @@ public final class Supply {
 
 	public static <T> Provider<T> lazyProvider(Dependency<T> dependency,
 			Injector injector) {
-		return dependency.type().arrayDimensions() == 1 // no specs for results
+		return dependency.type().arrayDimensions() == 1
 			// composed within the Injector
 			? new LazyDirectProvider<>(dependency, injector)
 			: new LazyPreresolvedProvider<>(dependency, injector);
@@ -321,7 +321,8 @@ public final class Supply {
 		public Provider<?> supply(Dependency<? super Provider<?>> dep,
 				Injector injector) {
 			return lazyProvider(
-					dep.onTypeParameter().uninject().ignoredExpiry(), injector);
+					dep.onTypeParameter().uninject().ignoredScoping(),
+					injector);
 		}
 
 		@Override

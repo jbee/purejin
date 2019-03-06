@@ -1,11 +1,11 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *  Copyright (c) 2012-2019, Jan Bernitt 
+ *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
 
-import se.jbee.inject.config.Options;
+import se.jbee.inject.config.Choices;
 
 /**
  * The basic idea is to split the binding process into 2 steps: installing
@@ -59,40 +59,40 @@ public interface Bootstrapper {
 
 	/**
 	 * @param <T> Type of the preset value passed to the module
-	 * @param module the {@link PresetModule} to install (within the parent
+	 * @param module the {@link ModuleWith} to install (within the parent
 	 *            {@link Bundle} that is given implicitly - the
 	 *            {@link Bootstrapper} keeps track of that)
 	 */
-	<T> void install(PresetModule<T> module);
+	<T> void install(ModuleWith<T> module);
 
 	/**
 	 * @param options The choices made to install.
 	 */
 	@SuppressWarnings("unchecked")
-	<O extends Enum<O> & OptionBundle<O>> void install(O... options);
+	<O extends Enum<O> & ChoiceBundle<O>> void install(O... options);
 
 	/**
 	 * @param options The choices made to uninstall again.
 	 */
 	@SuppressWarnings("unchecked")
-	<O extends Enum<O> & OptionBundle<O>> void uninstall(O... options);
+	<O extends Enum<O> & ChoiceBundle<O>> void uninstall(O... options);
 
 	/**
-	 * @see Options
+	 * @see Choices
 	 * @param bundle the {@link Bundle} to install
 	 * @param optionProperty The property the installation is connected to.
 	 */
-	<O extends Enum<O>> void install(Class<? extends OptionBundle<O>> bundle,
+	<O extends Enum<O>> void install(Class<? extends ChoiceBundle<O>> bundle,
 			Class<O> optionProperty);
 
 	/**
 	 * 
 	 * @author Jan Bernitt (jan@jbee.se)
 	 * 
-	 * @param <O> The type of choices possible
+	 * @param <C> The type of choices possible
 	 */
 	@FunctionalInterface
-	interface OptionBootstrapper<O> {
+	interface ChoiceBootstrapper<C> {
 
 		/**
 		 * Installs the bundle when the given option is used.
@@ -100,7 +100,7 @@ public interface Bootstrapper {
 		 * If the module passed hasn't been
 		 * {@link Bootstrapper#install(Enum...)}ed the call will be ignored.
 		 */
-		void install(Class<? extends Bundle> bundle, O onOption);
+		void install(Class<? extends Bundle> bundle, C choice);
 
 	}
 

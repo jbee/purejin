@@ -23,6 +23,7 @@ import java.lang.reflect.Modifier;
 import java.util.function.BiConsumer;
 
 import se.jbee.inject.Dependency;
+import se.jbee.inject.Generator;
 import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
@@ -33,6 +34,7 @@ import se.jbee.inject.Resource;
 import se.jbee.inject.Scope;
 import se.jbee.inject.Target;
 import se.jbee.inject.Type;
+import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bootstrap.Binding;
 import se.jbee.inject.bootstrap.BindingType;
 import se.jbee.inject.bootstrap.Bindings;
@@ -40,13 +42,9 @@ import se.jbee.inject.bootstrap.BoundConstant;
 import se.jbee.inject.bootstrap.BoundConstructor;
 import se.jbee.inject.bootstrap.BoundMethod;
 import se.jbee.inject.bootstrap.Supply;
-import se.jbee.inject.config.ConstructionMirror;
-import se.jbee.inject.config.NamingMirror;
-import se.jbee.inject.config.ParameterisationMirror;
-import se.jbee.inject.config.ProductionMirror;
+import se.jbee.inject.config.Mirrors;
 import se.jbee.inject.container.Factory;
 import se.jbee.inject.container.Initialiser;
-import se.jbee.inject.container.Scoped;
 import se.jbee.inject.container.Supplier;
 
 /**
@@ -305,13 +303,17 @@ public class Binder {
 
 		private final ScopedBinder binder;
 
-		protected AutoBinder(RootBinder binder, Scope scope) {
+		protected AutoBinder(RootBinder binder, Name scope) {
 			this.binder = binder.on(binder.bind().asAuto()).on(
 					binder.bind().next()).per(scope);
 		}
 
 		private Bindings bindings() {
 			return binder.bindings();
+		}
+
+		private Mirrors mirrors() {
+			return bindings().mirrors;
 		}
 
 		public void in(Class<?> service) {
@@ -327,7 +329,7 @@ public class Binder {
 					params);
 			if (!boundInstanceMethods)
 				return; // do not try to construct the class
-			Constructor<?> c = bindings().construction.reflect(service);
+			Constructor<?> c = mirrors().construction.reflect(service);
 			if (c != null)
 				bind(c, params);
 		}
@@ -335,16 +337,14 @@ public class Binder {
 		private boolean bindMirrorMethodsIn(Class<?> impl, Object instance,
 				Parameter<?>[] params) {
 			boolean instanceMethods = false;
-			Bindings bindings = bindings();
-			for (Method method : bindings.production.reflect(impl)) {
+			for (Method method : mirrors().production.reflect(impl)) {
 				Type<?> returnType = Type.returnType(method);
-				//TODO why do this check below???
-				if (!Type.VOID.equalTo(returnType)) {
-					if (params.length == 0) {
-						params = bindings.parameterisation.reflect(method);
-					}
-					binder.bind(bindings.naming.reflect(method), returnType).to(
-							instance, method, params);
+				if (returnType.rawType != void.class
+					&& returnType.rawType != Void.class) {
+					if (params.length == 0)
+						params = mirrors().parameterisation.reflect(method);
+					binder.bind(mirrors().naming.reflect(method),
+							returnType).to(instance, method, params);
 					instanceMethods = instanceMethods
 						|| !Modifier.isStatic(method.getModifiers());
 				}
@@ -353,11 +353,11 @@ public class Binder {
 		}
 
 		private <T> void bind(Constructor<T> c, Parameter<?>... params) {
-			Name name = bindings().naming.reflect(c);
+			Name name = mirrors().naming.reflect(c);
 			if (params.length == 0)
-				params = bindings().parameterisation.reflect(c);
+				params = mirrors().parameterisation.reflect(c);
 			Class<T> impl = c.getDeclaringClass();
-			Binder appBinder = binder.root.per(Scoped.APPLICATION).implicit();
+			Binder appBinder = binder.root.per(Scope.application).implicit();
 			if (name.isDefault()) {
 				appBinder.autobind(impl).to(c, params);
 			} else {
@@ -387,36 +387,15 @@ public class Binder {
 			super(null, bind);
 		}
 
-		public ScopedBinder per(Scope scope) {
+		public ScopedBinder per(Name scope) {
 			return new ScopedBinder(root, bind().per(scope));
 		}
 
 		/**
 		 * @since 19.1
 		 */
-		public RootBinder constructBy(ConstructionMirror reflector) {
-			return into(bindings().with(reflector));
-		}
-
-		/**
-		 * @since 19.1
-		 */
-		public RootBinder produceBy(ProductionMirror reflector) {
-			return into(bindings().with(reflector));
-		}
-
-		/**
-		 * @since 19.1
-		 */
-		public RootBinder parameteriseBy(ParameterisationMirror reflector) {
-			return into(bindings().with(reflector));
-		}
-
-		/**
-		 * @since 19.1
-		 */
-		public RootBinder nameBy(NamingMirror reflector) {
-			return into(bindings().with(reflector));
+		public RootBinder with(Mirrors mirrors) {
+			return into(bindings().with(mirrors));
 		}
 
 		/**
@@ -578,16 +557,25 @@ public class Binder {
 		}
 
 		public void to(Factory<? extends T> factory) {
-			to(Supply.factory(factory));
+			toSupplier(Supply.factory(factory));
 		}
 
-		public void to(Supplier<? extends T> supplier) {
+		public void toSupplier(Supplier<? extends T> supplier) {
 			to(supplier, BindingType.PREDEFINED);
 		}
 
+		/**
+		 * @since 19.1
+		 */
 		public void to(java.util.function.Supplier<? extends T> method) {
-			to((Supplier<? extends T>) (Dependency<? super T> d,
-					Injector i) -> method.get());
+			toSupplier((Dependency<? super T> d, Injector i) -> method.get());
+		}
+
+		/**
+		 * @since 19.1
+		 */
+		public void toGenerator(Generator<? extends T> generator) {
+			toSupplier(new SupplierGeneratorBridge<>(generator));
 		}
 
 		public final void to(T constant) {
@@ -612,7 +600,7 @@ public class Binder {
 		}
 
 		public void toConstructor() {
-			to(bindings().construction.reflect(resource.type().rawType));
+			to(mirrors().construction.reflect(resource.type().rawType));
 		}
 
 		public void toConstructor(Class<? extends T> impl,
@@ -620,7 +608,7 @@ public class Binder {
 			if (isClassVirtual(impl))
 				throw new InconsistentBinding(
 						"Not a constructable type: " + impl);
-			to(bindings().construction.reflect(impl), params);
+			to(mirrors().construction.reflect(impl), params);
 		}
 
 		public void toConstructor(Parameter<?>... params) {
@@ -664,6 +652,10 @@ public class Binder {
 
 		protected final Bindings bindings() {
 			return bind().bindings;
+		}
+
+		protected final Mirrors mirrors() {
+			return bindings().mirrors;
 		}
 
 		protected final Type<T> getType() {
@@ -745,4 +737,31 @@ public class Binder {
 		}
 	}
 
+	/**
+	 * This cannot be changed to a lambda since we need a type that actually
+	 * implements both {@link Supplier} and {@link Generator}. This way the
+	 * {@link Generator} is picked directly by the {@link Injector}.
+	 */
+	private static final class SupplierGeneratorBridge<T>
+			implements Supplier<T>, Generator<T> {
+
+		private final Generator<T> generator;
+
+		SupplierGeneratorBridge(Generator<T> generator) {
+			this.generator = generator;
+		}
+
+		@Override
+		public T yield(Dependency<? super T> dep)
+				throws UnresolvableDependency {
+			return generator.yield(dep);
+		}
+
+		@Override
+		public T supply(Dependency<? super T> dep, Injector injector)
+				throws UnresolvableDependency {
+			return yield(dep);
+		}
+
+	}
 }

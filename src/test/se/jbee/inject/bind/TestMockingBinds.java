@@ -12,7 +12,6 @@ import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Type.returnType;
-import static se.jbee.inject.container.Scoped.INJECTION;
 
 import java.awt.Rectangle;
 import java.awt.Shape;
@@ -29,6 +28,7 @@ import org.junit.Test;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Name;
+import se.jbee.inject.Scope;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -67,7 +67,8 @@ public class TestMockingBinds {
 			// so a wrongly implemented supplier would lead to a ClassCastExceptions
 			@SuppressWarnings("unchecked")
 			Type<B> upperBound = (Type<B>) raw(base).asUpperBound();
-			per(INJECTION).bind(anyOf(upperBound)).to(new MockSupplier<>(base));
+			per(Scope.injection).bind(anyOf(upperBound)).toSupplier(
+					new MockSupplier<>(base));
 		}
 
 	}
@@ -141,7 +142,7 @@ public class TestMockingBinds {
 						instance(name, returnType(method)));
 				// this hierarchy is used to allow bindings meant for mocks without risk of collisions
 				dependency = dependency.injectingInto(Mock.class).injectingInto(
-						method.getDeclaringClass()).ignoredExpiry();
+						method.getDeclaringClass()).ignoredScoping();
 				return injector.resolve(dependency);
 			} catch (UnresolvableDependency e) {
 				Class<?> rt = method.getReturnType();

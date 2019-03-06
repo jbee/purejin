@@ -17,9 +17,9 @@ import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
+import se.jbee.inject.Scope;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BoundParameter;
-import se.jbee.inject.container.Scoped;
 import se.jbee.inject.container.Supplier;
 
 /**
@@ -117,7 +117,7 @@ public class TestConstructorParameterBinds {
 			bind(Serializable.class).to(Integer.class); // should not be used
 			bind(Qux.class).toConstructor(asType(CharSequence.class, y),
 					constant(Number.class, 1980));
-			per(Scoped.INJECTION).bind(named("inc"), Foo.class).toConstructor(
+			per(Scope.injection).bind(named("inc"), Foo.class).toConstructor(
 					BoundParameter.supplier(raw(Integer.class),
 							new IncrementingSupplier()));
 		}

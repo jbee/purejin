@@ -104,7 +104,7 @@ public class TestMacroBinds {
 	public void thatBindingsCanJustBeCounted() {
 		CountMacro count = new CountMacro();
 		Injector injector = injectorWithMacro(MacroBindsModule.class, count);
-		assertEquals(6, count.expands);
+		assertEquals(6 + 10, count.expands); // 10 from scopes
 		assertEquals(0, injector.resolve(InjectionCase[].class).length);
 	}
 

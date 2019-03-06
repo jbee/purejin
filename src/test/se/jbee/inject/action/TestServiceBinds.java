@@ -3,12 +3,12 @@ package se.jbee.inject.action;
 import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.action.ActionModule.actionDependency;
-import static se.jbee.inject.container.Scoped.DEPENDENCY_TYPE;
 
 import org.junit.Test;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
+import se.jbee.inject.Scope;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.container.Supplier;
@@ -79,7 +79,7 @@ public class TestServiceBinds {
 		@Override
 		protected void declare() {
 			bindActionsIn(MathService.class);
-			per(DEPENDENCY_TYPE).starbind(Service.class).toSupplier(
+			per(Scope.dependencyType).starbind(Service.class).toSupplier(
 					ServiceSupplier.class);
 		}
 

@@ -96,7 +96,7 @@ public abstract class UnresolvableDependency extends RuntimeException {
 		}
 		StringBuilder b = new StringBuilder();
 		for (InjectionCase<?> c : cases) {
-			b.append('\n').append(c.resource.toString()).append(
+			b.append("\n    ").append(c.resource.toString()).append(
 					" defined ").append(c.source);
 		}
 		return b.toString();

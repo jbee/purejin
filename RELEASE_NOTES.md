@@ -21,13 +21,17 @@ v19.1 (upcoming)
 - added `Injector.resolve` `default` methods for convenience
 - added `to` for `java.util.function.Supplier` (method references)
 - added `Name.pluginFor` factory method
-- added `SingletonScope` to mark singleton `Scope` implementations
 
 **API changes**
 - `Inspector` split in (and replaced by) `*Mirror` functional interfaces
 - `InspectorBinder` replaced by `AutoBinder` and `autobind()` (no args)
 - `Bindings` are created via `newBindings` and modified using the `with` methods
 - renamed class `Assembly` to `Injectee`
+- renamed class `Options` to `Choices`
+- renamed class `Presets` to `Options`
+- renamed class `OptionBundle` to `ChoiceBundle`
+- renamed class `OpttionBootstrapper` to `ChoiceBootstrapper`
+- renamed class `PresetModule` to `ModuleWith`
 - renamed class `NoResourceForDependency` to `NoCaseForDependency`
 - renamed class and method `MorePreciseThan#morePreciseThan` to `Qualifying#moreQualiedThan`
 - redesign of `Injectron`/`InjectronInfo` to `Generator` and `InjectionCase`
@@ -50,14 +54,13 @@ v19.1 (upcoming)
 - implicit `construct(...)` for plugin class now only done if class is constructible
 - `Class.class` is now also considered `Metaclass#undeterminable`
 - fixed NPE when trying to resolve `InjectionCase[]` for unbound type 
-- fixed `toString()` of dependency instance scope that wrongly stated `per-dependency-type`
 
 **Improvements**
 - arrays composed by `InjectorImpl` contain instances only once in any case
 - macros are now replaced when defined for same type (no behaviour change)
 - supplied constants are now expanded via macros as `BoundConstant`
 - explicit `BoundConstant`s implicitly bind to constant's actual type too
-- improved `PresetModule` now also supplies the `Presets` itself
+- improved `ModuleWith` now also supplies the `Options` itself
 - `Action` metadata uses concurrent maps instead of `synchronized` blocks
 
 

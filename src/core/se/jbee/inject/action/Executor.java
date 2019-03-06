@@ -29,7 +29,7 @@ public interface Executor {
 	 * @param args all resolved arguments for the method (in order)
 	 * @param output type of the result
 	 * @param input parameter type
-	 * @param dynamic value provided (also one of the arguments)
+	 * @param value provided (also one of the arguments)
 	 * @return result of the invocation
 	 * @throws ActionMalfunction in case of any {@link Exception} during
 	 *             execution. The cause should be the exception causing the

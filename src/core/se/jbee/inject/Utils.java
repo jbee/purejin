@@ -10,7 +10,10 @@ import static java.lang.reflect.Array.newInstance;
 import static java.util.Arrays.copyOf;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -182,6 +185,43 @@ public final class Utils {
 			Class<? extends Annotation> annotation) {
 		return arrayFindFirst(annotation.getDeclaredMethods(),
 				m -> m.getReturnType() == type);
+	}
+
+	public static Name annotatedName(Method nameProperty, Annotation obj) {
+		if (obj == null)
+			return null;
+		try {
+			String name = (String) nameProperty.invoke(obj);
+			if (!name.isEmpty() && !name.equals(nameProperty.getDefaultValue()))
+				return Name.named(name);
+		} catch (Exception e) {
+			// fall through
+		}
+		return null;
+	}
+
+	public static <A extends Annotation> A annotation(Class<A> type,
+			AnnotatedElement obj) {
+		A res = obj.getAnnotation(type);
+		if (res != null)
+			return res;
+		if (!isAllowedOnAnnotations(type))
+			return null;
+		do {
+			for (Annotation a : obj.getAnnotations()) {
+				res = annotation(type, a.annotationType());
+				if (res != null)
+					return res;
+			}
+		} while (obj instanceof Class && obj != Object.class);
+		return null;
+	}
+
+	public static boolean isAllowedOnAnnotations(
+			Class<? extends Annotation> type) {
+		return type.isAnnotationPresent(Target.class)
+			&& arrayContains(type.getAnnotation(Target.class).value(),
+					e -> e == ElementType.ANNOTATION_TYPE);
 	}
 
 	/* Classes */

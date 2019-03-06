@@ -104,8 +104,8 @@ Copyright (c) 2012, Jan Bernitt
 
 	<target name="-jar" depends="compile, javadoc, license">
 		<jar destfile="${dist.dir}/${dist-artifact.id}-${archive-version}.jar"  >
-			<fileset dir="." file="LICENSE" />
-			<fileset dir="." file="README" />
+			<fileset file="./LICENSE" />
+			<fileset file="./README" />
 			<fileset dir="${core.target.dir}" includes="**/*.class" />
 			<manifest>
 				<attribute name='Specification-Version' value='${app.version}'/>
@@ -117,9 +117,9 @@ Copyright (c) 2012, Jan Bernitt
 			</manifest>
 		</jar>
 		<jar destfile="${dist.dir}/${dist-artifact.id}-${archive-version}-sources.jar">
-			<fileset dir="." file="LICENSE" />
-			<fileset dir="." file="README" />
-			<fileset dir="." file="build.xml" />
+			<fileset file="./LICENSE" />
+			<fileset file="./README" />
+			<fileset file="./build.xml" />
 			<fileset dir="${core.src.dir}" includes="**/*.java" />
 			<manifest>
 				<attribute name='Specification-Version' value='${app.version}'/>
@@ -131,8 +131,8 @@ Copyright (c) 2012, Jan Bernitt
 			</manifest>
 		</jar>
 		<jar destfile="${dist.dir}/${dist-artifact.id}-${archive-version}-javadoc.jar">
-			<fileset dir="." file="LICENSE" />
-			<fileset dir="." file="README" />
+			<fileset file="./LICENSE" />
+			<fileset file="./README" />
 			<fileset dir="${javadoc.target.dir}" includes="**/*" />
 			<manifest>
 				<attribute name='Specification-Version' value='${app.version}'/>
@@ -144,7 +144,7 @@ Copyright (c) 2012, Jan Bernitt
 			</manifest>
 		</jar>
 		<zip destfile="${dist.dir}/${dist-artifact.id}-${archive-version}.zip">
-			<fileset dir="." file="LICENSE" />
+			<fileset file="./LICENSE" />
 			<fileset dir="${dist.dir}" includes="${dist-artifact.id}-${archive-version}*.jar" />
 		</zip>
 	</target>

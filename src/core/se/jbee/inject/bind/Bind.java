@@ -7,6 +7,7 @@ package se.jbee.inject.bind;
 
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Instance;
+import se.jbee.inject.Name;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Scope;
 import se.jbee.inject.Source;
@@ -14,6 +15,7 @@ import se.jbee.inject.Target;
 import se.jbee.inject.bootstrap.Binding;
 import se.jbee.inject.bootstrap.BindingType;
 import se.jbee.inject.bootstrap.Bindings;
+import se.jbee.inject.config.ScopingMirror;
 import se.jbee.inject.container.Supplier;
 
 /**
@@ -23,16 +25,16 @@ import se.jbee.inject.container.Supplier;
  */
 public final class Bind {
 
-	public static Bind create(Bindings bindings, Source source, Scope scope) {
-		return new Bind(bindings, source, scope, Target.ANY);
+	public static Bind create(Bindings bindings, Source source) {
+		return new Bind(bindings, source, Scope.mirror, Target.ANY);
 	}
 
 	public final Bindings bindings;
 	public final Source source;
-	public final Scope scope;
+	public final Name scope;
 	public final Target target;
 
-	private Bind(Bindings bindings, Source source, Scope scope, Target target) {
+	private Bind(Bindings bindings, Source source, Name scope, Target target) {
 		this.bindings = bindings;
 		this.source = source;
 		this.scope = scope;
@@ -67,7 +69,7 @@ public final class Bind {
 		return with(source.typed(type));
 	}
 
-	public Bind per(Scope scope) {
+	public Bind per(Name scope) {
 		return new Bind(bindings, source, scope, target);
 	}
 
@@ -95,6 +97,12 @@ public final class Bind {
 
 	public <T> Binding<T> asType(Resource<T> resource, BindingType type,
 			Supplier<? extends T> supplier) {
-		return Binding.binding(resource, type, supplier, scope, source);
+		Name effectiveScope = scope.equalTo(Scope.mirror)
+			? bindings.mirrors.scoping.reflect(resource.type().rawType)
+			: scope;
+		if (effectiveScope.equalTo(ScopingMirror.auto))
+			effectiveScope = Scope.application;
+		return Binding.binding(resource, type, supplier, effectiveScope,
+				source);
 	}
 }

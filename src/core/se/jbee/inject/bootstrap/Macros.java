@@ -288,7 +288,8 @@ public final class Macros {
 
 	static <T> void bindToMirrorConstructor(Bindings bindings,
 			Binding<T> binding, Class<? extends T> impl) {
-		Constructor<? extends T> c = bindings.construction.reflect(impl);
+		Constructor<? extends T> c = bindings.mirrors.construction.reflect(
+				impl);
 		if (c != null) {
 			bindings.macros.expandInto(bindings, binding,
 					BoundConstructor.bind(c));

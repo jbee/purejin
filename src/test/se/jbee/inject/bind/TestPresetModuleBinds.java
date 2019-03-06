@@ -15,16 +15,16 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.bootstrap.PresetModule;
+import se.jbee.inject.bootstrap.ModuleWith;
 import se.jbee.inject.config.Globals;
-import se.jbee.inject.config.Presets;
+import se.jbee.inject.config.Options;
 
 /**
- * This test demonstrates how to use {@link Presets} to pass input data to the
- * {@link Bootstrap} that can be accessed in any {@link PresetModule} class. The
+ * This test demonstrates how to use {@link Options} to pass input data to the
+ * {@link Bootstrap} that can be accessed in any {@link ModuleWith} class. The
  * value passed into {@link BinderModuleWith#declare(Object)} is determined by
  * the type of the generic. This has to be the same {@link Type} as the one used
- * when declaring the value via {@link Presets#preset(Class, Object)}.
+ * when declaring the value via {@link Options#set(Class, Object)}.
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
@@ -71,10 +71,10 @@ public class TestPresetModuleBinds {
 	}
 
 	private static class PresetModuleBindsModule4
-			extends BinderModuleWith<Presets> {
+			extends BinderModuleWith<Options> {
 
 		@Override
-		protected void declare(Presets preset) {
+		protected void declare(Options preset) {
 			assertNotNull(preset);
 		}
 
@@ -83,12 +83,12 @@ public class TestPresetModuleBinds {
 	private final Injector injector = injector();
 
 	private static Injector injector() {
-		Presets presets = Presets.EMPTY.preset(Properties.class,
-				exampleProperties()).preset(listTypeOf(String.class),
-						asList("a", "b")).preset(listTypeOf(Integer.class),
+		Options presets = Options.EMPTY.set(Properties.class,
+				exampleProperties()).set(listTypeOf(String.class),
+						asList("a", "b")).set(listTypeOf(Integer.class),
 								asList(1, 2));
 		return Bootstrap.injector(PresetModuleBindsBundle.class,
-				Globals.STANDARD.presets(presets));
+				Globals.STANDARD.with(presets));
 	}
 
 	private static Properties exampleProperties() {

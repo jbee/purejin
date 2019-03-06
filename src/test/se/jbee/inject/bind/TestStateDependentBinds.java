@@ -16,12 +16,12 @@ import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Provider;
+import se.jbee.inject.Scope;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency.NoCaseForDependency;
 import se.jbee.inject.bind.Binder.RootBinder;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.container.Scoped;
 import se.jbee.inject.container.Supplier;
 import se.jbee.inject.util.Resource;
 
@@ -122,7 +122,7 @@ public class TestStateDependentBinds {
 		}
 
 		public <S> void via(Type<S> state) {
-			binder.per(Scoped.INJECTION).bind(type).to(
+			binder.per(Scope.injection).bind(type).toSupplier(
 					stateDependent(type, Dependency.dependency(state)));
 		}
 
@@ -176,7 +176,7 @@ public class TestStateDependentBinds {
 
 		@Override
 		protected void declare() {
-			per(Scoped.INJECTION).bind(Validator.class).to(
+			per(Scope.injection).bind(Validator.class).toSupplier(
 					stateDependent(Type.raw(Validator.class),
 							dependency(ValidationStrength.class)));
 
@@ -187,9 +187,9 @@ public class TestStateDependentBinds {
 			bind(named((Object) null), Validator.class).to(Permissive.class);
 
 			// the below is just *a* example - it is just important to provide the 'value' per injection
-			produceBy(allMethods.returnTypeAssignableTo(
-					raw(ValidationStrength.class))).per(
-							Scoped.INJECTION).autobind().in(
+			with(bindings().mirrors.produceBy(allMethods.returnTypeAssignableTo(
+					raw(ValidationStrength.class)))).per(
+							Scope.injection).autobind().in(
 									StatefulObject.class);
 		}
 	}
@@ -219,10 +219,11 @@ public class TestStateDependentBinds {
 			bind(named((Object) null), Validator.class).to(Permissive.class);
 
 			// the below is just *a* example - it is just important to provide the 'value' per injection
-			produceBy(allMethods.returnTypeAssignableTo(
-					raw(ValidationStrength.class))).per(
-							Scoped.INJECTION).autobind().in(
-									StatefulObject.class);
+			with(bindings().mirrors.produceBy( //
+					allMethods.returnTypeAssignableTo(
+							raw(ValidationStrength.class)))) //
+									.per(Scope.injection) //
+									.autobind().in(StatefulObject.class);
 		}
 
 	}
@@ -239,10 +240,11 @@ public class TestStateDependentBinds {
 
 			// the below is just *a* example - it is just important to provide the 'value' per injection
 			// @formatter:off
-			produceBy(allMethods.returnTypeAssignableTo(raw(int.class)))
-				.nameBy(defaultName.orAnnotatedBy(Resource.class))
-				.parameteriseBy(noParameters.orNamesAnnotatedBy(Resource.class))
-				.per(Scoped.INJECTION)
+			with(bindings().mirrors.produceBy(
+					allMethods.returnTypeAssignableTo(raw(int.class)))
+				.nameBy(defaultName.unlessAnnotatedWith(Resource.class))
+				.parameteriseBy(noParameters.unlessAnnotatedWith(Resource.class)))
+				.per(Scope.injection)
 				.autobind().in(StatefulObject.class);
 			// @formatter:on
 		}

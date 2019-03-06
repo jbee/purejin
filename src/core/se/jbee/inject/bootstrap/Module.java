@@ -11,7 +11,7 @@ package se.jbee.inject.bootstrap;
  * build graphs of {@link Bundle}s with {@link Module}s as leafs.
  * 
  * @see Bundle
- * @see PresetModule
+ * @see ModuleWith
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */

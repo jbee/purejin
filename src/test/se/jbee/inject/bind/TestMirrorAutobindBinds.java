@@ -19,9 +19,10 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Provider;
+import se.jbee.inject.Scope;
 import se.jbee.inject.UnresolvableDependency.NoCaseForDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.container.Scoped;
+import se.jbee.inject.config.Mirrors;
 import se.jbee.inject.util.Resource;
 import se.jbee.inject.util.WebMethod;
 
@@ -39,21 +40,23 @@ public class TestMirrorAutobindBinds {
 
 		@Override
 		protected void declare() {
-			produceBy(allMethods).autobind().inModule();
+			Mirrors mirrors = bindings().mirrors;
+			Mirrors mirrorAllMethods = mirrors.produceBy(allMethods);
+			with(mirrorAllMethods).autobind().inModule();
 			// @formatter:off
-			produceBy(allMethods.annotatedWith(WebMethod.class))
-				.nameBy(defaultName.orAnnotatedBy(Resource.class))
-				.parameteriseBy(noParameters.orNamesAnnotatedBy(Resource.class))
+			with(mirrors.produceBy(allMethods.annotatedWith(WebMethod.class))
+				.nameBy(defaultName.unlessAnnotatedWith(Resource.class))
+				.parameteriseBy(noParameters.unlessAnnotatedWith(Resource.class)))
 				.autobind().in(Implementor1.class);
 			// @formatter:on
-			produceBy(allMethods.returnTypeAssignableTo(
-					raw(Provider.class))).autobind().in(Implementor2.class);
-			produceBy(allMethods.returnTypeIn(
-					packageAndSubPackagesOf(Injector.class))).autobind().in(
+			with(mirrors.produceBy(allMethods.returnTypeAssignableTo(
+					raw(Provider.class)))).autobind().in(Implementor2.class);
+			with(mirrors.produceBy(allMethods.returnTypeIn(
+					packageAndSubPackagesOf(Injector.class)))).autobind().in(
 							Implementor3.class);
-			produceBy(allMethods).per(Scoped.APPLICATION).autobind().in(
+			with(mirrorAllMethods).per(Scope.application).autobind().in(
 					new Implementor4(STATE));
-			produceBy(allMethods).per(Scoped.INJECTION).autobind().in(
+			with(mirrorAllMethods).per(Scope.injection).autobind().in(
 					FactoryImpl.class);
 		}
 

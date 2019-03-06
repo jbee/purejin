@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.event;
@@ -11,8 +11,6 @@ import java.util.concurrent.Executors;
 import se.jbee.inject.bind.BinderModule;
 import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.container.Initialiser;
-import se.jbee.inject.container.Scoped;
-import se.jbee.inject.container.Supplier;
 
 /**
  * Base {@link Module} for modules that want to make known a handler to the
@@ -23,7 +21,7 @@ import se.jbee.inject.container.Supplier;
 public abstract class EventModule extends BinderModule {
 
 	protected EventModule() {
-		super(Scoped.APPLICATION, EventBaseModule.class);
+		super(EventBaseModule.class);
 	}
 
 	/**
@@ -44,7 +42,7 @@ public abstract class EventModule extends BinderModule {
 		initbind(event).to((Initialiser<T>) (listener,
 				injector) -> injector.resolve(EventProcessor.class).register(
 						event, listener));
-		bind(event).to((Supplier<T>) (dep,
+		bind(event).toSupplier((dep,
 				injector) -> injector.resolve(EventProcessor.class).getProxy(
 						event));
 	}

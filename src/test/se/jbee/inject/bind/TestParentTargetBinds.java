@@ -5,8 +5,8 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
+import se.jbee.inject.Scope;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.container.Scoped;
 
 public class TestParentTargetBinds {
 
@@ -15,9 +15,9 @@ public class TestParentTargetBinds {
 		@Override
 		protected void declare() {
 			bind(String.class).to("everywhere");
-			per(Scoped.TARGET_INSTANCE).construct(Child.class);
+			per(Scope.targetInstance).construct(Child.class);
 			injectingInto(Child.class).bind(String.class).to("child");
-			per(Scoped.TARGET_INSTANCE).construct(Parent.class);
+			per(Scope.targetInstance).construct(Parent.class);
 			injectingInto(Child.class).within(Parent.class) //
 					.bind(String.class).to("child-with-parent");
 			construct(Grandparent.class);

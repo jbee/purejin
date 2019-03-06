@@ -1,3 +1,8 @@
+/*
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
+ *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
+ */
 package se.jbee.inject.config;
 
 import static se.jbee.inject.Type.raw;
@@ -42,7 +47,7 @@ public interface ConstructionMirror {
 		};
 	}
 
-	static ConstructionMirror annotatedWith(
+	default ConstructionMirror annotatedWith(
 			Class<? extends Annotation> marker) {
 		return new ConstructionMirror() {
 
@@ -54,7 +59,9 @@ public interface ConstructionMirror {
 					if (c.isAnnotationPresent(marker))
 						return (Constructor<T>) c;
 				}
-				return cs.length == 1 ? (Constructor<T>) cs[0] : null;
+				return cs.length == 1
+					? (Constructor<T>) cs[0]
+					: this.reflect(type);
 			}
 		};
 	}

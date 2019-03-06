@@ -84,7 +84,7 @@ public final class Instance<T>
 
 	@Override
 	public String toString() {
-		return (name + " " + type).trim();
+		return type.toString() + " " + name;
 	}
 
 	public boolean isAny() {

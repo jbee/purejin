@@ -21,12 +21,11 @@ import java.util.Map;
 import java.util.Set;
 
 import se.jbee.inject.InconsistentBinding;
-import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
+import se.jbee.inject.config.Choices;
 import se.jbee.inject.config.Globals;
 import se.jbee.inject.config.Options;
-import se.jbee.inject.config.Presets;
 import se.jbee.inject.container.Inject;
 
 /**
@@ -70,19 +69,8 @@ public final class Bootstrap {
 				bindings.declareFrom(modulariser(globals).modularise(root)));
 	}
 
-	public static <T> Module module(PresetModule<T> module, Presets presets) {
+	public static <T> Module module(ModuleWith<T> module, Options presets) {
 		return new PresetModuleBridge<>(module, presets);
-	}
-
-	public static void eagerSingletons(Injector injector) {
-		for (InjectionCase<?> icase : injector.resolve(InjectionCase[].class)) {
-			if (icase.scoping.isStableByDesign())
-				instance(icase); // instantiate to make sure they exist in repository
-		}
-	}
-
-	public static <T> T instance(InjectionCase<T> icase) {
-		return icase.yield(icase.resource.toDependency());
 	}
 
 	public static void nonnullThrowsReentranceException(Object field) {
@@ -99,30 +87,30 @@ public final class Bootstrap {
 	}
 
 	/**
-	 * Implements the {@link PresetModule} abstraction by presenting them as
+	 * Implements the {@link ModuleWith} abstraction by presenting them as
 	 * {@link Module}.
 	 * 
-	 * @param <T> type of the {@link Presets} value injected into the
-	 *            {@link PresetModule}
+	 * @param <T> type of the {@link Options} value injected into the
+	 *            {@link ModuleWith}
 	 */
 	private static final class PresetModuleBridge<T> implements Module {
 
-		private final PresetModule<T> module;
-		private final Presets presets;
+		private final ModuleWith<T> module;
+		private final Options presets;
 
-		PresetModuleBridge(PresetModule<T> module, Presets presets) {
+		PresetModuleBridge(ModuleWith<T> module, Options presets) {
 			this.module = module;
 			this.presets = presets;
 		}
 
 		@Override
 		public void declare(Bindings bindings) {
-			Type<?> valueType = Type.supertype(PresetModule.class,
+			Type<?> valueType = Type.supertype(ModuleWith.class,
 					raw(module.getClass())).parameter(0);
 			@SuppressWarnings("unchecked")
-			final T value = (T) (valueType.rawType == Presets.class
+			final T value = (T) (valueType.rawType == Options.class
 				? presets
-				: presets.value(valueType));
+				: presets.get(valueType));
 			module.declare(bindings, value);
 		}
 	}
@@ -168,31 +156,30 @@ public final class Bootstrap {
 		}
 
 		@Override
-		public <O extends Enum<O>> void install(
-				Class<? extends OptionBundle<O>> bundle,
-				final Class<O> property) {
+		public <C extends Enum<C>> void install(
+				Class<? extends ChoiceBundle<C>> bundle,
+				final Class<C> property) {
 			if (!globals.edition.featured(property))
 				return;
-			final Options options = globals.options;
-			Bootstrap.instance(bundle).bootstrap(
-					(bundleForOption, onOption) -> {
-						// NB: null is a valid value to define what happens when no configuration is present
-						if (options.isChosen(property, onOption)) {
-							BuildinBootstrapper.this.install(bundleForOption);
-						}
-					});
+			final Choices choices = globals.choices;
+			Bootstrap.instance(bundle).bootstrap((bundleForChoice, choice) -> {
+				// NB: null is a valid value to define what happens when no configuration is present
+				if (choices.isChosen(property, choice)) {
+					BuildinBootstrapper.this.install(bundleForChoice);
+				}
+			});
 		}
 
 		@Override
 		@SafeVarargs
-		public final <O extends Enum<O> & OptionBundle<O>> void install(
-				O... options) {
-			if (options.length > 0) {
-				final O option = options[0];
-				if (!globals.edition.featured(option.getClass()))
+		public final <C extends Enum<C> & ChoiceBundle<C>> void install(
+				C... choices) {
+			if (choices.length > 0) {
+				final C choice0 = choices[0];
+				if (!globals.edition.featured(choice0.getClass()))
 					return;
-				final EnumSet<O> installing = EnumSet.of(option, options);
-				option.bootstrap((bundle, onOption) -> {
+				final EnumSet<C> installing = EnumSet.of(choice0, choices);
+				choice0.bootstrap((bundle, onOption) -> {
 					if (installing.contains(onOption))
 						BuildinBootstrapper.this.install(bundle);
 				});
@@ -210,8 +197,8 @@ public final class Bootstrap {
 		}
 
 		@Override
-		public <T> void install(PresetModule<T> module) {
-			install(module(module, globals.presets));
+		public <T> void install(ModuleWith<T> module) {
+			install(module(module, globals.options));
 		}
 
 		@Override
@@ -252,12 +239,12 @@ public final class Bootstrap {
 
 		@Override
 		@SafeVarargs
-		public final <O extends Enum<O> & OptionBundle<O>> void uninstall(
+		public final <O extends Enum<O> & ChoiceBundle<O>> void uninstall(
 				O... bundles) {
 			if (bundles.length > 0) {
 				final EnumSet<O> uninstalling = EnumSet.of(bundles[0], bundles);
-				bundles[0].bootstrap((bundle, onOption) -> {
-					if (uninstalling.contains(onOption))
+				bundles[0].bootstrap((bundle, choice) -> {
+					if (uninstalling.contains(choice))
 						uninstall(bundle);
 				});
 			}

@@ -5,11 +5,6 @@
  */
 package se.jbee.inject.bootstrap;
 
-import se.jbee.inject.config.ConstructionMirror;
-import se.jbee.inject.config.NamingMirror;
-import se.jbee.inject.config.ParameterisationMirror;
-import se.jbee.inject.config.ProductionMirror;
-
 /**
  * The default utility {@link Bundle} that is a {@link Bootstrap} as well so
  * that bindings can be declared nicer.
@@ -38,7 +33,7 @@ public abstract class BootstrapperBundle implements Bundle, Bootstrapper {
 	}
 
 	@Override
-	public final <T> void install(PresetModule<T> module) {
+	public final <T> void install(ModuleWith<T> module) {
 		bootstrap.install(module);
 	}
 
@@ -49,68 +44,32 @@ public abstract class BootstrapperBundle implements Bundle, Bootstrapper {
 
 	@Override
 	@SafeVarargs
-	public final <M extends Enum<M> & OptionBundle<M>> void install(
+	public final <M extends Enum<M> & ChoiceBundle<M>> void install(
 			M... modules) {
 		bootstrap.install(modules);
 	}
 
 	@Override
 	public final <C extends Enum<C>> void install(
-			Class<? extends OptionBundle<C>> bundle, Class<C> property) {
+			Class<? extends ChoiceBundle<C>> bundle, Class<C> property) {
 		bootstrap.install(bundle, property);
 	}
 
 	@Override
 	@SafeVarargs
-	public final <O extends Enum<O> & OptionBundle<O>> void uninstall(
+	public final <O extends Enum<O> & ChoiceBundle<O>> void uninstall(
 			O... options) {
 		bootstrap.uninstall(options);
 	}
 
-	protected final <O extends Enum<O> & OptionBundle<O>> void installAll(
+	protected final <O extends Enum<O> & ChoiceBundle<O>> void installAll(
 			Class<O> optionsOfType) {
 		install(optionsOfType.getEnumConstants());
 	}
 
-	protected final <O extends Enum<O> & OptionBundle<O>> void uninstallAll(
+	protected final <O extends Enum<O> & ChoiceBundle<O>> void uninstallAll(
 			Class<O> optionsOfType) {
 		uninstall(optionsOfType.getEnumConstants());
-	}
-
-	protected final void install(Module module, ConstructionMirror mirror) {
-		install(bindings -> module.declare(bindings.with(mirror)));
-	}
-
-	protected final void install(Class<? extends Module> module,
-			ConstructionMirror mirror) {
-		install(newInstance(module), mirror);
-	}
-
-	protected final void install(Module module, NamingMirror mirror) {
-		install(bindings -> module.declare(bindings.with(mirror)));
-	}
-
-	protected final void install(Class<? extends Module> module,
-			NamingMirror mirror) {
-		install(newInstance(module), mirror);
-	}
-
-	protected final void install(Module module, ProductionMirror mirror) {
-		install(bindings -> module.declare(bindings.with(mirror)));
-	}
-
-	protected final void install(Class<? extends Module> module,
-			ProductionMirror mirror) {
-		install(newInstance(module), mirror);
-	}
-
-	protected final void install(Module module, ParameterisationMirror mirror) {
-		install(bindings -> module.declare(bindings.with(mirror)));
-	}
-
-	protected final void install(Class<? extends Module> module,
-			ParameterisationMirror mirror) {
-		install(newInstance(module), mirror);
 	}
 
 	protected static Module newInstance(Class<? extends Module> module) {

@@ -31,11 +31,12 @@ import se.jbee.inject.Dependency;
 import se.jbee.inject.Generator;
 import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Injector;
-import se.jbee.inject.Repository;
+import se.jbee.inject.Name;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Scope;
 import se.jbee.inject.Scoping;
 import se.jbee.inject.Type;
+import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.NoCaseForDependency;
 
 /**
@@ -64,14 +65,25 @@ public final class Inject {
 	 */
 	private static final class InjectorImpl implements Injector {
 
+		final int generators;
 		private final Map<Class<?>, InjectionCase<?>[]> casesByType;
 		private final InjectionCase<?>[] wildcardCases;
 		final InjectionCase<? extends Initialiser<?>>[] initialisersCases;
 
 		InjectorImpl(Injectee<?>... injectees) {
+			this.generators = injectees.length;
 			this.casesByType = initFrom(injectees);
 			this.wildcardCases = wildcardCases(casesByType);
 			this.initialisersCases = initInitialisers();
+			for (InjectionCase<?>[] cases : casesByType.values()) {
+				initEagerCases(cases);
+			}
+		}
+
+		private static <T> void initEagerCases(InjectionCase<T>[] cases) {
+			for (InjectionCase<T> c : cases)
+				if (c.scoping.isEager())
+					c.generator.yield(c.resource.toDependency());
 		}
 
 		private InjectionCase<? extends Initialiser<?>>[] initInitialisers() {
@@ -94,19 +106,17 @@ public final class Inject {
 
 		private <T> Map<Class<?>, InjectionCase<?>[]> initFrom(
 				Injectee<?>... injectees) {
-			Map<Scope, Repository> reps = initRepositories(injectees);
 			InjectionCase<?>[] cases = new InjectionCase<?>[injectees.length];
 			for (int i = 0; i < injectees.length; i++) {
 				@SuppressWarnings("unchecked")
 				Injectee<T> injectee = (Injectee<T>) injectees[i];
-				Scope scope = injectee.scope();
-				Repository rep = reps.get(scope);
+				Name scope = injectee.scope();
 				Scoping scoping = scopingOf(scope);
-				//IDEA allow supplier to implement Generator and if so use that directly?
-				Generator<T> gen = new InjectorGenerator<>(i, this, rep,
-						injectee, scoping);
+				Resource<T> resource = injectee.resource();
+				Generator<T> gen = generator(i, injectee, scope, scoping,
+						resource);
 				cases[i] = new InjectionCase<>(i, injectee.source(), scoping,
-						injectee.resource(), gen);
+						resource, gen);
 			}
 			Arrays.sort(cases);
 			Map<Class<?>, InjectionCase<?>[]> casesByType = new IdentityHashMap<>(
@@ -128,6 +138,18 @@ public final class Inject {
 			return casesByType;
 		}
 
+		@SuppressWarnings("unchecked")
+		private <T> Generator<T> generator(int serialID, Injectee<T> injectee,
+				Name scope, Scoping scoping, Resource<T> resource) {
+			Supplier<? extends T> supplier = injectee.supplier();
+			if (Generator.class.isAssignableFrom(supplier.getClass()))
+				return (Generator<T>) supplier;
+			if (Scope.class.isAssignableFrom(resource.type().rawType)
+				|| Scope.container.equalTo(scope))
+				return new LazySingletonGenerator<>(this, supplier);
+			return new ScopedGenerator<>(serialID, this, injectee, scoping);
+		}
+
 		private static InjectionCase<?>[] wildcardCases(
 				Map<Class<?>, InjectionCase<?>[]> cases) {
 			List<InjectionCase<?>> res = new ArrayList<>();
@@ -141,18 +163,6 @@ public final class Inject {
 			return res.size() == 0
 				? null
 				: res.toArray(new InjectionCase[res.size()]);
-		}
-
-		private static Map<Scope, Repository> initRepositories(
-				Injectee<?>[] injectees) {
-			Map<Scope, Repository> reps = new IdentityHashMap<>();
-			for (Injectee<?> i : injectees) {
-				Scope scope = i.scope();
-				Repository repository = reps.get(scope);
-				if (repository == null)
-					reps.put(scope, scope.init(injectees.length));
-			}
-			return reps;
 		}
 
 		@SuppressWarnings("unchecked")
@@ -311,45 +321,73 @@ public final class Inject {
 		}
 	}
 
-	private static final class InjectorGenerator<T> implements Generator<T> {
+	private static final class LazySingletonGenerator<T>
+			implements Generator<T> {
+
+		private final Injector injector;
+		private final Supplier<? extends T> supplier;
+		private volatile T value;
+
+		LazySingletonGenerator(Injector injector,
+				Supplier<? extends T> supplier) {
+			this.injector = injector;
+			this.supplier = supplier;
+		}
+
+		@Override
+		public T yield(Dependency<? super T> dep)
+				throws UnresolvableDependency {
+			if (value == null) {
+				synchronized (this) {
+					if (value == null)
+						value = supplier.supply(dep, injector);
+				}
+			}
+			return value;
+		}
+	}
+
+	private static final class ScopedGenerator<T> implements Generator<T> {
 
 		private final InjectorImpl injector;
 		private final int serialID;
-		private final Repository repository;
 		private final Supplier<? extends T> supplier;
-		private final Resource<T> resource;
 		private final Scoping scoping;
+		private final Resource<T> resource;
+		private volatile Scope scope;
 
 		private Class<?> cachedForType;
 		private Initialiser<? super T>[] cachedInitialisers;
 
-		InjectorGenerator(int serialID, InjectorImpl injector,
-				Repository repository, Injectee<T> injectee, Scoping scoping) {
+		ScopedGenerator(int serialID, InjectorImpl injector,
+				Injectee<T> injectee, Scoping scoping) {
 			this.serialID = serialID;
 			this.injector = injector;
-			this.repository = repository;
 			this.scoping = scoping;
 			this.supplier = injectee.supplier();
 			this.resource = injectee.resource();
+			this.scope = scope;
 		}
 
 		@Override
 		public T yield(Dependency<? super T> dep) {
+			if (scope == null)
+				//as scopes are known to be "singletons" its ok should this really happen more then once
+				scope = injector.resolve(scoping.scope, Scope.class);
 			final Dependency<? super T> injected = dep.injectingInto(resource,
 					scoping);
-			return repository.serve(serialID, injected, () -> {
+			return scope.yield(serialID, injected, () -> {
 				T instance = supplier.supply(injected, injector);
 				if (instance != null && injector.initialisersCases != null)
-					dynamicInitialisationOf(instance, injected);
+					postConstruct(instance, injected);
 				return instance;
-			});
+			}, injector.generators);
 		}
 
 		//TODO add support for annotation based initialisers - resolve Initialiser bound for Annotation class.
 
 		@SuppressWarnings("unchecked")
-		private void dynamicInitialisationOf(T instance,
-				Dependency<?> context) {
+		private void postConstruct(T instance, Dependency<?> context) {
 			Class<?> type = instance.getClass();
 			if (type == Class.class || type == InjectionCase.class
 				|| Initialiser.class.isAssignableFrom(type)) {
@@ -359,7 +397,7 @@ public final class Inject {
 				cachedForType = type;
 				cachedInitialisers = arrayFlatmap(injector.initialisersCases,
 						Initialiser.class,
-						icase -> initialiser(type, icase, context));
+						icase -> resolveInitialiser(type, icase, context));
 			}
 			if (cachedInitialisers.length > 0)
 				for (Initialiser<? super T> i : cachedInitialisers)
@@ -367,7 +405,7 @@ public final class Inject {
 		}
 
 		@SuppressWarnings("unchecked")
-		private <I extends Initialiser<?>> Initialiser<? super T> initialiser(
+		private <I extends Initialiser<?>> Initialiser<? super T> resolveInitialiser(
 				Class<?> type, InjectionCase<I> icase, Dependency<?> context) {
 			Resource<I> initialiser = icase.resource;
 			if (!initialiser.target.isAvailableFor(context))

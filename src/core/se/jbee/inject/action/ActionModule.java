@@ -16,8 +16,6 @@ import static se.jbee.inject.Type.returnType;
 import static se.jbee.inject.Utils.accessible;
 import static se.jbee.inject.Utils.arrayFindFirst;
 import static se.jbee.inject.config.ProductionMirror.allMethods;
-import static se.jbee.inject.container.Scoped.APPLICATION;
-import static se.jbee.inject.container.Scoped.DEPENDENCY_TYPE;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -26,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
+import se.jbee.inject.Scope;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.SupplyFailed;
@@ -35,7 +34,6 @@ import se.jbee.inject.bootstrap.InjectionSite;
 import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.config.ProductionMirror;
-import se.jbee.inject.container.Scoped;
 import se.jbee.inject.container.Supplier;
 
 /**
@@ -73,17 +71,18 @@ public abstract class ActionModule extends BinderModule {
 	}
 
 	protected ActionModule() {
-		super(Scoped.APPLICATION, ActionBaseModule.class);
+		super(ActionBaseModule.class);
 	}
 
 	private static final class ActionBaseModule extends BinderModule {
 
 		@Override
 		public void declare() {
-			asDefault().per(DEPENDENCY_TYPE).starbind(Action.class).toSupplier(
-					ActionSupplier.class);
-			asDefault().per(APPLICATION).bind(ACTION_MIRROR).to(allMethods);
-			asDefault().per(APPLICATION).bind(Executor.class).to(
+			asDefault().per(Scope.dependencyType).starbind(
+					Action.class).toSupplier(ActionSupplier.class);
+			asDefault().per(Scope.application).bind(ACTION_MIRROR).to(
+					allMethods);
+			asDefault().per(Scope.application).bind(Executor.class).to(
 					DirectExecutor.class);
 		}
 
@@ -162,7 +161,7 @@ public abstract class ActionModule extends BinderModule {
 				for (Method action : actionsIn(impl)) {
 					Type<?> rt = returnType(action);
 					if (rt.equalTo(output)) {
-						if (input.equalTo(Type.VOID)) {
+						if (input.equalTo(Type.VOID)) { // no input => no params
 							if (action.getParameterTypes().length == 0)
 								return action;
 						} else {

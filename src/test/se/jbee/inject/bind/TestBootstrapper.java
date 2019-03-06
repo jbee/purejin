@@ -4,8 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static se.jbee.inject.Name.named;
+import static se.jbee.inject.Scoping.scopingOf;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.container.Scoped.INJECTION;
+import static se.jbee.inject.config.ConstructionMirror.mostParams;
 import static se.jbee.inject.container.Typecast.injectionCasesTypeFor;
 
 import java.beans.ConstructorProperties;
@@ -20,11 +21,12 @@ import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Name;
 import se.jbee.inject.Resource;
+import se.jbee.inject.Scope;
 import se.jbee.inject.UnresolvableDependency.DependencyCycle;
+import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bundle;
-import se.jbee.inject.config.ConstructionMirror;
 import se.jbee.inject.container.Supplier;
 
 /**
@@ -158,8 +160,9 @@ public class TestBootstrapper {
 
 		@Override
 		protected void declare() {
-			bind(named("eager"), String.class).to(this);
-			per(INJECTION).bind(named("lazy"), String.class).to(this);
+			bind(named("eager"), String.class).toSupplier(this);
+			per(Scope.injection).bind(named("lazy"), String.class).toSupplier(
+					this);
 		}
 
 		@Override
@@ -179,12 +182,18 @@ public class TestBootstrapper {
 
 		@Override
 		protected void bootstrap() {
-			install(CustomMirrorModule.class, ConstructionMirror.annotatedWith(
-					ConstructorProperties.class));
+			install(DefaultScopes.class);
+			install(CustomMirrorModule.class);
 		}
 	}
 
 	private static class CustomMirrorModule extends BinderModule {
+
+		@Override
+		protected Bindings configure(Bindings bindings) {
+			return bindings.with(bindings.mirrors.constructBy(
+					mostParams.annotatedWith(ConstructorProperties.class)));
+		}
 
 		@Override
 		protected void declare() {
@@ -248,7 +257,7 @@ public class TestBootstrapper {
 		Injector injector = Bootstrap.injector(ReplacingBindsModule.class);
 		assertEquals(6, injector.resolve(Number.class));
 		InjectionCase<?>[] cases = injector.resolve(InjectionCase[].class);
-		assertEquals(7, cases.length); // 3x Comparable, Float, Double, Integer and Number (3x Serializable has been nullified)
+		assertEquals(7 + 10, cases.length); // 3x Comparable, Float, Double, Integer and Number (3x Serializable has been nullified) + 10 Scope
 		InjectionCase<Number>[] casesForNumber = injector.resolve(
 				injectionCasesTypeFor(Number.class));
 		assertEquals(1, casesForNumber.length);
@@ -260,11 +269,12 @@ public class TestBootstrapper {
 
 	@Test
 	public void thatEagerSingeltonsCanBeCreated() {
+		scopingOf(Scope.application).eager();
 		Injector injector = Bootstrap.injector(
 				EagerSingletonsBindsModule.class);
-		int before = EagerSingletonsBindsModule.eagers;
-		Bootstrap.eagerSingletons(injector);
-		assertEquals(before + 1, EagerSingletonsBindsModule.eagers);
+		assertNotNull(injector);
+		assertEquals(1, EagerSingletonsBindsModule.eagers);
+		scopingOf(Scope.application).lazy();
 	}
 
 	@Test

@@ -8,10 +8,11 @@ import static se.jbee.inject.Scoping.scopingOf;
 
 import org.junit.Test;
 
+import se.jbee.inject.Name;
 import se.jbee.inject.Provider;
-import se.jbee.inject.Repository;
 import se.jbee.inject.Scope;
 import se.jbee.inject.Scoping;
+import se.jbee.inject.scope.DependencyScope;
 
 public class TestScopes {
 
@@ -39,63 +40,71 @@ public class TestScopes {
 
 	@Test
 	public void thatDependencyTypeScopeEnsuresSingletonPerExactGenericType() {
-		Repository r = Scoped.DEPENDENCY_TYPE.init(2);
+		Scope r = new DependencyScope(DependencyScope::dependencyTypeOf);
 		A a = new A();
 		B b = new B();
 		Provider<A> ia = new ConstantProvider<>(a);
 		Provider<B> ib = new ConstantProvider<>(b);
-		assertSame(r.serve(1, dependency(A.class), ia), a);
-		assertSame(r.serve(1, dependency(A.class), null), a); // the null Provider shouldn't be called now
-		assertSame(r.serve(2, dependency(B.class), ib), b);
-		assertSame(r.serve(2, dependency(B.class), null), b); // the null Provider shouldn't be called now
+		assertSame(r.yield(1, dependency(A.class), ia, 2), a);
+		assertSame(r.yield(1, dependency(A.class), null, 2), a); // the null Provider shouldn't be called now
+		assertSame(r.yield(2, dependency(B.class), ib, 2), b);
+		assertSame(r.yield(2, dependency(B.class), null, 2), b); // the null Provider shouldn't be called now
 	}
 
 	@Test
 	public void injectionScopeIsNotStableInAnyOtherScope() {
-		Scoping injection = scopingOf(Scoped.INJECTION);
-		assertFalse(injection.isStableIn(Scoped.APPLICATION));
-		assertFalse(injection.isStableIn(Scoped.DEPENDENCY));
-		assertFalse(injection.isStableIn(Scoped.DEPENDENCY_INSTANCE));
-		assertFalse(injection.isStableIn(Scoped.DEPENDENCY_TYPE));
-		assertFalse(injection.isStableIn(Scoped.TARGET_INSTANCE));
+		Scoping injection = scopingOf(Scope.injection);
+		assertFalse(injection.isStableIn(Scope.application));
+		assertFalse(injection.isStableIn(Scope.dependency));
+		assertFalse(injection.isStableIn(Scope.dependencyInstance));
+		assertFalse(injection.isStableIn(Scope.dependencyType));
+		assertFalse(injection.isStableIn(Scope.targetInstance));
 		assertTrue(injection.isStableIn(injection));
 	}
 
 	@Test
 	public void threadScopeIsNotStableInAnyOtherScopeExceptInjection() {
-		Scoping thread = scopingOf(Scoped.THREAD);
-		assertFalse(thread.isStableIn(Scoped.APPLICATION));
-		assertFalse(thread.isStableIn(Scoped.DEPENDENCY));
-		assertFalse(thread.isStableIn(Scoped.DEPENDENCY_INSTANCE));
-		assertFalse(thread.isStableIn(Scoped.DEPENDENCY_TYPE));
-		assertFalse(thread.isStableIn(Scoped.TARGET_INSTANCE));
+		Scoping thread = scopingOf(Scope.thread);
+		assertFalse(thread.isStableIn(Scope.application));
+		assertFalse(thread.isStableIn(Scope.dependency));
+		assertFalse(thread.isStableIn(Scope.dependencyInstance));
+		assertFalse(thread.isStableIn(Scope.dependencyType));
+		assertFalse(thread.isStableIn(Scope.targetInstance));
 		assertTrue(thread.isStableIn(thread));
-		assertTrue(thread.isStableIn(Scoped.INJECTION));
+		assertTrue(thread.isStableIn(Scope.injection));
 	}
 
 	@Test
 	public void applicationIsStableInAnyOtherScope() {
-		assertStableScope(Scoped.APPLICATION);
+		assertStableScope(Scope.application);
 	}
 
 	@Test
 	public void dependencyBasedIsStableInAnyOtherScope() {
-		assertStableScope(Scoped.DEPENDENCY);
-		assertStableScope(Scoped.DEPENDENCY_INSTANCE);
-		assertStableScope(Scoped.DEPENDENCY_TYPE);
-		assertStableScope(Scoped.TARGET_INSTANCE);
+		assertStableScope(Scope.dependency);
+		assertStableScope(Scope.dependencyInstance);
+		assertStableScope(Scope.dependencyType);
+		assertStableScope(Scope.targetInstance);
 	}
 
-	private static void assertStableScope(Scope scope) {
-		Scoping s = scopingOf(scope);
-		assertTrue(s.isStableIn(scope));
+	@Test
+	public void ignoreIsStableInAnyOtherScope() {
+		assertStableScope(Scoping.ignore);
+	}
+
+	private static void assertStableScope(Name scope) {
+		assertStableScope(scopingOf(scope));
+	}
+
+	private static void assertStableScope(Scoping s) {
+		assertTrue(s.isStableIn(s.scope));
 		assertTrue(s.isStableIn(s));
-		assertTrue(s.isStableIn(Scoped.DEPENDENCY));
-		assertTrue(s.isStableIn(Scoped.DEPENDENCY_INSTANCE));
-		assertTrue(s.isStableIn(Scoped.DEPENDENCY_TYPE));
-		assertTrue(s.isStableIn(Scoped.TARGET_INSTANCE));
-		assertTrue(s.isStableIn(Scoped.THREAD));
-		assertTrue(s.isStableIn(Scoped.INJECTION));
+		assertTrue(s.isStableIn(Scope.dependency));
+		assertTrue(s.isStableIn(Scope.dependencyInstance));
+		assertTrue(s.isStableIn(Scope.dependencyType));
+		assertTrue(s.isStableIn(Scope.targetInstance));
+		assertTrue(s.isStableIn(Scope.thread));
+		assertTrue(s.isStableIn(Scope.injection));
 	}
 
 }

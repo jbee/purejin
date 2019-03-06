@@ -23,6 +23,7 @@ public class TestLinker {
 
 		@Override
 		protected void bootstrap() {
+			install(DefaultScopes.class);
 			install(new TwiceInstalledModule());
 			install(new TwiceInstalledModule());
 		}

@@ -35,7 +35,7 @@ public final class Name implements Qualifying<Name>, Serializable {
 	 */
 	public static final Name ANY = new Name(WILDCARD);
 
-	private final String value;
+	final String value;
 
 	public static Name pluginFor(Class<?> pluginPoint, String name) {
 		return named(pluginPoint.getCanonicalName() + ":" + name);

@@ -1,3 +1,8 @@
+/*
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
+ *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
+ */
 package se.jbee.inject.config;
 
 import static se.jbee.inject.InconsistentBinding.noSuchAnnotationProperty;
@@ -34,7 +39,7 @@ public interface ParameterisationMirror {
 	 * {@link Annotation} which is used to indicate the instance {@link Name} of
 	 * a method parameter.
 	 */
-	default ParameterisationMirror orNamesAnnotatedBy(
+	default ParameterisationMirror unlessAnnotatedWith(
 			Class<? extends Annotation> naming) {
 		if (naming == null)
 			return this;
@@ -51,7 +56,7 @@ public interface ParameterisationMirror {
 				Annotation instance = arrayFindFirst(ais[i],
 						a -> naming == a.annotationType());
 				if (instance != null) {
-					//TODO nicer exception handling for invoke
+					//TODO nicer exception handling for invoke (same in other mirrors)
 					try {
 						String name = (String) nameProperty.invoke(instance);
 						if (!name.isEmpty()

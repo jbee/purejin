@@ -1,86 +1,75 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *  Copyright (c) 2012-2019, Jan Bernitt 
+ *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.config;
 
-import java.io.Serializable;
-import java.util.EnumSet;
 import java.util.IdentityHashMap;
 
+import se.jbee.inject.Type;
+
 /**
- * {@link Options} are used to model configurations of the bootstrapping process
- * through one enum for each configurable property (each property is identified
- * by the enum's {@link Class} object).
- * 
- * Each property can be used as a set or single associate value. So a option
- * property can describe either alternatives where one should be chosen or
- * options with multiple choice. It is up to the author of the module to decide
- * and use correctly.
- * 
- * {@linkplain Options} are immutable! Use {@link #chosen(Enum)} to build up
- * sets.
- * 
+ * {@link Options} are an immutable associative data structure associating a
+ * exact {@link Type} (including generics) with a value for/of that exact given
+ * type. These values act as input <i>parameters</i> to the bootstrapping
+ * process. The values are used within modules that depend on data that is given
+ * as program input.
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public final class Options implements Serializable {
+public final class Options {
 
-	public static final Options STANDARD = new Options(new IdentityHashMap<>());
+	public static final Options EMPTY = new Options(new IdentityHashMap<>(0));
 
-	private final IdentityHashMap<Class<? extends Enum<?>>, EnumSet<?>> properties;
+	private final IdentityHashMap<String, Object> values;
 
-	private Options(
-			IdentityHashMap<Class<? extends Enum<?>>, EnumSet<?>> properties) {
-		this.properties = properties;
+	private Options(IdentityHashMap<String, Object> values) {
+		this.values = values;
 	}
 
-	public <C extends Enum<C>> boolean isChosen(Class<C> property, C option) {
-		EnumSet<?> options = properties.get(property);
-		return options == null || options.isEmpty()
-			? (option == null)
-			: options.contains(option);
+	/**
+	 * @see #set(Type, Object)
+	 */
+	public <T> Options set(Class<T> type, T value) {
+		return set(Type.raw(type), value);
 	}
 
-	public <C extends Enum<C>> Options chosen(C option) {
-		if (option == null)
+	/**
+	 * @return new {@link Options} instance with the given key-value
+	 *         association. Any existing association of the same key will be
+	 *         overridden.
+	 */
+	public <T> Options set(Type<T> type, T value) {
+		final String key = key(type);
+		if (value == null && !values.containsKey(key)) {
 			return this;
-		return with(option.getDeclaringClass(), EnumSet.of(option));
-	}
-
-	private <C extends Enum<C>> Options with(Class<C> property,
-			EnumSet<C> options) {
-		IdentityHashMap<Class<? extends Enum<?>>, EnumSet<?>> clone = copy();
-		clone.put(property, options);
+		}
+		@SuppressWarnings("unchecked")
+		IdentityHashMap<String, Object> clone = (IdentityHashMap<String, Object>) values.clone();
+		if (value == null) {
+			clone.remove(key);
+		} else {
+			clone.put(key, value);
+		}
 		return new Options(clone);
 	}
 
-	@SafeVarargs
-	public final <C extends Enum<C>> Options chosen(C... options) {
-		if (options.length == 0)
-			return this;
-		return with(options[0].getDeclaringClass(),
-				EnumSet.of(options[0], options));
-	}
-
+	/**
+	 * @return The value associated with the given exact {@link Type} or
+	 *         <code>null</code> of no value is associated with it.
+	 */
 	@SuppressWarnings("unchecked")
-	private IdentityHashMap<Class<? extends Enum<?>>, EnumSet<?>> copy() {
-		return (IdentityHashMap<Class<? extends Enum<?>>, EnumSet<?>>) properties.clone();
+	public <T> T get(Type<T> type) {
+		return (T) values.get(key(type));
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		return obj instanceof Options
-			&& properties.equals(((Options) obj).properties);
-	}
-
-	@Override
-	public int hashCode() {
-		return properties.hashCode();
+	private static <T> String key(Type<T> type) {
+		return type.toString().intern();
 	}
 
 	@Override
 	public String toString() {
-		return properties.toString();
+		return values.toString();
 	}
 }

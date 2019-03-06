@@ -12,8 +12,8 @@ import se.jbee.inject.Injector;
  * is created.
  * 
  * Users can bind an implementation for this interface. The {@link Injector}
- * will resolve all of them and call their {@link #init(Injector)} method as
- * soon as the context is done.
+ * will resolve all of them and call their {@link #init(Object, Injector)}
+ * method as soon as the context is done.
  * 
  * This gives users the possibility to run initialisation code once and build
  * more powerful mechanisms on top of it.

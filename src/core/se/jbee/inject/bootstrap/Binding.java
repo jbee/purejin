@@ -15,9 +15,9 @@ import java.util.Set;
 
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.InconsistentBinding;
+import se.jbee.inject.Name;
 import se.jbee.inject.Qualifying;
 import se.jbee.inject.Resource;
-import se.jbee.inject.Scope;
 import se.jbee.inject.Source;
 import se.jbee.inject.Type;
 import se.jbee.inject.Typed;
@@ -38,18 +38,18 @@ public final class Binding<T>
 		implements Comparable<Binding<?>>, Injectee<T>, Module, Typed<T> {
 
 	public static <T> Binding<T> binding(Resource<T> resource, BindingType type,
-			Supplier<? extends T> supplier, Scope scope, Source source) {
+			Supplier<? extends T> supplier, Name scope, Source source) {
 		return new Binding<>(resource, type, supplier, scope, source);
 	}
 
 	public final Resource<T> resource;
 	public final BindingType type;
 	public final Supplier<? extends T> supplier;
-	public final Scope scope;
+	public final Name scope;
 	public final Source source;
 
 	private Binding(Resource<T> resource, BindingType type,
-			Supplier<? extends T> supplier, Scope scope, Source source) {
+			Supplier<? extends T> supplier, Name scope, Source source) {
 		this.resource = resource;
 		this.type = type;
 		this.supplier = supplier;
@@ -63,7 +63,7 @@ public final class Binding<T>
 	}
 
 	@Override
-	public Scope scope() {
+	public Name scope() {
 		return scope;
 	}
 

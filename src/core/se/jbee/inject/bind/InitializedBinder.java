@@ -5,11 +5,9 @@
  */
 package se.jbee.inject.bind;
 
-import se.jbee.inject.Scope;
 import se.jbee.inject.bind.Binder.RootBinder;
 import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.container.Scoped;
 
 /**
  * A {@link RootBinder} that can be initialized using the
@@ -25,11 +23,7 @@ public abstract class InitializedBinder extends RootBinder {
 	private Boolean initialized;
 
 	protected InitializedBinder() {
-		this(Scoped.APPLICATION);
-	}
-
-	protected InitializedBinder(Scope inital) {
-		super(Bind.create(Bindings.newBindings(), null, inital));
+		super(Bind.create(Bindings.newBindings(), null));
 		this.bind = super.bind();
 	}
 

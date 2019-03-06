@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bind;
@@ -9,11 +9,11 @@ import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrapper;
 import se.jbee.inject.bootstrap.Bundle;
-import se.jbee.inject.bootstrap.PresetModule;
-import se.jbee.inject.config.Presets;
+import se.jbee.inject.bootstrap.ModuleWith;
+import se.jbee.inject.config.Options;
 
 /**
- * The default utility {@link PresetModule}.
+ * The default utility {@link ModuleWith}.
  * 
  * A {@link BinderModuleWith} is also a {@link Bundle} so it should be used and
  * installed as such. It will than {@link Bundle#bootstrap(Bootstrapper)} itself
@@ -22,30 +22,31 @@ import se.jbee.inject.config.Presets;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public abstract class BinderModuleWith<T> extends InitializedBinder
-		implements Bundle, PresetModule<T> {
+		implements Bundle, ModuleWith<T> {
 
 	@Override
 	public final void bootstrap(Bootstrapper bootstrap) {
+		bootstrap.install(DefaultScopes.class);
 		bootstrap.install(this);
 	}
 
 	@Override
-	public final void declare(Bindings bindings, T preset) {
+	public final void declare(Bindings bindings, T option) {
 		__init__(bindings);
-		declare(preset);
+		declare(option);
 	}
 
 	@Override
 	public String toString() {
-		Type<?> preset = Type.supertype(PresetModule.class,
+		Type<?> preset = Type.supertype(ModuleWith.class,
 				Type.raw(getClass())).parameter(0);
 		return "module " + getClass().getSimpleName() + "[" + preset + "]";
 	}
 
 	/**
-	 * @see PresetModule#declare(Bindings, Object)
-	 * @param preset The value contained in the {@link Presets} for the type of
-	 *            this {@link PresetModule}.
+	 * @see ModuleWith#declare(Bindings, Object)
+	 * @param preset The value contained in the {@link Options} for the type of
+	 *            this {@link ModuleWith}.
 	 */
 	protected abstract void declare(T preset);
 }

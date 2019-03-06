@@ -5,7 +5,6 @@
  */
 package se.jbee.inject.bind;
 
-import se.jbee.inject.Scope;
 import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrapper;
 import se.jbee.inject.bootstrap.Bundle;
@@ -26,11 +25,10 @@ public abstract class BinderModule extends InitializedBinder
 	private final Class<? extends Bundle> basis;
 
 	protected BinderModule() {
-		this.basis = null;
+		this(null);
 	}
 
-	protected BinderModule(Scope inital, Class<? extends Bundle> basis) {
-		super(inital);
+	protected BinderModule(Class<? extends Bundle> basis) {
 		this.basis = basis;
 	}
 
@@ -38,13 +36,18 @@ public abstract class BinderModule extends InitializedBinder
 	public final void bootstrap(Bootstrapper bootstrap) {
 		if (basis != null)
 			bootstrap.install(basis);
+		bootstrap.install(DefaultScopes.class);
 		bootstrap.install(this);
 	}
 
 	@Override
 	public final void declare(Bindings bindings) {
-		__init__(bindings);
+		__init__(configure(bindings));
 		declare();
+	}
+
+	protected Bindings configure(Bindings bindings) {
+		return bindings;
 	}
 
 	@Override
@@ -56,5 +59,4 @@ public abstract class BinderModule extends InitializedBinder
 	 * @see Module#declare(Bindings)
 	 */
 	protected abstract void declare();
-
 }

@@ -69,14 +69,14 @@ public class TestSerializable {
 
 	@Test
 	public void scopingIsSerializable() {
-		assertSerializable(Scoping.IGNORE);
-		assertSerializable(Scoping.scopingOf(Scope.class));
+		assertSerializable(Scoping.ignore);
+		assertSerializable(Scoping.scopingOf(Scope.application));
 	}
 
 	@Test
 	public void injectionIsSerializable() {
 		assertSerializable(new Injection(Instance.anyOf(String.class),
-				Resource.resource(String.class), Scoping.IGNORE));
+				Resource.resource(String.class), Scoping.ignore));
 	}
 
 	@Test

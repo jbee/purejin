@@ -8,13 +8,13 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bundle;
+import se.jbee.inject.bootstrap.ChoiceBootstrapperBundle;
 import se.jbee.inject.bootstrap.Module;
-import se.jbee.inject.bootstrap.OptionBootstrapperBundle;
+import se.jbee.inject.config.Choices;
 import se.jbee.inject.config.Globals;
-import se.jbee.inject.config.Options;
 
 /**
- * The test demonstrates how to use {@link Options} to allow different
+ * The test demonstrates how to use {@link Choices} to allow different
  * bootstrapping depended on a setting that can be determined before the
  * bootstrapping and that is constant from that moment on. In this example it is
  * the machine the application is running on.
@@ -26,11 +26,11 @@ import se.jbee.inject.config.Options;
  *
  * In this example we use {@link Binder#multibind(Class)}s to show that just one
  * of them has been bootstrapped depending on the value we defined in the
- * {@link Options} before bootstrapping.
+ * {@link Choices} before bootstrapping.
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public class TestOptionBinds {
+public class TestChoicesBinds {
 
 	private enum Machine {
 		LOCALHOST, WORKER_1
@@ -47,11 +47,11 @@ public class TestOptionBinds {
 
 	/**
 	 * The {@link GenericMachineBundle} will be used when no {@link Machine}
-	 * value has been defined in the {@link Options} so that it is actually
+	 * value has been defined in the {@link Choices} so that it is actually
 	 * <code>null</code>.
 	 */
 	private static class MachineBundle
-			extends OptionBootstrapperBundle<Machine> {
+			extends ChoiceBootstrapperBundle<Machine> {
 
 		@Override
 		protected void bootstrap() {
@@ -90,20 +90,20 @@ public class TestOptionBinds {
 
 	@Test
 	public void thatBundleOfTheGivenConstGotBootstrappedAndOthersNot() {
-		assertOptionResolvedToValue(Machine.LOCALHOST, "on-localhost");
-		assertOptionResolvedToValue(Machine.WORKER_1, "on-worker-1");
+		assertChoiceResolvedToValue(Machine.LOCALHOST, "on-localhost");
+		assertChoiceResolvedToValue(Machine.WORKER_1, "on-worker-1");
 	}
 
 	@Test
 	public void thatBundleOfUndefinedConstGotBootstrappedAndOthersNot() {
-		assertOptionResolvedToValue(null, "on-generic");
+		assertChoiceResolvedToValue(null, "on-generic");
 	}
 
-	private static void assertOptionResolvedToValue(Machine actualOption,
+	private static void assertChoiceResolvedToValue(Machine actualChoice,
 			String expected) {
-		Options options = Options.STANDARD.chosen(actualOption);
+		Choices choices = Choices.STANDARD.choose(actualChoice);
 		Injector injector = Bootstrap.injector(ModularBindsBundle.class,
-				Globals.STANDARD.options(options));
+				Globals.STANDARD.with(choices));
 		assertArrayEquals(new String[] { expected },
 				injector.resolve(String[].class));
 	}

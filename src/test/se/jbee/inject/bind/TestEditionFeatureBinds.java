@@ -12,11 +12,11 @@ import org.junit.Test;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Bootstrapper.OptionBootstrapper;
+import se.jbee.inject.bootstrap.Bootstrapper.ChoiceBootstrapper;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bundle;
+import se.jbee.inject.bootstrap.ChoiceBundle;
 import se.jbee.inject.bootstrap.Module;
-import se.jbee.inject.bootstrap.OptionBundle;
 import se.jbee.inject.config.Edition;
 import se.jbee.inject.config.Feature;
 import se.jbee.inject.config.Globals;
@@ -92,12 +92,12 @@ public class TestEditionFeatureBinds {
 
 	@Featured(AnnotatedFeature.BAZ)
 	private enum FeaturedOptionBundle
-			implements OptionBundle<FeaturedOptionBundle> {
+			implements ChoiceBundle<FeaturedOptionBundle> {
 		QUX;
 
 		@Override
 		public void bootstrap(
-				OptionBootstrapper<FeaturedOptionBundle> bootstrapper) {
+				ChoiceBootstrapper<FeaturedOptionBundle> bootstrapper) {
 			bootstrapper.install(AnotherModule.class, QUX);
 		}
 
@@ -137,7 +137,7 @@ public class TestEditionFeatureBinds {
 	private static void assertEditionInstalls(Edition edition,
 			Integer... expected) {
 		Injector injector = Bootstrap.injector(RootBundle.class,
-				Globals.STANDARD.edition(edition));
+				Globals.STANDARD.with(edition));
 		assertEqualSets(expected, injector.resolve(Integer[].class));
 	}
 

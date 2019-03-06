@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *  Copyright (c) 2012-2019, Jan Bernitt 
+ *			
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -134,7 +134,7 @@ public final class Dependency<T>
 		return dependency(instance, UNTARGETED);
 	}
 
-	public Dependency<T> ignoredExpiry() {
+	public Dependency<T> ignoredScoping() {
 		return hierarchy.length == 0
 			? this
 			: dependency(instance,
@@ -174,7 +174,7 @@ public final class Dependency<T>
 
 	public <I> Dependency<T> injectingInto(Instance<I> target)
 			throws DependencyCycle, UnstableDependency {
-		return injectingInto(new Resource<>(target), Scoping.IGNORE);
+		return injectingInto(new Resource<>(target), Scoping.ignore);
 	}
 
 	public Dependency<T> injectingInto(Resource<?> target, Scoping scoping)

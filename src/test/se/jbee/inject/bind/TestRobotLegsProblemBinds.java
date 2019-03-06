@@ -1,13 +1,13 @@
 package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertNotSame;
-import static se.jbee.inject.container.Scoped.TARGET_INSTANCE;
 
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
+import se.jbee.inject.Scope;
 import se.jbee.inject.bootstrap.Bootstrap;
 
 /**
@@ -65,7 +65,7 @@ public class TestRobotLegsProblemBinds {
 
 		@Override
 		protected void declare() {
-			per(TARGET_INSTANCE).construct(Foot.class);
+			per(Scope.targetInstance).construct(Foot.class);
 			bind(left, Leg.class).toConstructor();
 			bind(right, Leg.class).toConstructor();
 		}

@@ -1,11 +1,17 @@
+/*
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
+ *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
+ */
 package se.jbee.inject.config;
 
 import static se.jbee.inject.InconsistentBinding.noSuchAnnotationProperty;
+import static se.jbee.inject.Utils.annotatedName;
+import static se.jbee.inject.Utils.annotation;
 import static se.jbee.inject.Utils.annotationPropertyByType;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import se.jbee.inject.Name;
@@ -21,26 +27,16 @@ public interface NamingMirror {
 
 	NamingMirror defaultName = obj -> Name.DEFAULT;
 
-	default NamingMirror orAnnotatedBy(Class<? extends Annotation> naming) {
+	default NamingMirror unlessAnnotatedWith(
+			Class<? extends Annotation> naming) {
 		if (naming == null)
 			return this;
 		Method nameProperty = annotationPropertyByType(String.class, naming);
 		if (nameProperty == null)
 			throw noSuchAnnotationProperty(String.class, naming);
 		return obj -> {
-			try {
-				if (!obj.isAnnotationPresent(naming))
-					return this.reflect(obj);
-				String name = (String) nameProperty.invoke(
-						obj.getAnnotation(naming));
-				if (!name.isEmpty()
-					&& !name.equals(nameProperty.getDefaultValue()))
-					return Name.named(name);
-				return this.reflect(obj);
-			} catch (IllegalAccessException | IllegalArgumentException
-					| InvocationTargetException e) {
-				return this.reflect(obj);
-			}
+			Name name = annotatedName(nameProperty, annotation(naming, obj));
+			return name == null ? this.reflect(obj) : name;
 		};
 	}
 

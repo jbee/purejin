@@ -1,12 +1,9 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bind;
-
-import static se.jbee.inject.container.Scoped.DEPENDENCY;
-import static se.jbee.inject.container.Scoped.TARGET_INSTANCE;
 
 import java.util.Collection;
 import java.util.List;
@@ -14,14 +11,15 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import se.jbee.inject.Provider;
-import se.jbee.inject.bootstrap.Bootstrapper.OptionBootstrapper;
-import se.jbee.inject.bootstrap.OptionBundle;
+import se.jbee.inject.Scope;
+import se.jbee.inject.bootstrap.Bootstrapper.ChoiceBootstrapper;
+import se.jbee.inject.bootstrap.ChoiceBundle;
 import se.jbee.inject.bootstrap.Supply;
 
 /**
  * Installs all the build-in functionality by using the core API.
  */
-public enum BuildinBundle implements OptionBundle<BuildinBundle> {
+public enum BuildinBundle implements ChoiceBundle<BuildinBundle> {
 	/**
 	 * Adds: {@link Provider}s can be injected for all bound types.
 	 */
@@ -46,7 +44,7 @@ public enum BuildinBundle implements OptionBundle<BuildinBundle> {
 	LOGGER;
 
 	@Override
-	public void bootstrap(OptionBootstrapper<BuildinBundle> bootstrapper) {
+	public void bootstrap(ChoiceBootstrapper<BuildinBundle> bootstrapper) {
 		bootstrapper.install(ListBridgeModule.class, LIST);
 		bootstrapper.install(SetBridgeModule.class, SET);
 		bootstrapper.install(CollectionBridgeModule.class, COLLECTION);
@@ -58,7 +56,7 @@ public enum BuildinBundle implements OptionBundle<BuildinBundle> {
 
 		@Override
 		protected void declare() {
-			per(TARGET_INSTANCE).starbind(Logger.class).to(Supply.LOGGER);
+			per(Scope.targetInstance).starbind(Logger.class).to(Supply.LOGGER);
 		}
 
 	}
@@ -67,7 +65,8 @@ public enum BuildinBundle implements OptionBundle<BuildinBundle> {
 
 		@Override
 		protected void declare() {
-			per(DEPENDENCY).starbind(Provider.class).to(Supply.PROVIDER_BRIDGE);
+			per(Scope.dependency).starbind(Provider.class).toSupplier(
+					Supply.PROVIDER_BRIDGE);
 		}
 
 	}
@@ -76,7 +75,8 @@ public enum BuildinBundle implements OptionBundle<BuildinBundle> {
 
 		@Override
 		protected void declare() {
-			per(DEPENDENCY).starbind(List.class).to(Supply.LIST_BRIDGE);
+			per(Scope.dependency).starbind(List.class).toSupplier(
+					Supply.LIST_BRIDGE);
 		}
 
 	}
@@ -85,7 +85,8 @@ public enum BuildinBundle implements OptionBundle<BuildinBundle> {
 
 		@Override
 		protected void declare() {
-			per(DEPENDENCY).starbind(Set.class).to(Supply.SET_BRIDGE);
+			per(Scope.dependency).starbind(Set.class).toSupplier(
+					Supply.SET_BRIDGE);
 		}
 
 	}
@@ -94,7 +95,7 @@ public enum BuildinBundle implements OptionBundle<BuildinBundle> {
 
 		@Override
 		protected void declare() {
-			asDefault().per(DEPENDENCY).starbind(
+			asDefault().per(Scope.dependency).starbind(
 					Collection.class).toParametrized(List.class);
 		}
 	}

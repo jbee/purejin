@@ -14,10 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import se.jbee.inject.InconsistentBinding;
-import se.jbee.inject.config.ConstructionMirror;
-import se.jbee.inject.config.NamingMirror;
-import se.jbee.inject.config.ParameterisationMirror;
-import se.jbee.inject.config.ProductionMirror;
+import se.jbee.inject.config.Mirrors;
 
 /**
  * {@link Bindings} accumulate the {@link Binding} 4-tuples.
@@ -30,53 +27,26 @@ public final class Bindings {
 
 	public static Bindings newBindings() {
 		return new Bindings(new ArrayList<>(128), Macros.DEFAULT,
-				ConstructionMirror.mostParams, NamingMirror.defaultName,
-				ProductionMirror.noMethods,
-				ParameterisationMirror.noParameters);
+				Mirrors.DEFAULT);
 	}
 
 	private final List<Binding<?>> bindings;
 	public final Macros macros;
-	public final ConstructionMirror construction;
-	public final NamingMirror naming;
-	public final ProductionMirror production;
-	public final ParameterisationMirror parameterisation;
+	public final Mirrors mirrors;
 
 	private Bindings(List<Binding<?>> bindings, Macros macros,
-			ConstructionMirror construction, NamingMirror naming,
-			ProductionMirror production,
-			ParameterisationMirror parameterisation) {
+			Mirrors mirrors) {
 		this.bindings = bindings;
 		this.macros = macros;
-		this.construction = construction;
-		this.naming = naming;
-		this.production = production;
-		this.parameterisation = parameterisation;
+		this.mirrors = mirrors;
 	}
 
-	public Bindings with(ConstructionMirror mirror) {
-		return new Bindings(bindings, macros, mirror, naming, production,
-				parameterisation);
-	}
-
-	public Bindings with(NamingMirror mirror) {
-		return new Bindings(bindings, macros, construction, mirror, production,
-				parameterisation);
-	}
-
-	public Bindings with(ProductionMirror mirror) {
-		return new Bindings(bindings, macros, construction, naming, mirror,
-				parameterisation);
-	}
-
-	public Bindings with(ParameterisationMirror mirror) {
-		return new Bindings(bindings, macros, construction, naming, production,
-				mirror);
+	public Bindings with(Mirrors mirrors) {
+		return new Bindings(bindings, macros, mirrors);
 	}
 
 	public Bindings with(Macros macros) {
-		return new Bindings(bindings, macros, construction, naming, production,
-				parameterisation);
+		return new Bindings(bindings, macros, mirrors);
 	}
 
 	/**

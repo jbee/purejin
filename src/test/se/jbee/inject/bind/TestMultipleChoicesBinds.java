@@ -7,13 +7,13 @@ import org.junit.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.bootstrap.OptionBootstrapperBundle;
+import se.jbee.inject.bootstrap.ChoiceBootstrapperBundle;
+import se.jbee.inject.config.Choices;
 import se.jbee.inject.config.Globals;
-import se.jbee.inject.config.Options;
 
-public class TestMultipleOptionChoicesBinds {
+public class TestMultipleChoicesBinds {
 
-	private enum Choices {
+	private enum Text {
 		A, B, C, D, E
 	}
 
@@ -23,7 +23,6 @@ public class TestMultipleOptionChoicesBinds {
 		protected void declare() {
 			multibind(String.class).to("A");
 		}
-
 	}
 
 	private static class B extends BinderModule {
@@ -32,7 +31,6 @@ public class TestMultipleOptionChoicesBinds {
 		protected void declare() {
 			multibind(String.class).to("B");
 		}
-
 	}
 
 	private static class C extends BinderModule {
@@ -49,7 +47,6 @@ public class TestMultipleOptionChoicesBinds {
 		protected void declare() {
 			multibind(String.class).to("D");
 		}
-
 	}
 
 	private static class E extends BinderModule {
@@ -58,19 +55,17 @@ public class TestMultipleOptionChoicesBinds {
 		protected void declare() {
 			multibind(String.class).to("E");
 		}
-
 	}
 
-	private static class ChoicesBundle
-			extends OptionBootstrapperBundle<Choices> {
+	private static class ChoicesBundle extends ChoiceBootstrapperBundle<Text> {
 
 		@Override
 		protected void bootstrap() {
-			install(A.class, Choices.A);
-			install(B.class, Choices.B);
-			install(C.class, Choices.C);
-			install(D.class, Choices.D);
-			install(E.class, Choices.E);
+			install(A.class, Text.A);
+			install(B.class, Text.B);
+			install(C.class, Text.C);
+			install(D.class, Text.D);
+			install(E.class, Text.E);
 		}
 	}
 
@@ -78,15 +73,14 @@ public class TestMultipleOptionChoicesBinds {
 
 		@Override
 		protected void bootstrap() {
-			install(ChoicesBundle.class, Choices.class);
+			install(ChoicesBundle.class, Text.class);
 		}
-
 	}
 
 	@Test
-	public void thatMultipleOptionChoicesArePossible() {
-		Options options = Options.STANDARD.chosen(Choices.A, Choices.D);
-		Globals globals = Globals.STANDARD.options(options);
+	public void thatMultipleChoicesArePossible() {
+		Choices choices = Choices.STANDARD.chooseMultiple(Text.A, Text.D);
+		Globals globals = Globals.STANDARD.with(choices);
 		Injector injector = Bootstrap.injector(RootBundle.class, globals);
 		assertEqualSets(new String[] { "A", "D" },
 				injector.resolve(String[].class));
