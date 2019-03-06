@@ -8,7 +8,7 @@ import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.config.NamingMirror.defaultName;
 import static se.jbee.inject.config.ParameterisationMirror.noParameters;
 import static se.jbee.inject.config.ProductionMirror.allMethods;
-import static se.jbee.inject.container.Typecast.providerTypeOf;
+import static se.jbee.inject.container.Cast.providerTypeOf;
 
 import org.junit.Test;
 

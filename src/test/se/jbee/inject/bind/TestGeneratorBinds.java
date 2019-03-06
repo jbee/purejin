@@ -2,7 +2,7 @@ package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.container.Typecast.injectionCaseTypeFor;
+import static se.jbee.inject.container.Cast.injectionCaseTypeFor;
 
 import org.junit.Test;
 

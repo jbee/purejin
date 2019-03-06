@@ -15,7 +15,7 @@ import static se.jbee.inject.Target.targeting;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.isClassVirtual;
 import static se.jbee.inject.Utils.newArray;
-import static se.jbee.inject.container.Typecast.initialiserTypeOf;
+import static se.jbee.inject.container.Cast.initialiserTypeOf;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;

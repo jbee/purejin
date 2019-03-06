@@ -5,7 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.container.Typecast.initialiserTypeOf;
+import static se.jbee.inject.container.Cast.initialiserTypeOf;
 
 import org.junit.Test;
 

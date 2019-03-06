@@ -26,7 +26,7 @@ import se.jbee.inject.Type;
  * @author Jan Bernitt (jan@jbee.se)
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
-public final class Typecast {
+public final class Cast {
 
 	public static <T> Type<List<T>> listTypeOf(Class<T> elementType) {
 		return listTypeOf(raw(elementType));

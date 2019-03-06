@@ -26,6 +26,8 @@ v19.1 (upcoming)
 - `Inspector` split in (and replaced by) `*Mirror` functional interfaces
 - `InspectorBinder` replaced by `AutoBinder` and `autobind()` (no args)
 - `Bindings` are created via `newBindings` and modified using the `with` methods
+- renamed class `Inject` to `Container`
+- renamed class `Typecast` to `Cast`
 - renamed class `Assembly` to `Injectee`
 - renamed class `Options` to `Choices`
 - renamed class `Presets` to `Options`

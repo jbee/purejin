@@ -9,8 +9,8 @@ import static org.junit.Assert.fail;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.container.Typecast.listTypeOf;
-import static se.jbee.inject.container.Typecast.providerTypeOf;
+import static se.jbee.inject.container.Cast.listTypeOf;
+import static se.jbee.inject.container.Cast.providerTypeOf;
 
 import java.util.HashSet;
 import java.util.List;

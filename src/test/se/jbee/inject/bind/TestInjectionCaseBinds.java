@@ -6,10 +6,10 @@ import static org.junit.Assert.assertSame;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.container.Typecast.generatorTypeOf;
-import static se.jbee.inject.container.Typecast.generatorsTypeFor;
-import static se.jbee.inject.container.Typecast.injectionCaseTypeFor;
-import static se.jbee.inject.container.Typecast.injectionCasesTypeFor;
+import static se.jbee.inject.container.Cast.generatorTypeOf;
+import static se.jbee.inject.container.Cast.generatorsTypeFor;
+import static se.jbee.inject.container.Cast.injectionCaseTypeFor;
+import static se.jbee.inject.container.Cast.injectionCasesTypeFor;
 
 import java.util.List;
 

@@ -26,7 +26,7 @@ import se.jbee.inject.Type;
 import se.jbee.inject.config.Choices;
 import se.jbee.inject.config.Globals;
 import se.jbee.inject.config.Options;
-import se.jbee.inject.container.Inject;
+import se.jbee.inject.container.Container;
 
 /**
  * Utility to create an {@link Injector} context from {@link Bundle}s and
@@ -51,7 +51,7 @@ public final class Bootstrap {
 	}
 
 	public static Injector injector(Bindings bindings, Module[] modules) {
-		return Inject.container(
+		return Container.injector(
 				Binding.disambiguate(bindings.declareFrom(modules)));
 	}
 

@@ -7,7 +7,7 @@ import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Scoping.scopingOf;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.config.ConstructionMirror.mostParams;
-import static se.jbee.inject.container.Typecast.injectionCasesTypeFor;
+import static se.jbee.inject.container.Cast.injectionCasesTypeFor;
 
 import java.beans.ConstructorProperties;
 

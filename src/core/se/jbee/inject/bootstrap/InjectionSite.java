@@ -6,7 +6,7 @@
 package se.jbee.inject.bootstrap;
 
 import static se.jbee.inject.Instance.anyOf;
-import static se.jbee.inject.container.Typecast.injectionCaseTypeFor;
+import static se.jbee.inject.container.Cast.injectionCaseTypeFor;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.InjectionCase;

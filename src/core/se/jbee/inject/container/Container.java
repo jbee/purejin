@@ -14,8 +14,8 @@ import static se.jbee.inject.Utils.arrayFilter;
 import static se.jbee.inject.Utils.arrayFindFirst;
 import static se.jbee.inject.Utils.arrayFlatmap;
 import static se.jbee.inject.Utils.arrayOf;
-import static se.jbee.inject.container.Typecast.initialiserTypeOf;
-import static se.jbee.inject.container.Typecast.injectionCasesTypeFor;
+import static se.jbee.inject.container.Cast.initialiserTypeOf;
+import static se.jbee.inject.container.Cast.injectionCasesTypeFor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,19 +40,23 @@ import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.NoCaseForDependency;
 
 /**
- * Implements the {@link Injector} container and its {@link Generator}s.
+ * The {@link Container} is not a single type or entity but the composition of
+ * an {@link Injector} and it's {@link Generator}s or {@link InjectionCase}s.
+ * 
+ * So while this class contains the implementation it is not a relevant type on
+ * its own. Here it works more as a namespace for the implementation.
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public final class Inject {
+public final class Container {
 
 	static final InjectionCase<?>[] noCases = new InjectionCase[0];
 
-	public static Injector container(Injectee<?>... injectees) {
+	public static Injector injector(Injectee<?>... injectees) {
 		return new InjectorImpl(injectees);
 	}
 
-	private Inject() {
+	private Container() {
 		throw new UnsupportedOperationException("util");
 	}
 

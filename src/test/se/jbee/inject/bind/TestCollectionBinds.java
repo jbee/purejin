@@ -5,9 +5,9 @@ import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.container.Typecast.collectionTypeOf;
-import static se.jbee.inject.container.Typecast.listTypeOf;
-import static se.jbee.inject.container.Typecast.setTypeOf;
+import static se.jbee.inject.container.Cast.collectionTypeOf;
+import static se.jbee.inject.container.Cast.listTypeOf;
+import static se.jbee.inject.container.Cast.setTypeOf;
 
 import java.util.Collection;
 import java.util.List;
@@ -20,7 +20,7 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.container.Typecast;
+import se.jbee.inject.container.Cast;
 
 public class TestCollectionBinds {
 
@@ -82,7 +82,7 @@ public class TestCollectionBinds {
 
 	@Test
 	public void thatCollectionIsAvailable() {
-		Type<? extends Collection<?>> collectionType = Typecast.collectionTypeOf(
+		Type<? extends Collection<?>> collectionType = Cast.collectionTypeOf(
 				Integer.class);
 		ai.assertInjectsItems(new Integer[] { 846, 42 }, collectionType);
 	}
