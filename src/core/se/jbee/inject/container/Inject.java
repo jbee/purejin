@@ -76,14 +76,14 @@ public final class Inject {
 			this.wildcardCases = wildcardCases(casesByType);
 			this.initialisersCases = initInitialisers();
 			for (InjectionCase<?>[] cases : casesByType.values()) {
-				initEagerCases(cases);
+				for (InjectionCase<?> c : cases)
+					initEagerCase(c);
 			}
 		}
 
-		private static <T> void initEagerCases(InjectionCase<T>[] cases) {
-			for (InjectionCase<T> c : cases)
-				if (c.scoping.isEager())
-					c.generator.yield(c.resource.toDependency());
+		private static <T> void initEagerCase(InjectionCase<T> c) {
+			if (c.scoping.isEager())
+				c.generator.yield(c.resource.toDependency());
 		}
 
 		private InjectionCase<? extends Initialiser<?>>[] initInitialisers() {
