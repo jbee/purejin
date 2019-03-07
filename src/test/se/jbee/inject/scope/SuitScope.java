@@ -1,11 +1,11 @@
-package se.jbee.inject.container;
+package se.jbee.inject.scope;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ TestCast.class })
-public class SuitContainer {
-	// tests of the container package
+@SuiteClasses({ TestScopes.class })
+public class SuitScope {
+
 }

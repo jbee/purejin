@@ -1,4 +1,4 @@
-package se.jbee.inject.container;
+package se.jbee.inject.scope;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
@@ -12,23 +12,8 @@ import se.jbee.inject.Name;
 import se.jbee.inject.Provider;
 import se.jbee.inject.Scope;
 import se.jbee.inject.Scoping;
-import se.jbee.inject.scope.DependencyScope;
 
 public class TestScopes {
-
-	private static class ConstantProvider<T> implements Provider<T> {
-
-		private final T instance;
-
-		ConstantProvider(T instance) {
-			this.instance = instance;
-		}
-
-		@Override
-		public T provide() {
-			return instance;
-		}
-	}
 
 	static class A {
 		// just for test
@@ -40,15 +25,15 @@ public class TestScopes {
 
 	@Test
 	public void thatDependencyTypeScopeEnsuresSingletonPerExactGenericType() {
-		Scope r = new DependencyScope(DependencyScope::dependencyTypeOf);
+		Scope scope = new DependencyScope(DependencyScope::typeName);
 		A a = new A();
 		B b = new B();
-		Provider<A> ia = new ConstantProvider<>(a);
-		Provider<B> ib = new ConstantProvider<>(b);
-		assertSame(r.yield(1, dependency(A.class), ia, 2), a);
-		assertSame(r.yield(1, dependency(A.class), null, 2), a); // the null Provider shouldn't be called now
-		assertSame(r.yield(2, dependency(B.class), ib, 2), b);
-		assertSame(r.yield(2, dependency(B.class), null, 2), b); // the null Provider shouldn't be called now
+		Provider<A> ia = () -> a;
+		Provider<B> ib = () -> b;
+		assertSame(scope.yield(1, dependency(A.class), ia, 2), a);
+		assertSame(scope.yield(1, dependency(A.class), null, 2), a); // the null Provider shouldn't be called now
+		assertSame(scope.yield(2, dependency(B.class), ib, 2), b);
+		assertSame(scope.yield(2, dependency(B.class), null, 2), b); // the null Provider shouldn't be called now
 	}
 
 	@Test

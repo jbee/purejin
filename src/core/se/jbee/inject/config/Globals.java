@@ -39,7 +39,7 @@ public final class Globals {
 	 * {@link Options} including all features.
 	 */
 	public static final Globals STANDARD = new Globals(Edition.FULL,
-			Choices.STANDARD, Options.EMPTY);
+			Choices.NONE, Options.NONE);
 
 	public final Edition edition;
 	public final Choices choices;

@@ -62,7 +62,7 @@ public class TestExample1Binds {
 		Properties props = new Properties();
 		props.put("x", "abc");
 		props.put("y", 12);
-		Options presets = Options.EMPTY.set(Properties.class, props);
+		Options presets = Options.NONE.set(Properties.class, props);
 		Globals globals = Globals.STANDARD.with(presets);
 		Injector injector = Bootstrap.injector(Example1Module1.class, globals);
 		MyClass obj = injector.resolve(MyClass.class);

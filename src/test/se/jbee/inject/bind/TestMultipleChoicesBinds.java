@@ -79,7 +79,7 @@ public class TestMultipleChoicesBinds {
 
 	@Test
 	public void thatMultipleChoicesArePossible() {
-		Choices choices = Choices.STANDARD.chooseMultiple(Text.A, Text.D);
+		Choices choices = Choices.NONE.chooseMultiple(Text.A, Text.D);
 		Globals globals = Globals.STANDARD.with(choices);
 		Injector injector = Bootstrap.injector(RootBundle.class, globals);
 		assertEqualSets(new String[] { "A", "D" },

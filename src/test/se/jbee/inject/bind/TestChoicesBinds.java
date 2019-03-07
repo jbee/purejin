@@ -101,7 +101,7 @@ public class TestChoicesBinds {
 
 	private static void assertChoiceResolvedToValue(Machine actualChoice,
 			String expected) {
-		Choices choices = Choices.STANDARD.choose(actualChoice);
+		Choices choices = Choices.NONE.choose(actualChoice);
 		Injector injector = Bootstrap.injector(ModularBindsBundle.class,
 				Globals.STANDARD.with(choices));
 		assertArrayEquals(new String[] { expected },

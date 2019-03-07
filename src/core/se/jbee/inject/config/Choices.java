@@ -26,7 +26,7 @@ import java.util.IdentityHashMap;
  */
 public final class Choices implements Serializable {
 
-	public static final Choices STANDARD = new Choices(new IdentityHashMap<>());
+	public static final Choices NONE = new Choices(new IdentityHashMap<>());
 
 	private final IdentityHashMap<Class<? extends Enum<?>>, EnumSet<?>> choicesByType;
 

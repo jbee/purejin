@@ -18,21 +18,21 @@ public final class DependencyScope implements Scope {
 	 * @since 19.1
 	 */
 	public static final Scope JVM = new DependencyScope(
-			DependencyScope::dependencyInstanceOf);
+			DependencyScope::instanceName);
 
-	public static String dependencyTypeOf(Dependency<?> dep) {
+	public static String typeName(Dependency<?> dep) {
 		return dep.type().toString();
 	}
 
-	public static String dependencyInstanceOf(Dependency<?> dep) {
+	public static String instanceName(Dependency<?> dep) {
 		return dep.instance.name.toString() + "@" + dep.type().toString();
 	}
 
-	public static String targetedDependencyTypeOf(Dependency<?> dep) {
-		return dependencyInstanceOf(dep) + targetInstanceOf(dep);
+	public static String hierarchicalInstanceName(Dependency<?> dep) {
+		return instanceName(dep) + targetInstanceName(dep);
 	}
 
-	public static String targetInstanceOf(Dependency<?> dep) {
+	public static String targetInstanceName(Dependency<?> dep) {
 		StringBuilder b = new StringBuilder();
 		for (int i = dep.injectionDepth() - 1; i >= 0; i--)
 			b.append(dep.target(i));

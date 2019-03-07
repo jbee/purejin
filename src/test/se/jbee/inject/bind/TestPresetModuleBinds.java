@@ -83,7 +83,7 @@ public class TestPresetModuleBinds {
 	private final Injector injector = injector();
 
 	private static Injector injector() {
-		Options presets = Options.EMPTY.set(Properties.class,
+		Options presets = Options.NONE.set(Properties.class,
 				exampleProperties()).set(listTypeOf(String.class),
 						asList("a", "b")).set(listTypeOf(Integer.class),
 								asList(1, 2));

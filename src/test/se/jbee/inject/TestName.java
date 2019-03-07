@@ -46,4 +46,9 @@ public class TestName {
 	public void anyShouldBeCompatibleToWhateverName() {
 		assertTrue(Name.ANY.isCompatibleWith(named("foo")));
 	}
+
+	@Test
+	public void prefixShouldBeCompatibleToSamePrefix() {
+		assertTrue(named("disk:*").isCompatibleWith(named("disk:/home/jan/")));
+	}
 }

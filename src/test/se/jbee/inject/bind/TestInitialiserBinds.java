@@ -134,7 +134,7 @@ public class TestInitialiserBinds {
 	@Test
 	public void initialisersCanMakeUseOfParammetersUsingPresetModules() {
 		Globals globals = Globals.STANDARD.with(
-				Options.EMPTY.set(Integer.class, 42)); // setup some parameter
+				Options.NONE.set(Integer.class, 42)); // setup some parameter
 		Injector injector = Bootstrap.injector(
 				TestInitialiserBindsPresetModule.class, globals);
 

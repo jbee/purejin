@@ -1,11 +1,21 @@
 package se.jbee.inject.bind;
 
+import static se.jbee.inject.Name.named;
+
+import java.io.File;
+
+import se.jbee.inject.Dependency;
+import se.jbee.inject.Injector;
 import se.jbee.inject.Scope;
+import se.jbee.inject.UnresolvableDependency;
+import se.jbee.inject.container.Supplier;
 import se.jbee.inject.scope.ApplicationScope;
 import se.jbee.inject.scope.DependencyScope;
+import se.jbee.inject.scope.DiskScope;
 import se.jbee.inject.scope.ThreadScope;
 
-public final class DefaultScopes extends BinderModule {
+public final class DefaultScopes extends BinderModule
+		implements Supplier<Scope> {
 
 	@Override
 	protected void declare() {
@@ -16,14 +26,28 @@ public final class DefaultScopes extends BinderModule {
 		inScope.bind(Scope.jvm, Scope.class).to(DependencyScope.JVM);
 		inScope.bind(Scope.dependency, Scope.class).to(
 				() -> new DependencyScope(
-						DependencyScope::targetedDependencyTypeOf));
+						DependencyScope::hierarchicalInstanceName));
 		inScope.bind(Scope.dependencyInstance, Scope.class).to(
-				() -> new DependencyScope(
-						DependencyScope::dependencyInstanceOf));
+				() -> new DependencyScope(DependencyScope::instanceName));
 		inScope.bind(Scope.dependencyType, Scope.class).to(
-				() -> new DependencyScope(DependencyScope::dependencyTypeOf));
+				() -> new DependencyScope(DependencyScope::typeName));
 		inScope.bind(Scope.targetInstance, Scope.class).to(
-				() -> new DependencyScope(DependencyScope::targetInstanceOf));
+				() -> new DependencyScope(DependencyScope::targetInstanceName));
+		inScope.bind(named("disk:*"), Scope.class).toSupplier(this);
+	}
+
+	/**
+	 * By convention {@link Scope#disk(File)} create names starting with
+	 * {@code disk:} followed by the path to the folder of the scope. This can
+	 * be used to extract the directory in this {@link Supplier} to bind the
+	 * particular {@link DiskScope} for that directory.
+	 */
+	@Override
+	public Scope supply(Dependency<? super Scope> dep, Injector injector)
+			throws UnresolvableDependency {
+		String disk = dep.instance.name.toString();
+		File dir = new File(disk.substring(5));
+		return new DiskScope(dir, DependencyScope::instanceName);
 	}
 
 }

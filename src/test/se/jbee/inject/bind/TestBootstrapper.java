@@ -257,7 +257,7 @@ public class TestBootstrapper {
 		Injector injector = Bootstrap.injector(ReplacingBindsModule.class);
 		assertEquals(6, injector.resolve(Number.class));
 		InjectionCase<?>[] cases = injector.resolve(InjectionCase[].class);
-		assertEquals(7 + 10, cases.length); // 3x Comparable, Float, Double, Integer and Number (3x Serializable has been nullified) + 10 Scope
+		assertEquals(7 + 11, cases.length); // 3x Comparable, Float, Double, Integer and Number (3x Serializable has been nullified) + 10 Scope
 		InjectionCase<Number>[] casesForNumber = injector.resolve(
 				injectionCasesTypeFor(Number.class));
 		assertEquals(1, casesForNumber.length);

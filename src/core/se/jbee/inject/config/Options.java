@@ -20,7 +20,7 @@ import se.jbee.inject.Type;
  */
 public final class Options {
 
-	public static final Options EMPTY = new Options(new IdentityHashMap<>(0));
+	public static final Options NONE = new Options(new IdentityHashMap<>(0));
 
 	private final IdentityHashMap<String, Object> values;
 

@@ -100,7 +100,8 @@ public final class Name implements Qualifying<Name>, Serializable {
 
 	public boolean isCompatibleWith(Name other) {
 		return isAny() || other.isAny() || other.value.equals(value)
-			|| (value.matches(other.value.replace(WILDCARD, ".*")));
+			|| value.matches(other.value.replace(WILDCARD, ".*"))
+			|| other.value.matches(value.replace(WILDCARD, ".*"));
 	}
 
 }

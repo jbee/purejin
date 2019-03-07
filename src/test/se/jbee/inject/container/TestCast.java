@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import se.jbee.inject.Type;
 
-public class TestTypecast {
+public class TestCast {
 
 	@Test
 	public void thatReturnTypeConformsToModelledType() {
