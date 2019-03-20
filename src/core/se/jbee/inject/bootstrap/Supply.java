@@ -85,10 +85,10 @@ public final class Supply {
 
 	public static <T> Supplier<T> method(BoundMethod<T> method) {
 		return new MethodSupplier<>(method,
-				bind(parameterTypes(method.factory), method.parameters));
+				bind(parameterTypes(method.producer), method.parameters));
 	}
 
-	public static <T> Supplier<T> costructor(BoundConstructor<T> constructor) {
+	public static <T> Supplier<T> constructor(BoundConstructor<T> constructor) {
 		return new ConstructorSupplier<>(constructor.constructor,
 				bind(parameterTypes(constructor.constructor),
 						constructor.parameters));
@@ -414,7 +414,7 @@ public final class Supply {
 
 		@Override
 		protected T invoke(Object[] args) {
-			return Supply.constructor(constructor, args);
+			return Supply.construct(constructor, args);
 		}
 
 		@Override
@@ -440,18 +440,18 @@ public final class Supply {
 		protected void init(Dependency<? super T> dependency,
 				Injector injector) {
 			if (method.isInstanceMethod && owner == null) {
-				owner = injector.resolve(method.factory.getDeclaringClass());
+				owner = injector.resolve(method.producer.getDeclaringClass());
 			}
 		}
 
 		@Override
 		protected T invoke(Object[] args) {
-			return returnType.cast(Supply.method(method.factory, owner, args));
+			return returnType.cast(Supply.produce(method.producer, owner, args));
 		}
 
 		@Override
 		public String toString() {
-			return describe(method.factory);
+			return describe(method.producer);
 		}
 	}
 
@@ -541,7 +541,7 @@ public final class Supply {
 
 	}
 
-	public static <T> T constructor(Constructor<T> constructor, Object... args)
+	public static <T> T construct(Constructor<T> constructor, Object... args)
 			throws SupplyFailed {
 		try {
 			return constructor.newInstance(args);
@@ -550,7 +550,7 @@ public final class Supply {
 		}
 	}
 
-	public static Object method(Method method, Object owner, Object... args)
+	public static Object produce(Method method, Object owner, Object... args)
 			throws SupplyFailed {
 		try {
 			return method.invoke(owner, args);

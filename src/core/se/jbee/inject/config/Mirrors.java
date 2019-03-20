@@ -3,7 +3,7 @@ package se.jbee.inject.config;
 public final class Mirrors {
 
 	public static final Mirrors DEFAULT = new Mirrors(
-			ConstructionMirror.mostParams, ProductionMirror.noMethods,
+			ConstructionMirror.common, ProductionMirror.noMethods,
 			NamingMirror.defaultName, ParameterisationMirror.noParameters,
 			ScopingMirror.alwaysDefault);
 

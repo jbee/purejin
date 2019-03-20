@@ -8,6 +8,7 @@ import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Scope;
 import se.jbee.inject.UnresolvableDependency;
+import se.jbee.inject.config.Config;
 import se.jbee.inject.container.Supplier;
 import se.jbee.inject.scope.ApplicationScope;
 import se.jbee.inject.scope.DependencyScope;
@@ -47,7 +48,8 @@ public final class DefaultScopes extends BinderModule
 			throws UnresolvableDependency {
 		String disk = dep.instance.name.toString();
 		File dir = new File(disk.substring(5));
-		return new DiskScope(dir, DependencyScope::instanceName);
+		return new DiskScope(injector.resolve(Config.class), dir,
+				DependencyScope::instanceName);
 	}
 
 }

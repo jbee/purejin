@@ -58,7 +58,7 @@ public class TestInjectionCaseBinds {
 
 	@Test
 	public void thatInjectionCaseArrayIsAvailableForAllResources() {
-		assertEquals(4 + 11, injector.resolve(InjectionCase[].class).length);
+		assertEquals(4 + 12, injector.resolve(InjectionCase[].class).length);
 	}
 
 	@Test
@@ -88,7 +88,7 @@ public class TestInjectionCaseBinds {
 
 	@Test
 	public void thatGeneratorArrayIsAvailableForAllResources() {
-		assertEquals(4 + 11, injector.resolve(Generator[].class).length);
+		assertEquals(4 + 12, injector.resolve(Generator[].class).length);
 	}
 
 	@Test

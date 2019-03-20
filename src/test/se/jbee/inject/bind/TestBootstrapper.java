@@ -6,7 +6,7 @@ import static org.junit.Assert.fail;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Scoping.scopingOf;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.config.ConstructionMirror.mostParams;
+import static se.jbee.inject.config.ConstructionMirror.common;
 import static se.jbee.inject.container.Cast.injectionCasesTypeFor;
 
 import java.beans.ConstructorProperties;
@@ -192,7 +192,7 @@ public class TestBootstrapper {
 		@Override
 		protected Bindings configure(Bindings bindings) {
 			return bindings.with(bindings.mirrors.constructBy(
-					mostParams.annotatedWith(ConstructorProperties.class)));
+					common.annotatedWith(ConstructorProperties.class)));
 		}
 
 		@Override
@@ -257,7 +257,7 @@ public class TestBootstrapper {
 		Injector injector = Bootstrap.injector(ReplacingBindsModule.class);
 		assertEquals(6, injector.resolve(Number.class));
 		InjectionCase<?>[] cases = injector.resolve(InjectionCase[].class);
-		assertEquals(7 + 11, cases.length); // 3x Comparable, Float, Double, Integer and Number (3x Serializable has been nullified) + 10 Scope
+		assertEquals(7 + 12, cases.length); // 3x Comparable, Float, Double, Integer and Number (3x Serializable has been nullified) + 10 Scope
 		InjectionCase<Number>[] casesForNumber = injector.resolve(
 				injectionCasesTypeFor(Number.class));
 		assertEquals(1, casesForNumber.length);

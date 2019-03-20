@@ -8,7 +8,7 @@ package se.jbee.inject.bootstrap;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.accessible;
 import static se.jbee.inject.Utils.arrayOf;
-import static se.jbee.inject.config.ConstructionMirror.noArgsConstructor;
+import static se.jbee.inject.Utils.noArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -79,7 +79,7 @@ public final class Bootstrap {
 	}
 
 	public static <T> T instance(Class<T> type) {
-		return Supply.constructor(accessible(noArgsConstructor(type)));
+		return Supply.construct(accessible(noArgsConstructor(type)));
 	}
 
 	private Bootstrap() {

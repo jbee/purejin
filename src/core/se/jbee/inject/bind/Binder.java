@@ -42,6 +42,7 @@ import se.jbee.inject.bootstrap.BoundConstant;
 import se.jbee.inject.bootstrap.BoundConstructor;
 import se.jbee.inject.bootstrap.BoundMethod;
 import se.jbee.inject.bootstrap.Supply;
+import se.jbee.inject.config.Config;
 import se.jbee.inject.config.Mirrors;
 import se.jbee.inject.container.Factory;
 import se.jbee.inject.container.Initialiser;
@@ -438,6 +439,27 @@ public class Binder {
 
 		protected ScopedBinder(RootBinder root, Bind bind) {
 			super(root, bind);
+		}
+
+		/**
+		 * @since 19.1
+		 */
+		public TargetedBinder config() {
+			return injectingInto(Config.class);
+		}
+
+		/**
+		 * @since 19.1
+		 */
+		public TargetedBinder config(Class<?> ns) {
+			return config().within(ns);
+		}
+
+		/**
+		 * @since 19.1
+		 */
+		public TargetedBinder config(Instance<?> ns) {
+			return config().within(ns);
 		}
 
 		public TargetedBinder injectingInto(Class<?> target) {

@@ -13,7 +13,8 @@ import static se.jbee.inject.Utils.isClassVirtual;
 import static se.jbee.inject.bootstrap.BindingType.LINK;
 import static se.jbee.inject.bootstrap.BindingType.METHOD;
 import static se.jbee.inject.bootstrap.BindingType.PREDEFINED;
-import static se.jbee.inject.bootstrap.Supply.costructor;
+import static se.jbee.inject.bootstrap.Supply.constructor;
+import static se.jbee.inject.bootstrap.Supply.method;
 import static se.jbee.inject.bootstrap.Supply.parametrizedInstance;
 
 import java.lang.reflect.Constructor;
@@ -180,7 +181,7 @@ public final class Macros {
 		public <T> void expand(BoundConstructor<?> constructor,
 				Binding<T> incomplete, Bindings bindings) {
 			bindings.expandInto(incomplete.complete(BindingType.CONSTRUCTOR,
-					costructor(constructor.typed(incomplete.type()))));
+					constructor(constructor.typed(incomplete.type()))));
 		}
 	}
 
@@ -193,7 +194,7 @@ public final class Macros {
 		public <T> void expand(BoundMethod<?> method, Binding<T> incomplete,
 				Bindings bindings) {
 			bindings.expandInto(incomplete.complete(METHOD,
-					Supply.method(method.typed(incomplete.type()))));
+					method(method.typed(incomplete.type()))));
 		}
 	}
 

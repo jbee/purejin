@@ -147,7 +147,7 @@ public class TestServiceInvocationBinds {
 			Object[] state = before(output, input, value);
 			O res;
 			try {
-				res = output.rawType.cast(Supply.method(action, impl, args));
+				res = output.rawType.cast(Supply.produce(action, impl, args));
 			} catch (SupplyFailed e) {
 				Exception ex = e;
 				if (e.getCause() instanceof Exception) {

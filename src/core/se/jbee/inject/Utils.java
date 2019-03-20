@@ -7,7 +7,11 @@ package se.jbee.inject;
 
 import static java.lang.System.arraycopy;
 import static java.lang.reflect.Array.newInstance;
+import static java.lang.reflect.Modifier.isPrivate;
+import static java.lang.reflect.Modifier.isProtected;
+import static java.lang.reflect.Modifier.isPublic;
 import static java.util.Arrays.copyOf;
+import static se.jbee.inject.Type.raw;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
@@ -16,6 +20,7 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
@@ -24,6 +29,8 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
+
+import se.jbee.inject.UnresolvableDependency.NoMethodForDependency;
 
 /**
  * Language level utility methods for the library.
@@ -224,7 +231,7 @@ public final class Utils {
 					e -> e == ElementType.ANNOTATION_TYPE);
 	}
 
-	/* Classes */
+	/* Classes / Types */
 
 	/**
 	 * @return the given object made accessible.
@@ -267,16 +274,87 @@ public final class Utils {
 			return false;
 		if (cls == Object.class)
 			return true;
-		for (Field f : cls.getDeclaredFields()) {
+		for (Field f : cls.getDeclaredFields())
 			if (!Modifier.isStatic(f.getModifiers()))
 				return false;
-		}
-		for (Constructor<?> c : cls.getDeclaredConstructors()) {
+		for (Constructor<?> c : cls.getDeclaredConstructors())
 			// maybe arguments are passed to super-type so we check it too
 			if (c.getParameterTypes().length > 0)
 				return isClassMonomodal(cls.getSuperclass());
-		}
 		return true;
+	}
+
+	/* Members */
+
+	public static <T extends Member> T moreVisible(T a, T b) {
+		int am = a.getModifiers();
+		int bm = b.getModifiers();
+		if (isPublic(am))
+			return a;
+		if (isPublic(bm))
+			return b;
+		if (isProtected(am))
+			return a;
+		if (isProtected(bm))
+			return b;
+		if (isPrivate(bm))
+			return a;
+		if (isPrivate(am))
+			return b;
+		return a; // same
+	}
+
+	/**
+	 * Returns the constructor with most visible visibility and longest argument
+	 * list. Self-referencing constructors are ignored.
+	 *
+	 * @param type constructed type
+	 * @return The highest visibility constructor with the most parameters that
+	 *         does not have the declaring class itself as parameter type (some
+	 *         compiler seam to generate such a synthetic constructor)
+	 * @throws NoMethodForDependency in case the type is not constructible (has
+	 *             no constructors at all)
+	 */
+	public static <T> Constructor<T> commonConstructor(Class<T> type)
+			throws NoMethodForDependency {
+		Constructor<?>[] cs = type.getDeclaredConstructors();
+		if (cs.length == 0)
+			throw new NoMethodForDependency(raw(type));
+		Constructor<?> mostParamsConstructor = null;
+		for (Constructor<?> c : cs) {
+			if (!arrayContains(c.getParameterTypes(), type, (a, b) -> a == b) // avoid self referencing constructors (synthetic) as they cause endless loop
+				&& (mostParamsConstructor == null //
+					|| (moreVisible(c, mostParamsConstructor) == c
+						&& (moreVisible(mostParamsConstructor, c) == c
+							|| c.getParameterCount() > mostParamsConstructor.getParameterCount())))) {
+				mostParamsConstructor = c;
+			}
+		}
+		if (mostParamsConstructor == null)
+			throw new NoMethodForDependency(raw(type));
+		@SuppressWarnings("unchecked")
+		Constructor<T> c = (Constructor<T>) mostParamsConstructor;
+		return c;
+	}
+
+	public static <T> Constructor<T> commonConstructorOrNull(Class<T> type) {
+		try {
+			return commonConstructor(type);
+		} catch (RuntimeException e) {
+			return null;
+		}
+	}
+
+	public static <T> Constructor<T> noArgsConstructor(Class<T> type) {
+		if (type.isInterface())
+			throw new NoMethodForDependency(raw(type));
+		try {
+			return type.getDeclaredConstructor();
+		} catch (Exception e) {
+			if (e instanceof RuntimeException)
+				throw (RuntimeException) e;
+			throw new RuntimeException(e);
+		}
 	}
 
 	/* Sequences */
@@ -299,5 +377,15 @@ public final class Utils {
 			if (seq.charAt(i) == match)
 				c++;
 		return c;
+	}
+
+	/* Exception Handling */
+
+	public static <T> T orElse(T defaultValue, Provider<T> src) {
+		try {
+			return src.provide();
+		} catch (UnresolvableDependency e) {
+			return defaultValue;
+		}
 	}
 }

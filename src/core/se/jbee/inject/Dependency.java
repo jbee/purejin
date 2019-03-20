@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -48,6 +48,7 @@ public final class Dependency<T>
 		return (Dependency) dependency(raw(Class[].class)).named(
 				pluginFor(pluginPoint, property));
 	}
+	//TODO maybe extract a Plugins Extension
 
 	public static <T> Dependency<T> dependency(Class<T> type) {
 		return dependency(raw(type));

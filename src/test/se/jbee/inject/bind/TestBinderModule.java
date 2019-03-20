@@ -54,7 +54,7 @@ public class TestBinderModule {
 		Binding<?>[] bindings = Bootstrap.bindings(TestBinderModuleBundle.class,
 				Bindings.newBindings(), Globals.STANDARD);
 
-		assertEquals(4 + 11, bindings.length); // 11 scopes
+		assertEquals(4 + 12, bindings.length); // 11 scopes
 
 		assertBinding(TestBinderModuleModule1.class, 1, EXPLICIT,
 				forType(Integer.class, bindings));

@@ -4,12 +4,16 @@ v19.1 (upcoming)
 ==============
 
 > Mechanics of Scope/Scoping as well as Injectrons were refined.
-> Initialisers were added.
+> Initialisers, Extensions and Configs were added.
+> Mirrors replaced the Inspector.
 
 **General Notes**
 - changed versioning from _major.minor_ to _year.serial_ (e.g. 19.1 is the first in 2019)
 
 **Additions**
+- added `Extension` mechanism
+- added `DiskScope`
+- added `Config` for namespaced configuration (avoid name collisions)
 - added `Serializable` to `Type`, `Name`, `Instance`, `Instances`, `Packages`, 
   `Target`, `Resource`, `Source`, `Scoping`, `Injection`, `Dependency`,
   `Options`

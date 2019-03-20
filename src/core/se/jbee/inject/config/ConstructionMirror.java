@@ -5,15 +5,13 @@
  */
 package se.jbee.inject.config;
 
-import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.Utils.arrayContains;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
+import java.util.function.IntPredicate;
 
 import se.jbee.inject.Packages;
 import se.jbee.inject.Type;
-import se.jbee.inject.UnresolvableDependency.NoMethodForDependency;
+import se.jbee.inject.Utils;
 
 @FunctionalInterface
 public interface ConstructionMirror {
@@ -29,11 +27,12 @@ public interface ConstructionMirror {
 	 *         Returns {@code null} when no suitable constructor was found.
 	 */
 	<T> Constructor<T> reflect(Class<T> type);
+	//TODO maybe use the list of constructors as parameter to allow better filtering
 
 	/**
 	 * Default value and starting point for custom {@link ConstructionMirror}.
 	 */
-	ConstructionMirror mostParams = ConstructionMirror::mostParamsConstructorOrNull;
+	ConstructionMirror common = Utils::commonConstructorOrNull;
 
 	default ConstructionMirror in(Packages filter) {
 		return new ConstructionMirror() {
@@ -45,6 +44,11 @@ public interface ConstructionMirror {
 					: null;
 			}
 		};
+	}
+
+	default ConstructionMirror withModifier(IntPredicate filter) {
+		//TODO add a filter the others can be based upon
+		return null;
 	}
 
 	default ConstructionMirror annotatedWith(
@@ -64,58 +68,6 @@ public interface ConstructionMirror {
 					: this.reflect(type);
 			}
 		};
-	}
-
-	/**
-	 * Returns the constructor usually should be used.
-	 *
-	 * @param type constructed type
-	 * @return The constructor with the most parameters that does not have the
-	 *         declaring class itself as parameter type (some compiler seam to
-	 *         generate such a synthetic constructor)
-	 * @throws NoMethodForDependency in case the type is not constructible (has
-	 *             no constructors at all)
-	 */
-	public static <T> Constructor<T> mostParamsConstructor(Class<T> type)
-			throws NoMethodForDependency {
-		Constructor<?>[] cs = type.getDeclaredConstructors();
-		if (cs.length == 0)
-			throw new NoMethodForDependency(raw(type));
-		Constructor<?> mostParamsConstructor = null;
-		for (Constructor<?> c : cs) {
-			if (!arrayContains(c.getParameterTypes(), type, (a, b) -> a == b) // avoid self referencing constructors (synthetic) as they cause endless loop
-				&& (mostParamsConstructor == null
-					|| c.getParameterCount() > mostParamsConstructor.getParameterCount())) {
-				mostParamsConstructor = c;
-			}
-		}
-		if (mostParamsConstructor == null)
-			throw new NoMethodForDependency(raw(type));
-		@SuppressWarnings("unchecked")
-		Constructor<T> c = (Constructor<T>) mostParamsConstructor;
-		return c;
-	}
-
-	public static <T> Constructor<T> mostParamsConstructorOrNull(
-			Class<T> type) {
-		try {
-			return mostParamsConstructor(type);
-		} catch (RuntimeException e) {
-			return null;
-		}
-	}
-
-	public static <T> Constructor<T> noArgsConstructor(Class<T> type) {
-		if (type.isInterface())
-			throw new NoMethodForDependency(raw(type));
-		try {
-			return type.getDeclaredConstructor();
-		} catch (Exception e) {
-			if (e instanceof RuntimeException) {
-				throw (RuntimeException) e;
-			}
-			throw new RuntimeException(e);
-		}
 	}
 
 }

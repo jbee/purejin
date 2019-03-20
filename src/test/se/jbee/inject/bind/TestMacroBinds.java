@@ -104,7 +104,7 @@ public class TestMacroBinds {
 	public void thatBindingsCanJustBeCounted() {
 		CountMacro count = new CountMacro();
 		Injector injector = injectorWithMacro(MacroBindsModule.class, count);
-		assertEquals(6 + 11, count.expands); // 11 from scopes
+		assertEquals(6 + 12, count.expands); // 11 from scopes
 		assertEquals(0, injector.resolve(InjectionCase[].class).length);
 	}
 
@@ -194,7 +194,7 @@ public class TestMacroBinds {
 		public <T> void expand(BoundConstructor<?> constructor,
 				Binding<T> incomplete, Bindings bindings) {
 			Supplier<T> supplier = new InitialisationSupplier<>(
-					Supply.costructor(constructor.typed(incomplete.type())));
+					Supply.constructor(constructor.typed(incomplete.type())));
 			bindings.expandInto(incomplete.complete(CONSTRUCTOR, supplier));
 		}
 

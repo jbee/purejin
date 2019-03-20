@@ -17,6 +17,7 @@ import se.jbee.inject.Dependency;
 import se.jbee.inject.Provider;
 import se.jbee.inject.Scope;
 import se.jbee.inject.UnresolvableDependency;
+import se.jbee.inject.config.Config;
 
 /**
  * The {@link DiskScope} is a {@link Scope} that persists objects on disk.
@@ -35,6 +36,8 @@ import se.jbee.inject.UnresolvableDependency;
  */
 public final class DiskScope implements Scope, Closeable {
 
+	public static final String SYNC_INTERVAL = "sync";
+
 	private static final class DiskEntry implements Serializable {
 
 		final Serializable obj;
@@ -48,15 +51,19 @@ public final class DiskScope implements Scope, Closeable {
 		}
 	}
 
+	private final long syncInterval;
 	private final File dir;
 	private final Function<Dependency<?>, String> filenames;
 	private final Map<String, DiskEntry> loaded = new ConcurrentHashMap<>();
 
 	//TODO add daemon that periodically snycs to disk - add bindable config for period
 
-	public DiskScope(File dir, Function<Dependency<?>, String> filenames) {
+	public DiskScope(Config config, File dir,
+			Function<Dependency<?>, String> filenames) {
 		this.dir = dir;
 		this.filenames = filenames;
+		this.syncInterval = config.of(DiskScope.class).longValue(SYNC_INTERVAL,
+				60 * 1000);
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> close()));
 	}
 

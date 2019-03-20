@@ -94,7 +94,7 @@ public abstract class ActionModule extends BinderModule {
 		public <I, O> O exec(Object impl, Method action, Object[] args,
 				Type<O> output, Type<I> input, I value) {
 			try {
-				return output.rawType.cast(Supply.method(action, impl, args));
+				return output.rawType.cast(Supply.produce(action, impl, args));
 			} catch (SupplyFailed e) {
 				Exception ex = e;
 				if (e.getCause() instanceof Exception) {

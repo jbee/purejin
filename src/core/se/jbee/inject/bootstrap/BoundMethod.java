@@ -23,32 +23,32 @@ import se.jbee.inject.Utils;
  */
 public final class BoundMethod<T> implements Typed<T> {
 
-	public static <T> BoundMethod<T> bind(Object instance, Method factory,
+	public static <T> BoundMethod<T> bind(Object instance, Method producer,
 			Type<T> returnType, Parameter<?>... parameters) {
-		return new BoundMethod<>(instance, factory, returnType, parameters);
+		return new BoundMethod<>(instance, producer, returnType, parameters);
 	}
 
 	public final Object instance;
-	public final Method factory;
+	public final Method producer;
 	public final Type<T> returnType;
 	public final Parameter<?>[] parameters;
 	public final boolean isInstanceMethod;
 
-	private BoundMethod(Object instance, Method factory, Type<T> returnType,
+	private BoundMethod(Object instance, Method producer, Type<T> returnType,
 			Parameter<?>[] parameters) {
 		this.returnType = returnType;
-		this.factory = accessible(factory);
+		this.producer = accessible(producer);
 		this.parameters = parameters;
 		this.instance = instance;
-		this.isInstanceMethod = !Modifier.isStatic(factory.getModifiers());
-		final Type<?> actualReturnType = Type.returnType(factory);
+		this.isInstanceMethod = !Modifier.isStatic(producer.getModifiers());
+		final Type<?> actualReturnType = Type.returnType(producer);
 		actualReturnType.toSupertype(returnType); // make sure types are compatible
 		if (instance != null
-			&& factory.getDeclaringClass() != instance.getClass()) {
+			&& producer.getDeclaringClass() != instance.getClass()) {
 			throw new IllegalArgumentException(
 					"The producer method and the instance it is invoked on have to be the same class.");
 		}
-		Utils.accessible(factory);
+		Utils.accessible(producer);
 	}
 
 	@Override
