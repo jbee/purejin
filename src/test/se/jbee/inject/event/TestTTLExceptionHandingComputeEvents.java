@@ -4,6 +4,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
+import static se.jbee.inject.util.TestUtils.wait20;
+import static se.jbee.inject.util.TestUtils.wait50;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
@@ -59,34 +61,26 @@ public class TestTTLExceptionHandingComputeEvents {
 
 		@Override
 		public boolean slowMethod() {
-			return beSlow();
+			return wait50();
 		}
 
 		@Override
 		public Future<Boolean> slowMethodReturnsFuture() {
-			beSlow();
+			wait50();
 			return CompletableFuture.completedFuture(true);
 		}
 
 		@Override
 		public boolean slowMethodThatThrowsException() throws Exception {
-			return beSlow();
+			return wait50();
 		}
 
 		@Override
 		public boolean slowMethodThatThrowsTineoutException()
 				throws TimeoutException {
-			return beSlow();
+			return wait50();
 		}
 
-		private static boolean beSlow() {
-			try {
-				Thread.sleep(40);
-				return true;
-			} catch (InterruptedException e) {
-				return false;
-			}
-		}
 	}
 
 	private static final class TestTTLExceptionHandingComputeEventsModule
@@ -163,9 +157,6 @@ public class TestTTLExceptionHandingComputeEvents {
 
 	private void blockProcessorWithTask() {
 		handler.slowMethodReturnsFuture(); // blocks the single thread for 20ms
-		try {
-			Thread.sleep(20); // make sure the task really gets started before we add the 2nd one
-		} catch (InterruptedException e1) {
-		}
+		wait20(); // make sure the task really gets started before we add the 2nd one
 	}
 }

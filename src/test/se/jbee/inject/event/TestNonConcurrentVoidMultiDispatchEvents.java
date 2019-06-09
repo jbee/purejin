@@ -3,6 +3,7 @@ package se.jbee.inject.event;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static se.jbee.inject.util.TestUtils.wait50;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,8 +99,7 @@ public class TestNonConcurrentVoidMultiDispatchEvents {
 			TestMultiDispatchEventsModule.class);
 
 	@Test
-	public void onlyOneThreadAtATimeCallsSameListersMethods()
-			throws InterruptedException {
+	public void onlyOneThreadAtATimeCallsSameListersMethods() {
 		Listener listener = injector.resolve(Listener.class);
 		Service a = injector.resolve(Service.class);
 		Service b = injector.resolve(Service.class);
@@ -155,8 +155,8 @@ public class TestNonConcurrentVoidMultiDispatchEvents {
 	 * Called when the {@link EventProcessor} should be given some time to run
 	 * the expected events.
 	 */
-	private static void giveSomeTime() throws InterruptedException {
-		Thread.sleep(40);
+	private static void giveSomeTime() {
+		wait50();
 	}
 
 	private static void notifyAll(Service a) {

@@ -114,8 +114,7 @@ public final class Binding<T>
 
 	@Override
 	public int hashCode() {
-		// TODO Auto-generated method stub
-		return super.hashCode();
+		return resource.hashCode() ^ source.hashCode();
 	}
 
 	@Override
@@ -158,7 +157,8 @@ public final class Binding<T>
 		for (int i = 1; i < bindings.length; i++) {
 			Binding<?> lastUnique = bindings[lastUniqueIndex];
 			Binding<?> current = bindings[i];
-			final boolean equalResource = lastUnique.resource.equalTo(current.resource);
+			final boolean equalResource = lastUnique.resource.equalTo(
+					current.resource);
 			DeclarationType uType = lastUnique.source.declarationType;
 			DeclarationType curType = current.source.declarationType;
 			if (equalResource && uType.clashesWith(curType)) {

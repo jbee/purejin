@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static se.jbee.inject.util.TestUtils.wait50;
 
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
@@ -69,17 +70,16 @@ public class TestEventBasics {
 			TestEventsModule.class);
 
 	@Test
-	public void thatNonReturnDisptachIsNonBlockingForTheCaller()
-			throws InterruptedException {
+	public void thatNonReturnDisptachIsNonBlockingForTheCaller() {
 		Handler proxy = injector.resolve(Handler.class);
 		Service service = injector.resolve(Service.class);
 		assertEquals(0, service.messages.size());
 		proxy.onChange("foo");
-		Thread.sleep(50); // give time for the message to arrive
+		wait50(); // give time for the message to arrive
 		assertEquals(1, service.messages.size());
 		assertEquals("foo", service.messages.get(0));
 		proxy.onChange("bar");
-		Thread.sleep(50); // give time for the message to arrive
+		wait50(); // give time for the message to arrive
 		assertEquals(2, service.messages.size());
 		assertEquals("bar", service.messages.get(1));
 	}

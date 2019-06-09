@@ -1,7 +1,8 @@
 package se.jbee.inject.scope;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import se.jbee.inject.Dependency;
@@ -39,7 +40,8 @@ public final class DependencyScope implements Scope {
 		return b.toString();
 	}
 
-	private final ConcurrentMap<String, Object> instances = new ConcurrentHashMap<>();
+	private final AtomicReference<Map<String, Object>> instances = new AtomicReference<>(
+			new HashMap<>());
 	private final Function<Dependency<?>, String> identity;
 
 	public DependencyScope(Function<Dependency<?>, String> identity) {
@@ -52,16 +54,12 @@ public final class DependencyScope implements Scope {
 			Provider<T> provider, int generators)
 			throws UnresolvableDependency {
 		final String key = identity.apply(dep);
-		//TODO computeIfAbsent cannot be used since recursive insert (provider uses same scope) ends in dead-lock
-		T instance = (T) instances.get(key);
+		Map<String, Object> map = instances.get();
+		T instance = (T) map.get(key);
 		if (instance != null)
 			return instance;
-		synchronized (instances) {
-			instance = (T) instances.get(key);
-			if (instance == null) {
-				instance = provider.provide();
-				instances.put(key, instance);
-			}
+		synchronized (map) {
+			instance = (T) map.computeIfAbsent(key, k -> provider.provide());
 		}
 		return instance;
 	}
