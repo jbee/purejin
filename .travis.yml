@@ -2,7 +2,8 @@ language: java
 
 cache:
   directories:
-  - $HOME/lib
+  - '$HOME/lib'
+  - '$HOME/.sonar/cache'
 
 jdk:
   - oraclejdk8
