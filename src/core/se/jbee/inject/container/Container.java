@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Generator;
@@ -332,7 +333,7 @@ public final class Container {
 
 		private final Injector injector;
 		private final Supplier<? extends T> supplier;
-		private volatile T value;
+		private final AtomicReference<T> value = new AtomicReference<>();
 
 		LazySingletonGenerator(Injector injector,
 				Supplier<? extends T> supplier) {
@@ -343,13 +344,11 @@ public final class Container {
 		@Override
 		public T yield(Dependency<? super T> dep)
 				throws UnresolvableDependency {
-			if (value == null) {
-				synchronized (this) {
-					if (value == null)
-						value = supplier.supply(dep, injector);
-				}
-			}
-			return value;
+			T res = value.get();
+			if (res != null)
+				return res;
+			return value.updateAndGet(
+					v -> v != null ? v : supplier.supply(dep, injector));
 		}
 	}
 
@@ -360,7 +359,7 @@ public final class Container {
 		private final Supplier<? extends T> supplier;
 		private final Scoping scoping;
 		private final Resource<T> resource;
-		private volatile Scope scope;
+		private final AtomicReference<Scope> scope = new AtomicReference<>();
 
 		private Class<?> cachedForType;
 		private Initialiser<? super T>[] cachedInitialisers;
@@ -372,14 +371,17 @@ public final class Container {
 			this.scoping = scoping;
 			this.supplier = injectee.supplier();
 			this.resource = injectee.resource();
-			this.scope = scope;
 		}
 
 		@Override
 		public T yield(Dependency<? super T> dep) {
-			if (scope == null)
+			Scope scope = this.scope.get();
+			if (scope == null) {
 				//as scopes are known to be "singletons" its ok should this really happen more then once
-				scope = injector.resolve(scoping.scope, Scope.class);
+				scope = this.scope.updateAndGet(s -> s != null
+					? s
+					: injector.resolve(scoping.scope, Scope.class));
+			}
 			final Dependency<? super T> injected = dep.injectingInto(resource,
 					scoping);
 			return scope.yield(serialID, injected, () -> {
