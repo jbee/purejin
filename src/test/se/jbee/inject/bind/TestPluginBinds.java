@@ -14,6 +14,7 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.bind.Binder.PluginBinder;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Module;
+import se.jbee.inject.config.Plugins;
 
 /**
  * Plug-in-binds are a convenient way to define a named set of classes. The name
@@ -59,28 +60,27 @@ public class TestPluginBinds {
 	private final Injector injector = Bootstrap.injector(
 			TestPluginModule.class);
 
-	private final Dependency<Class<?>[]> plugins = Dependency.pluginsFor(
-			Callable.class);
+	private final Plugins plugins = injector.resolve(Plugins.class);
 
 	@Test
 	public void thatJustUntargetedExtensionsAreResolvedGlobally() {
-		Class<?>[] classes = injector.resolve(plugins);
+		Class<?>[] classes = plugins.forPoint(Callable.class);
 		assertEquals(1, classes.length);
 		assertSame(TestExtensionAction.class, classes[0]);
 	}
 
 	@Test
 	public void thatPackageLocalExtensionsAreResolvedWithAppropiateInjection() {
-		Class<?>[] classes = injector.resolve(
-				plugins.injectingInto(Module.class));
+		Class<?>[] classes = plugins.targeting(Module.class).forPoint(
+				Callable.class);
 		assertEqualSets(new Class<?>[] { TestExtensionAction.class,
 				TestExtensionPackageLocalAction.class }, classes);
 	}
 
 	@Test
 	public void thatInstanceOfExtensionsAreResolvedWithAppropiateInjection() {
-		Class<?>[] classes = injector.resolve(
-				plugins.injectingInto(String.class));
+		Class<?>[] classes = plugins.targeting(String.class).forPoint(
+				Callable.class);
 		assertEqualSets(new Class<?>[] { TestExtensionAction.class,
 				TestExtensionInstanceOfAction.class }, classes);
 	}

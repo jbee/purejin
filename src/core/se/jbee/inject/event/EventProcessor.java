@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.event;
@@ -47,7 +47,7 @@ public interface EventProcessor extends AutoCloseable {
 
 	/**
 	 * This will cause the calling thread to wait until there is a
-	 * implementation for the given event.
+	 * implementation for the given event type.
 	 *
 	 * Instead of support blocking in case no implementation is known for a
 	 * event the API allows to call this method explicitly to wait until a
@@ -59,7 +59,7 @@ public interface EventProcessor extends AutoCloseable {
 	<E> void await(Class<E> event) throws InterruptedException;
 
 	/**
-	 * Registers a event handler implementation to be used by this
+	 * Registers an event handler implementation to be used by this
 	 * {@link EventProcessor}.
 	 * 
 	 * The processor uses all registered handlers to {@link #dispatch(Event)}
@@ -67,7 +67,7 @@ public interface EventProcessor extends AutoCloseable {
 	 * depending on the handler method signature and the
 	 * {@link EventPreferences} given with an {@link Event}.
 	 * 
-	 * When a event type is {@link EventModule#handle(Class)}d the registration
+	 * When an event type is {@link EventModule#handle(Class)}d the registration
 	 * occurs "automatically" though {@link Initialiser}s for the event handler
 	 * interface. For handler implementations it is sufficient to implement that
 	 * handler interface. No explicit connection needs to be bound.
@@ -121,10 +121,10 @@ public interface EventProcessor extends AutoCloseable {
 	<E> E getProxy(Class<E> event);
 
 	/**
-	 * Does a multi-dispatch (dispatch to all registered handlers) if
-	 * {@link EventPreferences#isMultiDispatch()} is {@code true}, otherwise
-	 * single dispatch if it is {@code false} using a round robin in case
-	 * multiple handlers were registered.
+	 * Does a multi-dispatch (dispatch to all handlers registered when this
+	 * method is called) if {@link EventPreferences#isMultiDispatch()} is
+	 * {@code true}, otherwise single dispatch if it is {@code false} using a
+	 * round robin in case multiple handlers were registered.
 	 * 
 	 * The dispatch is usually asynchronous (method returns when event queued
 	 * for processing) unless the {@link EventPreferences#isSyncMultiDispatch()}
@@ -155,14 +155,15 @@ public interface EventProcessor extends AutoCloseable {
 	<E> void dispatch(Event<E, ?> event) throws Throwable;
 
 	/**
-	 * Forwards the handler method call to a registered event handler
-	 * implementation. If multiple handlers were registered usually a round
-	 * robin is used to distribute load.
+	 * Forwards the handler method call to a event handler implementation
+	 * registered at the start of this method call.
 	 * 
-	 * For boolean results the
-	 * {@link EventPreferences#isAggregatedMultiDispatch()} can be set to do a
-	 * multi-dispatch to all registered handlers. The result is {@code true} if
-	 * *any* of the handlers returned true, otherwise it is {@code false}.
+	 * If multiple handlers were registered usually a round robin is used to
+	 * distribute load.
+	 * 
+	 * In case of {@link EventPreferences#isAggregatedMultiDispatch()} the event
+	 * is dispatched to all handlers registered at start of this method call
+	 * aggregating the result using the {@link Event#aggregator} function.
 	 * 
 	 * @param event the event to compute a result for
 	 * @return the result if the computation, usually this is the result

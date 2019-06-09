@@ -33,12 +33,12 @@ public class ExtensionModule extends BinderModule {
 		}
 
 		@Override
-		public T supply(Dependency<? super T> dep, Injector injector) {
+		public T supply(Dependency<? super T> dep, Injector context) {
 			@SuppressWarnings("unchecked")
 			Constructor<T> c = (Constructor<T>) construction.reflect(
 					dep.type().rawType);
 			return Supply.constructor(BoundConstructor.bind(c)).supply(dep,
-					injector);
+					context);
 		}
 
 	}

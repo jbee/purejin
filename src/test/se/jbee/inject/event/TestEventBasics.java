@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
@@ -89,7 +88,8 @@ public class TestEventBasics {
 	public void thatHandledInterfacesInjectProxy() {
 		Handler proxy = injector.resolve(Handler.class);
 		assertTrue(Proxy.isProxyClass(proxy.getClass()));
-		assertSame(injector.resolve(Handler.class), proxy); // should be "cached and reused"
+		assertSame("should be 'cached and reused'",
+				injector.resolve(Handler.class), proxy);
 	}
 
 	@Test
@@ -112,7 +112,7 @@ public class TestEventBasics {
 			assertSame(UnboxingFuture.class, fc.getClass());
 			assertEquals("423", fc.get());
 		} catch (Exception e) {
-			fail("Should work");
+			throw new AssertionError("Should have worked but got:", e);
 		}
 
 	}

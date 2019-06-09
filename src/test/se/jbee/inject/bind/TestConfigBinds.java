@@ -29,20 +29,20 @@ public class TestConfigBinds {
 
 	@Test
 	public void generalConfiguration() {
-		assertEquals("bar", config.stringValue("foo").get());
+		assertEquals("bar", config.stringValue("foo"));
 		assertEquals(13, config.intValue("foo"));
 	}
 
 	@Test
 	public void namespacedConfiguration() {
 		Config testConfig = config.of(TestConfigBinds.class);
-		assertEquals("que", testConfig.stringValue("foo").get());
+		assertEquals("que", testConfig.stringValue("foo"));
 		assertEquals(42, testConfig.intValue("foo"));
 	}
 
 	@Test(expected = NoSuchElementException.class)
 	public void unknownValueThrowsException() {
-		config.stringValue("unknown").get();
+		config.value("unknown", String.class).get();
 	}
 
 	public void unknownPrimitiveReturnsZero() {

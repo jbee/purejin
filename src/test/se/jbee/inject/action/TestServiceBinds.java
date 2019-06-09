@@ -46,9 +46,9 @@ public class TestServiceBinds {
 
 		@Override
 		public Service<?, ?> supply(Dependency<? super Service<?, ?>> dep,
-				Injector injector) {
+				Injector context) {
 			Type<? super Service<?, ?>> type = dep.type();
-			return newService(injector.resolve(
+			return newService(context.resolve(
 					actionDependency(type.parameter(0), type.parameter(1))));
 		}
 

@@ -104,7 +104,7 @@ public class TestMacroBinds {
 	public void thatBindingsCanJustBeCounted() {
 		CountMacro count = new CountMacro();
 		Injector injector = injectorWithMacro(MacroBindsModule.class, count);
-		assertEquals(6 + 12, count.expands); // 11 from scopes
+		assertEquals(6 + 13, count.expands); // 11 from scopes
 		assertEquals(0, injector.resolve(InjectionCase[].class).length);
 	}
 
@@ -167,12 +167,12 @@ public class TestMacroBinds {
 		}
 
 		@Override
-		public T supply(Dependency<? super T> dep, Injector injector) {
-			T instance = decorated.supply(dep, injector);
+		public T supply(Dependency<? super T> dep, Injector context) {
+			T instance = decorated.supply(dep, context);
 			for (Field f : instance.getClass().getDeclaredFields()) {
 				if (f.isAnnotationPresent(Initialisation.class)) {
 					try {
-						f.set(instance, injector.resolve(fieldType(f)));
+						f.set(instance, context.resolve(fieldType(f)));
 					} catch (Exception e) {
 						throw new RuntimeException(e);
 					}

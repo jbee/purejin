@@ -37,10 +37,6 @@ public final class Name implements Qualifying<Name>, Serializable {
 
 	final String value;
 
-	public static Name pluginFor(Class<?> pluginPoint, String name) {
-		return named(pluginPoint.getCanonicalName() + ":" + name);
-	}
-
 	public static Name named(Object name) {
 		return named(String.valueOf(name));
 	}

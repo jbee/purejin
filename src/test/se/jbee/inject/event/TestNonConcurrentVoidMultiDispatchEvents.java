@@ -19,7 +19,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
  * events (here {@link Listener#onX(int)} and {@link Listener#onY(int)}).
  * 
  * While the dispatch is asynchronous the test setting uses a
- * {@link EventPreferences#maxConcurrentUsage} of 1 which only allows one thread
+ * {@link EventPreferences#maxConcurrency} of 1 which only allows one thread
  * calling any of the two methods at the same time which means the other message
  * can only be delivered after the first has been delivered successful.
  * 
@@ -86,11 +86,10 @@ public class TestNonConcurrentVoidMultiDispatchEvents {
 		@Override
 		protected void declare() {
 			handle(Listener.class);
-			per(Scope.injection).construct(Service.class);
+			per(Scope.injection).construct(Service.class); // dirty way to get multiple services
 			// makes observed calls "single threaded"
 			bind(EventMirror.class).to(
-					event -> EventPreferences.DEFAULT.withMaxConcurrentUsage(
-							1));
+					event -> EventPreferences.DEFAULT.withMaxConcurrency(1));
 		}
 
 	}
@@ -167,7 +166,8 @@ public class TestNonConcurrentVoidMultiDispatchEvents {
 	}
 
 	private static void assertMessages(List<Integer> actual, int... expected) {
-		assertEquals(expected.length, actual.size());
+		assertEquals("Number of message not same:", expected.length,
+				actual.size());
 		for (int i = 0; i < expected.length; i++)
 			assertEquals(expected[i], actual.get(i).intValue());
 	}

@@ -38,8 +38,8 @@ public class TestPrimitiveArrayBinds {
 	private static class IntArraySupplier implements Supplier<int[]> {
 
 		@Override
-		public int[] supply(Dependency<? super int[]> dep, Injector injector) {
-			Integer[] values = injector.resolve(Integer[].class);
+		public int[] supply(Dependency<? super int[]> dep, Injector context) {
+			Integer[] values = context.resolve(Integer[].class);
 			int[] primitives = new int[values.length];
 			for (int i = 0; i < primitives.length; i++) {
 				primitives[i] = values[i];

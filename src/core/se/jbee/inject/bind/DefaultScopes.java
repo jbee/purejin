@@ -1,8 +1,10 @@
 package se.jbee.inject.bind;
 
+import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static se.jbee.inject.Name.named;
 
 import java.io.File;
+import java.util.concurrent.ScheduledExecutorService;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
@@ -35,6 +37,8 @@ public final class DefaultScopes extends BinderModule
 		inScope.bind(Scope.targetInstance, Scope.class).to(
 				() -> new DependencyScope(DependencyScope::targetInstanceName));
 		inScope.bind(named("disk:*"), Scope.class).toSupplier(this);
+		inScope.bind(ScheduledExecutorService.class).to(
+				() -> newSingleThreadScheduledExecutor());
 	}
 
 	/**
@@ -44,11 +48,12 @@ public final class DefaultScopes extends BinderModule
 	 * particular {@link DiskScope} for that directory.
 	 */
 	@Override
-	public Scope supply(Dependency<? super Scope> dep, Injector injector)
+	public Scope supply(Dependency<? super Scope> dep, Injector context)
 			throws UnresolvableDependency {
 		String disk = dep.instance.name.toString();
 		File dir = new File(disk.substring(5));
-		return new DiskScope(injector.resolve(Config.class), dir,
+		return new DiskScope(context.resolve(Config.class),
+				context.resolve(ScheduledExecutorService.class), dir,
 				DependencyScope::instanceName);
 	}
 

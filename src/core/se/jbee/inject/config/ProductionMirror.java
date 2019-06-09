@@ -19,6 +19,13 @@ import java.util.function.Predicate;
 import se.jbee.inject.Packages;
 import se.jbee.inject.Type;
 
+/**
+ * Extracts the relevant {@link Method}s for a given target {@link Class}. These
+ * can be methods for different purposes. For example factory methods or methods
+ * that are used in advanced abstractions like actions.
+ * 
+ * @since 19.1
+ */
 @FunctionalInterface
 public interface ProductionMirror {
 
@@ -32,39 +39,40 @@ public interface ProductionMirror {
 
 	ProductionMirror noMethods = impl -> __noMethodsArray;
 
+	//TODO inheritence...
 	ProductionMirror allMethods = impl -> impl.getDeclaredMethods();
 
 	default ProductionMirror ignoreSynthetic() {
-		return filter(method -> !method.isSynthetic());
+		return select(method -> !method.isSynthetic());
 	}
 
 	default ProductionMirror ignoreGenericReturnType() {
-		return filter(
+		return select(
 				method -> !(method.getGenericReturnType() instanceof TypeVariable<?>));
 	}
 
 	default ProductionMirror ignore(Predicate<Method> filter) {
-		return filter(filter.negate());
+		return select(filter.negate());
 	}
 
-	default ProductionMirror filter(Predicate<Method> filter) {
+	default ProductionMirror select(Predicate<Method> filter) {
 		return impl -> arrayFilter(this.reflect(impl), filter);
 	}
 
 	default ProductionMirror returnTypeAssignableTo(Type<?> supertype) {
-		return filter(method -> returnType(method).isAssignableTo(supertype));
+		return select(method -> returnType(method).isAssignableTo(supertype));
 	}
 
 	default ProductionMirror withModifier(IntPredicate filter) {
-		return filter(method -> filter.test(method.getModifiers()));
+		return select(method -> filter.test(method.getModifiers()));
 	}
 
 	default ProductionMirror annotatedWith(Class<? extends Annotation> marker) {
-		return filter(method -> method.isAnnotationPresent(marker));
+		return select(method -> method.isAnnotationPresent(marker));
 	}
 
 	default ProductionMirror returnTypeIn(Packages filter) {
-		return filter(method -> filter.contains(raw(method.getReturnType())));
+		return select(method -> filter.contains(raw(method.getReturnType())));
 	}
 
 	default ProductionMirror in(Packages filter) {

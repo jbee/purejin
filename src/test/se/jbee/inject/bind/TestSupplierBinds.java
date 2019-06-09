@@ -21,7 +21,7 @@ public class TestSupplierBinds {
 
 		@Override
 		public String supply(Dependency<? super String> dep,
-				Injector injector) {
+				Injector context) {
 			return "foobar";
 		}
 

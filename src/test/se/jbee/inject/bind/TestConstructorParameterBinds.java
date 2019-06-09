@@ -95,7 +95,7 @@ public class TestConstructorParameterBinds {
 
 		@Override
 		public Integer supply(Dependency<? super Integer> dep,
-				Injector injector) {
+				Injector context) {
 			return c++;
 		}
 

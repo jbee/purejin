@@ -12,6 +12,12 @@ import java.lang.reflect.Method;
 import se.jbee.inject.Name;
 import se.jbee.inject.Scope;
 
+/**
+ * Extracts the {@link Name} of the {@link Scope} to use for instances of a
+ * given type. This can be used to implement scope annotations.
+ * 
+ * @since 19.1
+ */
 @FunctionalInterface
 public interface ScopingMirror {
 

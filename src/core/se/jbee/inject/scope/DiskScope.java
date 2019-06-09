@@ -1,5 +1,7 @@
 package se.jbee.inject.scope;
 
+import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static se.jbee.inject.Type.raw;
 
 import java.io.Closeable;
@@ -9,8 +11,12 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 import se.jbee.inject.Dependency;
@@ -27,7 +33,7 @@ import se.jbee.inject.config.Config;
  * automatically bound to an instance of the {@link DiskScope} if the defaults
  * are in place.
  * 
- * {@link DiskScope}s are limited to instances that can be serialised to disk.
+ * {@link DiskScope}s are limited to {@link Serializable} types.
  * 
  * This implementation is not heavily optimised. It does the job and illustrates
  * the principle.
@@ -43,11 +49,14 @@ public final class DiskScope implements Scope, Closeable {
 		final Serializable obj;
 		final long asOfLastModified;
 		final File file;
+		final File tmpFile;
+		final AtomicBoolean syncing = new AtomicBoolean();
 
 		DiskEntry(Serializable obj, long asOfLastModified, File file) {
 			this.obj = obj;
 			this.asOfLastModified = asOfLastModified;
 			this.file = file;
+			this.tmpFile = new File(file.getAbsoluteFile() + ".tmp");
 		}
 	}
 
@@ -56,14 +65,16 @@ public final class DiskScope implements Scope, Closeable {
 	private final Function<Dependency<?>, String> filenames;
 	private final Map<String, DiskEntry> loaded = new ConcurrentHashMap<>();
 
-	//TODO add daemon that periodically snycs to disk - add bindable config for period
-
-	public DiskScope(Config config, File dir,
+	public DiskScope(Config config, ScheduledExecutorService executor, File dir,
 			Function<Dependency<?>, String> filenames) {
 		this.dir = dir;
 		this.filenames = filenames;
 		this.syncInterval = config.of(DiskScope.class).longValue(SYNC_INTERVAL,
 				60 * 1000);
+		if (syncInterval > 0) {
+			executor.scheduleAtFixedRate(() -> syncToDisk(), syncInterval,
+					syncInterval, TimeUnit.MILLISECONDS);
+		}
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> close()));
 	}
 
@@ -97,32 +108,40 @@ public final class DiskScope implements Scope, Closeable {
 			}
 		}
 		Serializable res = (Serializable) provider.provide();
+		DiskEntry entry = new DiskEntry(res, lastModified, file);
 		if (dirReady())
-			save(res, file);
-		return new DiskEntry(res, lastModified, file);
+			syncToDisk(entry);
+		return entry;
 	}
 
 	private boolean dirReady() {
 		return dir.exists() || dir.mkdirs();
 	}
 
-	private static boolean save(Serializable obj, File file) {
+	private static void syncToDisk(DiskEntry entry) {
+		if (!entry.syncing.compareAndSet(false, true))
+			return; // already doing it...
 		try (ObjectOutputStream out = new ObjectOutputStream(
-				new FileOutputStream(file))) {
-			out.writeObject(obj);
-			return true;
+				new FileOutputStream(entry.tmpFile))) {
+			out.writeObject(entry.obj);
+			Files.move(entry.tmpFile.toPath(), entry.file.toPath(),
+					REPLACE_EXISTING, ATOMIC_MOVE);
 		} catch (Exception e) {
-			// well, that's not good but we can serve from provider
-			return false;
+			// too bad...
+		} finally {
+			entry.syncing.set(false);
 		}
 	}
 
 	@Override
 	public void close() {
+		syncToDisk();
+	}
+
+	private void syncToDisk() {
 		if (!dirReady())
 			return;
-		for (DiskEntry e : loaded.values()) {
-			save(e.obj, e.file);
-		}
+		for (DiskEntry e : loaded.values())
+			syncToDisk(e);
 	}
 }

@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.container;
@@ -17,7 +17,7 @@ import se.jbee.inject.Provider;
 import se.jbee.inject.Type;
 
 /**
- * Util to get rid of warnings for known generic {@link Type}s.
+ * Utility to get rid of warnings for known generic {@link Type}s.
  * 
  * <b>Implementation Note:</b> storing the the raw type in a var before
  * returning the generic type is a workaround to make this compile with javac

@@ -167,7 +167,7 @@ public class TestBootstrapper {
 
 		@Override
 		public String supply(Dependency<? super String> dep,
-				Injector injector) {
+				Injector context) {
 			if (!dep.instance.name.equalTo(named("lazy"))) {
 				eagers++;
 				return "eager";
@@ -257,7 +257,7 @@ public class TestBootstrapper {
 		Injector injector = Bootstrap.injector(ReplacingBindsModule.class);
 		assertEquals(6, injector.resolve(Number.class));
 		InjectionCase<?>[] cases = injector.resolve(InjectionCase[].class);
-		assertEquals(7 + 12, cases.length); // 3x Comparable, Float, Double, Integer and Number (3x Serializable has been nullified) + 10 Scope
+		assertEquals(7 + 13, cases.length); // 3x Comparable, Float, Double, Integer and Number (3x Serializable has been nullified) + 10 Scope
 		InjectionCase<Number>[] casesForNumber = injector.resolve(
 				injectionCasesTypeFor(Number.class));
 		assertEquals(1, casesForNumber.length);

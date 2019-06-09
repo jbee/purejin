@@ -43,7 +43,7 @@ public abstract class EventModule extends BinderModule {
 				injector) -> injector.resolve(EventProcessor.class).register(
 						event, listener));
 		bind(event).toSupplier((dep,
-				injector) -> injector.resolve(EventProcessor.class).getProxy(
+				context) -> context.resolve(EventProcessor.class).getProxy(
 						event));
 	}
 

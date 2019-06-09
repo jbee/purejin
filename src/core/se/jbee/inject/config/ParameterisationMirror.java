@@ -13,13 +13,21 @@ import static se.jbee.inject.Utils.annotationPropertyByType;
 import static se.jbee.inject.Utils.arrayFindFirst;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 
+import se.jbee.inject.Dependency;
 import se.jbee.inject.Name;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Type;
 
+/**
+ * Extracts the {@link Parameter} hints used to resolve the {@link Dependency}s
+ * of a {@link Method} or {@link Constructor} being injected.
+ * 
+ * @since 19.1
+ */
 @FunctionalInterface
 public interface ParameterisationMirror {
 

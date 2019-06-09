@@ -20,14 +20,19 @@ import se.jbee.inject.Instance;
  * A {@link Config} is an {@link Extension} that uses the {@link Dependency}
  * hierarchy to effectively name-space configuration values to avoid name
  * collisions.
+ * 
+ * @since 19.1
  */
 public class Config implements Extension {
 
 	private final Injector context;
-	private Instance<?> ns;
+	private final Instance<?> ns;
 
+	/**
+	 * Called by the {@link Injector} itself when used as an {@link Extension}
+	 */
 	public Config(Injector context) {
-		this.context = context;
+		this(context, null);
 	}
 
 	private Config(Injector context, Instance<?> ns) {
@@ -57,12 +62,16 @@ public class Config implements Extension {
 		});
 	}
 
-	public Optional<String> stringValue(String name) {
-		return value(name, String.class);
+	public String stringValue(String name) {
+		return stringValue(name, "");
+	}
+
+	public String stringValue(String name, String defaultValue) {
+		return value(name, String.class).orElse(defaultValue);
 	}
 
 	public boolean booleanValue(String name) {
-		return value(name, boolean.class).orElse(false);
+		return booleanValue(name, false);
 	}
 
 	public boolean booleanValue(String name, boolean defaultValue) {
@@ -70,7 +79,7 @@ public class Config implements Extension {
 	}
 
 	public int intValue(String name) {
-		return value(name, int.class).orElse(0);
+		return intValue(name, 0);
 	}
 
 	public int intValue(String name, int defaultValue) {
@@ -78,7 +87,7 @@ public class Config implements Extension {
 	}
 
 	public long longValue(String name) {
-		return value(name, long.class).orElse(0L);
+		return longValue(name, 0L);
 	}
 
 	public long longValue(String name, long defaultValue) {

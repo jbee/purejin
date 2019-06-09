@@ -117,10 +117,10 @@ public final class Supply {
 		}
 
 		@Override
-		public final T supply(Dependency<? super T> dep, Injector injector) {
+		public final T supply(Dependency<? super T> dep, Injector context) {
 			Type<?> elementType = dep.type().parameter(0);
 			return bridge(supplyArray(
-					dep.typed(elementType.addArrayDimension()), injector));
+					dep.typed(elementType.addArrayDimension()), context));
 		}
 
 		private static <E> E[] supplyArray(Dependency<E[]> elementType,
@@ -176,8 +176,8 @@ public final class Supply {
 		}
 
 		@Override
-		public T supply(Dependency<? super T> dep, Injector injector) {
-			return injector.resolve(this.dependency);
+		public T supply(Dependency<? super T> dep, Injector context) {
+			return context.resolve(this.dependency);
 		}
 
 		@Override
@@ -195,7 +195,7 @@ public final class Supply {
 		}
 
 		@Override
-		public T supply(Dependency<? super T> dep, Injector injector) {
+		public T supply(Dependency<? super T> dep, Injector context) {
 			return constant;
 		}
 
@@ -254,10 +254,10 @@ public final class Supply {
 		}
 
 		@Override
-		public T supply(Dependency<? super T> dep, Injector injector) {
-			final Supplier<? extends T> supplier = injector.resolve(
+		public T supply(Dependency<? super T> dep, Injector context) {
+			final Supplier<? extends T> supplier = context.resolve(
 					dep.instanced(anyOf(type)));
-			return supplier.supply(dep, injector);
+			return supplier.supply(dep, context);
 		}
 	}
 
@@ -274,12 +274,12 @@ public final class Supply {
 		}
 
 		@Override
-		public T supply(Dependency<? super T> dep, Injector injector) {
+		public T supply(Dependency<? super T> dep, Injector context) {
 			Type<? super T> type = dep.type();
 			Instance<? extends T> parametrized = instance.typed(
 					instance.type().parametized(type.parameters()).upperBound(
 							dep.type().isUpperBound()));
-			return injector.resolve(dep.instanced(parametrized));
+			return context.resolve(dep.instanced(parametrized));
 		}
 
 		@Override
@@ -298,10 +298,10 @@ public final class Supply {
 		}
 
 		@Override
-		public T supply(Dependency<? super T> dep, Injector injector) {
+		public T supply(Dependency<? super T> dep, Injector context) {
 			// Note that this is not "buffered" using specs as it is used to
 			// implement the plain resolution
-			return injector.resolve(dep.instanced(instance));
+			return context.resolve(dep.instanced(instance));
 		}
 
 		@Override
@@ -319,10 +319,10 @@ public final class Supply {
 
 		@Override
 		public Provider<?> supply(Dependency<? super Provider<?>> dep,
-				Injector injector) {
+				Injector context) {
 			return lazyProvider(
 					dep.onTypeParameter().uninject().ignoredScoping(),
-					injector);
+					context);
 		}
 
 		@Override
@@ -385,7 +385,7 @@ public final class Supply {
 		}
 
 		@Override
-		public T supply(Dependency<? super T> dep, Injector injector) {
+		public T supply(Dependency<? super T> dep, Injector context) {
 			return factory.fabricate(dep.instance, dep.target(1));
 		}
 
@@ -462,7 +462,7 @@ public final class Supply {
 		}
 
 		@Override
-		public T supply(Dependency<? super T> dep, Injector injector) {
+		public T supply(Dependency<? super T> dep, Injector context) {
 			throw required(dep);
 		}
 
@@ -522,7 +522,7 @@ public final class Supply {
 		protected abstract T invoke(Object[] args);
 
 		@Override
-		public T supply(Dependency<? super T> dep, Injector injector)
+		public T supply(Dependency<? super T> dep, Injector context)
 				throws UnresolvableDependency {
 			InjectionSite local = previous; // this is important so previous
 											// might work as a simple cache but
@@ -530,13 +530,13 @@ public final class Supply {
 											// invocation in face of multiple
 											// threads calling
 			if (local == null) {
-				init(dep, injector);
+				init(dep, context);
 			}
 			if (local == null || !local.site.equalTo(dep)) {
-				local = new InjectionSite(dep, injector, params);
+				local = new InjectionSite(dep, context, params);
 				previous = local;
 			}
-			return invoke(local.args(injector));
+			return invoke(local.args(context));
 		}
 
 	}

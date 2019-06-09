@@ -34,8 +34,8 @@ public class TestCommandBinds {
 
 		@Override
 		public Command<?> supply(Dependency<? super Command<?>> dep,
-				Injector injector) {
-			return newCommand(injector.resolve(actionDependency(
+				Injector context) {
+			return newCommand(context.resolve(actionDependency(
 					dep.type().parameter(0), raw(Long.class))));
 		}
 

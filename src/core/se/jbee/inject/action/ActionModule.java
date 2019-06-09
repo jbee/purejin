@@ -7,7 +7,6 @@ package se.jbee.inject.action;
 
 import static java.util.Arrays.asList;
 import static se.jbee.inject.Dependency.dependency;
-import static se.jbee.inject.Dependency.pluginsFor;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.parameterTypes;
@@ -33,6 +32,7 @@ import se.jbee.inject.bootstrap.BoundParameter;
 import se.jbee.inject.bootstrap.InjectionSite;
 import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.bootstrap.Supply;
+import se.jbee.inject.config.Plugins;
 import se.jbee.inject.config.ProductionMirror;
 import se.jbee.inject.container.Supplier;
 
@@ -127,7 +127,7 @@ public abstract class ActionModule extends BinderModule {
 			this.injector = injector;
 			this.executor = injector.resolve(Executor.class);
 			this.implementationClasses = injector.resolve(
-					pluginsFor(Action.class));
+					Plugins.class).forPoint(Action.class);
 			this.actionMirror = injector.resolve(
 					dependency(ACTION_MIRROR).injectingInto(
 							ActionSupplier.class));
@@ -135,7 +135,7 @@ public abstract class ActionModule extends BinderModule {
 
 		@Override
 		public Action<?, ?> supply(Dependency<? super Action<?, ?>> dep,
-				Injector injector) {
+				Injector context) {
 			Type<? super Action<?, ?>> type = dep.type();
 			return provide(type.parameter(0), type.parameter(1));
 		}

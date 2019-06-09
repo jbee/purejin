@@ -9,12 +9,12 @@ import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Instance.defaultInstanceOf;
 import static se.jbee.inject.Instance.instance;
-import static se.jbee.inject.Name.pluginFor;
 import static se.jbee.inject.Source.source;
 import static se.jbee.inject.Target.targeting;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.isClassVirtual;
 import static se.jbee.inject.Utils.newArray;
+import static se.jbee.inject.config.Plugins.pluginPoint;
 import static se.jbee.inject.container.Cast.initialiserTypeOf;
 
 import java.lang.reflect.Constructor;
@@ -274,11 +274,10 @@ public class Binder {
 		}
 
 		public void into(Class<?> pluginPoint, String property) {
-			binder.bind(pluginFor(pluginPoint, property), Class.class).to(
+			binder.bind(pluginPoint(pluginPoint, property), Class.class).to(
 					plugin);
-			if (!isClassVirtual(plugin)) {
+			if (!isClassVirtual(plugin))
 				binder.implicit().construct(plugin);
-			}
 			// we allow both collections of classes that have a common
 			// super-type or collections that don't
 			if (raw(plugin).isAssignableTo(raw(pluginPoint).asUpperBound())
@@ -442,6 +441,8 @@ public class Binder {
 		}
 
 		/**
+		 * Root for container "global" configuration.
+		 * 
 		 * @since 19.1
 		 */
 		public TargetedBinder config() {
@@ -449,6 +450,8 @@ public class Binder {
 		}
 
 		/**
+		 * Root for target type specific configuration.
+		 * 
 		 * @since 19.1
 		 */
 		public TargetedBinder config(Class<?> ns) {
@@ -456,6 +459,8 @@ public class Binder {
 		}
 
 		/**
+		 * Root for {@link Instance} specific configuration.
+		 * 
 		 * @since 19.1
 		 */
 		public TargetedBinder config(Instance<?> ns) {
@@ -780,7 +785,7 @@ public class Binder {
 		}
 
 		@Override
-		public T supply(Dependency<? super T> dep, Injector injector)
+		public T supply(Dependency<? super T> dep, Injector context)
 				throws UnresolvableDependency {
 			return yield(dep);
 		}

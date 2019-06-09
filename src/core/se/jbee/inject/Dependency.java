@@ -7,7 +7,6 @@ package se.jbee.inject;
 
 import static java.util.Arrays.asList;
 import static se.jbee.inject.Instance.defaultInstanceOf;
-import static se.jbee.inject.Name.pluginFor;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.arrayAppend;
 import static se.jbee.inject.Utils.arrayContains;
@@ -37,18 +36,6 @@ public final class Dependency<T>
 	 * default.
 	 */
 	private static final Injection[] UNTARGETED = new Injection[0];
-
-	public static Dependency<Class<?>[]> pluginsFor(Class<?> pluginPoint) {
-		return pluginsFor(pluginPoint, Name.ANY.toString());
-	}
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static Dependency<Class<?>[]> pluginsFor(Class<?> pluginPoint,
-			String property) {
-		return (Dependency) dependency(raw(Class[].class)).named(
-				pluginFor(pluginPoint, property));
-	}
-	//TODO maybe extract a Plugins Extension
 
 	public static <T> Dependency<T> dependency(Class<T> type) {
 		return dependency(raw(type));

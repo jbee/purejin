@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.event;
@@ -9,12 +9,10 @@ import static java.lang.reflect.Proxy.newProxyInstance;
 import static se.jbee.inject.Type.returnType;
 import static se.jbee.inject.event.EventException.unwrapGet;
 
-import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -37,84 +35,81 @@ import se.jbee.inject.Type;
  */
 public class ConcurrentEventProcessor implements EventProcessor {
 
-	private final static class EventHandler extends WeakReference<Object> {
+	private final static class EventHandler<E> {
 
 		/**
 		 * How many threads are currently calling one of the handlers methods.
 		 */
-		final AtomicInteger concurrentUsage = new AtomicInteger(0);
+		final AtomicInteger concurrentCalls = new AtomicInteger(0);
+		final E handler;
 
-		EventHandler(Object handler) {
-			super(handler);
+		EventHandler(E handler) {
+			this.handler = handler;
 		}
 
 		/**
 		 * If the use succeeds (result is true) the end of usage should be
-		 * marked by calling {@link #free()} so that this handler can continue
-		 * to keep track of the concurrent using threads.
+		 * marked by calling {@link #release()} so that this handler can
+		 * continue to keep track of the concurrent using threads.
 		 * 
 		 * @return true if this handler could be reserved for usage by the
 		 *         calling thread, else false.
 		 */
-		boolean allocateFor(Event<?, ?> e) {
+		boolean acquire(Event<?, ?> e) {
 			while (true) {
-				int currentUsage = concurrentUsage.get();
-				if (currentUsage >= e.prefs.maxConcurrentUsage)
+				int calls = concurrentCalls.get();
+				if (calls >= e.prefs.maxConcurrency)
 					return false;
-				boolean success = concurrentUsage.compareAndSet(currentUsage,
-						currentUsage + 1);
-				if (success)
+				if (concurrentCalls.compareAndSet(calls, calls + 1))
 					return true;
 			}
 		}
 
-		void free() {
-			concurrentUsage.decrementAndGet();
+		void release() {
+			concurrentCalls.decrementAndGet();
 		}
 	}
 
-	static final class EventHandlers
-			extends ConcurrentLinkedDeque<EventHandler> {
+	static final class EventHandlers<E>
+			extends ConcurrentLinkedDeque<EventHandler<E>> {
 
 		/**
 		 * Tries to find a handler that can be used to process the event. A
 		 * successfully received handler has to be marked
-		 * {@link #free(EventHandler)} right after usage ends unless its handler
-		 * reference became collected. In that case the handler became
+		 * {@link #release(EventHandler)} right after usage ends unless its
+		 * handler reference became collected. In that case the handler became
 		 * out-dated.
 		 * 
 		 * @return a free handler to use or null if there is no such handler
 		 */
-		EventHandler allocateFor(Event<?, ?> e) {
+		EventHandler<E> acquire(Event<E, ?> e) {
 			// either we run out of handler to poll
 			// or we find a handler to use
 			while (true) {
-				EventHandler h = pollFirst();
+				EventHandler<E> h = pollFirst();
 				if (h == null)
 					return null;
-				if (h.allocateFor(e)) {
-					if (h.get() != null)
-						return h;
-				} else {
-					addLast(h);
+				if (h.acquire(e)) {
+					return h;
 				}
+				addLast(h);
 			}
 		}
 
-		void free(EventHandler h) {
-			h.free();
+		void release(EventHandler<E> h) {
+			h.release();
 			addLast(h);
 		}
 	}
 
 	private final Map<Class<?>, Object> proxiesByEventType = new ConcurrentHashMap<>();
-	private final Map<Class<?>, EventHandlers> handlersByEventType = new ConcurrentHashMap<>();
+	private final Map<Class<?>, EventHandlers<?>> handlersByEventType = new ConcurrentHashMap<>();
 	private final Map<Class<?>, EventPreferences> prefsByEventType = new ConcurrentHashMap<>();
 	private final ExecutorService executor;
-	private final EventMirror reflector;
+	private final EventMirror mirror;
 
-	ConcurrentEventProcessor(EventMirror reflector, ExecutorService executor) {
-		this.reflector = reflector;
+	ConcurrentEventProcessor(EventMirror mirror, ExecutorService executor) {
+		this.mirror = mirror;
 		this.executor = executor;
 	}
 
@@ -125,7 +120,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 
 	@Override
 	public <E> void await(Class<E> event) throws InterruptedException {
-		EventHandlers hs = getHandlers(event);
+		EventHandlers<E> hs = getHandlers(event, true);
 		if (!hs.isEmpty())
 			return;
 		synchronized (hs) {
@@ -134,8 +129,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	}
 
 	private EventPreferences getPrefs(Class<?> event) {
-		return prefsByEventType.computeIfAbsent(event,
-				e -> reflector.reflect(e));
+		return prefsByEventType.computeIfAbsent(event, e -> mirror.reflect(e));
 	}
 
 	@Override
@@ -145,23 +139,26 @@ public class ConcurrentEventProcessor implements EventProcessor {
 					handler).getClass() == ProxyEventHandler.class) {
 			return; // prevent own proxies to be registered as this causes multi-threaded endless loops
 		}
-		EventHandlers hs = getHandlers(event);
-		hs.addFirst(new EventHandler(handler));
+		EventHandlers<E> hs = getHandlers(event, true);
+		hs.addFirst(new EventHandler<>(handler));
 		synchronized (hs) {
 			hs.notifyAll();
 		}
 	}
 
-	private <E> EventHandlers getHandlers(Class<E> event) {
-		return handlersByEventType.computeIfAbsent(event,
-				k -> new EventHandlers());
+	@SuppressWarnings("unchecked")
+	private <E> EventHandlers<E> getHandlers(Class<E> event, boolean init) {
+		return (EventHandlers<E>) (init
+			? handlersByEventType.computeIfAbsent(event,
+					k -> new EventHandlers<>())
+			: handlersByEventType.get(event));
 	}
 
 	@Override
 	public <E> void deregister(Class<E> event, E handler) {
-		EventHandlers hs = handlersByEventType.get(event);
+		EventHandlers<?> hs = handlersByEventType.get(event);
 		if (hs != null && !hs.isEmpty())
-			hs.removeIf(h -> h.get() == handler);
+			hs.removeIf(h -> h.handler == handler);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -172,6 +169,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 						new ProxyEventHandler<>(e, getPrefs(e), this)));
 	}
 
+	//TODO event processing has to be done in a way that makes a try for each target handler - should the event not be completely handled it has to requeue for retries so that other events are processed in the meantime
 	private <T> Future<T> submit(Event<?, ?> event, Callable<T> f) {
 		try {
 			return executor.submit(f);
@@ -215,85 +213,79 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	}
 
 	private <E, T> T doCompute(Event<E, T> event) throws EventException {
-		ensureNoTimeout(event);
-		EventHandlers hs = handlersByEventType.get(event.type);
+		ensureNotExpired(event);
+		EventHandlers<E> hs = getHandlers(event.type, false);
 		if (hs == null)
 			throw new EventException(event, null);
-		while (true) {
-			EventHandler h = hs.allocateFor(event);
-			if (h == null)
-				throw new EventException(event, null);
-			@SuppressWarnings("unchecked")
-			E handler = (E) h.get();
-			if (handler != null) {
-				T res = invoke(event, handler);
-				hs.free(h);
-				return res;
-			}
+		EventHandler<E> h = hs.acquire(event);
+		if (h == null)
+			throw new EventException(event, null); //TODO this should maybe become a Unsupported exception?
+		try {
+			return doHandle(event, h.handler);
+		} finally {
+			hs.release(h);
 		}
 	}
 
 	private <E, T> T doDispatch(Event<E, T> event) throws EventException {
-		ensureNoTimeout(event);
-		EventHandlers hs = handlersByEventType.get(event.type);
+		ensureNotExpired(event);
+		EventHandlers<E> hs = getHandlers(event.type, false);
 		if (hs == null || hs.isEmpty())
 			return null;
-		Iterator<EventHandler> iter = hs.iterator();
-		LinkedList<EventHandler> retry = null;
-		final BinaryOperator<T> aggregator = event.aggregator;
+		LinkedList<EventHandler<E>> needRetry = null;
 		T res = null;
-		while (iter.hasNext()) {
-			EventHandler h = iter.next();
-			@SuppressWarnings("unchecked")
-			E handler = (E) h.get();
-			if (handler != null) {
-				if (h.allocateFor(event)) {
-					T res1 = invoke(event, handler);
-					if (aggregator != null)
-						res = res == null ? res1 : aggregator.apply(res, res1);
-					h.free();
-				} else {
-					if (retry == null)
-						retry = new LinkedList<>();
-					retry.add(h);
-				}
+		for (EventHandler<E> h : hs) {
+			if (h.acquire(event)) {
+				res = doAggregate(event, h, res);
 			} else {
-				iter.remove();
+				if (needRetry == null)
+					needRetry = new LinkedList<>();
+				needRetry.add(h);
 			}
 		}
-		if (retry != null) {
-			while (!retry.isEmpty()) {
-				EventHandler h = retry.pollFirst();
-				@SuppressWarnings("unchecked")
-				E handler = (E) h.get();
-				if (handler != null) {
-					if (h.allocateFor(event)) {
-						T res1 = invoke(event, handler);
-						if (aggregator != null)
-							res = res == null
-								? res1
-								: aggregator.apply(res, res1);
-						h.free();
+		if (needRetry != null && !needRetry.isEmpty()) {
+			for (int i = 0; i < event.prefs.maxRetries; i++) {
+				int size = needRetry.size();
+				for (int j = 0; j < size; j++) {
+					EventHandler<E> h = needRetry.pollFirst();
+					if (h.acquire(event)) {
+						res = doAggregate(event, h, res);
 					} else {
-						retry.addLast(h);
+						needRetry.addLast(h);
 					}
 				}
 			}
+			if (needRetry.isEmpty())
+				return res;
 		}
 		return res;
 	}
 
-	private static <E, T> void ensureNoTimeout(Event<E, T> event)
+	private static <T, E> T doAggregate(Event<E, T> event, EventHandler<E> h,
+			T res) {
+		final BinaryOperator<T> aggregator = event.aggregator;
+		try {
+			T res1 = doHandle(event, h.handler);
+			return aggregator == null || res == null
+				? res1
+				: aggregator.apply(res, res1);
+			// TODO shoudn't there be a catch here so each handler's errors are isolated?
+		} finally {
+			h.release();
+		}
+	}
+
+	private static <E, T> void ensureNotExpired(Event<E, T> event)
 			throws EventException {
-		if (event.isOutdated())
+		if (event.isExpired())
 			throw new EventException(event, new TimeoutException());
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <E, T> T invoke(Event<E, T> event, E listener)
+	private static <E, T> T doHandle(Event<E, T> event, E handler)
 			throws EventException {
 		try {
-			return (T) event.handler.invoke(listener, event.args);
+			return (T) event.target.invoke(handler, event.args);
 		} catch (IllegalAccessException | IllegalArgumentException
 				| InvocationTargetException e) {
 			throw new EventException(event, e);
@@ -314,17 +306,18 @@ public class ConcurrentEventProcessor implements EventProcessor {
 		}
 
 		@Override
-		public Object invoke(Object proxy, Method method, Object[] args)
+		public Object invoke(Object proxy, Method target, Object[] args)
 				throws Throwable {
-			return invoke(method, args, returnType(method));
+			return invoke(target, args, returnType(target));
 		}
 
 		@SuppressWarnings("unchecked")
-		private <T> Object invoke(Method method, Object[] args, Type<T> result)
+		private <T> Object invoke(Method target, Object[] args, Type<T> result)
 				throws Throwable {
 			Class<T> raw = result.rawType;
-			Event<E, T> e = new Event<>(event, prefs, result, method, args,
-					defaultAggregator(raw, args));
+			Event<E, T> e = new Event<>(event, prefs, result, target, args,
+					(BinaryOperator<T>) defaultAggregator(raw,
+							target.getParameterTypes(), args));
 			if (e.returnsVoid()) {
 				processor.dispatch((Event<E, Void>) e);
 				return null;
@@ -337,21 +330,22 @@ public class ConcurrentEventProcessor implements EventProcessor {
 		}
 
 		@SuppressWarnings("unchecked")
-		private static <T> BinaryOperator<T> defaultAggregator(Class<T> raw,
+		private static <T> BinaryOperator<?> defaultAggregator(
+				Class<T> rawReturnType, Class<?>[] parameterTypes,
 				Object[] args) {
 			BinaryOperator<T> aggregator = args != null && args.length > 0
 				&& args[args.length - 1] != null
-				&& BinaryOperator.class.isAssignableFrom(args.getClass())
-					? (BinaryOperator<T>) args[args.length - 1]
-					: null;
+				&& BinaryOperator.class.isAssignableFrom(
+						parameterTypes[args.length - 1])
+							? (BinaryOperator<T>) args[args.length - 1]
+							: null;
 			if (aggregator != null)
 				return aggregator;
-			if (raw == boolean.class || raw == Boolean.class)
-				return (BinaryOperator<T>) ((BinaryOperator<Boolean>) (a,
-						b) -> a || b);
-			if (raw == int.class || raw == Integer.class)
-				return (BinaryOperator<T>) ((BinaryOperator<Integer>) (a,
-						b) -> a + b);
+			if (rawReturnType == boolean.class
+				|| rawReturnType == Boolean.class)
+				return ((BinaryOperator<Boolean>) Boolean::logicalAnd);
+			if (rawReturnType == int.class || rawReturnType == Integer.class)
+				return ((BinaryOperator<Integer>) Integer::sum);
 			return null;
 		}
 

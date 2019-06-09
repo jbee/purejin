@@ -317,11 +317,14 @@ public final class Utils {
 	 */
 	public static <T> Constructor<T> commonConstructor(Class<T> type)
 			throws NoMethodForDependency {
-		Constructor<?>[] cs = type.getDeclaredConstructors();
+		@SuppressWarnings("unchecked")
+		Constructor<T>[] cs = (Constructor<T>[]) type.getDeclaredConstructors();
 		if (cs.length == 0)
 			throw new NoMethodForDependency(raw(type));
-		Constructor<?> mostParamsConstructor = null;
-		for (Constructor<?> c : cs) {
+		if (cs.length == 1)
+			return cs[0];
+		Constructor<T> mostParamsConstructor = null;
+		for (Constructor<T> c : cs) {
 			if (!arrayContains(c.getParameterTypes(), type, (a, b) -> a == b) // avoid self referencing constructors (synthetic) as they cause endless loop
 				&& (mostParamsConstructor == null //
 					|| (moreVisible(c, mostParamsConstructor) == c
@@ -332,9 +335,7 @@ public final class Utils {
 		}
 		if (mostParamsConstructor == null)
 			throw new NoMethodForDependency(raw(type));
-		@SuppressWarnings("unchecked")
-		Constructor<T> c = (Constructor<T>) mostParamsConstructor;
-		return c;
+		return mostParamsConstructor;
 	}
 
 	public static <T> Constructor<T> commonConstructorOrNull(Class<T> type) {

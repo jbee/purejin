@@ -50,7 +50,7 @@ public final class EventException extends RuntimeException {
 					&& event.prefs.isReturnNoHandlerAsNull())
 					return null;
 				if (ee.isCausedByTimeout())
-					for (Class<?> et : event.handler.getExceptionTypes())
+					for (Class<?> et : event.target.getExceptionTypes())
 						if (et.isAssignableFrom(TimeoutException.class))
 							throw ee.getCause();
 				throw ee;
