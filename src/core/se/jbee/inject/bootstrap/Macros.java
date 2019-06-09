@@ -51,11 +51,11 @@ public final class Macros {
 					INSTANCE_LINK).with(PARAMETRIZED_LINK).with(ARRAY);
 
 	private final Class<?>[] types;
-	private final Macro<?>[] macros;
+	private final Macro<?>[] functions;
 
-	private Macros(Class<?>[] types, Macro<?>[] macros) {
+	private Macros(Class<?>[] types, Macro<?>[] functions) {
 		this.types = types;
-		this.macros = macros;
+		this.functions = functions;
 	}
 
 	/**
@@ -86,12 +86,12 @@ public final class Macros {
 	public <T> Macros with(Class<T> type, Macro<? extends T> macro) {
 		int index = index(type);
 		if (index >= 0) {
-			Macro<?>[] tmp = macros.clone();
+			Macro<?>[] tmp = functions.clone();
 			tmp[index] = macro;
 			return new Macros(types, tmp);
 		}
 		return new Macros(arrayPrepand(type, types),
-				arrayPrepand(macro, macros));
+				arrayPrepand(macro, functions));
 	}
 
 	/**
@@ -120,7 +120,7 @@ public final class Macros {
 		if (index < 0)
 			throw new InconsistentBinding(
 					"No macro for type:" + type.getCanonicalName());
-		return (Macro<? super V>) macros[index];
+		return (Macro<? super V>) functions[index];
 	}
 
 	private int index(final Class<?> type) {
@@ -226,15 +226,14 @@ public final class Macros {
 					incomplete.type().rawType.cast(value.constant));
 			bindings.expandInto(
 					incomplete.complete(BindingType.PREDEFINED, supplier));
-			if (incomplete.source.declarationType == DeclarationType.EXPLICIT) {
-				if (incomplete.type().rawType != value.constant.getClass()) {
-					@SuppressWarnings("unchecked")
-					Class<T> type = (Class<T>) value.constant.getClass();
-					bindings.expandInto(Binding.binding(
-							incomplete.resource.typed(raw(type)),
-							BindingType.PREDEFINED, supplier, incomplete.scope,
-							incomplete.source.typed(DeclarationType.IMPLICIT)));
-				}
+			if (incomplete.source.declarationType == DeclarationType.EXPLICIT
+				&& incomplete.type().rawType != value.constant.getClass()) {
+				@SuppressWarnings("unchecked")
+				Class<T> type = (Class<T>) value.constant.getClass();
+				bindings.expandInto(Binding.binding(
+						incomplete.resource.typed(raw(type)),
+						BindingType.PREDEFINED, supplier, incomplete.scope,
+						incomplete.source.typed(DeclarationType.IMPLICIT)));
 			}
 		}
 	}

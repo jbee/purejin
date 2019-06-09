@@ -2,6 +2,7 @@ package se.jbee.inject;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static se.jbee.inject.Type.raw;
@@ -305,31 +306,32 @@ public class TestType {
 	@Test
 	public void thatRawTypeCanBeCastToAnySupertype() {
 		Type<ArrayList> rawArrayList = raw(ArrayList.class);
-		rawArrayList.castTo(raw(List.class));
-		rawArrayList.castTo(raw(List.class).parametized(Integer.class));
-		rawArrayList.castTo(raw(List.class).parametized(
-				Integer.class).parametizedAsUpperBounds());
+		assertNotNull(rawArrayList.castTo(raw(List.class)));
+		assertNotNull(rawArrayList.castTo(
+				raw(List.class).parametized(Integer.class)));
+		assertNotNull(rawArrayList.castTo(raw(List.class).parametized(
+				Integer.class).parametizedAsUpperBounds()));
 	}
 
 	@Test
 	public void thatUnparametizedTypeCanBeCastToAllItsSupertypes() {
 		Type<Integer> integer = raw(Integer.class);
 		for (Type<? super Integer> supertype : integer.supertypes()) {
-			integer.castTo(supertype);
+			assertNotNull(integer.castTo(supertype));
 		}
 	}
 
 	@Test(expected = ClassCastException.class)
 	public void thatParameterizedTypeCannotBeCastToDifferentActualTypeParameterSupertype() {
-		raw(List.class).parametized(String.class).castTo(
-				raw(Collection.class).parametized(Integer.class));
+		assertNotNull(raw(List.class).parametized(String.class).castTo(
+				raw(Collection.class).parametized(Integer.class)));
 	}
 
 	@Test
 	public void thatParameterizedTypeCanBeCastToWildcardedSupertype() {
-		raw(ArrayList.class).parametized(Integer.class).castTo(
+		assertNotNull(raw(ArrayList.class).parametized(Integer.class).castTo(
 				raw(List.class).parametized(
-						Number.class).parametizedAsUpperBounds());
+						Number.class).parametizedAsUpperBounds()));
 	}
 
 	private static void assertContains(Type<?>[] actual, Type<?> expected) {

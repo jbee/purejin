@@ -28,6 +28,10 @@ import se.jbee.inject.Type;
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public final class Cast {
 
+	private Cast() {
+		throw new UnsupportedOperationException("util");
+	}
+
 	public static <T> Type<List<T>> listTypeOf(Class<T> elementType) {
 		return listTypeOf(raw(elementType));
 	}

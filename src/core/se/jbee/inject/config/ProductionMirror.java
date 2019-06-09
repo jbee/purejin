@@ -40,7 +40,7 @@ public interface ProductionMirror {
 	ProductionMirror noMethods = impl -> __noMethodsArray;
 
 	//TODO inheritence...
-	ProductionMirror allMethods = impl -> impl.getDeclaredMethods();
+	ProductionMirror allMethods = Class::getDeclaredMethods;
 
 	default ProductionMirror ignoreSynthetic() {
 		return select(method -> !method.isSynthetic());

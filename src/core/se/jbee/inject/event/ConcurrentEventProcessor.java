@@ -35,7 +35,7 @@ import se.jbee.inject.Type;
  */
 public class ConcurrentEventProcessor implements EventProcessor {
 
-	private final static class EventHandler<E> {
+	private static final class EventHandler<E> {
 
 		/**
 		 * How many threads are currently calling one of the handlers methods.
@@ -129,7 +129,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	}
 
 	private EventPreferences getPrefs(Class<?> event) {
-		return prefsByEventType.computeIfAbsent(event, e -> mirror.reflect(e));
+		return prefsByEventType.computeIfAbsent(event, mirror::reflect);
 	}
 
 	@Override
@@ -187,7 +187,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 			res = submit(event, () -> doCompute(event));
 		}
 		if (event.prefs.isSyncMultiDispatch())
-			EventException.unwrap(event, () -> res.get());
+			EventException.unwrap(event, res::get);
 	}
 
 	// - when should I give up?

@@ -159,20 +159,20 @@ public final class Binding<T>
 			Binding<?> lastUnique = bindings[lastUniqueIndex];
 			Binding<?> current = bindings[i];
 			final boolean equalResource = lastUnique.resource.equalTo(current.resource);
-			DeclarationType t_d = lastUnique.source.declarationType;
-			DeclarationType t_i = current.source.declarationType;
-			if (equalResource && t_d.clashesWith(t_i)) {
+			DeclarationType uType = lastUnique.source.declarationType;
+			DeclarationType curType = current.source.declarationType;
+			if (equalResource && uType.clashesWith(curType)) {
 				throw new InconsistentBinding(
 						"Duplicate binds:\n" + lastUnique + "\n" + current);
 			}
-			if (t_i == DeclarationType.REQUIRED) {
+			if (curType == DeclarationType.REQUIRED) {
 				required.add(current.resource.type());
-			} else if (equalResource && t_d.droppedWith(t_i)) {
+			} else if (equalResource && uType.droppedWith(curType)) {
 				if (i - 1 == lastUniqueIndex) {
 					dropped.add(uniques.remove(uniques.size() - 1));
 				}
 				dropped.add(current);
-			} else if (!equalResource || !t_i.replacedBy(t_d)) {
+			} else if (!equalResource || !curType.replacedBy(uType)) {
 				uniques.add(current);
 				lastUniqueIndex = i;
 			}

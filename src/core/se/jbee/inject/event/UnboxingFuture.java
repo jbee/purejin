@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.event;
@@ -54,14 +54,14 @@ final class UnboxingFuture<T> implements Future<T> {
 	public T get() throws InterruptedException, ExecutionException {
 		Future<T> unboxed;
 		try {
-			unboxed = EventException.unwrap(event, () -> boxed.get());
+			unboxed = EventException.unwrap(event, boxed::get);
 		} catch (ExecutionException | InterruptedException e) {
 			throw e;
 		} catch (EventException e) {
 			if (e.isCausedByHandlerException())
 				throw (ExecutionException) e.getCause();
 			throw e;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new ExecutionException(e);
 		}
 		return unboxed.get();

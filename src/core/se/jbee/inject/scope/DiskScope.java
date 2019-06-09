@@ -72,10 +72,10 @@ public final class DiskScope implements Scope, Closeable {
 		this.syncInterval = config.of(DiskScope.class).longValue(SYNC_INTERVAL,
 				60 * 1000);
 		if (syncInterval > 0) {
-			executor.scheduleAtFixedRate(() -> syncToDisk(), syncInterval,
+			executor.scheduleAtFixedRate(this::syncToDisk, syncInterval,
 					syncInterval, TimeUnit.MILLISECONDS);
 		}
-		Runtime.getRuntime().addShutdownHook(new Thread(() -> close()));
+		Runtime.getRuntime().addShutdownHook(new Thread(this::close));
 	}
 
 	@SuppressWarnings("unchecked")

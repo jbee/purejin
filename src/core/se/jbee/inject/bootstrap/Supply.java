@@ -46,6 +46,8 @@ public final class Supply {
 
 	private static final Supplier<?> REQUIRED = new RequiredSupplier<>();
 
+	private static final String SUPPLIES = "supplies";
+
 	/**
 	 * A {@link Supplier} used as fall-back. Should a required resource not be
 	 * provided it is still bound to this supplier that will throw an exception
@@ -182,7 +184,7 @@ public final class Supply {
 
 		@Override
 		public String toString() {
-			return describe("supplies", dependency);
+			return describe(SUPPLIES, dependency);
 		}
 	}
 
@@ -201,7 +203,7 @@ public final class Supply {
 
 		@Override
 		public String toString() {
-			return describe("supplies", constant);
+			return describe(SUPPLIES, constant);
 		}
 
 	}
@@ -240,7 +242,7 @@ public final class Supply {
 
 		@Override
 		public String toString() {
-			return describe("supplies", arrayType);
+			return describe(SUPPLIES, arrayType);
 		}
 	}
 
@@ -284,7 +286,7 @@ public final class Supply {
 
 		@Override
 		public String toString() {
-			return describe("supplies", instance);
+			return describe(SUPPLIES, instance);
 		}
 
 	}
@@ -306,7 +308,7 @@ public final class Supply {
 
 		@Override
 		public String toString() {
-			return describe("supplies", instance);
+			return describe(SUPPLIES, instance);
 		}
 	}
 
@@ -326,7 +328,7 @@ public final class Supply {
 
 		@Override
 		public String toString() {
-			return describe("supplies", Provider.class);
+			return describe(SUPPLIES, Provider.class);
 		}
 	}
 
@@ -390,7 +392,7 @@ public final class Supply {
 
 		@Override
 		public String toString() {
-			return describe("supplies", factory);
+			return describe(SUPPLIES, factory);
 		}
 
 	}
@@ -505,7 +507,7 @@ public final class Supply {
 		return describe(behaviour, Arrays.toString(variants));
 	}
 
-	public static abstract class WithParameters<T> implements Supplier<T> {
+	public abstract static class WithParameters<T> implements Supplier<T> {
 
 		private final BoundParameter<?>[] params;
 

@@ -56,8 +56,7 @@ public abstract class EventModule extends BinderModule {
 			asDefault().bind(EventMirror.class).to(
 					event -> EventPreferences.DEFAULT);
 			asDefault().injectingInto(EventProcessor.class).bind(
-					ExecutorService.class).to(
-							() -> Executors.newWorkStealingPool());
+					ExecutorService.class).to(Executors::newWorkStealingPool);
 		}
 
 	}

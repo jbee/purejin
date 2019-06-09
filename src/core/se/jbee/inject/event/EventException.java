@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.event;
@@ -23,8 +23,8 @@ import java.util.concurrent.TimeoutException;
 public final class EventException extends RuntimeException {
 
 	public static <T> T unwrapGet(Event<?, T> event, Future<T> f)
-			throws Throwable {
-		return unwrap(event, () -> f.get());
+			throws Exception {
+		return unwrap(event, f::get);
 	}
 
 	/**
@@ -38,14 +38,14 @@ public final class EventException extends RuntimeException {
 	 *             event in the {@link EventProcessor}.
 	 */
 	public static <T> T unwrap(Event<?, ? extends T> event, Callable<T> func)
-			throws Throwable {
+			throws Exception {
 		try {
 			return func.call();
 		} catch (ExecutionException e) {
 			if (e.getCause() instanceof EventException) {
 				EventException ee = (EventException) e.getCause();
 				if (ee.isCausedByHandlerException())
-					throw ((InvocationTargetException) ee.getCause()).getTargetException();
+					throw (Exception) ((InvocationTargetException) ee.getCause()).getTargetException();
 				if (ee.isCausedByNoHandler()
 					&& event.prefs.isReturnNoHandlerAsNull())
 					return null;
@@ -56,11 +56,9 @@ public final class EventException extends RuntimeException {
 				throw ee;
 			}
 			throw new EventException(event, e);
-		} catch (InterruptedException ex) {
+		} catch (InterruptedException | EventException ex) {
 			throw ex;
 		} catch (Exception ex) {
-			if (ex instanceof EventException)
-				throw ex;
 			throw new EventException(event, ex);
 		}
 	}

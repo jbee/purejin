@@ -59,9 +59,7 @@ public final class Event<E, T> {
 	}
 
 	public boolean isExpired() {
-		return prefs.ttl <= 0
-			? false
-			: currentTimeMillis() > created + prefs.ttl;
+		return prefs.ttl > 0 && currentTimeMillis() > created + prefs.ttl;
 	}
 
 	public boolean returnsVoid() {

@@ -165,7 +165,7 @@ public final class Container {
 				}
 			}
 			Collections.sort(res);
-			return res.size() == 0
+			return res.isEmpty()
 				? null
 				: res.toArray(new InjectionCase[res.size()]);
 		}

@@ -52,6 +52,7 @@ public final class DependencyScope implements Scope {
 			Provider<T> provider, int generators)
 			throws UnresolvableDependency {
 		final String key = identity.apply(dep);
+		//TODO computeIfAbsent cannot be used since recursive insert (provider uses same scope) ends in dead-lock
 		T instance = (T) instances.get(key);
 		if (instance != null)
 			return instance;
