@@ -88,41 +88,35 @@ public final class BoundParameter<T> implements Parameter<T> {
 			Parameter<? extends E>... parameters) {
 		@SuppressWarnings("unchecked")
 		BoundParameter<? extends E>[] params = new BoundParameter[parameters.length];
-		for (int i = 0; i < parameters.length; i++) {
+		for (int i = 0; i < parameters.length; i++)
 			params[i] = bind(parameters[i]);
-		}
 		return params;
 	}
 
 	public static BoundParameter<?>[] bind(Type<?>[] types,
 			Parameter<?>... parameters) {
-		if (types.length == 0) {
+		if (types.length == 0)
 			return NO_PARAMS;
-		}
 		BoundParameter<?>[] params = new BoundParameter<?>[types.length];
 		for (Parameter<?> parameter : parameters) {
-			int i = 0;
-			boolean found = false;
-			while (i < types.length && !found) {
-				if (params[i] == null) {
-					found = parameter.type().isAssignableTo(types[i]);
-					if (found) {
-						params[i] = bind(parameter);
-					}
-				}
-				i++;
-			}
-			if (!found) {
+			int i = indexForType(types, parameter, params);
+			if (i < 0)
 				throw new IllegalArgumentException(
 						"Couldn't arrange parameter: " + parameter);
-			}
+			params[i] = bind(parameter);
 		}
-		for (int i = 0; i < params.length; i++) {
-			if (params[i] == null) {
+		for (int i = 0; i < params.length; i++)
+			if (params[i] == null)
 				params[i] = bind(types[i]);
-			}
-		}
 		return params;
+	}
+
+	private static int indexForType(Type<?>[] types, Parameter<?> parameter,
+			BoundParameter<?>[] params) {
+		for (int i = 0; i < types.length; i++)
+			if (params[i] == null && parameter.type().isAssignableTo(types[i]))
+				return i;
+		return -1;
 	}
 
 	// ------------------------------------------------------

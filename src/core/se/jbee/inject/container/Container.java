@@ -258,25 +258,29 @@ public final class Container {
 		private <T, G> InjectionCase<G>[] resolveCases(Dependency<T> dep,
 				Type<G> generatedType) {
 			Dependency<G> generatedTypeDep = dep.typed(generatedType);
-			if (generatedType.isUpperBound()) {
-				List<InjectionCase<?>> res = new ArrayList<>();
-				for (Entry<Class<?>, InjectionCase<?>[]> e : casesByType.entrySet()) {
-					if (raw(e.getKey()).isAssignableTo(generatedType)) {
-						InjectionCase<? extends G>[] casesForType = (InjectionCase<? extends G>[]) e.getValue();
-						for (InjectionCase<? extends G> icase : casesForType) {
-							if (icase.resource.isCompatibleWith(
-									generatedTypeDep))
-								res.add(icase);
-						}
-					}
-				}
-				return toArray(res, raw(InjectionCase.class));
-			}
+			if (generatedType.isUpperBound())
+				return resolveWildcardCases(generatedType, generatedTypeDep);
 			InjectionCase<G>[] cases = injectionCasesForType(generatedType);
 			return cases == null
 				? (InjectionCase<G>[]) noCases
 				: arrayFilter(cases,
 						c -> c.resource.isCompatibleWith(generatedTypeDep));
+		}
+
+		@SuppressWarnings("unchecked")
+		private <G> InjectionCase<G>[] resolveWildcardCases(
+				Type<G> generatedType, Dependency<G> generatedTypeDep) {
+			List<InjectionCase<?>> res = new ArrayList<>();
+			for (Entry<Class<?>, InjectionCase<?>[]> e : casesByType.entrySet()) {
+				if (raw(e.getKey()).isAssignableTo(generatedType)) {
+					InjectionCase<? extends G>[] casesForType = (InjectionCase<? extends G>[]) e.getValue();
+					for (InjectionCase<? extends G> icase : casesForType) {
+						if (icase.resource.isCompatibleWith(generatedTypeDep))
+							res.add(icase);
+					}
+				}
+			}
+			return toArray(res, raw(InjectionCase.class));
 		}
 
 		private static <E, T> void addAllMatching(List<E> elements,
