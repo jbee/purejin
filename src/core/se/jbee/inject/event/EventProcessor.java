@@ -55,8 +55,10 @@ public interface EventProcessor extends AutoCloseable {
 	 * kind of custom blocking wait logic around the {@link EventProcessor}.
 	 * 
 	 * @param event type of event handler to wait for.
+	 * @return true if waiting ended because a event handler became available,
+	 *         else false
 	 */
-	<E> void await(Class<E> event) throws InterruptedException;
+	<E> boolean await(Class<E> event);
 
 	/**
 	 * Registers an event handler implementation to be used by this

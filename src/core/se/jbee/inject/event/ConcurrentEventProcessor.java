@@ -119,12 +119,17 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	}
 
 	@Override
-	public <E> void await(Class<E> event) throws InterruptedException {
+	public <E> boolean await(Class<E> event) {
 		EventHandlers<E> hs = getHandlers(event, true);
 		if (!hs.isEmpty())
-			return;
+			return true;
 		synchronized (hs) {
-			hs.wait();
+			try {
+				hs.wait();
+				return true;
+			} catch (InterruptedException e) {
+				return false;
+			}
 		}
 	}
 

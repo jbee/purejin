@@ -85,7 +85,7 @@ final class UnboxingFuture<T> implements Future<T> {
 			if (e.isCausedByTimeout())
 				throw (TimeoutException) e.getCause();
 			throw e;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new ExecutionException(e);
 		}
 		long left = waitMillis - (currentTimeMillis() - start);

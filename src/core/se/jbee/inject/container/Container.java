@@ -6,6 +6,7 @@
 package se.jbee.inject.container;
 
 import static java.lang.System.identityHashCode;
+import static java.util.Arrays.copyOf;
 import static java.util.Arrays.copyOfRange;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Scoping.scopingOf;
@@ -95,7 +96,7 @@ public final class Container {
 			InjectionCase<? extends Initialiser<?>>[] initCases = resolve(
 					injectionCasesTypeFor(initialiserTypeOf(Type.WILDCARD)));
 			if (initCases.length == 0)
-				return null;
+				return initCases;
 			Type<Initialiser<Injector>> injectorInitType = initialiserTypeOf(
 					Injector.class);
 			Initialiser<Injector>[] injectorInitialisers = resolve(
@@ -104,7 +105,7 @@ public final class Container {
 			for (Initialiser<Injector> init : injectorInitialisers)
 				init.init(this, this);
 			if (initCases.length == injectorInitialisers.length)
-				return null; // no other dynamic initialisers
+				return copyOf(initCases, 0); // no other dynamic initialisers
 			return arrayFilter(initCases,
 					c -> !c.type().equalTo(injectorInitType));
 		}
@@ -228,7 +229,7 @@ public final class Container {
 			final Class<E> rawElemType = elemType.rawType;
 			if (rawElemType == InjectionCase.class
 				|| rawElemType == Generator.class) {
-				return (T) resolveCaseArray(dep, elemType.parameter(0));
+				return (T) resolveCases(dep, elemType.parameter(0));
 			}
 			if (dep.type().rawType.getComponentType().isPrimitive()) {
 				throw new NoCaseForDependency(dep, null,
@@ -254,7 +255,7 @@ public final class Container {
 		}
 
 		@SuppressWarnings("unchecked")
-		private <T, G> InjectionCase<G>[] resolveCaseArray(Dependency<T> dep,
+		private <T, G> InjectionCase<G>[] resolveCases(Dependency<T> dep,
 				Type<G> generatedType) {
 			Dependency<G> generatedTypeDep = dep.typed(generatedType);
 			if (generatedType.isUpperBound()) {
@@ -272,10 +273,10 @@ public final class Container {
 				return toArray(res, raw(InjectionCase.class));
 			}
 			InjectionCase<G>[] cases = injectionCasesForType(generatedType);
-			if (cases == null)
-				return (InjectionCase<G>[]) noCases;
-			return arrayFilter(cases,
-					c -> c.resource.isCompatibleWith(generatedTypeDep));
+			return cases == null
+				? (InjectionCase<G>[]) noCases
+				: arrayFilter(cases,
+						c -> c.resource.isCompatibleWith(generatedTypeDep));
 		}
 
 		private static <E, T> void addAllMatching(List<E> elements,
@@ -386,7 +387,8 @@ public final class Container {
 					scoping);
 			return scope.yield(serialID, injected, () -> {
 				T instance = supplier.supply(injected, injector);
-				if (instance != null && injector.initialisersCases != null)
+				if (instance != null && injector.initialisersCases != null
+					&& injector.initialisersCases.length > 0)
 					postConstruct(instance, injected);
 				return instance;
 			}, injector.generators);
