@@ -113,7 +113,12 @@ public abstract class UnresolvableDependency extends RuntimeException {
 
 		public NoMethodForDependency(Type<?> returnType,
 				Type<?>... parameterTypes) {
-			super(returnType + ":" + Arrays.toString(parameterTypes));
+			this(returnType, parameterTypes, null);
+		}
+
+		public NoMethodForDependency(Type<?> returnType,
+				Type<?>[] parameterTypes, Throwable cause) {
+			super(returnType + ":" + Arrays.toString(parameterTypes), cause);
 		}
 	}
 

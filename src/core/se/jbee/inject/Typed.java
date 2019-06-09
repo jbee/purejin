@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -25,5 +25,5 @@ public interface Typed<T> {
 	 * @throws ClassCastException in case this cannot be typed as the type
 	 *             given.
 	 */
-	<E> Typed<E> typed(Type<E> type) throws ClassCastException;
+	<E> Typed<E> typed(Type<E> type);
 }

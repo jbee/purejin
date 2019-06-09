@@ -37,9 +37,10 @@ public class TestDiskScopeBinds {
 
 	@Before
 	public void cleanDir() throws IOException {
-		for (File file : dir.listFiles())
-			if (!file.isDirectory())
-				file.delete();
+		if (dir.exists())
+			for (File file : dir.listFiles())
+				if (!file.isDirectory())
+					file.delete();
 		Files.deleteIfExists(dir.toPath());
 	}
 

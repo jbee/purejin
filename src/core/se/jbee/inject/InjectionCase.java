@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -68,6 +68,17 @@ public final class InjectionCase<T> implements Comparable<InjectionCase<?>>,
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof InjectionCase
+			&& ((InjectionCase<?>) obj).serialID == serialID;
+	}
+
+	@Override
+	public int hashCode() {
+		return serialID;
+	}
+
+	@Override
 	public int compareTo(InjectionCase<?> other) {
 		Resource<?> r1 = resource;
 		Resource<?> r2 = other.resource;
@@ -87,4 +98,5 @@ public final class InjectionCase<T> implements Comparable<InjectionCase<?>>,
 	public boolean moreQualiedThan(InjectionCase<?> other) {
 		return resource.moreQualiedThan(other.resource);
 	}
+
 }

@@ -30,23 +30,23 @@ public final class Bindings {
 				Mirrors.DEFAULT);
 	}
 
-	private final List<Binding<?>> bindings;
+	private final List<Binding<?>> list;
 	public final Macros macros;
 	public final Mirrors mirrors;
 
-	private Bindings(List<Binding<?>> bindings, Macros macros,
+	private Bindings(List<Binding<?>> list, Macros macros,
 			Mirrors mirrors) {
-		this.bindings = bindings;
+		this.list = list;
 		this.macros = macros;
 		this.mirrors = mirrors;
 	}
 
 	public Bindings with(Mirrors mirrors) {
-		return new Bindings(bindings, macros, mirrors);
+		return new Bindings(list, macros, mirrors);
 	}
 
 	public Bindings with(Macros macros) {
-		return new Bindings(bindings, macros, mirrors);
+		return new Bindings(list, macros, mirrors);
 	}
 
 	/**
@@ -58,7 +58,7 @@ public final class Bindings {
 					"Incomplete binding added: " + complete);
 		}
 		// NB. #64 here we can inform post binding that about the new binding
-		bindings.add(complete);
+		list.add(complete);
 	}
 
 	public void expandInto(Binding<?> binding) {
@@ -66,7 +66,7 @@ public final class Bindings {
 	}
 
 	public Binding<?>[] toArray() {
-		return arrayOf(bindings, Binding.class);
+		return arrayOf(list, Binding.class);
 	}
 
 	public Binding<?>[] declareFrom(Module... modules) {

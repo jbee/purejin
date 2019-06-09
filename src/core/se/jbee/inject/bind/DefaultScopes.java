@@ -1,9 +1,9 @@
 package se.jbee.inject.bind;
 
-import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static se.jbee.inject.Name.named;
 
 import java.io.File;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import se.jbee.inject.Dependency;
@@ -38,7 +38,7 @@ public final class DefaultScopes extends BinderModule
 				() -> new DependencyScope(DependencyScope::targetInstanceName));
 		inScope.bind(named("disk:*"), Scope.class).toSupplier(this);
 		inScope.bind(ScheduledExecutorService.class).to(
-				() -> newSingleThreadScheduledExecutor());
+				Executors::newSingleThreadScheduledExecutor);
 	}
 
 	/**

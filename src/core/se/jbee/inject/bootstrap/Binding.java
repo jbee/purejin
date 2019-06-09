@@ -104,6 +104,21 @@ public final class Binding<T>
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Binding))
+			return false;
+		Binding<?> other = (Binding<?>) obj;
+		return resource.equalTo(other.resource) && source.equalTo(other.source)
+			&& scope.equalTo(other.scope) && type == other.type;
+	}
+
+	@Override
+	public int hashCode() {
+		// TODO Auto-generated method stub
+		return super.hashCode();
+	}
+
+	@Override
 	public int compareTo(Binding<?> other) {
 		int res = resource.type().rawType.getCanonicalName().compareTo(
 				other.resource.type().rawType.getCanonicalName());
@@ -141,24 +156,24 @@ public final class Binding<T>
 		Set<Type<?>> required = new HashSet<>();
 		List<Binding<?>> dropped = new ArrayList<>();
 		for (int i = 1; i < bindings.length; i++) {
-			Binding<?> b_d = bindings[lastUniqueIndex];
-			Binding<?> b_i = bindings[i];
-			final boolean equalResource = b_d.resource.equalTo(b_i.resource);
-			DeclarationType t_d = b_d.source.declarationType;
-			DeclarationType t_i = b_i.source.declarationType;
+			Binding<?> lastUnique = bindings[lastUniqueIndex];
+			Binding<?> current = bindings[i];
+			final boolean equalResource = lastUnique.resource.equalTo(current.resource);
+			DeclarationType t_d = lastUnique.source.declarationType;
+			DeclarationType t_i = current.source.declarationType;
 			if (equalResource && t_d.clashesWith(t_i)) {
 				throw new InconsistentBinding(
-						"Duplicate binds:\n" + b_d + "\n" + b_i);
+						"Duplicate binds:\n" + lastUnique + "\n" + current);
 			}
 			if (t_i == DeclarationType.REQUIRED) {
-				required.add(b_i.resource.type());
+				required.add(current.resource.type());
 			} else if (equalResource && t_d.droppedWith(t_i)) {
 				if (i - 1 == lastUniqueIndex) {
 					dropped.add(uniques.remove(uniques.size() - 1));
 				}
-				dropped.add(b_i);
+				dropped.add(current);
 			} else if (!equalResource || !t_i.replacedBy(t_d)) {
-				uniques.add(b_i);
+				uniques.add(current);
 				lastUniqueIndex = i;
 			}
 		}

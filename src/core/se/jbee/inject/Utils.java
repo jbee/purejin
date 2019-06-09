@@ -351,10 +351,10 @@ public final class Utils {
 			throw new NoMethodForDependency(raw(type));
 		try {
 			return type.getDeclaredConstructor();
+		} catch (RuntimeException e) {
+			throw e;
 		} catch (Exception e) {
-			if (e instanceof RuntimeException)
-				throw (RuntimeException) e;
-			throw new RuntimeException(e);
+			throw new NoMethodForDependency(raw(type), new Type[0], e);
 		}
 	}
 

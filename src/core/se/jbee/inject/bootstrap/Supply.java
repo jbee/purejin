@@ -110,7 +110,7 @@ public final class Supply {
 		throw new UnsupportedOperationException("util");
 	}
 
-	public static abstract class ArrayBridge<T> implements Supplier<T> {
+	public abstract static class ArrayBridge<T> implements Supplier<T> {
 
 		ArrayBridge() {
 			// make visible
@@ -321,8 +321,7 @@ public final class Supply {
 		public Provider<?> supply(Dependency<? super Provider<?>> dep,
 				Injector context) {
 			return lazyProvider(
-					dep.onTypeParameter().uninject().ignoredScoping(),
-					context);
+					dep.onTypeParameter().uninject().ignoredScoping(), context);
 		}
 
 		@Override
@@ -446,7 +445,8 @@ public final class Supply {
 
 		@Override
 		protected T invoke(Object[] args) {
-			return returnType.cast(Supply.produce(method.producer, owner, args));
+			return returnType.cast(
+					Supply.produce(method.producer, owner, args));
 		}
 
 		@Override

@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
@@ -58,8 +58,7 @@ public final class BoundMethod<T> implements Typed<T> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <E> BoundMethod<E> typed(Type<E> supertype)
-			throws ClassCastException {
+	public <E> BoundMethod<E> typed(Type<E> supertype) {
 		type().castTo(supertype); // make sure is valid
 		return (BoundMethod<E>) this;
 	}

@@ -713,25 +713,28 @@ public class Binder {
 			super(bind.asMulti().next(), instance);
 		}
 
-		@SuppressWarnings("unchecked")
 		public void toElements(Parameter<? extends E> p1) {
-			toElements(new Parameter[] { p1 });
+			expandElements(p1);
 		}
 
-		@SuppressWarnings("unchecked")
 		public void toElements(Parameter<? extends E> p1,
 				Parameter<? extends E> p2) {
-			toElements(new Parameter[] { p1, p2 });
+			expandElements(p1, p2);
 		}
 
-		@SuppressWarnings("unchecked")
 		public void toElements(Parameter<? extends E> p1,
 				Parameter<? extends E> p2, Parameter<? extends E> p3) {
-			toElements(new Parameter[] { p1, p2, p3 });
+			expandElements(p1, p2, p3);
 		}
 
 		@SafeVarargs
 		public final void toElements(Parameter<? extends E>... parameters) {
+			expand(parameters);
+		}
+
+		@SafeVarargs
+		private final void expandElements(
+				Parameter<? extends E>... parameters) {
 			expand(parameters);
 		}
 

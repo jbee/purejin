@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
@@ -162,7 +162,7 @@ public final class BoundParameter<T> implements Parameter<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public <E> BoundParameter<E> typed(Type<E> type) throws ClassCastException {
+	public <E> BoundParameter<E> typed(Type<E> type) {
 		asType.toSupertype(type);
 		return new BoundParameter<>(this.type, type, (Instance<E>) instance,
 				(E) value, (Supplier<? extends E>) supplier);

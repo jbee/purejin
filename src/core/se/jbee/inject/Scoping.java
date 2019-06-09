@@ -44,7 +44,7 @@ public final class Scoping implements Serializable {
 	}
 
 	public static Scoping scopingOf(Name scope) {
-		return SCOPING_BY_SCOPE.computeIfAbsent(scope, k -> new Scoping(k));
+		return SCOPING_BY_SCOPE.computeIfAbsent(scope, Scoping::new);
 	}
 
 	public final Name scope;

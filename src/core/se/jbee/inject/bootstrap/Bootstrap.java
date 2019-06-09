@@ -141,13 +141,8 @@ public final class Bootstrap {
 			installed.add(bundle);
 			if (!stack.isEmpty()) {
 				final Class<? extends Bundle> parent = stack.peek();
-				Set<Class<? extends Bundle>> children = bundleChildren.get(
-						parent);
-				if (children == null) {
-					children = new LinkedHashSet<>();
-					bundleChildren.put(parent, children);
-				}
-				children.add(bundle);
+				bundleChildren.computeIfAbsent(parent,
+						key -> new LinkedHashSet<>()).add(bundle);
 			}
 			stack.push(bundle);
 			Bootstrap.instance(bundle).bootstrap(this);
@@ -192,7 +187,7 @@ public final class Bootstrap {
 			if (uninstalled.contains(bundle)
 				|| !globals.edition.featured(module.getClass()))
 				return;
-			bundleModules.computeIfAbsent(bundle, __ -> new ArrayList<>()).add(
+			bundleModules.computeIfAbsent(bundle, key -> new ArrayList<>()).add(
 					module);
 		}
 
