@@ -180,7 +180,7 @@ Copyright (c) 2012, Jan Bernitt
 		<mkdir dir="${junit.output.dir}" />
 		<junit fork="yes" printsummary="withOutAndErr">
 			<formatter type="xml" />
-			<test name="se.jbee.inject.SuiteSilk" todir="${junit.output.dir}" />
+			<test name="se.jbee.inject.SuitAllSlow" todir="${junit.output.dir}" />
 			<classpath refid="classpath.junit" />
 		</junit>
 	</target>
