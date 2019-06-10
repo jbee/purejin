@@ -39,12 +39,10 @@ public abstract class EventModule extends BinderModule {
 		if (!event.isInterface())
 			throw new IllegalArgumentException(
 					"Event type has to be an interface but was: " + event);
-		initbind(event).to((Initialiser<T>) (listener,
-				injector) -> injector.resolve(EventProcessor.class).register(
-						event, listener));
-		bind(event).toSupplier((dep,
-				context) -> context.resolve(EventProcessor.class).getProxy(
-						event));
+		initbind(event).to((Initialiser<T>) (listener, injector) -> //
+		injector.resolve(EventProcessor.class).register(event, listener));
+		bind(event).toSupplier((dep, context) -> //
+		context.resolve(EventProcessor.class).getProxy(event));
 	}
 
 	private static final class EventBaseModule extends BinderModule {
@@ -54,7 +52,7 @@ public abstract class EventModule extends BinderModule {
 			asDefault().bind(EventProcessor.class).to(
 					ConcurrentEventProcessor.class);
 			asDefault().bind(EventMirror.class).to(
-					event -> EventPreferences.DEFAULT);
+					event -> EventPolicy.DEFAULT);
 			asDefault().injectingInto(EventProcessor.class).bind(
 					ExecutorService.class).to(Executors::newWorkStealingPool);
 		}

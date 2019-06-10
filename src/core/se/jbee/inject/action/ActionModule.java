@@ -159,23 +159,21 @@ public abstract class ActionModule extends BinderModule {
 		private <I, O> Method resolveAction(Type<I> input, Type<O> output) {
 			for (Class<?> impl : implementationClasses) {
 				for (Method action : actionsIn(impl)) {
-					Type<?> rt = returnType(action);
-					if (rt.equalTo(output)) {
-						if (input.equalTo(Type.VOID)) { // no input => no params
-							if (action.getParameterTypes().length == 0)
-								return action;
-						} else {
-							Type<?> param = arrayFindFirst(
-									parameterTypes(action),
-									t -> t.equalTo(input));
-							if (param != null)
-								return action;
-						}
-					}
+					if (isActionForTypes(action, input, output))
+						return action;
 				}
 			}
 			throw new UnresolvableDependency.NoMethodForDependency(output,
 					input);
+		}
+
+		private static <I, O> boolean isActionForTypes(Method candidate,
+				Type<I> input, Type<O> output) {
+			return returnType(candidate).equalTo(output)
+				&& (input.equalTo(Type.VOID)
+					&& candidate.getParameterCount() == 0 // no input => no params
+					|| arrayFindFirst(parameterTypes(candidate),
+							t -> t.equalTo(input)) != null);
 		}
 
 		private Method[] actionsIn(Class<?> impl) {

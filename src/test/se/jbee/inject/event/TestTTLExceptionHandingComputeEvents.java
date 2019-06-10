@@ -22,7 +22,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
 
 /**
  * Tests to verify the correctness of the exception handling caused by timeouts
- * related to the {@link EventPreferences#ttl} period.
+ * related to the {@link EventPolicy#ttl} period.
  * 
  * The general sentiment is that the event system should behave as transparent
  * as possible. That means if the original handler method throws exceptions
@@ -93,7 +93,7 @@ public class TestTTLExceptionHandingComputeEvents {
 			injectingInto(EventProcessor.class).bind(ExecutorService.class).to(
 					() -> Executors.newSingleThreadExecutor());
 			bind(EventMirror.class).to(
-					event -> EventPreferences.DEFAULT.withTTL(5));
+					event -> EventPolicy.DEFAULT.withTTL(5));
 		}
 	}
 

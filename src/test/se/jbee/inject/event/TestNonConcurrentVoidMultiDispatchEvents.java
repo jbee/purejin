@@ -20,7 +20,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
  * events (here {@link Listener#onX(int)} and {@link Listener#onY(int)}).
  * 
  * While the dispatch is asynchronous the test setting uses a
- * {@link EventPreferences#maxConcurrency} of 1 which only allows one thread
+ * {@link EventPolicy#maxConcurrency} of 1 which only allows one thread
  * calling any of the two methods at the same time which means the other message
  * can only be delivered after the first has been delivered successful.
  * 
@@ -90,7 +90,7 @@ public class TestNonConcurrentVoidMultiDispatchEvents {
 			per(Scope.injection).construct(Service.class); // dirty way to get multiple services
 			// makes observed calls "single threaded"
 			bind(EventMirror.class).to(
-					event -> EventPreferences.DEFAULT.withMaxConcurrency(1));
+					event -> EventPolicy.DEFAULT.withMaxConcurrency(1));
 		}
 
 	}

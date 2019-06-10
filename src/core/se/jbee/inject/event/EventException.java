@@ -47,7 +47,7 @@ public final class EventException extends RuntimeException {
 				if (ee.isCausedByHandlerException())
 					throw (Exception) ((InvocationTargetException) ee.getCause()).getTargetException();
 				if (ee.isCausedByNoHandler()
-					&& event.prefs.isReturnNoHandlerAsNull())
+					&& event.policy.isReturnNoHandlerAsNull())
 					return null;
 				if (ee.isCausedByTimeout())
 					for (Class<?> et : event.target.getExceptionTypes())
@@ -96,7 +96,7 @@ public final class EventException extends RuntimeException {
 
 	/**
 	 * @return true if the event should be processed after its
-	 *         {@link EventPreferences#ttl} period already has passed.
+	 *         {@link EventPolicy#ttl} period already has passed.
 	 */
 	public boolean isCausedByTimeout() {
 		return getCause() instanceof TimeoutException;

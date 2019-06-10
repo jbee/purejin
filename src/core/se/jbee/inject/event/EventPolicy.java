@@ -14,7 +14,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.BinaryOperator;
 
 /**
- * Properties that control how the {@link Event}s are processed by a
+ * A {@link EventPolicy} controls how the {@link Event}s are processed by a
  * {@link EventProcessor}.
  * 
  * {@link EventProcessor} are optimised for throughput. Therefore some fault
@@ -26,7 +26,7 @@ import java.util.function.BinaryOperator;
  * 
  * @since 19.1
  */
-public final class EventPreferences implements Serializable {
+public final class EventPolicy implements Serializable {
 
 	public enum Flags {
 
@@ -72,8 +72,8 @@ public final class EventPreferences implements Serializable {
 		RETURN_NO_HANDLER_AS_NULL;
 	}
 
-	public static final EventPreferences DEFAULT = new EventPreferences(
-			Integer.MAX_VALUE, Runtime.getRuntime().availableProcessors(), 0,
+	public static final EventPolicy DEFAULT = new EventPolicy(Integer.MAX_VALUE,
+			Runtime.getRuntime().availableProcessors(), 0,
 			EnumSet.of(Flags.MULTI_DISPATCH));
 
 	/**
@@ -110,11 +110,12 @@ public final class EventPreferences implements Serializable {
 	 */
 	public final int ttl;
 
+	@SuppressWarnings("squid:S1319")
 	private final EnumSet<Flags> flags;
 
 	//TODO what is Success? disptach to 1 of many in round robin, dispatch to all?, dispatch to x% of many?
 
-	public EventPreferences(int maxAttempts, int maxConcurrency, int ttl,
+	private EventPolicy(int maxAttempts, int maxConcurrency, int ttl,
 			EnumSet<Flags> flags) {
 		this.maxRetries = max(0, maxAttempts);
 		this.maxConcurrency = max(1, maxConcurrency);
@@ -138,28 +139,28 @@ public final class EventPreferences implements Serializable {
 		return flags.contains(Flags.RETURN_NO_HANDLER_AS_NULL);
 	}
 
-	public EventPreferences withTTL(int ttl) {
-		return new EventPreferences(maxRetries, maxConcurrency, ttl, flags);
+	public EventPolicy withTTL(int ttl) {
+		return new EventPolicy(maxRetries, maxConcurrency, ttl, flags);
 	}
 
-	public EventPreferences withMaxConcurrency(int n) {
-		return new EventPreferences(maxRetries, n, ttl, flags);
+	public EventPolicy withMaxConcurrency(int n) {
+		return new EventPolicy(maxRetries, n, ttl, flags);
 	}
 
-	public EventPreferences withMaxRetries(int n) {
-		return new EventPreferences(n, maxConcurrency, ttl, flags);
+	public EventPolicy withMaxRetries(int n) {
+		return new EventPolicy(n, maxConcurrency, ttl, flags);
 	}
 
-	public EventPreferences with(Flags flag) {
+	public EventPolicy with(Flags flag) {
 		EnumSet<Flags> flags = EnumSet.copyOf(this.flags);
 		flags.add(flag);
-		return new EventPreferences(maxRetries, maxConcurrency, ttl, flags);
+		return new EventPolicy(maxRetries, maxConcurrency, ttl, flags);
 	}
 
-	public EventPreferences with(Flags... flags) {
+	public EventPolicy with(Flags... flags) {
 		EnumSet<Flags> fs = EnumSet.copyOf(this.flags);
 		fs.addAll(Arrays.asList(flags));
-		return new EventPreferences(maxRetries, maxConcurrency, ttl, fs);
+		return new EventPolicy(maxRetries, maxConcurrency, ttl, fs);
 	}
 
 	@Override

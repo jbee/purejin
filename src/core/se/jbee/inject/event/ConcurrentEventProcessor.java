@@ -29,7 +29,7 @@ import se.jbee.inject.Type;
 
 /**
  * Default implementation of the {@link EventProcessor} supporting all
- * {@link EventPreferences}.
+ * {@link EventPolicy}.
  * 
  * @since 19.1
  */
@@ -58,7 +58,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 		boolean acquire(Event<?, ?> e) {
 			while (true) {
 				int calls = concurrentCalls.get();
-				if (calls >= e.prefs.maxConcurrency)
+				if (calls >= e.policy.maxConcurrency)
 					return false;
 				if (concurrentCalls.compareAndSet(calls, calls + 1))
 					return true;
@@ -104,7 +104,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 
 	private final Map<Class<?>, Object> proxiesByEventType = new ConcurrentHashMap<>();
 	private final Map<Class<?>, EventHandlers<?>> handlersByEventType = new ConcurrentHashMap<>();
-	private final Map<Class<?>, EventPreferences> prefsByEventType = new ConcurrentHashMap<>();
+	private final Map<Class<?>, EventPolicy> prefsByEventType = new ConcurrentHashMap<>();
 	private final ExecutorService executor;
 	private final EventMirror mirror;
 
@@ -119,21 +119,16 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	}
 
 	@Override
-	public <E> boolean await(Class<E> event) {
+	public <E> void await(Class<E> event) throws InterruptedException {
 		EventHandlers<E> hs = getHandlers(event, true);
-		if (!hs.isEmpty())
-			return true;
-		synchronized (hs) {
-			try {
+		while (hs.isEmpty()) {
+			synchronized (hs) {
 				hs.wait();
-				return true;
-			} catch (InterruptedException e) {
-				return false;
 			}
 		}
 	}
 
-	private EventPreferences getPrefs(Class<?> event) {
+	private EventPolicy getPrefs(Class<?> event) {
 		return prefsByEventType.computeIfAbsent(event, mirror::reflect);
 	}
 
@@ -184,14 +179,14 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	}
 
 	@Override
-	public <E> void dispatch(Event<E, ?> event) throws Throwable {
+	public <E> void dispatch(Event<E, ?> event) throws Exception {
 		Future<?> res;
-		if (event.prefs.isMultiDispatch()) {
+		if (event.policy.isMultiDispatch()) {
 			res = submit(event, () -> doDispatch(event));
 		} else {
 			res = submit(event, () -> doCompute(event));
 		}
-		if (event.prefs.isSyncMultiDispatch())
+		if (event.policy.isSyncMultiDispatch())
 			EventException.unwrap(event, res::get);
 	}
 
@@ -201,7 +196,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	// note: these can be programmed as a utility on top with basically the same effect and little extra overhead for a corner case
 	//       as long as there is a clear contract: namely that failure is always indicated by a EventEception
 	@Override
-	public <E, T> T compute(Event<E, T> event) throws Throwable {
+	public <E, T> T compute(Event<E, T> event) throws Exception {
 		return unwrapGet(event, submit(event, () -> doProcess(event)));
 	}
 
@@ -213,7 +208,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	}
 
 	private <E, T> T doProcess(Event<E, T> event) throws EventException {
-		return event.prefs.isAggregatedMultiDispatch()
+		return event.policy.isAggregatedMultiDispatch()
 			&& event.aggregator != null ? doDispatch(event) : doCompute(event);
 	}
 
@@ -249,7 +244,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 			}
 		}
 		if (needRetry != null && !needRetry.isEmpty()) {
-			for (int i = 0; i < event.prefs.maxRetries; i++) {
+			for (int i = 0; i < event.policy.maxRetries; i++) {
 				int size = needRetry.size();
 				for (int j = 0; j < size; j++) {
 					EventHandler<E> h = needRetry.pollFirst();
@@ -259,9 +254,9 @@ public class ConcurrentEventProcessor implements EventProcessor {
 						needRetry.addLast(h);
 					}
 				}
+				if (needRetry.isEmpty())
+					return res;
 			}
-			if (needRetry.isEmpty())
-				return res;
 		}
 		return res;
 	}
@@ -300,10 +295,10 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	static class ProxyEventHandler<E> implements InvocationHandler {
 
 		final Class<E> event;
-		final EventPreferences prefs;
+		final EventPolicy prefs;
 		final EventProcessor processor;
 
-		public ProxyEventHandler(Class<E> event, EventPreferences prefs,
+		public ProxyEventHandler(Class<E> event, EventPolicy prefs,
 				EventProcessor processor) {
 			this.event = event;
 			this.prefs = prefs;

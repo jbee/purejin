@@ -27,21 +27,21 @@ public final class Event<E, T> {
 	 */
 	public final long created;
 	public final Class<E> type;
-	public final EventPreferences prefs;
+	public final EventPolicy policy;
 	public final Type<T> result;
 	public final Method target;
 	public final Object[] args;
 	/**
 	 * The function used to aggregate multiple values if a computation is
 	 * dispatched to more then one handler using
-	 * {@link EventPreferences#isAggregatedMultiDispatch()}.
+	 * {@link EventPolicy#isAggregatedMultiDispatch()}.
 	 */
 	public final BinaryOperator<T> aggregator;
 
-	public Event(Class<E> event, EventPreferences prefs, Type<T> result,
+	public Event(Class<E> event, EventPolicy policy, Type<T> result,
 			Method target, Object[] args, BinaryOperator<T> aggregator) {
 		this.type = event;
-		this.prefs = prefs;
+		this.policy = policy;
 		this.result = result;
 		this.target = target;
 		this.args = args;
@@ -55,11 +55,11 @@ public final class Event<E, T> {
 	}
 
 	public boolean isNonConcurrent() {
-		return prefs.maxConcurrency == 1;
+		return policy.maxConcurrency == 1;
 	}
 
 	public boolean isExpired() {
-		return prefs.ttl > 0 && currentTimeMillis() > created + prefs.ttl;
+		return policy.ttl > 0 && currentTimeMillis() > created + policy.ttl;
 	}
 
 	public boolean returnsVoid() {
