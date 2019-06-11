@@ -243,19 +243,22 @@ public class ConcurrentEventProcessor implements EventProcessor {
 				needRetry.add(h);
 			}
 		}
-		if (needRetry != null && !needRetry.isEmpty()) {
-			for (int i = 0; i < event.policy.maxRetries; i++) {
-				int size = needRetry.size();
-				for (int j = 0; j < size; j++) {
-					EventHandler<E> h = needRetry.pollFirst();
-					if (h.acquire(event)) {
-						res = doAggregate(event, h, res);
-					} else {
-						needRetry.addLast(h);
-					}
+		return needRetry == null ? res : doRetry(event, needRetry, res);
+	}
+
+	private static <E, T> T doRetry(Event<E, T> event,
+			LinkedList<EventHandler<E>> needRetry, T res) {
+		for (int i = 0; i < event.policy.maxRetries; i++) {
+			int size = needRetry.size();
+			if (size == 0)
+				return res;
+			for (int j = 0; j < size; j++) {
+				EventHandler<E> h = needRetry.pollFirst();
+				if (h.acquire(event)) {
+					res = doAggregate(event, h, res);
+				} else {
+					needRetry.addLast(h);
 				}
-				if (needRetry.isEmpty())
-					return res;
 			}
 		}
 		return res;

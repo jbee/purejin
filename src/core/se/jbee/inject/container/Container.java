@@ -69,6 +69,7 @@ public final class Container {
 	 * ({@link InjectionCase} s) are given ordered from most precise to least
 	 * precise. The first in order that matches yields the result instance.
 	 */
+	@SuppressWarnings("squid:S1200")
 	private static final class InjectorImpl implements Injector {
 
 		final int generators;

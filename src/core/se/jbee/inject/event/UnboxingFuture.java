@@ -68,9 +68,9 @@ final class UnboxingFuture<T> implements Future<T> {
 	}
 
 	@Override
+	@SuppressWarnings("squid:S1941")
 	public T get(long timeout, TimeUnit unit)
 			throws InterruptedException, ExecutionException, TimeoutException {
-		long waitMillis = unit.toMillis(timeout);
 		long start = currentTimeMillis();
 		Future<T> unboxed;
 		try {
@@ -88,6 +88,7 @@ final class UnboxingFuture<T> implements Future<T> {
 		} catch (Exception e) {
 			throw new ExecutionException(e);
 		}
+		long waitMillis = unit.toMillis(timeout);
 		long left = waitMillis - (currentTimeMillis() - start);
 		if (left <= 0) {
 			unboxed.cancel(false);
