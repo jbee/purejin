@@ -10,7 +10,7 @@ jdk:
   - oraclejdk9
   - oraclejdk11
 
-install: ant
+install: ant test
 
 addons:
   sonarcloud:
@@ -18,5 +18,4 @@ addons:
     token:
       secure: "31be8765f44df02e40a5baaaaa83fcce0dee739a" # encrypted value of your token
 script:
-  - ant test-init
   - sonar-scanner
