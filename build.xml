@@ -25,7 +25,6 @@ Copyright (c) 2012, Jan Bernitt
 	<property name="test.src.dir" value="${src.dir}/test" />
 
 	<property name="core.target.dir" value="${target.dir}/core" />
-	<property name="draft.target.dir" value="${target.dir}/draft" />
 	<property name="test.target.dir" value="${target.dir}/test" />
 	<property name="javadoc.target.dir" value="${target.dir}/javadoc" />
 	<property name="junit.output.dir" value="${target.dir}/junit" />
@@ -40,7 +39,6 @@ Copyright (c) 2012, Jan Bernitt
 	</path>
 	<path id="classpath.test">
 		<path refid="classpath.core"/>
-		<pathelement location="${draft.target.dir}" />
 		<fileset dir="${lib.dir}">
 		    <include name="*.jar"/>
 		</fileset>
@@ -54,7 +52,6 @@ Copyright (c) 2012, Jan Bernitt
 		<mkdir dir="${target.dir}" />
 		<mkdir dir="${core.target.dir}" />
 		<mkdir dir="${test.target.dir}" />
-		<mkdir dir="${draft.target.dir}" />
 		<copy includeemptydirs="false" todir="${core.target.dir}">
 			<fileset dir="${core.src.dir}">
 				<exclude name="**/*.launch" />
@@ -166,6 +163,15 @@ Copyright (c) 2012, Jan Bernitt
 	<target name="test-init">
 		<mkdir dir="${lib.dir}"/>
 		<get src="http://search.maven.org/remotecontent?filepath=junit/junit/4.8.1/junit-4.8.1.jar" dest="${lib.dir}/junit-4.8.1.jar" usetimestamp="true" skipexisting="true" />
+        <get src="http://search.maven.org/remotecontent?filepath=org/jacoco/jacoco/0.8.4/jacoco-0.8.4.zip" dest="${lib.dir}/org.jacoco.ant-0.8.4.zip" usetimestamp="true" skipexisting="true" />
+		<unzip src="${lib.dir}/org.jacoco.ant-0.8.4.zip" dest="${lib.dir}" overwrite="true">
+		    <patternset>
+		        <include name="lib/jacocoant.jar"/>
+		    </patternset>
+		    <mapper>
+		    	  <globmapper from="lib/*" to="*"/>
+		    </mapper>
+		</unzip>
 	</target>
 	
 	<target name="test-compile" depends="compile, test-init">
@@ -178,11 +184,15 @@ Copyright (c) 2012, Jan Bernitt
 	
 	<target name="test" depends="test-compile">
 		<mkdir dir="${junit.output.dir}" />
-		<junit fork="yes" printsummary="withOutAndErr">
-			<formatter type="xml" />
-			<test name="se.jbee.inject.SuitAllSlow" todir="${junit.output.dir}" />
-			<classpath refid="classpath.junit" />
-		</junit>
+        <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml" classpathref="classpath.test"/>
+
+        <jacoco:coverage destfile="${junit.output.dir}/jacoco.exec" xmlns:jacoco="antlib:org.jacoco.ant">
+            <junit fork="yes" printsummary="withOutAndErr">
+                <formatter type="xml" />
+                <test name="se.jbee.inject.SuitAllSlow" todir="${junit.output.dir}" />
+                <classpath refid="classpath.junit" />
+            </junit>
+        </jacoco:coverage>		
 	</target>
 	
 	<target name="report">

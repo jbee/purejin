@@ -41,7 +41,8 @@ public class TestMirrorAutobindBinds {
 		@Override
 		protected void declare() {
 			Mirrors mirrors = bindings().mirrors;
-			Mirrors mirrorAllMethods = mirrors.produceBy(allMethods);
+			Mirrors mirrorAllMethods = mirrors.produceBy(
+					allMethods.ignoreSynthetic());
 			with(mirrorAllMethods).autobind().inModule();
 			// @formatter:off
 			with(mirrors.produceBy(allMethods.annotatedWith(WebMethod.class))
