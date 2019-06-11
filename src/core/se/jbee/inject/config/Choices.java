@@ -29,6 +29,7 @@ public final class Choices implements Serializable {
 
 	public static final Choices NONE = new Choices(new HashMap<>());
 
+	@SuppressWarnings("squid:S1948")
 	private final Map<Class<? extends Enum<?>>, EnumSet<?>> choicesByType;
 
 	private Choices(Map<Class<? extends Enum<?>>, EnumSet<?>> choices) {

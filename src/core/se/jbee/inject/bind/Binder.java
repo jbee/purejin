@@ -54,6 +54,7 @@ import se.jbee.inject.container.Supplier;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
+@SuppressWarnings({ "squid:S1448" })
 public class Binder {
 
 	public static RootBinder create(Bind bind) {

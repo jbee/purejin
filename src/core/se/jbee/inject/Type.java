@@ -498,7 +498,7 @@ public final class Type<T>
 		return actualTypeArguments;
 	}
 
-	private void addSuperInterfaces(Set<Type<?>> res, Class<?> type,
+	private static void addSuperInterfaces(Set<Type<?>> res, Class<?> type,
 			Map<String, Type<?>> actualTypeArguments) {
 		Class<?>[] interfaces = type.getInterfaces();
 		java.lang.reflect.Type[] genericInterfaces = type.getGenericInterfaces();
