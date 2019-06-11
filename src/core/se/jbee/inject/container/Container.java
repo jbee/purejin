@@ -273,14 +273,18 @@ public final class Container {
 			List<InjectionCase<?>> res = new ArrayList<>();
 			for (Entry<Class<?>, InjectionCase<?>[]> e : casesByType.entrySet()) {
 				if (raw(e.getKey()).isAssignableTo(generatedType)) {
-					InjectionCase<? extends G>[] casesForType = (InjectionCase<? extends G>[]) e.getValue();
-					for (InjectionCase<? extends G> icase : casesForType) {
-						if (icase.resource.isCompatibleWith(generatedTypeDep))
-							res.add(icase);
-					}
+					addCompatibleCases(res, generatedTypeDep,
+							(InjectionCase<? extends G>[]) e.getValue());
 				}
 			}
 			return toArray(res, raw(InjectionCase.class));
+		}
+
+		private static <G> void addCompatibleCases(List<InjectionCase<?>> res,
+				Dependency<G> dep, InjectionCase<? extends G>[] cases) {
+			for (InjectionCase<? extends G> icase : cases)
+				if (icase.resource.isCompatibleWith(dep))
+					res.add(icase);
 		}
 
 		private static <E, T> void addAllMatching(List<E> elements,

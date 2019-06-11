@@ -1,13 +1,7 @@
 package se.jbee.inject;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static se.jbee.inject.util.TestUtils.assertSerializable;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.List;
 
@@ -86,28 +80,4 @@ public class TestSerializable {
 		assertSerializable(dep.injectingInto(Integer.class));
 	}
 
-	private static void assertSerializable(Serializable obj) {
-		try {
-			byte[] binObj = serialize(obj);
-			Serializable obj2 = deserialize(binObj);
-			assertEquals(obj, obj2);
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
-	}
-
-	private static byte[] serialize(Serializable obj) throws IOException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ObjectOutputStream oos = new ObjectOutputStream(baos);
-		oos.writeObject(obj);
-		oos.close();
-		return baos.toByteArray();
-	}
-
-	private static Serializable deserialize(byte[] b)
-			throws IOException, ClassNotFoundException {
-		ByteArrayInputStream bais = new ByteArrayInputStream(b);
-		ObjectInputStream ois = new ObjectInputStream(bais);
-		return (Serializable) ois.readObject();
-	}
 }

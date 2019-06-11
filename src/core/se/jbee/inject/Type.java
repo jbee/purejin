@@ -38,6 +38,7 @@ import java.util.Set;
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
+@SuppressWarnings({ "squid:S1448", "squid:S1200" })
 public final class Type<T>
 		implements Qualifying<Type<?>>, Parameter<T>, Serializable {
 
@@ -448,7 +449,7 @@ public final class Type<T>
 	public static <S> Type<? extends S> supertype(Class<S> supertype,
 			Type<? extends S> type) {
 		if (supertype.getTypeParameters().length == 0)
-			return raw(supertype); // just for better performance 
+			return raw(supertype); // just for better performance
 		@SuppressWarnings("unchecked")
 		Type<? extends S> res = (Type<? extends S>) arrayFindFirst(
 				type.supertypes(), s -> s.rawType == supertype);

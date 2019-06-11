@@ -187,7 +187,7 @@ Copyright (c) 2012, Jan Bernitt
         <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml" classpathref="classpath.test"/>
 
         <jacoco:coverage destfile="${junit.output.dir}/jacoco.exec" xmlns:jacoco="antlib:org.jacoco.ant">
-            <junit fork="yes" printsummary="withOutAndErr">
+            <junit fork="yes" printsummary="withOutAndErr" haltonfailure="no">
                 <formatter type="xml" />
                 <test name="se.jbee.inject.SuitAllSlow" todir="${junit.output.dir}" />
                 <classpath refid="classpath.junit" />

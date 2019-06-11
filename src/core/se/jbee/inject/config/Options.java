@@ -1,11 +1,12 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.config;
 
-import java.util.IdentityHashMap;
+import java.util.HashMap;
+import java.util.Map;
 
 import se.jbee.inject.Type;
 
@@ -20,11 +21,11 @@ import se.jbee.inject.Type;
  */
 public final class Options {
 
-	public static final Options NONE = new Options(new IdentityHashMap<>(0));
+	public static final Options NONE = new Options(new HashMap<>(0));
 
-	private final IdentityHashMap<String, Object> values;
+	private final Map<String, Object> values;
 
-	private Options(IdentityHashMap<String, Object> values) {
+	private Options(Map<String, Object> values) {
 		this.values = values;
 	}
 
@@ -42,11 +43,9 @@ public final class Options {
 	 */
 	public <T> Options set(Type<T> type, T value) {
 		final String key = key(type);
-		if (value == null && !values.containsKey(key)) {
+		if (value == null && !values.containsKey(key))
 			return this;
-		}
-		@SuppressWarnings("unchecked")
-		IdentityHashMap<String, Object> clone = (IdentityHashMap<String, Object>) values.clone();
+		Map<String, Object> clone = new HashMap<>(values);
 		if (value == null) {
 			clone.remove(key);
 		} else {

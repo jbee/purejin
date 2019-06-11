@@ -94,6 +94,22 @@ public class Config implements Extension {
 		return value(name, long.class).orElse(defaultValue);
 	}
 
+	public float floatValue(String name) {
+		return floatValue(name, 0f);
+	}
+
+	public float floatValue(String name, float defaultValue) {
+		return value(name, float.class).orElse(defaultValue);
+	}
+
+	public double doubleValue(String name) {
+		return doubleValue(name, 0d);
+	}
+
+	public double doubleValue(String name, double defaultValue) {
+		return value(name, double.class).orElse(defaultValue);
+	}
+
 	public <E extends Enum<E>> E enumValue(String name, E defaultValue) {
 		return value(name, defaultValue.getDeclaringClass()).orElse(
 				defaultValue);

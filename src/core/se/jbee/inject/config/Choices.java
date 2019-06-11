@@ -7,7 +7,8 @@ package se.jbee.inject.config;
 
 import java.io.Serializable;
 import java.util.EnumSet;
-import java.util.IdentityHashMap;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * {@link Choices} are used to model configurations of the bootstrapping process
@@ -26,12 +27,11 @@ import java.util.IdentityHashMap;
  */
 public final class Choices implements Serializable {
 
-	public static final Choices NONE = new Choices(new IdentityHashMap<>());
+	public static final Choices NONE = new Choices(new HashMap<>());
 
-	private final IdentityHashMap<Class<? extends Enum<?>>, EnumSet<?>> choicesByType;
+	private final Map<Class<? extends Enum<?>>, EnumSet<?>> choicesByType;
 
-	private Choices(
-			IdentityHashMap<Class<? extends Enum<?>>, EnumSet<?>> choices) {
+	private Choices(Map<Class<? extends Enum<?>>, EnumSet<?>> choices) {
 		this.choicesByType = choices;
 	}
 
@@ -50,7 +50,8 @@ public final class Choices implements Serializable {
 
 	private <C extends Enum<C>> Choices with(Class<C> property,
 			EnumSet<C> choices) {
-		IdentityHashMap<Class<? extends Enum<?>>, EnumSet<?>> clone = copy();
+		Map<Class<? extends Enum<?>>, EnumSet<?>> clone = new HashMap<>(
+				choicesByType);
 		clone.put(property, choices);
 		return new Choices(clone);
 	}
@@ -61,11 +62,6 @@ public final class Choices implements Serializable {
 			return this;
 		return with(choices[0].getDeclaringClass(),
 				EnumSet.of(choices[0], choices));
-	}
-
-	@SuppressWarnings("unchecked")
-	private IdentityHashMap<Class<? extends Enum<?>>, EnumSet<?>> copy() {
-		return (IdentityHashMap<Class<? extends Enum<?>>, EnumSet<?>>) choicesByType.clone();
 	}
 
 	@Override

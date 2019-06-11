@@ -27,6 +27,7 @@ import se.jbee.inject.UnresolvableDependency.UnstableDependency;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
+@SuppressWarnings("squid:S1448")
 public final class Dependency<T>
 		implements Parameter<T>, Iterable<Injection>, Serializable {
 

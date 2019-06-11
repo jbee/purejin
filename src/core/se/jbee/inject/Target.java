@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -20,6 +20,7 @@ import java.io.Serializable;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
+@SuppressWarnings("squid:S1448")
 public final class Target implements Qualifying<Target>, Serializable {
 
 	public static final Target ANY = targeting(Instance.ANY);

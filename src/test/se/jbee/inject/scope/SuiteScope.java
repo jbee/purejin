@@ -6,6 +6,6 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({ TestScopes.class })
-public class SuitScope {
+public class SuiteScope {
 
 }

@@ -37,6 +37,7 @@ import se.jbee.inject.UnresolvableDependency.NoMethodForDependency;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
+@SuppressWarnings({ "squid:S1200", "squid:S1448" })
 public final class Utils {
 
 	/**
@@ -251,6 +252,7 @@ public final class Utils {
 	 *
 	 *         Note that this method just covers JRE types.
 	 */
+	@SuppressWarnings("squid:S1067")
 	public static boolean isClassVirtual(Class<?> cls) {
 		return cls == null || cls.isInterface() || cls.isEnum()
 			|| cls.isAnnotation() || cls.isAnonymousClass() || cls.isPrimitive()
@@ -288,9 +290,9 @@ public final class Utils {
 
 	public static <T extends Member> T moreVisible(T a, T b) {
 		int am = a.getModifiers();
-		int bm = b.getModifiers();
 		if (isPublic(am))
 			return a;
+		int bm = b.getModifiers();
 		if (isPublic(bm))
 			return b;
 		if (isProtected(am))
@@ -324,18 +326,20 @@ public final class Utils {
 		if (cs.length == 1)
 			return cs[0];
 		Constructor<T> mostParamsConstructor = null;
-		for (Constructor<T> c : cs) {
-			if (!arrayContains(c.getParameterTypes(), type, (a, b) -> a == b) // avoid self referencing constructors (synthetic) as they cause endless loop
-				&& (mostParamsConstructor == null //
-					|| (moreVisible(c, mostParamsConstructor) == c
-						&& (moreVisible(mostParamsConstructor, c) == c
-							|| c.getParameterCount() > mostParamsConstructor.getParameterCount())))) {
-				mostParamsConstructor = c;
-			}
-		}
+		for (Constructor<T> c : cs)
+			mostParamsConstructor = commonConstructor(type,
+					mostParamsConstructor, c);
 		if (mostParamsConstructor == null)
 			throw new NoMethodForDependency(raw(type));
 		return mostParamsConstructor;
+	}
+
+	private static <T> Constructor<T> commonConstructor(Class<T> type,
+			Constructor<T> a, Constructor<T> b) {
+		return !arrayContains(b.getParameterTypes(), type, Class::equals) // avoid self referencing constructors (synthetic) as they cause endless loop
+			&& (a == null //
+				|| (moreVisible(b, a) == b && (moreVisible(a, b) == b
+					|| b.getParameterCount() > a.getParameterCount()))) ? b : a;
 	}
 
 	public static <T> Constructor<T> commonConstructorOrNull(Class<T> type) {
