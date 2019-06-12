@@ -74,20 +74,6 @@ public final class Utils {
 		return copy;
 	}
 
-	public static <A> A[] arrayInsert(A e, A[] arr, Eq<A> eq) {
-		if (arr.length == 0)
-			return arrayPrepand(e, arr);
-		int i = arrayIndex(arr, e, eq);
-		if (i >= 0) {
-			if (e == arr[i]) // already very same
-				return arr;
-			A[] tmp = arr.clone();
-			tmp[i] = e;
-			return tmp;
-		}
-		return arrayPrepand(e, arr);
-	}
-
 	public static <A> A[] arrayDropTail(A[] arr, int n) {
 		if (arr.length <= n)
 			return newArray(arr, 0);
@@ -132,11 +118,9 @@ public final class Utils {
 	public static <A> int arrayIndex(A[] arr, A e, Eq<A> eq) {
 		if (arr == null || arr.length == 0)
 			return -1;
-		for (int i = 0; i < arr.length; i++) {
-			if (eq.test(e, arr[i])) {
+		for (int i = 0; i < arr.length; i++)
+			if (eq.test(e, arr[i]))
 				return i;
-			}
-		}
 		return -1;
 	}
 
@@ -351,7 +335,7 @@ public final class Utils {
 	}
 
 	public static <T> Constructor<T> noArgsConstructor(Class<T> type) {
-		if (type.isInterface())
+		if (type.isInterface() || type.isEnum() || type.isPrimitive())
 			throw new NoMethodForDependency(raw(type));
 		try {
 			return type.getDeclaredConstructor();

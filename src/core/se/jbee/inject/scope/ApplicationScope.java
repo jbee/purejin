@@ -1,6 +1,7 @@
 package se.jbee.inject.scope;
 
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Generator;
@@ -18,29 +19,16 @@ import se.jbee.inject.UnresolvableDependency;
  */
 public final class ApplicationScope implements Scope {
 
-	private final AtomicReference<Object[]> instances = new AtomicReference<>();
+	private final AtomicReference<AtomicReferenceArray<Object>> instances = new AtomicReference<>();
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T yield(int serialID, Dependency<? super T> dep,
 			Provider<T> provider, int generators)
 			throws UnresolvableDependency {
-		Object[] objects = instances.get();
-		if (objects == null) {
-			instances.compareAndSet(null, new Object[generators]);
-			objects = instances.get();
-		}
-		Object res = objects[serialID];
-		if (res != null)
-			return (T) res;
-		synchronized (objects) {
-			res = objects[serialID];
-			// we need to ask again since the instance could have been initialised before we got entrance to the sync block
-			if (res == null) {
-				res = provider.provide();
-				objects[serialID] = res;
-			}
-		}
-		return (T) res;
+		return (T) instances.updateAndGet(objs -> objs != null
+			? objs
+			: new AtomicReferenceArray<>(generators)).updateAndGet(serialID,
+					obj -> obj != null ? obj : provider.provide());
 	}
 }

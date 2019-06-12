@@ -5,8 +5,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static se.jbee.inject.Type.raw;
 
-import java.lang.reflect.Method;
-
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
@@ -141,25 +139,26 @@ public class TestServiceInvocationBinds {
 		}
 
 		@Override
-		public <I, O> O exec(Object impl, Method action, Object[] args,
-				Type<O> output, Type<I> input, I value)
+		public <I, O> O exec(ActionSite<I, O> site, Object[] args, I value)
 				throws ActionMalfunction {
-			Object[] state = before(output, input, value);
+			Object[] state = before(site.output, site.input, value);
 			O res;
 			try {
-				res = output.rawType.cast(Supply.produce(action, impl, args));
+				res = site.output.rawType.cast(
+						Supply.produce(site.action, site.impl, args));
 			} catch (SupplyFailed e) {
 				Exception ex = e;
 				if (e.getCause() instanceof Exception) {
 					ex = (Exception) e.getCause();
 				}
-				afterException(output, input, value, ex, state);
+				afterException(site.output, site.input, value, ex, state);
 				throw new ActionMalfunction(
-						action.getDeclaringClass().getSimpleName() + "#"
-							+ action.getName() + " failed: " + ex.getMessage(),
+						site.action.getDeclaringClass().getSimpleName() + "#"
+							+ site.action.getName() + " failed: "
+							+ ex.getMessage(),
 						ex);
 			}
-			after(output, input, value, res, state);
+			after(site.output, site.input, value, res, state);
 			return res;
 		}
 

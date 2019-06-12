@@ -12,7 +12,6 @@ import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.parameterTypes;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Type.returnType;
-import static se.jbee.inject.Utils.accessible;
 import static se.jbee.inject.Utils.arrayFindFirst;
 import static se.jbee.inject.config.ProductionMirror.allMethods;
 
@@ -81,7 +80,7 @@ public abstract class ActionModule extends BinderModule {
 			asDefault().per(Scope.dependencyType).starbind(
 					Action.class).toSupplier(ActionSupplier.class);
 			asDefault().per(Scope.application).bind(ACTION_MIRROR).to(
-					allMethods);
+					allMethods.ignoreSynthetic());
 			asDefault().per(Scope.application).bind(Executor.class).to(
 					DirectExecutor.class);
 		}
@@ -91,10 +90,10 @@ public abstract class ActionModule extends BinderModule {
 	static final class DirectExecutor implements Executor {
 
 		@Override
-		public <I, O> O exec(Object impl, Method action, Object[] args,
-				Type<O> output, Type<I> input, I value) {
+		public <I, O> O exec(ActionSite<I, O> site, Object[] args, I value) {
 			try {
-				return output.rawType.cast(Supply.produce(action, impl, args));
+				return site.output.rawType.cast(
+						Supply.produce(site.action, site.impl, args));
 			} catch (SupplyFailed e) {
 				Exception ex = e;
 				if (e.getCause() instanceof Exception) {
@@ -148,12 +147,10 @@ public abstract class ActionModule extends BinderModule {
 		}
 
 		private <I, O> Action<?, ?> newAction(Type<I> input, Type<O> output) {
-			Action<?, ?> action;
 			Method method = resolveAction(input, output);
 			Object impl = injector.resolve(method.getDeclaringClass());
-			action = new ExecutorRunAction<>(impl, method, input, output,
-					executor, injector);
-			return action;
+			return new ExecutorRunAction<>(injector, executor,
+					new ActionSite<>(impl, method, input, output));
 		}
 
 		private <I, O> Method resolveAction(Type<I> input, Type<O> output) {
@@ -184,32 +181,25 @@ public abstract class ActionModule extends BinderModule {
 
 	private static final class ExecutorRunAction<I, O> implements Action<I, O> {
 
-		private final Object impl;
-		private final Method action;
-		private final Type<I> input;
-		private final Type<O> output;
-
-		private final Executor executor;
 		private final Injector injector;
+		private final Executor executor;
 
+		private final ActionSite<I, O> site;
 		private final InjectionSite injection;
 		private final int inputIndex;
 
-		ExecutorRunAction(Object impl, Method action, Type<I> input,
-				Type<O> output, Executor executor, Injector injector) {
-			this.impl = impl;
-			this.action = accessible(action);
-			this.input = input;
-			this.output = output;
-			this.executor = executor;
+		ExecutorRunAction(Injector injector, Executor executor,
+				ActionSite<I, O> site) {
 			this.injector = injector;
-			Type<?>[] types = parameterTypes(action);
+			this.executor = executor;
+			this.site = site;
+			Type<?>[] types = parameterTypes(site.action);
 			this.injection = new InjectionSite(
-					dependency(output).injectingInto(
-							action.getDeclaringClass()),
+					dependency(site.output).injectingInto(
+							site.action.getDeclaringClass()),
 					injector, BoundParameter.bind(types,
-							BoundParameter.constant(input, null)));
-			this.inputIndex = asList(types).indexOf(input);
+							BoundParameter.constant(site.input, null)));
+			this.inputIndex = asList(types).indexOf(site.input);
 		}
 
 		@Override
@@ -223,7 +213,7 @@ public abstract class ActionModule extends BinderModule {
 			}
 			if (inputIndex >= 0)
 				args[inputIndex] = input;
-			return executor.exec(impl, action, args, output, this.input, input);
+			return executor.exec(site, args, input);
 		}
 	}
 }
