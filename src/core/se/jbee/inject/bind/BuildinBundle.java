@@ -56,7 +56,8 @@ public enum BuildinBundle implements ChoiceBundle<BuildinBundle> {
 
 		@Override
 		protected void declare() {
-			per(Scope.targetInstance).starbind(Logger.class).to(Supply.LOGGER);
+			per(Scope.targetInstance).starbind(Logger.class).toSupplier(
+					Supply.LOGGER);
 		}
 
 	}

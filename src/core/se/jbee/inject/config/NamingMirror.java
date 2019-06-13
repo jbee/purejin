@@ -5,7 +5,7 @@
  */
 package se.jbee.inject.config;
 
-import static se.jbee.inject.InconsistentBinding.noSuchAnnotationProperty;
+import static se.jbee.inject.InconsistentBinding.annotationLacksProperty;
 import static se.jbee.inject.Utils.annotatedName;
 import static se.jbee.inject.Utils.annotation;
 import static se.jbee.inject.Utils.annotationPropertyByType;
@@ -38,7 +38,7 @@ public interface NamingMirror {
 			return this;
 		Method nameProperty = annotationPropertyByType(String.class, naming);
 		if (nameProperty == null)
-			throw noSuchAnnotationProperty(String.class, naming);
+			throw annotationLacksProperty(String.class, naming);
 		return obj -> {
 			Name name = annotatedName(nameProperty, annotation(naming, obj));
 			return name == null ? this.reflect(obj) : name;

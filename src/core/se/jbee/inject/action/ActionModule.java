@@ -27,7 +27,7 @@ import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.SupplyFailed;
 import se.jbee.inject.bind.BinderModule;
-import se.jbee.inject.bootstrap.BoundParameter;
+import se.jbee.inject.bootstrap.Argument;
 import se.jbee.inject.bootstrap.InjectionSite;
 import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.bootstrap.Supply;
@@ -93,13 +93,13 @@ public abstract class ActionModule extends BinderModule {
 		public <I, O> O exec(ActionSite<I, O> site, Object[] args, I value) {
 			try {
 				return site.output.rawType.cast(
-						Supply.produce(site.action, site.impl, args));
+						Supply.produce(site.action, site.owner, args));
 			} catch (SupplyFailed e) {
 				Exception ex = e;
 				if (e.getCause() instanceof Exception) {
 					ex = (Exception) e.getCause();
 				}
-				throw new ActionMalfunction(
+				throw new ActionExecutionFailed(
 						"Exception on invocation of the action", ex);
 			}
 		}
@@ -195,20 +195,20 @@ public abstract class ActionModule extends BinderModule {
 			this.site = site;
 			Type<?>[] types = parameterTypes(site.action);
 			this.injection = new InjectionSite(
+					injector,
 					dependency(site.output).injectingInto(
-							site.action.getDeclaringClass()),
-					injector, BoundParameter.bind(types,
-							BoundParameter.constant(site.input, null)));
+							site.action.getDeclaringClass()), Argument.bind(types,
+							Argument.constant(site.input, null)));
 			this.inputIndex = asList(types).indexOf(site.input);
 		}
 
 		@Override
-		public O exec(I input) throws ActionMalfunction {
+		public O exec(I input) throws ActionExecutionFailed {
 			Object[] args = null;
 			try {
 				args = injection.args(injector);
 			} catch (UnresolvableDependency e) {
-				throw new ActionMalfunction(
+				throw new ActionExecutionFailed(
 						"Failed to provide all implicit arguments", e);
 			}
 			if (inputIndex >= 0)

@@ -75,7 +75,7 @@ public final class Bootstrap {
 
 	public static void nonnullThrowsReentranceException(Object field) {
 		if (field != null)
-			throw new InconsistentBinding("Reentrance not allowed!");
+			throw InconsistentBinding.contextAlreadyInitialised();
 	}
 
 	public static <T> T instance(Class<T> type) {

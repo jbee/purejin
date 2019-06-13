@@ -8,38 +8,26 @@ import se.jbee.inject.Dependency;
 import se.jbee.inject.Extension;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Scope;
-import se.jbee.inject.bootstrap.BoundConstructor;
+import se.jbee.inject.bootstrap.New;
 import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.config.ConstructionMirror;
-import se.jbee.inject.container.Supplier;
 
 public class ExtensionModule extends BinderModule {
 
 	@Override
 	protected void declare() {
-		asDefault().per(Scope.dependencyType).bind(
-				raw(Extension.class).asUpperBound()).toSupplier(
-						new ExtensionSupplier<>(
-								bindings().mirrors.construction));
+		ConstructionMirror mirror = bindings().mirrors.construction;
+		asDefault() //
+				.per(Scope.dependencyType) //
+				.bind(raw(Extension.class).asUpperBound()) //
+				.toSupplier((dep, context) -> extension(mirror, dep, context));
 	}
 
-	static final class ExtensionSupplier<T extends Extension>
-			implements Supplier<T> {
-
-		final ConstructionMirror construction;
-
-		ExtensionSupplier(ConstructionMirror construction) {
-			this.construction = construction;
-		}
-
-		@Override
-		public T supply(Dependency<? super T> dep, Injector context) {
-			@SuppressWarnings("unchecked")
-			Constructor<T> c = (Constructor<T>) construction.reflect(
-					dep.type().rawType);
-			return Supply.constructor(BoundConstructor.bind(c)).supply(dep,
-					context);
-		}
-
+	private static <T> T extension(ConstructionMirror mirror,
+			Dependency<? super T> dep, Injector context) {
+		@SuppressWarnings("unchecked")
+		Constructor<T> constructor = (Constructor<T>) mirror.reflect(
+				dep.type().rawType);
+		return Supply.constructor(New.bind(constructor)).supply(dep, context);
 	}
 }

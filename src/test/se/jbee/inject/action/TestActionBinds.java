@@ -68,7 +68,7 @@ public class TestActionBinds {
 		try {
 			error.exec(null);
 			fail("Expected an exception...");
-		} catch (ActionMalfunction e) {
+		} catch (ActionExecutionFailed e) {
 			assertSame(IllegalStateException.class, e.getCause().getClass());
 		}
 	}

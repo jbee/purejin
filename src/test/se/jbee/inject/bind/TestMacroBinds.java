@@ -27,7 +27,7 @@ import se.jbee.inject.bootstrap.Binding;
 import se.jbee.inject.bootstrap.BindingType;
 import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.BoundConstructor;
+import se.jbee.inject.bootstrap.New;
 import se.jbee.inject.bootstrap.Bundle;
 import se.jbee.inject.bootstrap.Macro;
 import se.jbee.inject.bootstrap.Macros;
@@ -122,15 +122,15 @@ public class TestMacroBinds {
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	static final class RequiredConstructorParametersMacro
-			implements Macro<BoundConstructor<?>> {
+			implements Macro<New<?>> {
 
 		@Override
-		public <T> void expand(BoundConstructor<?> value, Binding<T> incomplete,
+		public <T> void expand(New<?> value, Binding<T> incomplete,
 				Bindings bindings) {
-			Macros.CONSTRUCTOR.expand(value, incomplete, bindings);
-			Type<?>[] params = Type.parameterTypes(value.constructor);
+			Macros.NEW.expand(value, incomplete, bindings);
+			Type<?>[] params = Type.parameterTypes(value.target);
 			for (int i = 0; i < params.length; i++) {
-				bindings.expandInto(required(params[i], incomplete));
+				bindings.addExpanded(required(params[i], incomplete));
 			}
 		}
 
@@ -188,14 +188,14 @@ public class TestMacroBinds {
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	static final class InitialisationMacro
-			implements Macro<BoundConstructor<?>> {
+			implements Macro<New<?>> {
 
 		@Override
-		public <T> void expand(BoundConstructor<?> constructor,
+		public <T> void expand(New<?> constructor,
 				Binding<T> incomplete, Bindings bindings) {
 			Supplier<T> supplier = new InitialisationSupplier<>(
 					Supply.constructor(constructor.typed(incomplete.type())));
-			bindings.expandInto(incomplete.complete(CONSTRUCTOR, supplier));
+			bindings.addExpanded(incomplete.complete(CONSTRUCTOR, supplier));
 		}
 
 	}

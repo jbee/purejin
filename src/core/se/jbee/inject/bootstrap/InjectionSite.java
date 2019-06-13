@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
@@ -12,7 +12,7 @@ import se.jbee.inject.Dependency;
 import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency;
-import se.jbee.inject.bootstrap.BoundParameter.ParameterType;
+import se.jbee.inject.bootstrap.Argument.ParameterResolution;
 
 /**
  * Similar to a call-site each {@linkplain InjectionSite} represents the
@@ -23,38 +23,37 @@ public final class InjectionSite {
 
 	public final Dependency<?> site;
 
-	private final BoundParameter<?>[] params;
+	private final Argument<?>[] params;
 	private final InjectionCase<?>[] cases;
 	private final Object[] args;
 
 	private final int[] dynamics;
 	private int dynamicsLength = 0;
 
-	public InjectionSite(Dependency<?> site, Injector injector,
-			BoundParameter<?>[] params) {
+	public InjectionSite(Injector injector, Dependency<?> site,
+			Argument<?>[] args) {
 		this.site = site;
-		this.params = params;
-		this.cases = new InjectionCase<?>[params.length];
-		this.dynamics = new int[params.length];
+		this.params = args;
+		this.cases = new InjectionCase<?>[args.length];
+		this.dynamics = new int[args.length];
 		this.args = initNonDynamicParameters(injector);
 	}
 
 	public Object[] args(Injector injector) throws UnresolvableDependency {
-		if (dynamicsLength == 0) {
+		if (dynamicsLength == 0)
 			return args;
-		}
 		// in this case we have to copy to become thread-safe!
 		Object[] args = this.args.clone();
 		for (int j = 0; j < dynamicsLength; j++) {
 			int i = dynamics[j];
-			BoundParameter<?> p = params[i];
-			switch (p.type) {
-			case INSTANCE:
+			Argument<?> p = params[i];
+			switch (p.resolution) {
+			case SIMPLE:
 				args[i] = instance(cases[i],
-						site.instanced(params[i].instance));
+						site.instanced(params[i].reference));
 				break;
 			default:
-			case EXTERNAL:
+			case HIERARCHICAL:
 				args[i] = supply(p, site, injector);
 			}
 		}
@@ -66,39 +65,40 @@ public final class InjectionSite {
 		dynamicsLength = 0;
 		for (int i = 0; i < cases.length; i++) {
 			args[i] = null;
-			BoundParameter<?> p = params[i];
-			if (p.type == ParameterType.INSTANCE
+			Argument<?> p = params[i];
+			if (p.resolution == ParameterResolution.SIMPLE
 				&& p.type().arrayDimensions() == 1) {
 				// in this case there is no single spec, the injector composes
 				// the result array from multiple specs
+				//TODO move this to construction time: there is no InjectionCase that can be cached
 				p = p.external();
 				params[i] = p;
 			}
-			switch (p.type) {
-			case INSTANCE:
+			switch (p.resolution) {
+			case SIMPLE:
 				Dependency<? extends InjectionCase<?>> caseDep = site.typed(
-						injectionCaseTypeFor(p.instance.type)).named(
-								p.instance.name);
+						injectionCaseTypeFor(p.reference.type)).named(
+								p.reference.name);
 				InjectionCase<?> icase = injector.resolve(caseDep);
 				if (icase.scoping.isStableByDesign()) {
-					args[i] = instance(icase, site.instanced(p.instance));
+					args[i] = instance(icase, site.instanced(p.reference));
 				} else {
 					dynamics[dynamicsLength++] = i;
 					cases[i] = icase;
 				}
 				break;
-			case CONSTANT:
-				args[i] = p.value;
+			case NEVER:
+				args[i] = p.constant;
 				break;
 			default:
-			case EXTERNAL:
+			case HIERARCHICAL:
 				dynamics[dynamicsLength++] = i;
 			}
 		}
 		return args;
 	}
 
-	private static <T> T supply(BoundParameter<T> p, Dependency<?> dep,
+	private static <T> T supply(Argument<T> p, Dependency<?> dep,
 			Injector injector) {
 		return p.supplier.supply(dep.instanced(anyOf(p.type())), injector);
 	}

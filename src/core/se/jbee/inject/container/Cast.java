@@ -19,10 +19,6 @@ import se.jbee.inject.Type;
 /**
  * Utility to get rid of warnings for known generic {@link Type}s.
  * 
- * <b>Implementation Note:</b> storing the the raw type in a var before
- * returning the generic type is a workaround to make this compile with javac
- * (cast works with javaw).
- * 
  * @author Jan Bernitt (jan@jbee.se)
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -64,14 +60,6 @@ public final class Cast {
 
 	public static <T> Type<Provider<T>> providerTypeOf(Type<T> providedType) {
 		return (Type) raw(Provider.class).parametized(providedType);
-	}
-
-	public static <T> Type<Factory<T>> factoryTypeOf(Class<T> providedType) {
-		return factoryTypeOf(raw(providedType));
-	}
-
-	public static <T> Type<Factory<T>> factoryTypeOf(Type<T> providedType) {
-		return (Type) raw(Factory.class).parametized(providedType);
 	}
 
 	public static <T> Type<Generator<T>> generatorTypeOf(Type<T> providedType) {

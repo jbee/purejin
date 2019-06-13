@@ -5,9 +5,9 @@
  */
 package se.jbee.inject.action;
 
-public class ActionMalfunction extends RuntimeException {
+public class ActionExecutionFailed extends RuntimeException {
 
-	public ActionMalfunction(String message, Throwable cause) {
+	public ActionExecutionFailed(String message, Throwable cause) {
 		super(message + ": " + cause.getMessage(), cause);
 	}
 

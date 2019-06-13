@@ -113,7 +113,7 @@ public class TestServiceInvocationBinds {
 		int afterExceptionCount = inv.afterExceptionCount;
 		try {
 			fail.exec("Foo");
-		} catch (ActionMalfunction e) {
+		} catch (ActionExecutionFailed e) {
 			assertTrue(e.getCause() instanceof IllegalStateException);
 			assertEquals(e.getCause().getMessage(), "Foo");
 			assertEquals(afterExceptionCount + 1, inv.afterExceptionCount);
@@ -140,19 +140,19 @@ public class TestServiceInvocationBinds {
 
 		@Override
 		public <I, O> O exec(ActionSite<I, O> site, Object[] args, I value)
-				throws ActionMalfunction {
+				throws ActionExecutionFailed {
 			Object[] state = before(site.output, site.input, value);
 			O res;
 			try {
 				res = site.output.rawType.cast(
-						Supply.produce(site.action, site.impl, args));
+						Supply.produce(site.action, site.owner, args));
 			} catch (SupplyFailed e) {
 				Exception ex = e;
 				if (e.getCause() instanceof Exception) {
 					ex = (Exception) e.getCause();
 				}
 				afterException(site.output, site.input, value, ex, state);
-				throw new ActionMalfunction(
+				throw new ActionExecutionFailed(
 						site.action.getDeclaringClass().getSimpleName() + "#"
 							+ site.action.getName() + " failed: "
 							+ ex.getMessage(),

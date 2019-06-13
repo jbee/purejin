@@ -38,13 +38,12 @@ import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bootstrap.Binding;
 import se.jbee.inject.bootstrap.BindingType;
 import se.jbee.inject.bootstrap.Bindings;
-import se.jbee.inject.bootstrap.BoundConstant;
-import se.jbee.inject.bootstrap.BoundConstructor;
-import se.jbee.inject.bootstrap.BoundMethod;
+import se.jbee.inject.bootstrap.Constant;
+import se.jbee.inject.bootstrap.Factory;
+import se.jbee.inject.bootstrap.New;
 import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.config.Config;
 import se.jbee.inject.config.Mirrors;
-import se.jbee.inject.container.Factory;
 import se.jbee.inject.container.Initialiser;
 import se.jbee.inject.container.Supplier;
 
@@ -321,31 +320,31 @@ public class Binder {
 			in(service, new Parameter<?>[0]);
 		}
 
-		public void in(Object service, Parameter<?>... params) {
-			bindMirrorMethodsIn(service.getClass(), service, params);
+		public void in(Object service, Parameter<?>... hints) {
+			bindMirrorMethodsIn(service.getClass(), service, hints);
 		}
 
-		public void in(Class<?> service, Parameter<?>... params) {
+		public void in(Class<?> service, Parameter<?>... hints) {
 			boolean boundInstanceMethods = bindMirrorMethodsIn(service, null,
-					params);
+					hints);
 			if (!boundInstanceMethods)
 				return; // do not try to construct the class
-			Constructor<?> c = mirrors().construction.reflect(service);
-			if (c != null)
-				bind(c, params);
+			Constructor<?> target = mirrors().construction.reflect(service);
+			if (target != null)
+				bind(target, hints);
 		}
 
 		private boolean bindMirrorMethodsIn(Class<?> impl, Object instance,
-				Parameter<?>[] params) {
+				Parameter<?>[] hints) {
 			boolean instanceMethods = false;
 			for (Method method : mirrors().production.reflect(impl)) {
-				Type<?> returnType = Type.returnType(method);
-				if (returnType.rawType != void.class
-					&& returnType.rawType != Void.class) {
-					if (params.length == 0)
-						params = mirrors().parameterisation.reflect(method);
-					binder.bind(mirrors().naming.reflect(method),
-							returnType).to(instance, method, params);
+				Type<?> returns = Type.returnType(method);
+				if (returns.rawType != void.class
+					&& returns.rawType != Void.class) {
+					if (hints.length == 0)
+						hints = mirrors().parameterisation.reflect(method);
+					binder.bind(mirrors().naming.reflect(method), returns).to(
+							instance, method, hints);
 					instanceMethods = instanceMethods
 						|| !Modifier.isStatic(method.getModifiers());
 				}
@@ -353,16 +352,16 @@ public class Binder {
 			return instanceMethods;
 		}
 
-		private <T> void bind(Constructor<T> c, Parameter<?>... params) {
-			Name name = mirrors().naming.reflect(c);
-			if (params.length == 0)
-				params = mirrors().parameterisation.reflect(c);
-			Class<T> impl = c.getDeclaringClass();
+		private <T> void bind(Constructor<T> target, Parameter<?>... hints) {
+			Name name = mirrors().naming.reflect(target);
+			if (hints.length == 0)
+				hints = mirrors().parameterisation.reflect(target);
+			Class<T> impl = target.getDeclaringClass();
 			Binder appBinder = binder.root.per(Scope.application).implicit();
 			if (name.isDefault()) {
-				appBinder.autobind(impl).to(c, params);
+				appBinder.autobind(impl).to(target, hints);
 			} else {
-				appBinder.bind(name, impl).to(c, params);
+				appBinder.bind(name, impl).to(target, hints);
 				for (Type<? super T> st : Type.raw(impl).supertypes()) {
 					if (st.isInterface()) {
 						appBinder.implicit().bind(name, st).to(name, impl);
@@ -413,10 +412,8 @@ public class Binder {
 		// OPEN also allow naming for provided instances - this is used for
 		// value objects that become parameter
 
-		public <T> void provide(Class<T> implementation,
-				Parameter<?>... parameters) {
-			on(bind().asProvided()).bind(implementation).toConstructor(
-					parameters);
+		public <T> void provide(Class<T> impl, Parameter<?>... hints) {
+			on(bind().asProvided()).bind(impl).toConstructor(hints);
 		}
 
 		public <T> void require(Class<T> dependency) {
@@ -557,15 +554,13 @@ public class Binder {
 			to(Instance.anyOf(raw(impl)));
 		}
 
-		public void to(Constructor<? extends T> constructor,
-				Parameter<?>... parameters) {
-			expand(BoundConstructor.bind(constructor, parameters));
+		public void to(Constructor<? extends T> target, Parameter<?>... hints) {
+			expand(New.bind(target, hints));
 		}
 
-		protected final void to(Object instance, Method method,
-				Parameter<?>[] parameters) {
-			expand(BoundMethod.bind(instance, method, Type.returnType(method),
-					parameters));
+		protected final void to(Object owner, Method target,
+				Parameter<?>... hints) {
+			expand(Factory.bind(owner, target, hints));
 		}
 
 		protected final void expand(Object value) {
@@ -584,10 +579,6 @@ public class Binder {
 			bindings.macros.expandInto(bindings, binding, value);
 		}
 
-		public void to(Factory<? extends T> factory) {
-			toSupplier(Supply.factory(factory));
-		}
-
 		public void toSupplier(Supplier<? extends T> supplier) {
 			to(supplier, BindingType.PREDEFINED);
 		}
@@ -595,15 +586,15 @@ public class Binder {
 		/**
 		 * @since 19.1
 		 */
-		public void to(java.util.function.Supplier<? extends T> method) {
-			toSupplier((Dependency<? super T> d, Injector i) -> method.get());
+		public void toGenerator(Generator<? extends T> generator) {
+			toSupplier(new SupplierGeneratorBridge<>(generator));
 		}
 
 		/**
 		 * @since 19.1
 		 */
-		public void toGenerator(Generator<? extends T> generator) {
-			toSupplier(new SupplierGeneratorBridge<>(generator));
+		public void to(java.util.function.Supplier<? extends T> method) {
+			toSupplier((Dependency<? super T> d, Injector i) -> method.get());
 		}
 
 		public final void to(T constant) {
@@ -622,9 +613,8 @@ public class Binder {
 		@SafeVarargs
 		public final void to(T constant1, T... constants) {
 			TypedBinder<T> multibinder = onMulti().toConstant(constant1);
-			for (int i = 0; i < constants.length; i++) {
+			for (int i = 0; i < constants.length; i++)
 				multibinder.toConstant(constants[i]);
-			}
 		}
 
 		public void toConstructor() {
@@ -632,15 +622,14 @@ public class Binder {
 		}
 
 		public void toConstructor(Class<? extends T> impl,
-				Parameter<?>... params) {
+				Parameter<?>... hints) {
 			if (isClassVirtual(impl))
-				throw new InconsistentBinding(
-						"Not a constructable type: " + impl);
-			to(mirrors().construction.reflect(impl), params);
+				throw InconsistentBinding.notConstructible(impl);
+			to(mirrors().construction.reflect(impl), hints);
 		}
 
-		public void toConstructor(Parameter<?>... params) {
-			toConstructor(getType().rawType, params);
+		public void toConstructor(Parameter<?>... hints) {
+			toConstructor(getType().rawType, hints);
 		}
 
 		public <I extends T> void to(Name name, Class<I> type) {
@@ -670,7 +659,7 @@ public class Binder {
 		}
 
 		private TypedBinder<T> toConstant(T constant) {
-			expand(new BoundConstant<>(constant));
+			expand(new Constant<>(constant));
 			return this;
 		}
 
@@ -714,29 +703,28 @@ public class Binder {
 			super(bind.asMulti().next(), instance);
 		}
 
-		public void toElements(Parameter<? extends E> p1) {
-			expandElements(p1);
+		public void toElements(Parameter<? extends E> elem1) {
+			expandElements(elem1);
 		}
 
-		public void toElements(Parameter<? extends E> p1,
-				Parameter<? extends E> p2) {
-			expandElements(p1, p2);
+		public void toElements(Parameter<? extends E> elem1,
+				Parameter<? extends E> elem2) {
+			expandElements(elem1, elem2);
 		}
 
-		public void toElements(Parameter<? extends E> p1,
-				Parameter<? extends E> p2, Parameter<? extends E> p3) {
-			expandElements(p1, p2, p3);
-		}
-
-		@SafeVarargs
-		public final void toElements(Parameter<? extends E>... parameters) {
-			expand(parameters);
+		public void toElements(Parameter<? extends E> elem1,
+				Parameter<? extends E> elem2, Parameter<? extends E> elem3) {
+			expandElements(elem1, elem2, elem3);
 		}
 
 		@SafeVarargs
-		private final void expandElements(
-				Parameter<? extends E>... parameters) {
-			expand(parameters);
+		public final void toElements(Parameter<? extends E>... elems) {
+			expand(elems);
+		}
+
+		@SafeVarargs
+		private final void expandElements(Parameter<? extends E>... hints) {
+			expand(hints);
 		}
 
 		public void toElements(E c1) {

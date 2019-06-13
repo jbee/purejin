@@ -117,12 +117,12 @@ public final class Container {
 			for (int i = 0; i < injectees.length; i++) {
 				@SuppressWarnings("unchecked")
 				Injectee<T> injectee = (Injectee<T>) injectees[i];
-				Name scope = injectee.scope();
+				Name scope = injectee.scope;
 				Scoping scoping = scopingOf(scope);
-				Resource<T> resource = injectee.resource();
+				Resource<T> resource = injectee.resource;
 				Generator<T> gen = generator(i, injectee, scope, scoping,
 						resource);
-				cases[i] = new InjectionCase<>(i, injectee.source(), scoping,
+				cases[i] = new InjectionCase<>(i, injectee.source, scoping,
 						resource, gen);
 			}
 			Arrays.sort(cases);
@@ -148,7 +148,7 @@ public final class Container {
 		@SuppressWarnings("unchecked")
 		private <T> Generator<T> generator(int serialID, Injectee<T> injectee,
 				Name scope, Scoping scoping, Resource<T> resource) {
-			Supplier<? extends T> supplier = injectee.supplier();
+			Supplier<? extends T> supplier = injectee.supplier;
 			if (Generator.class.isAssignableFrom(supplier.getClass()))
 				return (Generator<T>) supplier;
 			if (Scope.class.isAssignableFrom(resource.type().rawType)
@@ -379,8 +379,8 @@ public final class Container {
 			this.serialID = serialID;
 			this.injector = injector;
 			this.scoping = scoping;
-			this.supplier = injectee.supplier();
-			this.resource = injectee.resource();
+			this.supplier = injectee.supplier;
+			this.resource = injectee.resource;
 		}
 
 		@Override

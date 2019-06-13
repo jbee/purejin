@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
@@ -31,8 +31,14 @@ import se.jbee.inject.container.Supplier;
  * 
  * This makes the binder API independent of specific {@link Supplier}s. So even
  * if one uses <code>bind(...).toConstructor()</code> the actual
- * {@link Supplier} used is a result of macro expansion what allows to customize
+ * {@link Supplier} used is a result of macro expansion what allows to customise
  * behaviour but sill use the binder API as is.
+ * 
+ * The most important {@link Macro} is the one bound for {@link Binding} itself.
+ * It is its task to actually do {@link Bindings#add(Binding)}. All other
+ * {@link Macro}s should use {@link Bindings#addExpanded(Binding)} (called with
+ * a {@link Binding} value) so that any meta-expansion can be taken care of in
+ * the {@link Macro} bound for {@link Binding}.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  * 

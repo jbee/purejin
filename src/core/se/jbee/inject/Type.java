@@ -384,32 +384,31 @@ public final class Type<T>
 		return name(true);
 	}
 
-	void toString(StringBuilder b, boolean canonicalName) {
+	void toString(StringBuilder str, boolean canonicalName) {
 		if (isUpperBound()) {
 			if (rawType == Object.class) {
-				b.append("?");
+				str.append("?");
 				return;
 			}
-			b.append("? extends ");
+			str.append("? extends ");
 		}
 		String name = canonicalName
 			? rawType.getCanonicalName()
 			: rawType.getSimpleName();
-		b.append(rawType.isArray()
+		str.append(rawType.isArray()
 			? name.substring(0, name.indexOf('['))
 			: name);
 		if (isParameterized()) {
-			b.append('<');
-			params[0].toString(b, canonicalName);
+			str.append('<');
+			params[0].toString(str, canonicalName);
 			for (int i = 1; i < params.length; i++) {
-				b.append(',');
-				params[i].toString(b, canonicalName);
+				str.append(',');
+				params[i].toString(str, canonicalName);
 			}
-			b.append('>');
+			str.append('>');
 		}
-		if (rawType.isArray()) {
-			b.append(name.substring(name.indexOf('[')));
-		}
+		if (rawType.isArray())
+			str.append(name.substring(name.indexOf('[')));
 	}
 
 	public String simpleName() {
@@ -417,9 +416,9 @@ public final class Type<T>
 	}
 
 	private String name(boolean canonicalName) {
-		StringBuilder b = new StringBuilder();
-		toString(b, canonicalName);
-		return b.toString();
+		StringBuilder str = new StringBuilder();
+		toString(str, canonicalName);
+		return str.toString();
 	}
 
 	private void checkTypeParameters(Type<?>... params) {
@@ -454,7 +453,7 @@ public final class Type<T>
 		Type<? extends S> res = (Type<? extends S>) arrayFindFirst(
 				type.supertypes(), s -> s.rawType == supertype);
 		if (res == null)
-			throw new IllegalArgumentException("`" + supertype
+			throw new ClassCastException("`" + supertype
 				+ "` is not a supertype of: `" + type + "`");
 		return res;
 	}

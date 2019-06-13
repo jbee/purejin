@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.BoundParameter;
+import se.jbee.inject.bootstrap.Argument;
 import se.jbee.inject.config.Globals;
 import se.jbee.inject.config.Options;
 
@@ -37,9 +37,9 @@ public class TestExample1Binds {
 		@Override
 		protected void declare(Properties properties) {
 			bind(MyClass.class).toConstructor(
-					BoundParameter.constant(String.class,
+					Argument.constant(String.class,
 							properties.getProperty("x")),
-					BoundParameter.constant(Integer.class,
+					Argument.constant(Integer.class,
 							(Integer) properties.get("y")));
 		}
 	}

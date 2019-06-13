@@ -25,10 +25,10 @@ public interface Executor {
 	 * 
 	 * @param args all resolved arguments for the method (in order)
 	 * @param value provided (also one of the arguments)
-	 * @throws ActionMalfunction in case of any {@link Exception} during
+	 * @throws ActionExecutionFailed in case of any {@link Exception} during
 	 *             execution. The cause should be the exception causing the
 	 *             problem, not another wrapper like {@link SupplyFailed}.
 	 */
 	<I, O> O exec(ActionSite<I, O> site, Object[] args, I value)
-			throws ActionMalfunction;
+			throws ActionExecutionFailed;
 }

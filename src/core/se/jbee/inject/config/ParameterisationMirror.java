@@ -5,7 +5,7 @@
  */
 package se.jbee.inject.config;
 
-import static se.jbee.inject.InconsistentBinding.noSuchAnnotationProperty;
+import static se.jbee.inject.InconsistentBinding.annotationLacksProperty;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.parameterTypes;
@@ -53,7 +53,7 @@ public interface ParameterisationMirror {
 			return this;
 		Method nameProperty = annotationPropertyByType(String.class, naming);
 		if (nameProperty == null)
-			throw noSuchAnnotationProperty(String.class, naming);
+			throw annotationLacksProperty(String.class, naming);
 		return obj -> {
 			Annotation[][] ais = obj.getParameterAnnotations();
 			Type<?>[] tis = parameterTypes(obj);

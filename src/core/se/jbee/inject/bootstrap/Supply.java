@@ -9,7 +9,7 @@ import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Type.parameterTypes;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.newArray;
-import static se.jbee.inject.bootstrap.BoundParameter.bind;
+import static se.jbee.inject.bootstrap.Argument.bind;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -29,7 +29,6 @@ import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.NoCaseForDependency;
 import se.jbee.inject.UnresolvableDependency.SupplyFailed;
-import se.jbee.inject.container.Factory;
 import se.jbee.inject.container.Supplier;
 
 /**
@@ -42,7 +41,7 @@ public final class Supply {
 	public static final Supplier<Provider<?>> PROVIDER_BRIDGE = new ProviderSupplierBridge();
 	public static final Supplier<List<?>> LIST_BRIDGE = new ArrayToListBridge();
 	public static final Supplier<Set<?>> SET_BRIDGE = new ArrayToSetBridge();
-	public static final Factory<Logger> LOGGER = new LoggerFactory();
+	public static final Supplier<Logger> LOGGER = new LoggerSupplier();
 
 	private static final Supplier<?> REQUIRED = new RequiredSupplier<>();
 
@@ -70,7 +69,7 @@ public final class Supply {
 	public static <E> Supplier<E[]> elements(Type<E[]> arrayType,
 			Parameter<? extends E>[] elements) {
 		return new PredefinedArraySupplier<>(arrayType,
-				BoundParameter.bind(elements));
+				Argument.bind(elements));
 	}
 
 	public static <T> Supplier<T> instance(Instance<T> instance) {
@@ -85,19 +84,14 @@ public final class Supply {
 		return new LazyParametrizedInstance<>(instance);
 	}
 
-	public static <T> Supplier<T> method(BoundMethod<T> method) {
+	public static <T> Supplier<T> method(Factory<T> method) {
 		return new MethodSupplier<>(method,
-				bind(parameterTypes(method.producer), method.parameters));
+				bind(parameterTypes(method.target), method.hints));
 	}
 
-	public static <T> Supplier<T> constructor(BoundConstructor<T> constructor) {
-		return new ConstructorSupplier<>(constructor.constructor,
-				bind(parameterTypes(constructor.constructor),
-						constructor.parameters));
-	}
-
-	public static <T> Supplier<T> factory(Factory<T> factory) {
-		return new FactorySupplierBridge<>(factory);
+	public static <T> Supplier<T> constructor(New<T> constructor) {
+		return new ConstructorSupplier<>(constructor.target,
+				bind(parameterTypes(constructor.target), constructor.hints));
 	}
 
 	public static <T> Provider<T> lazyProvider(Dependency<T> dependency,
@@ -222,7 +216,7 @@ public final class Supply {
 
 		@SuppressWarnings("unchecked")
 		PredefinedArraySupplier(Type<E[]> arrayType,
-				BoundParameter<? extends E>[] elements) {
+				Argument<? extends E>[] elements) {
 			super(elements);
 			this.arrayType = arrayType;
 			this.res = (E[]) newArray(arrayType.baseType().rawType,
@@ -356,10 +350,10 @@ public final class Supply {
 		private final InjectionCase<? extends T> icase;
 
 		@SuppressWarnings("unchecked")
-		LazyPreresolvedProvider(Dependency<T> dependency, Injector injector) {
-			this.dependency = dependency;
-			this.icase = injector.resolve(dependency.typed(
-					raw(InjectionCase.class).parametized(dependency.type())));
+		LazyPreresolvedProvider(Dependency<T> dep, Injector injector) {
+			this.dependency = dep;
+			this.icase = injector.resolve(dep.typed(
+					raw(InjectionCase.class).parametized(dep.type())));
 		}
 
 		@Override
@@ -373,39 +367,14 @@ public final class Supply {
 		}
 	}
 
-	/**
-	 * Adapter to a simpler API that will not need any {@link Injector} to
-	 * supply it's value in any case.
-	 */
-	private static final class FactorySupplierBridge<T> implements Supplier<T> {
-
-		private final Factory<T> factory;
-
-		FactorySupplierBridge(Factory<T> factory) {
-			this.factory = factory;
-		}
-
-		@Override
-		public T supply(Dependency<? super T> dep, Injector context) {
-			return factory.fabricate(dep.instance, dep.target(1));
-		}
-
-		@Override
-		public String toString() {
-			return describe(SUPPLIES, factory);
-		}
-
-	}
-
 	private static final class ConstructorSupplier<T>
 			extends WithParameters<T> {
 
-		private final Constructor<T> constructor;
+		private final Constructor<T> target;
 
-		ConstructorSupplier(Constructor<T> constructor,
-				BoundParameter<?>[] params) {
+		ConstructorSupplier(Constructor<T> target, Argument<?>[] params) {
 			super(params);
-			this.constructor = constructor;
+			this.target = target;
 		}
 
 		@Override
@@ -415,45 +384,44 @@ public final class Supply {
 
 		@Override
 		protected T invoke(Object[] args) {
-			return Supply.construct(constructor, args);
+			return Supply.construct(target, args);
 		}
 
 		@Override
 		public String toString() {
-			return describe(constructor);
+			return describe(target);
 		}
 	}
 
 	private static final class MethodSupplier<T> extends WithParameters<T> {
 
-		private final BoundMethod<T> method;
 		private Object owner;
-		private final Class<T> returnType;
+		private final Factory<T> method;
+		private final Class<T> returns;
 
-		MethodSupplier(BoundMethod<T> method, BoundParameter<?>[] parameters) {
+		MethodSupplier(Factory<T> method, Argument<?>[] parameters) {
 			super(parameters);
 			this.method = method;
-			this.returnType = method.returnType.rawType;
-			this.owner = method.instance;
+			this.returns = method.returns.rawType;
+			this.owner = method.owner;
 		}
 
 		@Override
 		protected void init(Dependency<? super T> dependency,
 				Injector injector) {
 			if (method.isInstanceMethod && owner == null) {
-				owner = injector.resolve(method.producer.getDeclaringClass());
+				owner = injector.resolve(method.target.getDeclaringClass());
 			}
 		}
 
 		@Override
 		protected T invoke(Object[] args) {
-			return returnType.cast(
-					Supply.produce(method.producer, owner, args));
+			return returns.cast(Supply.produce(method.target, owner, args));
 		}
 
 		@Override
 		public String toString() {
-			return describe(method.producer);
+			return describe(method.target);
 		}
 	}
 
@@ -481,16 +449,16 @@ public final class Supply {
 		}
 	}
 
-	private static class LoggerFactory implements Factory<Logger> {
+	private static class LoggerSupplier implements Supplier<Logger> {
 
-		LoggerFactory() {
+		LoggerSupplier() {
 			// make visible
 		}
 
 		@Override
-		public <P> Logger fabricate(Instance<? super Logger> created,
-				Instance<P> receiver) {
-			return Logger.getLogger(receiver.type().rawType.getCanonicalName());
+		public Logger supply(Dependency<? super Logger> dep, Injector context) {
+			return Logger.getLogger(
+					dep.target(1).type().rawType.getCanonicalName());
 		}
 
 	}
@@ -509,16 +477,16 @@ public final class Supply {
 
 	public abstract static class WithParameters<T> implements Supplier<T> {
 
-		private final BoundParameter<?>[] params;
+		private final Argument<?>[] params;
 
 		private InjectionSite previous;
 
-		WithParameters(BoundParameter<?>[] params) {
+		WithParameters(Argument<?>[] params) {
 			this.params = params;
 
 		}
 
-		protected abstract void init(Dependency<? super T> dependency,
+		protected abstract void init(Dependency<? super T> dep,
 				Injector injector);
 
 		protected abstract T invoke(Object[] args);
@@ -526,16 +494,15 @@ public final class Supply {
 		@Override
 		public T supply(Dependency<? super T> dep, Injector context)
 				throws UnresolvableDependency {
-			InjectionSite local = previous; // this is important so previous
-											// might work as a simple cache but
-											// never causes trouble for this
-											// invocation in face of multiple
-											// threads calling
+			// this is important so previous might work as a simple cache but
+			// never causes trouble for this invocation in face of multiple
+			// threads calling
+			InjectionSite local = previous;
 			if (local == null) {
 				init(dep, context);
 			}
 			if (local == null || !local.site.equalTo(dep)) {
-				local = new InjectionSite(dep, context, params);
+				local = new InjectionSite(context, dep, params);
 				previous = local;
 			}
 			return invoke(local.args(context));
@@ -543,21 +510,21 @@ public final class Supply {
 
 	}
 
-	public static <T> T construct(Constructor<T> constructor, Object... args)
+	public static <T> T construct(Constructor<T> target, Object... args)
 			throws SupplyFailed {
 		try {
-			return constructor.newInstance(args);
+			return target.newInstance(args);
 		} catch (Exception e) {
-			throw SupplyFailed.valueOf(e, constructor);
+			throw SupplyFailed.valueOf(e, target);
 		}
 	}
 
-	public static Object produce(Method method, Object owner, Object... args)
+	public static Object produce(Method target, Object owner, Object... args)
 			throws SupplyFailed {
 		try {
-			return method.invoke(owner, args);
+			return target.invoke(owner, args);
 		} catch (Exception e) {
-			throw SupplyFailed.valueOf(e, method);
+			throw SupplyFailed.valueOf(e, target);
 		}
 	}
 }

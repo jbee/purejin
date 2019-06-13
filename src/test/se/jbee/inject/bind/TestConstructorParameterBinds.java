@@ -5,8 +5,8 @@ import static org.junit.Assert.assertNotNull;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.bootstrap.BoundParameter.asType;
-import static se.jbee.inject.bootstrap.BoundParameter.constant;
+import static se.jbee.inject.bootstrap.Argument.asType;
+import static se.jbee.inject.bootstrap.Argument.constant;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
@@ -14,12 +14,13 @@ import java.lang.reflect.Constructor;
 import org.junit.Test;
 
 import se.jbee.inject.Dependency;
+import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Scope;
+import se.jbee.inject.bootstrap.Argument;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.BoundParameter;
 import se.jbee.inject.container.Supplier;
 
 /**
@@ -118,7 +119,7 @@ public class TestConstructorParameterBinds {
 			bind(Qux.class).toConstructor(asType(CharSequence.class, y),
 					constant(Number.class, 1980));
 			per(Scope.injection).bind(named("inc"), Foo.class).toConstructor(
-					BoundParameter.supplier(raw(Integer.class),
+					Argument.supplier(raw(Integer.class),
 							new IncrementingSupplier()));
 		}
 	}
@@ -153,9 +154,9 @@ public class TestConstructorParameterBinds {
 	}
 
 	/**
-	 * We can see that {@link BoundParameter#asType(Class, Parameter)} works
-	 * because the instance y would also been assignable to the 1st parameter of
-	 * type {@link Serializable} (in {@link Qux}) but since we typed it as a
+	 * We can see that {@link Argument#asType(Class, Parameter)} works because
+	 * the instance y would also been assignable to the 1st parameter of type
+	 * {@link Serializable} (in {@link Qux}) but since we typed it as a
 	 * {@link CharSequence} it no longer is assignable to 1st argument and will
 	 * be used as 2nd argument where the as well {@link Serializable}
 	 * {@link Number} constant used as 2nd {@link Parameter} is used for as the
@@ -183,7 +184,7 @@ public class TestConstructorParameterBinds {
 		assertEquals("when x alignment after another is broken", "y", baz.bar);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = InconsistentBinding.class)
 	public void thatParametersNotArrangedThrowsException() {
 		Bootstrap.injector(FaultyParameterConstructorBindsModule.class);
 	}

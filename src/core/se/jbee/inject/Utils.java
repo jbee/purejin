@@ -50,6 +50,8 @@ public final class Utils {
 
 	/* Arrays */
 
+	//TODO an arrayInit where two arrays of same length are passed, one being the target of a transformation of the first elements
+
 	public static <A> A[] arrayFilter(A[] arr, Predicate<A> accept) {
 		if (arr == null || arr.length == 0)
 			return arr;

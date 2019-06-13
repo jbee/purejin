@@ -30,6 +30,7 @@ v19.1 (upcoming)
 - `Inspector` split in (and replaced by) `*Mirror` functional interfaces
 - `InspectorBinder` replaced by `AutoBinder` and `autobind()` (no args)
 - `Bindings` are created via `newBindings` and modified using the `with` methods
+- removed class `se.jbee.inject.container.Factory` (use `Supplier`)
 - renamed class `Inject` to `Container`
 - renamed class `Typecast` to `Cast`
 - renamed class `Assembly` to `Injectee`
@@ -39,6 +40,11 @@ v19.1 (upcoming)
 - renamed class `OpttionBootstrapper` to `ChoiceBootstrapper`
 - renamed class `PresetModule` to `ModuleWith`
 - renamed class `NoResourceForDependency` to `NoCaseForDependency`
+- renamed class `BoundParameter` to `Argument`
+- renamed class `BoundConstructor` to `New`
+- renamed class `BoundMethod` to `Factory`
+- renamed class `BoundConstant` to `Constant`
+- renamed class `ActionMalfunction` to `ActionExecutionFailed`
 - renamed class and method `MorePreciseThan#morePreciseThan` to `Qualifying#moreQualiedThan`
 - redesign of `Injectron`/`InjectronInfo` to `Generator` and `InjectionCase`
 - renamed field `Injection#expiry` to `Injection#scoping`

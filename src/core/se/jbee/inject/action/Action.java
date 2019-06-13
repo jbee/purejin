@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.action;
@@ -25,8 +25,9 @@ public interface Action<I, O> {
 	 * @param input might be null for {@link Void} arguments or when argument
 	 *            was resolved to null
 	 * @return might be null
-	 * @throws ActionMalfunction wraps all {@link RuntimeException}s
+	 * @throws ActionExecutionFailed wraps all {@link Exception}s thrown by the
+	 *             underlying method.
 	 */
-	O exec(I input) throws ActionMalfunction;
+	O exec(I input) throws ActionExecutionFailed;
 
 }

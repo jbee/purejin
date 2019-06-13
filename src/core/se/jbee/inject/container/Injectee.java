@@ -24,7 +24,7 @@ import se.jbee.inject.Source;
  * Each {@link Injectee} becomes an {@link InjectionCase} and {@link Generator}
  * within the {@link Injector} (1:1 relation).
  * 
- * The interface is mainly introduced to decouple the everything on top of the
+ * The class is mainly introduced to decouple the everything on top of the
  * container module (which is the core) from the container implementation
  * itself. In the concrete case the bootstrap package should only depend on the
  * container but not vice versa. This also allows to build custom bootstrapping
@@ -35,14 +35,23 @@ import se.jbee.inject.Source;
  * 
  * @param <T> Type of instances assembled.
  */
-public interface Injectee<T> {
+public class Injectee<T> {
 
-	Source source();
+	public final Name scope;
+	public final Resource<T> resource;
+	public final Supplier<? extends T> supplier;
+	public final Source source;
 
-	Name scope();
+	public Injectee(Name scope, Resource<T> resource,
+			Supplier<? extends T> supplier, Source source) {
+		this.scope = scope;
+		this.resource = resource;
+		this.supplier = supplier;
+		this.source = source;
+	}
 
-	Resource<T> resource();
-
-	Supplier<? extends T> supplier();
-
+	@Override
+	public String toString() {
+		return resource + " / " + scope + " / " + source;
+	}
 }

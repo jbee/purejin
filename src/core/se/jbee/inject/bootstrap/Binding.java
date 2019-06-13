@@ -34,47 +34,20 @@ import se.jbee.inject.container.Supplier;
  *
  * @param <T> The type of the bound value (instance)
  */
-public final class Binding<T>
-		implements Comparable<Binding<?>>, Injectee<T>, Module, Typed<T> {
+public final class Binding<T> extends Injectee<T>
+		implements Comparable<Binding<?>>, Module, Typed<T> {
 
 	public static <T> Binding<T> binding(Resource<T> resource, BindingType type,
 			Supplier<? extends T> supplier, Name scope, Source source) {
 		return new Binding<>(resource, type, supplier, scope, source);
 	}
 
-	public final Resource<T> resource;
 	public final BindingType type;
-	public final Supplier<? extends T> supplier;
-	public final Name scope;
-	public final Source source;
 
 	private Binding(Resource<T> resource, BindingType type,
 			Supplier<? extends T> supplier, Name scope, Source source) {
-		this.resource = resource;
+		super(scope, resource, supplier, source);
 		this.type = type;
-		this.supplier = supplier;
-		this.scope = scope;
-		this.source = source;
-	}
-
-	@Override
-	public Resource<T> resource() {
-		return resource;
-	}
-
-	@Override
-	public Name scope() {
-		return scope;
-	}
-
-	@Override
-	public Source source() {
-		return source;
-	}
-
-	@Override
-	public Supplier<? extends T> supplier() {
-		return supplier;
 	}
 
 	@Override
@@ -95,6 +68,8 @@ public final class Binding<T>
 
 	public Binding<T> complete(BindingType type,
 			Supplier<? extends T> supplier) {
+		if (type == BindingType.MACRO)
+			throw InconsistentBinding.illegalCompletion(this, type);
 		return new Binding<>(resource, type, supplier, scope, source);
 	}
 
@@ -135,19 +110,13 @@ public final class Binding<T>
 		return -1; // keep order
 	}
 
-	@Override
-	public String toString() {
-		return resource + " / " + scope + " / " + source;
-	}
-
 	/**
 	 * Removes those bindings that are ambiguous but also do not clash because
 	 * of different {@link DeclarationType}s that replace each other.
 	 */
 	public static Binding<?>[] disambiguate(Binding<?>[] bindings) {
-		if (bindings.length <= 1) {
+		if (bindings.length <= 1)
 			return bindings;
-		}
 		List<Binding<?>> uniques = new ArrayList<>(bindings.length);
 		Arrays.sort(bindings);
 		uniques.add(bindings[0]);
@@ -161,16 +130,13 @@ public final class Binding<T>
 					current.resource);
 			DeclarationType uType = lastUnique.source.declarationType;
 			DeclarationType curType = current.source.declarationType;
-			if (equalResource && uType.clashesWith(curType)) {
-				throw new InconsistentBinding(
-						"Duplicate binds:\n" + lastUnique + "\n" + current);
-			}
+			if (equalResource && uType.clashesWith(curType))
+				throw InconsistentBinding.clash(lastUnique, current);
 			if (curType == DeclarationType.REQUIRED) {
 				required.add(current.resource.type());
 			} else if (equalResource && uType.droppedWith(curType)) {
-				if (i - 1 == lastUniqueIndex) {
+				if (i - 1 == lastUniqueIndex)
 					dropped.add(uniques.remove(uniques.size() - 1));
-				}
 				dropped.add(current);
 			} else if (!equalResource || !curType.replacedBy(uType)) {
 				uniques.add(current);
@@ -192,10 +158,9 @@ public final class Binding<T>
 				required.remove(type);
 			}
 		}
-		if (!required.isEmpty()) {
+		if (!required.isEmpty())
 			throw new UnresolvableDependency.NoCaseForDependency(required,
 					dropped);
-		}
 		return arrayOf(res, Binding.class);
 	}
 

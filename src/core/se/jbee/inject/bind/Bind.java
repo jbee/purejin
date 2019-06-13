@@ -97,12 +97,16 @@ public final class Bind {
 
 	public <T> Binding<T> asType(Resource<T> resource, BindingType type,
 			Supplier<? extends T> supplier) {
+		return Binding.binding(resource, type, supplier,
+				effectiveScope(resource), source);
+	}
+
+	private <T> Name effectiveScope(Resource<T> resource) {
 		Name effectiveScope = scope.equalTo(Scope.mirror)
 			? bindings.mirrors.scoping.reflect(resource.type().rawType)
 			: scope;
-		if (effectiveScope.equalTo(ScopingMirror.auto))
-			effectiveScope = Scope.application;
-		return Binding.binding(resource, type, supplier, effectiveScope,
-				source);
+		return effectiveScope.equalTo(ScopingMirror.auto)
+			? Scope.application
+			: effectiveScope;
 	}
 }
