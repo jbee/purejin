@@ -194,11 +194,10 @@ public abstract class ActionModule extends BinderModule {
 			this.executor = executor;
 			this.site = site;
 			Type<?>[] types = parameterTypes(site.action);
-			this.injection = new InjectionSite(
-					injector,
+			this.injection = new InjectionSite(injector,
 					dependency(site.output).injectingInto(
-							site.action.getDeclaringClass()), Argument.bind(types,
-							Argument.constant(site.input, null)));
+							site.action.getDeclaringClass()),
+					Argument.bind(types, Argument.constant(site.input, null)));
 			this.inputIndex = asList(types).indexOf(site.input);
 		}
 

@@ -23,11 +23,12 @@ public class ExtensionModule extends BinderModule {
 				.toSupplier((dep, context) -> extension(mirror, dep, context));
 	}
 
-	private static <T> T extension(ConstructionMirror mirror,
-			Dependency<? super T> dep, Injector context) {
-		@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
+	private static <T> T extension(ConstructionMirror mirror, Dependency<?> dep,
+			Injector context) {
 		Constructor<T> constructor = (Constructor<T>) mirror.reflect(
 				dep.type().rawType);
-		return Supply.constructor(New.bind(constructor)).supply(dep, context);
+		return Supply.constructor(New.bind(constructor)).supply(
+				(Dependency<? super T>) dep, context);
 	}
 }
