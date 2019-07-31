@@ -65,7 +65,8 @@ public class TestDependencyParameterBinds {
 		Injector resolver = Bootstrap.injector(
 				DependencyParameterBindsBundle.class);
 		Bean bean = resolver.resolve(Bean.class);
-		assertSame(Logger.getLogger(BinderModule.class.getCanonicalName()),
-				bean.logger);
+		Logger expected = Logger.getLogger(
+				BinderModule.class.getCanonicalName());
+		assertSame(expected.getName(), bean.logger.getName());
 	}
 }

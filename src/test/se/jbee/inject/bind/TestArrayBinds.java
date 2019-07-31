@@ -6,10 +6,10 @@ import static se.jbee.inject.bind.AssertInjects.assertEqualSets;
 
 import org.junit.Test;
 
+import se.jbee.inject.Hint;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Name;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Argument;
 
 /**
  * How to inject different arrays into different instances of the same parent
@@ -61,8 +61,8 @@ public class TestArrayBinds {
 			bind(CMD_3, Command.class).toConstructor();
 			injectingInto(CMD_3, Command.class).bind(Number.class).to(1, 6d, 8);
 
-			bind(CMD_4, Command.class).toConstructor(Argument.constant(
-					Number[].class, new Number[] { 2d, 9 }));
+			bind(CMD_4, Command.class).toConstructor(
+					Hint.constant(new Number[] { 2d, 9 }));
 
 			bind(CMD_5, Command.class).toConstructor();
 			injectingInto(CMD_5, Command.class).arraybind(

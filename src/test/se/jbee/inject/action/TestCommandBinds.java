@@ -53,7 +53,7 @@ public class TestCommandBinds {
 
 			@Override
 			public Long calc(P param) {
-				return service.exec(param);
+				return service.run(param);
 			}
 
 		}

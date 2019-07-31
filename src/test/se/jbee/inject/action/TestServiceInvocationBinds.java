@@ -100,7 +100,7 @@ public class TestServiceInvocationBinds {
 				raw(Action.class).parametized(String.class, Integer.class));
 		int beforeCount = inv.beforeCount;
 		int afterCount = inv.afterCount;
-		assertEquals("Foo".hashCode(), hashCode.exec("Foo").intValue());
+		assertEquals("Foo".hashCode(), hashCode.run("Foo").intValue());
 		assertEquals(beforeCount + 1, inv.beforeCount);
 		assertEquals(afterCount + 1, inv.afterCount);
 	}
@@ -112,7 +112,7 @@ public class TestServiceInvocationBinds {
 				raw(Action.class).parametized(String.class, Void.class));
 		int afterExceptionCount = inv.afterExceptionCount;
 		try {
-			fail.exec("Foo");
+			fail.run("Foo");
 		} catch (ActionExecutionFailed e) {
 			assertTrue(e.getCause() instanceof IllegalStateException);
 			assertEquals(e.getCause().getMessage(), "Foo");
@@ -139,7 +139,7 @@ public class TestServiceInvocationBinds {
 		}
 
 		@Override
-		public <I, O> O exec(ActionSite<I, O> site, Object[] args, I value)
+		public <I, O> O run(ActionSite<I, O> site, Object[] args, I value)
 				throws ActionExecutionFailed {
 			Object[] state = before(site.output, site.input, value);
 			O res;

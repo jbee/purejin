@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import se.jbee.inject.Dependency;
+import se.jbee.inject.Hint;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Scope;
@@ -27,7 +28,6 @@ import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.SupplyFailed;
 import se.jbee.inject.bind.BinderModule;
-import se.jbee.inject.bootstrap.Argument;
 import se.jbee.inject.bootstrap.InjectionSite;
 import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.bootstrap.Supply;
@@ -90,7 +90,7 @@ public abstract class ActionModule extends BinderModule {
 	static final class DirectExecutor implements Executor {
 
 		@Override
-		public <I, O> O exec(ActionSite<I, O> site, Object[] args, I value) {
+		public <I, O> O run(ActionSite<I, O> site, Object[] args, I value) {
 			try {
 				return site.output.rawType.cast(
 						Supply.produce(site.action, site.owner, args));
@@ -155,10 +155,10 @@ public abstract class ActionModule extends BinderModule {
 
 		private <I, O> Method resolveAction(Type<I> input, Type<O> output) {
 			for (Class<?> impl : implementationClasses) {
-				for (Method action : actionsIn(impl)) {
-					if (isActionForTypes(action, input, output))
-						return action;
-				}
+				Method action = arrayFindFirst(actionsIn(impl),
+						a -> isActionForTypes(a, input, output));
+				if (action != null)
+					return action;
 			}
 			throw new UnresolvableDependency.NoMethodForDependency(output,
 					input);
@@ -197,12 +197,12 @@ public abstract class ActionModule extends BinderModule {
 			this.injection = new InjectionSite(injector,
 					dependency(site.output).injectingInto(
 							site.action.getDeclaringClass()),
-					Argument.bind(types, Argument.constant(site.input, null)));
+					Hint.bind(types, Hint.constantNull(site.input)));
 			this.inputIndex = asList(types).indexOf(site.input);
 		}
 
 		@Override
-		public O exec(I input) throws ActionExecutionFailed {
+		public O run(I input) throws ActionExecutionFailed {
 			Object[] args = null;
 			try {
 				args = injection.args(injector);
@@ -212,7 +212,7 @@ public abstract class ActionModule extends BinderModule {
 			}
 			if (inputIndex >= 0)
 				args[inputIndex] = input;
-			return executor.exec(site, args, input);
+			return executor.run(site, args, input);
 		}
 	}
 }

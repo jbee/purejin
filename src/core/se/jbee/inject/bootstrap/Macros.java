@@ -220,15 +220,15 @@ public final class Macros {
 		public <T> void expand(Constant<?> value, Binding<T> incomplete,
 				Bindings bindings) {
 			Supplier<T> supplier = Supply.constant(
-					incomplete.type().rawType.cast(value.constant));
+					incomplete.type().rawType.cast(value.value));
 			bindings.addExpanded(
 					incomplete.complete(BindingType.PREDEFINED, supplier));
 			// implicitly bind to the exact type of the constant
 			// should that differ from the binding type
 			if (incomplete.source.declarationType == DeclarationType.EXPLICIT
-				&& incomplete.type().rawType != value.constant.getClass()) {
+				&& incomplete.type().rawType != value.value.getClass()) {
 				@SuppressWarnings("unchecked")
-				Class<T> type = (Class<T>) value.constant.getClass();
+				Class<T> type = (Class<T>) value.value.getClass();
 				bindings.addExpanded(Binding.binding(
 						incomplete.resource.typed(raw(type)),
 						BindingType.PREDEFINED, supplier, incomplete.scope,

@@ -67,7 +67,7 @@ public class TestServiceBinds {
 
 			@Override
 			public O calc(I input) {
-				return action.exec(input);
+				return action.run(input);
 			}
 
 		}

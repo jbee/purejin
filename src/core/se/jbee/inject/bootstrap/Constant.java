@@ -13,10 +13,9 @@ package se.jbee.inject.bootstrap;
  */
 public final class Constant<T> {
 
-	public final T constant;
+	public final T value;
 
-	public Constant(T constant) {
-		this.constant = constant;
+	public Constant(T value) {
+		this.value = value;
 	}
-
 }

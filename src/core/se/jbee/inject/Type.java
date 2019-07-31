@@ -60,11 +60,7 @@ public final class Type<T>
 
 	private static Type<?>[] parameterTypes(
 			java.lang.reflect.Type[] genericParameterTypes) {
-		Type<?>[] res = new Type<?>[genericParameterTypes.length];
-		for (int i = 0; i < res.length; i++) {
-			res[i] = type(genericParameterTypes[i]);
-		}
-		return res;
+		return arrayMap(genericParameterTypes, Type.class, Type::type);
 	}
 
 	public static Type<?>[] wildcards(TypeVariable<?>... variables) {
@@ -79,11 +75,8 @@ public final class Type<T>
 
 	private static Type<?>[] types(java.lang.reflect.Type[] parameters,
 			Map<String, Type<?>> actualTypeArguments) {
-		Type<?>[] args = new Type<?>[parameters.length];
-		for (int i = 0; i < parameters.length; i++) {
-			args[i] = type(parameters[i], actualTypeArguments);
-		}
-		return args;
+		return arrayMap(parameters, Type.class,
+				p -> type(p, actualTypeArguments));
 	}
 
 	private static Type<?> type(java.lang.reflect.Type type) {
@@ -92,16 +85,13 @@ public final class Type<T>
 
 	private static Type<?> type(java.lang.reflect.Type type,
 			Map<String, Type<?>> actualTypeArguments) {
-		if (type instanceof Class<?>) {
+		if (type instanceof Class<?>)
 			return raw((Class<?>) type);
-		}
-		if (type instanceof ParameterizedType) {
+		if (type instanceof ParameterizedType)
 			return parameterizedType((ParameterizedType) type,
 					actualTypeArguments);
-		}
-		if (type instanceof TypeVariable<?>) {
+		if (type instanceof TypeVariable<?>)
 			return actualTypeArguments.get(((TypeVariable<?>) type).getName());
-		}
 		if (type instanceof GenericArrayType) {
 			GenericArrayType gat = (GenericArrayType) type;
 			return type(gat.getGenericComponentType()).addArrayDimension();
@@ -109,9 +99,8 @@ public final class Type<T>
 		if (type instanceof WildcardType) {
 			WildcardType wt = (WildcardType) type;
 			java.lang.reflect.Type[] upperBounds = wt.getUpperBounds();
-			if (upperBounds.length == 1) {
+			if (upperBounds.length == 1)
 				return type(upperBounds[0]).asUpperBound();
-			}
 		}
 		throw new UnsupportedOperationException(
 				"Type has no support yet: " + type);
@@ -165,10 +154,9 @@ public final class Type<T>
 	}
 
 	public <S> Type<S> toSupertype(Type<S> supertype) {
-		if (!isAssignableTo(supertype)) {
+		if (!isAssignableTo(supertype))
 			throw new ClassCastException(
 					"Cannot cast " + this + " to " + supertype);
-		}
 		return supertype;
 	}
 
@@ -218,9 +206,8 @@ public final class Type<T>
 		if (!rawType.isArray())
 			return this;
 		Class<?> baseType = rawType;
-		while (baseType.isArray()) {
+		while (baseType.isArray())
 			baseType = baseType.getComponentType();
-		}
 		return new Type<>(upperBound, (Class<B>) baseType, params);
 	}
 
@@ -317,20 +304,20 @@ public final class Type<T>
 			|| (!isUpperBound() && other.isUpperBound()))
 			return true;
 		if (rawType == other.rawType)
-			return moreApplicableParametersThan(other);
+			return moreQualifiedParametersThan(other);
 		@SuppressWarnings("unchecked")
 		Type<?> asOther = supertype(rawType, (Type<? extends T>) other);
-		return moreApplicableParametersThan(asOther);
+		return moreQualifiedParametersThan(asOther);
 	}
 
-	private boolean moreApplicableParametersThan(Type<?> other) {
+	private boolean moreQualifiedParametersThan(Type<?> other) {
 		if (params.length == 1)
 			return params[0].moreQualiedThan(other.params[0]);
-		int morePrecise = 0;
+		int moreQualified = 0;
 		for (int i = 0; i < params.length; i++)
 			if (params[i].moreQualiedThan(other.params[0]))
-				morePrecise++;
-		return morePrecise > params.length - morePrecise;
+				moreQualified++;
+		return moreQualified > params.length - moreQualified;
 	}
 
 	/**
@@ -536,5 +523,10 @@ public final class Type<T>
 			return (Class<T>) Short.class;
 		throw new UnsupportedOperationException(
 				"The primitive " + type + " cannot be wrapped yet!");
+	}
+
+	@Override
+	public Hint<T> asHint() {
+		return Hint.relativeReferenceTo(this);
 	}
 }

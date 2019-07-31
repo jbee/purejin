@@ -6,11 +6,13 @@ v19.1 (upcoming)
 > Mechanics of Scope/Scoping as well as Injectrons were refined.
 > Initialisers, Extensions and Configs were added.
 > Mirrors replaced the Inspector.
+> Injection Hints as data replace BoundParameter
 
 **General Notes**
 - changed versioning from _major.minor_ to _year.serial_ (e.g. 19.1 is the first in 2019)
 
 **Additions**
+- added build in extension for `Optional` parameter injection
 - added `Extension` mechanism
 - added `DiskScope`
 - added `Config` for namespaced configuration (avoid name collisions)
@@ -40,11 +42,13 @@ v19.1 (upcoming)
 - renamed class `OpttionBootstrapper` to `ChoiceBootstrapper`
 - renamed class `PresetModule` to `ModuleWith`
 - renamed class `NoResourceForDependency` to `NoCaseForDependency`
-- renamed class `BoundParameter` to `Argument`
 - renamed class `BoundConstructor` to `New`
 - renamed class `BoundMethod` to `Factory`
 - renamed class `BoundConstant` to `Constant`
+- renamed and moved class `BoundParameter` to `Hint`
 - renamed class `ActionMalfunction` to `ActionExecutionFailed`
+- extracted class `ActionSite` 
+- renamed method `Action.exec` to `Action.run`
 - renamed class and method `MorePreciseThan#morePreciseThan` to `Qualifying#moreQualiedThan`
 - redesign of `Injectron`/`InjectronInfo` to `Generator` and `InjectionCase`
 - renamed field `Injection#expiry` to `Injection#scoping`

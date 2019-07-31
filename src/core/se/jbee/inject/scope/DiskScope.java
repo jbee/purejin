@@ -14,6 +14,7 @@ import java.io.Serializable;
 import java.nio.file.Files;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -60,10 +61,13 @@ public final class DiskScope implements Scope, Closeable {
 		}
 	}
 
+	/**
+	 * NB. {@link ConcurrentHashMap} does not allow updates while updating.
+	 */
+	private final Map<String, DiskEntry> loaded = new ConcurrentSkipListMap<>();
 	private final long syncInterval;
 	private final File dir;
 	private final Function<Dependency<?>, String> filenames;
-	private final Map<String, DiskEntry> loaded = new ConcurrentHashMap<>();
 
 	public DiskScope(Config config, ScheduledExecutorService executor, File dir,
 			Function<Dependency<?>, String> filenames) {

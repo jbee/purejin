@@ -38,7 +38,7 @@ public class TestActionBinds {
 	static class MyOtherService {
 
 		public int mul2(int value, Action<Float, Integer> service) {
-			return value * 2 + service.exec(2.8f);
+			return value * 2 + service.run(2.8f);
 		}
 
 		public int round(float value) {
@@ -52,12 +52,12 @@ public class TestActionBinds {
 		Action<Integer, Integer> mul2 = injector.resolve(
 				actionDependency(raw(Integer.class), raw(Integer.class)));
 		assertNotNull(mul2);
-		assertEquals(9, mul2.exec(3).intValue());
+		assertEquals(9, mul2.run(3).intValue());
 		Action<Number, Integer> negate = injector.resolve(
 				actionDependency(raw(Number.class), raw(Integer.class)));
 		assertNotNull(mul2);
-		assertEquals(-3, negate.exec(3).intValue());
-		assertEquals(11, mul2.exec(4).intValue());
+		assertEquals(-3, negate.run(3).intValue());
+		assertEquals(11, mul2.run(4).intValue());
 	}
 
 	@Test
@@ -66,7 +66,7 @@ public class TestActionBinds {
 		Action<Void, Void> error = injector.resolve(
 				actionDependency(raw(Void.class), raw(Void.class)));
 		try {
-			error.exec(null);
+			error.run(null);
 			fail("Expected an exception...");
 		} catch (ActionExecutionFailed e) {
 			assertSame(IllegalStateException.class, e.getCause().getClass());

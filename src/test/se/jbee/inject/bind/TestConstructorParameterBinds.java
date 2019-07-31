@@ -2,26 +2,22 @@ package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static se.jbee.inject.Hint.constant;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.bootstrap.Argument.asType;
-import static se.jbee.inject.bootstrap.Argument.constant;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 
 import org.junit.Test;
 
-import se.jbee.inject.Dependency;
+import se.jbee.inject.Hint;
 import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
-import se.jbee.inject.Scope;
-import se.jbee.inject.bootstrap.Argument;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.container.Supplier;
 
 /**
  * The test illustrates how to use {@link Parameter}s to give hints which
@@ -86,22 +82,6 @@ public class TestConstructorParameterBinds {
 		}
 	}
 
-	private static class IncrementingSupplier implements Supplier<Integer> {
-
-		int c = 0;
-
-		IncrementingSupplier() {
-			// make visible
-		}
-
-		@Override
-		public Integer supply(Dependency<? super Integer> dep,
-				Injector context) {
-			return c++;
-		}
-
-	}
-
 	private static class ParameterConstructorBindsModule extends BinderModule {
 
 		@Override
@@ -116,11 +96,8 @@ public class TestConstructorParameterBinds {
 			bind(Baz.class).toConstructor(y, y);
 			bind(CharSequence.class).to(String.class); // should not be used
 			bind(Serializable.class).to(Integer.class); // should not be used
-			bind(Qux.class).toConstructor(asType(CharSequence.class, y),
-					constant(Number.class, 1980));
-			per(Scope.injection).bind(named("inc"), Foo.class).toConstructor(
-					Argument.supplier(raw(Integer.class),
-							new IncrementingSupplier()));
+			bind(Qux.class).toConstructor(y.asType(CharSequence.class),
+					constant(1980).asType(Number.class));
 		}
 	}
 
@@ -154,8 +131,8 @@ public class TestConstructorParameterBinds {
 	}
 
 	/**
-	 * We can see that {@link Argument#asType(Class, Parameter)} works because
-	 * the instance y would also been assignable to the 1st parameter of type
+	 * We can see that {@link Hint#asType(Class, Parameter)} works because the
+	 * instance y would also been assignable to the 1st parameter of type
 	 * {@link Serializable} (in {@link Qux}) but since we typed it as a
 	 * {@link CharSequence} it no longer is assignable to 1st argument and will
 	 * be used as 2nd argument where the as well {@link Serializable}
@@ -189,18 +166,4 @@ public class TestConstructorParameterBinds {
 		Bootstrap.injector(FaultyParameterConstructorBindsModule.class);
 	}
 
-	/**
-	 * As an example for a custom {@link Supplier} used as {@link Parameter} a
-	 * special {@link Foo} instance "inc" is parameterized with such a
-	 * parameter. Therefore the passed {@link Integer} value increments with
-	 * every injection.
-	 */
-	@Test
-	public void thatCustomParameterIsArranged() {
-		Foo foo = injector.resolve("inc", Foo.class);
-		assertEquals(0, foo.baz.intValue());
-
-		foo = injector.resolve("inc", Foo.class);
-		assertEquals(1, foo.baz.intValue());
-	}
 }

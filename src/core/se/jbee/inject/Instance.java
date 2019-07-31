@@ -96,4 +96,8 @@ public final class Instance<T>
 		return Qualifying.compareRelated(type, other.type, name, other.name);
 	}
 
+	@Override
+	public Hint<T> asHint() {
+		return Hint.relativeReferenceTo(this);
+	}
 }

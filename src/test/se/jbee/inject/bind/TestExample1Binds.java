@@ -9,9 +9,9 @@ import java.util.Properties;
 
 import org.junit.Test;
 
+import se.jbee.inject.Hint;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Argument;
 import se.jbee.inject.config.Globals;
 import se.jbee.inject.config.Options;
 
@@ -37,10 +37,8 @@ public class TestExample1Binds {
 		@Override
 		protected void declare(Properties properties) {
 			bind(MyClass.class).toConstructor(
-					Argument.constant(String.class,
-							properties.getProperty("x")),
-					Argument.constant(Integer.class,
-							(Integer) properties.get("y")));
+					Hint.constant(properties.getProperty("x")),
+					Hint.constant((Integer) properties.get("y")));
 		}
 	}
 

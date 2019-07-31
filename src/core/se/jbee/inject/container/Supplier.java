@@ -27,4 +27,5 @@ public interface Supplier<T> {
 	 */
 	T supply(Dependency<? super T> dep, Injector context)
 			throws UnresolvableDependency;
+
 }

@@ -1,8 +1,8 @@
 package se.jbee.inject.scope;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Function;
 
 import se.jbee.inject.Dependency;
@@ -40,12 +40,17 @@ public final class DependencyScope implements Scope {
 		return b.toString();
 	}
 
-	private final AtomicReference<Map<String, Object>> instances = new AtomicReference<>(
-			new HashMap<>());
-	private final Function<Dependency<?>, String> identity;
+	/**
+	 * Cannot use a {@link ConcurrentHashMap} for this since it has the property
+	 * of not allowing updates to any other key while an entry being updated
+	 * atomically but resolving dependencies during the update (in the update
+	 * function) could very well lead to initialising other entries.
+	 */
+	private final ConcurrentMap<String, Object> instances = new ConcurrentSkipListMap<>();
+	private final Function<Dependency<?>, String> injectionKey;
 
-	public DependencyScope(Function<Dependency<?>, String> identity) {
-		this.identity = identity;
+	public DependencyScope(Function<Dependency<?>, String> injectionKey) {
+		this.injectionKey = injectionKey;
 	}
 
 	@Override
@@ -53,15 +58,8 @@ public final class DependencyScope implements Scope {
 	public <T> T yield(int serialID, Dependency<? super T> dep,
 			Provider<T> provider, int generators)
 			throws UnresolvableDependency {
-		final String key = identity.apply(dep);
-		Map<String, Object> map = instances.get();
-		T instance = (T) map.get(key);
-		if (instance != null)
-			return instance;
-		synchronized (map) {
-			instance = (T) map.computeIfAbsent(key, k -> provider.provide());
-		}
-		return instance;
+		return (T) instances.computeIfAbsent(injectionKey.apply(dep),
+				k -> provider.provide());
 	}
 
 }

@@ -82,10 +82,9 @@ public final class Container {
 			this.casesByType = initFrom(injectees);
 			this.wildcardCases = wildcardCases(casesByType);
 			this.initialisersCases = initInitialisers();
-			for (InjectionCase<?>[] cases : casesByType.values()) {
+			for (InjectionCase<?>[] cases : casesByType.values())
 				for (InjectionCase<?> c : cases)
 					initEagerCase(c);
-			}
 		}
 
 		private static <T> void initEagerCase(InjectionCase<T> c) {
@@ -160,12 +159,10 @@ public final class Container {
 		private static InjectionCase<?>[] wildcardCases(
 				Map<Class<?>, InjectionCase<?>[]> cases) {
 			List<InjectionCase<?>> res = new ArrayList<>();
-			for (InjectionCase<?>[] casesForType : cases.values()) {
-				for (InjectionCase<?> icase : casesForType) {
+			for (InjectionCase<?>[] casesForType : cases.values())
+				for (InjectionCase<?> icase : casesForType)
 					if (icase.type().isUpperBound())
 						res.add(icase);
-				}
-			}
 			Collections.sort(res);
 			return res.isEmpty()
 				? null
@@ -229,13 +226,11 @@ public final class Container {
 		private <T, E> T resolveArray(Dependency<T> dep, Type<E> elemType) {
 			final Class<E> rawElemType = elemType.rawType;
 			if (rawElemType == InjectionCase.class
-				|| rawElemType == Generator.class) {
+				|| rawElemType == Generator.class)
 				return (T) resolveCases(dep, elemType.parameter(0));
-			}
-			if (dep.type().rawType.getComponentType().isPrimitive()) {
+			if (dep.type().rawType.getComponentType().isPrimitive())
 				throw new NoCaseForDependency(dep, null,
 						"Primitive arrays cannot be used to inject all instances of the wrapper type. Use the wrapper array instead.");
-			}
 			Set<Integer> identities = new HashSet<>();
 			if (!elemType.isUpperBound()) {
 				List<E> elements = new ArrayList<>();
@@ -246,12 +241,10 @@ public final class Container {
 				return toArray(elements, elemType);
 			}
 			List<E> elements = new ArrayList<>();
-			for (Entry<Class<?>, InjectionCase<?>[]> e : casesByType.entrySet()) {
-				if (Type.raw(e.getKey()).isAssignableTo(elemType)) {
-					InjectionCase<? extends E>[] icase = (InjectionCase<? extends E>[]) e.getValue();
-					addAllMatching(elements, identities, dep, elemType, icase);
-				}
-			}
+			for (Entry<Class<?>, InjectionCase<?>[]> e : casesByType.entrySet())
+				if (Type.raw(e.getKey()).isAssignableTo(elemType))
+					addAllMatching(elements, identities, dep, elemType,
+							(InjectionCase<? extends E>[]) e.getValue());
 			return toArray(elements, elemType);
 		}
 
@@ -272,12 +265,10 @@ public final class Container {
 		private <G> InjectionCase<G>[] resolveWildcardCases(
 				Type<G> generatedType, Dependency<G> generatedTypeDep) {
 			List<InjectionCase<?>> res = new ArrayList<>();
-			for (Entry<Class<?>, InjectionCase<?>[]> e : casesByType.entrySet()) {
-				if (raw(e.getKey()).isAssignableTo(generatedType)) {
+			for (Entry<Class<?>, InjectionCase<?>[]> e : casesByType.entrySet())
+				if (raw(e.getKey()).isAssignableTo(generatedType))
 					addCompatibleCases(res, generatedTypeDep,
 							(InjectionCase<? extends G>[]) e.getValue());
-				}
-			}
 			return toArray(res, raw(InjectionCase.class));
 		}
 
@@ -338,12 +329,20 @@ public final class Container {
 		}
 	}
 
+	/**
+	 * This needs to use the double-checked locking pattern since we have to
+	 * make sure the {@link Supplier} in only ever called once to initialise the
+	 * field. No other idiom allows running initialisation function precisly
+	 * once.
+	 * 
+	 * @param <T> Type of the lazy value
+	 */
 	private static final class LazySingletonGenerator<T>
 			implements Generator<T> {
 
 		private final Injector injector;
 		private final Supplier<? extends T> supplier;
-		private final AtomicReference<T> value = new AtomicReference<>();
+		private volatile T value;
 
 		LazySingletonGenerator(Injector injector,
 				Supplier<? extends T> supplier) {
@@ -354,11 +353,16 @@ public final class Container {
 		@Override
 		public T yield(Dependency<? super T> dep)
 				throws UnresolvableDependency {
-			T res = value.get();
+			T res = value;
 			if (res != null)
 				return res;
-			return value.updateAndGet(
-					v -> v != null ? v : supplier.supply(dep, injector));
+			synchronized (this) {
+				if (value == null) {
+					// do this always only once
+					value = supplier.supply(dep, injector);
+				}
+			}
+			return value;
 		}
 	}
 
@@ -369,7 +373,7 @@ public final class Container {
 		private final Supplier<? extends T> supplier;
 		private final Scoping scoping;
 		private final Resource<T> resource;
-		private final AtomicReference<Scope> scope = new AtomicReference<>();
+		private volatile Scope scope;
 
 		private Class<?> cachedForType;
 		private Initialiser<? super T>[] cachedInitialisers;
@@ -385,17 +389,26 @@ public final class Container {
 
 		@Override
 		public T yield(Dependency<? super T> dep) {
-			Scope scope = this.scope.get();
 			if (scope == null) {
-				//as scopes are known to be "singletons" its ok should this really happen more then once
-				scope = this.scope.updateAndGet(s -> s != null
-					? s
-					: injector.resolve(scoping.scope, Scope.class));
+				//as scopes are known container "singletons"; its OK should this really happen more then once
+				scope = injector.resolve(scoping.scope, Scope.class);
 			}
-			final Dependency<? super T> injected = dep.injectingInto(resource,
+			Dependency<? super T> injected = dep.injectingInto(resource,
 					scoping);
+			/**
+			 * This cache makes sure that within one thread even if the provider
+			 * (lambda below) is called multiple times (which can occur because
+			 * methods like {@code updateAndGet} on atomics have a loop) will
+			 * always yield the same instance. Different invocation of this
+			 * method however can lead to multiple calls to the supplier.
+			 */
+			AtomicReference<T> instanceCache = new AtomicReference<>();
 			return scope.yield(serialID, injected, () -> {
-				T instance = supplier.supply(injected, injector);
+				T instance = instanceCache.get();
+				if (instance == null) {
+					instance = supplier.supply(injected, injector);
+					instanceCache.set(instance);
+				}
 				if (instance != null && injector.initialisersCases != null
 					&& injector.initialisersCases.length > 0)
 					postConstruct(instance, injected);

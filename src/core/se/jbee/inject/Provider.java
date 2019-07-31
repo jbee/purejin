@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -23,5 +23,11 @@ import se.jbee.inject.container.Supplier;
 @FunctionalInterface
 public interface Provider<T> {
 
+	/**
+	 * @return The lazily resolved instance. Implementations should make sure
+	 *         that calling this method multiple times does cache the result if
+	 *         that is semantically correct.
+	 * @throws UnresolvableDependency
+	 */
 	T provide() throws UnresolvableDependency;
 }

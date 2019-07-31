@@ -28,6 +28,6 @@ public interface Action<I, O> {
 	 * @throws ActionExecutionFailed wraps all {@link Exception}s thrown by the
 	 *             underlying method.
 	 */
-	O exec(I input) throws ActionExecutionFailed;
+	O run(I input) throws ActionExecutionFailed;
 
 }

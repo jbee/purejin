@@ -362,11 +362,9 @@ public class Binder {
 				appBinder.autobind(impl).to(target, hints);
 			} else {
 				appBinder.bind(name, impl).to(target, hints);
-				for (Type<? super T> st : Type.raw(impl).supertypes()) {
-					if (st.isInterface()) {
+				for (Type<? super T> st : Type.raw(impl).supertypes())
+					if (st.isInterface())
 						appBinder.implicit().bind(name, st).to(name, impl);
-					}
-				}
 			}
 		}
 

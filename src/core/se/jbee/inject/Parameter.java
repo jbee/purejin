@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -39,4 +39,13 @@ public interface Parameter<T> extends Typed<T> {
 
 	Parameter<?>[] noParameters = new Parameter<?>[0];
 
+	Hint<T> asHint();
+
+	default <S> Hint<S> asType(Type<S> supertype) {
+		return asHint().asType(supertype);
+	}
+
+	default <S> Hint<S> asType(Class<S> supertype) {
+		return asHint().asType(supertype);
+	}
 }

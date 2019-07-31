@@ -200,4 +200,9 @@ public final class Dependency<T>
 	public Iterator<Injection> iterator() {
 		return asList(hierarchy).iterator();
 	}
+
+	@Override
+	public Hint<T> asHint() {
+		return Hint.absoluteReferenceTo(this);
+	}
 }

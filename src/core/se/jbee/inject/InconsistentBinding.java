@@ -48,11 +48,6 @@ public final class InconsistentBinding extends RuntimeException {
 					+ " that is not bound to a macro for binding: " + expanded);
 	}
 
-	public static InconsistentBinding notSupported(Parameter<?> param) {
-		return new InconsistentBinding("Attempt to use an unsupported type "
-			+ param.getClass() + " as Argument: " + param);
-	}
-
 	public static InconsistentBinding incomprehensiveHint(Parameter<?> hint) {
 		return new InconsistentBinding(
 				"Attempt to give a parameter hint that does not fit the target: "

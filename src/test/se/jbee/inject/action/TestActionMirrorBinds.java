@@ -48,6 +48,6 @@ public class TestActionMirrorBinds {
 	public void actionMirrorCanBeCustomized() {
 		Action<Void, Integer> answer = injector.resolve(
 				actionDependency(raw(Void.class), raw(Integer.class)));
-		assertEquals(42, answer.exec(null).intValue());
+		assertEquals(42, answer.run(null).intValue());
 	}
 }

@@ -7,11 +7,13 @@ package se.jbee.inject.bind;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
 import se.jbee.inject.Provider;
 import se.jbee.inject.Scope;
+import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bootstrap.Bootstrapper.ChoiceBootstrapper;
 import se.jbee.inject.bootstrap.ChoiceBundle;
 import se.jbee.inject.bootstrap.Supply;
@@ -41,7 +43,12 @@ public enum BuildinBundle implements ChoiceBundle<BuildinBundle> {
 	/**
 	 * Adds: {@link Logger}s can be injected per receiving class.
 	 */
-	LOGGER;
+	LOGGER,
+	/**
+	 * Adds: Support for injection of {@link Optional}s. If {@link Optional}
+	 * parameters cannot be resolved {@link Optional#empty()} is injected.
+	 */
+	OPTIONAL;
 
 	@Override
 	public void bootstrap(ChoiceBootstrapper<BuildinBundle> bootstrapper) {
@@ -50,6 +57,7 @@ public enum BuildinBundle implements ChoiceBundle<BuildinBundle> {
 		bootstrapper.install(CollectionBridgeModule.class, COLLECTION);
 		bootstrapper.install(ProviderBridgeModule.class, PROVIDER);
 		bootstrapper.install(LoggerModule.class, LOGGER);
+		bootstrapper.install(OptionalBridgeModule.class, OPTIONAL);
 	}
 
 	private static class LoggerModule extends BinderModule {
@@ -67,7 +75,7 @@ public enum BuildinBundle implements ChoiceBundle<BuildinBundle> {
 		@Override
 		protected void declare() {
 			per(Scope.dependency).starbind(Provider.class).toSupplier(
-					Supply.PROVIDER_BRIDGE);
+					Supply.PROVIDER);
 		}
 
 	}
@@ -99,6 +107,23 @@ public enum BuildinBundle implements ChoiceBundle<BuildinBundle> {
 			asDefault().per(Scope.dependency).starbind(
 					Collection.class).toParametrized(List.class);
 		}
+	}
+
+	private static class OptionalBridgeModule extends BinderModule {
+
+		@Override
+		protected void declare() {
+			asDefault().per(Scope.dependency).starbind(
+					Optional.class).toSupplier((dep, context) -> {
+						try {
+							return Optional.ofNullable(
+									context.resolve(dep.onTypeParameter()));
+						} catch (UnresolvableDependency e) {
+							return Optional.empty();
+						}
+					});
+		}
+
 	}
 
 }
