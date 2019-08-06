@@ -3,7 +3,7 @@ package se.jbee.inject.action;
 import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.action.ActionModule.actionDependency;
-import static se.jbee.inject.config.ProductionMirror.allMethods;
+import static se.jbee.inject.config.ProductionMirror.declaredMethods;
 
 import org.junit.Test;
 
@@ -23,7 +23,7 @@ public class TestActionMirrorBinds {
 
 		@Override
 		protected void declare() {
-			discoverActionsBy(allMethods.annotatedWith(Resource.class));
+			discoverActionsBy(declaredMethods.annotatedWith(Resource.class));
 			bindActionsIn(ActionMirrorBindsActions.class);
 		}
 

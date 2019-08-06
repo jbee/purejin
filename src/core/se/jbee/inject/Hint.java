@@ -18,7 +18,6 @@ import se.jbee.inject.bootstrap.InjectionSite;
  * A {@link Hint} is a suggested reference for parameters of a
  * {@link Constructor} or {@link Method} to inject.
  * 
- * @author Jan Bernitt (jan@jbee.se)
  * @since 19.1
  *
  * @param <T> The {@link Type} of the argument
@@ -132,11 +131,6 @@ public final class Hint<T> implements Parameter<T> {
 		return relativeRef == null && absoluteRef == null;
 	}
 
-	public boolean isDynamic() {
-		return absoluteRef != null || asType.rawType == Injector.class
-			|| type().arrayDimensions() == 1;
-	}
-
 	@Override
 	public <S> Hint<S> asType(Type<S> supertype) {
 		return typed(supertype);
@@ -162,12 +156,10 @@ public final class Hint<T> implements Parameter<T> {
 
 	@Override
 	public String toString() {
-		String as = " as " + asType;
-		if (value != null)
-			return value + as;
-		if (absoluteRef != null)
-			return absoluteRef + as;
-		return relativeRef + as;
+		if (isConstant())
+			return "value as " + asType;
+		return "ref to " + (absoluteRef != null ? absoluteRef : relativeRef)
+			+ " as " + asType;
 	}
 
 }

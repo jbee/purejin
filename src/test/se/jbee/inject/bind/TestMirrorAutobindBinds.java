@@ -8,6 +8,7 @@ import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.config.NamingMirror.defaultName;
 import static se.jbee.inject.config.ParameterisationMirror.noParameters;
 import static se.jbee.inject.config.ProductionMirror.allMethods;
+import static se.jbee.inject.config.ProductionMirror.declaredMethods;
 import static se.jbee.inject.container.Cast.providerTypeOf;
 
 import java.lang.reflect.Constructor;
@@ -41,8 +42,7 @@ public class TestMirrorAutobindBinds {
 		@Override
 		protected void declare() {
 			Mirrors mirrors = bindings().mirrors;
-			Mirrors mirrorAllMethods = mirrors.produceBy(
-					allMethods.ignoreSynthetic());
+			Mirrors mirrorAllMethods = mirrors.produceBy(declaredMethods);
 			with(mirrorAllMethods).autobind().inModule();
 			// @formatter:off
 			with(mirrors.produceBy(allMethods.annotatedWith(WebMethod.class))

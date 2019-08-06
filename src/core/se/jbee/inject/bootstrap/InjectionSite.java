@@ -12,6 +12,7 @@ import se.jbee.inject.Generator;
 import se.jbee.inject.Hint;
 import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Injector;
+import se.jbee.inject.Instance;
 import se.jbee.inject.UnresolvableDependency;
 
 /**
@@ -19,7 +20,8 @@ import se.jbee.inject.UnresolvableDependency;
  * resolution of arguments from a specific site or path that is represented by a
  * {@link Dependency}. This is used in cases where otherwise a dependency would
  * be resolved over and over again for the same {@link Dependency}. For example
- * when injecting a factory method with arguments.
+ * when injecting a factory {@link java.lang.reflect.Method} or
+ * {@link java.lang.reflect.Constructor} with arguments.
  */
 public final class InjectionSite {
 
@@ -28,60 +30,61 @@ public final class InjectionSite {
 	private final Hint<?>[] hints;
 	private final Generator<?>[] generators;
 	private final Object[] preResolvedArgs;
-
-	private final int[] dynamics;
-	private int dynamicsLength = 0;
+	private final int[] lazyArgIndexes;
+	private final int lazyArgCount;
 
 	public InjectionSite(Injector injector, Dependency<?> site,
 			Hint<?>[] hints) {
 		this.site = site;
 		this.hints = hints;
 		this.generators = new Generator<?>[hints.length];
-		this.dynamics = new int[hints.length];
-		this.preResolvedArgs = preResolveArgs(injector);
+		this.preResolvedArgs = new Object[hints.length];
+		this.lazyArgIndexes = new int[hints.length];
+		this.lazyArgCount = preResolveArgs(injector);
 	}
 
 	public Object[] args(Injector injector) throws UnresolvableDependency {
-		if (dynamicsLength == 0)
+		if (lazyArgCount == 0)
 			return preResolvedArgs;
 		// in this case we have to copy to become thread-safe!
-		Object[] args = this.preResolvedArgs.clone();
-		for (int j = 0; j < dynamicsLength; j++) {
-			int i = dynamics[j];
+		Object[] args = preResolvedArgs.clone();
+		for (int j = 0; j < lazyArgCount; j++) {
+			int i = lazyArgIndexes[j];
 			Hint<?> hint = hints[i];
 			args[i] = generators[i] == null
 				? injector.resolve(site.instanced(hint.relativeRef))
-				: yield(generators[i], site.instanced(hints[i].relativeRef));
+				: yield(generators[i], site.instanced(hint.relativeRef));
 		}
 		return args;
 	}
 
-	private Object[] preResolveArgs(Injector injector) {
-		Object[] args = new Object[hints.length];
-		dynamicsLength = 0;
+	private int preResolveArgs(Injector injector) {
+		int lazyArgCount = 0;
 		for (int i = 0; i < generators.length; i++) {
-			args[i] = null;
 			Hint<?> hint = hints[i];
-			if (hint.absoluteRef != null) {
-				args[i] = injector.resolve(hint.absoluteRef);
-			} else if (hint.isDynamic()) {
-				dynamics[dynamicsLength++] = i;
+			if (hint.type().rawType == Injector.class) {
+				preResolvedArgs[i] = injector;
+			} else if (hint.type().arrayDimensions() == 1) {
+				lazyArgIndexes[lazyArgCount++] = i;
+			} else if (hint.absoluteRef != null) {
+				preResolvedArgs[i] = injector.resolve(hint.absoluteRef);
 			} else if (hint.isConstant()) {
-				args[i] = hint.value;
-			} else {
+				preResolvedArgs[i] = hint.value;
+			} else { // relative ref
+				Instance<?> ref = hint.relativeRef;
 				Dependency<? extends InjectionCase<?>> caseDep = site.typed(
-						injectionCaseTypeFor(hint.relativeRef.type)).named(
-								hint.relativeRef.name);
+						injectionCaseTypeFor(ref.type)).named(ref.name);
 				InjectionCase<?> icase = injector.resolve(caseDep);
 				if (icase.scoping.isStableByDesign()) {
-					args[i] = yield(icase, site.instanced(hint.relativeRef));
+					preResolvedArgs[i] = yield(icase,
+							site.instanced(hint.relativeRef));
 				} else {
-					dynamics[dynamicsLength++] = i;
+					lazyArgIndexes[lazyArgCount++] = i;
 					generators[i] = icase;
 				}
 			}
 		}
-		return args;
+		return lazyArgCount;
 	}
 
 	@SuppressWarnings("unchecked")

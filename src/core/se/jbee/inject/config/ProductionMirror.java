@@ -5,6 +5,7 @@
  */
 package se.jbee.inject.config;
 
+import static java.util.Arrays.asList;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Type.returnType;
 import static se.jbee.inject.Utils.arrayFilter;
@@ -12,7 +13,10 @@ import static se.jbee.inject.Utils.arrayFilter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.TypeVariable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 
@@ -38,9 +42,12 @@ public interface ProductionMirror {
 	Method[] reflect(Class<?> impl);
 
 	ProductionMirror noMethods = impl -> __noMethodsArray;
+	ProductionMirror declaredMethods = ((ProductionMirror) Class::getDeclaredMethods).ignoreSynthetic();
+	ProductionMirror allMethods = ((ProductionMirror) ProductionMirror::allMethods).ignoreSynthetic();
 
-	//TODO inheritence...
-	ProductionMirror allMethods = Class::getDeclaredMethods;
+	default ProductionMirror ignoreStatic() {
+		return withModifier(((IntPredicate) Modifier::isStatic).negate());
+	}
 
 	default ProductionMirror ignoreSynthetic() {
 		return select(method -> !method.isSynthetic());
@@ -81,4 +88,12 @@ public interface ProductionMirror {
 			: __noMethodsArray;
 	}
 
+	static Method[] allMethods(Class<?> type) {
+		List<Method> all = new ArrayList<>();
+		while (type != Object.class && type != null) {
+			all.addAll(asList(type.getDeclaredMethods()));
+			type = type.getSuperclass();
+		}
+		return all.toArray(new Method[0]);
+	}
 }

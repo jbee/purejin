@@ -80,7 +80,7 @@ public abstract class ActionModule extends BinderModule {
 			asDefault().per(Scope.dependencyType).starbind(
 					Action.class).toSupplier(ActionSupplier.class);
 			asDefault().per(Scope.application).bind(ACTION_MIRROR).to(
-					allMethods.ignoreSynthetic());
+					allMethods);
 			asDefault().per(Scope.application).bind(Executor.class).to(
 					DirectExecutor.class);
 		}

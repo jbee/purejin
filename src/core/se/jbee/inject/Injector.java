@@ -13,19 +13,32 @@ import static se.jbee.inject.Type.raw;
 /**
  * Knows how to *resolve* an instance for a given {@link Dependency}.
  *
- * The process of resolving might include fabrication of instances.
+ * The process of resolving might include creation of instances.
  *
- * An {@link Injector} is immutable (at least from the outside view). Once
- * created it provides a certain set of supported dependencies that can be
- * resolved. All calls to {@link #resolve(Dependency)} always have the same
- * result for the same {@linkplain Dependency}. The only exception to this are
- * scoping effects (expiring and parallel instances).
+ * Once created a {@link Injector} container consists of a fixed set of
+ * {@link InjectionCase}s.
+ * 
+ * Calls to {@link #resolve(Dependency)} always have the same result for the
+ * same {@linkplain Dependency}. The only exception to this are scoping effects
+ * (expiring and parallel instances).
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
 @FunctionalInterface
 public interface Injector {
 
+	/**
+	 * To resolve all matching implementations create a {@link Dependency} on
+	 * the array type of the implementations. When list or set bridges have been
+	 * installed this can also be resolved as list or set.
+	 * 
+	 * @param dependency describes the absolute instance to resolve. This
+	 *            includes nesting within the resolution process and other
+	 *            details of a {@link Dependency} to consider.
+	 * @return The resolved instance or
+	 * @throws UnresolvableDependency in case no {@link InjectionCase} is found
+	 *             that could serve the requested instance
+	 */
 	<T> T resolve(Dependency<T> dependency) throws UnresolvableDependency;
 
 	/* Utility methods */

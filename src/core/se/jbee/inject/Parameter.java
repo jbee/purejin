@@ -6,15 +6,14 @@
 package se.jbee.inject;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 
 /**
- * {@linkplain Parameter}s are *not* about to find/identify the
- * {@link Constructor} to use! This would get far to complex to understand (yet
- * simple to implement) using different constructors depending on the
- * {@linkplain Parameter}s.
+ * {@linkplain Parameter}s identify what to inject as argument to a
+ * {@link Constructor} or {@link Method} parameter.
  * 
- * {@linkplain Parameter}s identify the {@link Instance} to use for the
- * constructor.
+ * {@linkplain Parameter}s are *not* about finding or identifying the
+ * {@link Constructor} to use!
  * 
  * <h3>How {@linkplain Parameter}s are understood:</h3>
  * <dl>
