@@ -235,6 +235,7 @@ public class Binder {
 						dependency(dependencies).injectingInto(target));
 				for (C arg : args)
 					initialiser.accept(obj, arg);
+				return impl;
 			});
 		}
 
@@ -255,6 +256,7 @@ public class Binder {
 				C arg = injector.resolve(
 						dependency(dependency).injectingInto(target));
 				initialiser.accept(obj, arg);
+				return impl;
 			});
 		}
 	}
@@ -408,7 +410,7 @@ public class Binder {
 		}
 
 		// OPEN also allow naming for provided instances - this is used for
-		// value objects that become parameter
+		// value objects that become parameter; settings required and provided
 
 		public <T> void provide(Class<T> impl, Parameter<?>... hints) {
 			on(bind().asProvided()).bind(impl).toConstructor(hints);

@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -55,7 +56,27 @@ public final class Container {
 	static final InjectionCase<?>[] noCases = new InjectionCase[0];
 
 	public static Injector injector(Injectee<?>... injectees) {
-		return new InjectorImpl(injectees);
+		InjectorImpl impl = new InjectorImpl(injectees);
+		initEager(impl);
+		// run initialisers for the injector
+		Injector res = impl;
+		if (impl.injectorInitialisers != null)
+			for (Initialiser<Injector> init : impl.injectorInitialisers)
+				res = init.init(res, impl);
+		impl.injectorInitialisers = null; // no longer needed
+		impl.initialised = res;
+		return res;
+	}
+
+	private static void initEager(Iterable<InjectionCase<?>[]> casesByType) {
+		for (InjectionCase<?>[] cases : casesByType)
+			for (InjectionCase<?> c : cases)
+				initEager(c);
+	}
+
+	private static <T> void initEager(InjectionCase<T> c) {
+		if (c.scoping.isEager())
+			c.generator.yield(c.resource.toDependency());
 	}
 
 	private Container() {
@@ -70,26 +91,26 @@ public final class Container {
 	 * precise. The first in order that matches yields the result instance.
 	 */
 	@SuppressWarnings("squid:S1200")
-	private static final class InjectorImpl implements Injector {
+	private static final class InjectorImpl
+			implements Injector, Iterable<InjectionCase<?>[]> {
 
 		final int generators;
 		private final Map<Class<?>, InjectionCase<?>[]> casesByType;
 		private final InjectionCase<?>[] wildcardCases;
-		final InjectionCase<? extends Initialiser<?>>[] initialisersCases;
+		final InjectionCase<? extends Initialiser<?>>[] postConstruct;
+		Initialiser<Injector>[] injectorInitialisers;
+		Injector initialised;
 
 		InjectorImpl(Injectee<?>... injectees) {
 			this.generators = injectees.length;
 			this.casesByType = initFrom(injectees);
 			this.wildcardCases = wildcardCases(casesByType);
-			this.initialisersCases = initInitialisers();
-			for (InjectionCase<?>[] cases : casesByType.values())
-				for (InjectionCase<?> c : cases)
-					initEagerCase(c);
+			this.postConstruct = initInitialisers();
 		}
 
-		private static <T> void initEagerCase(InjectionCase<T> c) {
-			if (c.scoping.isEager())
-				c.generator.yield(c.resource.toDependency());
+		@Override
+		public Iterator<InjectionCase<?>[]> iterator() {
+			return casesByType.values().iterator();
 		}
 
 		private InjectionCase<? extends Initialiser<?>>[] initInitialisers() {
@@ -99,11 +120,8 @@ public final class Container {
 				return initCases;
 			Type<Initialiser<Injector>> injectorInitType = initialiserTypeOf(
 					Injector.class);
-			Initialiser<Injector>[] injectorInitialisers = resolve(
+			injectorInitialisers = resolve(
 					injectorInitType.addArrayDimension());
-			// run initialisers for the injector
-			for (Initialiser<Injector> init : injectorInitialisers)
-				init.init(this, this);
 			if (initCases.length == injectorInitialisers.length)
 				return copyOf(initCases, 0); // no other dynamic initialisers
 			return arrayFilter(initCases,
@@ -184,7 +202,7 @@ public final class Container {
 					return (T) res;
 			}
 			if (rawType == Injector.class)
-				return (T) this;
+				return (T) initialised;
 			InjectionCase<T> match = injectionCaseMatching(dep);
 			if (match != null)
 				return match.yield(dep);
@@ -376,7 +394,7 @@ public final class Container {
 		private volatile Scope scope;
 
 		private Class<?> cachedForType;
-		private Initialiser<? super T>[] cachedInitialisers;
+		private Initialiser<? super T>[] cachedPostConstructs;
 
 		ScopedGenerator(int serialID, InjectorImpl injector,
 				Injectee<T> injectee, Scoping scoping) {
@@ -400,44 +418,51 @@ public final class Container {
 			 * (lambda below) is called multiple times (which can occur because
 			 * methods like {@code updateAndGet} on atomics have a loop) will
 			 * always yield the same instance. Different invocation of this
-			 * method however can lead to multiple calls to the supplier.
+			 * method (yield) however can lead to multiple calls to the
+			 * supplier.
 			 */
 			AtomicReference<T> instanceCache = new AtomicReference<>();
 			return scope.yield(serialID, injected, () -> {
 				T instance = instanceCache.get();
 				if (instance == null) {
-					instance = supplier.supply(injected, injector);
+					instance = supplier.supply(injected, injector());
+					if (instance != null && injector.postConstruct != null
+						&& injector.postConstruct.length > 0)
+						instance = postConstruct(instance, injected);
 					instanceCache.set(instance);
 				}
-				if (instance != null && injector.initialisersCases != null
-					&& injector.initialisersCases.length > 0)
-					postConstruct(instance, injected);
 				return instance;
 			}, injector.generators);
+		}
+
+		private Injector injector() {
+			Injector initialised = injector.initialised;
+			return initialised != null ? initialised : injector;
 		}
 
 		//TODO add support for annotation based initialisers - resolve Initialiser bound for Annotation class.
 
 		@SuppressWarnings("unchecked")
-		private void postConstruct(T instance, Dependency<?> context) {
+		private T postConstruct(T instance, Dependency<?> context) {
 			Class<?> type = instance.getClass();
 			if (type == Class.class || type == InjectionCase.class
 				|| Initialiser.class.isAssignableFrom(type)) {
-				return;
+				return instance;
 			}
 			if (type != cachedForType) {
 				cachedForType = type;
-				cachedInitialisers = arrayFlatmap(injector.initialisersCases,
+				cachedPostConstructs = arrayFlatmap(injector.postConstruct,
 						Initialiser.class,
-						icase -> resolveInitialiser(type, icase, context));
+						icase -> yieldInitialiser(type, icase, context));
 			}
-			if (cachedInitialisers.length > 0)
-				for (Initialiser<? super T> i : cachedInitialisers)
-					i.init(instance, injector);
+			if (cachedPostConstructs.length > 0)
+				for (Initialiser<? super T> i : cachedPostConstructs)
+					instance = (T) i.init(instance, injector());
+			return instance;
 		}
 
 		@SuppressWarnings("unchecked")
-		private <I extends Initialiser<?>> Initialiser<? super T> resolveInitialiser(
+		private <I extends Initialiser<?>> Initialiser<? super T> yieldInitialiser(
 				Class<?> type, InjectionCase<I> icase, Dependency<?> context) {
 			Resource<I> initialiser = icase.resource;
 			if (!initialiser.target.isAvailableFor(context))

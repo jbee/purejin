@@ -25,7 +25,8 @@ import org.junit.runners.Suite.SuiteClasses;
 		TestEditionPackageBinds.class, TestPubSubBinds.class,
 		TestSetterInitialisationBinds.class, TestDynamicInitialiserBinds.class,
 		TestMacroBinds.class, TestGeneratorBinds.class,
-		TestDiskScopeBinds.class, TestConfigBinds.class })
+		TestDiskScopeBinds.class, TestConfigBinds.class,
+		TestInitialiserDecorationBinds.class })
 public class SuiteBind {
 	// all tests in the bind package
 }

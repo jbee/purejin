@@ -28,7 +28,7 @@ public class TestDynamicInitialiserBinds {
 
 	private static interface MyListener {
 
-		void inc(int n);
+		MyListener inc(int n);
 	}
 
 	static class MyService implements MyListener {
@@ -36,8 +36,9 @@ public class TestDynamicInitialiserBinds {
 		int sum;
 
 		@Override
-		public void inc(int n) {
+		public MyListener inc(int n) {
 			sum += n;
+			return this;
 		}
 
 	}

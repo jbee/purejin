@@ -35,16 +35,17 @@ public class TestInitialiserBinds {
 		}
 
 		@Override
-		public void init(Injector target, Injector context) {
+		public Injector init(Injector target, Injector context) {
 			// just to show that one could use the module itself as well
 			// this e.g. allows to pass down and use setup data by using
 			// PresetModule's as shown with TestInitialiserBindsPresetModule
 			moduleInitRan = true;
+			return target;
 		}
 
 	}
 
-	static final class TestInitialiserBindsPresetModule
+	static final class TestInitialiserBindsModuleWith
 			extends BinderModuleWith<Integer> implements Initialiser<Injector> {
 
 		Integer setup;
@@ -58,9 +59,10 @@ public class TestInitialiserBinds {
 		}
 
 		@Override
-		public void init(Injector target, Injector context) {
+		public Injector init(Injector target, Injector context) {
 			assertNotNull(setup);
 			// use setup to initialize something
+			return target;
 		}
 	}
 
@@ -79,7 +81,7 @@ public class TestInitialiserBinds {
 		}
 
 		@Override
-		public void init(Injector target, Injector context) {
+		public Injector init(Injector target, Injector context) {
 			// by the use of upper bound we receive all implementing classes
 			// even though they have not be bound explicitly for AutoCloseable.
 			AutoCloseable[] autoCloseables = target.resolve(
@@ -93,6 +95,7 @@ public class TestInitialiserBinds {
 						throw new RuntimeException(e);
 					}
 			};
+			return target;
 		}
 
 	}
@@ -125,24 +128,24 @@ public class TestInitialiserBinds {
 		SingletonResource resource = injector.resolve(SingletonResource.class);
 		assertNotNull(resource);
 		assertFalse(resource.isClosed);
-		shutdownHookMock.run();
+		shutdownHookMock.run(); // simulated shutdown
 		assertTrue(resource.isClosed);
 
 		assertTrue(moduleInitRan);
 	}
 
 	@Test
-	public void initialisersCanMakeUseOfParammetersUsingPresetModules() {
+	public void initialisersCanMakeUseOfParammetersUsingArgumentedModules() {
 		Globals globals = Globals.STANDARD.with(
 				Options.NONE.set(Integer.class, 42)); // setup some parameter
 		Injector injector = Bootstrap.injector(
-				TestInitialiserBindsPresetModule.class, globals);
+				TestInitialiserBindsModuleWith.class, globals);
 
 		// double check
 		Initialiser<Injector> initialiser = injector.resolve(
 				initialiserTypeOf(Injector.class));
-		assertTrue(initialiser instanceof TestInitialiserBindsPresetModule);
-		TestInitialiserBindsPresetModule module = (TestInitialiserBindsPresetModule) initialiser;
+		assertTrue(initialiser instanceof TestInitialiserBindsModuleWith);
+		TestInitialiserBindsModuleWith module = (TestInitialiserBindsModuleWith) initialiser;
 		assertNotNull(module.setup);
 		assertEquals(42, module.setup.intValue());
 	}
