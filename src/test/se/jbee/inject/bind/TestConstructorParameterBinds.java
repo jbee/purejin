@@ -38,6 +38,7 @@ public class TestConstructorParameterBinds {
 
 	private static class Foo {
 
+		@SuppressWarnings("unused")
 		final Integer baz;
 
 		@SuppressWarnings("unused")

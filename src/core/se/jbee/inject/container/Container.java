@@ -357,7 +357,7 @@ public final class Container {
 
 		private final Injector injector;
 		private final Supplier<? extends T> supplier;
-		private volatile T value;
+		private final Lazy<T> value = new Lazy<>();
 
 		LazySingletonGenerator(Injector injector,
 				Supplier<? extends T> supplier) {
@@ -368,16 +368,7 @@ public final class Container {
 		@Override
 		public T yield(Dependency<? super T> dep)
 				throws UnresolvableDependency {
-			T res = value;
-			if (res != null)
-				return res;
-			synchronized (this) {
-				if (value == null) {
-					// do this always only once
-					value = supplier.supply(dep, injector);
-				}
-			}
-			return value;
+			return value.get(() -> supplier.supply(dep, injector));
 		}
 	}
 
@@ -388,7 +379,7 @@ public final class Container {
 		private final Supplier<? extends T> supplier;
 		private final Scoping scoping;
 		private final Resource<T> resource;
-		private volatile Scope scope;
+		private final Lazy<Scope> scope = new Lazy<>();
 
 		private Class<?> cachedForType;
 		private Initialiser<? super T>[] cachedPostConstructs;
@@ -402,12 +393,13 @@ public final class Container {
 			this.resource = injectee.resource;
 		}
 
+		private Scope resolveScope() {
+			return injector.resolve(scoping.scope, Scope.class);
+		}
+
 		@Override
 		public T yield(Dependency<? super T> dep) {
-			if (scope == null) {
-				//as scopes are known container "singletons"; its OK should this really happen more then once
-				scope = injector.resolve(scoping.scope, Scope.class);
-			}
+			Scope scopeValue = scope.get(this::resolveScope);
 			Dependency<? super T> injected = dep.injectingInto(resource,
 					scoping);
 			/**
@@ -419,7 +411,7 @@ public final class Container {
 			 * supplier.
 			 */
 			AtomicReference<T> instanceCache = new AtomicReference<>();
-			return scope.yield(serialID, injected, () -> {
+			return scopeValue.yield(serialID, injected, () -> {
 				T instance = instanceCache.get();
 				if (instance == null) {
 					instance = supplier.supply(injected, injector());
