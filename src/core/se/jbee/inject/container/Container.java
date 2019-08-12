@@ -190,9 +190,6 @@ public final class Container {
 		@SuppressWarnings("unchecked")
 		@Override
 		public <T> T resolve(Dependency<T> dep) {
-			//TODO new feature: resolve by annotation type -> as addon with own API?
-			// could do type analysis on basis of cases
-			// or could use the injection hierarchy for the annotation types [injectingInto(Class<? extends Annotation>[])]
 			final Type<T> type = dep.type();
 			final Class<T> rawType = type.rawType;
 			if (rawType == InjectionCase.class || rawType == Generator.class) {
@@ -439,8 +436,6 @@ public final class Container {
 			Injector initialised = injector.initialised;
 			return initialised != null ? initialised : injector;
 		}
-
-		//TODO add support for annotation based initialisers - resolve Initialiser bound for Annotation class.
 
 		@SuppressWarnings("unchecked")
 		private T postConstruct(T instance, Dependency<?> context) {

@@ -29,16 +29,19 @@ public interface Initialiser<T> {
 	 * its state has been initialised. It can be used to decorate the injector
 	 * or other target instances.
 	 * 
-	 * @param target the newly created instance to initialise
+	 * @param target the newly created instance to initialise. For
+	 *            {@link Initialiser} of the {@link Injector} this is always the
+	 *            decorated {@link Injector} in case decoration was done by
+	 *            other {@link Initialiser}s.
 	 * @param context use to receive instances that require further
-	 *            initialisation setup
+	 *            initialisation setup. For {@link Initialiser} of the
+	 *            {@link Injector} this is always the underlying
+	 *            {@link Injector} that isn't decorated in case decoration was
+	 *            done before by another {@link Initialiser}.
 	 * @return the initialised instance; usually this is still the target
 	 *         instance. When using proxy or decorator pattern this would be the
 	 *         proxy or decorator instance.
 	 */
 	T init(T target, Injector context);
 
-	// * If T is returned this could be used to do decorations (but the init would have to take place so that the decorated instance ends up in scope => looks like it already is)
-	// * For annotations bind a Initialiser<Object> with a hierarchy injectingInto(MyAnnotation.class)
-	// * When returning T this could even be used to wrap the Injector itself and that way extend it which could be used to make annotations work
 }
