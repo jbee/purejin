@@ -18,6 +18,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
 
 import se.jbee.inject.InconsistentBinding;
@@ -27,6 +28,7 @@ import se.jbee.inject.config.Choices;
 import se.jbee.inject.config.Globals;
 import se.jbee.inject.config.Options;
 import se.jbee.inject.container.Container;
+import se.jbee.inject.container.Lazy;
 
 /**
  * Utility to create an {@link Injector} context from {@link Bundle}s and
@@ -35,6 +37,27 @@ import se.jbee.inject.container.Container;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Bootstrap {
+
+	private static final Lazy<Injector> serviceContext = new Lazy<>();
+
+	public static Injector getServiceContext() {
+		return serviceContext.get(Bootstrap::loadServiceContext);
+	}
+
+	private static Injector loadServiceContext() {
+		Set<Class<? extends Bundle>> roots = new LinkedHashSet<>();
+		for (Bundle root : ServiceLoader.load(Bundle.class))
+			roots.add(root.getClass());
+		if (roots.isEmpty())
+			throw InconsistentBinding.noRootBundle();
+		BuildinBootstrapper bootstrapper = new BuildinBootstrapper(
+				Globals.STANDARD);
+		@SuppressWarnings("unchecked")
+		Class<? extends Bundle>[] bundles = bootstrapper.bundleAll(
+				roots.toArray(new Class[0]));
+		return injector(Bindings.newBindings(),
+				bootstrapper.modulesOf(bundles));
+	}
 
 	public static Injector injector(Class<? extends Bundle> root) {
 		return injector(root, Globals.STANDARD);
@@ -201,17 +224,25 @@ public final class Bootstrap {
 			return modulesOf(bundle(root));
 		}
 
-		@SuppressWarnings("unchecked")
 		@Override
 		public Class<? extends Bundle>[] bundle(Class<? extends Bundle> root) {
-			if (!installed.contains(root))
-				install(root);
+			return bundleAll(root);
+		}
+
+		@SafeVarargs
+		@SuppressWarnings("unchecked")
+		final Class<? extends Bundle>[] bundleAll(
+				Class<? extends Bundle>... roots) {
 			Set<Class<? extends Bundle>> installed = new LinkedHashSet<>();
-			addAllInstalledIn(root, installed);
+			for (Class<? extends Bundle> root : roots)
+				if (!installed.contains(root))
+					install(root);
+			for (Class<? extends Bundle> root : roots)
+				addAllInstalledIn(root, installed);
 			return arrayOf(installed, Class.class);
 		}
 
-		private Module[] modulesOf(Class<? extends Bundle>[] bundles) {
+		final Module[] modulesOf(Class<? extends Bundle>[] bundles) {
 			List<Module> installed = new ArrayList<>(bundles.length);
 			for (Class<? extends Bundle> b : bundles) {
 				List<Module> modules = bundleModules.get(b);

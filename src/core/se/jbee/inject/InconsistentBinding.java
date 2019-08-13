@@ -80,4 +80,9 @@ public final class InconsistentBinding extends RuntimeException {
 				"Detected a self-referential binding: \n\t" + bound + " => "
 					+ linked + "\n\t" + inconsistent);
 	}
+
+	public static InconsistentBinding noRootBundle() {
+		return new InconsistentBinding(
+				"No root bundle has been defined for ServiceLoader service via file META-INF/services/se.jbee.inject.bootstrap.Bundle");
+	}
 }
