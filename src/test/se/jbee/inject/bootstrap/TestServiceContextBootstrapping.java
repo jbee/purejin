@@ -22,7 +22,7 @@ public class TestServiceContextBootstrapping {
 
 	@Test
 	public void serviceLoaderCanBeUsedToDeclareModuleRoots() {
-		Injector context = Bootstrap.getServiceContext();
+		Injector context = Bootstrap.getApplicationContext();
 		assertNotNull(context);
 		assertEquals(13, context.resolve(int.class).intValue());
 		assertEquals("com.example.app.MyFirstModule",

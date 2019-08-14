@@ -1,12 +1,12 @@
 package com.example.app;
 
-import se.jbee.inject.bind.BinderModule;
+import se.jbee.inject.bind.BinderModuleWith;
 
-public class MyFirstModule extends BinderModule {
+public class MyFirstModule extends BinderModuleWith<Integer> {
 
 	@Override
-	protected void declare() {
-		bind(int.class).to(13);
+	protected void declare(Integer value) {
+		bind(int.class).to(value);
 		bind(String.class).to(getClass().getName());
 	}
 

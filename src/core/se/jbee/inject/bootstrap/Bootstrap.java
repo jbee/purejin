@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,25 +39,65 @@ import se.jbee.inject.container.Lazy;
  */
 public final class Bootstrap {
 
-	private static final Lazy<Injector> serviceContext = new Lazy<>();
+	private static final Lazy<Injector> APPLICATION_CONTEXT = new Lazy<>();
 
-	public static Injector getServiceContext() {
-		return serviceContext.get(Bootstrap::loadServiceContext);
+	/**
+	 * The <em>Application Context</em> is a implicitly defined {@link Injector}
+	 * context usually used by applications assembled from multiple software
+	 * modules.
+	 * 
+	 * Instead of passing a single root {@link Bundle} to the bootstrapping one
+	 * or more root {@link Bundle}s are defined as services for the
+	 * {@link ServiceLoader} in the
+	 * <code>META-INF/services/se.jbee.inject.bootstrap.Bundle</code> files or
+	 * jar or war files. As usual such a file contains only the fully qualified
+	 * class name of the root bundle for the software module the jar represents.
+	 * As an application can consist of multiple software modules there can be
+	 * multiple root bundles. The application root bundle can be seen as a
+	 * virtual bundle installing all the bundles referenced by
+	 * {@link ServiceLoader}.
+	 * 
+	 * Instead of passing configuration like {@link Globals} to this method
+	 * these can be configured by implementing the
+	 * {@link ApplicationContextConfig} interface and declaring it as a service
+	 * in
+	 * <code>META-INF/services/se.jbee.inject.bootstrap.ApplicationContextConfig</code>
+	 * of one of the application jars so it can be loaded via
+	 * {@link ServiceLoader}. This allows application specific configuration of
+	 * the bootstrapped application context.
+	 * 
+	 * Once created the {@link Injector} instance is cached so further calls to
+	 * this method always return the same instance.
+	 * 
+	 * @since 19.1
+	 * 
+	 * @return the {@link Injector} instance derived from one or more roots
+	 *         defined using the {@link ServiceLoader} mechanism
+	 */
+	public static Injector getApplicationContext() {
+		return APPLICATION_CONTEXT.get(Bootstrap::loadApplicationContext);
 	}
 
-	private static Injector loadServiceContext() {
+	private static Injector loadApplicationContext() {
 		Set<Class<? extends Bundle>> roots = new LinkedHashSet<>();
 		for (Bundle root : ServiceLoader.load(Bundle.class))
 			roots.add(root.getClass());
 		if (roots.isEmpty())
 			throw InconsistentBinding.noRootBundle();
-		BuildinBootstrapper bootstrapper = new BuildinBootstrapper(
-				Globals.STANDARD);
+		Iterator<ApplicationContextConfig> configIter = ServiceLoader.load(
+				ApplicationContextConfig.class).iterator();
+		Globals globals = Globals.STANDARD;
+		Bindings bindings = Bindings.newBindings();
+		if (configIter.hasNext()) {
+			ApplicationContextConfig config = configIter.next();
+			globals = config.globals();
+			bindings = bindings.with(config.macros()).with(config.mirrors());
+		}
+		BuildinBootstrapper bootstrapper = new BuildinBootstrapper(globals);
 		@SuppressWarnings("unchecked")
 		Class<? extends Bundle>[] bundles = bootstrapper.bundleAll(
 				roots.toArray(new Class[0]));
-		return injector(Bindings.newBindings(),
-				bootstrapper.modulesOf(bundles));
+		return injector(bindings, bootstrapper.modulesOf(bundles));
 	}
 
 	public static Injector injector(Class<? extends Bundle> root) {
