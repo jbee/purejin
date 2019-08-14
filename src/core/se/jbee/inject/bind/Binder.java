@@ -555,11 +555,15 @@ public class Binder {
 		}
 
 		public void to(Constructor<? extends T> target, Parameter<?>... hints) {
+			if (hints.length == 0)
+				hints = mirrors().parameterisation.reflect(target);
 			expand(New.bind(target, hints));
 		}
 
 		protected final void to(Object owner, Method target,
 				Parameter<?>... hints) {
+			if (hints.length == 0)
+				hints = mirrors().parameterisation.reflect(target);
 			expand(Factory.bind(owner, target, hints));
 		}
 

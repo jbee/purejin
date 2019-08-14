@@ -151,8 +151,9 @@ public class TestProviderBinds {
 			injector.resolve(FaultyStateConsumer.class);
 			fail("expected " + UnstableDependency.class.getSimpleName());
 		} catch (UnstableDependency e) {
-			assertEquals(
-					"Cannot inject se.jbee.inject.bind.TestProviderBinds.DynamicState  {* => *, [*] } injection into se.jbee.inject.bind.TestProviderBinds.FaultyStateConsumer  {* => *, [*] } application",
+			assertEquals("Unstable dependency injection\n"
+				+ "	of: se.jbee.inject.bind.TestProviderBinds.DynamicState  {* => *, [*] } injection\n"
+				+ "	into: se.jbee.inject.bind.TestProviderBinds.FaultyStateConsumer  {* => *, [*] } application",
 					e.getMessage());
 		}
 	}

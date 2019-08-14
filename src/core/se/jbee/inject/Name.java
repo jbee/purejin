@@ -16,9 +16,15 @@ import java.io.Serializable;
 public final class Name implements Qualifying<Name>, Serializable {
 
 	/**
-	 * Character used as wildcard when matching names.
+	 * Character used as wild-card when matching names.
 	 */
-	private static final String WILDCARD = "*";
+	private static final char WILDCARD = '*';
+
+	/**
+	 * Character used as divider for name-spacing {@link Class} objects passed
+	 * to {@link #named(Object)}.
+	 */
+	public static final char NAMESPACE = ':';
 
 	/**
 	 * Used when no name is specified. Maybe at first counter-intuitively this
@@ -33,11 +39,15 @@ public final class Name implements Qualifying<Name>, Serializable {
 	 * It is the least qualified name of all so it is the last name that will be
 	 * tried and as it matches any name asked for it the match is found.
 	 */
-	public static final Name ANY = new Name(WILDCARD);
+	public static final Name ANY = new Name("" + WILDCARD);
 
 	final String value;
 
 	public static Name named(Object name) {
+		if (name instanceof Class) {
+			Class<?> cls = (Class<?>) name;
+			return named(cls.getCanonicalName() + NAMESPACE);
+		}
 		return named(String.valueOf(name));
 	}
 
@@ -54,6 +64,18 @@ public final class Name implements Qualifying<Name>, Serializable {
 	@Override
 	public String toString() {
 		return value;
+	}
+
+	public String withoutNamespace() {
+		return value.substring(value.indexOf(NAMESPACE) + 1);
+	}
+
+	public Name asPrefix() {
+		return isAny() ? this : named(value + WILDCARD);
+	}
+
+	public Name concat(String suffix) {
+		return named(value + suffix);
 	}
 
 	@Override
@@ -82,22 +104,40 @@ public final class Name implements Qualifying<Name>, Serializable {
 	public boolean moreQualiedThan(Name other) {
 		final boolean thisIsDefault = isDefault();
 		final boolean otherIsDefault = other.isDefault();
-		if (thisIsDefault || otherIsDefault) {
+		if (thisIsDefault || otherIsDefault)
 			return !otherIsDefault;
-		}
 		final boolean thisIsAny = isAny();
 		final boolean otherIsAny = other.isAny();
-		if (thisIsAny || otherIsAny) {
+		if (thisIsAny || otherIsAny)
 			return !thisIsAny;
-		}
 		return value.length() > other.value.length()
 			&& value.startsWith(other.value);
 	}
 
 	public boolean isCompatibleWith(Name other) {
 		return isAny() || other.isAny() || other.value.equals(value)
-			|| value.matches(other.value.replace(WILDCARD, ".*"))
-			|| other.value.matches(value.replace(WILDCARD, ".*"));
+			|| matches(value, other.value) || matches(other.value, value);
+	}
+
+	private static boolean matches(String pattern, String str) {
+		int i = 0, j = 0;
+		int len = pattern.length();
+		int strLen = str.length();
+		while (i < len && j < strLen) {
+			char p = pattern.charAt(i++);
+			if (p == WILDCARD) {
+				if (i == len) // end of pattern is wild-card
+					return true;
+				while (str.charAt(j) != pattern.charAt(i)) // i already forwarded to next
+					j++;
+			} else if (p != str.charAt(j)) {
+				return false;
+			} else {
+				j++;
+			}
+		}
+		return j == strLen && (i == len
+			|| i + 1 == len && pattern.charAt(len - 1) == WILDCARD);
 	}
 
 }

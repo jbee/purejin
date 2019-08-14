@@ -233,8 +233,10 @@ public final class Container {
 		}
 
 		private <T> NoCaseForDependency noCaseFor(Dependency<T> dep) {
-			return new NoCaseForDependency(dep,
-					injectionCasesForType(dep.type()), "");
+			Type<T> type = dep.type();
+			//FIXMe if T is InjectionCase this does not work
+			return new NoCaseForDependency(dep, injectionCasesForType(type),
+					"");
 		}
 
 		@SuppressWarnings("unchecked")

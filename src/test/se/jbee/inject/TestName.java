@@ -1,5 +1,6 @@
 package se.jbee.inject;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static se.jbee.inject.Name.named;
 
@@ -49,6 +50,28 @@ public class TestName {
 
 	@Test
 	public void prefixShouldBeCompatibleToSamePrefix() {
-		assertTrue(named("disk:*").isCompatibleWith(named("disk:/home/jan/")));
+		assertTrue(named("disk:").asPrefix().isCompatibleWith(
+				named("disk:/home/jan/")));
+	}
+
+	@Test
+	public void prefixShouldBeCompatibleToSamePrefixInnerClassName() {
+		String prefix = "se.jbee.inject.bind.testpropertyannotationbinds$property:*";
+		String name = "se.jbee.inject.bind.testpropertyannotationbinds$property:foo";
+		assertTrue(named(prefix).isCompatibleWith(named(name)));
+	}
+
+	@Test
+	public void infixShouldBeCompatibleToSameInfix() {
+		Name foobar = named("foo*bar");
+		assertTrue(foobar.isCompatibleWith(named("foobar")));
+		assertTrue(foobar.isCompatibleWith(named("footerbar")));
+	}
+
+	@Test
+	public void infixShouldNotBeCompatibleWithPrefixPartOfInfix() {
+		Name foobar = named("foo*bar");
+		assertFalse(foobar.isCompatibleWith(named("foobbar")));
+		assertFalse(foobar.isCompatibleWith(named("foo")));
 	}
 }

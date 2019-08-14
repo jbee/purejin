@@ -33,8 +33,12 @@ public abstract class BinderModuleWith<T> extends InitializedBinder
 
 	@Override
 	public final void declare(Bindings bindings, T option) {
-		__init__(bindings);
+		__init__(configure(bindings));
 		declare(option);
+	}
+
+	protected Bindings configure(Bindings bindings) {
+		return bindings;
 	}
 
 	@Override

@@ -54,6 +54,10 @@ public final class Type<T>
 		return type(method.getGenericReturnType());
 	}
 
+	public static Type<?> parameterType(java.lang.reflect.Parameter param) {
+		return type(param.getParameterizedType());
+	}
+
 	public static Type<?>[] parameterTypes(Executable methodOrConstructor) {
 		return parameterTypes(methodOrConstructor.getGenericParameterTypes());
 	}

@@ -27,7 +27,7 @@ public final class Plugins implements Extension {
 	 * @return A fully qualified plugin point name
 	 */
 	public static Name pluginPoint(Class<?> point, String property) {
-		return Name.named(point.getCanonicalName() + ":" + property);
+		return Name.named(point).concat(property);
 	}
 
 	private final Injector context;
