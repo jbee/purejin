@@ -1,9 +1,11 @@
 package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
@@ -21,6 +23,7 @@ import se.jbee.inject.Generator;
 import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Name;
+import se.jbee.inject.UnresolvableDependency.NoCaseForDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
 
 public class TestInjectionCaseBinds {
@@ -95,5 +98,27 @@ public class TestInjectionCaseBinds {
 	@Test
 	public void thatInjectorIsAvailableByDefault() {
 		assertSame(injector, injector.resolve(Injector.class));
+	}
+
+	@Test
+	public void resolingViaInjectionCaseDoesLookupPlainTypeForPotentialMatches() {
+		try {
+			injector.resolve(named("x"), injectionCaseTypeFor(String.class));
+			fail("Expected not to find a matching case");
+		} catch (NoCaseForDependency e) {
+			assertFalse(e.getMessage().contains(": none"));
+			assertTrue(e.getMessage().contains("special"));
+		}
+	}
+
+	@Test
+	public void resolingViaGeneratorDoesLookupPlainTypeForPotentialMatches() {
+		try {
+			injector.resolve(named("x"), generatorTypeOf(raw(String.class)));
+			fail("Expected not to find a matching case");
+		} catch (NoCaseForDependency e) {
+			assertFalse(e.getMessage().contains(": none"));
+			assertTrue(e.getMessage().contains("special"));
+		}
 	}
 }

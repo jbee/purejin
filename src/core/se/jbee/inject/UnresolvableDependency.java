@@ -79,27 +79,25 @@ public abstract class UnresolvableDependency extends RuntimeException {
 			extends UnresolvableDependency {
 
 		public <T> NoCaseForDependency(Dependency<T> dependency,
-				InjectionCase<T>[] available, String msg) {
-			super("No resource for dependency:\n" + dependency
-				+ "\navailable are (for same raw type): " + describe(available)
-				+ "\n" + msg);
+				InjectionCase<?>[] available, String msg) {
+			super("No matching case found.\n\t dependency: " + dependency
+				+ "\n\tavailable are (for same raw type): "
+				+ describe(available) + "\n\t" + msg);
 		}
 
 		public NoCaseForDependency(Collection<Type<?>> types, List<?> dropped) {
-			super("No resource for required type(s): " + types
-				+ "\ndrobbed bindings:\n" + dropped);
+			super("No case for type(s)\n\trequired: " + types
+				+ "\n\tdrobbed bindings:\n" + dropped);
 		}
 	}
 
 	public static String describe(InjectionCase<?>... cases) {
-		if (cases == null || cases.length == 0) {
+		if (cases == null || cases.length == 0)
 			return "none";
-		}
 		StringBuilder b = new StringBuilder();
-		for (InjectionCase<?> c : cases) {
+		for (InjectionCase<?> c : cases)
 			b.append("\n    ").append(c.resource.toString()).append(
 					" defined ").append(c.source);
-		}
 		return b.toString();
 	}
 

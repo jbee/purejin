@@ -120,7 +120,8 @@ public final class Name implements Qualifying<Name>, Serializable {
 	}
 
 	private static boolean matches(String pattern, String str) {
-		int i = 0, j = 0;
+		int i = 0;
+		int j = 0;
 		int len = pattern.length();
 		int strLen = str.length();
 		while (i < len && j < strLen) {

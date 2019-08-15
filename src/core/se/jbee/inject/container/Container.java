@@ -234,8 +234,9 @@ public final class Container {
 
 		private <T> NoCaseForDependency noCaseFor(Dependency<T> dep) {
 			Type<T> type = dep.type();
-			//FIXMe if T is InjectionCase this does not work
-			return new NoCaseForDependency(dep, injectionCasesForType(type),
+			Type<?> listType = type.rawType == InjectionCase.class
+				|| type.rawType == Generator.class ? type.parameter(0) : type;
+			return new NoCaseForDependency(dep, injectionCasesForType(listType),
 					"");
 		}
 
