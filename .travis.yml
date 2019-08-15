@@ -10,6 +10,9 @@ jdk:
   - openjdk9
   - openjdk11
 
+before_script:
+   - sudo apt-get install ant-optional
+
 install: ant test
 
 addons:
