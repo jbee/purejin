@@ -6,9 +6,9 @@ cache:
   - '$HOME/.sonar/cache'
 
 jdk:
-  - oraclejdk8
-  - oraclejdk9
-  - oraclejdk11
+  - openjdk8
+  - openjdk9
+  - openjdk11
 
 install: ant test
 
