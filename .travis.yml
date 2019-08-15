@@ -10,10 +10,15 @@ jdk:
   - openjdk9
   - openjdk11
 
-install: ant bootstrap
-script: ant test
+install: ant test
 
 addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - ant
+      - ant-optional
   sonarcloud:
     organization: "jbee-github" # the key of the org you chose at step #3
     token:
