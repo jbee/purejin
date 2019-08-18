@@ -61,4 +61,20 @@ public interface Macro<V> {
 	 *            {@link Binding}s should be added to.
 	 */
 	<T> void expand(V value, Binding<T> incomplete, Bindings bindings);
+
+	/**
+	 * A {@link Completion} just uses the passed value to
+	 * {@link Completion#complete(Binding, Object)} the {@link Binding} and add
+	 * it to the {@link Bindings}.
+	 */
+	interface Completion<V> extends Macro<V> {
+
+		@Override
+		public default <T> void expand(V value, Binding<T> incomplete,
+				Bindings bindings) {
+			bindings.addExpanded(complete(incomplete, value));
+		}
+
+		<T> Binding<T> complete(Binding<T> incomplete, V value);
+	}
 }

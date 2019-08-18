@@ -148,28 +148,12 @@ public final class Macros {
 		}
 	}
 
-	/**
-	 * A {@link SimpleMacro} just uses the passed value to
-	 * {@link SimpleMacro#complete(Binding, Object)} the {@link Binding} and add
-	 * it to the {@link Bindings}.
-	 */
-	static abstract class SimpleMacro<V> implements Macro<V> {
-
-		@Override
-		public <T> void expand(V value, Binding<T> incomplete,
-				Bindings bindings) {
-			bindings.addExpanded(complete(incomplete, value));
-		}
-
-		protected abstract <T> Binding<T> complete(Binding<T> incomplete,
-				V value);
-	}
-
-	static final class ArrayElementsMacro extends SimpleMacro<Parameter<?>[]> {
+	static final class ArrayElementsMacro
+			implements Macro.Completion<Parameter<?>[]> {
 
 		@Override
 		@SuppressWarnings({ "unchecked", "rawtypes" })
-		protected <T> Binding<T> complete(Binding<T> incomplete,
+		public <T> Binding<T> complete(Binding<T> incomplete,
 				Parameter<?>[] elements) {
 			return incomplete.complete(PREDEFINED,
 					supplier((Type) incomplete.type(), elements));
@@ -184,30 +168,31 @@ public final class Macros {
 
 	}
 
-	static final class NewMacro extends SimpleMacro<New<?>> {
+	static final class NewMacro implements Macro.Completion<New<?>> {
 
 		@Override
-		protected <T> Binding<T> complete(Binding<T> incomplete,
+		public <T> Binding<T> complete(Binding<T> incomplete,
 				New<?> constructor) {
 			return incomplete.complete(CONSTRUCTOR,
 					constructor(constructor.typed(incomplete.type())));
 		}
 	}
 
-	static final class FactoryMacro extends SimpleMacro<Factory<?>> {
+	static final class FactoryMacro implements Macro.Completion<Factory<?>> {
 
 		@Override
-		protected <T> Binding<T> complete(Binding<T> incomplete,
+		public <T> Binding<T> complete(Binding<T> incomplete,
 				Factory<?> method) {
 			return incomplete.complete(METHOD,
 					method(method.typed(incomplete.type())));
 		}
 	}
 
-	static final class TypeParametrizedLinkMacro extends SimpleMacro<Class<?>> {
+	static final class TypeParametrizedLinkMacro
+			implements Macro.Completion<Class<?>> {
 
 		@Override
-		protected <T> Binding<T> complete(Binding<T> incomplete, Class<?> to) {
+		public <T> Binding<T> complete(Binding<T> incomplete, Class<?> to) {
 			return incomplete.complete(LINK, parametrizedInstance(
 					anyOf(raw(to).castTo(incomplete.type()))));
 		}

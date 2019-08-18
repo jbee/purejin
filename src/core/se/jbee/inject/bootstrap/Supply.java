@@ -45,7 +45,6 @@ public final class Supply {
 	public static final Supplier<Logger> LOGGER = (dep, context) //
 	-> Logger.getLogger(dep.target(1).type().rawType.getCanonicalName());
 
-	@SuppressWarnings("unchecked")
 	private static final Supplier<?> REQUIRED = (dep, context) -> {
 		throw new NoCaseForDependency(dep, new InjectionCase[0],
 				"Should never be called!");
@@ -58,8 +57,7 @@ public final class Supply {
 	 * list). Arrays itself have build in support that will (if not redefined by
 	 * a more precise binding) return all known
 	 */
-	public static final ArrayBridge<List<?>> LIST_BRIDGE = //
-			elems -> Arrays.asList(elems);
+	public static final ArrayBridge<List<?>> LIST_BRIDGE = Arrays::asList;
 	public static final ArrayBridge<Set<?>> SET_BRIDGE = // 
 			elems -> new HashSet<>(Arrays.asList(elems));
 
@@ -90,8 +88,7 @@ public final class Supply {
 
 	public static <E> Supplier<E[]> elements(Type<E[]> arrayType,
 			Parameter<? extends E>[] elements) {
-		return new PredefinedArraySupplier<>(arrayType,
-				Hint.bind(elements));
+		return new PredefinedArraySupplier<>(arrayType, Hint.bind(elements));
 	}
 
 	public static <T> Supplier<T> instance(Instance<T> instance) {
