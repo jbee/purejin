@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
 import se.jbee.inject.config.Choices;

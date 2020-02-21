@@ -70,6 +70,14 @@ public final class Type<T>
 	public static Type<?>[] wildcards(TypeVariable<?>... variables) {
 		Type<?>[] wildcards = new Type<?>[variables.length];
 		Arrays.fill(wildcards, WILDCARD);
+		for (int i = 0; i < variables.length; i++) {
+			if (variables[i].getBounds().length == 1) {
+				wildcards[i] = Type.type(
+						variables[i].getBounds()[0]).asUpperBound();
+			} else {
+				wildcards[i] = WILDCARD;
+			}
+		}
 		return wildcards;
 	}
 

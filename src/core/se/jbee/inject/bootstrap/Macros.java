@@ -6,6 +6,7 @@
 package se.jbee.inject.bootstrap;
 
 import static se.jbee.inject.Instance.anyOf;
+import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.arrayIndex;
 import static se.jbee.inject.Utils.arrayPrepand;
@@ -17,14 +18,18 @@ import static se.jbee.inject.bootstrap.BindingType.PREDEFINED;
 import static se.jbee.inject.bootstrap.Supply.constructor;
 import static se.jbee.inject.bootstrap.Supply.method;
 import static se.jbee.inject.bootstrap.Supply.parametrizedInstance;
+import static se.jbee.inject.config.Plugins.pluginPoint;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 
 import se.jbee.inject.DeclarationType;
-import se.jbee.inject.InconsistentBinding;
+import se.jbee.inject.InconsistentDeclaration;
 import se.jbee.inject.Instance;
+import se.jbee.inject.Name;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Resource;
+import se.jbee.inject.Scope;
 import se.jbee.inject.Type;
 import se.jbee.inject.container.Supplier;
 
@@ -104,7 +109,7 @@ public final class Macros {
 	 *            {@link Bindings})
 	 * @param value Non-null value to expand via matching {@link Macro}
 	 *
-	 * @throws InconsistentBinding In case no {@link Macro} had been declared
+	 * @throws InconsistentDeclaration In case no {@link Macro} had been declared
 	 *             for the type of value argument
 	 */
 	public <T, V> void expandInto(Bindings bindings, Binding<T> binding,
@@ -168,13 +173,15 @@ public final class Macros {
 
 	}
 
-	static final class NewMacro implements Macro.Completion<New<?>> {
+	static final class NewMacro implements Macro<New<?>> {
 
 		@Override
-		public <T> Binding<T> complete(Binding<T> incomplete,
-				New<?> constructor) {
-			return incomplete.complete(CONSTRUCTOR,
-					constructor(constructor.typed(incomplete.type())));
+		public <T> void expand(New<?> constructor, Binding<T> incomplete,
+				Bindings bindings) {
+			bindings.addExpanded(incomplete.complete(CONSTRUCTOR,
+					constructor(constructor.typed(incomplete.type()))));
+			Class<?> impl = constructor.target.getDeclaringClass();
+			bindTypeAnnotationsImplicit(bindings, incomplete, impl);
 		}
 	}
 
@@ -244,6 +251,8 @@ public final class Macros {
 				bindings.addExpanded(binding.complete(LINK,
 						Supply.instance(linked.typed(type))));
 				implicitlyBindToConstructor(binding, linked, bindings);
+				bindTypeAnnotationsImplicit(bindings, binding,
+						bound.type().rawType);
 				return;
 			}
 			if (type.isInterface())
@@ -270,5 +279,26 @@ public final class Macros {
 				impl);
 		if (target != null)
 			bindings.macros.expandInto(bindings, binding, New.bind(target));
+	}
+
+	static <I> void bindTypeAnnotationsImplicit(Bindings bindings,
+			Binding<?> incomplete, Class<I> impl) {
+		Annotation[] annotations = impl.getAnnotations();
+		if (annotations.length > 0) {
+			for (Annotation a : annotations) {
+				bindAnnotation(bindings, incomplete, impl, a);
+			}
+		}
+	}
+
+	static <I> void bindAnnotation(Bindings bindings, Binding<?> incomplete,
+			Class<I> impl, Annotation a) {
+		Name point = pluginPoint(a.annotationType(), impl.getCanonicalName());
+		@SuppressWarnings("rawtypes")
+		Instance<Class> plugin = instance(point, raw(Class.class));
+		bindings.addExpanded(
+				Binding.binding(new Resource<>(plugin), BindingType.PREDEFINED,
+						Supply.constant(impl), Scope.application,
+						incomplete.source.typed(DeclarationType.IMPLICIT)));
 	}
 }

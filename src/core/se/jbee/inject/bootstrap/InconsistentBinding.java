@@ -1,24 +1,14 @@
-/*
- *  Copyright (c) 2012-2019, Jan Bernitt
- *	
- *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
- */
-package se.jbee.inject;
+package se.jbee.inject.bootstrap;
 
-import java.lang.annotation.Annotation;
-
-import se.jbee.inject.bootstrap.Binding;
-import se.jbee.inject.bootstrap.BindingType;
+import se.jbee.inject.InconsistentDeclaration;
+import se.jbee.inject.Instance;
 
 /**
- * If there is a statically resolvable problem with a binding (resource in the
- * context of a container) this exception is thrown during bootstrapping. It is
- * never thrown after the bootstrapping step has finished (a {@link Injector}
- * was created successfully).
+ * Problems related to {@link Binding} and the bootstrapping process.
  * 
- * @see UnresolvableDependency
+ * @since 19.1
  */
-public final class InconsistentBinding extends RuntimeException {
+public class InconsistentBinding extends InconsistentDeclaration {
 
 	private InconsistentBinding(String msg) {
 		super(msg);
@@ -29,11 +19,6 @@ public final class InconsistentBinding extends RuntimeException {
 	public static InconsistentBinding contextAlreadyInitialised() {
 		return new InconsistentBinding(
 				"Attempt to set binding context after it had been initialised already.");
-	}
-
-	public static InconsistentBinding notConstructible(Class<?> impl) {
-		return new InconsistentBinding(
-				"Attempt to bind a non-constructible type: " + impl);
 	}
 
 	public static InconsistentBinding addingIncomplete(Binding<?> complete) {
@@ -48,24 +33,11 @@ public final class InconsistentBinding extends RuntimeException {
 					+ " that is not bound to a macro for binding: " + expanded);
 	}
 
-	public static InconsistentBinding incomprehensiveHint(Parameter<?> hint) {
-		return new InconsistentBinding(
-				"Attempt to give a parameter hint that does not fit the target: "
-					+ hint);
-	}
-
 	public static InconsistentBinding illegalCompletion(Binding<?> completing,
 			BindingType type) {
 		return new InconsistentBinding(
 				"Attempt to complete a binding with illegal type " + type + " :"
 					+ completing);
-	}
-
-	public static InconsistentBinding annotationLacksProperty(Class<?> property,
-			Class<? extends Annotation> type) {
-		return new InconsistentBinding("Attempt to use an annotation "
-			+ type.getSimpleName() + " that lacks a expected property of type: "
-			+ property.getSimpleName());
 	}
 
 	public static InconsistentBinding clash(Binding<?> a, Binding<?> b) {
@@ -85,4 +57,5 @@ public final class InconsistentBinding extends RuntimeException {
 		return new InconsistentBinding(
 				"No root bundle has been defined for ServiceLoader service via file META-INF/services/se.jbee.inject.bootstrap.Bundle");
 	}
+
 }

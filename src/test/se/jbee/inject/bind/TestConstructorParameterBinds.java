@@ -13,7 +13,7 @@ import java.lang.reflect.Constructor;
 import org.junit.Test;
 
 import se.jbee.inject.Hint;
-import se.jbee.inject.InconsistentBinding;
+import se.jbee.inject.InconsistentDeclaration;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
@@ -162,7 +162,7 @@ public class TestConstructorParameterBinds {
 		assertEquals("when x alignment after another is broken", "y", baz.bar);
 	}
 
-	@Test(expected = InconsistentBinding.class)
+	@Test(expected = InconsistentDeclaration.class)
 	public void thatParametersNotArrangedThrowsException() {
 		Bootstrap.injector(FaultyParameterConstructorBindsModule.class);
 	}

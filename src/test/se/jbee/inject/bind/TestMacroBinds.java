@@ -27,10 +27,10 @@ import se.jbee.inject.bootstrap.Binding;
 import se.jbee.inject.bootstrap.BindingType;
 import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.New;
 import se.jbee.inject.bootstrap.Bundle;
 import se.jbee.inject.bootstrap.Macro;
 import se.jbee.inject.bootstrap.Macros;
+import se.jbee.inject.bootstrap.New;
 import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.config.Globals;
 import se.jbee.inject.container.Supplier;
@@ -104,7 +104,7 @@ public class TestMacroBinds {
 	public void thatBindingsCanJustBeCounted() {
 		CountMacro count = new CountMacro();
 		Injector injector = injectorWithMacro(MacroBindsModule.class, count);
-		assertEquals(6 + 13, count.expands); // 11 from scopes
+		assertEquals(6 + 16, count.expands); // 16 core bindings
 		assertEquals(0, injector.resolve(InjectionCase[].class).length);
 	}
 
@@ -187,12 +187,11 @@ public class TestMacroBinds {
 	 *
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	static final class InitialisationMacro
-			implements Macro<New<?>> {
+	static final class InitialisationMacro implements Macro<New<?>> {
 
 		@Override
-		public <T> void expand(New<?> constructor,
-				Binding<T> incomplete, Bindings bindings) {
+		public <T> void expand(New<?> constructor, Binding<T> incomplete,
+				Bindings bindings) {
 			Supplier<T> supplier = new InitialisationSupplier<>(
 					Supply.constructor(constructor.typed(incomplete.type())));
 			bindings.addExpanded(incomplete.complete(CONSTRUCTOR, supplier));

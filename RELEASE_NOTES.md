@@ -7,6 +7,7 @@ v19.1 (upcoming)
 > Initialisers, Extensions and Configs were added.
 > Mirrors replaced the Inspector.
 > Injection Hints as data replace BoundParameter
+> Resolve dependencies based on annotations 
 
 **General Notes**
 - changed versioning from _major.minor_ to _year.serial_ (e.g. 19.1 is the first in 2019)
@@ -27,6 +28,7 @@ v19.1 (upcoming)
 - added `Injector.resolve` `default` methods for convenience
 - added `to` for `java.util.function.Supplier` (method references)
 - added `Name.pluginFor` factory method
+- added `Injector.annotatedWith` to resolved types with a particular annotation
 
 **API changes**
 - `Inspector` split in (and replaced by) `*Mirror` functional interfaces
@@ -46,6 +48,8 @@ v19.1 (upcoming)
 - renamed class `BoundMethod` to `Factory`
 - renamed class `BoundConstant` to `Constant`
 - renamed and moved class `BoundParameter` to `Hint`
+- renamed `InconsistentBinding` to `InconsistentDeclaration`
+- extracted `InconsistentBinding` exception in `bootstrap` package
 - renamed class `ActionMalfunction` to `ActionExecutionFailed`
 - extracted class `ActionSite` 
 - renamed method `Action.exec` to `Action.run`

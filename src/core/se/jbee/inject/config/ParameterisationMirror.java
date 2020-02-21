@@ -5,7 +5,7 @@
  */
 package se.jbee.inject.config;
 
-import static se.jbee.inject.InconsistentBinding.annotationLacksProperty;
+import static se.jbee.inject.InconsistentDeclaration.annotationLacksProperty;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.parameterTypes;

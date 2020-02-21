@@ -16,7 +16,7 @@ import org.junit.Test;
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Generator;
-import se.jbee.inject.InconsistentBinding;
+import se.jbee.inject.InconsistentDeclaration;
 import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Name;
@@ -166,8 +166,7 @@ public class TestBootstrapper {
 		}
 
 		@Override
-		public String supply(Dependency<? super String> dep,
-				Injector context) {
+		public String supply(Dependency<? super String> dep, Injector context) {
 			if (!dep.instance.name.equalTo(named("lazy"))) {
 				eagers++;
 				return "eager";
@@ -227,7 +226,7 @@ public class TestBootstrapper {
 		assertNotNull(Bootstrap.injector(OneMutualDependentBundle.class));
 	}
 
-	@Test(expected = InconsistentBinding.class)
+	@Test(expected = InconsistentDeclaration.class)
 	public void thatNonUniqueResourcesThrowAnException() {
 		Bootstrap.injector(ClashingBindsModule.class);
 	}
@@ -257,7 +256,7 @@ public class TestBootstrapper {
 		Injector injector = Bootstrap.injector(ReplacingBindsModule.class);
 		assertEquals(6, injector.resolve(Number.class));
 		InjectionCase<?>[] cases = injector.resolve(InjectionCase[].class);
-		assertEquals(7 + 13, cases.length); // 3x Comparable, Float, Double, Integer and Number (3x Serializable has been nullified) + 10 Scope
+		assertEquals(7 + 14 + 1, cases.length); // 3x Comparable, Float, Double, Integer and Number (3x Serializable has been nullified) + 11 Scope + 1 Annotation
 		InjectionCase<Number>[] casesForNumber = injector.resolve(
 				injectionCasesTypeFor(Number.class));
 		assertEquals(1, casesForNumber.length);

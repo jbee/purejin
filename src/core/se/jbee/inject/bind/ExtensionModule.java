@@ -8,10 +8,17 @@ import se.jbee.inject.Dependency;
 import se.jbee.inject.Extension;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Scope;
+import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.bootstrap.New;
 import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.config.ConstructionMirror;
+import se.jbee.inject.container.Supplier;
 
+/**
+ * A {@link Module} that provides a {@link Supplier} for any {@link Extension}.
+ * 
+ * @since 19.1
+ */
 public class ExtensionModule extends BinderModule {
 
 	@Override

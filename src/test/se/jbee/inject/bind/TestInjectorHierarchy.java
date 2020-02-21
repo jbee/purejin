@@ -1,7 +1,9 @@
 package se.jbee.inject.bind;
 
-import static org.junit.Assert.assertArrayEquals;
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+
+import java.util.HashSet;
 
 import org.junit.Test;
 
@@ -82,8 +84,13 @@ public class TestInjectorHierarchy {
 	public void mergedArrayContextIsAccessibleForHierarchicalInjector() {
 		Number[] numbers = branched1.resolve(
 				Type.raw(Number[].class).asUpperBound());
-		assertArrayEquals(new Number[] { 42, 13f, 42.42f }, numbers);
+		assertEqualSets(new Number[] { 42, 13f, 42.42f }, numbers);
 		numbers = branched2.resolve(Type.raw(Number[].class).asUpperBound());
-		assertArrayEquals(new Number[] { 42, 13f, 0.42f }, numbers);
+		assertEqualSets(new Number[] { 42, 13f, 0.42f }, numbers);
+	}
+
+	private static <T> void assertEqualSets(T[] expected, T[] actual) {
+		assertEquals(new HashSet<>(asList(expected)),
+				new HashSet<>(asList(actual)));
 	}
 }

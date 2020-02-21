@@ -10,7 +10,9 @@ import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
+import java.util.Collection;
 
 import se.jbee.inject.UnresolvableDependency.NoCaseForDependency;
 import se.jbee.inject.UnresolvableDependency.NoMethodForDependency;
@@ -70,6 +72,25 @@ public interface Injector {
 
 	default <T> T resolve(Instance<T> inst) {
 		return resolve(dependency(inst));
+	}
+
+	/**
+	 * Resolves all instances that are annotated with the given
+	 * {@link Annotation} type.
+	 * 
+	 * Note that this feature requires use of default macros which add
+	 * annotation information as plug-ins which is used by the build-in
+	 * {@link AnnotatedWith} supplier to assemble the returned list.
+	 * 
+	 * @since 19.1
+	 * 
+	 * @param type the {@link Annotation} which the returned instance's types
+	 *            are annotated with.
+	 * @return a collection (logical set) of instances of types which have an
+	 *         {@link Annotation} of the given type.
+	 */
+	default Collection<?> annotatedWith(Class<? extends Annotation> type) {
+		return resolve(raw(AnnotatedWith.class).parametized(type)).annotated();
 	}
 
 	/**

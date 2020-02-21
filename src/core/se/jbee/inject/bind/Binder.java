@@ -24,7 +24,7 @@ import java.util.function.BiConsumer;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Generator;
-import se.jbee.inject.InconsistentBinding;
+import se.jbee.inject.InconsistentDeclaration;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
@@ -628,7 +628,7 @@ public class Binder {
 		public void toConstructor(Class<? extends T> impl,
 				Parameter<?>... hints) {
 			if (isClassVirtual(impl))
-				throw InconsistentBinding.notConstructible(impl);
+				throw InconsistentDeclaration.notConstructible(impl);
 			to(mirrors().construction.reflect(impl), hints);
 		}
 

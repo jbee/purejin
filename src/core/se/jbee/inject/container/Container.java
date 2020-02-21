@@ -171,7 +171,7 @@ public final class Container {
 			if (Scope.class.isAssignableFrom(resource.type().rawType)
 				|| Scope.container.equalTo(scope))
 				return new LazySingletonGenerator<>(this, supplier);
-			return new ScopedGenerator<>(serialID, this, injectee, scoping);
+			return new LazyScopedGenerator<>(serialID, this, injectee, scoping);
 		}
 
 		private static InjectionCase<?>[] wildcardCases(
@@ -375,7 +375,7 @@ public final class Container {
 		}
 	}
 
-	private static final class ScopedGenerator<T> implements Generator<T> {
+	private static final class LazyScopedGenerator<T> implements Generator<T> {
 
 		private final InjectorImpl injector;
 		private final int serialID;
@@ -387,7 +387,7 @@ public final class Container {
 		private Class<?> cachedForType;
 		private Initialiser<? super T>[] cachedPostConstructs;
 
-		ScopedGenerator(int serialID, InjectorImpl injector,
+		LazyScopedGenerator(int serialID, InjectorImpl injector,
 				Injectee<T> injectee, Scoping scoping) {
 			this.serialID = serialID;
 			this.injector = injector;

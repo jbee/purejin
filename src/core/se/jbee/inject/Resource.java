@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -51,7 +51,12 @@ public final class Resource<T>
 	 * {@link Dependency} given ?
 	 */
 	public boolean isAssignableTo(Dependency<? super T> dependency) {
-		return instance.type().isAssignableTo(dependency.type());
+		Type<T> offered = instance.type();
+		Type<? super T> required = dependency.type();
+		return offered.isAssignableTo(required)
+			|| required.rawType.isAssignableFrom(offered.rawType)
+				&& offered.hasTypeParameter()
+				&& offered.areAllTypeParametersAreUpperBounds();
 	}
 
 	/**

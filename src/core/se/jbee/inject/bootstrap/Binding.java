@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Set;
 
 import se.jbee.inject.DeclarationType;
-import se.jbee.inject.InconsistentBinding;
 import se.jbee.inject.Name;
 import se.jbee.inject.Qualifying;
 import se.jbee.inject.Resource;

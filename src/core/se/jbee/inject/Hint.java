@@ -63,7 +63,7 @@ public final class Hint<T> implements Parameter<T> {
 
 	public static <T> Hint<T> constant(T constant) {
 		if (constant == null)
-			throw InconsistentBinding.incomprehensiveHint(null);
+			throw InconsistentDeclaration.incomprehensiveHint(null);
 		@SuppressWarnings("unchecked")
 		Type<T> type = (Type<T>) raw(constant.getClass());
 		return new Hint<>(type, constant, null, null);
@@ -87,7 +87,7 @@ public final class Hint<T> implements Parameter<T> {
 		for (Parameter<?> hint : hints) {
 			int i = indexForType(types, hint, args);
 			if (i < 0)
-				throw InconsistentBinding.incomprehensiveHint(hint);
+				throw InconsistentDeclaration.incomprehensiveHint(hint);
 			args[i] = hint.asHint();
 		}
 		for (int i = 0; i < args.length; i++)
