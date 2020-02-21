@@ -100,12 +100,31 @@ public final class Container {
 		final InjectionCase<? extends Initialiser<?>>[] postConstruct;
 		Initialiser<Injector>[] injectorInitialisers;
 		Injector initialised;
+		final YieldListener listener;
 
 		InjectorImpl(Injectee<?>... injectees) {
 			this.generators = injectees.length;
 			this.casesByType = initFrom(injectees);
 			this.wildcardCases = wildcardCases(casesByType);
 			this.postConstruct = initInitialisers();
+			this.listener = initListeners();
+		}
+
+		private YieldListener initListeners() {
+			YieldListener[] listeners = resolve(YieldListener[].class);
+			if (listeners.length == 0)
+				return null;
+			if (listeners.length == 1)
+				return listeners[0];
+			return new YieldListener() {
+				@Override
+				public <T> void onStableInstanceGeneration(int serialID,
+						Resource<T> resource, Scoping scoping, T instance) {
+					for (YieldListener l : listeners)
+						l.onStableInstanceGeneration(serialID, resource,
+								scoping, instance);
+				}
+			};
 		}
 
 		@Override
@@ -348,10 +367,15 @@ public final class Container {
 	}
 
 	/**
-	 * This needs to use the double-checked locking pattern since we have to
-	 * make sure the {@link Supplier} in only ever called once to initialise the
-	 * field. No other idiom allows running initialisation function precisly
-	 * once.
+	 * The {@link Lazy} value makes sure the {@link Supplier} is only ever
+	 * called once.
+	 * 
+	 * This {@link Generator} represents the {@link Scope#container} where the
+	 * {@link LazySingletonGenerator#value} field holds the singleton value.
+	 * 
+	 * So in contrast to other scopes that are implemented as instances of
+	 * {@link Scope} the {@link Scope#container} is "virtual". Its instances
+	 * exist in the different instances of the {@link LazyScopedGenerator}.
 	 * 
 	 * @param <T> Type of the lazy value
 	 */
@@ -375,6 +399,12 @@ public final class Container {
 		}
 	}
 
+	/**
+	 * Default {@link Generator} that uses a {@link Scope} implementation to
+	 * manage the value.
+	 * 
+	 * @param <T> Type of the generated value
+	 */
 	private static final class LazyScopedGenerator<T> implements Generator<T> {
 
 		private final InjectorImpl injector;
@@ -402,7 +432,6 @@ public final class Container {
 
 		@Override
 		public T yield(Dependency<? super T> dep) {
-			Scope scopeValue = scope.get(this::resolveScope);
 			Dependency<? super T> injected = dep.injectingInto(resource,
 					scoping);
 			/**
@@ -414,17 +443,22 @@ public final class Container {
 			 * supplier.
 			 */
 			AtomicReference<T> instanceCache = new AtomicReference<>();
-			return scopeValue.yield(serialID, injected, () -> {
-				T instance = instanceCache.get();
-				if (instance == null) {
-					instance = supplier.supply(injected, injector());
-					if (instance != null && injector.postConstruct != null
-						&& injector.postConstruct.length > 0)
-						instance = postConstruct(instance, injected);
-					instanceCache.set(instance);
-				}
-				return instance;
-			}, injector.generators);
+			return scope.get(this::resolveScope).yield(serialID, injected, () -> // 
+			instanceCache.updateAndGet(instance -> instance != null
+				? instance
+				: createInstance(injected)), injector.generators);
+		}
+
+		private T createInstance(Dependency<? super T> injected) {
+			T instance = supplier.supply(injected, injector());
+			if (instance != null && injector.postConstruct != null
+				&& injector.postConstruct.length > 0)
+				instance = postConstruct(instance, injected);
+			if (scoping.isStableByDesign() && injector.listener != null) {
+				injector.listener.onStableInstanceGeneration(serialID, resource,
+						scoping, instance);
+			}
+			return instance;
 		}
 
 		private Injector injector() {

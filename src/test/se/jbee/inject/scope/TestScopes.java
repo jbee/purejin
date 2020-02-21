@@ -82,6 +82,7 @@ public class TestScopes {
 	}
 
 	private static void assertStableScope(Scoping s) {
+		assertTrue(s.isStableByDesign());
 		assertTrue(s.isStableIn(s.scope));
 		assertTrue(s.isStableIn(s));
 		assertTrue(s.isStableIn(Scope.dependency));

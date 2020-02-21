@@ -87,6 +87,9 @@ public final class Scoping implements Serializable {
 
 	public Scoping group(Scoping group) {
 		this.group = group;
+		this.stableByDesign = group.stableByDesign;
+		this.eager = group.eager;
+		this.stableInScopes = group.stableInScopes;
 		return this;
 	}
 

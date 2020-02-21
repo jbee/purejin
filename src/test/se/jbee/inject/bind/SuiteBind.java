@@ -28,7 +28,8 @@ import org.junit.runners.Suite.SuiteClasses;
 		TestDiskScopeBinds.class, TestConfigBinds.class,
 		TestInitialiserDecorationBinds.class,
 		TestInitialiserAnnotationBinds.class, TestPropertyAnnotationBinds.class,
-		TestInjectorHierarchy.class, TestAnnotatedWithBinds.class })
+		TestInjectorHierarchy.class, TestAnnotatedWithBinds.class,
+		TestYieldListeners.class })
 public class SuiteBind {
 	// all tests in the bind package
 }
