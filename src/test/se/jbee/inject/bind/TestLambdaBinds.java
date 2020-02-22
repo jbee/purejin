@@ -16,7 +16,7 @@ public class TestLambdaBinds {
 		@Override
 		public void bootstrap(Bootstrapper bootstrap) {
 			bootstrap.install(
-					bindings -> bindings.declareFrom(new LambdaBindsModule()));
+					bindings -> bindings.declaredFrom(new LambdaBindsModule()));
 		}
 
 	}

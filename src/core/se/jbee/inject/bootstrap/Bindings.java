@@ -8,11 +8,13 @@ package se.jbee.inject.bootstrap;
 import static se.jbee.inject.Utils.arrayOf;
 import static se.jbee.inject.Utils.isClassMonomodal;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import se.jbee.inject.config.Annotations;
 import se.jbee.inject.config.Mirrors;
 
 /**
@@ -26,25 +28,32 @@ public final class Bindings {
 
 	public static Bindings newBindings() {
 		return new Bindings(new ArrayList<>(128), Macros.DEFAULT,
-				Mirrors.DEFAULT);
+				Mirrors.DEFAULT, Annotations.DETECT);
 	}
 
 	private final List<Binding<?>> list;
 	public final Macros macros;
 	public final Mirrors mirrors;
+	public final Annotations annotations;
 
-	private Bindings(List<Binding<?>> list, Macros macros, Mirrors mirrors) {
+	private Bindings(List<Binding<?>> list, Macros macros, Mirrors mirrors,
+			Annotations annotations) {
 		this.list = list;
 		this.macros = macros;
 		this.mirrors = mirrors;
+		this.annotations = annotations;
 	}
 
 	public Bindings with(Mirrors mirrors) {
-		return new Bindings(list, macros, mirrors);
+		return new Bindings(list, macros, mirrors, annotations);
 	}
 
 	public Bindings with(Macros macros) {
-		return new Bindings(list, macros, mirrors);
+		return new Bindings(list, macros, mirrors, annotations);
+	}
+
+	public Bindings with(Annotations annotations) {
+		return new Bindings(list, macros, mirrors, annotations);
 	}
 
 	/**
@@ -61,11 +70,33 @@ public final class Bindings {
 		macros.expandInto(this, binding, binding);
 	}
 
+	public void addFromAnnotated(Class<?> type) {
+		Annotation[] as = type.getAnnotations();
+		if (as.length == 0)
+			throw InconsistentBinding.noTypeAnnotation(type);
+		int n = 0;
+		for (Annotation a : as) {
+			ModuleWith<Class<?>> definition = annotations.annotationDefinition(
+					a.annotationType());
+			if (definition != null) {
+				definition.declare(this, type);
+				n++;
+			}
+		}
+		if (n == 0)
+			throw InconsistentBinding.noTypeAnnotation(type);
+	}
+
 	public Binding<?>[] toArray() {
 		return arrayOf(list, Binding.class);
 	}
 
-	public Binding<?>[] declareFrom(Module... modules) {
+	public Binding<?>[] declaredFrom(Module... modules) {
+		declareFrom(modules);
+		return toArray();
+	}
+
+	public void declareFrom(Module... modules) {
 		Set<Class<?>> declared = new HashSet<>();
 		Set<Class<?>> multimodals = new HashSet<>();
 		for (Module m : modules) {
@@ -78,7 +109,6 @@ public final class Bindings {
 				declared.add(ns);
 			}
 		}
-		return toArray();
 	}
 
 }

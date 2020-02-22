@@ -58,4 +58,11 @@ public class InconsistentBinding extends InconsistentDeclaration {
 				"No root bundle has been defined for ServiceLoader service via file META-INF/services/se.jbee.inject.bootstrap.Bundle");
 	}
 
+	public static InconsistentBinding noTypeAnnotation(Class<?> type) {
+		int annotations = type.getAnnotations().length;
+		return new InconsistentBinding(
+				"Exepected an annotation on type but found none "
+					+ (annotations == 0 ? "" : "that has a custom definition")
+					+ ": " + type.getName());
+	}
 }

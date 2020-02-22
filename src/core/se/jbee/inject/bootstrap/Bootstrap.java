@@ -90,7 +90,10 @@ public final class Bootstrap {
 		if (configIter.hasNext()) {
 			ApplicationContextConfig config = configIter.next();
 			globals = config.globals();
-			bindings = bindings.with(config.macros()).with(config.mirrors());
+			bindings = bindings //
+					.with(config.macros()) //
+					.with(config.mirrors()) //
+					.with(globals.annotations);
 		}
 		BuildinBootstrapper bootstrapper = new BuildinBootstrapper(globals);
 		@SuppressWarnings("unchecked")
@@ -110,12 +113,13 @@ public final class Bootstrap {
 
 	public static Injector injector(Class<? extends Bundle> root,
 			Bindings bindings, Globals globals) {
-		return injector(bindings, modulariser(globals).modularise(root));
+		return injector(bindings.with(globals.annotations),
+				modulariser(globals).modularise(root));
 	}
 
 	public static Injector injector(Bindings bindings, Module[] modules) {
 		return Container.injector(
-				Binding.disambiguate(bindings.declareFrom(modules)));
+				Binding.disambiguate(bindings.declaredFrom(modules)));
 	}
 
 	public static Modulariser modulariser(Globals globals) {
@@ -128,8 +132,8 @@ public final class Bootstrap {
 
 	public static Binding<?>[] bindings(Class<? extends Bundle> root,
 			Bindings bindings, Globals globals) {
-		return Binding.disambiguate(
-				bindings.declareFrom(modulariser(globals).modularise(root)));
+		return Binding.disambiguate(bindings.with(globals.annotations)//
+				.declaredFrom(modulariser(globals).modularise(root)));
 	}
 
 	public static <T> Module module(ModuleWith<T> module, Options presets) {

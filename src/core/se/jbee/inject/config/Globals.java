@@ -18,6 +18,7 @@ import se.jbee.inject.Type;
  * @see Options
  * @see Choices
  * @see Edition
+ * @see Annotations
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
@@ -39,20 +40,23 @@ public final class Globals {
 	 * {@link Options} including all features.
 	 */
 	public static final Globals STANDARD = new Globals(Edition.FULL,
-			Choices.NONE, Options.NONE);
+			Choices.NONE, Options.NONE, Annotations.DETECT);
 
 	public final Edition edition;
 	public final Choices choices;
 	public final Options options;
+	public final Annotations annotations;
 
-	private Globals(Edition edition, Choices choices, Options options) {
+	private Globals(Edition edition, Choices choices, Options options,
+			Annotations annotations) {
 		this.edition = edition;
 		this.choices = choices;
 		this.options = options;
+		this.annotations = annotations;
 	}
 
 	public Globals with(Edition edition) {
-		return new Globals(edition, choices, options);
+		return new Globals(edition, choices, options, annotations);
 	}
 
 	public Globals withEditionIncluding(Packages included) {
@@ -66,11 +70,15 @@ public final class Globals {
 	}
 
 	public Globals with(Choices choices) {
-		return new Globals(edition, choices, options);
+		return new Globals(edition, choices, options, annotations);
 	}
 
 	public Globals with(Options options) {
-		return new Globals(edition, choices, options);
+		return new Globals(edition, choices, options, annotations);
+	}
+
+	public Globals with(Annotations annotations) {
+		return new Globals(edition, choices, options, annotations);
 	}
 
 	private static class FeatureEdition<T extends Enum<T>> implements Edition {

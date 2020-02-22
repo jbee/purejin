@@ -77,6 +77,11 @@ public class Binder {
 		return bind().bindings;
 	}
 
+	public Binder annotated(Class<?> type) {
+		bindings().addFromAnnotated(type);
+		return this;
+	}
+
 	public <E> TypedElementBinder<E> arraybind(Class<E[]> type) {
 		return new TypedElementBinder<>(bind(), defaultInstanceOf(raw(type)));
 	}
