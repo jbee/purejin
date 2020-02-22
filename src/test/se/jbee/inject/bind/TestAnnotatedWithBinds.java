@@ -1,14 +1,16 @@
 package se.jbee.inject.bind;
 
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 import java.util.HashSet;
 
-import javax.annotation.Resource;
-import javax.jws.WebService;
 import javax.management.MXBean;
 
 import org.junit.Test;
@@ -36,7 +38,18 @@ public class TestAnnotatedWithBinds {
 
 	}
 
-	@Resource
+	@Target(TYPE)
+	@Retention(RUNTIME)
+	static @interface WebService {
+
+	}
+
+	@Target(TYPE)
+	@Retention(RUNTIME)
+	static @interface Resource {
+
+	}
+
 	static class ServiceImpl implements Service {
 
 		final AnnotatedWith<WebService> webServices;

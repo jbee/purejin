@@ -1,6 +1,5 @@
 package se.jbee.inject.bind;
 
-import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.bind.AssertInjects.assertEqualSets;
 
@@ -79,28 +78,16 @@ public class TestArrayBinds {
 
 	@Test
 	public void thatEachCommandGetsOnlyThePreconditionsBoundToIt() {
-		Command cmd1 = injector.resolve(CMD_1, Command.class);
-		assertEquals(2, cmd1.preconds.length);
-		assertEqualSets(new Number[] { 1, 2.0d }, cmd1.preconds);
+		assertPreconditions(CMD_1, 1, 2.0d);
+		assertPreconditions(CMD_2, 2d, 3f, 5L);
+		assertPreconditions(CMD_3, 1, 6d, 8);
+		assertPreconditions(CMD_4, 2d, 9);
+		assertPreconditions(CMD_5, 1, 2, 3);
+		assertPreconditions(CMD_6, 4, 5, 6);
+	}
 
-		Command cmd2 = injector.resolve(CMD_2, Command.class);
-		assertEquals(3, cmd2.preconds.length);
-		assertEqualSets(new Number[] { 2d, 3f, 5L }, cmd2.preconds);
-
-		Command cmd3 = injector.resolve(CMD_3, Command.class);
-		assertEquals(3, cmd3.preconds.length);
-		assertEqualSets(new Number[] { 1, 6d, 8 }, cmd3.preconds);
-
-		Command cmd4 = injector.resolve(CMD_4, Command.class);
-		assertEquals(2, cmd4.preconds.length);
-		assertEqualSets(new Number[] { 2d, 9 }, cmd4.preconds);
-
-		Command cmd5 = injector.resolve(CMD_5, Command.class);
-		assertEquals(3, cmd5.preconds.length);
-		assertEqualSets(new Number[] { 1, 2, 3 }, cmd5.preconds);
-
-		Command cmd6 = injector.resolve(CMD_6, Command.class);
-		assertEquals(3, cmd6.preconds.length);
-		assertEqualSets(new Number[] { 4, 5, 6 }, cmd6.preconds);
+	private void assertPreconditions(Name command, Number... expected) {
+		assertEqualSets(expected,
+				injector.resolve(command, Command.class).preconds);
 	}
 }
