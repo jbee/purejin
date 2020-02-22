@@ -64,12 +64,12 @@ public final class InjectionSite {
 			Hint<?> hint = hints[i];
 			if (hint.type().rawType == Injector.class) {
 				preResolvedArgs[i] = injector;
+			} else if (hint.isConstant()) {
+				preResolvedArgs[i] = hint.value;
 			} else if (hint.type().arrayDimensions() == 1) {
 				lazyArgIndexes[lazyArgCount++] = i;
 			} else if (hint.absoluteRef != null) {
 				preResolvedArgs[i] = injector.resolve(hint.absoluteRef);
-			} else if (hint.isConstant()) {
-				preResolvedArgs[i] = hint.value;
 			} else { // relative ref
 				Instance<?> ref = hint.relativeRef;
 				Dependency<? extends InjectionCase<?>> caseDep = site.typed(

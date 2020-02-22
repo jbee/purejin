@@ -432,7 +432,7 @@ public final class Container {
 
 		@Override
 		public T yield(Dependency<? super T> dep) {
-			Dependency<? super T> injected = dep.injectingInto(resource,
+			final Dependency<? super T> injected = dep.injectingInto(resource,
 					scoping);
 			/**
 			 * This cache makes sure that within one thread even if the provider
