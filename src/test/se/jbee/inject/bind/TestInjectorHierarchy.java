@@ -10,6 +10,7 @@ import org.junit.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.decoration.Decorate;
 
 /**
  * Test that demontrates how two {@link Injector} contexts can be linked
@@ -64,8 +65,8 @@ public class TestInjectorHierarchy {
 			TestInjectorHierarchyBranch1Context.class);
 	private final Injector branch2 = Bootstrap.injector(
 			TestInjectorHierarchyBranch2Context.class);
-	private final Injector branched1 = Injector.hierarchy(root, branch1);
-	private final Injector branched2 = Injector.hierarchy(root, branch2);
+	private final Injector branched1 = Decorate.hierarchy(root, branch1);
+	private final Injector branched2 = Decorate.hierarchy(root, branch2);
 
 	@Test
 	public void parentContextIsAccessibleForHierarchicalInjector() {
