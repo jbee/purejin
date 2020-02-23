@@ -35,6 +35,7 @@ v19.1 (upcoming)
 - `InspectorBinder` replaced by `AutoBinder` and `autobind()` (no args)
 - `Bindings` are created via `newBindings` and modified using the `with` methods
 - renamed method `Bindings.declareFrom` to `Bindings.declaredFrom`
+- renamed enum `BindingType.LINK` to `BindingType.REFERENCE`
 - removed class `se.jbee.inject.container.Factory` (use `Supplier`)
 - renamed class `Inject` to `Container`
 - renamed class `Typecast` to `Cast`

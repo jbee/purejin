@@ -12,7 +12,7 @@ import static se.jbee.inject.Utils.arrayIndex;
 import static se.jbee.inject.Utils.arrayPrepand;
 import static se.jbee.inject.Utils.isClassVirtual;
 import static se.jbee.inject.bootstrap.BindingType.CONSTRUCTOR;
-import static se.jbee.inject.bootstrap.BindingType.LINK;
+import static se.jbee.inject.bootstrap.BindingType.REFERENCE;
 import static se.jbee.inject.bootstrap.BindingType.METHOD;
 import static se.jbee.inject.bootstrap.BindingType.PREDEFINED;
 import static se.jbee.inject.bootstrap.Supply.constructor;
@@ -42,8 +42,8 @@ import se.jbee.inject.container.Supplier;
 public final class Macros {
 
 	public static final Macro<Binding<?>> EXPAND = new AutoInheritanceMacro();
-	public static final Macro<Class<?>> PARAMETRIZED_LINK = new TypeParametrizedLinkMacro();
-	public static final Macro<Instance<?>> INSTANCE_LINK = new LinkMacro();
+	public static final Macro<Class<?>> PARAMETRIZED_LINK = new TypeParametrizedReferenceMacro();
+	public static final Macro<Instance<?>> INSTANCE_LINK = new ReferenceMacro();
 	public static final Macro<Parameter<?>[]> ARRAY = new ArrayElementsMacro();
 	public static final Macro<New<?>> NEW = new NewMacro();
 	public static final Macro<Factory<?>> FACTORY = new FactoryMacro();
@@ -195,12 +195,12 @@ public final class Macros {
 		}
 	}
 
-	static final class TypeParametrizedLinkMacro
+	static final class TypeParametrizedReferenceMacro
 			implements Macro.Completion<Class<?>> {
 
 		@Override
 		public <T> Binding<T> complete(Binding<T> incomplete, Class<?> to) {
-			return incomplete.complete(LINK, parametrizedInstance(
+			return incomplete.complete(REFERENCE, parametrizedInstance(
 					anyOf(raw(to).castTo(incomplete.type()))));
 		}
 
@@ -229,7 +229,7 @@ public final class Macros {
 		}
 	}
 
-	static final class LinkMacro implements Macro<Instance<?>> {
+	static final class ReferenceMacro implements Macro<Instance<?>> {
 
 		@Override
 		public <T> void expand(Instance<?> linked, Binding<T> binding,
@@ -240,7 +240,7 @@ public final class Macros {
 				@SuppressWarnings("unchecked")
 				Class<? extends Supplier<? extends T>> supplier = (Class<? extends Supplier<? extends T>>) t.rawType;
 				bindings.addExpanded(
-						binding.complete(LINK, Supply.reference(supplier)));
+						binding.complete(REFERENCE, Supply.reference(supplier)));
 				implicitlyBindToConstructor(binding, linked, bindings);
 				return;
 			}
@@ -248,7 +248,7 @@ public final class Macros {
 			final Instance<T> bound = binding.resource.instance;
 			if (!bound.type().equalTo(type)
 				|| !linked.name.isCompatibleWith(bound.name)) {
-				bindings.addExpanded(binding.complete(LINK,
+				bindings.addExpanded(binding.complete(REFERENCE,
 						Supply.instance(linked.typed(type))));
 				implicitlyBindToConstructor(binding, linked, bindings);
 				bindTypeAnnotationsImplicit(bindings, binding,

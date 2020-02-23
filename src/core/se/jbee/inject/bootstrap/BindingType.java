@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
@@ -16,16 +16,17 @@ import se.jbee.inject.container.Supplier;
 public enum BindingType {
 
 	/**
-	 * The binding expresses a need, it is unclear if another binding can
-	 * fulfill it.
+	 * The binding expresses a need, it is unclear if another binding can fulfil
+	 * it.
 	 */
 	REQUIRED,
 
 	/**
-	 * The binding is a virtual or generic instance factory like one for lists
-	 * or other type parameterized "bridges".
+	 * The binding is a forward reference to a sub-type (implementation type) or
+	 * to a virtual or generic instance factory like one for lists or other type
+	 * parameterised "bridges".
 	 */
-	LINK,
+	REFERENCE,
 
 	/**
 	 * The instances are supplied from a {@link Supplier} that has been defined
