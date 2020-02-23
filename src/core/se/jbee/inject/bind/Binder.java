@@ -77,9 +77,19 @@ public class Binder {
 		return bind().bindings;
 	}
 
-	public Binder annotated(Class<?> type) {
-		bindings().addFromAnnotated(type);
-		return this;
+	public void annotated(Class<?>... types) {
+		Bindings bindings = bindings();
+		for (Class<?> type : types)
+			bindings.addFromAnnotated(type);
+	}
+
+	/**
+	 * Allows access only via interface.
+	 * 
+	 * @since 19.1
+	 */
+	public Binder withIndirectAccess() {
+		return with(bind().target.indirect());
 	}
 
 	public <E> TypedElementBinder<E> arraybind(Class<E[]> type) {

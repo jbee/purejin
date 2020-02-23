@@ -11,7 +11,7 @@ import static se.jbee.inject.Type.raw;
 import java.io.Serializable;
 
 /**
- * Describes WHAT can be injected and WHERE it can be injected.
+ * Describes WHAT (type-wise) can be injected and WHERE it can be injected.
  *
  * It is an {@link Instance} with added information where the bind applies.
  *
@@ -75,6 +75,12 @@ public final class Resource<T>
 		return instance.name.isCompatibleWith(dependency.instance.name);
 	}
 
+	public Resource<T> indirect(boolean indirect) {
+		return target.indirect == indirect
+			? this
+			: new Resource<>(instance, target.indirect(indirect));
+	}
+
 	@Override
 	public Type<T> type() {
 		return instance.type();
@@ -127,4 +133,5 @@ public final class Resource<T>
 		}
 		return dep;
 	}
+
 }

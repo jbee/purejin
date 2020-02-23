@@ -30,7 +30,7 @@ import org.junit.runners.Suite.SuiteClasses;
 		TestInitialiserAnnotationBinds.class, TestPropertyAnnotationBinds.class,
 		TestInjectorHierarchy.class, TestAnnotatedWithBinds.class,
 		TestYieldListeners.class, TestCustomAnnotationBinds.class,
-		TestArrayBinds.class })
+		TestArrayBinds.class, TestIndirectBinds.class })
 public class SuiteBind {
 	// all tests in the bind package
 }

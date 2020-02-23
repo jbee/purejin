@@ -34,29 +34,51 @@ public final class Target implements Qualifying<Target>, Serializable {
 	}
 
 	public static Target targeting(Instance<?> instance) {
-		return new Target(Instances.ANY, instance, Packages.ALL);
+		return new Target(Instances.ANY, instance, Packages.ALL, false);
 	}
 
 	public final Instances parents;
 	public final Instance<?> instance;
 	public final Packages packages;
+	/**
+	 * When true, access to this {@link Target} is only permitted in when it is
+	 * used though an interface.
+	 */
+	public final boolean indirect;
 
-	private Target(Instances parents, Instance<?> instance, Packages packages) {
+	private Target(Instances parents, Instance<?> instance, Packages packages,
+			boolean indirect) {
 		this.parents = parents;
 		this.instance = instance;
 		this.packages = packages;
+		this.indirect = indirect;
+	}
+
+	/**
+	 * @since 19.1
+	 * 
+	 * @return Same as this {@link Target} but also {@link #indirect}
+	 */
+	public Target indirect() {
+		return indirect(true);
+	}
+
+	public Target indirect(boolean indirect) {
+		return this.indirect == indirect
+			? this
+			: new Target(parents, instance, packages, indirect);
 	}
 
 	public Target within(Instance<?> parent) {
-		return new Target(parents.push(parent), instance, packages);
+		return new Target(parents.push(parent), instance, packages, indirect);
 	}
 
 	public Target injectingInto(Instance<?> instance) {
-		return new Target(parents, instance, packages);
+		return new Target(parents, instance, packages, indirect);
 	}
 
 	public Target in(Packages packages) {
-		return new Target(parents, instance, packages);
+		return new Target(parents, instance, packages, indirect);
 	}
 
 	public Target injectingInto(Type<?> type) {
@@ -118,7 +140,7 @@ public final class Target implements Qualifying<Target>, Serializable {
 	public String toString() {
 		return "{" + parents + " => "
 			+ (instance.isAny() ? "*" : instance.toString()) + ", [" + packages
-			+ "] }";
+			+ "] }" + (indirect ? "!" : "");
 	}
 
 	public Target inPackageAndSubPackagesOf(Class<?> type) {

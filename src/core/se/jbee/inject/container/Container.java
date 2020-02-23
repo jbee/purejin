@@ -432,6 +432,7 @@ public final class Container {
 
 		@Override
 		public T yield(Dependency<? super T> dep) {
+			dep.ensureNoIllegalDirectAccessOf(resource);
 			final Dependency<? super T> injected = dep.injectingInto(resource,
 					scoping);
 			/**

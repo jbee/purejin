@@ -50,6 +50,7 @@ public class TestAnnotatedWithBinds {
 
 	}
 
+	@Resource
 	static class ServiceImpl implements Service {
 
 		final AnnotatedWith<WebService> webServices;

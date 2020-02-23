@@ -12,9 +12,9 @@ import static se.jbee.inject.Utils.arrayIndex;
 import static se.jbee.inject.Utils.arrayPrepand;
 import static se.jbee.inject.Utils.isClassVirtual;
 import static se.jbee.inject.bootstrap.BindingType.CONSTRUCTOR;
-import static se.jbee.inject.bootstrap.BindingType.REFERENCE;
 import static se.jbee.inject.bootstrap.BindingType.METHOD;
 import static se.jbee.inject.bootstrap.BindingType.PREDEFINED;
+import static se.jbee.inject.bootstrap.BindingType.REFERENCE;
 import static se.jbee.inject.bootstrap.Supply.constructor;
 import static se.jbee.inject.bootstrap.Supply.method;
 import static se.jbee.inject.bootstrap.Supply.parametrizedInstance;
@@ -42,8 +42,8 @@ import se.jbee.inject.container.Supplier;
 public final class Macros {
 
 	public static final Macro<Binding<?>> EXPAND = new AutoInheritanceMacro();
-	public static final Macro<Class<?>> PARAMETRIZED_LINK = new TypeParametrizedReferenceMacro();
-	public static final Macro<Instance<?>> INSTANCE_LINK = new ReferenceMacro();
+	public static final Macro<Class<?>> PARAMETRIZED_REF = new TypeParametrizedReferenceMacro();
+	public static final Macro<Instance<?>> INSTANCE_REF = new ReferenceMacro();
 	public static final Macro<Parameter<?>[]> ARRAY = new ArrayElementsMacro();
 	public static final Macro<New<?>> NEW = new NewMacro();
 	public static final Macro<Factory<?>> FACTORY = new FactoryMacro();
@@ -52,9 +52,14 @@ public final class Macros {
 	public static final Macros NONE = new Macros(new Class<?>[0],
 			new Macro<?>[0]);
 
-	public static final Macros DEFAULT = Macros.NONE.with(EXPAND).with(
-			NEW).with(CONSTANT).with(FACTORY).with(INSTANCE_LINK).with(
-					PARAMETRIZED_LINK).with(ARRAY);
+	public static final Macros DEFAULT = Macros.NONE //
+			.with(EXPAND) //
+			.with(NEW) //
+			.with(CONSTANT)//
+			.with(FACTORY) //
+			.with(INSTANCE_REF) //
+			.with(PARAMETRIZED_REF) //
+			.with(ARRAY);
 
 	private final Class<?>[] types;
 	private final Macro<?>[] functions;
@@ -109,8 +114,8 @@ public final class Macros {
 	 *            {@link Bindings})
 	 * @param value Non-null value to expand via matching {@link Macro}
 	 *
-	 * @throws InconsistentDeclaration In case no {@link Macro} had been declared
-	 *             for the type of value argument
+	 * @throws InconsistentDeclaration In case no {@link Macro} had been
+	 *             declared for the type of value argument
 	 */
 	public <T, V> void expandInto(Bindings bindings, Binding<T> binding,
 			V value) {
@@ -239,8 +244,8 @@ public final class Macros {
 				&& !binding.type().isAssignableTo(raw(Supplier.class))) {
 				@SuppressWarnings("unchecked")
 				Class<? extends Supplier<? extends T>> supplier = (Class<? extends Supplier<? extends T>>) t.rawType;
-				bindings.addExpanded(
-						binding.complete(REFERENCE, Supply.reference(supplier)));
+				bindings.addExpanded(binding.complete(REFERENCE,
+						Supply.reference(supplier)));
 				implicitlyBindToConstructor(binding, linked, bindings);
 				return;
 			}
@@ -266,7 +271,9 @@ public final class Macros {
 			Instance<T> instance, Bindings bindings) {
 		Class<T> impl = instance.type().rawType;
 		if (!isClassVirtual(impl)) {
-			Binding<T> binding = Binding.binding(new Resource<>(instance),
+			Binding<T> binding = Binding.binding(
+					new Resource<>(instance).indirect(
+							incomplete.resource.target.indirect),
 					BindingType.CONSTRUCTOR, null, incomplete.scope,
 					incomplete.source.typed(DeclarationType.IMPLICIT));
 			bindToMirrorConstructor(bindings, binding, impl);

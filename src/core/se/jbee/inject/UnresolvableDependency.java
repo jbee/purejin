@@ -142,4 +142,13 @@ public abstract class UnresolvableDependency extends RuntimeException {
 		}
 	}
 
+	public static final class IllegalAcccess extends UnresolvableDependency {
+
+		public <T> IllegalAcccess(Resource<T> resource,
+				Dependency<? super T> dep) {
+			super("Cannot access " + resource + " directly for " + dep);
+		}
+
+	}
+
 }

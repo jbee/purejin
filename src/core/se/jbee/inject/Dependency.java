@@ -196,6 +196,22 @@ public final class Dependency<T>
 			throw new UnstableDependency(unstable, injection);
 	}
 
+	public void ensureNoIllegalDirectAccessOf(Resource<? extends T> resource) {
+		if (!resource.target.indirect)
+			return;
+		Type<? super T> required = instance.type;
+		if (required.rawType.isInterface())
+			return;
+		for (int level = 0; level < injectionDepth(); level++) {
+			Instance<?> parent = target(level);
+			if (!required.isAssignableTo(parent.type()))
+				throw new UnresolvableDependency.IllegalAcccess(resource, this);
+			if (parent.type.rawType.isInterface())
+				return;
+		}
+		throw new UnresolvableDependency.IllegalAcccess(resource, this);
+	}
+
 	@Override
 	public Iterator<Injection> iterator() {
 		return asList(hierarchy).iterator();
