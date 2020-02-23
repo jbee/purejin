@@ -334,7 +334,7 @@ public class Binder {
 		}
 
 		public void in(Class<?> service) {
-			in(service, new Parameter<?>[0]);
+			in(service, Parameter.noParameters);
 		}
 
 		public void in(Object service, Parameter<?>... hints) {

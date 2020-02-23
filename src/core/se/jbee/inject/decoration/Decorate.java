@@ -10,6 +10,10 @@ import se.jbee.inject.UnresolvableDependency.NoMethodForDependency;
 
 public class Decorate {
 
+	private Decorate() {
+		throw new UnsupportedOperationException("util");
+	}
+
 	/**
 	 * Chains {@link Injector}s similar to a {@link ClassLoader} hierarchy.
 	 * 
@@ -41,12 +45,12 @@ public class Decorate {
 	static <T> T resolveArray(Dependency<T> dep, Injector root,
 			Injector branch) {
 		T branchInstance = null;
-		T rootInstance = null;
 		try {
 			branchInstance = branch.resolve(dep);
 		} catch (UnresolvableDependency e) {
 			return root.resolve(dep);
 		}
+		T rootInstance = null;
 		try {
 			rootInstance = root.resolve(dep);
 		} catch (UnresolvableDependency e) {

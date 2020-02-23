@@ -115,7 +115,7 @@ public class TestServiceInvocationBinds {
 			fail.run("Foo");
 		} catch (ActionExecutionFailed e) {
 			assertTrue(e.getCause() instanceof IllegalStateException);
-			assertEquals(e.getCause().getMessage(), "Foo");
+			assertEquals("Foo", e.getCause().getMessage());
 			assertEquals(afterExceptionCount + 1, inv.afterExceptionCount);
 			return;
 		}

@@ -58,13 +58,13 @@ public class TestAutobindBinds {
 
 	@Test
 	public void thatSuperinterfaceOfAutoboundTypeIsBound() {
-		assertEquals(injector.resolve(Serializable.class), 42);
+		assertEquals(42, injector.resolve(Serializable.class));
 	}
 
 	@Test
 	public void thatParametizedSuperinterfaceOfAutoboundTypeIsBound() {
-		assertEquals(injector.resolve(
-				raw(Comparable.class).parametized(Integer.class)), 42);
+		assertEquals(42, injector.resolve(
+				raw(Comparable.class).parametized(Integer.class)));
 	}
 
 }
