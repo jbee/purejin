@@ -4,6 +4,7 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 
 import java.io.Serializable;
 import java.lang.annotation.Retention;
@@ -16,6 +17,7 @@ import com.example.app.Support;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.Scope;
+import se.jbee.inject.UnresolvableDependency.IllegalAcccess;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Bundle;
 import se.jbee.inject.bootstrap.ModuleWith;
@@ -50,7 +52,8 @@ public class TestCustomAnnotationBinds {
 
 		@Override
 		protected void declare(Class<?> annotated) {
-			per(Scope.application).autobind(annotated).toConstructor();
+			per(Scope.application).withIndirectAccess() // withIndirectAccess just used as an example (not needed)
+					.autobind(annotated).toConstructor();
 		}
 	}
 
@@ -114,6 +117,12 @@ public class TestCustomAnnotationBinds {
 		assertSame(SomeServiceImpl.class, service.getClass());
 		assertSame(SomeServiceImpl.class,
 				injector.resolve(Serializable.class).getClass());
+		// just to check the access limitation is honoured
+		try {
+			injector.resolve(SomeServiceImpl.class);
+			fail("Expected interface must be used");
+		} catch (IllegalAcccess e) {
+		}
 	}
 
 	/**
