@@ -77,6 +77,7 @@ public final class Bootstrap {
 		return APPLICATION_CONTEXT.get(Bootstrap::loadApplicationContext);
 	}
 
+	@SuppressWarnings("unchecked")
 	private static Injector loadApplicationContext() {
 		Set<Class<? extends Bundle>> roots = new LinkedHashSet<>();
 		for (Bundle root : ServiceLoader.load(Bundle.class))
@@ -95,10 +96,14 @@ public final class Bootstrap {
 					.with(config.mirrors()) //
 					.with(globals.annotations);
 		}
+		return injector(bindings, globals, roots.toArray(new Class[0]));
+	}
+
+	@SafeVarargs
+	public static Injector injector(Bindings bindings, Globals globals,
+			Class<? extends Bundle>... roots) {
 		BuildinBootstrapper bootstrapper = new BuildinBootstrapper(globals);
-		@SuppressWarnings("unchecked")
-		Class<? extends Bundle>[] bundles = bootstrapper.bundleAll(
-				roots.toArray(new Class[0]));
+		Class<? extends Bundle>[] bundles = bootstrapper.bundleAll(roots);
 		return injector(bindings, bootstrapper.modulesOf(bundles));
 	}
 

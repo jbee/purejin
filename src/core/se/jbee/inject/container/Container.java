@@ -217,7 +217,8 @@ public final class Container {
 				if (res != null)
 					return (T) res;
 			}
-			if (rawType == Injector.class)
+			if (rawType == Injector.class
+				&& (dep.instance.name.isAny() || dep.instance.name.isDefault()))
 				return (T) initialised;
 			InjectionCase<T> match = injectionCaseMatching(dep);
 			if (match != null)

@@ -65,4 +65,10 @@ public class InconsistentBinding extends InconsistentDeclaration {
 					+ (annotations == 0 ? "" : "that has a custom definition")
 					+ ": " + type.getName());
 	}
+
+	public static InconsistentBinding noFunctionalInterface(Class<?> type) {
+		return new InconsistentBinding(
+				"The type must be annotated with @FunctionalInterface to be usable in this role:"
+					+ type.getName());
+	}
 }

@@ -70,6 +70,14 @@ public interface Injector {
 		return resolve(dependency(inst));
 	}
 
+	default Injector subContext(Class<?> target) {
+		return subContext(target.getName());
+	}
+
+	default Injector subContext(String name) {
+		return resolve(name, Injector.class);
+	}
+
 	/**
 	 * Resolves all instances that are annotated with the given
 	 * {@link Annotation} type.

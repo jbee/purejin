@@ -38,12 +38,16 @@ import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bootstrap.Binding;
 import se.jbee.inject.bootstrap.BindingType;
 import se.jbee.inject.bootstrap.Bindings;
+import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.Bundle;
 import se.jbee.inject.bootstrap.Constant;
 import se.jbee.inject.bootstrap.Factory;
 import se.jbee.inject.bootstrap.New;
 import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.config.Config;
+import se.jbee.inject.config.Globals;
 import se.jbee.inject.config.Mirrors;
+import se.jbee.inject.config.Plugins;
 import se.jbee.inject.container.Initialiser;
 import se.jbee.inject.container.Supplier;
 
@@ -200,6 +204,42 @@ public class Binder {
 	}
 
 	/**
+	 * @see #lazyInstall(Class, String)
+	 * @since 19.1
+	 */
+	public void lazyInstall(Class<? extends Bundle> bundle,
+			Class<?> subContext) {
+		lazyInstall(bundle, subContext.getName());
+	}
+
+	/**
+	 * Binds a lazy {@link Bundle} which is installed in a sub-context
+	 * {@link Injector}. The {@link Injector} is bootstrapped lazily on first
+	 * usage. Use {@link Injector#subContext(String)} to resolve the sub-context
+	 * by name.
+	 * 
+	 * @since 19.1
+	 * @param bundle the {@link Bundle} to install in the sub-context lazy
+	 *            {@link Injector}
+	 * @param subContext the name of the lazy {@link Injector} sub-context
+	 */
+	public void lazyInstall(Class<? extends Bundle> bundle, String subContext) {
+		plug(bundle).into(Injector.class, subContext);
+		implicit().bind(Name.named(subContext), Injector.class).toSupplier(
+				Binder::lazyInjector);
+	}
+
+	protected final static Injector lazyInjector(
+			Dependency<? super Injector> dep, Injector context) {
+		@SuppressWarnings("unchecked")
+		Class<? extends Bundle>[] bundles = (Class<? extends Bundle>[]) //
+		context.resolve(Plugins.class).forPoint(Injector.class,
+				dep.instance.name.toString());
+		return Bootstrap.injector(Bindings.newBindings(), Globals.STANDARD,
+				bundles);
+	}
+
+	/**
 	 * 
 	 * @param target the type whose instances should be initialised by calling
 	 *            some method
@@ -291,8 +331,8 @@ public class Binder {
 		}
 
 		public void into(Class<?> pluginPoint, String property) {
-			binder.bind(pluginPoint(pluginPoint, property), Class.class).to(
-					plugin);
+			binder.multibind(pluginPoint(pluginPoint, property),
+					Class.class).to(plugin);
 			if (!isClassVirtual(plugin))
 				binder.implicit().construct(plugin);
 			// we allow both collections of classes that have a common
