@@ -32,7 +32,7 @@ public class TestInitialiserDecorationBinds {
 			bind(int.class).to(42);
 			bind(Foo.class).toConstructor();
 
-			bind(Shape.class).to(new Area());
+			bind(Shape.class).to(() -> new Area()); // OBS: A constant would not work as it is resolved using a shortcut
 			initbind(Shape.class).to(this);
 		}
 
@@ -94,6 +94,7 @@ public class TestInitialiserDecorationBinds {
 	@Test
 	public void resolvedInstancesCanBeDocratedUsingInitialisers() {
 		Shape s = injector.resolve(Shape.class);
+		assertNotNull(s);
 		assertSame(s, injector.resolve(Shape.class));
 		assertTrue(Proxy.isProxyClass(s.getClass()));
 		assertNotNull(s.getBounds());

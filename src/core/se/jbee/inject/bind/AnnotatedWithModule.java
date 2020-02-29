@@ -1,5 +1,6 @@
 package se.jbee.inject.bind;
 
+import static java.util.Arrays.asList;
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Type.raw;
 
@@ -43,11 +44,11 @@ public class AnnotatedWithModule extends BinderModule {
 	private static AnnotatedWith<?> annotatedWith(Dependency<?> dep,
 			Injector context) {
 		return () -> {
-			Class<?> annotation = dep.type().parameter(0).rawType;
+			Class<?> point = dep.type().parameter(0).rawType;
 			Class<?>[] annotated = context.resolve(Plugins.class).forPoint(
-					annotation);
+					point);
 			List<Object> res = new ArrayList<>();
-			for (Class<?> a : annotated)
+			for (Class<?> a : asList(annotated))
 				res.add(context.resolve(a));
 			return res;
 		};

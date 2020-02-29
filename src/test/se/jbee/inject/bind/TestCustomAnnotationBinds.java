@@ -87,7 +87,7 @@ public class TestCustomAnnotationBinds {
 
 		@Override
 		protected void declare() {
-			annotated(SomeServiceImpl.class);
+			addAnnotated(SomeServiceImpl.class);
 		}
 
 	}
@@ -101,7 +101,7 @@ public class TestCustomAnnotationBinds {
 
 		@Override
 		protected void declare() {
-			annotated(SomeOtherService.class);
+			addAnnotated(SomeOtherService.class);
 		}
 
 	}

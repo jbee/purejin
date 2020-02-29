@@ -15,7 +15,7 @@ import org.junit.runners.Suite.SuiteClasses;
 		TestInjectionCaseBinds.class, TestProviderBinds.class,
 		TestPrimitiveBinds.class, TestInjectorExceptions.class,
 		TestCollectionBinds.class, TestMirrorAutobindBinds.class,
-		TestParentTargetBinds.class, TestPresetModuleBinds.class,
+		TestParentTargetBinds.class, TestModuleWithBinds.class,
 		TestRequiredProvidedBinds.class, TestStateDependentBinds.class,
 		TestPrimitiveArrayBinds.class, TestMultipleChoicesBinds.class,
 		TestMacroBinds.class, TestBootstrapper.class, TestLinker.class,
@@ -31,7 +31,8 @@ import org.junit.runners.Suite.SuiteClasses;
 		TestInjectorHierarchy.class, TestAnnotatedWithBinds.class,
 		TestYieldListeners.class, TestCustomAnnotationBinds.class,
 		TestArrayBinds.class, TestIndirectBinds.class,
-		TestLazyInstallBinds.class })
+		TestInstallInSubContextBinds.class, TestDefaultMacroBinds.class,
+		TestInjectorDecorationBinds.class })
 public class SuiteBind {
 	// all tests in the bind package
 }

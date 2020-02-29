@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -89,6 +89,14 @@ public enum DeclarationType implements Qualifying<DeclarationType> {
 			|| (this == IMPLICIT && other == IMPLICIT);
 	}
 
+	/**
+	 * Bindings are dropped if they exist for convenience. In case of ambiguity
+	 * all of them are dropped (ignored) so that the effect is predictable.
+	 * 
+	 * @param other type of another binding
+	 * @return True if both this and the other binding should be dropped, else
+	 *         false
+	 */
 	public boolean droppedWith(DeclarationType other) {
 		return this == other && (this == AUTO || this == PROVIDED);
 	}

@@ -19,14 +19,14 @@ import se.jbee.inject.bootstrap.Bundle;
  * example the first level is the "foo" sub-context, the second level is the
  * "bar" sub-context defined in "foo".
  */
-public class TestLazyInstallBinds {
+public class TestInstallInSubContextBinds {
 
-	static final class TestLazyInstallBindsModule extends BinderModule {
+	static final class TestInstallInSubContextBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			lazyInstall(LazyModule1.class, "foo");
-			lazyInstall(LazyModule3.class, "foo");
+			installIn("foo", LazyModule1.class);
+			installIn("foo", LazyModule3.class);
 		}
 
 	}
@@ -54,13 +54,13 @@ public class TestLazyInstallBinds {
 		@Override
 		protected void declare() {
 			bind(String.class).to("13");
-			lazyInstall(LazyModule2.class, "bar");
+			installIn("bar", LazyModule2.class);
 		}
 
 	}
 
 	private final Injector injector = Bootstrap.injector(
-			TestLazyInstallBindsModule.class);
+			TestInstallInSubContextBindsModule.class);
 
 	@Test(expected = UnresolvableDependency.class)
 	public void lazyInstallsAreNotAccessibleDirectly() {

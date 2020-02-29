@@ -5,7 +5,7 @@ import static se.jbee.inject.Type.raw;
 import java.lang.reflect.Constructor;
 
 import se.jbee.inject.Dependency;
-import se.jbee.inject.Extension;
+import se.jbee.inject.SPI;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Scope;
 import se.jbee.inject.bootstrap.Module;
@@ -15,18 +15,18 @@ import se.jbee.inject.config.ConstructionMirror;
 import se.jbee.inject.container.Supplier;
 
 /**
- * A {@link Module} that provides a {@link Supplier} for any {@link Extension}.
+ * A {@link Module} that provides a {@link Supplier} for any {@link SPI}.
  * 
  * @since 19.1
  */
-public class ExtensionModule extends BinderModule {
+public class SPIModule extends BinderModule {
 
 	@Override
 	protected void declare() {
 		ConstructionMirror mirror = bindings().mirrors.construction;
 		asDefault() //
 				.per(Scope.dependencyType) //
-				.bind(raw(Extension.class).asUpperBound()) //
+				.bind(raw(SPI.class).asUpperBound()) //
 				.toSupplier((dep, context) -> extension(mirror, dep, context));
 	}
 

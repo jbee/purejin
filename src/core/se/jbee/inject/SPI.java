@@ -8,11 +8,10 @@ package se.jbee.inject;
  * it depends on bound instances that should be injected into its
  * {@link Utils#commonConstructor(Class)}.
  * 
- * This is used to extend existing SPIs by wrapping or combining them, hence the
- * name {@link Extension}.
+ * This is used to extend existing SPIs by wrapping or combining them.
  * 
  * @since 19.1
  */
-public interface Extension {
+public interface SPI {
 	// marker
 }

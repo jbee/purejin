@@ -41,7 +41,7 @@ public class TestMirrorAutobindBinds {
 
 		@Override
 		protected void declare() {
-			Mirrors mirrors = bindings().mirrors;
+			Mirrors mirrors = mirrors();
 			Mirrors mirrorAllMethods = mirrors.produceBy(declaredMethods);
 			with(mirrorAllMethods).autobind().inModule();
 			// @formatter:off

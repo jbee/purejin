@@ -14,6 +14,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import se.jbee.inject.Instance;
+import se.jbee.inject.Name;
+import se.jbee.inject.Resource;
+import se.jbee.inject.Scope;
+import se.jbee.inject.Source;
+import se.jbee.inject.Type;
 import se.jbee.inject.config.Annotations;
 import se.jbee.inject.config.Mirrors;
 
@@ -85,6 +91,18 @@ public final class Bindings {
 		}
 		if (n == 0)
 			throw InconsistentBinding.noTypeAnnotation(type);
+	}
+
+	public <T> void addConstant(Source source, Name name, Class<T> type,
+			T constant) {
+		addConstant(source, Instance.instance(name, Type.raw(type)), constant);
+	}
+
+	public <T> void addConstant(Source source, Instance<T> instance,
+			T constant) {
+		addExpanded(Binding.binding(new Resource<>(instance),
+				BindingType.PREDEFINED, Supply.constant(constant),
+				Scope.container, source));
 	}
 
 	public Binding<?>[] toArray() {

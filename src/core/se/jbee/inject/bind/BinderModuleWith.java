@@ -27,7 +27,7 @@ public abstract class BinderModuleWith<T> extends InitializedBinder
 	@Override
 	public final void bootstrap(Bootstrapper bootstrap) {
 		bootstrap.install(DefaultScopes.class);
-		bootstrap.install(ExtensionModule.class);
+		bootstrap.install(SPIModule.class);
 		bootstrap.install(AnnotatedWithModule.class);
 		bootstrap.install(this);
 	}

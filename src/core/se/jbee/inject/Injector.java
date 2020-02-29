@@ -5,13 +5,18 @@
  */
 package se.jbee.inject;
 
+import static java.util.Collections.emptyList;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
 import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Knows how to *resolve* an instance for a given {@link Dependency}.
@@ -94,6 +99,27 @@ public interface Injector {
 	 *         {@link Annotation} of the given type.
 	 */
 	default Collection<?> annotatedWith(Class<? extends Annotation> type) {
-		return resolve(raw(AnnotatedWith.class).parametized(type)).annotated();
+		return resolve(Name.ANY,
+				raw(AnnotatedWith.class).parametized(type)).annotated();
+	}
+
+	default Collection<?> annotatedWith(Class<? extends Annotation> type,
+			ElementType target) {
+		return resolve(named(target.name()),
+				raw(AnnotatedWith.class).parametized(type)).annotated();
+	}
+
+	default Collection<?> annotatedWith(Class<? extends Annotation> type,
+			ElementType... anyOfTargets) {
+		if (anyOfTargets.length == 0)
+			return emptyList();
+		EnumSet<ElementType> include = EnumSet.of(anyOfTargets[0],
+				anyOfTargets);
+		if (include.equals(EnumSet.allOf(ElementType.class)))
+			return annotatedWith(type);
+		Set<Object> matches = new HashSet<>();
+		for (ElementType target : include)
+			matches.addAll(annotatedWith(type, target));
+		return matches;
 	}
 }

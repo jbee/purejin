@@ -84,6 +84,15 @@ public class TestMacroBinds {
 		}
 	}
 
+	private static class EmptyModule extends BinderModule {
+
+		@Override
+		protected void declare() {
+			// acts as a reference
+		}
+
+	}
+
 	private static final class CountMacro implements Macro<Binding<?>> {
 
 		int expands = 0;
@@ -103,8 +112,10 @@ public class TestMacroBinds {
 	@Test
 	public void thatBindingsCanJustBeCounted() {
 		CountMacro count = new CountMacro();
+		CountMacro emptyCount = new CountMacro();
 		Injector injector = injectorWithMacro(MacroBindsModule.class, count);
-		assertEquals(6 + 16, count.expands); // 16 core bindings
+		injectorWithMacro(EmptyModule.class, emptyCount);
+		assertEquals(6 + 2, count.expands - emptyCount.expands); // constructors cause 2 bindings each
 		assertEquals(0, injector.resolve(InjectionCase[].class).length);
 	}
 

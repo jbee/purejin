@@ -37,7 +37,7 @@ public abstract class BinderModule extends InitializedBinder
 		if (basis != null)
 			bootstrap.install(basis);
 		bootstrap.install(DefaultScopes.class);
-		bootstrap.install(ExtensionModule.class);
+		bootstrap.install(SPIModule.class);
 		bootstrap.install(AnnotatedWithModule.class);
 		bootstrap.install(this);
 	}

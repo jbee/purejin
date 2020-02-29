@@ -15,6 +15,8 @@ import se.jbee.inject.bind.BinderModuleWith;
 @Support
 public class SupportAnnotation extends BinderModuleWith<Class<?>> {
 
+	//TODO create a @Link annotated which then references to Support annotation class, old behaviour as fallback in case only one annotation is present
+
 	@Override
 	protected void declare(Class<?> annotated) {
 		per(Scope.application).autobind(annotated).toConstructor();

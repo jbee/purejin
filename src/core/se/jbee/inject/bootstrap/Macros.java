@@ -5,12 +5,12 @@
  */
 package se.jbee.inject.bootstrap;
 
+import static se.jbee.inject.DeclarationType.MULTI;
 import static se.jbee.inject.Instance.anyOf;
-import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.arrayIndex;
 import static se.jbee.inject.Utils.arrayPrepand;
-import static se.jbee.inject.Utils.isClassVirtual;
+import static se.jbee.inject.Utils.isClassInstantiable;
 import static se.jbee.inject.bootstrap.BindingType.CONSTRUCTOR;
 import static se.jbee.inject.bootstrap.BindingType.METHOD;
 import static se.jbee.inject.bootstrap.BindingType.PREDEFINED;
@@ -21,7 +21,10 @@ import static se.jbee.inject.bootstrap.Supply.parametrizedInstance;
 import static se.jbee.inject.config.Plugins.pluginPoint;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.InconsistentDeclaration;
@@ -29,7 +32,7 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Resource;
-import se.jbee.inject.Scope;
+import se.jbee.inject.Source;
 import se.jbee.inject.Type;
 import se.jbee.inject.container.Supplier;
 
@@ -40,6 +43,8 @@ import se.jbee.inject.container.Supplier;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Macros {
+
+	// TODO can Macros be Options?
 
 	public static final Macro<Binding<?>> EXPAND = new AutoInheritanceMacro();
 	public static final Macro<Class<?>> PARAMETRIZED_REF = new TypeParametrizedReferenceMacro();
@@ -186,17 +191,28 @@ public final class Macros {
 			bindings.addExpanded(incomplete.complete(CONSTRUCTOR,
 					constructor(constructor.typed(incomplete.type()))));
 			Class<?> impl = constructor.target.getDeclaringClass();
-			bindTypeAnnotationsImplicit(bindings, incomplete, impl);
+			Source source = incomplete.source;
+			bindings.addConstant(source.typed(MULTI), Name.DEFAULT,
+					Constructor.class, constructor.target);
+			plugAnnotationsInto(bindings, source, impl, ElementType.TYPE, impl);
+			plugAnnotationsInto(bindings, source, impl, ElementType.CONSTRUCTOR,
+					constructor.target);
 		}
 	}
 
-	static final class FactoryMacro implements Macro.Completion<Factory<?>> {
+	static final class FactoryMacro implements Macro<Factory<?>> {
 
 		@Override
-		public <T> Binding<T> complete(Binding<T> incomplete,
-				Factory<?> method) {
-			return incomplete.complete(METHOD,
-					method(method.typed(incomplete.type())));
+		public <T> void expand(Factory<?> method, Binding<T> incomplete,
+				Bindings bindings) {
+			bindings.addExpanded(incomplete.complete(METHOD,
+					method(method.typed(incomplete.type()))));
+			Source source = incomplete.source;
+			bindings.addConstant(source.typed(MULTI), Name.DEFAULT,
+					Method.class, method.target);
+			plugAnnotationsInto(bindings, source,
+					method.target.getDeclaringClass(), ElementType.METHOD,
+					method.target);
 		}
 	}
 
@@ -256,8 +272,9 @@ public final class Macros {
 				bindings.addExpanded(binding.complete(REFERENCE,
 						Supply.instance(linked.typed(type))));
 				implicitlyBindToConstructor(binding, linked, bindings);
-				bindTypeAnnotationsImplicit(bindings, binding,
-						bound.type().rawType);
+				Class<T> boundRawType = bound.type().rawType;
+				plugAnnotationsInto(bindings, binding.source, boundRawType,
+						ElementType.TYPE, boundRawType);
 				return;
 			}
 			if (type.isInterface())
@@ -270,7 +287,7 @@ public final class Macros {
 	static <T> void implicitlyBindToConstructor(Binding<?> incomplete,
 			Instance<T> instance, Bindings bindings) {
 		Class<T> impl = instance.type().rawType;
-		if (!isClassVirtual(impl)) {
+		if (isClassInstantiable(impl)) {
 			Binding<T> binding = Binding.binding(
 					new Resource<>(instance).indirect(
 							incomplete.resource.target.indirect),
@@ -288,24 +305,22 @@ public final class Macros {
 			bindings.macros.expandInto(bindings, binding, New.bind(target));
 	}
 
-	static <I> void bindTypeAnnotationsImplicit(Bindings bindings,
-			Binding<?> incomplete, Class<I> impl) {
-		Annotation[] annotations = impl.getAnnotations();
+	static void plugAnnotationsInto(Bindings bindings, Source source,
+			Class<?> plugin, ElementType declaredType,
+			AnnotatedElement declaration) {
+		Annotation[] annotations = declaration.getAnnotations();
 		if (annotations.length > 0) {
-			for (Annotation a : annotations) {
-				bindAnnotation(bindings, incomplete, impl, a);
-			}
+			for (Annotation a : annotations)
+				plugAnnotationInto(bindings, source, plugin, declaredType,
+						a.annotationType());
 		}
 	}
 
-	static <I> void bindAnnotation(Bindings bindings, Binding<?> incomplete,
-			Class<I> impl, Annotation a) {
-		Name point = pluginPoint(a.annotationType(), impl.getCanonicalName());
-		@SuppressWarnings("rawtypes")
-		Instance<Class> plugin = instance(point, raw(Class.class));
-		bindings.addExpanded(
-				Binding.binding(new Resource<>(plugin), BindingType.PREDEFINED,
-						Supply.constant(impl), Scope.application,
-						incomplete.source.typed(DeclarationType.IMPLICIT)));
+	static void plugAnnotationInto(Bindings bindings, Source source,
+			Class<?> plugin, ElementType declaredType,
+			Class<? extends Annotation> pluginPoint) {
+		bindings.addConstant(source.typed(DeclarationType.MULTI),
+				pluginPoint(pluginPoint, declaredType.name()), Class.class,
+				plugin);
 	}
 }

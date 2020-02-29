@@ -37,11 +37,17 @@ public class TestPluginBinds {
 
 		@Override
 		protected void declare() {
+			// testing effectiveness of usual targeting
 			asDefault().plug(TestExtensionAction.class).into(Callable.class);
 			inPackageOf(Module.class).plug(
 					TestExtensionPackageLocalAction.class).into(Callable.class);
 			injectingInto(Serializable.class).plug(
 					TestExtensionInstanceOfAction.class).into(Callable.class);
+
+			// testing elimination of duplicates
+			plug(Integer.class).into(Long.class);
+			plug(Integer.class).into(Long.class); // 2x
+			plug(Float.class).into(Long.class);
 		}
 	}
 
@@ -83,5 +89,11 @@ public class TestPluginBinds {
 				Callable.class);
 		assertEqualSets(new Class<?>[] { TestExtensionAction.class,
 				TestExtensionInstanceOfAction.class }, classes);
+	}
+
+	@Test
+	public void thatDuplicatesAreEliminated() {
+		Class<?>[] classes = plugins.forPoint(Long.class);
+		assertEqualSets(new Class<?>[] { Integer.class, Float.class }, classes);
 	}
 }

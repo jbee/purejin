@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -8,6 +8,12 @@ package se.jbee.inject;
 /**
  * A {@link Generator} creates the instance(s) for the generator's
  * {@link InjectionCase}.
+ * 
+ * When binding directly to a {@link Generator} any {@link Scoping} will be
+ * ineffective since the supplied {@link Generator} will directly be asked to
+ * {@link #yield(Dependency)} the instance for the dependency. This can be used
+ * to implement instance management different to the one provided by
+ * {@link Scope}s or to simply avoid unnecessary indirection or processing.
  * 
  * @since 19.1
  */

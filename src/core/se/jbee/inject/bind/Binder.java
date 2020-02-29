@@ -12,7 +12,7 @@ import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Source.source;
 import static se.jbee.inject.Target.targeting;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.Utils.isClassVirtual;
+import static se.jbee.inject.Utils.isClassInstantiable;
 import static se.jbee.inject.Utils.newArray;
 import static se.jbee.inject.config.Plugins.pluginPoint;
 import static se.jbee.inject.container.Cast.initialiserTypeOf;
@@ -81,7 +81,11 @@ public class Binder {
 		return bind().bindings;
 	}
 
-	public void annotated(Class<?>... types) {
+	protected final Mirrors mirrors() {
+		return bindings().mirrors;
+	}
+
+	public void addAnnotated(Class<?>... types) {
 		Bindings bindings = bindings();
 		for (Class<?> type : types)
 			bindings.addFromAnnotated(type);
@@ -204,12 +208,13 @@ public class Binder {
 	}
 
 	/**
-	 * @see #lazyInstall(Class, String)
+	 * @see #installIn(String, Class)
 	 * @since 19.1
 	 */
-	public void lazyInstall(Class<? extends Bundle> bundle,
-			Class<?> subContext) {
-		lazyInstall(bundle, subContext.getName());
+	@SafeVarargs
+	public final void installIn(Class<?> subContext,
+			Class<? extends Bundle>... lazyInstalled) {
+		installIn(subContext.getName(), lazyInstalled);
 	}
 
 	/**
@@ -218,17 +223,24 @@ public class Binder {
 	 * usage. Use {@link Injector#subContext(String)} to resolve the sub-context
 	 * by name.
 	 * 
-	 * @since 19.1
-	 * @param bundle the {@link Bundle} to install in the sub-context lazy
-	 *            {@link Injector}
 	 * @param subContext the name of the lazy {@link Injector} sub-context
+	 * @param lazyInstalled the {@link Bundle} to install in the sub-context
+	 *            lazy {@link Injector}
+	 * 
+	 * @since 19.1
 	 */
-	public void lazyInstall(Class<? extends Bundle> bundle, String subContext) {
-		plug(bundle).into(Injector.class, subContext);
-		implicit().bind(Name.named(subContext), Injector.class).toSupplier(
-				Binder::lazyInjector);
+	@SafeVarargs
+	public final void installIn(String subContext,
+			Class<? extends Bundle>... lazyInstalled) {
+		if (lazyInstalled.length > 0) {
+			for (Class<? extends Bundle> bundle : lazyInstalled)
+				plug(bundle).into(Injector.class, subContext);
+			implicit().bind(Name.named(subContext), Injector.class).toSupplier(
+					Binder::lazyInjector);
+		}
 	}
 
+	//TODO maybe bind a supplier that can create any sub-context asked for - some just have no bundles
 	protected final static Injector lazyInjector(
 			Dependency<? super Injector> dep, Injector context) {
 		@SuppressWarnings("unchecked")
@@ -333,7 +345,7 @@ public class Binder {
 		public void into(Class<?> pluginPoint, String property) {
 			binder.multibind(pluginPoint(pluginPoint, property),
 					Class.class).to(plugin);
-			if (!isClassVirtual(plugin))
+			if (isClassInstantiable(plugin))
 				binder.implicit().construct(plugin);
 			// we allow both collections of classes that have a common
 			// super-type or collections that don't
@@ -349,7 +361,7 @@ public class Binder {
 	}
 
 	/**
-	 * The {@link AutoBinder} makes use of the reflectors defined in
+	 * The {@link AutoBinder} makes use of {@link Mirrors} defined in
 	 * {@link Bindings} to select and bind constructors for beans and methods as
 	 * factories and {@link Name} these instances as well as provide
 	 * {@link Parameter} hints.
@@ -541,6 +553,9 @@ public class Binder {
 		}
 
 		/**
+		 * Bind {@link Method}s and {@link Constructor}s based on
+		 * {@link Mirrors}.
+		 * 
 		 * @since 19.1
 		 */
 		public AutoBinder autobind() {
@@ -682,7 +697,7 @@ public class Binder {
 
 		public void toConstructor(Class<? extends T> impl,
 				Parameter<?>... hints) {
-			if (isClassVirtual(impl))
+			if (!isClassInstantiable(impl))
 				throw InconsistentDeclaration.notConstructible(impl);
 			to(mirrors().construction.reflect(impl), hints);
 		}

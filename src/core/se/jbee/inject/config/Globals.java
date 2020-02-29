@@ -24,6 +24,8 @@ import se.jbee.inject.Type;
  */
 public final class Globals {
 
+	//TODO provide Globals in Injector context by default
+
 	@SafeVarargs
 	public static <T extends Enum<T> & Feature<T>> Edition featureEdition(
 			T... featured) {

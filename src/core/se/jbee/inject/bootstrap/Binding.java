@@ -127,22 +127,35 @@ public final class Binding<T> extends Injectee<T>
 			Binding<?> current = bindings[i];
 			final boolean equalResource = lastUnique.resource.equalTo(
 					current.resource);
-			DeclarationType uType = lastUnique.source.declarationType;
+			DeclarationType lastType = lastUnique.source.declarationType;
 			DeclarationType curType = current.source.declarationType;
-			if (equalResource && uType.clashesWith(curType))
+			if (equalResource && lastType.clashesWith(curType))
 				throw InconsistentBinding.clash(lastUnique, current);
 			if (curType == DeclarationType.REQUIRED) {
 				required.add(current.resource.type());
-			} else if (equalResource && uType.droppedWith(curType)) {
+			} else if (equalResource && (lastType.droppedWith(curType))) {
 				if (i - 1 == lastUniqueIndex)
 					dropped.add(uniques.remove(uniques.size() - 1));
 				dropped.add(current);
-			} else if (!equalResource || !curType.replacedBy(uType)) {
-				uniques.add(current);
-				lastUniqueIndex = i;
+			} else if (!equalResource || !curType.replacedBy(lastType)) {
+				if (!isDuplicateIdenticalConstant(equalResource, curType,
+						lastUnique, current)) {
+					uniques.add(current);
+					lastUniqueIndex = i;
+				} else {
+					dropped.add(current);
+				}
 			}
 		}
 		return withoutProvidedThatAreNotRequiredIn(uniques, required, dropped);
+	}
+
+	private static boolean isDuplicateIdenticalConstant(boolean equalResource,
+			DeclarationType curType, Binding<?> lastUnique,
+			Binding<?> current) {
+		return equalResource && curType == DeclarationType.MULTI
+			&& current.type == BindingType.PREDEFINED
+			&& lastUnique.supplier.equals(current.supplier);
 	}
 
 	private static Binding<?>[] withoutProvidedThatAreNotRequiredIn(

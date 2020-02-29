@@ -28,20 +28,20 @@ import se.jbee.inject.config.Options;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public class TestPresetModuleBinds {
+public class TestModuleWithBinds {
 
-	private static class PresetModuleBindsBundle extends BootstrapperBundle {
+	private static class TestModuleWithBindsBundle extends BootstrapperBundle {
 
 		@Override
 		protected void bootstrap() {
-			install(PresetModuleBindsModule1.class);
-			install(PresetModuleBindsModule2.class);
-			install(PresetModuleBindsModule3.class);
+			install(TestModuleWithBindsModule1.class);
+			install(TestModuleWithBindsModule2.class);
+			install(TestModuleWithBindsModule3.class);
 		}
 
 	}
 
-	private static class PresetModuleBindsModule1
+	private static class TestModuleWithBindsModule1
 			extends BinderModuleWith<Properties> {
 
 		@Override
@@ -50,7 +50,7 @@ public class TestPresetModuleBinds {
 		}
 	}
 
-	private static class PresetModuleBindsModule2
+	private static class TestModuleWithBindsModule2
 			extends BinderModuleWith<List<String>> {
 
 		@Override
@@ -60,7 +60,7 @@ public class TestPresetModuleBinds {
 
 	}
 
-	private static class PresetModuleBindsModule3
+	private static class TestModuleWithBindsModule3
 			extends BinderModuleWith<List<Integer>> {
 
 		@Override
@@ -70,7 +70,7 @@ public class TestPresetModuleBinds {
 
 	}
 
-	private static class PresetModuleBindsModule4
+	private static class TestModuleWithBindsModule4
 			extends BinderModuleWith<Options> {
 
 		@Override
@@ -87,7 +87,7 @@ public class TestPresetModuleBinds {
 				exampleProperties()).set(listTypeOf(String.class),
 						asList("a", "b")).set(listTypeOf(Integer.class),
 								asList(1, 2));
-		return Bootstrap.injector(PresetModuleBindsBundle.class,
+		return Bootstrap.injector(TestModuleWithBindsBundle.class,
 				Globals.STANDARD.with(presets));
 	}
 
@@ -110,6 +110,6 @@ public class TestPresetModuleBinds {
 
 	@Test
 	public void presetItselfCanBePassedToModule() {
-		assertNotNull(Bootstrap.injector(PresetModuleBindsModule4.class));
+		assertNotNull(Bootstrap.injector(TestModuleWithBindsModule4.class));
 	}
 }

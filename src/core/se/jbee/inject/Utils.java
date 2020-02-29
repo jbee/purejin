@@ -247,6 +247,10 @@ public final class Utils {
 			|| Map.class.isAssignableFrom(cls);
 	}
 
+	public static boolean isClassInstantiable(Class<?> cls) {
+		return !isClassVirtual(cls) && cls.getTypeParameters().length == 0;
+	}
+
 	/**
 	 * @return A {@link Class} is monomodal if it there is just a single
 	 *         possible initial state. All newly created instances can just have

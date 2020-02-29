@@ -2,6 +2,8 @@ package se.jbee.inject.config;
 
 public final class Mirrors {
 
+	//TODO can Mirrors be Options?
+
 	public static final Mirrors DEFAULT = new Mirrors(ConstructionMirror.common,
 			ProductionMirror.noMethods, NamingMirror.defaultName,
 			ParameterisationMirror.noParameters, ScopingMirror.alwaysDefault);
