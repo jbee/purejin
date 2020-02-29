@@ -23,6 +23,8 @@ import java.util.ServiceLoader;
 import java.util.Set;
 
 import se.jbee.inject.Injector;
+import se.jbee.inject.Name;
+import se.jbee.inject.Source;
 import se.jbee.inject.Type;
 import se.jbee.inject.config.Choices;
 import se.jbee.inject.config.Globals;
@@ -187,8 +189,12 @@ public final class Bootstrap {
 		}
 	}
 
+	public static Class<? extends Bundle> getBootstrapperBundle() {
+		return BuildinBootstrapper.class;
+	}
+
 	private static final class BuildinBootstrapper
-			implements Bootstrapper, Bundler, Modulariser {
+			implements Bootstrapper, Bundler, Modulariser, Bundle, Module {
 
 		private final Map<Class<? extends Bundle>, Set<Class<? extends Bundle>>> bundleChildren = new IdentityHashMap<>();
 		private final Map<Class<? extends Bundle>, List<Module>> bundleModules = new IdentityHashMap<>();
@@ -199,6 +205,18 @@ public final class Bootstrap {
 
 		BuildinBootstrapper(Globals globals) {
 			this.globals = globals;
+			install(BuildinBootstrapper.class);
+		}
+
+		@Override
+		public void bootstrap(Bootstrapper bootstrap) {
+			bootstrap.install(this);
+		}
+
+		@Override
+		public void declare(Bindings bindings) {
+			bindings.addConstant(Source.source(BuildinBootstrapper.class),
+					Name.DEFAULT, Globals.class, globals);
 		}
 
 		@Override
@@ -217,7 +235,10 @@ public final class Bootstrap {
 						key -> new LinkedHashSet<>()).add(bundle);
 			}
 			stack.push(bundle);
-			Bootstrap.instance(bundle).bootstrap(this);
+			Bundle instance = bundle == BuildinBootstrapper.class
+				? this
+				: Bootstrap.instance(bundle);
+			instance.bootstrap(this);
 			if (stack.pop() != bundle)
 				throw new IllegalStateException(bundle.getCanonicalName());
 		}
@@ -288,6 +309,8 @@ public final class Bootstrap {
 					install(root);
 			for (Class<? extends Bundle> root : roots)
 				addAllInstalledIn(root, installed);
+			if (!uninstalled.contains(BuildinBootstrapper.class))
+				installed.add(BuildinBootstrapper.class);
 			return arrayOf(installed, Class.class);
 		}
 
