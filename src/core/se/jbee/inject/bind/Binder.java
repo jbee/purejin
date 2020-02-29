@@ -38,16 +38,13 @@ import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bootstrap.Binding;
 import se.jbee.inject.bootstrap.BindingType;
 import se.jbee.inject.bootstrap.Bindings;
-import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Bundle;
 import se.jbee.inject.bootstrap.Constant;
 import se.jbee.inject.bootstrap.Factory;
 import se.jbee.inject.bootstrap.New;
 import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.config.Config;
-import se.jbee.inject.config.Globals;
 import se.jbee.inject.config.Mirrors;
-import se.jbee.inject.config.Plugins;
 import se.jbee.inject.container.Initialiser;
 import se.jbee.inject.container.Supplier;
 
@@ -235,20 +232,7 @@ public class Binder {
 		if (lazyInstalled.length > 0) {
 			for (Class<? extends Bundle> bundle : lazyInstalled)
 				plug(bundle).into(Injector.class, subContext);
-			implicit().bind(Name.named(subContext), Injector.class).toSupplier(
-					Binder::lazyInjector);
 		}
-	}
-
-	//TODO maybe bind a supplier that can create any sub-context asked for - some just have no bundles
-	protected final static Injector lazyInjector(
-			Dependency<? super Injector> dep, Injector context) {
-		@SuppressWarnings("unchecked")
-		Class<? extends Bundle>[] bundles = (Class<? extends Bundle>[]) //
-		context.resolve(Plugins.class).forPoint(Injector.class,
-				dep.instance.name.toString());
-		return Bootstrap.injector(Bindings.newBindings(), Globals.STANDARD,
-				bundles);
 	}
 
 	/**

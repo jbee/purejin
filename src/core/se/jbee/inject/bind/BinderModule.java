@@ -36,6 +36,7 @@ public abstract class BinderModule extends InitializedBinder
 	public final void bootstrap(Bootstrapper bootstrap) {
 		if (basis != null)
 			bootstrap.install(basis);
+		bootstrap.install(BuildinBundle.SUB_CONTEXT);
 		bootstrap.install(DefaultScopes.class);
 		bootstrap.install(SPIModule.class);
 		bootstrap.install(AnnotatedWithModule.class);

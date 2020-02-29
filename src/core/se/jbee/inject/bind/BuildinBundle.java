@@ -11,12 +11,19 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import se.jbee.inject.Dependency;
+import se.jbee.inject.Injector;
 import se.jbee.inject.Provider;
 import se.jbee.inject.Scope;
 import se.jbee.inject.UnresolvableDependency;
+import se.jbee.inject.bootstrap.Bindings;
+import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Bootstrapper.ChoiceBootstrapper;
+import se.jbee.inject.bootstrap.Bundle;
 import se.jbee.inject.bootstrap.ChoiceBundle;
 import se.jbee.inject.bootstrap.Supply;
+import se.jbee.inject.config.Globals;
+import se.jbee.inject.config.Plugins;
 
 /**
  * Installs all the build-in functionality by using the core API.
@@ -48,7 +55,11 @@ public enum BuildinBundle implements ChoiceBundle<BuildinBundle> {
 	 * Adds: Support for injection of {@link Optional}s. If {@link Optional}
 	 * parameters cannot be resolved {@link Optional#empty()} is injected.
 	 */
-	OPTIONAL;
+	OPTIONAL,
+	/**
+	 * Adds: Support for {@link Injector} sub-contexts.
+	 */
+	SUB_CONTEXT;
 
 	@Override
 	public void bootstrap(ChoiceBootstrapper<BuildinBundle> bootstrapper) {
@@ -58,6 +69,7 @@ public enum BuildinBundle implements ChoiceBundle<BuildinBundle> {
 		bootstrapper.install(ProviderBridgeModule.class, PROVIDER);
 		bootstrapper.install(LoggerModule.class, LOGGER);
 		bootstrapper.install(OptionalBridgeModule.class, OPTIONAL);
+		bootstrapper.install(SubContextModule.class, SUB_CONTEXT);
 	}
 
 	private static class LoggerModule extends BinderModule {
@@ -122,6 +134,26 @@ public enum BuildinBundle implements ChoiceBundle<BuildinBundle> {
 							return Optional.empty();
 						}
 					});
+		}
+
+	}
+
+	private static final class SubContextModule extends BinderModule {
+
+		@Override
+		protected void declare() {
+			asDefault().per(Scope.dependencyInstance).starbind(
+					Injector.class).toSupplier(SubContextModule::lazyInjector);
+		}
+
+		final static Injector lazyInjector(Dependency<? super Injector> dep,
+				Injector context) {
+			@SuppressWarnings("unchecked")
+			Class<? extends Bundle>[] bundles = (Class<? extends Bundle>[]) //
+			context.resolve(Plugins.class).forPoint(Injector.class,
+					dep.instance.name.toString());
+			return Bootstrap.injector(Bindings.newBindings(), Globals.STANDARD,
+					bundles);
 		}
 
 	}

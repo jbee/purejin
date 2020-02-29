@@ -1,6 +1,7 @@
 package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 
 import org.junit.Test;
@@ -63,12 +64,12 @@ public class TestInstallInSubContextBinds {
 			TestInstallInSubContextBindsModule.class);
 
 	@Test(expected = UnresolvableDependency.class)
-	public void lazyInstallsAreNotAccessibleDirectly() {
+	public void bindsInstalledInSubContextAreNotAccessibleInParent() {
 		injector.resolve(int.class);
 	}
 
 	@Test
-	public void lazyInstallsMakesSubInjectorAvailable() {
+	public void bindsAreAvailableInTheSubContextTheyWereInstalledIn() {
 		Injector foo = injector.subContext("foo");
 		assertNotSame(foo, injector);
 		assertEquals(42, foo.resolve(int.class).intValue());
@@ -78,4 +79,11 @@ public class TestInstallInSubContextBinds {
 		assertNotSame(foo, bar);
 		assertEquals("42", bar.resolve(String.class));
 	}
+
+	@Test
+	public void anySubContextCanBeResolvedButItMightBeEmpty() {
+		Injector subContext = injector.subContext("withoutIntallIn");
+		assertNotNull(subContext);
+	}
+
 }
