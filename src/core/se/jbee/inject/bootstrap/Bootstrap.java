@@ -5,6 +5,7 @@
  */
 package se.jbee.inject.bootstrap;
 
+import static se.jbee.inject.Name.DEFAULT;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.accessible;
 import static se.jbee.inject.Utils.arrayOf;
@@ -22,10 +23,12 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 
+import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Name;
 import se.jbee.inject.Source;
 import se.jbee.inject.Type;
+import se.jbee.inject.config.Annotations;
 import se.jbee.inject.config.Choices;
 import se.jbee.inject.config.Globals;
 import se.jbee.inject.config.Options;
@@ -215,8 +218,16 @@ public final class Bootstrap {
 
 		@Override
 		public void declare(Bindings bindings) {
-			bindings.addConstant(Source.source(BuildinBootstrapper.class),
-					Name.DEFAULT, Globals.class, globals);
+			Source source = Source.source(BuildinBootstrapper.class).typed(
+					DeclarationType.DEFAULT);
+			Name name = DEFAULT;
+			bindings.addConstant(source.next(), name, Globals.class, globals);
+			bindings.addConstant(source.next(), name, Options.class,
+					globals.options);
+			bindings.addConstant(source.next(), name, Choices.class,
+					globals.choices);
+			bindings.addConstant(source.next(), name, Annotations.class,
+					globals.annotations);
 		}
 
 		@Override

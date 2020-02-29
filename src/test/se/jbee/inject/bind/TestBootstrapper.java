@@ -257,7 +257,7 @@ public class TestBootstrapper {
 		assertEquals(6, injector.resolve(Number.class));
 		InjectionCase<?>[] cases = injector.resolve(InjectionCase[].class);
 		//TODO can this be limited to cases with a certain Scope so that container can be excluded?
-		assertEquals(25, cases.length); // 3x Comparable, Float, Double, Integer and Number (3x Serializable has been nullified) + 11 Scope + 2 Annotation
+		assertEquals(28, cases.length); // 3x Comparable, Float, Double, Integer and Number (3x Serializable has been nullified) + 11 Scope + 2 Annotation
 		InjectionCase<Number>[] casesForNumber = injector.resolve(
 				injectionCasesTypeFor(Number.class));
 		assertEquals(1, casesForNumber.length);
