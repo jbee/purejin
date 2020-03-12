@@ -5,7 +5,7 @@ import java.lang.reflect.Array;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency;
-import se.jbee.inject.UnresolvableDependency.NoCaseForDependency;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.UnresolvableDependency.NoMethodForDependency;
 
 public class Decorate {
@@ -33,7 +33,7 @@ public class Decorate {
 					return Decorate.resolveArray(dep, root, branch);
 				try {
 					return branch.resolve(dep);
-				} catch (NoCaseForDependency | NoMethodForDependency e) {
+				} catch (NoResourceForDependency | NoMethodForDependency e) {
 					return root.resolve(dep);
 				}
 			}

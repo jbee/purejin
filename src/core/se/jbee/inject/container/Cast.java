@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Set;
 
 import se.jbee.inject.Generator;
-import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Provider;
+import se.jbee.inject.Resource;
 import se.jbee.inject.Type;
 
 /**
@@ -71,24 +71,20 @@ public final class Cast {
 		return (Type) raw(Generator[].class).parametized(generatedType);
 	}
 
-	public static <T> Type<InjectionCase<T>> injectionCaseTypeFor(
-			Class<T> generatedType) {
-		return injectionCaseTypeFor(raw(generatedType));
+	public static <T> Type<Resource<T>> resourceTypeFor(Class<T> type) {
+		return resourceTypeFor(raw(type));
 	}
 
-	public static <T> Type<InjectionCase<T>> injectionCaseTypeFor(
-			Type<T> generatorType) {
-		return (Type) raw(InjectionCase.class).parametized(generatorType);
+	public static <T> Type<Resource<T>> resourceTypeFor(Type<T> type) {
+		return (Type) raw(Resource.class).parametized(type);
 	}
 
-	public static <T> Type<InjectionCase<T>[]> injectionCasesTypeFor(
-			Class<T> generatedType) {
-		return injectionCasesTypeFor(raw(generatedType));
+	public static <T> Type<Resource<T>[]> resourcesTypeFor(Class<T> type) {
+		return resourcesTypeFor(raw(type));
 	}
 
-	public static <T> Type<InjectionCase<T>[]> injectionCasesTypeFor(
-			Type<T> generatedType) {
-		return (Type) raw(InjectionCase[].class).parametized(generatedType);
+	public static <T> Type<Resource<T>[]> resourcesTypeFor(Type<T> type) {
+		return (Type) raw(Resource[].class).parametized(type);
 	}
 
 	public static <T> Type<Initialiser<T>> initialiserTypeOf(

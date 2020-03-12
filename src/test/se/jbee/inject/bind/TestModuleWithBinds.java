@@ -15,9 +15,9 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.bootstrap.ModuleWith;
-import se.jbee.inject.config.Globals;
+import se.jbee.inject.config.Env;
 import se.jbee.inject.config.Options;
+import se.jbee.inject.declare.ModuleWith;
 
 /**
  * This test demonstrates how to use {@link Options} to pass input data to the
@@ -71,10 +71,10 @@ public class TestModuleWithBinds {
 	}
 
 	private static class TestModuleWithBindsModule4
-			extends BinderModuleWith<Options> {
+			extends BinderModuleWith<Env> {
 
 		@Override
-		protected void declare(Options preset) {
+		protected void declare(Env preset) {
 			assertNotNull(preset);
 		}
 
@@ -83,12 +83,11 @@ public class TestModuleWithBinds {
 	private final Injector injector = injector();
 
 	private static Injector injector() {
-		Options presets = Options.NONE.set(Properties.class,
-				exampleProperties()).set(listTypeOf(String.class),
-						asList("a", "b")).set(listTypeOf(Integer.class),
-								asList(1, 2));
-		return Bootstrap.injector(TestModuleWithBindsBundle.class,
-				Globals.STANDARD.with(presets));
+		Env env = Bootstrap.ENV //
+				.with(Properties.class, exampleProperties()) //
+				.with(listTypeOf(String.class), asList("a", "b")) //
+				.with(listTypeOf(Integer.class), asList(1, 2));
+		return Bootstrap.injector(TestModuleWithBindsBundle.class, env);
 	}
 
 	private static Properties exampleProperties() {
@@ -109,7 +108,7 @@ public class TestModuleWithBinds {
 	}
 
 	@Test
-	public void presetItselfCanBePassedToModule() {
+	public void envItselfCanBePassedToModule() {
 		assertNotNull(Bootstrap.injector(TestModuleWithBindsModule4.class));
 	}
 }

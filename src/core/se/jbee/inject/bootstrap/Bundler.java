@@ -5,6 +5,8 @@
  */
 package se.jbee.inject.bootstrap;
 
+import se.jbee.inject.declare.Bundle;
+
 /**
  * Determines all reachable {@link Bundle}s starting from a root {@link Bundle}.
  * 

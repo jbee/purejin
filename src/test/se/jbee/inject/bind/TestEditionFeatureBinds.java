@@ -12,14 +12,14 @@ import org.junit.Test;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Bootstrapper.ChoiceBootstrapper;
+import se.jbee.inject.bootstrap.Bootstrapper.ToggledBootstrapper;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.bootstrap.Bundle;
-import se.jbee.inject.bootstrap.ChoiceBundle;
-import se.jbee.inject.bootstrap.Module;
+import se.jbee.inject.bootstrap.ToggledBundles;
 import se.jbee.inject.config.Edition;
+import se.jbee.inject.config.Env;
 import se.jbee.inject.config.Feature;
-import se.jbee.inject.config.Globals;
+import se.jbee.inject.declare.Bundle;
+import se.jbee.inject.declare.Module;
 
 /**
  * A test that demonstrates how to use {@link Feature}s and {@link Edition}s to
@@ -92,12 +92,12 @@ public class TestEditionFeatureBinds {
 
 	@Featured(AnnotatedFeature.BAZ)
 	private enum FeaturedOptionBundle
-			implements ChoiceBundle<FeaturedOptionBundle> {
+			implements ToggledBundles<FeaturedOptionBundle> {
 		QUX;
 
 		@Override
 		public void bootstrap(
-				ChoiceBootstrapper<FeaturedOptionBundle> bootstrapper) {
+				ToggledBootstrapper<FeaturedOptionBundle> bootstrapper) {
 			bootstrapper.install(AnotherModule.class, QUX);
 		}
 
@@ -114,30 +114,30 @@ public class TestEditionFeatureBinds {
 
 	@Test
 	public void thatJustTheFeaturedBundleIsInstalled() {
-		assertEditionInstalls(Globals.featureEdition(AnnotatedFeature.FOO), 42);
+		assertEditionInstalls(Edition.includes(AnnotatedFeature.FOO), 42);
 	}
 
 	@Test
 	public void thatJustTheFeaturedModuleIsInstalled() {
-		assertEditionInstalls(Globals.featureEdition(AnnotatedFeature.BAR), 8);
+		assertEditionInstalls(Edition.includes(AnnotatedFeature.BAR), 8);
 	}
 
 	@Test
 	public void thatJustTheFeaturedModularBundleIsInstalled() {
-		assertEditionInstalls(Globals.featureEdition(AnnotatedFeature.BAZ),
-				128);
+		assertEditionInstalls(Edition.includes(AnnotatedFeature.BAZ), 128);
 	}
 
 	@Test
 	public void thatTheFeaturedBundlesAndModulesAreInstalled() {
-		assertEditionInstalls(Globals.featureEdition(AnnotatedFeature.BAR,
-				AnnotatedFeature.BAZ), 8, 128);
+		assertEditionInstalls(
+				Edition.includes(AnnotatedFeature.BAR, AnnotatedFeature.BAZ), 8,
+				128);
 	}
 
 	private static void assertEditionInstalls(Edition edition,
 			Integer... expected) {
-		Injector injector = Bootstrap.injector(RootBundle.class,
-				Globals.STANDARD.with(edition));
+		Env env = Bootstrap.ENV.with(Edition.class, edition);
+		Injector injector = Bootstrap.injector(RootBundle.class, env);
 		assertEqualSets(expected, injector.resolve(Integer[].class));
 	}
 

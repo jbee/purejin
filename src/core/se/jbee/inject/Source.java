@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -74,5 +74,9 @@ public final class Source implements Qualifying<Source>, Serializable {
 		return declarationNo > 0
 			? this
 			: new Source(ident, declarationType, totalDeclarations, 0);
+	}
+
+	public Package pkg() {
+		return ident.getPackage();
 	}
 }

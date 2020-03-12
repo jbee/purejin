@@ -15,10 +15,10 @@ import java.io.Serializable;
 public final class Injection implements Serializable {
 
 	public final Instance<?> dependency;
-	public final Resource<?> target;
+	public final Locator<?> target;
 	public final Scoping scoping;
 
-	public Injection(Instance<?> dependency, Resource<?> target,
+	public Injection(Instance<?> dependency, Locator<?> target,
 			Scoping scoping) {
 		this.dependency = dependency;
 		this.target = target;

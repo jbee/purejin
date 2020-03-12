@@ -13,7 +13,7 @@ import se.jbee.inject.Provider;
 import se.jbee.inject.Scope;
 import se.jbee.inject.Scoping;
 
-public class TestScopes {
+public class TestScoping {
 
 	static class A {
 		// just for test
@@ -22,6 +22,10 @@ public class TestScopes {
 	static class B {
 		// just for test
 	}
+
+	private static final Name requestScope = Name.named("request");
+	private static final Scoping request = Scoping.scopingOf(
+			requestScope).group(Scope.worker);
 
 	@Test
 	public void thatDependencyTypeScopeEnsuresSingletonPerExactGenericType() {
@@ -44,11 +48,13 @@ public class TestScopes {
 		assertFalse(injection.isStableIn(Scope.dependencyInstance));
 		assertFalse(injection.isStableIn(Scope.dependencyType));
 		assertFalse(injection.isStableIn(Scope.targetInstance));
+		assertFalse(injection.isStableIn(Scope.worker));
+		assertFalse(injection.isStableIn(Scope.thread));
 		assertTrue(injection.isStableIn(injection));
 	}
 
 	@Test
-	public void threadScopeIsNotStableInAnyOtherScopeExceptInjection() {
+	public void threadScopeIsNotStableInAnyOtherScopeExceptInjectionAndWorker() {
 		Scoping thread = scopingOf(Scope.thread);
 		assertFalse(thread.isStableIn(Scope.application));
 		assertFalse(thread.isStableIn(Scope.dependency));
@@ -57,6 +63,29 @@ public class TestScopes {
 		assertFalse(thread.isStableIn(Scope.targetInstance));
 		assertTrue(thread.isStableIn(thread));
 		assertTrue(thread.isStableIn(Scope.injection));
+		assertTrue(thread.isStableIn(Scope.worker));
+	}
+
+	@Test
+	public void workerScopeIsNotStableInAnyOtherScopeExceptInjection() {
+		assertWorkerScopeStability(scopingOf(Scope.worker));
+	}
+
+	@Test
+	public void customWorkerScopeIsAsStableAsWorkerGroupScope() {
+		assertWorkerScopeStability(request);
+	}
+
+	private static void assertWorkerScopeStability(Scoping worker) {
+		assertFalse(worker.isStableIn(Scope.application));
+		assertFalse(worker.isStableIn(Scope.dependency));
+		assertFalse(worker.isStableIn(Scope.dependencyInstance));
+		assertFalse(worker.isStableIn(Scope.dependencyType));
+		assertFalse(worker.isStableIn(Scope.targetInstance));
+		assertFalse(worker.isStableIn(Scope.thread));
+		assertTrue(worker.isStableIn(worker));
+		assertTrue(worker.isStableIn(Scope.worker));
+		assertTrue(worker.isStableIn(Scope.injection));
 	}
 
 	@Test

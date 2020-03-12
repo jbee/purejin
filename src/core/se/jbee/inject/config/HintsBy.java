@@ -29,7 +29,7 @@ import se.jbee.inject.Type;
  * @since 19.1
  */
 @FunctionalInterface
-public interface ParameterisationMirror {
+public interface HintsBy {
 
 	/**
 	 * @return The {@link Parameter} hints for the construction/invocation of
@@ -40,14 +40,14 @@ public interface ParameterisationMirror {
 	 */
 	Parameter<?>[] reflect(Executable obj);
 
-	ParameterisationMirror noParameters = obj -> Parameter.noParameters;
+	HintsBy noParameters = obj -> Parameter.noParameters;
 
 	/**
-	 * A {@link ParameterisationMirror} that allows to specify the
+	 * A {@link HintsBy} that allows to specify the
 	 * {@link Annotation} which is used to indicate the instance {@link Name} of
 	 * a method parameter.
 	 */
-	default ParameterisationMirror unlessAnnotatedWith(
+	default HintsBy unlessAnnotatedWith(
 			Class<? extends Annotation> naming) {
 		if (naming == null)
 			return this;

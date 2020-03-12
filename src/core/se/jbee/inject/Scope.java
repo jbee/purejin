@@ -22,7 +22,7 @@ import java.io.File;
 public interface Scope {
 
 	/**
-	 * @param serialID ID number of this {@link InjectionCase} with the
+	 * @param serialID ID number of this {@link Resource} with the
 	 *            {@link Injector} context
 	 * @param dep currently served {@link Dependency}
 	 * @param provider constructor function yielding new instances if needed.
@@ -37,8 +37,8 @@ public interface Scope {
 	 *         depending on the {@link Scope} that created this
 	 *         {@link Repository}).
 	 * 
-	 *         The information from the {@link Dependency} and
-	 *         {@link InjectionCase} can be used to lookup existing instances.
+	 *         The information from the {@link Dependency} and {@link Resource}
+	 *         can be used to lookup existing instances.
 	 */
 	<T> T yield(int serialID, Dependency<? super T> dep, Provider<T> provider,
 			int generators) throws UnresolvableDependency;
@@ -82,6 +82,18 @@ public interface Scope {
 	 */
 	Name thread = named("thread");
 
+	/**
+	 * Is a family of temporary scopes that are explicitly linked and unlinked
+	 * with a thread for a period of time. This is usually used for worker
+	 * threads that a linked to a fresh scope for each work item. In contrast to
+	 * a {@link #thread} scope the worker scope resets when it is unlinked and
+	 * linked again for the same {@link Thread}.
+	 * 
+	 * A typical example of a worker scope is a 'per-request' scope in a HTTP
+	 * server.
+	 */
+	Name worker = named("@worker");
+
 	Name dependency = named("dependency");
 
 	Name dependencyType = named("dependency-type");
@@ -105,5 +117,76 @@ public interface Scope {
 			Provider<T> provider, int generators)
 			throws UnresolvableDependency {
 		return provider.provide();
+	}
+
+	/**
+	 * SPI for temporary {@link Thread} bound {@link Scope}s.
+	 * 
+	 * For example to {@link #allocate()} and {@link #deallocate()} the
+	 * {@link Scope#worker} to a worker {@link Thread}.
+	 * 
+	 * An instance of the {@link Controller} is resolved from the
+	 * {@link Injector} using the {@link Scope}'s {@link Name} as
+	 * {@link Instance} name for the {@link Controller} {@link Dependency}.
+	 * 
+	 * To create a fresh {@link Scope} context resolve the instance with the
+	 * worker {@link Thread}.
+	 * 
+	 * To transfer an existing {@link Scope} context to a worker {@link Thread}
+	 * resolve the instance with the {@link Thread} that should be the source of
+	 * the transfer. The source must be {@link #allocate()}ed already. A
+	 * transfer is used to e.g. perform asynchronous computation as part of a
+	 * work item where the asynchronous computation should have access to
+	 * resources of the outer work item.
+	 * 
+	 * This interface is usually implemented by binding the {@link Controller}
+	 * in the {@link Scope} it controls so that its implementation can return
+	 * the controller implementation.
+	 * 
+	 * @since 19.1
+	 */
+	public interface Controller {
+
+		/**
+		 * Activates a worker {@link Scope} to the current {@link Thread}.
+		 * 
+		 * This method must be called by the worker {@link Thread} at the
+		 * beginning of starting a work item.
+		 * 
+		 * When this {@link Controller} was resolved within the worker
+		 * {@link Thread} a fresh empty {@link Scope} context is created.
+		 * 
+		 * When this {@link Controller} was resolved by another {@link Thread}
+		 * the existing {@link Scope} context of that {@link Thread} is
+		 * transferred to or shared with the current worker {@link Thread}.
+		 * Should the {@link Scope} be {@link #deallocate()}ed by the source of
+		 * the transfer it will continue to exist and be valid to use by this
+		 * worker {@link Thread} until it is also unlinked by it.
+		 * 
+		 * Such transfer of {@link Scope} from one {@link Thread} to another
+		 * worker can occur whether or not the source created the {@link Scope}
+		 * or received it by transfer itself.
+		 */
+		void allocate();
+
+		/**
+		 * Deactivates an existing {@link Scope} from the current
+		 * {@link Thread}.
+		 * 
+		 * This has no effect on the allocation state of other {@link Thread}s,
+		 * neither those receiving a transfer from the current {@link Thread}
+		 * nor those that transferred to the current worker {@link Thread}.
+		 * 
+		 * This method must be called by the worker {@link Thread} at the end of
+		 * working a work item.
+		 * 
+		 * If no {@link Scope} context was allocated for the current
+		 * {@link Thread} the call has no effect.
+		 */
+		void deallocate();
+
+		static Instance<Controller> forScope(Name scope) {
+			return Instance.instance(scope, Type.raw(Controller.class));
+		}
 	}
 }

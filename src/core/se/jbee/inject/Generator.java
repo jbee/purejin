@@ -7,7 +7,7 @@ package se.jbee.inject;
 
 /**
  * A {@link Generator} creates the instance(s) for the generator's
- * {@link InjectionCase}.
+ * {@link Resource}.
  * 
  * When binding directly to a {@link Generator} any {@link Scoping} will be
  * ineffective since the supplied {@link Generator} will directly be asked to

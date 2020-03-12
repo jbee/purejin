@@ -2,6 +2,8 @@ package se.jbee.inject.bootstrap;
 
 import se.jbee.inject.InconsistentDeclaration;
 import se.jbee.inject.Instance;
+import se.jbee.inject.Name;
+import se.jbee.inject.Type;
 
 /**
  * Problems related to {@link Binding} and the bootstrapping process.
@@ -31,6 +33,13 @@ public class InconsistentBinding extends InconsistentDeclaration {
 		return new InconsistentBinding(
 				"Attempt to expand value of type " + macro.getName()
 					+ " that is not bound to a macro for binding: " + expanded);
+	}
+
+	public static InconsistentBinding undefinedEnvProperty(Name name,
+			Type<?> property, Package pkg) {
+		return new InconsistentBinding(
+				"Attempt to resolve environment property failed, no value was bound to "
+					+ name + " of type " + property + " in " + pkg);
 	}
 
 	public static InconsistentBinding illegalCompletion(Binding<?> completing,

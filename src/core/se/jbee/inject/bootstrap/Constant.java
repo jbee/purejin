@@ -5,6 +5,8 @@
  */
 package se.jbee.inject.bootstrap;
 
+import se.jbee.inject.declare.Macro;
+
 /**
  * A {@link Constant} is the {@link Macro} expansion wrapper type for any
  * constant bound to in the fluent binder API.

@@ -25,11 +25,10 @@ import se.jbee.inject.Name;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Scope;
 import se.jbee.inject.UnresolvableDependency;
-import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.config.Globals;
-import se.jbee.inject.config.Options;
-import se.jbee.inject.config.ParameterisationMirror;
+import se.jbee.inject.config.Env;
+import se.jbee.inject.config.Environment;
+import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.container.Supplier;
 
 /**
@@ -54,15 +53,16 @@ public class TestPropertyAnnotationBinds {
 			extends BinderModuleWith<Properties> {
 
 		/**
-		 * Configures custom {@link ParameterisationMirror}.
+		 * Configures custom {@link HintsBy}.
 		 */
 		@Override
-		protected Bindings configure(Bindings bindings) {
-			return bindings.with(bindings.mirrors.parameteriseBy(this::hints));
+		protected Env configure(Env env) {
+			return Environment.override(env).with(
+					HintsBy.class, this::hints);
 		}
 
 		/**
-		 * The custom {@link ParameterisationMirror} implementation checks the
+		 * The custom {@link HintsBy} implementation checks the
 		 * the {@link Property} annotation; if present, a {@link Instance} hint
 		 * is added to the constructor arguments linking the parameter to a
 		 * named {@link String}. The name of that {@link String} is derived from
@@ -123,10 +123,9 @@ public class TestPropertyAnnotationBinds {
 		Properties properties = new Properties();
 		properties.put("foo", "property1");
 		properties.put("bar", "property2");
-		Globals globals = Globals.STANDARD.with(
-				Options.NONE.set(Properties.class, properties));
+		Env env = Bootstrap.ENV.with(Properties.class, properties);
 		Injector injector = Bootstrap.injector(
-				TestPropertyAnnotationBindsModule.class, globals);
+				TestPropertyAnnotationBindsModule.class, env);
 		ExampleBean bean = injector.resolve(ExampleBean.class);
 		assertEquals("property1", bean.property1);
 		assertEquals("property2", bean.property2);

@@ -27,10 +27,10 @@ import se.jbee.inject.Generator;
 import se.jbee.inject.InconsistentDeclaration;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
+import se.jbee.inject.Locator;
 import se.jbee.inject.Name;
 import se.jbee.inject.Packages;
 import se.jbee.inject.Parameter;
-import se.jbee.inject.Resource;
 import se.jbee.inject.Scope;
 import se.jbee.inject.Target;
 import se.jbee.inject.Type;
@@ -38,15 +38,22 @@ import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bootstrap.Binding;
 import se.jbee.inject.bootstrap.BindingType;
 import se.jbee.inject.bootstrap.Bindings;
-import se.jbee.inject.bootstrap.Bundle;
 import se.jbee.inject.bootstrap.Constant;
-import se.jbee.inject.bootstrap.Factory;
 import se.jbee.inject.bootstrap.New;
+import se.jbee.inject.bootstrap.Produces;
 import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.config.Config;
+import se.jbee.inject.config.ConstructsBy;
+import se.jbee.inject.config.Env;
 import se.jbee.inject.config.Mirrors;
+import se.jbee.inject.config.NamesBy;
+import se.jbee.inject.config.HintsBy;
+import se.jbee.inject.config.ProducesBy;
+import se.jbee.inject.config.ScopesBy;
 import se.jbee.inject.container.Initialiser;
 import se.jbee.inject.container.Supplier;
+import se.jbee.inject.declare.Bundle;
+import se.jbee.inject.declare.Mirror;
 
 /**
  * The default implementation of a fluent binder interface that provides a lot
@@ -74,18 +81,19 @@ public class Binder {
 					// Bind properties - do not access field directly
 	}
 
+	protected final Env env() {
+		return bind().env;
+	}
+
 	protected final Bindings bindings() {
 		return bind().bindings;
 	}
 
-	protected final Mirrors mirrors() {
-		return bindings().mirrors;
-	}
-
+	//TODO make this into a Module subclass
 	public void addAnnotated(Class<?>... types) {
 		Bindings bindings = bindings();
 		for (Class<?> type : types)
-			bindings.addFromAnnotated(type);
+			bindings.addAnnotated(bind().env, type);
 	}
 
 	/**
@@ -200,7 +208,7 @@ public class Binder {
 		return on(bind().asImplicit());
 	}
 
-	protected Binder with(Target target) {
+	protected final Binder with(Target target) {
 		return new Binder(root, bind().with(target));
 	}
 
@@ -345,28 +353,67 @@ public class Binder {
 	}
 
 	/**
-	 * The {@link AutoBinder} makes use of {@link Mirrors} defined in
-	 * {@link Bindings} to select and bind constructors for beans and methods as
-	 * factories and {@link Name} these instances as well as provide
-	 * {@link Parameter} hints.
+	 * The {@link AutoBinder} makes use of {@link Mirror}s to select and bind
+	 * constructors for beans and methods as factories and {@link Name} these
+	 * instances as well as provide {@link Parameter} hints.
 	 * 
 	 * @since 19.1
 	 */
 	public static class AutoBinder {
 
 		private final ScopedBinder binder;
+		private final ConstructsBy constructsBy;
+		private final ProducesBy producesBy;
+		private final NamesBy namesBy;
+		private final ScopesBy scopesBy; //TODO use it
+		private final HintsBy hintsBy;
 
 		protected AutoBinder(RootBinder binder, Name scope) {
-			this.binder = binder.on(binder.bind().asAuto()).on(
-					binder.bind().next()).per(scope);
+			Bind bind = binder.bind();
+			this.binder = binder.on(bind.asAuto()).on(bind.next()).per(scope);
+			Env env = bind.env;
+			Package where = bind.source.pkg();
+			this.constructsBy = env.property(ConstructsBy.class, where);
+			this.producesBy = env.property(ProducesBy.class, where);
+			this.namesBy = env.property(NamesBy.class, where);
+			this.scopesBy = env.property(ScopesBy.class, where);
+			this.hintsBy = env.property(HintsBy.class, where);
 		}
 
-		private Bindings bindings() {
-			return binder.bindings();
+		private AutoBinder(ScopedBinder binder, ConstructsBy constructsBy,
+				ProducesBy producesBy, NamesBy namesBy,
+				ScopesBy scopesBy, HintsBy hintsBy) {
+			this.binder = binder;
+			this.constructsBy = constructsBy;
+			this.producesBy = producesBy;
+			this.namesBy = namesBy;
+			this.scopesBy = scopesBy;
+			this.hintsBy = hintsBy;
 		}
 
-		private Mirrors mirrors() {
-			return bindings().mirrors;
+		public AutoBinder constructBy(ConstructsBy mirror) {
+			return new AutoBinder(binder, mirror, producesBy, namesBy, scopesBy,
+					hintsBy);
+		}
+
+		public AutoBinder produceBy(ProducesBy mirror) {
+			return new AutoBinder(binder, constructsBy, mirror, namesBy,
+					scopesBy, hintsBy);
+		}
+
+		public AutoBinder nameBy(NamesBy mirror) {
+			return new AutoBinder(binder, constructsBy, producesBy, mirror,
+					scopesBy, hintsBy);
+		}
+
+		public AutoBinder scopeBy(ScopesBy mirror) {
+			return new AutoBinder(binder, constructsBy, producesBy, namesBy,
+					mirror, hintsBy);
+		}
+
+		public AutoBinder parameteriseBy(HintsBy mirror) {
+			return new AutoBinder(binder, constructsBy, producesBy, namesBy,
+					scopesBy, mirror);
 		}
 
 		public void in(Class<?> service) {
@@ -382,7 +429,7 @@ public class Binder {
 					hints);
 			if (!boundInstanceMethods)
 				return; // do not try to construct the class
-			Constructor<?> target = mirrors().construction.reflect(service);
+			Constructor<?> target = constructsBy.reflect(service);
 			if (target != null)
 				bind(target, hints);
 		}
@@ -390,14 +437,14 @@ public class Binder {
 		private boolean bindMirrorMethodsIn(Class<?> impl, Object instance,
 				Parameter<?>[] hints) {
 			boolean instanceMethods = false;
-			for (Method method : mirrors().production.reflect(impl)) {
+			for (Method method : producesBy.reflect(impl)) {
 				Type<?> returns = Type.returnType(method);
 				if (returns.rawType != void.class
 					&& returns.rawType != Void.class) {
 					if (hints.length == 0)
-						hints = mirrors().parameterisation.reflect(method);
-					binder.bind(mirrors().naming.reflect(method), returns).to(
-							instance, method, hints);
+						hints = hintsBy.reflect(method);
+					binder.bind(namesBy.reflect(method), returns).to(instance,
+							method, hints);
 					instanceMethods = instanceMethods
 						|| !Modifier.isStatic(method.getModifiers());
 				}
@@ -406,9 +453,9 @@ public class Binder {
 		}
 
 		private <T> void bind(Constructor<T> target, Parameter<?>... hints) {
-			Name name = mirrors().naming.reflect(target);
+			Name name = namesBy.reflect(target);
 			if (hints.length == 0)
-				hints = mirrors().parameterisation.reflect(target);
+				hints = hintsBy.reflect(target);
 			Class<T> impl = target.getDeclaringClass();
 			Binder appBinder = binder.root.per(Scope.application).implicit();
 			if (name.isDefault()) {
@@ -440,20 +487,6 @@ public class Binder {
 
 		public ScopedBinder per(Name scope) {
 			return new ScopedBinder(root, bind().per(scope));
-		}
-
-		/**
-		 * @since 19.1
-		 */
-		public RootBinder with(Mirrors mirrors) {
-			return into(bindings().with(mirrors));
-		}
-
-		/**
-		 * @since 19.1
-		 */
-		public RootBinder into(Bindings bindings) {
-			return on(bind().into(bindings));
 		}
 
 		public RootBinder asDefault() {
@@ -593,15 +626,23 @@ public class Binder {
 	public static class TypedBinder<T> {
 
 		private final Bind bind;
-		protected final Resource<T> resource;
+		protected final Locator<T> locator;
 
 		protected TypedBinder(Bind bind, Instance<T> instance) {
-			this(bind.next(), new Resource<>(instance, bind.target));
+			this(bind.next(), new Locator<>(instance, bind.target));
 		}
 
-		TypedBinder(Bind bind, Resource<T> resource) {
+		TypedBinder(Bind bind, Locator<T> locator) {
 			this.bind = bind;
-			this.resource = resource;
+			this.locator = locator;
+		}
+
+		private Env env() {
+			return bind().env;
+		}
+
+		private <P> P env(Class<P> property) {
+			return env().property(property, bind().source.pkg());
 		}
 
 		public <I extends T> void to(Class<I> impl) {
@@ -610,31 +651,31 @@ public class Binder {
 
 		public void to(Constructor<? extends T> target, Parameter<?>... hints) {
 			if (hints.length == 0)
-				hints = mirrors().parameterisation.reflect(target);
+				hints = env(HintsBy.class).reflect(target);
 			expand(New.bind(target, hints));
 		}
 
 		protected final void to(Object owner, Method target,
 				Parameter<?>... hints) {
 			if (hints.length == 0)
-				hints = mirrors().parameterisation.reflect(target);
-			expand(Factory.bind(owner, target, hints));
+				hints = env(HintsBy.class).reflect(target);
+			expand(Produces.bind(owner, target, hints));
 		}
 
 		protected final void expand(Object value) {
-			declareBindingsIn(bind().asType(resource, BindingType.MACRO, null),
+			declareBindingsIn(bind().asType(locator, BindingType.MACRO, null),
 					value);
 		}
 
 		protected final void expand(BindingType type,
 				Supplier<? extends T> supplier) {
-			Binding<T> binding = bind().asType(resource, type, supplier);
+			Binding<T> binding = bind().asType(locator, type, supplier);
 			declareBindingsIn(binding, binding);
 		}
 
 		private void declareBindingsIn(Binding<?> binding, Object value) {
 			Bindings bindings = bindings();
-			bindings.macros.expandInto(bindings, binding, value);
+			bindings.addExpanded(env(), binding, value);
 		}
 
 		public void toSupplier(Supplier<? extends T> supplier) {
@@ -676,14 +717,14 @@ public class Binder {
 		}
 
 		public void toConstructor() {
-			to(mirrors().construction.reflect(resource.type().rawType));
+			to(env(ConstructsBy.class).reflect(locator.type().rawType));
 		}
 
 		public void toConstructor(Class<? extends T> impl,
 				Parameter<?>... hints) {
 			if (!isClassInstantiable(impl))
 				throw InconsistentDeclaration.notConstructible(impl);
-			to(mirrors().construction.reflect(impl), hints);
+			to(env(ConstructsBy.class).reflect(impl), hints);
 		}
 
 		public void toConstructor(Parameter<?>... hints) {
@@ -729,16 +770,12 @@ public class Binder {
 			return bind().bindings;
 		}
 
-		protected final Mirrors mirrors() {
-			return bindings().mirrors;
-		}
-
 		protected final Type<T> getType() {
-			return resource.type();
+			return locator.type();
 		}
 
 		protected final TypedBinder<T> on(Bind bind) {
-			return new TypedBinder<>(bind, resource);
+			return new TypedBinder<>(bind, locator);
 		}
 
 		protected final TypedBinder<T> onMulti() {

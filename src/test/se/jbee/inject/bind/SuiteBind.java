@@ -12,7 +12,7 @@ import org.junit.runners.Suite.SuiteClasses;
 		TestChoicesBinds.class, TestTargetedBinds.class, TestLoggerBinds.class,
 		TestRobotLegsProblemBinds.class, TestConstructorParameterBinds.class,
 		TestDependencyParameterBinds.class, TestScopedBinds.class,
-		TestInjectionCaseBinds.class, TestProviderBinds.class,
+		TestResolveResourceBinds.class, TestProviderBinds.class,
 		TestPrimitiveBinds.class, TestInjectorExceptions.class,
 		TestCollectionBinds.class, TestMirrorAutobindBinds.class,
 		TestParentTargetBinds.class, TestModuleWithBinds.class,

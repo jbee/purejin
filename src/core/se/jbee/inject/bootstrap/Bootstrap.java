@@ -5,17 +5,12 @@
  */
 package se.jbee.inject.bootstrap;
 
-import static se.jbee.inject.Name.DEFAULT;
-import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.Utils.accessible;
 import static se.jbee.inject.Utils.arrayOf;
-import static se.jbee.inject.Utils.noArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,17 +18,21 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Injector;
-import se.jbee.inject.Name;
-import se.jbee.inject.Source;
-import se.jbee.inject.Type;
-import se.jbee.inject.config.Annotations;
-import se.jbee.inject.config.Choices;
+import se.jbee.inject.Utils;
+import se.jbee.inject.config.ConstructsBy;
+import se.jbee.inject.config.Edition;
+import se.jbee.inject.config.Env;
+import se.jbee.inject.config.Environment;
 import se.jbee.inject.config.Globals;
-import se.jbee.inject.config.Options;
+import se.jbee.inject.config.HintsBy;
+import se.jbee.inject.config.NamesBy;
+import se.jbee.inject.config.ProducesBy;
+import se.jbee.inject.config.ScopesBy;
 import se.jbee.inject.container.Container;
 import se.jbee.inject.container.Lazy;
+import se.jbee.inject.declare.Bundle;
+import se.jbee.inject.declare.Module;
 
 /**
  * Utility to create an {@link Injector} context from {@link Bundle}s and
@@ -42,6 +41,22 @@ import se.jbee.inject.container.Lazy;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Bootstrap {
+
+	public static final Environment ENV = new Environment() //
+			.with(Edition.class, Edition.FULL) //
+			.withMacro(Macros.EXPAND) //
+			.withMacro(Macros.NEW) //
+			.withMacro(Macros.CONSTANT) //
+			.withMacro(Macros.PRODUCES) //
+			.withMacro(Macros.INSTANCE_REF) //
+			.withMacro(Macros.PARAMETRIZED_REF) //
+			.withMacro(Macros.ARRAY) //
+			.with(ConstructsBy.class, ConstructsBy.common) //
+			.with(ProducesBy.class, ProducesBy.noMethods) //
+			.with(NamesBy.class, NamesBy.defaultName) //
+			.with(ScopesBy.class, ScopesBy.alwaysDefault) //
+			.with(HintsBy.class, HintsBy.noParameters) //
+			.readonly();
 
 	private static final Lazy<Injector> APPLICATION_CONTEXT = new Lazy<>();
 
@@ -89,65 +104,61 @@ public final class Bootstrap {
 			roots.add(root.getClass());
 		if (roots.isEmpty())
 			throw InconsistentBinding.noRootBundle();
-		Iterator<ApplicationContextConfig> configIter = ServiceLoader.load(
-				ApplicationContextConfig.class).iterator();
-		Globals globals = Globals.STANDARD;
-		Bindings bindings = Bindings.newBindings();
-		if (configIter.hasNext()) {
-			ApplicationContextConfig config = configIter.next();
-			globals = config.globals();
-			bindings = bindings //
-					.with(config.macros()) //
-					.with(config.mirrors()) //
-					.with(globals.annotations);
-		}
-		return injector(bindings, globals, roots.toArray(new Class[0]));
+		Env env = null; //FIXME
+		return injector(Bindings.newBindings(), env,
+				roots.toArray(new Class[0]));
 	}
 
 	@SafeVarargs
-	public static Injector injector(Bindings bindings, Globals globals,
+	public static Injector injector(Class<? extends Bundle>... roots) {
+		return injector(Bindings.newBindings(), ENV, roots);
+	}
+
+	@SafeVarargs
+	public static Injector injector(Bindings bindings, Env env,
 			Class<? extends Bundle>... roots) {
-		BuildinBootstrapper bootstrapper = new BuildinBootstrapper(globals);
+		BuildinBootstrapper bootstrapper = new BuildinBootstrapper(env);
 		Class<? extends Bundle>[] bundles = bootstrapper.bundleAll(roots);
-		return injector(bindings, bootstrapper.modulesOf(bundles));
+		return injector(env, bindings, bootstrapper.modulesOf(bundles));
 	}
 
 	public static Injector injector(Class<? extends Bundle> root) {
-		return injector(root, Globals.STANDARD);
+		return injector(root, ENV);
+	}
+
+	public static Injector injector(Class<? extends Bundle> root, Env env) {
+		return injector(root, Bindings.newBindings(), env);
 	}
 
 	public static Injector injector(Class<? extends Bundle> root,
-			Globals globals) {
-		return injector(root, Bindings.newBindings(), globals);
+			Bindings bindings, Env env) {
+		return injector(env, bindings, modulariser(env).modularise(root));
 	}
 
-	public static Injector injector(Class<? extends Bundle> root,
-			Bindings bindings, Globals globals) {
-		return injector(bindings.with(globals.annotations),
-				modulariser(globals).modularise(root));
-	}
+	// TODO move env to be the first param everywhere
 
-	public static Injector injector(Bindings bindings, Module[] modules) {
+	public static Injector injector(Env env, Bindings bindings,
+			Module[] modules) {
 		return Container.injector(
-				Binding.disambiguate(bindings.declaredFrom(modules)));
+				Binding.disambiguate(bindings.declaredFrom(env, modules)));
 	}
 
-	public static Modulariser modulariser(Globals globals) {
-		return new BuildinBootstrapper(globals);
+	public static Modulariser modulariser(Env env) {
+		return new BuildinBootstrapper(env);
 	}
 
-	public static Bundler bundler(Globals globals) {
-		return new BuildinBootstrapper(globals);
+	public static Bundler bundler(Env env) {
+		return new BuildinBootstrapper(env);
+	}
+
+	public static Binding<?>[] bindings(Class<? extends Bundle> root) {
+		return bindings(root, Bindings.newBindings(), ENV);
 	}
 
 	public static Binding<?>[] bindings(Class<? extends Bundle> root,
-			Bindings bindings, Globals globals) {
-		return Binding.disambiguate(bindings.with(globals.annotations)//
-				.declaredFrom(modulariser(globals).modularise(root)));
-	}
-
-	public static <T> Module module(ModuleWith<T> module, Options presets) {
-		return new PresetModuleBridge<>(module, presets);
+			Bindings bindings, Env env) {
+		return Binding.disambiguate(bindings//
+				.declaredFrom(env, modulariser(env).modularise(root)));
 	}
 
 	public static void nonnullThrowsReentranceException(Object field) {
@@ -155,86 +166,31 @@ public final class Bootstrap {
 			throw InconsistentBinding.contextAlreadyInitialised();
 	}
 
-	public static <T> T instance(Class<T> type) {
-		return Supply.construct(accessible(noArgsConstructor(type)));
-	}
-
 	private Bootstrap() {
 		throw new UnsupportedOperationException("util");
 	}
 
-	/**
-	 * Implements the {@link ModuleWith} abstraction by presenting them as
-	 * {@link Module}.
-	 * 
-	 * @param <T> type of the {@link Options} value injected into the
-	 *            {@link ModuleWith}
-	 */
-	private static final class PresetModuleBridge<T> implements Module {
-
-		private final ModuleWith<T> module;
-		private final Options presets;
-
-		PresetModuleBridge(ModuleWith<T> module, Options presets) {
-			this.module = module;
-			this.presets = presets;
-		}
-
-		@Override
-		public void declare(Bindings bindings) {
-			Type<?> valueType = Type.supertype(ModuleWith.class,
-					raw(module.getClass())).parameter(0);
-			@SuppressWarnings("unchecked")
-			final T value = (T) (valueType.rawType == Options.class
-				? presets
-				: presets.get(valueType));
-			module.declare(bindings, value);
-		}
-	}
-
-	public static Class<? extends Bundle> getBootstrapperBundle() {
-		return BuildinBootstrapper.class;
-	}
-
 	private static final class BuildinBootstrapper
-			implements Bootstrapper, Bundler, Modulariser, Bundle, Module {
+			implements Bootstrapper, Bundler, Modulariser {
 
 		private final Map<Class<? extends Bundle>, Set<Class<? extends Bundle>>> bundleChildren = new IdentityHashMap<>();
 		private final Map<Class<? extends Bundle>, List<Module>> bundleModules = new IdentityHashMap<>();
 		private final Set<Class<? extends Bundle>> uninstalled = new HashSet<>();
 		private final Set<Class<? extends Bundle>> installed = new HashSet<>();
 		private final LinkedList<Class<? extends Bundle>> stack = new LinkedList<>();
-		private final Globals globals;
+		private final Env env;
+		private final Edition edition;
 
-		BuildinBootstrapper(Globals globals) {
-			this.globals = globals;
-			install(BuildinBootstrapper.class);
-		}
-
-		@Override
-		public void bootstrap(Bootstrapper bootstrap) {
-			bootstrap.install(this);
-		}
-
-		@Override
-		public void declare(Bindings bindings) {
-			Source source = Source.source(BuildinBootstrapper.class).typed(
-					DeclarationType.DEFAULT);
-			Name name = DEFAULT;
-			bindings.addConstant(source.next(), name, Globals.class, globals);
-			bindings.addConstant(source.next(), name, Options.class,
-					globals.options);
-			bindings.addConstant(source.next(), name, Choices.class,
-					globals.choices);
-			bindings.addConstant(source.next(), name, Annotations.class,
-					globals.annotations);
+		BuildinBootstrapper(Env env) {
+			this.env = env;
+			this.edition = env.property(Edition.class, Env.class.getPackage());
 		}
 
 		@Override
 		public void install(Class<? extends Bundle> bundle) {
 			if (uninstalled.contains(bundle) || installed.contains(bundle))
 				return;
-			if (!globals.edition.featured(bundle)) {
+			if (!edition.featured(bundle)) {
 				// this way we will never ask again - something not featured is finally not featured
 				uninstalled.add(bundle);
 				return;
@@ -246,40 +202,37 @@ public final class Bootstrap {
 						key -> new LinkedHashSet<>()).add(bundle);
 			}
 			stack.push(bundle);
-			Bundle instance = bundle == BuildinBootstrapper.class
-				? this
-				: Bootstrap.instance(bundle);
+			Bundle instance = Utils.instance(bundle);
 			instance.bootstrap(this);
 			if (stack.pop() != bundle)
 				throw new IllegalStateException(bundle.getCanonicalName());
 		}
 
 		@Override
-		public <C extends Enum<C>> void install(
-				Class<? extends ChoiceBundle<C>> bundle,
-				final Class<C> property) {
-			if (!globals.edition.featured(property))
+		public <F extends Enum<F>> void install(
+				Class<? extends ToggledBundles<F>> bundle,
+				final Class<F> flags) {
+			if (!edition.featured(bundle))
 				return;
-			final Choices choices = globals.choices;
-			Bootstrap.instance(bundle).bootstrap((bundleForChoice, choice) -> {
+			Utils.instance(bundle).bootstrap((bundleForFlag, flag) -> {
 				// NB: null is a valid value to define what happens when no configuration is present
-				if (choices.isChosen(property, choice)) {
-					BuildinBootstrapper.this.install(bundleForChoice);
+				if (env.toggled(flags, flag, bundleForFlag.getPackage())) {
+					BuildinBootstrapper.this.install(bundleForFlag);
 				}
 			});
 		}
 
 		@Override
 		@SafeVarargs
-		public final <C extends Enum<C> & ChoiceBundle<C>> void install(
-				C... choices) {
-			if (choices.length > 0) {
-				final C choice0 = choices[0];
-				if (!globals.edition.featured(choice0.getClass()))
+		public final <F extends Enum<F> & ToggledBundles<F>> void install(
+				F... flags) {
+			if (flags.length > 0) {
+				final F flag0 = flags[0];
+				if (!edition.featured(flag0.getClass()))
 					return;
-				final EnumSet<C> installing = EnumSet.of(choice0, choices);
-				choice0.bootstrap((bundle, onOption) -> {
-					if (installing.contains(onOption))
+				final EnumSet<F> installing = EnumSet.of(flag0, flags);
+				flag0.bootstrap((bundle, flag) -> {
+					if (installing.contains(flag))
 						BuildinBootstrapper.this.install(bundle);
 				});
 			}
@@ -289,15 +242,10 @@ public final class Bootstrap {
 		public void install(Module module) {
 			Class<? extends Bundle> bundle = stack.peek();
 			if (uninstalled.contains(bundle)
-				|| !globals.edition.featured(module.getClass()))
+				|| !edition.featured(module.getClass()))
 				return;
 			bundleModules.computeIfAbsent(bundle, key -> new ArrayList<>()).add(
 					module);
-		}
-
-		@Override
-		public <T> void install(ModuleWith<T> module) {
-			install(module(module, globals.options));
 		}
 
 		@Override
@@ -320,8 +268,6 @@ public final class Bootstrap {
 					install(root);
 			for (Class<? extends Bundle> root : roots)
 				addAllInstalledIn(root, installed);
-			if (!uninstalled.contains(BuildinBootstrapper.class))
-				installed.add(BuildinBootstrapper.class);
 			return arrayOf(installed, Class.class);
 		}
 
@@ -348,12 +294,12 @@ public final class Bootstrap {
 
 		@Override
 		@SafeVarargs
-		public final <O extends Enum<O> & ChoiceBundle<O>> void uninstall(
-				O... bundles) {
-			if (bundles.length > 0) {
-				final EnumSet<O> uninstalling = EnumSet.of(bundles[0], bundles);
-				bundles[0].bootstrap((bundle, choice) -> {
-					if (uninstalling.contains(choice))
+		public final <F extends Enum<F> & ToggledBundles<F>> void uninstall(
+				F... flags) {
+			if (flags.length > 0) {
+				final EnumSet<F> uninstalling = EnumSet.of(flags[0], flags);
+				flags[0].bootstrap((bundle, flag) -> {
+					if (uninstalling.contains(flag))
 						uninstall(bundle);
 				});
 			}

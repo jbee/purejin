@@ -20,7 +20,7 @@ import java.util.List;
  * 
  * @see DependencyCycle
  * @see UnstableDependency
- * @see NoCaseForDependency
+ * @see NoResourceForDependency
  * @see NoMethodForDependency
  * @see SupplyFailed
  * 
@@ -48,7 +48,7 @@ public abstract class UnresolvableDependency extends RuntimeException {
 	public static final class DependencyCycle extends UnresolvableDependency {
 
 		public DependencyCycle(Dependency<?> dependency,
-				Resource<?> cycleTarget) {
+				Locator<?> cycleTarget) {
 			super("Cycle detected: " + dependency + " " + cycleTarget);
 		}
 
@@ -72,32 +72,33 @@ public abstract class UnresolvableDependency extends RuntimeException {
 	}
 
 	/**
-	 * An {@link Injector} couldn't find a {@link InjectionCase} that matches a
+	 * An {@link Injector} couldn't find a {@link Resource} that matches a
 	 * {@link Dependency} to resolve.
 	 */
-	public static final class NoCaseForDependency
+	public static final class NoResourceForDependency
 			extends UnresolvableDependency {
 
-		public <T> NoCaseForDependency(Dependency<T> dependency,
-				InjectionCase<?>[] available, String msg) {
-			super("No matching case found.\n\t dependency: " + dependency
+		public <T> NoResourceForDependency(Dependency<T> dependency,
+				Resource<?>[] available, String msg) {
+			super("No matching resource found.\n\t dependency: " + dependency
 				+ "\n\tavailable are (for same raw type): "
 				+ describe(available) + "\n\t" + msg);
 		}
 
-		public NoCaseForDependency(Collection<Type<?>> types, List<?> dropped) {
-			super("No case for type(s)\n\trequired: " + types
+		public NoResourceForDependency(Collection<Type<?>> types,
+				List<?> dropped) {
+			super("No resource for type(s)\n\trequired: " + types
 				+ "\n\tdrobbed bindings:\n" + dropped);
 		}
 	}
 
-	public static String describe(InjectionCase<?>... cases) {
-		if (cases == null || cases.length == 0)
+	public static String describe(Resource<?>... rs) {
+		if (rs == null || rs.length == 0)
 			return "none";
 		StringBuilder b = new StringBuilder();
-		for (InjectionCase<?> c : cases)
-			b.append("\n    ").append(c.resource.toString()).append(
-					" defined ").append(c.source);
+		for (Resource<?> rx : rs)
+			b.append("\n    ").append(rx.locator.toString()).append(
+					" defined ").append(rx.source);
 		return b.toString();
 	}
 
@@ -144,9 +145,9 @@ public abstract class UnresolvableDependency extends RuntimeException {
 
 	public static final class IllegalAcccess extends UnresolvableDependency {
 
-		public <T> IllegalAcccess(Resource<T> resource,
+		public <T> IllegalAcccess(Locator<T> target,
 				Dependency<? super T> dep) {
-			super("Cannot access " + resource + " directly for " + dep);
+			super("Cannot access " + target + " directly for " + dep);
 		}
 
 	}

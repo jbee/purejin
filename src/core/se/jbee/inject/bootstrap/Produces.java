@@ -13,19 +13,19 @@ import java.lang.reflect.Modifier;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Type;
 import se.jbee.inject.Typed;
+import se.jbee.inject.declare.Macro;
 
 /**
- * A {@link Factory} is the {@link Macro} expansion wrapper for a method bound
- * to a particular instance (if not static) that yields/produces instances to
- * inject.
+ * A {@link Produces} is the {@link Macro} expansion wrapper for a method bound
+ * to a particular instance (if not static) that produces instances to inject.
  *
  * @param <T> type of the value yield by the factory method
  */
-public final class Factory<T> implements Typed<T> {
+public final class Produces<T> implements Typed<T> {
 
-	public static Factory<?> bind(Object owner, Method target,
+	public static Produces<?> bind(Object owner, Method target,
 			Parameter<?>... hints) {
-		return new Factory<>(owner, target, hints);
+		return new Produces<>(owner, target, hints);
 	}
 
 	public final Object owner;
@@ -35,7 +35,7 @@ public final class Factory<T> implements Typed<T> {
 	public final boolean isInstanceMethod;
 
 	@SuppressWarnings("unchecked")
-	private Factory(Object owner, Method target, Parameter<?>[] hints) {
+	private Produces(Object owner, Method target, Parameter<?>[] hints) {
 		this.returns = (Type<T>) Type.returnType(target);
 		this.target = accessible(target);
 		this.hints = hints;
@@ -56,8 +56,8 @@ public final class Factory<T> implements Typed<T> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <E> Factory<E> typed(Type<E> supertype) {
+	public <E> Produces<E> typed(Type<E> supertype) {
 		type().castTo(supertype); // make sure is valid
-		return (Factory<E>) this;
+		return (Produces<E>) this;
 	}
 }

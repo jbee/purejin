@@ -7,11 +7,9 @@ import org.junit.Test;
 
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.bootstrap.Binding;
-import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.bootstrap.Module;
-import se.jbee.inject.config.Globals;
+import se.jbee.inject.declare.Module;
 
 /**
  * Making sure the general functions of the {@link BinderModule} work as
@@ -51,8 +49,8 @@ public class TestBinderModule {
 
 	@Test
 	public void thatBindingSourceReflectsTheOrigin() {
-		Binding<?>[] bindings = Bootstrap.bindings(TestBinderModuleBundle.class,
-				Bindings.newBindings(), Globals.STANDARD);
+		Binding<?>[] bindings = Bootstrap.bindings(
+				TestBinderModuleBundle.class);
 
 		assertBinding(TestBinderModuleModule1.class, 1, EXPLICIT,
 				forType(Integer.class, bindings));

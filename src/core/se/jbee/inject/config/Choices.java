@@ -25,6 +25,7 @@ import java.util.Map;
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
+@Deprecated
 public final class Choices implements Serializable {
 
 	public static final Choices NONE = new Choices(new HashMap<>());

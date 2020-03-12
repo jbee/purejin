@@ -12,8 +12,7 @@ import org.junit.Test;
 import se.jbee.inject.Hint;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.config.Globals;
-import se.jbee.inject.config.Options;
+import se.jbee.inject.config.Env;
 
 /**
  * In reply to https://groups.google.com/forum/#!topic/silk-di/JhBnvF7k6Q4
@@ -60,9 +59,8 @@ public class TestExample1Binds {
 		Properties props = new Properties();
 		props.put("x", "abc");
 		props.put("y", 12);
-		Options presets = Options.NONE.set(Properties.class, props);
-		Globals globals = Globals.STANDARD.with(presets);
-		Injector injector = Bootstrap.injector(Example1Module1.class, globals);
+		Env env = Bootstrap.ENV.with(Properties.class, props);
+		Injector injector = Bootstrap.injector(Example1Module1.class, env);
 		MyClass obj = injector.resolve(MyClass.class);
 		assertEquals(12, obj.twelve);
 		assertEquals("abc", obj.abc);

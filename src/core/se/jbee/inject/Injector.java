@@ -18,13 +18,15 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
+import se.jbee.inject.config.Env;
+
 /**
  * Knows how to *resolve* an instance for a given {@link Dependency}.
  *
  * The process of resolving might include creation of instances.
  *
  * Once created a {@link Injector} container consists of a fixed set of
- * {@link InjectionCase}s.
+ * {@link Resource}s.
  * 
  * Calls to {@link #resolve(Dependency)} always have the same result for the
  * same {@linkplain Dependency}. The only exception to this are scoping effects
@@ -44,12 +46,16 @@ public interface Injector {
 	 *            includes nesting within the resolution process and other
 	 *            details of a {@link Dependency} to consider.
 	 * @return The resolved instance or
-	 * @throws UnresolvableDependency in case no {@link InjectionCase} is found
-	 *             that could serve the requested instance
+	 * @throws UnresolvableDependency in case no {@link Resource} is found that
+	 *             could serve the requested instance
 	 */
 	<T> T resolve(Dependency<T> dependency) throws UnresolvableDependency;
 
 	/* Utility methods */
+
+	default Env asEnv() {
+		return resolve(Name.AS, Env.class);
+	}
 
 	default <T> T resolve(Class<T> type) {
 		return resolve(dependency(type));

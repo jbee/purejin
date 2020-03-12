@@ -2,7 +2,7 @@ package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.container.Cast.injectionCaseTypeFor;
+import static se.jbee.inject.container.Cast.resourceTypeFor;
 
 import org.junit.Test;
 
@@ -36,7 +36,7 @@ public class TestGeneratorBinds {
 	public void generatorCanBePassedDirectly() {
 		assertEquals("hello world", injector.resolve(String.class));
 		assertEquals("SupplierGeneratorBridge",
-				injector.resolve(injectionCaseTypeFor(raw(
+				injector.resolve(resourceTypeFor(raw(
 						String.class))).generator.getClass().getSimpleName());
 	}
 

@@ -1,9 +1,12 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject.bootstrap;
+package se.jbee.inject.declare;
+
+import se.jbee.inject.bootstrap.Bindings;
+import se.jbee.inject.config.Env;
 
 /**
  * {@link Bindings} are defined with {@link Module}s while {@link Bundle}s are
@@ -21,6 +24,6 @@ public interface Module {
 	/**
 	 * @param bindings use to declare made bound within this {@link Module}.
 	 */
-	void declare(Bindings bindings);
+	void declare(Bindings bindings, Env env);
 
 }

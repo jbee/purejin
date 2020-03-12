@@ -2,7 +2,7 @@ package se.jbee.inject.container;
 
 import se.jbee.inject.Generator;
 import se.jbee.inject.Injector;
-import se.jbee.inject.Resource;
+import se.jbee.inject.Locator;
 import se.jbee.inject.Scoping;
 
 /**
@@ -25,10 +25,10 @@ public interface YieldListener {
 	 * @param <T> Type of the created instance
 	 * @param serialID {@link Injector} internal ID for the {@link Generator}
 	 *            that created the instance
-	 * @param resource the {@link Resource} representing the created instance
+	 * @param locator the {@link Locator} representing the created instance
 	 * @param scoping the {@link Scoping} of the created instance
 	 * @param instance the created instance
 	 */
-	<T> void onStableInstanceGeneration(int serialID, Resource<T> resource,
+	<T> void onStableInstanceGeneration(int serialID, Locator<T> locator,
 			Scoping scoping, T instance);
 }

@@ -31,6 +31,7 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 import se.jbee.inject.UnresolvableDependency.NoMethodForDependency;
+import se.jbee.inject.UnresolvableDependency.SupplyFailed;
 
 /**
  * Language level utility methods for the library.
@@ -380,5 +381,29 @@ public final class Utils {
 		} catch (UnresolvableDependency e) {
 			return defaultValue;
 		}
+	}
+
+	/* Object Instantiation and Method Invocation */
+
+	public static <T> T construct(Constructor<T> target, Object... args)
+			throws SupplyFailed {
+		try {
+			return target.newInstance(args);
+		} catch (Exception e) {
+			throw SupplyFailed.valueOf(e, target);
+		}
+	}
+
+	public static Object produce(Method target, Object owner, Object... args)
+			throws SupplyFailed {
+		try {
+			return target.invoke(owner, args);
+		} catch (Exception e) {
+			throw SupplyFailed.valueOf(e, target);
+		}
+	}
+
+	public static <T> T instance(Class<T> type) {
+		return construct(accessible(noArgsConstructor(type)));
 	}
 }

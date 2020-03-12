@@ -8,6 +8,7 @@ package se.jbee.inject.bind;
 import se.jbee.inject.bind.Binder.RootBinder;
 import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.config.Env;
 
 /**
  * A {@link RootBinder} that can be initialized using the
@@ -23,7 +24,7 @@ public abstract class InitializedBinder extends RootBinder {
 	private Boolean initialized;
 
 	protected InitializedBinder() {
-		super(Bind.create(Bindings.newBindings(), null));
+		super(Bind.UNINITIALIZED);
 		this.bind = super.bind();
 	}
 
@@ -32,9 +33,9 @@ public abstract class InitializedBinder extends RootBinder {
 		return bind;
 	}
 
-	protected final void __init__(Bindings bindings) {
+	protected final void __init__(Env env, Bindings bindings) {
 		Bootstrap.nonnullThrowsReentranceException(initialized);
-		this.bind = bind.into(bindings);
+		this.bind = bind.into(env, bindings);
 		initialized = true;
 	}
 

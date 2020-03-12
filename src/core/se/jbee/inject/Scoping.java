@@ -37,10 +37,14 @@ public final class Scoping implements Serializable {
 		scopingOf(Scope.dependencyInstance).group(singleton);
 		scopingOf(Scope.targetInstance).group(singleton);
 		scopingOf(Scope.thread) //
-				.stableIn(Scope.thread)//
-				.stableIn(Scope.injection); //
+				.canBeInjectedInto(Scope.thread)//
+				.canBeInjectedInto(Scope.worker) //
+				.canBeInjectedInto(Scope.injection); //
 		scopingOf(Scope.injection) //
-				.stableIn(Scope.injection);
+				.canBeInjectedInto(Scope.injection);
+		scopingOf(Scope.worker) //
+				.canBeInjectedInto(Scope.worker) //
+				.canBeInjectedInto(Scope.injection); //
 	}
 
 	public static Scoping scopingOf(Name scope) {
@@ -69,23 +73,35 @@ public final class Scoping implements Serializable {
 	}
 
 	/**
-	 * Declares the given parent {@link Scope} as less stable as this scope.
-	 * This means this {@link Scope} cannot be injected into the given parent
-	 * {@link Scope}.
+	 * Declares this {@link Scoping} as being stable in the given parent.
+	 * 
+	 * Declares the given parent {@link Scope} at least as stable as this scope.
+	 * This means this {@link Scope} can be injected into the given parent
+	 * {@link Scope} without wrapping it in a {@link Provider} or alike.
 	 * 
 	 * @param parent another {@link Scope} type
 	 * @return this for chaining
 	 */
-	public Scoping stableIn(Name parent) {
+	public Scoping canBeInjectedInto(Name parent) {
 		stableInScopes = arrayAppend(stableInScopes, parent);
 		return this;
 	}
 
-	public Scoping stableIn(Scoping parent) {
-		return stableIn(parent.scope);
+	/**
+	 * @see #canBeInjectedInto(Name)
+	 */
+	public Scoping canBeInjectedInto(Scoping parent) {
+		return canBeInjectedInto(parent.scope);
+	}
+
+	public Scoping group(Name group) {
+		return group(Scoping.scopingOf(group));
 	}
 
 	public Scoping group(Scoping group) {
+		if (!group.isGroup())
+			throw new IllegalArgumentException(
+					"Scoping is not a group: " + group);
 		this.group = group;
 		this.stableByDesign = group.stableByDesign;
 		this.eager = group.eager;
@@ -122,6 +138,8 @@ public final class Scoping implements Serializable {
 	public boolean isStableIn(Scoping parent) {
 		return isStableByDesign() || parent.isIgnore() || isIgnore()
 			|| arrayContains(stableInScopes, s -> s.equalTo(parent.scope))
+			|| parent.group != null && arrayContains(stableInScopes,
+					s -> s.equalTo(parent.group.scope))
 			|| (group != null && group.isStableIn(parent));
 	}
 

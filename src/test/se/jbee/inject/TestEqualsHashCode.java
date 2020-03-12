@@ -38,8 +38,8 @@ public class TestEqualsHashCode {
 	}
 
 	@Test
-	public void resource() throws Exception {
-		assertValidEqualsAndHashCodeContract(Resource.class);
+	public void locator() throws Exception {
+		assertValidEqualsAndHashCodeContract(Locator.class);
 	}
 
 	@Test

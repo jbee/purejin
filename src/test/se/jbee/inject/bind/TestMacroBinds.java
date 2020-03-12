@@ -17,23 +17,23 @@ import org.junit.Test;
 
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Dependency;
-import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
+import se.jbee.inject.Locator;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Type;
-import se.jbee.inject.UnresolvableDependency.NoCaseForDependency;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.bootstrap.Binding;
 import se.jbee.inject.bootstrap.BindingType;
 import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Bundle;
-import se.jbee.inject.bootstrap.Macro;
 import se.jbee.inject.bootstrap.Macros;
 import se.jbee.inject.bootstrap.New;
 import se.jbee.inject.bootstrap.Supply;
-import se.jbee.inject.config.Globals;
+import se.jbee.inject.config.Env;
 import se.jbee.inject.container.Supplier;
+import se.jbee.inject.declare.Bundle;
+import se.jbee.inject.declare.Macro;
 
 /**
  * Demonstrates how to use {@link Macro}s to customize the and binding
@@ -102,7 +102,7 @@ public class TestMacroBinds {
 		}
 
 		@Override
-		public <T> void expand(Binding<?> value, Binding<T> incomplete,
+		public <T> void expand(Env env, Binding<?> value, Binding<T> incomplete,
 				Bindings bindings) {
 			expands++;
 		}
@@ -115,15 +115,13 @@ public class TestMacroBinds {
 		CountMacro emptyCount = new CountMacro();
 		Injector injector = injectorWithMacro(MacroBindsModule.class, count);
 		injectorWithMacro(EmptyModule.class, emptyCount);
+		assertEquals(0, injector.resolve(Resource[].class).length);
 		assertEquals(6 + 2, count.expands - emptyCount.expands); // constructors cause 2 bindings each
-		assertEquals(0, injector.resolve(InjectionCase[].class).length);
 	}
 
 	private static Injector injectorWithMacro(Class<? extends Bundle> root,
 			Macro<?> macro) {
-		return Bootstrap.injector(root,
-				Bindings.newBindings().with(Macros.DEFAULT.with(macro)),
-				Globals.STANDARD);
+		return Bootstrap.injector(root, Bootstrap.ENV.withMacro(macro));
 	}
 
 	/**
@@ -136,24 +134,24 @@ public class TestMacroBinds {
 			implements Macro<New<?>> {
 
 		@Override
-		public <T> void expand(New<?> value, Binding<T> incomplete,
+		public <T> void expand(Env env, New<?> value, Binding<T> incomplete,
 				Bindings bindings) {
-			Macros.NEW.expand(value, incomplete, bindings);
+			Macros.NEW.expand(env, value, incomplete, bindings);
 			Type<?>[] params = Type.parameterTypes(value.target);
 			for (int i = 0; i < params.length; i++) {
-				bindings.addExpanded(required(params[i], incomplete));
+				bindings.addExpanded(env, required(params[i], incomplete));
 			}
 		}
 
 		private static <T> Binding<T> required(Type<T> type,
 				Binding<?> binding) {
-			return Binding.binding(new Resource<>(Instance.anyOf(type)),
+			return Binding.binding(new Locator<>(Instance.anyOf(type)),
 					BindingType.REQUIRED, Supply.required(), binding.scope,
 					binding.source.typed(DeclarationType.REQUIRED));
 		}
 	}
 
-	@Test(expected = NoCaseForDependency.class)
+	@Test(expected = NoResourceForDependency.class)
 	public void thatAllConstructorParameterTypesCanBeMadeRequired() {
 		Macro<?> required = new RequiredConstructorParametersMacro();
 		Injector injector = injectorWithMacro(MacroBindsModule.class, required);
@@ -201,11 +199,12 @@ public class TestMacroBinds {
 	static final class InitialisationMacro implements Macro<New<?>> {
 
 		@Override
-		public <T> void expand(New<?> constructor, Binding<T> incomplete,
-				Bindings bindings) {
+		public <T> void expand(Env env, New<?> constructor,
+				Binding<T> incomplete, Bindings bindings) {
 			Supplier<T> supplier = new InitialisationSupplier<>(
 					Supply.constructor(constructor.typed(incomplete.type())));
-			bindings.addExpanded(incomplete.complete(CONSTRUCTOR, supplier));
+			bindings.addExpanded(env,
+					incomplete.complete(CONSTRUCTOR, supplier));
 		}
 
 	}

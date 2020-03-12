@@ -6,35 +6,36 @@
 package se.jbee.inject.bootstrap;
 
 import se.jbee.inject.Type;
-import se.jbee.inject.bootstrap.Bootstrapper.ChoiceBootstrapper;
+import se.jbee.inject.bootstrap.Bootstrapper.ToggledBootstrapper;
+import se.jbee.inject.declare.Bundle;
 
 /**
- * The default utility base class for {@link ChoiceBundle}s.
+ * The default utility base class for {@link ToggledBundles}s.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  * 
  * @param O the type of the options values (usually an enum)
  */
-public abstract class ChoiceBootstrapperBundle<C>
-		implements ChoiceBundle<C>, ChoiceBootstrapper<C> {
+public abstract class ToggledBootstrapperBundle<C>
+		implements ToggledBundles<C>, ToggledBootstrapper<C> {
 
-	private ChoiceBootstrapper<C> bootstrapper;
+	private ToggledBootstrapper<C> bootstrapper;
 
 	@Override
-	public void bootstrap(ChoiceBootstrapper<C> bs) {
+	public void bootstrap(ToggledBootstrapper<C> bs) {
 		Bootstrap.nonnullThrowsReentranceException(bootstrapper);
 		this.bootstrapper = bs;
 		bootstrap();
 	}
 
 	@Override
-	public void install(Class<? extends Bundle> bundle, C choice) {
-		bootstrapper.install(bundle, choice);
+	public void install(Class<? extends Bundle> bundle, C flag) {
+		bootstrapper.install(bundle, flag);
 	}
 
 	@Override
 	public String toString() {
-		Type<?> module = Type.supertype(ChoiceBundle.class,
+		Type<?> module = Type.supertype(ToggledBundles.class,
 				Type.raw(getClass())).parameter(0);
 		return "bundle " + getClass().getSimpleName() + "[" + module + "]";
 	}

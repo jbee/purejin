@@ -12,6 +12,7 @@ import java.lang.reflect.Constructor;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Type;
 import se.jbee.inject.Typed;
+import se.jbee.inject.declare.Macro;
 
 /**
  * A {@link New} is the {@link Macro} expansion wrapper for {@link Constructor}

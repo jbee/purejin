@@ -31,58 +31,58 @@ import se.jbee.inject.Type;
  * @since 19.1
  */
 @FunctionalInterface
-public interface ProductionMirror {
+public interface ProducesBy {
 
 	Method[] __noMethodsArray = new Method[0];
 
 	/**
 	 * @return The {@link Member}s that should be used in the context this
-	 *         {@link ProductionMirror} is used.
+	 *         {@link ProducesBy} is used.
 	 */
 	Method[] reflect(Class<?> impl);
 
-	ProductionMirror noMethods = impl -> __noMethodsArray;
-	ProductionMirror declaredMethods = ((ProductionMirror) Class::getDeclaredMethods).ignoreSynthetic();
-	ProductionMirror allMethods = ((ProductionMirror) ProductionMirror::allMethods).ignoreSynthetic();
+	ProducesBy noMethods = impl -> __noMethodsArray;
+	ProducesBy declaredMethods = ((ProducesBy) Class::getDeclaredMethods).ignoreSynthetic();
+	ProducesBy allMethods = ((ProducesBy) ProducesBy::allMethods).ignoreSynthetic();
 
-	default ProductionMirror ignoreStatic() {
+	default ProducesBy ignoreStatic() {
 		return withModifier(((IntPredicate) Modifier::isStatic).negate());
 	}
 
-	default ProductionMirror ignoreSynthetic() {
+	default ProducesBy ignoreSynthetic() {
 		return select(method -> !method.isSynthetic());
 	}
 
-	default ProductionMirror ignoreGenericReturnType() {
+	default ProducesBy ignoreGenericReturnType() {
 		return select(
 				method -> !(method.getGenericReturnType() instanceof TypeVariable<?>));
 	}
 
-	default ProductionMirror ignore(Predicate<Method> filter) {
+	default ProducesBy ignore(Predicate<Method> filter) {
 		return select(filter.negate());
 	}
 
-	default ProductionMirror select(Predicate<Method> filter) {
+	default ProducesBy select(Predicate<Method> filter) {
 		return impl -> arrayFilter(this.reflect(impl), filter);
 	}
 
-	default ProductionMirror returnTypeAssignableTo(Type<?> supertype) {
+	default ProducesBy returnTypeAssignableTo(Type<?> supertype) {
 		return select(method -> returnType(method).isAssignableTo(supertype));
 	}
 
-	default ProductionMirror withModifier(IntPredicate filter) {
+	default ProducesBy withModifier(IntPredicate filter) {
 		return select(method -> filter.test(method.getModifiers()));
 	}
 
-	default ProductionMirror annotatedWith(Class<? extends Annotation> marker) {
+	default ProducesBy annotatedWith(Class<? extends Annotation> marker) {
 		return select(method -> method.isAnnotationPresent(marker));
 	}
 
-	default ProductionMirror returnTypeIn(Packages filter) {
+	default ProducesBy returnTypeIn(Packages filter) {
 		return select(method -> filter.contains(raw(method.getReturnType())));
 	}
 
-	default ProductionMirror in(Packages filter) {
+	default ProducesBy in(Packages filter) {
 		return impl -> filter.contains(raw(impl))
 			? this.reflect(impl)
 			: __noMethodsArray;

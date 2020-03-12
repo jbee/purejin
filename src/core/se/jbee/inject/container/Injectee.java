@@ -8,8 +8,8 @@ package se.jbee.inject.container;
 import java.util.List;
 
 import se.jbee.inject.Generator;
-import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Injector;
+import se.jbee.inject.Locator;
 import se.jbee.inject.Name;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Source;
@@ -21,7 +21,7 @@ import se.jbee.inject.Source;
  * A {@link List} would be a generic {@link Injectee}, some singleton "service"
  * a non-generic one.
  * 
- * Each {@link Injectee} becomes an {@link InjectionCase} and {@link Generator}
+ * Each {@link Injectee} becomes an {@link Resource} and {@link Generator}
  * within the {@link Injector} (1:1 relation).
  * 
  * The class is mainly introduced to decouple the everything on top of the
@@ -33,25 +33,25 @@ import se.jbee.inject.Source;
  * 
  * @since 19.1
  * 
- * @param <T> Type of instances assembled.
+ * @param <T> Type of instances injected.
  */
 public class Injectee<T> {
 
 	public final Name scope;
-	public final Resource<T> resource;
+	public final Locator<T> locator;
 	public final Supplier<? extends T> supplier;
 	public final Source source;
 
-	public Injectee(Name scope, Resource<T> resource,
+	public Injectee(Name scope, Locator<T> locator,
 			Supplier<? extends T> supplier, Source source) {
 		this.scope = scope;
-		this.resource = resource;
+		this.locator = locator;
 		this.supplier = supplier;
 		this.source = source;
 	}
 
 	@Override
 	public String toString() {
-		return resource + " / " + scope + " / " + source;
+		return locator + " / " + scope + " / " + source;
 	}
 }

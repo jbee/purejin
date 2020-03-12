@@ -19,10 +19,10 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Scope;
 import se.jbee.inject.UnresolvableDependency.IllegalAcccess;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Bundle;
-import se.jbee.inject.bootstrap.ModuleWith;
-import se.jbee.inject.config.Annotations;
+import se.jbee.inject.config.Env;
 import se.jbee.inject.config.Globals;
+import se.jbee.inject.declare.Bundle;
+import se.jbee.inject.declare.ModuleWith;
 
 /**
  * A test that demonstrates how a custom annotation is defined as
@@ -108,10 +108,10 @@ public class TestCustomAnnotationBinds {
 
 	@Test
 	public void customAnnotationsAddedProgrammaticallyToGlobals() {
-		Globals globals = Globals.STANDARD.with(Annotations.DETECT.define(
-				Service.class, new ServiceAnnotation()));
+		Env env = Bootstrap.ENV.withAnnotation(Service.class,
+				new ServiceAnnotation());
 		Injector injector = Bootstrap.injector(
-				TestCustomAnnotationBindsModule1.class, globals);
+				TestCustomAnnotationBindsModule1.class, env);
 		SomeService service = injector.resolve(SomeService.class);
 		assertNotNull(service);
 		assertSame(SomeServiceImpl.class, service.getClass());

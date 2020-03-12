@@ -10,11 +10,12 @@ import org.junit.Test;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.Packages;
-import se.jbee.inject.UnresolvableDependency.NoCaseForDependency;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.bootstrap.Bundle;
-import se.jbee.inject.config.Globals;
+import se.jbee.inject.config.Edition;
+import se.jbee.inject.config.Env;
+import se.jbee.inject.declare.Bundle;
 
 /**
  * The test demonstrates how to assemble different editions based on the
@@ -52,21 +53,21 @@ public class TestEditionPackageBinds {
 		assertEquals(42, injector.resolve(int.class).intValue());
 
 		// an edition without the module in this test
-		injector = Bootstrap.injector(EditionPackageBindsBundle.class,
-				Globals.STANDARD.withEditionIncluding(
-						subPackagesOf(TestEditionPackageBinds.class)));
+		Env env = Bootstrap.ENV.with(Edition.class,
+				Edition.includes(subPackagesOf(TestEditionPackageBinds.class)));
+		injector = Bootstrap.injector(EditionPackageBindsBundle.class, env);
 		try {
 			Integer res = injector.resolve(int.class);
 			assertNull(res);
 			fail("Should have thrown exception since EditionPackageBindsModule should not have been installed");
-		} catch (NoCaseForDependency e) {
+		} catch (NoResourceForDependency e) {
 			// expected this
 		}
 
 		// an edition including the module in this test
-		injector = Bootstrap.injector(EditionPackageBindsBundle.class,
-				Globals.STANDARD.withEditionIncluding(packageAndSubPackagesOf(
-						TestEditionPackageBinds.class)));
+		env = Bootstrap.ENV.with(Edition.class, Edition.includes(
+				packageAndSubPackagesOf(TestEditionPackageBinds.class)));
+		injector = Bootstrap.injector(EditionPackageBindsBundle.class, env);
 		assertEquals(42, injector.resolve(int.class).intValue());
 	}
 }

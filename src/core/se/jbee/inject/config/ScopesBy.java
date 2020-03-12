@@ -19,20 +19,20 @@ import se.jbee.inject.Scope;
  * @since 19.1
  */
 @FunctionalInterface
-public interface ScopingMirror {
+public interface ScopesBy {
 
 	Name reflect(Class<?> type);
 
 	/**
-	 * A virtual scope used by the {@link ScopingMirror} to indicate that no
+	 * A virtual scope used by the {@link ScopesBy} to indicate that no
 	 * particular scope should be used. This falls back on
 	 * {@link Scope#application}.
 	 */
 	Name auto = named("@auto");
 
-	ScopingMirror alwaysDefault = type -> auto;
+	ScopesBy alwaysDefault = type -> auto;
 
-	default ScopingMirror unlessAnnotatedWith(
+	default ScopesBy unlessAnnotatedWith(
 			Class<? extends Annotation> naming) {
 		if (naming == null)
 			return this;

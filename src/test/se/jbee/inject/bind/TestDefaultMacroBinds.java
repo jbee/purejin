@@ -7,7 +7,7 @@ import static java.util.stream.Collectors.toCollection;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static se.jbee.inject.config.ProductionMirror.allMethods;
+import static se.jbee.inject.config.ProducesBy.allMethods;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -24,6 +24,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.container.Supplier;
 import se.jbee.inject.scope.ApplicationScope;
 import se.jbee.inject.scope.ThreadScope;
+import se.jbee.inject.scope.WorkerScope;
 
 /**
  * Tests that illustrates that {@link Constructor}s and {@link Method}s bound
@@ -63,8 +64,8 @@ public class TestDefaultMacroBinds {
 		protected void declare() {
 			injectingInto(Example.class).bind(String.class).to("constant");
 			// use mirrors and an annotation to bind methods as Supplier
-			with(mirrors().produceBy(allMethods.annotatedWith(Produces.class))) //
-					.autobind().in(Example.class);
+			autobind().produceBy(allMethods.annotatedWith(Produces.class)).in(
+					Example.class);
 		}
 
 	}
@@ -92,7 +93,7 @@ public class TestDefaultMacroBinds {
 		assertTrue(constructors.length > 0);
 		assertNoDuplicates(constructors);
 		assertDeclaringClasses(constructors, Example.class, // 2 Scopes from core...
-				ThreadScope.class, ApplicationScope.class);
+				ThreadScope.class, ApplicationScope.class, WorkerScope.class);
 	}
 
 	@Test

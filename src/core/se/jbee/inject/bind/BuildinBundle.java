@@ -16,19 +16,17 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Provider;
 import se.jbee.inject.Scope;
 import se.jbee.inject.UnresolvableDependency;
-import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Bootstrapper.ChoiceBootstrapper;
-import se.jbee.inject.bootstrap.Bundle;
-import se.jbee.inject.bootstrap.ChoiceBundle;
+import se.jbee.inject.bootstrap.Bootstrapper.ToggledBootstrapper;
+import se.jbee.inject.bootstrap.ToggledBundles;
 import se.jbee.inject.bootstrap.Supply;
-import se.jbee.inject.config.Globals;
 import se.jbee.inject.config.Plugins;
+import se.jbee.inject.declare.Bundle;
 
 /**
  * Installs all the build-in functionality by using the core API.
  */
-public enum BuildinBundle implements ChoiceBundle<BuildinBundle> {
+public enum BuildinBundle implements ToggledBundles<BuildinBundle> {
 	/**
 	 * Adds: {@link Provider}s can be injected for all bound types.
 	 */
@@ -62,7 +60,7 @@ public enum BuildinBundle implements ChoiceBundle<BuildinBundle> {
 	SUB_CONTEXT;
 
 	@Override
-	public void bootstrap(ChoiceBootstrapper<BuildinBundle> bootstrapper) {
+	public void bootstrap(ToggledBootstrapper<BuildinBundle> bootstrapper) {
 		bootstrapper.install(ListBridgeModule.class, LIST);
 		bootstrapper.install(SetBridgeModule.class, SET);
 		bootstrapper.install(CollectionBridgeModule.class, COLLECTION);
@@ -152,8 +150,8 @@ public enum BuildinBundle implements ChoiceBundle<BuildinBundle> {
 			Class<? extends Bundle>[] bundles = (Class<? extends Bundle>[]) //
 			context.resolve(Plugins.class).forPoint(Injector.class,
 					dep.instance.name.toString());
-			return Bootstrap.injector(Bindings.newBindings(), Globals.STANDARD,
-					bundles);
+			//TODO eventually forward the env here? get from context...
+			return Bootstrap.injector(bundles);
 		}
 
 	}

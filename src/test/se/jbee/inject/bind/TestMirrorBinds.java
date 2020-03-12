@@ -2,16 +2,17 @@ package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
-import static se.jbee.inject.container.Cast.injectionCaseTypeFor;
+import static se.jbee.inject.container.Cast.resourceTypeFor;
 
 import org.junit.Test;
 
-import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Injector;
+import se.jbee.inject.Resource;
 import se.jbee.inject.Scope;
-import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.config.ScopingMirror;
+import se.jbee.inject.config.Env;
+import se.jbee.inject.config.Environment;
+import se.jbee.inject.config.ScopesBy;
 import se.jbee.inject.util.Scoped;
 
 public class TestMirrorBinds {
@@ -19,10 +20,10 @@ public class TestMirrorBinds {
 	private static class MirrorBindsModule extends BinderModule {
 
 		@Override
-		protected Bindings configure(Bindings bindings) {
-			return bindings.with(bindings.mirrors.scopeBy(
-					ScopingMirror.alwaysDefault.unlessAnnotatedWith(
-							Scoped.class)));
+		protected Env configure(Env env) {
+			return Environment.override(env) //
+					.with(ScopesBy.class, ScopesBy.alwaysDefault //
+							.unlessAnnotatedWith(Scoped.class));
 		}
 
 		@Override
@@ -43,8 +44,8 @@ public class TestMirrorBinds {
 	public void annotatedScopeIsUsed() {
 		assertNotSame(injector.resolve(InjectionScoped.class),
 				injector.resolve(InjectionScoped.class));
-		InjectionCase<InjectionScoped> icase = injector.resolve(
-				injectionCaseTypeFor(InjectionScoped.class));
-		assertEquals(Scope.injection, icase.scoping.scope);
+		Resource<InjectionScoped> resource = injector.resolve(
+				resourceTypeFor(InjectionScoped.class));
+		assertEquals(Scope.injection, resource.scoping.scope);
 	}
 }

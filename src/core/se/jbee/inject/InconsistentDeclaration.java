@@ -8,14 +8,18 @@ package se.jbee.inject;
 import java.lang.annotation.Annotation;
 
 /**
- * If there is a statically resolvable problem with a binding (resource in the
- * context of a container) this exception is thrown during bootstrapping. It is
- * never thrown after the bootstrapping step has finished (a {@link Injector}
- * was created successfully).
+ * If there is a statically resolvable problem with a binding ({@link Locator}
+ * in the context of a container) this exception is thrown during bootstrapping.
+ * It is never thrown after the bootstrapping step has finished (a
+ * {@link Injector} was created successfully).
  * 
  * @see UnresolvableDependency
  */
 public class InconsistentDeclaration extends RuntimeException {
+
+	public InconsistentDeclaration(UnresolvableDependency cause) {
+		super(cause);
+	}
 
 	protected InconsistentDeclaration(String msg) {
 		super(msg);

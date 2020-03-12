@@ -5,10 +5,13 @@
  */
 package se.jbee.inject.bootstrap;
 
+import se.jbee.inject.declare.Bundle;
+import se.jbee.inject.declare.Module;
+
 /**
- * The default utility {@link Bundle} that is a {@link Bootstrap} as well so
+ * The default utility {@link Bundle} that is a {@link Bootstrapper} as well so
  * that bindings can be declared nicer.
- *
+ * 
  * @author Jan Bernitt (jan@jbee.se)
  */
 public abstract class BootstrapperBundle implements Bundle, Bootstrapper {
@@ -33,47 +36,38 @@ public abstract class BootstrapperBundle implements Bundle, Bootstrapper {
 	}
 
 	@Override
-	public final <T> void install(ModuleWith<T> module) {
-		bootstrap.install(module);
-	}
-
-	@Override
 	public final void uninstall(Class<? extends Bundle> bundle) {
 		bootstrap.uninstall(bundle);
 	}
 
 	@Override
 	@SafeVarargs
-	public final <M extends Enum<M> & ChoiceBundle<M>> void install(
+	public final <M extends Enum<M> & ToggledBundles<M>> void install(
 			M... modules) {
 		bootstrap.install(modules);
 	}
 
 	@Override
 	public final <C extends Enum<C>> void install(
-			Class<? extends ChoiceBundle<C>> bundle, Class<C> property) {
+			Class<? extends ToggledBundles<C>> bundle, Class<C> property) {
 		bootstrap.install(bundle, property);
 	}
 
 	@Override
 	@SafeVarargs
-	public final <O extends Enum<O> & ChoiceBundle<O>> void uninstall(
-			O... options) {
-		bootstrap.uninstall(options);
+	public final <O extends Enum<O> & ToggledBundles<O>> void uninstall(
+			O... flags) {
+		bootstrap.uninstall(flags);
 	}
 
-	protected final <O extends Enum<O> & ChoiceBundle<O>> void installAll(
+	protected final <O extends Enum<O> & ToggledBundles<O>> void installAll(
 			Class<O> optionsOfType) {
 		install(optionsOfType.getEnumConstants());
 	}
 
-	protected final <O extends Enum<O> & ChoiceBundle<O>> void uninstallAll(
+	protected final <O extends Enum<O> & ToggledBundles<O>> void uninstallAll(
 			Class<O> optionsOfType) {
 		uninstall(optionsOfType.getEnumConstants());
-	}
-
-	protected static Module newInstance(Class<? extends Module> module) {
-		return Bootstrap.instance(module);
 	}
 
 	@Override

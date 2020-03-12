@@ -7,7 +7,7 @@ import org.junit.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Bootstrapper;
-import se.jbee.inject.bootstrap.Bundle;
+import se.jbee.inject.declare.Bundle;
 
 public class TestLambdaBinds {
 
@@ -15,8 +15,8 @@ public class TestLambdaBinds {
 
 		@Override
 		public void bootstrap(Bootstrapper bootstrap) {
-			bootstrap.install(
-					bindings -> bindings.declaredFrom(new LambdaBindsModule()));
+			bootstrap.install((bindings, env) //
+			-> bindings.declaredFrom(env, new LambdaBindsModule()));
 		}
 
 	}

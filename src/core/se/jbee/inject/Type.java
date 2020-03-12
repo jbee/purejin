@@ -45,6 +45,29 @@ public final class Type<T>
 	public static final Type<Object> OBJECT = Type.raw(Object.class);
 	public static final Type<Void> VOID = raw(Void.class);
 	public static final Type<?> WILDCARD = OBJECT.asUpperBound();
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static final Type<Class<?>> CLASS = (Type) classType(Class.class);
+
+	public static <T> Type<T> classType(Class<T> type) {
+		Class<?> base = type;
+		while (base.isArray()) {
+			base = base.getComponentType();
+		}
+		if (base != type) {
+			Type<?> genericBase = withWildcardTypeParameters(base);
+			return new Type<>(type, genericBase.params);
+		}
+		return withWildcardTypeParameters(type);
+	}
+
+	private static <T> Type<T> withWildcardTypeParameters(Class<T> type) {
+		Type<T> res = raw(type);
+		TypeVariable<?>[] typeParameters = type.getTypeParameters();
+		if (typeParameters.length > 0) {
+			return res.parametized(wildcards(typeParameters));
+		}
+		return res;
+	}
 
 	public static Type<?> fieldType(Field field) {
 		return type(field.getGenericType());
@@ -98,7 +121,7 @@ public final class Type<T>
 	private static Type<?> type(java.lang.reflect.Type type,
 			Map<String, Type<?>> actualTypeArguments) {
 		if (type instanceof Class<?>)
-			return raw((Class<?>) type);
+			return raw((Class<?>) type); //TODO shouldn't this return the actual class type with all generics?
 		if (type instanceof ParameterizedType)
 			return parameterizedType((ParameterizedType) type,
 					actualTypeArguments);

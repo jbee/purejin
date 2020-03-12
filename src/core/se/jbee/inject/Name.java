@@ -41,6 +41,8 @@ public final class Name implements Qualifying<Name>, Serializable {
 	 */
 	public static final Name ANY = new Name("" + WILDCARD);
 
+	public static final Name AS = new Name("as");
+
 	final String value;
 
 	public static Name named(Object name) {

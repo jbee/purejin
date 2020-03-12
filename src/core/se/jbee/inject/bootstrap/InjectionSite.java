@@ -5,12 +5,12 @@
  */
 package se.jbee.inject.bootstrap;
 
-import static se.jbee.inject.container.Cast.injectionCaseTypeFor;
+import static se.jbee.inject.container.Cast.resourceTypeFor;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Generator;
 import se.jbee.inject.Hint;
-import se.jbee.inject.InjectionCase;
+import se.jbee.inject.Resource;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.UnresolvableDependency;
@@ -72,15 +72,15 @@ public final class InjectionSite {
 				preResolvedArgs[i] = injector.resolve(hint.absoluteRef);
 			} else { // relative ref
 				Instance<?> ref = hint.relativeRef;
-				Dependency<? extends InjectionCase<?>> caseDep = site.typed(
-						injectionCaseTypeFor(ref.type)).named(ref.name);
-				InjectionCase<?> icase = injector.resolve(caseDep);
-				if (icase.scoping.isStableByDesign()) {
-					preResolvedArgs[i] = yield(icase,
+				Dependency<? extends Resource<?>> resourceDep = site.typed(
+						resourceTypeFor(ref.type)).named(ref.name);
+				Resource<?> resource = injector.resolve(resourceDep);
+				if (resource.scoping.isStableByDesign()) {
+					preResolvedArgs[i] = yield(resource,
 							site.instanced(hint.relativeRef));
 				} else {
 					lazyArgIndexes[lazyArgCount++] = i;
-					generators[i] = icase;
+					generators[i] = resource;
 				}
 			}
 		}
@@ -88,7 +88,7 @@ public final class InjectionSite {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <I> I yield(Generator<I> icase, Dependency<?> dep) {
-		return icase.yield((Dependency<? super I>) dep);
+	private static <I> I yield(Generator<I> gen, Dependency<?> dep) {
+		return gen.yield((Dependency<? super I>) dep);
 	}
 }

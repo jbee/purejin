@@ -36,6 +36,10 @@ public final class Packages implements Qualifying<Packages>, Serializable {
 		return new Packages(packageNameOf(type), true);
 	}
 
+	public static Packages packageAndSubPackagesOf(Package pkg) {
+		return new Packages(packageNameOf(pkg), true);
+	}
+
 	public static Packages packageAndSubPackagesOf(Class<?> type,
 			Class<?>... types) {
 		commonPackageDepth(type, types);
@@ -69,7 +73,10 @@ public final class Packages implements Qualifying<Packages>, Serializable {
 	}
 
 	private static String packageNameOf(Class<?> packageOf) {
-		Package pkg = packageOf.getPackage();
+		return packageNameOf(packageOf.getPackage());
+	}
+
+	private static String packageNameOf(Package pkg) {
 		return pkg == null ? "(default)" : pkg.getName();
 	}
 

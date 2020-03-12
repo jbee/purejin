@@ -13,7 +13,7 @@ import static se.jbee.inject.Type.parameterTypes;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Type.returnType;
 import static se.jbee.inject.Utils.arrayFindFirst;
-import static se.jbee.inject.config.ProductionMirror.allMethods;
+import static se.jbee.inject.config.ProducesBy.allMethods;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -27,13 +27,13 @@ import se.jbee.inject.Scope;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.SupplyFailed;
+import se.jbee.inject.Utils;
 import se.jbee.inject.bind.BinderModule;
 import se.jbee.inject.bootstrap.InjectionSite;
-import se.jbee.inject.bootstrap.Module;
-import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.config.Plugins;
-import se.jbee.inject.config.ProductionMirror;
+import se.jbee.inject.config.ProducesBy;
 import se.jbee.inject.container.Supplier;
+import se.jbee.inject.declare.Module;
 
 /**
  * When binding {@link Action}s this {@link Module} can be extended.
@@ -45,14 +45,14 @@ import se.jbee.inject.container.Supplier;
 public abstract class ActionModule extends BinderModule {
 
 	/**
-	 * The {@link ProductionMirror} picks the {@link Method}s that are used to
+	 * The {@link ProducesBy} picks the {@link Method}s that are used to
 	 * implement {@link Action}s. This abstraction allows to customise what
 	 * methods are bound as {@link Action}s. The
-	 * {@link ProductionMirror#reflect(Class)} should return all methods in the
+	 * {@link ProducesBy#reflect(Class)} should return all methods in the
 	 * given {@link Class} that should be used to implement an {@link Action}.
 	 */
-	static final Instance<ProductionMirror> ACTION_MIRROR = instance(
-			named(Action.class), raw(ProductionMirror.class));
+	static final Instance<ProducesBy> ACTION_MIRROR = instance(
+			named(Action.class), raw(ProducesBy.class));
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <I, O> Dependency<Action<I, O>> actionDependency(
@@ -65,7 +65,7 @@ public abstract class ActionModule extends BinderModule {
 		plug(impl).into(Action.class);
 	}
 
-	protected final void discoverActionsBy(ProductionMirror mirror) {
+	protected final void discoverActionsBy(ProducesBy mirror) {
 		bind(ACTION_MIRROR).to(mirror);
 	}
 
@@ -93,7 +93,7 @@ public abstract class ActionModule extends BinderModule {
 		public <I, O> O run(ActionSite<I, O> site, Object[] args, I value) {
 			try {
 				return site.output.rawType.cast(
-						Supply.produce(site.action, site.owner, args));
+						Utils.produce(site.action, site.owner, args));
 			} catch (SupplyFailed e) {
 				Exception ex = e;
 				if (e.getCause() instanceof Exception) {
@@ -118,7 +118,7 @@ public abstract class ActionModule extends BinderModule {
 		private final Map<String, Action<?, ?>> cachedActions = new ConcurrentHashMap<>();
 
 		private final Injector injector;
-		private final ProductionMirror actionMirror;
+		private final ProducesBy actionMirror;
 		private final Executor executor;
 		private final Class<?>[] implementationClasses;
 

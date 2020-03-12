@@ -6,8 +6,8 @@ import static org.junit.Assert.fail;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Scoping.scopingOf;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.config.ConstructionMirror.common;
-import static se.jbee.inject.container.Cast.injectionCasesTypeFor;
+import static se.jbee.inject.config.ConstructsBy.common;
+import static se.jbee.inject.container.Cast.resourcesTypeFor;
 
 import java.beans.ConstructorProperties;
 
@@ -17,17 +17,19 @@ import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Generator;
 import se.jbee.inject.InconsistentDeclaration;
-import se.jbee.inject.InjectionCase;
 import se.jbee.inject.Injector;
+import se.jbee.inject.Locator;
 import se.jbee.inject.Name;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Scope;
 import se.jbee.inject.UnresolvableDependency.DependencyCycle;
-import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.bootstrap.Bundle;
+import se.jbee.inject.config.ConstructsBy;
+import se.jbee.inject.config.Env;
+import se.jbee.inject.config.Environment;
 import se.jbee.inject.container.Supplier;
+import se.jbee.inject.declare.Bundle;
 
 /**
  * The tests shows an example of cyclic depended {@link Bundle}s. It shows that
@@ -64,9 +66,9 @@ public class TestBootstrapper {
 	}
 
 	/**
-	 * Because the same {@link Resource} is defined twice (the
+	 * Because the same {@link Locator} is defined twice (the
 	 * {@link Name#DEFAULT} {@link Integer} instance) this module should cause
-	 * an exception. All {@link Resource} have to be unique.
+	 * an exception. All {@link Locator} have to be unique.
 	 */
 	private static class ClashingBindsModule extends BinderModule {
 
@@ -189,9 +191,10 @@ public class TestBootstrapper {
 	private static class CustomMirrorModule extends BinderModule {
 
 		@Override
-		protected Bindings configure(Bindings bindings) {
-			return bindings.with(bindings.mirrors.constructBy(
-					common.annotatedWith(ConstructorProperties.class)));
+		protected Env configure(Env env) {
+			return Environment.override(env) //
+					.with(ConstructsBy.class,
+							common.annotatedWith(ConstructorProperties.class));
 		}
 
 		@Override
@@ -255,16 +258,16 @@ public class TestBootstrapper {
 	public void thatBindingsAreReplacedByMoreQualiedOnes() {
 		Injector injector = Bootstrap.injector(ReplacingBindsModule.class);
 		assertEquals(6, injector.resolve(Number.class));
-		InjectionCase<?>[] cases = injector.resolve(InjectionCase[].class);
+		Resource<?>[] rs = injector.resolve(Resource[].class);
 		//TODO can this be limited to cases with a certain Scope so that container can be excluded?
-		assertEquals(29, cases.length); // 3x Comparable, Float, Double, Integer and Number (3x Serializable has been nullified) + 11 Scope + 2 Annotation
-		InjectionCase<Number>[] casesForNumber = injector.resolve(
-				injectionCasesTypeFor(Number.class));
-		assertEquals(1, casesForNumber.length);
+		assertEquals(29, rs.length); // 3x Comparable, Float, Double, Integer and Number (3x Serializable has been nullified) + 11 Scope + 2 Annotation
+		Resource<Number>[] forNumber = injector.resolve(
+				resourcesTypeFor(Number.class));
+		assertEquals(1, forNumber.length);
 		@SuppressWarnings("rawtypes")
-		InjectionCase<Comparable>[] casesForCompareable = injector.resolve(
-				injectionCasesTypeFor(Comparable.class));
-		assertEquals(3, casesForCompareable.length);
+		Resource<Comparable>[] forCompareable = injector.resolve(
+				resourcesTypeFor(Comparable.class));
+		assertEquals(3, forCompareable.length);
 	}
 
 	@Test

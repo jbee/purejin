@@ -5,11 +5,6 @@
  */
 package se.jbee.inject.config;
 
-import java.util.EnumSet;
-
-import se.jbee.inject.Packages;
-import se.jbee.inject.Type;
-
 /**
  * A record containing all configuring data and strategies.
  *
@@ -22,18 +17,8 @@ import se.jbee.inject.Type;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
+@Deprecated
 public final class Globals {
-
-	@SafeVarargs
-	public static <T extends Enum<T> & Feature<T>> Edition featureEdition(
-			T... featured) {
-		return new FeatureEdition<>(featured[0],
-				EnumSet.of(featured[0], featured));
-	}
-
-	public static Edition packagesEdition(Packages included) {
-		return new PackagesEdition(included);
-	}
 
 	/**
 	 * The standard configuration with no special {@link Choices} or
@@ -59,16 +44,6 @@ public final class Globals {
 		return new Globals(edition, choices, options, annotations);
 	}
 
-	public Globals withEditionIncluding(Packages included) {
-		return with(packagesEdition(included));
-	}
-
-	@SafeVarargs
-	public final <T extends Enum<T> & Feature<T>> Globals withEditionInclduing(
-			T... featured) {
-		return with(featureEdition(featured));
-	}
-
 	public Globals with(Choices choices) {
 		return new Globals(edition, choices, options, annotations);
 	}
@@ -81,35 +56,4 @@ public final class Globals {
 		return new Globals(edition, choices, options, annotations);
 	}
 
-	private static class FeatureEdition<T extends Enum<T>> implements Edition {
-
-		private final Feature<T> feature;
-		private final EnumSet<T> featured;
-
-		FeatureEdition(Feature<T> feature, EnumSet<T> featured) {
-			this.feature = feature;
-			this.featured = featured;
-		}
-
-		@Override
-		public boolean featured(Class<?> bundleOrModule) {
-			T f = feature.featureOf(bundleOrModule);
-			return f == null || featured.contains(f);
-		}
-	}
-
-	private static class PackagesEdition implements Edition {
-
-		private final Packages included;
-
-		PackagesEdition(Packages included) {
-			this.included = included;
-		}
-
-		@Override
-		public boolean featured(Class<?> bundleOrModule) {
-			return included.contains(Type.raw(bundleOrModule));
-		}
-
-	}
 }

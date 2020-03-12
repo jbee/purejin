@@ -12,7 +12,6 @@ import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.newArray;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -22,17 +21,18 @@ import java.util.logging.Logger;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Generator;
 import se.jbee.inject.Hint;
-import se.jbee.inject.InjectionCase;
+import se.jbee.inject.Resource;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
+import se.jbee.inject.Locator;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Provider;
 import se.jbee.inject.Scope;
 import se.jbee.inject.Scoping;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
-import se.jbee.inject.UnresolvableDependency.NoCaseForDependency;
-import se.jbee.inject.UnresolvableDependency.SupplyFailed;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import se.jbee.inject.Utils;
 import se.jbee.inject.container.Supplier;
 
 /**
@@ -49,7 +49,7 @@ public final class Supply {
 	-> Logger.getLogger(dep.target(1).type().rawType.getCanonicalName());
 
 	private static final Supplier<?> REQUIRED = (dep, context) -> {
-		throw new NoCaseForDependency(dep, new InjectionCase[0],
+		throw new NoResourceForDependency(dep, new Resource[0],
 				"Should never be called!");
 	};
 
@@ -67,9 +67,9 @@ public final class Supply {
 	private static final String SUPPLIES = "supplies";
 
 	/**
-	 * A {@link Supplier} used as fall-back. Should a required resource not be
-	 * provided it is still bound to this supplier that will throw an exception
-	 * should it ever be called.
+	 * A {@link Supplier} used as fall-back. Should a required {@link Locator}
+	 * not be provided it is still bound to this supplier that will throw an
+	 * exception should it ever be called.
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> Supplier<T> required() {
@@ -117,7 +117,7 @@ public final class Supply {
 		};
 	}
 
-	public static <T> Supplier<T> method(Factory<T> method) {
+	public static <T> Supplier<T> method(Produces<T> method) {
 		return new MethodSupplier<>(method,
 				bind(parameterTypes(method.target), method.hints));
 	}
@@ -132,9 +132,9 @@ public final class Supply {
 		if (dep.type().arrayDimensions() == 1)
 			return () -> injector.resolve(dep);
 		@SuppressWarnings("unchecked")
-		InjectionCase<? extends T> icase = injector.resolve(
-				dep.typed(raw(InjectionCase.class).parametized(dep.type())));
-		return () -> icase.yield(dep);
+		Resource<? extends T> resource = injector.resolve(
+				dep.typed(raw(Resource.class).parametized(dep.type())));
+		return () -> resource.yield(dep);
 	}
 
 	private Supply() {
@@ -236,7 +236,7 @@ public final class Supply {
 
 		@Override
 		protected T invoke(Object[] args, Injector context) {
-			return Supply.construct(target, args);
+			return Utils.construct(target, args);
 		}
 
 		@Override
@@ -248,10 +248,10 @@ public final class Supply {
 	private static final class MethodSupplier<T> extends WithArgs<T> {
 
 		private Object owner;
-		private final Factory<T> method;
+		private final Produces<T> method;
 		private final Class<T> returns;
 
-		MethodSupplier(Factory<T> method, Hint<?>[] args) {
+		MethodSupplier(Produces<T> method, Hint<?>[] args) {
 			super(args);
 			this.method = method;
 			this.returns = method.returns.rawType;
@@ -262,7 +262,7 @@ public final class Supply {
 		protected T invoke(Object[] args, Injector context) {
 			if (method.isInstanceMethod && owner == null)
 				owner = context.resolve(method.target.getDeclaringClass());
-			return returns.cast(Supply.produce(method.target, owner, args));
+			return returns.cast(Utils.produce(method.target, owner, args));
 		}
 
 		@Override
@@ -304,24 +304,6 @@ public final class Supply {
 			return invoke(local.args(context), context);
 		}
 
-	}
-
-	public static <T> T construct(Constructor<T> target, Object... args)
-			throws SupplyFailed {
-		try {
-			return target.newInstance(args);
-		} catch (Exception e) {
-			throw SupplyFailed.valueOf(e, target);
-		}
-	}
-
-	public static Object produce(Method target, Object owner, Object... args)
-			throws SupplyFailed {
-		try {
-			return target.invoke(owner, args);
-		} catch (Exception e) {
-			throw SupplyFailed.valueOf(e, target);
-		}
 	}
 
 }

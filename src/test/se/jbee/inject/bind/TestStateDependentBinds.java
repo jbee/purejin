@@ -5,9 +5,9 @@ import static org.junit.Assert.assertTrue;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.config.NamingMirror.defaultName;
-import static se.jbee.inject.config.ParameterisationMirror.noParameters;
-import static se.jbee.inject.config.ProductionMirror.allMethods;
+import static se.jbee.inject.config.NamesBy.defaultName;
+import static se.jbee.inject.config.HintsBy.noParameters;
+import static se.jbee.inject.config.ProducesBy.allMethods;
 import static se.jbee.inject.container.Cast.providerTypeOf;
 
 import org.junit.Test;
@@ -18,7 +18,7 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.Provider;
 import se.jbee.inject.Scope;
 import se.jbee.inject.Type;
-import se.jbee.inject.UnresolvableDependency.NoCaseForDependency;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.bind.Binder.RootBinder;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
@@ -159,7 +159,7 @@ public class TestStateDependentBinds {
 					named(actualState), type);
 			try {
 				return injector.resolve(dependency.instanced(actualToInject));
-			} catch (NoCaseForDependency e) {
+			} catch (NoResourceForDependency e) {
 				if (actualState != null) { // when not trying default
 					return supply(dependency, injector, null); // try default
 				}
@@ -187,10 +187,10 @@ public class TestStateDependentBinds {
 			bind(named((Object) null), Validator.class).to(Permissive.class);
 
 			// the below is just *a* example - it is just important to provide the 'value' per injection
-			with(bindings().mirrors.produceBy(allMethods.returnTypeAssignableTo(
-					raw(ValidationStrength.class)))).per(
-							Scope.injection).autobind().in(
-									StatefulObject.class);
+			per(Scope.injection).autobind() //
+					.produceBy(allMethods.returnTypeAssignableTo(
+							raw(ValidationStrength.class))) //
+					.in(StatefulObject.class);
 		}
 	}
 
@@ -219,11 +219,10 @@ public class TestStateDependentBinds {
 			bind(named((Object) null), Validator.class).to(Permissive.class);
 
 			// the below is just *a* example - it is just important to provide the 'value' per injection
-			with(bindings().mirrors.produceBy( //
-					allMethods.returnTypeAssignableTo(
-							raw(ValidationStrength.class)))) //
-									.per(Scope.injection) //
-									.autobind().in(StatefulObject.class);
+			per(Scope.injection).autobind() //
+					.produceBy(allMethods.returnTypeAssignableTo(
+							raw(ValidationStrength.class))) //
+					.in(StatefulObject.class);
 		}
 
 	}
@@ -239,14 +238,13 @@ public class TestStateDependentBinds {
 			bind(named((Object) null), String.class).to("Default is undefined");
 
 			// the below is just *a* example - it is just important to provide the 'value' per injection
-			// @formatter:off
-			with(bindings().mirrors.produceBy(
-					allMethods.returnTypeAssignableTo(raw(int.class)))
-				.nameBy(defaultName.unlessAnnotatedWith(Resource.class))
-				.parameteriseBy(noParameters.unlessAnnotatedWith(Resource.class)))
-				.per(Scope.injection)
-				.autobind().in(StatefulObject.class);
-			// @formatter:on
+			per(Scope.injection).autobind() //
+					.produceBy(
+							allMethods.returnTypeAssignableTo(raw(int.class))) //
+					.nameBy(defaultName.unlessAnnotatedWith(Resource.class)) //
+					.parameteriseBy(
+							noParameters.unlessAnnotatedWith(Resource.class)) //
+					.in(StatefulObject.class);
 		}
 
 	}

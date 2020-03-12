@@ -1,11 +1,13 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
 
-import se.jbee.inject.config.Choices;
+import se.jbee.inject.config.Env;
+import se.jbee.inject.declare.Bundle;
+import se.jbee.inject.declare.Module;
 
 /**
  * The basic idea is to split the binding process into 2 steps: installing
@@ -58,49 +60,41 @@ public interface Bootstrapper {
 	void install(Module module);
 
 	/**
-	 * @param <T> Type of the preset value passed to the module
-	 * @param module the {@link ModuleWith} to install (within the parent
-	 *            {@link Bundle} that is given implicitly - the
-	 *            {@link Bootstrapper} keeps track of that)
-	 */
-	<T> void install(ModuleWith<T> module);
-
-	/**
-	 * @param options The choices made to install.
+	 * @param flags for the {@link Bundle}s that should be installed.
 	 */
 	@SuppressWarnings("unchecked")
-	<O extends Enum<O> & ChoiceBundle<O>> void install(O... options);
+	<F extends Enum<F> & ToggledBundles<F>> void install(F... flags);
 
 	/**
-	 * @param options The choices made to uninstall again.
+	 * @param flags for the {@link Bundle}s that are uninstalled.
 	 */
 	@SuppressWarnings("unchecked")
-	<O extends Enum<O> & ChoiceBundle<O>> void uninstall(O... options);
+	<F extends Enum<F> & ToggledBundles<F>> void uninstall(F... flags);
 
 	/**
-	 * @see Choices
 	 * @param bundle the {@link Bundle} to install
-	 * @param optionProperty The property the installation is connected to.
+	 * @param flags The {@link Enum} representing all flags possible for the
+	 *            {@link ToggledBundles}
 	 */
-	<O extends Enum<O>> void install(Class<? extends ChoiceBundle<O>> bundle,
-			Class<O> optionProperty);
+	<F extends Enum<F>> void install(Class<? extends ToggledBundles<F>> bundle,
+			Class<F> flags);
 
 	/**
-	 * 
-	 * @author Jan Bernitt (jan@jbee.se)
-	 * 
-	 * @param <C> The type of choices possible
+	 * @param <C> The {@link Enum} representing all flags possible for the
+	 *            {@link ToggledBundles}
 	 */
 	@FunctionalInterface
-	interface ChoiceBootstrapper<C> {
+	interface ToggledBootstrapper<C> {
 
 		/**
-		 * Installs the bundle when the given option is used.
+		 * Installs the {@link Bundle} when the given flag is
+		 * {@link Env#toggled(Class, Enum, Package)}. The set of toggled flags
+		 * is always constant during the bootstrapping process.
 		 * 
-		 * If the module passed hasn't been
-		 * {@link Bootstrapper#install(Enum...)}ed the call will be ignored.
+		 * If the flag isn't toggled the this call has no effect. No
+		 * installation occurs.
 		 */
-		void install(Class<? extends Bundle> bundle, C choice);
+		void install(Class<? extends Bundle> bundle, C flag);
 
 	}
 

@@ -9,8 +9,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import se.jbee.inject.bind.BinderModule;
-import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.container.Initialiser;
+import se.jbee.inject.declare.Module;
 
 /**
  * Base {@link Module} for modules that want to make known a handler to the

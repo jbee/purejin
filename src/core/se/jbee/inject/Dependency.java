@@ -7,6 +7,7 @@ package se.jbee.inject;
 
 import static java.util.Arrays.asList;
 import static se.jbee.inject.Instance.defaultInstanceOf;
+import static se.jbee.inject.Packages.packageAndSubPackagesOf;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.arrayAppend;
 import static se.jbee.inject.Utils.arrayContains;
@@ -163,10 +164,19 @@ public final class Dependency<T>
 
 	public <I> Dependency<T> injectingInto(Instance<I> target)
 			throws DependencyCycle, UnstableDependency {
-		return injectingInto(new Resource<>(target), Scoping.ignore);
+		return injectingInto(new Locator<>(target), Scoping.ignore);
 	}
 
-	public Dependency<T> injectingInto(Resource<?> target, Scoping scoping)
+	public <I> Dependency<T> injectingInto(Package pkg) {
+		Target target = Target.ANY.in(packageAndSubPackagesOf(pkg));
+		Injection injection = new Injection(Instance.ANY,
+				new Locator<>(Instance.ANY, target), Scoping.ignore);
+		if (hierarchy.length == 0)
+			return new Dependency<>(instance, injection);
+		return new Dependency<>(instance, arrayAppend(hierarchy, injection));
+	}
+
+	public Dependency<T> injectingInto(Locator<?> target, Scoping scoping)
 			throws DependencyCycle, UnstableDependency {
 		Injection injection = new Injection(instance, target, scoping);
 		if (hierarchy.length == 0)
@@ -196,8 +206,8 @@ public final class Dependency<T>
 			throw new UnstableDependency(unstable, injection);
 	}
 
-	public void ensureNoIllegalDirectAccessOf(Resource<? extends T> resource) {
-		if (!resource.target.indirect)
+	public void ensureNoIllegalDirectAccessOf(Locator<? extends T> locator) {
+		if (!locator.target.indirect)
 			return;
 		Type<? super T> required = instance.type;
 		if (required.rawType.isInterface())
@@ -205,11 +215,11 @@ public final class Dependency<T>
 		for (int level = 0; level < injectionDepth(); level++) {
 			Instance<?> parent = target(level);
 			if (!required.isAssignableTo(parent.type()))
-				throw new UnresolvableDependency.IllegalAcccess(resource, this);
+				throw new UnresolvableDependency.IllegalAcccess(locator, this);
 			if (parent.type.rawType.isInterface())
 				return;
 		}
-		throw new UnresolvableDependency.IllegalAcccess(resource, this);
+		throw new UnresolvableDependency.IllegalAcccess(locator, this);
 	}
 
 	@Override

@@ -9,7 +9,7 @@ import org.junit.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Bundle;
+import se.jbee.inject.declare.Bundle;
 
 /**
  * A test that demonstrates how {@link Bundle}s (here in form of

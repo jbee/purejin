@@ -13,8 +13,8 @@ import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bind.Binder.PluginBinder;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Module;
 import se.jbee.inject.config.Plugins;
+import se.jbee.inject.declare.Module;
 
 /**
  * Plug-in-binds are a convenient way to define a named set of classes. The name

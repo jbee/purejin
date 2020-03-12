@@ -1,6 +1,7 @@
 package se.jbee.inject.bind;
 
 import static se.jbee.inject.Name.named;
+import static se.jbee.inject.Scope.container;
 
 import java.io.File;
 import java.util.concurrent.Executors;
@@ -8,6 +9,7 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
+import se.jbee.inject.Name;
 import se.jbee.inject.Scope;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.config.Config;
@@ -16,29 +18,38 @@ import se.jbee.inject.scope.ApplicationScope;
 import se.jbee.inject.scope.DependencyScope;
 import se.jbee.inject.scope.DiskScope;
 import se.jbee.inject.scope.ThreadScope;
+import se.jbee.inject.scope.WorkerScope;
 
 public final class DefaultScopes extends BinderModule
 		implements Supplier<Scope> {
 
 	@Override
 	protected void declare() {
-		ScopedBinder inScope = asDefault().per(Scope.container);
-		inScope.bind(Scope.injection, Scope.class).to(Scope.INJECTION);
-		inScope.bind(Scope.application, Scope.class).to(ApplicationScope.class);
-		inScope.bind(Scope.thread, Scope.class).to(ThreadScope.class);
-		inScope.bind(Scope.jvm, Scope.class).to(DependencyScope.JVM);
-		inScope.bind(Scope.dependency, Scope.class).to(
-				() -> new DependencyScope(
-						DependencyScope::hierarchicalInstanceName));
-		inScope.bind(Scope.dependencyInstance, Scope.class).to(
+		bindScope(Scope.injection).to(Scope.INJECTION);
+		bindScope(Scope.application).to(ApplicationScope.class);
+		bindScope(Scope.thread).to(ThreadScope.class);
+		bindScope(Scope.jvm).to(DependencyScope.JVM);
+		bindScope(Scope.worker).to(WorkerScope.class);
+		asDefault().per(Scope.worker).bind(
+				Scope.Controller.forScope(Scope.worker)).toGenerator(
+						(gen) -> null); // dummy generator as the scope will supply
+
+		bindScope(Scope.dependency).to(() -> new DependencyScope(
+				DependencyScope::hierarchicalInstanceName));
+		bindScope(Scope.dependencyInstance).to(
 				() -> new DependencyScope(DependencyScope::instanceName));
-		inScope.bind(Scope.dependencyType, Scope.class).to(
+		bindScope(Scope.dependencyType).to(
 				() -> new DependencyScope(DependencyScope::typeName));
-		inScope.bind(Scope.targetInstance, Scope.class).to(
+		bindScope(Scope.targetInstance).to(
 				() -> new DependencyScope(DependencyScope::targetInstanceName));
-		inScope.bind(named("disk:*"), Scope.class).toSupplier(this);
-		inScope.bind(ScheduledExecutorService.class).to(
+
+		bindScope(named("disk:*")).toSupplier(this);
+		asDefault().per(container).bind(ScheduledExecutorService.class).to(
 				Executors::newSingleThreadScheduledExecutor);
+	}
+
+	private TypedBinder<Scope> bindScope(Name named) {
+		return asDefault().per(container).bind(named, Scope.class);
 	}
 
 	/**

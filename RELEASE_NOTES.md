@@ -11,7 +11,7 @@ v19.1 (upcoming)
 > Named lazy Injector sub-contexts
 
 **General Notes**
-- changed versioning from _major.minor_ to _year.serial_ (e.g. 19.1 is the first in 2019)
+- changed versioning from _major.minor_ to _year.serial_ (e.g. 19.1 is the first started in 2019)
 
 **Additions**
 - added build in extension for `Optional` parameter injection
@@ -35,6 +35,8 @@ v19.1 (upcoming)
 - added `Binder.withIndirectAccess` to limit class injection to its interfaces
 
 **API changes**
+- Central interface for user declared artifacts moved to new package `declare`
+- renamed `Resource` to `Locator`
 - `Inspector` split in (and replaced by) `*Mirror` functional interfaces
 - `InspectorBinder` replaced by `AutoBinder` and `autobind()` (no args)
 - `Bindings` are created via `newBindings` and modified using the `with` methods
@@ -51,7 +53,7 @@ v19.1 (upcoming)
 - renamed class `PresetModule` to `ModuleWith`
 - renamed class `NoResourceForDependency` to `NoCaseForDependency`
 - renamed class `BoundConstructor` to `New`
-- renamed class `BoundMethod` to `Factory`
+- renamed class `BoundMethod` to `Produces`
 - renamed class `BoundConstant` to `Constant`
 - renamed and moved class `BoundParameter` to `Hint`
 - renamed `InconsistentBinding` to `InconsistentDeclaration`
@@ -60,10 +62,10 @@ v19.1 (upcoming)
 - extracted class `ActionSite` 
 - renamed method `Action.exec` to `Action.run`
 - renamed class and method `MorePreciseThan#morePreciseThan` to `Qualifying#moreQualiedThan`
-- redesign of `Injectron`/`InjectronInfo` to `Generator` and `InjectionCase`
+- redesign of `Injectron`/`InjectronInfo` to `Generator` and `Resource`
 - renamed field `Injection#expiry` to `Injection#scoping`
 - renamed method `Injection#ignoredExpiry()` to `Injection#ignoredScoping()`
-- renamed field `InjectronInfo#expiry` to `InjectionCase#scoping`
+- renamed field `InjectronInfo#expiry` to `Resource#scoping`
 - replaced `Expiry` with `Scoping` concept that is based on `Scope`  
 - moved `Supplier` into `container` package (was wrongly located in main API)
 - moved `Scope`, `Repository` and `Provider` into root package `se.jbee.inject`
@@ -79,14 +81,17 @@ v19.1 (upcoming)
 - wild-card array dependencies are honoured in presents of same raw type bounds
 - implicit `construct(...)` for plugin class now only done if class is constructible
 - `Class.class` is now also considered `Metaclass#undeterminable`
-- fixed NPE when trying to resolve `InjectionCase[]` for unbound type 
+- fixed NPE when trying to resolve `Resource[]` for unbound type 
 - identical `plug`-in binds do no longer collide
 
 **Improvements**
+- bound constants are `Scope.container` scoped `Generator`s (shortcut path within `Injector`)
 - arrays composed by `InjectorImpl` contain instances only once in any case
 - macros are now replaced when defined for same type (no behaviour change)
-- supplied constants are now expanded via macros as `BoundConstant`
-- explicit `BoundConstant`s implicitly bind to constant's actual type too
+- supplied constants are now expanded via macros as `Constant`
+- identical `MULTI` constant binds de-duplicate to single bind (instead of becoming multiple binds)
+- identical `AUTO` or `PROVIDED` binds de-duplicate to single bind (instead of being dropped)
+- explicit `Constant`s implicitly bind to constant's actual type too
 - improved `ModuleWith` now also supplies the `Options` itself
 - `Action` metadata uses concurrent maps instead of `synchronized` blocks
 

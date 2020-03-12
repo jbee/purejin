@@ -3,7 +3,9 @@
  *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject.bootstrap;
+package se.jbee.inject.declare;
+
+import se.jbee.inject.bootstrap.Bootstrapper;
 
 /**
  * A bundle installs sub-bundles and {@link Module}s.

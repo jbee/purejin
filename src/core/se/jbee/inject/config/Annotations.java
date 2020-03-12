@@ -6,7 +6,8 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import se.jbee.inject.bootstrap.ModuleWith;
+import se.jbee.inject.Link;
+import se.jbee.inject.declare.ModuleWith;
 
 /**
  * Configuration for custom annotations. These are annotations which in their
@@ -16,6 +17,7 @@ import se.jbee.inject.bootstrap.ModuleWith;
  * 
  * @since 19.1
  */
+@Deprecated
 public final class Annotations {
 
 	public static final Annotations DETECT = new Annotations(true);
@@ -48,7 +50,7 @@ public final class Annotations {
 				typeAnnotations);
 	}
 
-	public Annotations define(Class<? extends Annotation> type,
+	public Annotations declare(Class<? extends Annotation> type,
 			ModuleWith<Class<?>> as) {
 		Map<Class<? extends Annotation>, ModuleWith<Class<?>>> clone = new HashMap<>(
 				typeAnnotations);
@@ -57,25 +59,38 @@ public final class Annotations {
 				clone);
 	}
 
-	public ModuleWith<Class<?>> annotationDefinition(
-			Class<? extends Annotation> type) {
-		ensureHasDetected();
+	public ModuleWith<Class<?>> effect(Class<? extends Annotation> type) {
+		ensureAnnotationDetectionIsDone();
 		return typeAnnotations.get(type);
 	}
 
-	private void ensureHasDetected() {
+	private void ensureAnnotationDetectionIsDone() {
 		if (!detect)
 			return;
 		if (hasDetected.compareAndSet(false, true)) {
-			for (ModuleWith<?> def : ServiceLoader.load(ModuleWith.class)) {
+			detectAnnotations();
+		}
+	}
+
+	private void detectAnnotations() {
+		for (ModuleWith<?> def : ServiceLoader.load(ModuleWith.class)) {
+			if (def.getClass().isAnnotationPresent(Link.class)) {
+				declareDetected(def.getClass().getAnnotation(Link.class).to(),
+						def);
+			} else {
 				Annotation[] annotations = def.getClass().getAnnotations();
 				if (annotations.length == 1) {
-					Class<? extends Annotation> annotation = annotations[0].annotationType();
-					@SuppressWarnings("unchecked")
-					ModuleWith<Class<?>> effect = (ModuleWith<Class<?>>) def;
-					typeAnnotations.put(annotation, effect);
+					declareDetected(annotations[0].annotationType(), def);
 				}
 			}
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private void declareDetected(Class<?> type, ModuleWith<?> as) {
+		if (type.isAnnotation()) {
+			ModuleWith<Class<?>> effect = (ModuleWith<Class<?>>) as;
+			typeAnnotations.put((Class<? extends Annotation>) type, effect);
 		}
 	}
 }

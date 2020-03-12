@@ -22,7 +22,7 @@ import se.jbee.inject.Name;
  * @since 19.1
  */
 @FunctionalInterface
-public interface NamingMirror {
+public interface NamesBy {
 
 	/**
 	 * @return The {@link Name} of the instance provided by the given object.
@@ -30,9 +30,9 @@ public interface NamingMirror {
 	 */
 	Name reflect(AccessibleObject obj);
 
-	NamingMirror defaultName = obj -> Name.DEFAULT;
+	NamesBy defaultName = obj -> Name.DEFAULT;
 
-	default NamingMirror unlessAnnotatedWith(
+	default NamesBy unlessAnnotatedWith(
 			Class<? extends Annotation> naming) {
 		if (naming == null)
 			return this;

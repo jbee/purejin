@@ -5,10 +5,10 @@ import static org.junit.Assert.assertSame;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Packages.packageAndSubPackagesOf;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.config.NamingMirror.defaultName;
-import static se.jbee.inject.config.ParameterisationMirror.noParameters;
-import static se.jbee.inject.config.ProductionMirror.allMethods;
-import static se.jbee.inject.config.ProductionMirror.declaredMethods;
+import static se.jbee.inject.config.NamesBy.defaultName;
+import static se.jbee.inject.config.HintsBy.noParameters;
+import static se.jbee.inject.config.ProducesBy.allMethods;
+import static se.jbee.inject.config.ProducesBy.declaredMethods;
 import static se.jbee.inject.container.Cast.providerTypeOf;
 
 import java.lang.reflect.Constructor;
@@ -21,9 +21,8 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Provider;
 import se.jbee.inject.Scope;
-import se.jbee.inject.UnresolvableDependency.NoCaseForDependency;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.config.Mirrors;
 import se.jbee.inject.util.Resource;
 import se.jbee.inject.util.WebMethod;
 
@@ -41,24 +40,29 @@ public class TestMirrorAutobindBinds {
 
 		@Override
 		protected void declare() {
-			Mirrors mirrors = mirrors();
-			Mirrors mirrorAllMethods = mirrors.produceBy(declaredMethods);
-			with(mirrorAllMethods).autobind().inModule();
-			// @formatter:off
-			with(mirrors.produceBy(allMethods.annotatedWith(WebMethod.class))
-				.nameBy(defaultName.unlessAnnotatedWith(Resource.class))
-				.parameteriseBy(noParameters.unlessAnnotatedWith(Resource.class)))
-				.autobind().in(Implementor1.class);
-			// @formatter:on
-			with(mirrors.produceBy(allMethods.returnTypeAssignableTo(
-					raw(Provider.class)))).autobind().in(Implementor2.class);
-			with(mirrors.produceBy(allMethods.returnTypeIn(
-					packageAndSubPackagesOf(Injector.class)))).autobind().in(
-							Implementor3.class);
-			with(mirrorAllMethods).per(Scope.application).autobind().in(
-					new Implementor4(STATE));
-			with(mirrorAllMethods).per(Scope.injection).autobind().in(
-					FactoryImpl.class);
+			autobind() //
+					.produceBy(declaredMethods) //
+					.inModule();
+			autobind() //
+					.produceBy(allMethods.annotatedWith(WebMethod.class)) //
+					.nameBy(defaultName.unlessAnnotatedWith(Resource.class)) //
+					.parameteriseBy(
+							noParameters.unlessAnnotatedWith(Resource.class)) //
+					.in(Implementor1.class);
+			autobind() //
+					.produceBy(allMethods.returnTypeAssignableTo(
+							raw(Provider.class))) //
+					.in(Implementor2.class);
+			autobind() //
+					.produceBy(allMethods.returnTypeIn(
+							packageAndSubPackagesOf(Injector.class))) //
+					.in(Implementor3.class);
+			per(Scope.application).autobind() //
+					.produceBy(declaredMethods) //
+					.in(new Implementor4(STATE));
+			per(Scope.injection).autobind() //
+					.produceBy(declaredMethods) //
+					.in(FactoryImpl.class);
 		}
 
 		static int staticFactoryMethod() {
@@ -183,7 +187,7 @@ public class TestMirrorAutobindBinds {
 				injector.resolve(providerTypeOf(Boolean.class)).provide());
 	}
 
-	@Test(expected = NoCaseForDependency.class)
+	@Test(expected = NoResourceForDependency.class)
 	public void thatNoMethodsAreBoundThatAreNotAssignableToSpecifiedType() {
 		injector.resolve(Character.class);
 	}
@@ -193,7 +197,7 @@ public class TestMirrorAutobindBinds {
 		assertEquals(named("foobar"), injector.resolve(Name.class));
 	}
 
-	@Test(expected = NoCaseForDependency.class)
+	@Test(expected = NoResourceForDependency.class)
 	public void thatNoMethodsAreBoundThatAreNotInSpecifiedPackagesSet() {
 		injector.resolve(String.class);
 	}

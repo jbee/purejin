@@ -31,4 +31,6 @@ public interface AnnotatedWith<T extends Annotation> {
 	 *         {@link Annotation} of the type parameter T.
 	 */
 	Collection<?> annotated();
+
+	//TODO virtual annotations - that is pretending a class was annotated by making a plugin entry
 }

@@ -52,8 +52,8 @@ public class TestSerializable {
 	}
 
 	@Test
-	public void resourceIsSerializable() {
-		assertSerializable(Resource.resource(String.class));
+	public void locatorIsSerializable() {
+		assertSerializable(Locator.locator(String.class));
 	}
 
 	@Test
@@ -70,7 +70,7 @@ public class TestSerializable {
 	@Test
 	public void injectionIsSerializable() {
 		assertSerializable(new Injection(Instance.anyOf(String.class),
-				Resource.resource(String.class), Scoping.ignore));
+				Locator.locator(String.class), Scoping.ignore));
 	}
 
 	@Test

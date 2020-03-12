@@ -19,13 +19,14 @@ import se.jbee.inject.Type;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
+@Deprecated
 public final class Options {
 
 	public static final Options NONE = new Options(new HashMap<>(0));
 
-	private final Map<String, Object> values;
+	private final Map<Type<?>, Object> values;
 
-	private Options(Map<String, Object> values) {
+	private Options(Map<Type<?>, Object> values) {
 		this.values = values;
 	}
 
@@ -42,10 +43,10 @@ public final class Options {
 	 *         overridden.
 	 */
 	public <T> Options set(Type<T> type, T value) {
-		final String key = key(type);
+		final Type<?> key = type;
 		if (value == null && !values.containsKey(key))
 			return this;
-		Map<String, Object> clone = new HashMap<>(values);
+		Map<Type<?>, Object> clone = new HashMap<>(values);
 		if (value == null) {
 			clone.remove(key);
 		} else {
@@ -60,11 +61,7 @@ public final class Options {
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> T get(Type<T> type) {
-		return (T) values.get(key(type));
-	}
-
-	private static <T> String key(Type<T> type) {
-		return type.toString().intern();
+		return (T) values.get(type);
 	}
 
 	@Override

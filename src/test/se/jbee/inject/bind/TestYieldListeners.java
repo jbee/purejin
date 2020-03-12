@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
-import se.jbee.inject.Resource;
+import se.jbee.inject.Locator;
 import se.jbee.inject.Scoping;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.container.YieldListener;
@@ -53,7 +53,7 @@ public class TestYieldListeners {
 
 		@Override
 		public <T> void onStableInstanceGeneration(int serialID,
-				Resource<T> resource, Scoping scoping, T instance) {
+				Locator<T> locator, Scoping scoping, T instance) {
 			created.add(instance);
 		}
 	}

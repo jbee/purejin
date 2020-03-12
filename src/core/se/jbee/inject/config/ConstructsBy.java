@@ -21,7 +21,7 @@ import se.jbee.inject.Utils;
  * @since 19.1
  */
 @FunctionalInterface
-public interface ConstructionMirror {
+public interface ConstructsBy {
 
 	/**
 	 * @return The {@link Constructor} considered to be the reasonable or right
@@ -33,12 +33,12 @@ public interface ConstructionMirror {
 	<T> Constructor<T> reflect(Class<T> type);
 
 	/**
-	 * Default value and starting point for custom {@link ConstructionMirror}.
+	 * Default value and starting point for custom {@link ConstructsBy}.
 	 */
-	ConstructionMirror common = Utils::commonConstructorOrNull;
+	ConstructsBy common = Utils::commonConstructorOrNull;
 
-	default ConstructionMirror in(Packages filter) {
-		return new ConstructionMirror() {
+	default ConstructsBy in(Packages filter) {
+		return new ConstructsBy() {
 
 			@Override
 			public <T> Constructor<T> reflect(Class<T> type) {
@@ -49,9 +49,9 @@ public interface ConstructionMirror {
 		};
 	}
 
-	default ConstructionMirror annotatedWith(
+	default ConstructsBy annotatedWith(
 			Class<? extends Annotation> marker) {
-		return new ConstructionMirror() {
+		return new ConstructsBy() {
 
 			@Override
 			public <T> Constructor<T> reflect(Class<T> type) {

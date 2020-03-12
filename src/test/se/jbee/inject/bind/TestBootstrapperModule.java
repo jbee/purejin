@@ -1,6 +1,5 @@
 package se.jbee.inject.bind;
 
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 
 import java.lang.annotation.ElementType;
@@ -10,17 +9,15 @@ import javax.management.MXBean;
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
-import se.jbee.inject.UnresolvableDependency.NoCaseForDependency;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Bootstrapper;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.bootstrap.Bundle;
-import se.jbee.inject.bootstrap.ModuleWith;
-import se.jbee.inject.config.Annotations;
-import se.jbee.inject.config.Choices;
+import se.jbee.inject.config.Env;
 import se.jbee.inject.config.Globals;
-import se.jbee.inject.config.Options;
+import se.jbee.inject.declare.Bundle;
+import se.jbee.inject.declare.ModuleWith;
 
 /**
  * Test that illustrates that the {@link Bootstrap} process adds bindings such
@@ -32,7 +29,7 @@ public class TestBootstrapperModule {
 
 		@Override
 		protected void bootstrap() {
-			uninstall(Bootstrap.getBootstrapperBundle());
+			//TODO uninstall ...
 		}
 	}
 
@@ -46,57 +43,52 @@ public class TestBootstrapperModule {
 
 	@Test
 	public void globalsAreBoundByBootstrapper() {
-		Globals expected = Globals.STANDARD.with(
-				Options.NONE.set(String.class, "custom"));
-		Injector injector = Bootstrap.injector(EmptyBundle.class, expected);
-		assertSame(expected, injector.resolve(Globals.class));
+		Env env = Bootstrap.ENV.with(String.class, "custom");
+		Injector injector = Bootstrap.injector(EmptyBundle.class, env);
+		//TODO env test
 	}
 
 	@Test
 	public void optionsAreBoundByBootstrapper() {
-		Options expected = Options.NONE.set(String.class, "custom");
-		Globals globals = Globals.STANDARD.with(expected);
-		Injector injector = Bootstrap.injector(EmptyBundle.class, globals);
-		assertSame(expected, injector.resolve(Options.class));
+		Env env = Bootstrap.ENV.with(String.class, "custom");
+		Injector injector = Bootstrap.injector(EmptyBundle.class, env);
+		//TODO env test
 	}
 
 	@Test
 	public void choicesAreBoundByBootstrapper() {
-		Choices expected = Choices.NONE.choose(ElementType.TYPE);
-		Globals globals = Globals.STANDARD.with(expected);
-		Injector injector = Bootstrap.injector(EmptyBundle.class, globals);
-		assertSame(expected, injector.resolve(Choices.class));
+		Env env = Bootstrap.ENV.with(ElementType.class,
+				ElementType.TYPE);
+		Injector injector = Bootstrap.injector(EmptyBundle.class, env);
+		//TODO env test
 	}
 
 	@Test
 	public void annotationsAreBoundByBootstrapper() {
-		Annotations expected = Annotations.DETECT.define(MXBean.class,
-				new ModuleWith<Class<?>>() {
+		ModuleWith<Class<?>> effect = new ModuleWith<Class<?>>() {
 
-					@Override
-					public void declare(Bindings bindings, Class<?> option) {
-						// does not matter...
-					}
-				});
-		Globals globals = Globals.STANDARD.with(expected);
-		Injector injector = Bootstrap.injector(EmptyBundle.class, globals);
-		assertSame(expected, injector.resolve(Annotations.class));
+			@Override
+			public void declare(Bindings bindings, Env env,
+					Class<?> option) {
+				// does not matter...
+			}
+		};
+		Env env = Bootstrap.ENV.withAnnotation(MXBean.class, effect);
+		Injector injector = Bootstrap.injector(EmptyBundle.class, env);
+		//TODO env test
 	}
 
 	@Test
 	public void standardBootstrapperModuleCanBeUninstalled() {
 		Injector injector = Bootstrap.injector(UninstallingBundle.class);
-		assertUnbound(Globals.class, injector);
-		assertUnbound(Options.class, injector);
-		assertUnbound(Choices.class, injector);
-		assertUnbound(Annotations.class, injector);
+		//TODO new test that defaults are gone test
 	}
 
 	private static void assertUnbound(Class<?> type, Injector injector) {
 		try {
 			injector.resolve(type);
-			fail("Expected NoCaseForDependency");
-		} catch (NoCaseForDependency e) {
+			fail("Expected " + NoResourceForDependency.class.getName());
+		} catch (NoResourceForDependency e) {
 			// expected
 		}
 	}

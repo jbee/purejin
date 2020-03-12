@@ -7,10 +7,10 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
-import se.jbee.inject.UnresolvableDependency.NoCaseForDependency;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.bootstrap.Module;
+import se.jbee.inject.declare.Module;
 
 /**
  * The test shows very loose coupling using {@link BinderModule#require(Class)}
@@ -90,7 +90,7 @@ public class TestRequiredProvidedBinds {
 
 	}
 
-	@Test(expected = NoCaseForDependency.class)
+	@Test(expected = NoResourceForDependency.class)
 	public void thatNotProvidedRequiredBindThrowsException() {
 		Bootstrap.injector(RequirementModule.class);
 	}
@@ -109,7 +109,7 @@ public class TestRequiredProvidedBinds {
 		try {
 			injector.resolve(UnusedImpl.class);
 			fail("Should not be bound and therefore throw below exception");
-		} catch (NoCaseForDependency e) {
+		} catch (NoResourceForDependency e) {
 			// expected this
 		} catch (Throwable e) {
 			fail("Expected another exception but got: " + e);

@@ -5,6 +5,9 @@
  */
 package se.jbee.inject.bootstrap;
 
+import se.jbee.inject.declare.Bundle;
+import se.jbee.inject.declare.Module;
+
 /**
  * Determines / extracts the {@link Module}s from a root {@link Bundle}.
  * 

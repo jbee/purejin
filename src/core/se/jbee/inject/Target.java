@@ -13,7 +13,7 @@ import static se.jbee.inject.Type.raw;
 import java.io.Serializable;
 
 /**
- * Describes where a {@link Resource} is available for injection.
+ * Describes where a {@link Locator} is available for injection.
  *
  * This can be restricted by the {@link Packages} the injected that is injected
  * is defined in or the {@link Type} of the receiving instance.

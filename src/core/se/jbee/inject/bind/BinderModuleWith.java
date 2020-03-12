@@ -8,9 +8,10 @@ package se.jbee.inject.bind;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrapper;
-import se.jbee.inject.bootstrap.Bundle;
-import se.jbee.inject.bootstrap.ModuleWith;
+import se.jbee.inject.config.Env;
 import se.jbee.inject.config.Options;
+import se.jbee.inject.declare.Bundle;
+import se.jbee.inject.declare.ModuleWith;
 
 /**
  * The default utility {@link ModuleWith}.
@@ -22,7 +23,7 @@ import se.jbee.inject.config.Options;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public abstract class BinderModuleWith<T> extends InitializedBinder
-		implements Bundle, ModuleWith<T> {
+		implements Bundle, ModuleWith<T> { //TODO can this extends BinderModule?
 
 	@Override
 	public final void bootstrap(Bootstrapper bootstrap) {
@@ -34,13 +35,13 @@ public abstract class BinderModuleWith<T> extends InitializedBinder
 	}
 
 	@Override
-	public final void declare(Bindings bindings, T option) {
-		__init__(configure(bindings));
+	public void declare(Bindings bindings, Env env, T option) {
+		__init__(configure(env), bindings);
 		declare(option);
 	}
 
-	protected Bindings configure(Bindings bindings) {
-		return bindings;
+	protected Env configure(Env env) {
+		return env;
 	}
 
 	@Override

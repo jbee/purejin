@@ -14,15 +14,18 @@ import java.util.List;
 import java.util.Set;
 
 import se.jbee.inject.DeclarationType;
+import se.jbee.inject.Locator;
 import se.jbee.inject.Name;
 import se.jbee.inject.Qualifying;
-import se.jbee.inject.Resource;
 import se.jbee.inject.Source;
 import se.jbee.inject.Type;
 import se.jbee.inject.Typed;
 import se.jbee.inject.UnresolvableDependency;
+import se.jbee.inject.config.Env;
 import se.jbee.inject.container.Injectee;
 import se.jbee.inject.container.Supplier;
+import se.jbee.inject.declare.Bundle;
+import se.jbee.inject.declare.Module;
 
 /**
  * A {@link Binding} is implements the {@link Injectee} created during the
@@ -36,29 +39,29 @@ import se.jbee.inject.container.Supplier;
 public final class Binding<T> extends Injectee<T>
 		implements Comparable<Binding<?>>, Module, Typed<T> {
 
-	public static <T> Binding<T> binding(Resource<T> resource, BindingType type,
+	public static <T> Binding<T> binding(Locator<T> locator, BindingType type,
 			Supplier<? extends T> supplier, Name scope, Source source) {
-		return new Binding<>(resource, type, supplier, scope, source);
+		return new Binding<>(locator, type, supplier, scope, source);
 	}
 
 	public final BindingType type;
 
-	private Binding(Resource<T> resource, BindingType type,
+	private Binding(Locator<T> locator, BindingType type,
 			Supplier<? extends T> supplier, Name scope, Source source) {
-		super(scope, resource, supplier, source);
+		super(scope, locator, supplier, source);
 		this.type = type;
 	}
 
 	@Override
 	public Type<T> type() {
-		return resource.type();
+		return locator.type();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public <E> Binding<E> typed(Type<E> type) {
-		return new Binding<>(resource.typed(type().toSupertype(type)),
-				this.type, (Supplier<? extends E>) supplier, scope, source);
+		return new Binding<>(locator.typed(type().toSupertype(type)), this.type,
+				(Supplier<? extends E>) supplier, scope, source);
 	}
 
 	public boolean isComplete() {
@@ -69,11 +72,11 @@ public final class Binding<T> extends Injectee<T>
 			Supplier<? extends T> supplier) {
 		if (type == BindingType.MACRO)
 			throw InconsistentBinding.illegalCompletion(this, type);
-		return new Binding<>(resource, type, supplier, scope, source);
+		return new Binding<>(locator, type, supplier, scope, source);
 	}
 
 	@Override
-	public void declare(Bindings bindings) {
+	public void declare(Bindings bindings, Env env) {
 		bindings.add(this);
 	}
 
@@ -82,25 +85,25 @@ public final class Binding<T> extends Injectee<T>
 		if (!(obj instanceof Binding))
 			return false;
 		Binding<?> other = (Binding<?>) obj;
-		return resource.equalTo(other.resource) && source.equalTo(other.source)
+		return locator.equalTo(other.locator) && source.equalTo(other.source)
 			&& scope.equalTo(other.scope) && type == other.type;
 	}
 
 	@Override
 	public int hashCode() {
-		return resource.hashCode() ^ source.hashCode();
+		return locator.hashCode() ^ source.hashCode();
 	}
 
 	@Override
 	public int compareTo(Binding<?> other) {
-		int res = resource.type().rawType.getCanonicalName().compareTo(
-				other.resource.type().rawType.getCanonicalName());
+		int res = locator.type().rawType.getCanonicalName().compareTo(
+				other.locator.type().rawType.getCanonicalName());
 		if (res != 0)
 			return res;
-		res = Qualifying.compare(resource.instance, other.resource.instance);
+		res = Qualifying.compare(locator.instance, other.locator.instance);
 		if (res != 0)
 			return res;
-		res = Qualifying.compare(resource.target, other.resource.target);
+		res = Qualifying.compare(locator.target, other.locator.target);
 		if (res != 0)
 			return res;
 		res = Qualifying.compare(source, other.source);
@@ -125,25 +128,31 @@ public final class Binding<T> extends Injectee<T>
 		for (int i = 1; i < bindings.length; i++) {
 			Binding<?> lastUnique = bindings[lastUniqueIndex];
 			Binding<?> current = bindings[i];
-			final boolean equalResource = lastUnique.resource.equalTo(
-					current.resource);
+			final boolean equalResource = lastUnique.locator.equalTo(
+					current.locator);
 			DeclarationType lastType = lastUnique.source.declarationType;
 			DeclarationType curType = current.source.declarationType;
 			if (equalResource && lastType.clashesWith(curType))
 				throw InconsistentBinding.clash(lastUnique, current);
 			if (curType == DeclarationType.REQUIRED) {
-				required.add(current.resource.type());
+				required.add(current.locator.type());
 			} else if (equalResource && (lastType.droppedWith(curType))) {
-				if (i - 1 == lastUniqueIndex)
-					dropped.add(uniques.remove(uniques.size() - 1));
-				dropped.add(current);
+				if (isDuplicateIdenticalConstant(equalResource, lastUnique,
+						current)) {
+					dropped.add(current);
+				} else {
+					if (i - 1 == lastUniqueIndex)
+						dropped.add(uniques.remove(uniques.size() - 1));
+					dropped.add(current);
+				}
 			} else if (!equalResource || !curType.replacedBy(lastType)) {
-				if (!isDuplicateIdenticalConstant(equalResource, curType,
-						lastUnique, current)) {
+				if (current.source.declarationType == DeclarationType.MULTI
+					&& isDuplicateIdenticalConstant(equalResource, lastUnique,
+							current)) {
+					dropped.add(current);
+				} else {
 					uniques.add(current);
 					lastUniqueIndex = i;
-				} else {
-					dropped.add(current);
 				}
 			}
 		}
@@ -151,10 +160,8 @@ public final class Binding<T> extends Injectee<T>
 	}
 
 	private static boolean isDuplicateIdenticalConstant(boolean equalResource,
-			DeclarationType curType, Binding<?> lastUnique,
-			Binding<?> current) {
-		return equalResource && curType == DeclarationType.MULTI
-			&& current.type == BindingType.PREDEFINED
+			Binding<?> lastUnique, Binding<?> current) {
+		return equalResource && current.type == BindingType.PREDEFINED
 			&& lastUnique.supplier.equals(current.supplier);
 	}
 
@@ -163,7 +170,7 @@ public final class Binding<T> extends Injectee<T>
 			List<Binding<?>> dropped) {
 		List<Binding<?>> res = new ArrayList<>(bindings.size());
 		for (Binding<?> b : bindings) {
-			Type<?> type = b.resource.type();
+			Type<?> type = b.locator.type();
 			if (b.source.declarationType != DeclarationType.PROVIDED
 				|| required.contains(type)) {
 				res.add(b);
@@ -171,7 +178,7 @@ public final class Binding<T> extends Injectee<T>
 			}
 		}
 		if (!required.isEmpty())
-			throw new UnresolvableDependency.NoCaseForDependency(required,
+			throw new UnresolvableDependency.NoResourceForDependency(required,
 					dropped);
 		return arrayOf(res, Binding.class);
 	}

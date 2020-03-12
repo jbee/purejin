@@ -11,8 +11,7 @@ import org.junit.Test;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.config.Globals;
-import se.jbee.inject.config.Options;
+import se.jbee.inject.config.Env;
 import se.jbee.inject.container.Initialiser;
 
 /**
@@ -136,10 +135,9 @@ public class TestInitialiserBinds {
 
 	@Test
 	public void initialisersCanMakeUseOfParammetersUsingArgumentedModules() {
-		Globals globals = Globals.STANDARD.with(
-				Options.NONE.set(Integer.class, 42)); // setup some parameter
+		Env env = Bootstrap.ENV.with(Integer.class, 42); // setup some parameter
 		Injector injector = Bootstrap.injector(
-				TestInitialiserBindsModuleWith.class, globals);
+				TestInitialiserBindsModuleWith.class, env);
 
 		// double check
 		Initialiser<Injector> initialiser = injector.resolve(

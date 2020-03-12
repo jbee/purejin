@@ -7,11 +7,11 @@ import org.junit.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.bootstrap.Bundle;
-import se.jbee.inject.bootstrap.ChoiceBootstrapperBundle;
-import se.jbee.inject.bootstrap.Module;
+import se.jbee.inject.bootstrap.ToggledBootstrapperBundle;
 import se.jbee.inject.config.Choices;
-import se.jbee.inject.config.Globals;
+import se.jbee.inject.config.Env;
+import se.jbee.inject.declare.Bundle;
+import se.jbee.inject.declare.Module;
 
 /**
  * The test demonstrates how to use {@link Choices} to allow different
@@ -51,7 +51,7 @@ public class TestChoicesBinds {
 	 * <code>null</code>.
 	 */
 	private static class MachineBundle
-			extends ChoiceBootstrapperBundle<Machine> {
+			extends ToggledBootstrapperBundle<Machine> {
 
 		@Override
 		protected void bootstrap() {
@@ -101,9 +101,8 @@ public class TestChoicesBinds {
 
 	private static void assertChoiceResolvedToValue(Machine actualChoice,
 			String expected) {
-		Choices choices = Choices.NONE.choose(actualChoice);
-		Injector injector = Bootstrap.injector(ModularBindsBundle.class,
-				Globals.STANDARD.with(choices));
+		Env env = Bootstrap.ENV.withToggled(Machine.class, actualChoice);
+		Injector injector = Bootstrap.injector(ModularBindsBundle.class, env);
 		assertArrayEquals(new String[] { expected },
 				injector.resolve(String[].class));
 	}

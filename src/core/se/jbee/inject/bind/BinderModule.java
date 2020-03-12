@@ -7,8 +7,9 @@ package se.jbee.inject.bind;
 
 import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrapper;
-import se.jbee.inject.bootstrap.Bundle;
-import se.jbee.inject.bootstrap.Module;
+import se.jbee.inject.config.Env;
+import se.jbee.inject.declare.Bundle;
+import se.jbee.inject.declare.Module;
 
 /**
  * The default utility {@link Module} almost always used.
@@ -44,13 +45,17 @@ public abstract class BinderModule extends InitializedBinder
 	}
 
 	@Override
-	public final void declare(Bindings bindings) {
-		__init__(configure(bindings));
+	public void declare(Bindings bindings, Env env) {
+		__init__(configure(env), bindings);
 		declare();
 	}
 
-	protected Bindings configure(Bindings bindings) {
-		return bindings;
+	protected Env configure(Env env) {
+		return env;
+	}
+
+	protected final <P> P env(Class<P> property) {
+		return env().property(property, bind().source.pkg());
 	}
 
 	@Override

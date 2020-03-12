@@ -7,9 +7,8 @@ import org.junit.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.bootstrap.ChoiceBootstrapperBundle;
-import se.jbee.inject.config.Choices;
-import se.jbee.inject.config.Globals;
+import se.jbee.inject.bootstrap.ToggledBootstrapperBundle;
+import se.jbee.inject.config.Env;
 
 public class TestMultipleChoicesBinds {
 
@@ -57,7 +56,7 @@ public class TestMultipleChoicesBinds {
 		}
 	}
 
-	private static class ChoicesBundle extends ChoiceBootstrapperBundle<Text> {
+	private static class ToggledBundle extends ToggledBootstrapperBundle<Text> {
 
 		@Override
 		protected void bootstrap() {
@@ -73,15 +72,14 @@ public class TestMultipleChoicesBinds {
 
 		@Override
 		protected void bootstrap() {
-			install(ChoicesBundle.class, Text.class);
+			install(ToggledBundle.class, Text.class);
 		}
 	}
 
 	@Test
 	public void thatMultipleChoicesArePossible() {
-		Choices choices = Choices.NONE.chooseMultiple(Text.A, Text.D);
-		Globals globals = Globals.STANDARD.with(choices);
-		Injector injector = Bootstrap.injector(RootBundle.class, globals);
+		Env env = Bootstrap.ENV.withToggled(Text.class, Text.A, Text.D);
+		Injector injector = Bootstrap.injector(RootBundle.class, env);
 		assertEqualSets(new String[] { "A", "D" },
 				injector.resolve(String[].class));
 	}

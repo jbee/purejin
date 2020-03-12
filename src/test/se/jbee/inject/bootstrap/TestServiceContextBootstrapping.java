@@ -6,6 +6,8 @@ import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
+import se.jbee.inject.declare.Bundle;
+import se.jbee.inject.declare.Module;
 
 /**
  * This test demonstrates how the {@link java.util.ServiceLoader} concept is
