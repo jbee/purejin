@@ -3,11 +3,10 @@
  *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject.bootstrap;
+package se.jbee.inject.declare;
 
-import se.jbee.inject.bootstrap.Bootstrapper.ToggledBootstrapper;
-import se.jbee.inject.config.Env;
-import se.jbee.inject.declare.Bundle;
+import se.jbee.inject.Env;
+import se.jbee.inject.declare.Bootstrapper.Toggler;
 
 /**
  * A {@link Bundle} that does installs {@link Bundle}s in connected to a feature
@@ -18,7 +17,7 @@ import se.jbee.inject.declare.Bundle;
  * @author Jan Bernitt (jan@jbee.se)
  */
 @FunctionalInterface
-public interface ToggledBundles<C> {
+public interface Toggled<F> {
 
 	//TODO look into doing this as some sort of Bundle extension that is transparent for the Bootstrapper
 	// that also uses the environment to see if the bundle should be installed
@@ -26,8 +25,8 @@ public interface ToggledBundles<C> {
 	// This should also mean that Edition could be implemented "on top"
 
 	/**
-	 * @param bootstrapper the {@link ToggledBootstrapper} this bundle should
+	 * @param bootstrapper the {@link Toggler} this bundle should
 	 *            install itself in.
 	 */
-	void bootstrap(ToggledBootstrapper<C> bootstrapper);
+	void bootstrap(Toggler<F> bootstrapper);
 }

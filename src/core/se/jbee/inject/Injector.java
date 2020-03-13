@@ -18,8 +18,6 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
-import se.jbee.inject.config.Env;
-
 /**
  * Knows how to *resolve* an instance for a given {@link Dependency}.
  *

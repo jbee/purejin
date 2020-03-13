@@ -12,21 +12,23 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import se.jbee.inject.Dependency;
+import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
+import se.jbee.inject.Name;
 import se.jbee.inject.Provider;
 import se.jbee.inject.Scope;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Bootstrapper.ToggledBootstrapper;
-import se.jbee.inject.bootstrap.ToggledBundles;
 import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.config.Plugins;
+import se.jbee.inject.declare.Bootstrapper.Toggler;
 import se.jbee.inject.declare.Bundle;
+import se.jbee.inject.declare.Toggled;
 
 /**
  * Installs all the build-in functionality by using the core API.
  */
-public enum BuildinBundle implements ToggledBundles<BuildinBundle> {
+public enum Adapter implements Toggled<Adapter> {
 	/**
 	 * Adds: {@link Provider}s can be injected for all bound types.
 	 */
@@ -57,10 +59,15 @@ public enum BuildinBundle implements ToggledBundles<BuildinBundle> {
 	/**
 	 * Adds: Support for {@link Injector} sub-contexts.
 	 */
-	SUB_CONTEXT;
+	SUB_CONTEXT,
+	/**
+	 * Adds: Binds the bootstrapping {@link Env} as the {@link Name#DEFAULT}
+	 * {@link Env} in the {@link Injector} context.
+	 */
+	ENV;
 
 	@Override
-	public void bootstrap(ToggledBootstrapper<BuildinBundle> bootstrapper) {
+	public void bootstrap(Toggler<Adapter> bootstrapper) {
 		bootstrapper.install(ListBridgeModule.class, LIST);
 		bootstrapper.install(SetBridgeModule.class, SET);
 		bootstrapper.install(CollectionBridgeModule.class, COLLECTION);
@@ -68,6 +75,7 @@ public enum BuildinBundle implements ToggledBundles<BuildinBundle> {
 		bootstrapper.install(LoggerModule.class, LOGGER);
 		bootstrapper.install(OptionalBridgeModule.class, OPTIONAL);
 		bootstrapper.install(SubContextModule.class, SUB_CONTEXT);
+		bootstrapper.install(DefaultEnvModule.class, ENV);
 	}
 
 	private static class LoggerModule extends BinderModule {
@@ -152,6 +160,15 @@ public enum BuildinBundle implements ToggledBundles<BuildinBundle> {
 					dep.instance.name.toString());
 			//TODO eventually forward the env here? get from context...
 			return Bootstrap.injector(bundles);
+		}
+
+	}
+
+	private static final class DefaultEnvModule extends BinderModule {
+
+		@Override
+		protected void declare() {
+			asDefault().bind(Env.class).to(env());
 		}
 
 	}

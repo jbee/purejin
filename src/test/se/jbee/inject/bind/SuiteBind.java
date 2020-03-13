@@ -9,7 +9,7 @@ import org.junit.runners.Suite.SuiteClasses;
 		TestMultibindBinds.class, TestConstantBinds.class,
 		TestSupplierBinds.class, TestInstanceBinds.class,
 		TestPackageLocalisedBinds.class, TestEditionFeatureBinds.class,
-		TestChoicesBinds.class, TestTargetedBinds.class, TestLoggerBinds.class,
+		TestToggledBinds.class, TestTargetedBinds.class, TestLoggerBinds.class,
 		TestRobotLegsProblemBinds.class, TestConstructorParameterBinds.class,
 		TestDependencyParameterBinds.class, TestScopedBinds.class,
 		TestResolveResourceBinds.class, TestProviderBinds.class,
@@ -32,7 +32,7 @@ import org.junit.runners.Suite.SuiteClasses;
 		TestYieldListeners.class, TestCustomAnnotationBinds.class,
 		TestArrayBinds.class, TestIndirectBinds.class,
 		TestInstallInSubContextBinds.class, TestDefaultMacroBinds.class,
-		TestInjectorDecorationBinds.class, TestBootstrapperModule.class })
+		TestInjectorDecorationBinds.class })
 public class SuiteBind {
 	// all tests in the bind package
 }

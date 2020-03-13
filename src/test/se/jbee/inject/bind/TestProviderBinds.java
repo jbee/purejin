@@ -64,7 +64,7 @@ public class TestProviderBinds {
 
 		@Override
 		protected void bootstrap() {
-			installAll(BuildinBundle.class);
+			installAll(Adapter.class);
 			install(ProviderBindsModule.class);
 		}
 

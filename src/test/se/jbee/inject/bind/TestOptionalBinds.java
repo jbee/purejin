@@ -34,7 +34,7 @@ public class TestOptionalBinds {
 		@Override
 		protected void bootstrap() {
 			install(TestOptionalBindsModule.class);
-			install(BuildinBundle.OPTIONAL);
+			install(Adapter.OPTIONAL);
 		}
 
 	}

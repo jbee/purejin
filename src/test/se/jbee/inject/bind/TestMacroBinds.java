@@ -17,6 +17,7 @@ import org.junit.Test;
 
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Dependency;
+import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Locator;
@@ -30,7 +31,6 @@ import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Macros;
 import se.jbee.inject.bootstrap.New;
 import se.jbee.inject.bootstrap.Supply;
-import se.jbee.inject.config.Env;
 import se.jbee.inject.container.Supplier;
 import se.jbee.inject.declare.Bundle;
 import se.jbee.inject.declare.Macro;
@@ -121,7 +121,7 @@ public class TestMacroBinds {
 
 	private static Injector injectorWithMacro(Class<? extends Bundle> root,
 			Macro<?> macro) {
-		return Bootstrap.injector(root, Bootstrap.ENV.withMacro(macro));
+		return Bootstrap.injector(Bootstrap.ENV.withMacro(macro), root);
 	}
 
 	/**

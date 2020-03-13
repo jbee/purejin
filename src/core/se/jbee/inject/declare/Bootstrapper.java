@@ -3,11 +3,9 @@
  *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject.bootstrap;
+package se.jbee.inject.declare;
 
-import se.jbee.inject.config.Env;
-import se.jbee.inject.declare.Bundle;
-import se.jbee.inject.declare.Module;
+import se.jbee.inject.Env;
 
 /**
  * The basic idea is to split the binding process into 2 steps: installing
@@ -40,8 +38,9 @@ public interface Bootstrapper {
 	 * complects the overridden and the overriding {@linkplain Bundle} with each
 	 * other and requires to considerer both in a complected form.
 	 * 
-	 * To allow predictability uninstalling is a final decision. Further calls
-	 * that install the very same {@link Bundle} will not re-install it!
+	 * To allow predictability {@link #uninstall(Class)}ing is a final decision.
+	 * Further calls that {@link #install(Class)} for the very same
+	 * {@link Bundle} will not re-install it.
 	 * 
 	 * There is no need to uninstall a {@link Module} since uninstalling the
 	 * {@linkplain Bundle} that installed the module will effectively uninstall
@@ -63,28 +62,28 @@ public interface Bootstrapper {
 	 * @param flags for the {@link Bundle}s that should be installed.
 	 */
 	@SuppressWarnings("unchecked")
-	<F extends Enum<F> & ToggledBundles<F>> void install(F... flags);
+	<F extends Enum<F> & Toggled<F>> void install(F... flags);
 
 	/**
 	 * @param flags for the {@link Bundle}s that are uninstalled.
 	 */
 	@SuppressWarnings("unchecked")
-	<F extends Enum<F> & ToggledBundles<F>> void uninstall(F... flags);
+	<F extends Enum<F> & Toggled<F>> void uninstall(F... flags);
 
 	/**
 	 * @param bundle the {@link Bundle} to install
 	 * @param flags The {@link Enum} representing all flags possible for the
-	 *            {@link ToggledBundles}
+	 *            {@link Toggled}
 	 */
-	<F extends Enum<F>> void install(Class<? extends ToggledBundles<F>> bundle,
+	<F extends Enum<F>> void install(Class<? extends Toggled<F>> bundle,
 			Class<F> flags);
 
 	/**
-	 * @param <C> The {@link Enum} representing all flags possible for the
-	 *            {@link ToggledBundles}
+	 * @param <F> The {@link Enum} representing all flags possible for the
+	 *            {@link Toggled}
 	 */
 	@FunctionalInterface
-	interface ToggledBootstrapper<C> {
+	interface Toggler<F> {
 
 		/**
 		 * Installs the {@link Bundle} when the given flag is
@@ -94,7 +93,7 @@ public interface Bootstrapper {
 		 * If the flag isn't toggled the this call has no effect. No
 		 * installation occurs.
 		 */
-		void install(Class<? extends Bundle> bundle, C flag);
+		void install(Class<? extends Bundle> bundle, F flag);
 
 	}
 

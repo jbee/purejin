@@ -25,6 +25,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 import se.jbee.inject.DeclarationType;
+import se.jbee.inject.Env;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Locator;
 import se.jbee.inject.Name;
@@ -32,7 +33,6 @@ import se.jbee.inject.Parameter;
 import se.jbee.inject.Source;
 import se.jbee.inject.Type;
 import se.jbee.inject.config.ConstructsBy;
-import se.jbee.inject.config.Env;
 import se.jbee.inject.container.Supplier;
 import se.jbee.inject.declare.Macro;
 

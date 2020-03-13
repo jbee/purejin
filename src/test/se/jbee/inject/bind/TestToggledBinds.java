@@ -4,33 +4,32 @@ import static org.junit.Assert.assertArrayEquals;
 
 import org.junit.Test;
 
+import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.bootstrap.ToggledBootstrapperBundle;
-import se.jbee.inject.config.Choices;
-import se.jbee.inject.config.Env;
+import se.jbee.inject.bootstrap.TogglerBundle;
 import se.jbee.inject.declare.Bundle;
 import se.jbee.inject.declare.Module;
+import se.jbee.inject.declare.Toggled;
 
 /**
- * The test demonstrates how to use {@link Choices} to allow different
- * bootstrapping depended on a setting that can be determined before the
- * bootstrapping and that is constant from that moment on. In this example it is
- * the machine the application is running on.
+ * The test demonstrates how to use {@link Toggled} and the
+ * {@link TogglerBundle} to allow different bootstrapping depended on a toggle
+ * property set in the {@link Env}.
  *
- * Again this technique should avoid if-statements in the {@link Bundle}s and
+ * This technique should avoid if-statements in the {@link Bundle}s and
  * {@link Module}s itself to get manageable and predictable sets of
  * configurations that can be composed easily using arguments to the
  * bootstrapping process itself.
  *
  * In this example we use {@link Binder#multibind(Class)}s to show that just one
  * of them has been bootstrapped depending on the value we defined in the
- * {@link Choices} before bootstrapping.
+ * toggled property before bootstrapping.
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public class TestChoicesBinds {
+public class TestToggledBinds {
 
 	private enum Machine {
 		LOCALHOST, WORKER_1
@@ -47,11 +46,10 @@ public class TestChoicesBinds {
 
 	/**
 	 * The {@link GenericMachineBundle} will be used when no {@link Machine}
-	 * value has been defined in the {@link Choices} so that it is actually
+	 * value has been defined in the {@link Env} so that it is actually
 	 * <code>null</code>.
 	 */
-	private static class MachineBundle
-			extends ToggledBootstrapperBundle<Machine> {
+	private static class MachineBundle extends TogglerBundle<Machine> {
 
 		@Override
 		protected void bootstrap() {
@@ -102,7 +100,7 @@ public class TestChoicesBinds {
 	private static void assertChoiceResolvedToValue(Machine actualChoice,
 			String expected) {
 		Env env = Bootstrap.ENV.withToggled(Machine.class, actualChoice);
-		Injector injector = Bootstrap.injector(ModularBindsBundle.class, env);
+		Injector injector = Bootstrap.injector(env, ModularBindsBundle.class);
 		assertArrayEquals(new String[] { expected },
 				injector.resolve(String[].class));
 	}

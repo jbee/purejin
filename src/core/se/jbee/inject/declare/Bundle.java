@@ -5,8 +5,6 @@
  */
 package se.jbee.inject.declare;
 
-import se.jbee.inject.bootstrap.Bootstrapper;
-
 /**
  * A bundle installs sub-bundles and {@link Module}s.
  * 

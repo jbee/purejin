@@ -34,7 +34,7 @@ public class TestDependencyParameterBinds {
 
 		@Override
 		protected void bootstrap() {
-			install(BuildinBundle.LOGGER);
+			install(Adapter.LOGGER);
 			install(DependencyParameterBindsModule.class);
 		}
 

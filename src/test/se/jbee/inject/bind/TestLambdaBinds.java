@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Bootstrapper;
+import se.jbee.inject.declare.Bootstrapper;
 import se.jbee.inject.declare.Bundle;
 
 public class TestLambdaBinds {

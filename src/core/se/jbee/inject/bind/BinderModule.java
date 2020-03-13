@@ -5,9 +5,9 @@
  */
 package se.jbee.inject.bind;
 
+import se.jbee.inject.Env;
 import se.jbee.inject.bootstrap.Bindings;
-import se.jbee.inject.bootstrap.Bootstrapper;
-import se.jbee.inject.config.Env;
+import se.jbee.inject.declare.Bootstrapper;
 import se.jbee.inject.declare.Bundle;
 import se.jbee.inject.declare.Module;
 
@@ -35,12 +35,9 @@ public abstract class BinderModule extends InitializedBinder
 
 	@Override
 	public final void bootstrap(Bootstrapper bootstrap) {
+		bootstrap.install(DefaultsBundle.class);
 		if (basis != null)
 			bootstrap.install(basis);
-		bootstrap.install(BuildinBundle.SUB_CONTEXT);
-		bootstrap.install(DefaultScopes.class);
-		bootstrap.install(SPIModule.class);
-		bootstrap.install(AnnotatedWithModule.class);
 		bootstrap.install(this);
 	}
 

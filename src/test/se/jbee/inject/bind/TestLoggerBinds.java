@@ -28,7 +28,7 @@ public class TestLoggerBinds {
 
 		@Override
 		protected void bootstrap() {
-			install(BuildinBundle.LOGGER);
+			install(Adapter.LOGGER);
 			install(LoggerBindsModule.class);
 		}
 

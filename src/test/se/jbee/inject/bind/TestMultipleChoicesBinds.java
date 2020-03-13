@@ -4,11 +4,11 @@ import static se.jbee.inject.bind.AssertInjects.assertEqualSets;
 
 import org.junit.Test;
 
+import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.bootstrap.ToggledBootstrapperBundle;
-import se.jbee.inject.config.Env;
+import se.jbee.inject.bootstrap.TogglerBundle;
 
 public class TestMultipleChoicesBinds {
 
@@ -56,7 +56,7 @@ public class TestMultipleChoicesBinds {
 		}
 	}
 
-	private static class ToggledBundle extends ToggledBootstrapperBundle<Text> {
+	private static class ToggledBundle extends TogglerBundle<Text> {
 
 		@Override
 		protected void bootstrap() {
@@ -79,7 +79,7 @@ public class TestMultipleChoicesBinds {
 	@Test
 	public void thatMultipleChoicesArePossible() {
 		Env env = Bootstrap.ENV.withToggled(Text.class, Text.A, Text.D);
-		Injector injector = Bootstrap.injector(RootBundle.class, env);
+		Injector injector = Bootstrap.injector(env, RootBundle.class);
 		assertEqualSets(new String[] { "A", "D" },
 				injector.resolve(String[].class));
 	}

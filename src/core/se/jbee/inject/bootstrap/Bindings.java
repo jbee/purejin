@@ -5,6 +5,7 @@
  */
 package se.jbee.inject.bootstrap;
 
+import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.arrayOf;
 import static se.jbee.inject.Utils.isClassMonomodal;
 
@@ -14,15 +15,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import se.jbee.inject.Env;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Locator;
 import se.jbee.inject.Name;
 import se.jbee.inject.Scope;
 import se.jbee.inject.Source;
 import se.jbee.inject.Type;
-import se.jbee.inject.config.Annotations;
-import se.jbee.inject.config.Env;
-import se.jbee.inject.config.Mirrors;
 import se.jbee.inject.declare.Macro;
 import se.jbee.inject.declare.Module;
 import se.jbee.inject.declare.ModuleWith;
@@ -46,21 +45,6 @@ public final class Bindings {
 		this.list = list;
 	}
 
-	@Deprecated
-	public Bindings with(Mirrors mirrors) {
-		return new Bindings(list);
-	}
-
-	@Deprecated
-	public Bindings with(Macros macros) {
-		return new Bindings(list);
-	}
-
-	@Deprecated
-	public Bindings with(Annotations annotations) {
-		return new Bindings(list);
-	}
-
 	/**
 	 * Add (accumulate) a binding described by the 4-tuple given.
 	 */
@@ -79,7 +63,10 @@ public final class Bindings {
 	public <V> void addExpanded(Env env, Binding<?> binding, V value) {
 		@SuppressWarnings("unchecked")
 		Class<V> type = (Class<V>) value.getClass();
-		Macro<V> macro = env.ifBound(type, binding.source.ident.getPackage());
+		@SuppressWarnings("unchecked")
+		Macro<V> macro = env.property(
+				raw(Macro.class).parametized(Type.classType(type)),
+				binding.source.ident.getPackage());
 		if (macro == null)
 			throw InconsistentBinding.undefinedMacroType(binding, type);
 		macro.expand(env, value, binding, this);
@@ -92,7 +79,10 @@ public final class Bindings {
 			throw InconsistentBinding.noTypeAnnotation(annotated);
 		int n = 0;
 		for (Annotation a : as) {
-			ModuleWith<Class<?>> then = env.annotationProperty(a.annotationType(),
+			@SuppressWarnings("unchecked")
+			ModuleWith<Class<?>> then = env.property(
+					Name.named(a.annotationType()),
+					raw(ModuleWith.class).parametized(Type.CLASS),
 					annotated.getPackage());
 			//TODO add a meta annotation to mark annotation that are expected to be defined
 			// if such an annotation is present but no effect defined it is an binding error

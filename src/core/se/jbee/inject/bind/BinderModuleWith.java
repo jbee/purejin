@@ -5,11 +5,12 @@
  */
 package se.jbee.inject.bind;
 
+import java.lang.annotation.Annotation;
+
+import se.jbee.inject.Env;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Bindings;
-import se.jbee.inject.bootstrap.Bootstrapper;
-import se.jbee.inject.config.Env;
-import se.jbee.inject.config.Options;
+import se.jbee.inject.declare.Bootstrapper;
 import se.jbee.inject.declare.Bundle;
 import se.jbee.inject.declare.ModuleWith;
 
@@ -23,21 +24,18 @@ import se.jbee.inject.declare.ModuleWith;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public abstract class BinderModuleWith<T> extends InitializedBinder
-		implements Bundle, ModuleWith<T> { //TODO can this extends BinderModule?
+		implements Bundle, ModuleWith<T> {
 
 	@Override
 	public final void bootstrap(Bootstrapper bootstrap) {
-		bootstrap.install(BuildinBundle.SUB_CONTEXT);
-		bootstrap.install(DefaultScopes.class);
-		bootstrap.install(SPIModule.class);
-		bootstrap.install(AnnotatedWithModule.class);
+		bootstrap.install(DefaultsBundle.class);
 		bootstrap.install(this);
 	}
 
 	@Override
-	public void declare(Bindings bindings, Env env, T option) {
+	public void declare(Bindings bindings, Env env, T property) {
 		__init__(configure(env), bindings);
-		declare(option);
+		declare(property);
 	}
 
 	protected Env configure(Env env) {
@@ -52,9 +50,11 @@ public abstract class BinderModuleWith<T> extends InitializedBinder
 	}
 
 	/**
-	 * @see ModuleWith#declare(Bindings, Object)
-	 * @param preset The value contained in the {@link Options} for the type of
-	 *            this {@link ModuleWith}.
+	 * @see ModuleWith#declare(Bindings, Env, Object)
+	 * 
+	 * @param property The value contained from the {@link Env} by type or the
+	 *            annotated {@link Class} in case this {@link ModuleWith}
+	 *            defines the effects of a custom {@link Annotation}.
 	 */
-	protected abstract void declare(T preset);
+	protected abstract void declare(T property);
 }

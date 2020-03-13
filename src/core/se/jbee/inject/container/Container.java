@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import se.jbee.inject.Dependency;
+import se.jbee.inject.Env;
 import se.jbee.inject.Generator;
 import se.jbee.inject.InconsistentDeclaration;
 import se.jbee.inject.Injector;
@@ -43,7 +44,6 @@ import se.jbee.inject.Scoping;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
-import se.jbee.inject.config.Env;
 
 /**
  * The {@link Container} is not a single type or entity but the composition of

@@ -7,12 +7,12 @@ package se.jbee.inject.declare;
 
 import java.lang.reflect.Constructor;
 
+import se.jbee.inject.Env;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Locator;
 import se.jbee.inject.bootstrap.Binding;
 import se.jbee.inject.bootstrap.BindingType;
 import se.jbee.inject.bootstrap.Bindings;
-import se.jbee.inject.config.Env;
 import se.jbee.inject.container.Supplier;
 
 /**

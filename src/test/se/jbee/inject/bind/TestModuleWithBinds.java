@@ -11,20 +11,19 @@ import java.util.Properties;
 
 import org.junit.Test;
 
+import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.config.Env;
-import se.jbee.inject.config.Options;
-import se.jbee.inject.declare.ModuleWith;
+import se.jbee.inject.config.Environment;
 
 /**
- * This test demonstrates how to use {@link Options} to pass input data to the
- * {@link Bootstrap} that can be accessed in any {@link ModuleWith} class. The
- * value passed into {@link BinderModuleWith#declare(Object)} is determined by
- * the type of the generic. This has to be the same {@link Type} as the one used
- * when declaring the value via {@link Options#set(Class, Object)}.
+ * This test demonstrates how to set properties in the {@link Env} using the
+ * {@link Environment} utility. The value passed into
+ * {@link BinderModuleWith#declare(Object)} is determined by the type of the
+ * generic. This has to be the same {@link Type} as the one used when declaring
+ * the value using {@link Environment#with(Type, Object)}.
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
@@ -38,15 +37,15 @@ public class TestModuleWithBinds {
 			install(TestModuleWithBindsModule2.class);
 			install(TestModuleWithBindsModule3.class);
 		}
-
 	}
 
 	private static class TestModuleWithBindsModule1
 			extends BinderModuleWith<Properties> {
 
 		@Override
-		protected void declare(Properties preset) {
-			bind(named("foo"), String.class).to(preset.getProperty("foo.text"));
+		protected void declare(Properties property) {
+			bind(named("foo"), String.class).to(
+					property.getProperty("foo.text"));
 		}
 	}
 
@@ -54,8 +53,8 @@ public class TestModuleWithBinds {
 			extends BinderModuleWith<List<String>> {
 
 		@Override
-		protected void declare(List<String> preset) {
-			bind(named("list"), String.class).to(preset.get(1));
+		protected void declare(List<String> property) {
+			bind(named("list"), String.class).to(property.get(1));
 		}
 
 	}
@@ -64,8 +63,8 @@ public class TestModuleWithBinds {
 			extends BinderModuleWith<List<Integer>> {
 
 		@Override
-		protected void declare(List<Integer> preset) {
-			bind(named("list"), Integer.class).to(preset.get(1));
+		protected void declare(List<Integer> property) {
+			bind(named("list"), Integer.class).to(property.get(1));
 		}
 
 	}
@@ -74,8 +73,8 @@ public class TestModuleWithBinds {
 			extends BinderModuleWith<Env> {
 
 		@Override
-		protected void declare(Env preset) {
-			assertNotNull(preset);
+		protected void declare(Env property) {
+			assertNotNull(property);
 		}
 
 	}
@@ -87,7 +86,7 @@ public class TestModuleWithBinds {
 				.with(Properties.class, exampleProperties()) //
 				.with(listTypeOf(String.class), asList("a", "b")) //
 				.with(listTypeOf(Integer.class), asList(1, 2));
-		return Bootstrap.injector(TestModuleWithBindsBundle.class, env);
+		return Bootstrap.injector(env, TestModuleWithBindsBundle.class);
 	}
 
 	private static Properties exampleProperties() {

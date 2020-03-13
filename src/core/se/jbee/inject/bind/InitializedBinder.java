@@ -5,10 +5,10 @@
  */
 package se.jbee.inject.bind;
 
+import se.jbee.inject.Env;
 import se.jbee.inject.bind.Binder.RootBinder;
 import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.config.Env;
 
 /**
  * A {@link RootBinder} that can be initialized using the

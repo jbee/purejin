@@ -15,24 +15,23 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.Set;
 
+import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Utils;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.config.Edition;
-import se.jbee.inject.config.Env;
 import se.jbee.inject.config.Environment;
-import se.jbee.inject.config.Globals;
 import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.config.NamesBy;
 import se.jbee.inject.config.ProducesBy;
 import se.jbee.inject.config.ScopesBy;
 import se.jbee.inject.container.Container;
-import se.jbee.inject.container.Lazy;
+import se.jbee.inject.declare.Bootstrapper;
 import se.jbee.inject.declare.Bundle;
 import se.jbee.inject.declare.Module;
+import se.jbee.inject.declare.Toggled;
 
 /**
  * Utility to create an {@link Injector} context from {@link Bundle}s and
@@ -58,80 +57,30 @@ public final class Bootstrap {
 			.with(HintsBy.class, HintsBy.noParameters) //
 			.readonly();
 
-	private static final Lazy<Injector> APPLICATION_CONTEXT = new Lazy<>();
-
-	/**
-	 * The <em>Application Context</em> is a implicitly defined {@link Injector}
-	 * context usually used by applications assembled from multiple software
-	 * modules.
-	 * 
-	 * Instead of passing a single root {@link Bundle} to the bootstrapping one
-	 * or more root {@link Bundle}s are defined as services for the
-	 * {@link ServiceLoader} in the
-	 * <code>META-INF/services/se.jbee.inject.bootstrap.Bundle</code> files or
-	 * jar or war files. As usual such a file contains only the fully qualified
-	 * class name of the root bundle for the software module the jar represents.
-	 * As an application can consist of multiple software modules there can be
-	 * multiple root bundles. The application root bundle can be seen as a
-	 * virtual bundle installing all the bundles referenced by
-	 * {@link ServiceLoader}.
-	 * 
-	 * Instead of passing configuration like {@link Globals} to this method
-	 * these can be configured by implementing the
-	 * {@link ApplicationContextConfig} interface and declaring it as a service
-	 * in
-	 * <code>META-INF/services/se.jbee.inject.bootstrap.ApplicationContextConfig</code>
-	 * of one of the application jars so it can be loaded via
-	 * {@link ServiceLoader}. This allows application specific configuration of
-	 * the bootstrapped application context.
-	 * 
-	 * Once created the {@link Injector} instance is cached so further calls to
-	 * this method always return the same instance.
-	 * 
-	 * @since 19.1
-	 * 
-	 * @return the {@link Injector} instance derived from one or more roots
-	 *         defined using the {@link ServiceLoader} mechanism
-	 */
-	public static Injector getApplicationContext() {
-		return APPLICATION_CONTEXT.get(Bootstrap::loadApplicationContext);
-	}
-
-	@SuppressWarnings("unchecked")
-	private static Injector loadApplicationContext() {
-		Set<Class<? extends Bundle>> roots = new LinkedHashSet<>();
-		for (Bundle root : ServiceLoader.load(Bundle.class))
-			roots.add(root.getClass());
-		if (roots.isEmpty())
-			throw InconsistentBinding.noRootBundle();
-		Env env = null; //FIXME
-		return injector(Bindings.newBindings(), env,
-				roots.toArray(new Class[0]));
-	}
-
+	@Deprecated
 	@SafeVarargs
 	public static Injector injector(Class<? extends Bundle>... roots) {
 		return injector(Bindings.newBindings(), ENV, roots);
 	}
 
+	@Deprecated
 	@SafeVarargs
 	public static Injector injector(Bindings bindings, Env env,
 			Class<? extends Bundle>... roots) {
-		BuildinBootstrapper bootstrapper = new BuildinBootstrapper(env);
-		Class<? extends Bundle>[] bundles = bootstrapper.bundleAll(roots);
-		return injector(env, bindings, bootstrapper.modulesOf(bundles));
+		BuildinBootstrapper boots = new BuildinBootstrapper(env);
+		return injector(env, bindings, boots.modulesOf(boots.bundleAll(roots)));
 	}
 
 	public static Injector injector(Class<? extends Bundle> root) {
-		return injector(root, ENV);
+		return injector(ENV, root);
 	}
 
-	public static Injector injector(Class<? extends Bundle> root, Env env) {
-		return injector(root, Bindings.newBindings(), env);
+	public static Injector injector(Env env, Class<? extends Bundle> root) {
+		return injector(env, root, Bindings.newBindings());
 	}
 
-	public static Injector injector(Class<? extends Bundle> root,
-			Bindings bindings, Env env) {
+	public static Injector injector(Env env, Class<? extends Bundle> root,
+			Bindings bindings) {
 		return injector(env, bindings, modulariser(env).modularise(root));
 	}
 
@@ -151,12 +100,8 @@ public final class Bootstrap {
 		return new BuildinBootstrapper(env);
 	}
 
-	public static Binding<?>[] bindings(Class<? extends Bundle> root) {
-		return bindings(root, Bindings.newBindings(), ENV);
-	}
-
-	public static Binding<?>[] bindings(Class<? extends Bundle> root,
-			Bindings bindings, Env env) {
+	public static Binding<?>[] bindings(Env env, Class<? extends Bundle> root,
+			Bindings bindings) {
 		return Binding.disambiguate(bindings//
 				.declaredFrom(env, modulariser(env).modularise(root)));
 	}
@@ -210,8 +155,7 @@ public final class Bootstrap {
 
 		@Override
 		public <F extends Enum<F>> void install(
-				Class<? extends ToggledBundles<F>> bundle,
-				final Class<F> flags) {
+				Class<? extends Toggled<F>> bundle, final Class<F> flags) {
 			if (!edition.featured(bundle))
 				return;
 			Utils.instance(bundle).bootstrap((bundleForFlag, flag) -> {
@@ -224,8 +168,7 @@ public final class Bootstrap {
 
 		@Override
 		@SafeVarargs
-		public final <F extends Enum<F> & ToggledBundles<F>> void install(
-				F... flags) {
+		public final <F extends Enum<F> & Toggled<F>> void install(F... flags) {
 			if (flags.length > 0) {
 				final F flag0 = flags[0];
 				if (!edition.featured(flag0.getClass()))
@@ -234,6 +177,19 @@ public final class Bootstrap {
 				flag0.bootstrap((bundle, flag) -> {
 					if (installing.contains(flag))
 						BuildinBootstrapper.this.install(bundle);
+				});
+			}
+		}
+
+		@Override
+		@SafeVarargs
+		public final <F extends Enum<F> & Toggled<F>> void uninstall(
+				F... flags) {
+			if (flags.length > 0) {
+				final EnumSet<F> uninstalling = EnumSet.of(flags[0], flags);
+				flags[0].bootstrap((bundle, flag) -> {
+					if (uninstalling.contains(flag))
+						uninstall(bundle);
 				});
 			}
 		}
@@ -290,19 +246,6 @@ public final class Bootstrap {
 			for (Set<Class<? extends Bundle>> c : bundleChildren.values())
 				c.remove(bundle);
 			bundleModules.remove(bundle); // we are sure we don't need its modules
-		}
-
-		@Override
-		@SafeVarargs
-		public final <F extends Enum<F> & ToggledBundles<F>> void uninstall(
-				F... flags) {
-			if (flags.length > 0) {
-				final EnumSet<F> uninstalling = EnumSet.of(flags[0], flags);
-				flags[0].bootstrap((bundle, flag) -> {
-					if (uninstalling.contains(flag))
-						uninstall(bundle);
-				});
-			}
 		}
 
 		private void addAllInstalledIn(Class<? extends Bundle> bundle,

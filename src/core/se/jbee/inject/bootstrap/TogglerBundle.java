@@ -6,23 +6,24 @@
 package se.jbee.inject.bootstrap;
 
 import se.jbee.inject.Type;
-import se.jbee.inject.bootstrap.Bootstrapper.ToggledBootstrapper;
 import se.jbee.inject.declare.Bundle;
+import se.jbee.inject.declare.Toggled;
+import se.jbee.inject.declare.Bootstrapper.Toggler;
 
 /**
- * The default utility base class for {@link ToggledBundles}s.
+ * The default utility base class for {@link Toggled}s.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  * 
  * @param O the type of the options values (usually an enum)
  */
-public abstract class ToggledBootstrapperBundle<C>
-		implements ToggledBundles<C>, ToggledBootstrapper<C> {
+public abstract class TogglerBundle<C>
+		implements Toggled<C>, Toggler<C> {
 
-	private ToggledBootstrapper<C> bootstrapper;
+	private Toggler<C> bootstrapper;
 
 	@Override
-	public void bootstrap(ToggledBootstrapper<C> bs) {
+	public void bootstrap(Toggler<C> bs) {
 		Bootstrap.nonnullThrowsReentranceException(bootstrapper);
 		this.bootstrapper = bs;
 		bootstrap();
@@ -35,7 +36,7 @@ public abstract class ToggledBootstrapperBundle<C>
 
 	@Override
 	public String toString() {
-		Type<?> module = Type.supertype(ToggledBundles.class,
+		Type<?> module = Type.supertype(Toggled.class,
 				Type.raw(getClass())).parameter(0);
 		return "bundle " + getClass().getSimpleName() + "[" + module + "]";
 	}

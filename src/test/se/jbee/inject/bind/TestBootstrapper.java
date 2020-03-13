@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Dependency;
+import se.jbee.inject.Env;
 import se.jbee.inject.Generator;
 import se.jbee.inject.InconsistentDeclaration;
 import se.jbee.inject.Injector;
@@ -26,7 +27,6 @@ import se.jbee.inject.UnresolvableDependency.DependencyCycle;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.config.ConstructsBy;
-import se.jbee.inject.config.Env;
 import se.jbee.inject.config.Environment;
 import se.jbee.inject.container.Supplier;
 import se.jbee.inject.declare.Bundle;
@@ -260,7 +260,7 @@ public class TestBootstrapper {
 		assertEquals(6, injector.resolve(Number.class));
 		Resource<?>[] rs = injector.resolve(Resource[].class);
 		//TODO can this be limited to cases with a certain Scope so that container can be excluded?
-		assertEquals(29, rs.length); // 3x Comparable, Float, Double, Integer and Number (3x Serializable has been nullified) + 11 Scope + 2 Annotation
+		assertEquals(30, rs.length); // 3x Comparable, Float, Double, Integer and Number (3x Serializable has been nullified) + 11 Scope + 2 Annotation
 		Resource<Number>[] forNumber = injector.resolve(
 				resourcesTypeFor(Number.class));
 		assertEquals(1, forNumber.length);

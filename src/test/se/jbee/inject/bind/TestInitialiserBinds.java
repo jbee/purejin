@@ -9,9 +9,9 @@ import static se.jbee.inject.container.Cast.initialiserTypeOf;
 
 import org.junit.Test;
 
+import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.config.Env;
 import se.jbee.inject.container.Initialiser;
 
 /**
@@ -137,7 +137,7 @@ public class TestInitialiserBinds {
 	public void initialisersCanMakeUseOfParammetersUsingArgumentedModules() {
 		Env env = Bootstrap.ENV.with(Integer.class, 42); // setup some parameter
 		Injector injector = Bootstrap.injector(
-				TestInitialiserBindsModuleWith.class, env);
+				env, TestInitialiserBindsModuleWith.class);
 
 		// double check
 		Initialiser<Injector> initialiser = injector.resolve(

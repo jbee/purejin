@@ -6,6 +6,7 @@
 package se.jbee.inject.bind;
 
 import se.jbee.inject.DeclarationType;
+import se.jbee.inject.Env;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Locator;
 import se.jbee.inject.Name;
@@ -15,7 +16,6 @@ import se.jbee.inject.Target;
 import se.jbee.inject.bootstrap.Binding;
 import se.jbee.inject.bootstrap.BindingType;
 import se.jbee.inject.bootstrap.Bindings;
-import se.jbee.inject.config.Env;
 import se.jbee.inject.config.ScopesBy;
 import se.jbee.inject.container.Supplier;
 

@@ -15,12 +15,11 @@ import org.junit.Test;
 
 import com.example.app.Support;
 
+import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Scope;
 import se.jbee.inject.UnresolvableDependency.IllegalAcccess;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.config.Env;
-import se.jbee.inject.config.Globals;
 import se.jbee.inject.declare.Bundle;
 import se.jbee.inject.declare.ModuleWith;
 
@@ -80,8 +79,8 @@ public class TestCustomAnnotationBinds {
 
 	/**
 	 * The separate {@link Bundle} definition should just isolate the
-	 * {@link ServiceLoader} depended test from the {@link Globals} setup
-	 * dependent test.
+	 * {@link ServiceLoader} depended test from the programmatic setup dependent
+	 * test.
 	 */
 	static class TestCustomAnnotationBindsModule1 extends BinderModule {
 
@@ -94,8 +93,8 @@ public class TestCustomAnnotationBinds {
 
 	/**
 	 * The separate {@link Bundle} definition should just isolate the
-	 * {@link ServiceLoader} depended test from the {@link Globals} setup
-	 * dependent test.
+	 * {@link ServiceLoader} depended test from the programmatic setup dependent
+	 * test.
 	 */
 	static class TestCustomAnnotationBindsModule2 extends BinderModule {
 
@@ -110,8 +109,8 @@ public class TestCustomAnnotationBinds {
 	public void customAnnotationsAddedProgrammaticallyToGlobals() {
 		Env env = Bootstrap.ENV.withAnnotation(Service.class,
 				new ServiceAnnotation());
-		Injector injector = Bootstrap.injector(
-				TestCustomAnnotationBindsModule1.class, env);
+		Injector injector = Bootstrap.injector(env,
+				TestCustomAnnotationBindsModule1.class);
 		SomeService service = injector.resolve(SomeService.class);
 		assertNotNull(service);
 		assertSame(SomeServiceImpl.class, service.getClass());

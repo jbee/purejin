@@ -23,6 +23,7 @@ import java.lang.reflect.Modifier;
 import java.util.function.BiConsumer;
 
 import se.jbee.inject.Dependency;
+import se.jbee.inject.Env;
 import se.jbee.inject.Generator;
 import se.jbee.inject.InconsistentDeclaration;
 import se.jbee.inject.Injector;
@@ -44,16 +45,14 @@ import se.jbee.inject.bootstrap.Produces;
 import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.config.Config;
 import se.jbee.inject.config.ConstructsBy;
-import se.jbee.inject.config.Env;
+import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.config.Mirrors;
 import se.jbee.inject.config.NamesBy;
-import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.config.ProducesBy;
 import se.jbee.inject.config.ScopesBy;
 import se.jbee.inject.container.Initialiser;
 import se.jbee.inject.container.Supplier;
 import se.jbee.inject.declare.Bundle;
-import se.jbee.inject.declare.Mirror;
 
 /**
  * The default implementation of a fluent binder interface that provides a lot
@@ -353,7 +352,7 @@ public class Binder {
 	}
 
 	/**
-	 * The {@link AutoBinder} makes use of {@link Mirror}s to select and bind
+	 * The {@link AutoBinder} makes use of mirrors to select and bind
 	 * constructors for beans and methods as factories and {@link Name} these
 	 * instances as well as provide {@link Parameter} hints.
 	 * 
@@ -381,8 +380,8 @@ public class Binder {
 		}
 
 		private AutoBinder(ScopedBinder binder, ConstructsBy constructsBy,
-				ProducesBy producesBy, NamesBy namesBy,
-				ScopesBy scopesBy, HintsBy hintsBy) {
+				ProducesBy producesBy, NamesBy namesBy, ScopesBy scopesBy,
+				HintsBy hintsBy) {
 			this.binder = binder;
 			this.constructsBy = constructsBy;
 			this.producesBy = producesBy;

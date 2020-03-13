@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import se.jbee.inject.DeclarationType;
+import se.jbee.inject.Env;
 import se.jbee.inject.Locator;
 import se.jbee.inject.Name;
 import se.jbee.inject.Qualifying;
@@ -21,7 +22,6 @@ import se.jbee.inject.Source;
 import se.jbee.inject.Type;
 import se.jbee.inject.Typed;
 import se.jbee.inject.UnresolvableDependency;
-import se.jbee.inject.config.Env;
 import se.jbee.inject.container.Injectee;
 import se.jbee.inject.container.Supplier;
 import se.jbee.inject.declare.Bundle;

@@ -8,6 +8,7 @@ import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import se.jbee.inject.Env;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Type;

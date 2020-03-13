@@ -41,7 +41,7 @@ public class TestCollectionBinds {
 
 		@Override
 		protected void bootstrap() {
-			installAll(BuildinBundle.class);
+			installAll(Adapter.class);
 			install(CollectionBindsModule.class);
 		}
 
@@ -52,7 +52,7 @@ public class TestCollectionBinds {
 
 		@Override
 		protected void bootstrap() {
-			install(BuildinBundle.LIST, BuildinBundle.COLLECTION);
+			install(Adapter.LIST, Adapter.COLLECTION);
 			install(CollectionBindsModule.class);
 		}
 

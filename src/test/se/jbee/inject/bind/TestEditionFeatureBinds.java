@@ -10,16 +10,16 @@ import java.lang.annotation.Target;
 
 import org.junit.Test;
 
+import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Bootstrapper.ToggledBootstrapper;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.bootstrap.ToggledBundles;
 import se.jbee.inject.config.Edition;
-import se.jbee.inject.config.Env;
 import se.jbee.inject.config.Feature;
 import se.jbee.inject.declare.Bundle;
 import se.jbee.inject.declare.Module;
+import se.jbee.inject.declare.Toggled;
+import se.jbee.inject.declare.Bootstrapper.Toggler;
 
 /**
  * A test that demonstrates how to use {@link Feature}s and {@link Edition}s to
@@ -92,12 +92,12 @@ public class TestEditionFeatureBinds {
 
 	@Featured(AnnotatedFeature.BAZ)
 	private enum FeaturedOptionBundle
-			implements ToggledBundles<FeaturedOptionBundle> {
+			implements Toggled<FeaturedOptionBundle> {
 		QUX;
 
 		@Override
 		public void bootstrap(
-				ToggledBootstrapper<FeaturedOptionBundle> bootstrapper) {
+				Toggler<FeaturedOptionBundle> bootstrapper) {
 			bootstrapper.install(AnotherModule.class, QUX);
 		}
 
@@ -137,7 +137,7 @@ public class TestEditionFeatureBinds {
 	private static void assertEditionInstalls(Edition edition,
 			Integer... expected) {
 		Env env = Bootstrap.ENV.with(Edition.class, edition);
-		Injector injector = Bootstrap.injector(RootBundle.class, env);
+		Injector injector = Bootstrap.injector(env, RootBundle.class);
 		assertEqualSets(expected, injector.resolve(Integer[].class));
 	}
 

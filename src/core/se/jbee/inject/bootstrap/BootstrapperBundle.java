@@ -5,8 +5,10 @@
  */
 package se.jbee.inject.bootstrap;
 
+import se.jbee.inject.declare.Bootstrapper;
 import se.jbee.inject.declare.Bundle;
 import se.jbee.inject.declare.Module;
+import se.jbee.inject.declare.Toggled;
 
 /**
  * The default utility {@link Bundle} that is a {@link Bootstrapper} as well so
@@ -42,30 +44,28 @@ public abstract class BootstrapperBundle implements Bundle, Bootstrapper {
 
 	@Override
 	@SafeVarargs
-	public final <M extends Enum<M> & ToggledBundles<M>> void install(
-			M... modules) {
+	public final <M extends Enum<M> & Toggled<M>> void install(M... modules) {
 		bootstrap.install(modules);
 	}
 
 	@Override
 	public final <C extends Enum<C>> void install(
-			Class<? extends ToggledBundles<C>> bundle, Class<C> property) {
+			Class<? extends Toggled<C>> bundle, Class<C> property) {
 		bootstrap.install(bundle, property);
 	}
 
 	@Override
 	@SafeVarargs
-	public final <O extends Enum<O> & ToggledBundles<O>> void uninstall(
-			O... flags) {
+	public final <O extends Enum<O> & Toggled<O>> void uninstall(O... flags) {
 		bootstrap.uninstall(flags);
 	}
 
-	protected final <O extends Enum<O> & ToggledBundles<O>> void installAll(
+	protected final <O extends Enum<O> & Toggled<O>> void installAll(
 			Class<O> optionsOfType) {
 		install(optionsOfType.getEnumConstants());
 	}
 
-	protected final <O extends Enum<O> & ToggledBundles<O>> void uninstallAll(
+	protected final <O extends Enum<O> & Toggled<O>> void uninstallAll(
 			Class<O> optionsOfType) {
 		uninstall(optionsOfType.getEnumConstants());
 	}

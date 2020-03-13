@@ -8,13 +8,13 @@ import static se.jbee.inject.Packages.subPackagesOf;
 
 import org.junit.Test;
 
+import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Packages;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.config.Edition;
-import se.jbee.inject.config.Env;
 import se.jbee.inject.declare.Bundle;
 
 /**
@@ -55,7 +55,7 @@ public class TestEditionPackageBinds {
 		// an edition without the module in this test
 		Env env = Bootstrap.ENV.with(Edition.class,
 				Edition.includes(subPackagesOf(TestEditionPackageBinds.class)));
-		injector = Bootstrap.injector(EditionPackageBindsBundle.class, env);
+		injector = Bootstrap.injector(env, EditionPackageBindsBundle.class);
 		try {
 			Integer res = injector.resolve(int.class);
 			assertNull(res);
@@ -67,7 +67,7 @@ public class TestEditionPackageBinds {
 		// an edition including the module in this test
 		env = Bootstrap.ENV.with(Edition.class, Edition.includes(
 				packageAndSubPackagesOf(TestEditionPackageBinds.class)));
-		injector = Bootstrap.injector(EditionPackageBindsBundle.class, env);
+		injector = Bootstrap.injector(env, EditionPackageBindsBundle.class);
 		assertEquals(42, injector.resolve(int.class).intValue());
 	}
 }

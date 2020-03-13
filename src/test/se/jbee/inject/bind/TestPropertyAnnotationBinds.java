@@ -19,6 +19,7 @@ import java.util.Properties;
 import org.junit.Test;
 
 import se.jbee.inject.Dependency;
+import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
@@ -26,7 +27,6 @@ import se.jbee.inject.Parameter;
 import se.jbee.inject.Scope;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.config.Env;
 import se.jbee.inject.config.Environment;
 import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.container.Supplier;
@@ -125,7 +125,7 @@ public class TestPropertyAnnotationBinds {
 		properties.put("bar", "property2");
 		Env env = Bootstrap.ENV.with(Properties.class, properties);
 		Injector injector = Bootstrap.injector(
-				TestPropertyAnnotationBindsModule.class, env);
+				env, TestPropertyAnnotationBindsModule.class);
 		ExampleBean bean = injector.resolve(ExampleBean.class);
 		assertEquals("property1", bean.property1);
 		assertEquals("property2", bean.property2);

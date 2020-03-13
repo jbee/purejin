@@ -254,7 +254,7 @@ public class TestStateDependentBinds {
 		@Override
 		protected void bootstrap() {
 			install(StateDependentBindsModule1.class);
-			install(BuildinBundle.PROVIDER);
+			install(Adapter.PROVIDER);
 		}
 
 	}
