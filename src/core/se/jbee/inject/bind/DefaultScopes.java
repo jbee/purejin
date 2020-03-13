@@ -20,6 +20,13 @@ import se.jbee.inject.scope.DiskScope;
 import se.jbee.inject.scope.ThreadScope;
 import se.jbee.inject.scope.WorkerScope;
 
+/**
+ * Binds implementations for the standard {@link Scope}s declared as
+ * {@link Name} in the {@link Scope} class.
+ * 
+ * This includes {@link DiskScope}s that use their root folder as part of the
+ * {@link Scope}'s {@link Name}.
+ */
 public final class DefaultScopes extends BinderModule
 		implements Supplier<Scope> {
 

@@ -36,9 +36,6 @@ import se.jbee.inject.Scope;
 import se.jbee.inject.Target;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
-import se.jbee.inject.bootstrap.Binding;
-import se.jbee.inject.bootstrap.BindingType;
-import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Constant;
 import se.jbee.inject.bootstrap.New;
 import se.jbee.inject.bootstrap.Produces;
@@ -46,12 +43,14 @@ import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.config.Config;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.config.HintsBy;
-import se.jbee.inject.config.Mirrors;
 import se.jbee.inject.config.NamesBy;
 import se.jbee.inject.config.ProducesBy;
 import se.jbee.inject.config.ScopesBy;
 import se.jbee.inject.container.Initialiser;
 import se.jbee.inject.container.Supplier;
+import se.jbee.inject.declare.Binding;
+import se.jbee.inject.declare.BindingType;
+import se.jbee.inject.declare.Bindings;
 import se.jbee.inject.declare.Bundle;
 
 /**
@@ -569,8 +568,7 @@ public class Binder {
 		}
 
 		/**
-		 * Bind {@link Method}s and {@link Constructor}s based on
-		 * {@link Mirrors}.
+		 * Bind {@link Method}s and {@link Constructor}s based on mirrors.
 		 * 
 		 * @since 19.1
 		 */

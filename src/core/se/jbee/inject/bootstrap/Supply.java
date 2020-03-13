@@ -19,20 +19,18 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import se.jbee.inject.Dependency;
-import se.jbee.inject.Generator;
 import se.jbee.inject.Hint;
-import se.jbee.inject.Resource;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Locator;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Provider;
-import se.jbee.inject.Scope;
-import se.jbee.inject.Scoping;
+import se.jbee.inject.Resource;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.Utils;
+import se.jbee.inject.container.InjectionSite;
 import se.jbee.inject.container.Supplier;
 
 /**
@@ -74,10 +72,6 @@ public final class Supply {
 	@SuppressWarnings("unchecked")
 	public static <T> Supplier<T> required() {
 		return (Supplier<T>) REQUIRED;
-	}
-
-	public static <T> Supplier<T> constant(T constant) {
-		return new ConstantSupplier<>(constant);
 	}
 
 	/**
@@ -181,47 +175,6 @@ public final class Supply {
 		@Override
 		public String toString() {
 			return describe(SUPPLIES, arrayType);
-		}
-	}
-
-	/**
-	 * Since the {@link Supplier} also implements {@link Generator} it is used
-	 * directly without any {@link Scoping} effects. Effectively a constant
-	 * always has the {@link Scope#container}.
-	 * 
-	 * The implementation also implements {@link #equals(Object)} and
-	 * {@link #hashCode()} to allow elimination of duplicate constant bindings.
-	 */
-	private static final class ConstantSupplier<T>
-			implements Supplier<T>, Generator<T> {
-
-		private final T constant;
-
-		ConstantSupplier(T constant) {
-			this.constant = constant;
-		}
-
-		@Override
-		public T yield(Dependency<? super T> dep)
-				throws UnresolvableDependency {
-			return constant;
-		}
-
-		@Override
-		public T supply(Dependency<? super T> dep, Injector context)
-				throws UnresolvableDependency {
-			return yield(dep);
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			return obj instanceof ConstantSupplier
-				&& constant == ((ConstantSupplier<?>) obj).constant;
-		}
-
-		@Override
-		public int hashCode() {
-			return constant == null ? super.hashCode() : constant.hashCode();
 		}
 	}
 

@@ -12,7 +12,6 @@ import org.junit.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Name;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.BootstrapperBundle;
 
 /**
  * Solution for cycle on common interface injecting other implementations into

@@ -15,8 +15,7 @@ import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.config.Environment;
+import se.jbee.inject.bootstrap.Environment;
 
 /**
  * This test demonstrates how to set properties in the {@link Env} using the

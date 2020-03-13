@@ -12,10 +12,10 @@ import java.lang.reflect.Constructor;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Type;
 import se.jbee.inject.Typed;
-import se.jbee.inject.declare.Macro;
+import se.jbee.inject.declare.ValueBinder;
 
 /**
- * A {@link New} is the {@link Macro} expansion wrapper for {@link Constructor}
+ * A {@link New} is the {@link ValueBinder} expansion wrapper for {@link Constructor}
  * usages or the container equivalent of a {@code new} statement.
  * 
  * @param <T> Type of object created

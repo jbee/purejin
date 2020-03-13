@@ -6,10 +6,9 @@ import static se.jbee.inject.DeclarationType.EXPLICIT;
 import org.junit.Test;
 
 import se.jbee.inject.DeclarationType;
-import se.jbee.inject.bootstrap.Binding;
-import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.BootstrapperBundle;
+import se.jbee.inject.declare.Binding;
+import se.jbee.inject.declare.Bindings;
 import se.jbee.inject.declare.Module;
 
 /**

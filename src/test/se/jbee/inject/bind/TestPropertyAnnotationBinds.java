@@ -27,7 +27,7 @@ import se.jbee.inject.Parameter;
 import se.jbee.inject.Scope;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.config.Environment;
+import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.container.Supplier;
 

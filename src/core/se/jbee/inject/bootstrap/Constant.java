@@ -5,10 +5,10 @@
  */
 package se.jbee.inject.bootstrap;
 
-import se.jbee.inject.declare.Macro;
+import se.jbee.inject.declare.ValueBinder;
 
 /**
- * A {@link Constant} is the {@link Macro} expansion wrapper type for any
+ * A {@link Constant} is the {@link ValueBinder} expansion wrapper type for any
  * constant bound to in the fluent binder API.
  * 
  * @param <T> Type of the constant value

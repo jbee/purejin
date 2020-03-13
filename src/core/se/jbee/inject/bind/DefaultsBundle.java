@@ -1,6 +1,5 @@
 package se.jbee.inject.bind;
 
-import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.declare.Bundle;
 
 /**

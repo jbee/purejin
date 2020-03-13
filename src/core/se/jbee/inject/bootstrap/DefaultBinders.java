@@ -9,14 +9,14 @@ import static se.jbee.inject.DeclarationType.MULTI;
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.isClassInstantiable;
-import static se.jbee.inject.bootstrap.BindingType.CONSTRUCTOR;
-import static se.jbee.inject.bootstrap.BindingType.METHOD;
-import static se.jbee.inject.bootstrap.BindingType.PREDEFINED;
-import static se.jbee.inject.bootstrap.BindingType.REFERENCE;
 import static se.jbee.inject.bootstrap.Supply.constructor;
 import static se.jbee.inject.bootstrap.Supply.method;
 import static se.jbee.inject.bootstrap.Supply.parametrizedInstance;
 import static se.jbee.inject.config.Plugins.pluginPoint;
+import static se.jbee.inject.declare.BindingType.CONSTRUCTOR;
+import static se.jbee.inject.declare.BindingType.METHOD;
+import static se.jbee.inject.declare.BindingType.PREDEFINED;
+import static se.jbee.inject.declare.BindingType.REFERENCE;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
@@ -34,30 +34,33 @@ import se.jbee.inject.Source;
 import se.jbee.inject.Type;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.container.Supplier;
-import se.jbee.inject.declare.Macro;
+import se.jbee.inject.declare.Binding;
+import se.jbee.inject.declare.BindingType;
+import se.jbee.inject.declare.Bindings;
+import se.jbee.inject.declare.InconsistentBinding;
+import se.jbee.inject.declare.ValueBinder;
 
 /**
- * A immutable collection of {@link Macro}s each bound to a specific type
- * handled.
+ * Utility with default {@link ValueBinder}s.
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public final class Macros {
+public final class DefaultBinders {
 
-	public static final Macro<Binding<?>> EXPAND = new AutoInheritanceMacro();
-	public static final Macro<Class<?>> PARAMETRIZED_REF = new TypeParametrizedReferenceMacro();
-	public static final Macro<Instance<?>> INSTANCE_REF = new ReferenceMacro();
-	public static final Macro<Parameter<?>[]> ARRAY = new ArrayElementsMacro();
-	public static final Macro<New<?>> NEW = new NewMacro();
-	public static final Macro<Produces<?>> PRODUCES = new ProducesMacro();
-	public static final Macro<Constant<?>> CONSTANT = new ConstantMacro();
+	public static final ValueBinder<Binding<?>> SUPER_TYPES = new SuperTypesBinder();
+	public static final ValueBinder<Class<?>> PARAMETRIZED_REF = new TypeParametrizedReferenceBinder();
+	public static final ValueBinder<Instance<?>> INSTANCE_REF = new ReferenceBinder();
+	public static final ValueBinder<Parameter<?>[]> ARRAY = new ArrayElementsBinder();
+	public static final ValueBinder<New<?>> NEW = new NewBinder();
+	public static final ValueBinder<Produces<?>> PRODUCES = new ProducesBinder();
+	public static final ValueBinder<Constant<?>> CONSTANT = new ConstantBinder();
 
 	/**
-	 * This {@link Macro} adds bindings to super-types for {@link Binding}s
-	 * declared with {@link DeclarationType#AUTO} or
+	 * This {@link ValueBinder} adds bindings to super-types for
+	 * {@link Binding}s declared with {@link DeclarationType#AUTO} or
 	 * {@link DeclarationType#PROVIDED}.
 	 */
-	static final class AutoInheritanceMacro implements Macro<Binding<?>> {
+	static final class SuperTypesBinder implements ValueBinder<Binding<?>> {
 
 		@Override
 		public <T> void expand(Env env, Binding<?> untyped, Binding<T> binding,
@@ -74,8 +77,8 @@ public final class Macros {
 		}
 	}
 
-	static final class ArrayElementsMacro
-			implements Macro.Completion<Parameter<?>[]> {
+	static final class ArrayElementsBinder
+			implements ValueBinder.Completion<Parameter<?>[]> {
 
 		@Override
 		@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -94,7 +97,7 @@ public final class Macros {
 
 	}
 
-	static final class NewMacro implements Macro<New<?>> {
+	static final class NewBinder implements ValueBinder<New<?>> {
 
 		@Override
 		public <T> void expand(Env env, New<?> constructor,
@@ -112,7 +115,7 @@ public final class Macros {
 		}
 	}
 
-	static final class ProducesMacro implements Macro<Produces<?>> {
+	static final class ProducesBinder implements ValueBinder<Produces<?>> {
 
 		@Override
 		public <T> void expand(Env env, Produces<?> method,
@@ -128,8 +131,8 @@ public final class Macros {
 		}
 	}
 
-	static final class TypeParametrizedReferenceMacro
-			implements Macro.Completion<Class<?>> {
+	static final class TypeParametrizedReferenceBinder
+			implements ValueBinder.Completion<Class<?>> {
 
 		@Override
 		public <T> Binding<T> complete(Binding<T> incomplete, Class<?> to) {
@@ -139,12 +142,12 @@ public final class Macros {
 
 	}
 
-	static final class ConstantMacro implements Macro<Constant<?>> {
+	static final class ConstantBinder implements ValueBinder<Constant<?>> {
 
 		@Override
 		public <T> void expand(Env env, Constant<?> value,
 				Binding<T> incomplete, Bindings bindings) {
-			Supplier<T> supplier = Supply.constant(
+			Supplier<T> supplier = Bindings.constantSupplier(
 					incomplete.type().rawType.cast(value.value));
 			bindings.addExpanded(env,
 					incomplete.complete(BindingType.PREDEFINED, supplier));
@@ -162,7 +165,7 @@ public final class Macros {
 		}
 	}
 
-	static final class ReferenceMacro implements Macro<Instance<?>> {
+	static final class ReferenceBinder implements ValueBinder<Instance<?>> {
 
 		@Override
 		public <T> void expand(Env env, Instance<?> linked, Binding<T> binding,

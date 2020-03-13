@@ -12,7 +12,6 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.BootstrapperBundle;
 
 /**
  * This test demonstrates the most powerful {@link Parameter} hint: a

@@ -22,14 +22,16 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Utils;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.config.Edition;
-import se.jbee.inject.config.Environment;
 import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.config.NamesBy;
 import se.jbee.inject.config.ProducesBy;
 import se.jbee.inject.config.ScopesBy;
 import se.jbee.inject.container.Container;
+import se.jbee.inject.declare.Binding;
+import se.jbee.inject.declare.Bindings;
 import se.jbee.inject.declare.Bootstrapper;
 import se.jbee.inject.declare.Bundle;
+import se.jbee.inject.declare.InconsistentBinding;
 import se.jbee.inject.declare.Module;
 import se.jbee.inject.declare.Toggled;
 
@@ -43,13 +45,13 @@ public final class Bootstrap {
 
 	public static final Environment ENV = new Environment() //
 			.with(Edition.class, Edition.FULL) //
-			.withMacro(Macros.EXPAND) //
-			.withMacro(Macros.NEW) //
-			.withMacro(Macros.CONSTANT) //
-			.withMacro(Macros.PRODUCES) //
-			.withMacro(Macros.INSTANCE_REF) //
-			.withMacro(Macros.PARAMETRIZED_REF) //
-			.withMacro(Macros.ARRAY) //
+			.withBinder(DefaultBinders.SUPER_TYPES) //
+			.withBinder(DefaultBinders.NEW) //
+			.withBinder(DefaultBinders.CONSTANT) //
+			.withBinder(DefaultBinders.PRODUCES) //
+			.withBinder(DefaultBinders.INSTANCE_REF) //
+			.withBinder(DefaultBinders.PARAMETRIZED_REF) //
+			.withBinder(DefaultBinders.ARRAY) //
 			.with(ConstructsBy.class, ConstructsBy.common) //
 			.with(ProducesBy.class, ProducesBy.noMethods) //
 			.with(NamesBy.class, NamesBy.defaultName) //

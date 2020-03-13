@@ -11,7 +11,7 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Scope;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.config.Environment;
+import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.ScopesBy;
 import se.jbee.inject.util.Scoped;
 

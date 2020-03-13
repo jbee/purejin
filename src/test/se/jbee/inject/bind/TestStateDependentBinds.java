@@ -21,7 +21,6 @@ import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.bind.Binder.RootBinder;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.container.Supplier;
 import se.jbee.inject.util.Resource;
 

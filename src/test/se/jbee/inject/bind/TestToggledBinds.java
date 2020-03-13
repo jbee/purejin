@@ -7,8 +7,6 @@ import org.junit.Test;
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.BootstrapperBundle;
-import se.jbee.inject.bootstrap.TogglerBundle;
 import se.jbee.inject.declare.Bundle;
 import se.jbee.inject.declare.Module;
 import se.jbee.inject.declare.Toggled;

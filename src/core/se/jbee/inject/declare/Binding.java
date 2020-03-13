@@ -3,7 +3,7 @@
  *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject.bootstrap;
+package se.jbee.inject.declare;
 
 import static se.jbee.inject.Utils.arrayOf;
 
@@ -24,8 +24,6 @@ import se.jbee.inject.Typed;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.container.Injectee;
 import se.jbee.inject.container.Supplier;
-import se.jbee.inject.declare.Bundle;
-import se.jbee.inject.declare.Module;
 
 /**
  * A {@link Binding} is implements the {@link Injectee} created during the

@@ -12,7 +12,7 @@ import static se.jbee.inject.Utils.arrayMap;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-import se.jbee.inject.bootstrap.InjectionSite;
+import se.jbee.inject.container.InjectionSite;
 
 /**
  * A {@link Hint} is a suggested reference for parameters of a

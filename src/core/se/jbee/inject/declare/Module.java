@@ -6,7 +6,6 @@
 package se.jbee.inject.declare;
 
 import se.jbee.inject.Env;
-import se.jbee.inject.bootstrap.Bindings;
 
 /**
  * {@link Bindings} are defined with {@link Module}s while {@link Bundle}s are

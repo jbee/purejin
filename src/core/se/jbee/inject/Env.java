@@ -3,8 +3,6 @@ package se.jbee.inject;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
 
-import se.jbee.inject.bootstrap.InconsistentBinding;
-
 @FunctionalInterface
 public interface Env {
 
@@ -29,7 +27,7 @@ public interface Env {
 			}
 			return property(named(feature.name()),
 					raw(feature.getDeclaringClass()), pkg) != null;
-		} catch (InconsistentBinding e) {
+		} catch (InconsistentDeclaration e) {
 			return false;
 		}
 	}

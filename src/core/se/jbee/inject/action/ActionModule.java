@@ -29,9 +29,9 @@ import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.SupplyFailed;
 import se.jbee.inject.Utils;
 import se.jbee.inject.bind.BinderModule;
-import se.jbee.inject.bootstrap.InjectionSite;
 import se.jbee.inject.config.Plugins;
 import se.jbee.inject.config.ProducesBy;
+import se.jbee.inject.container.InjectionSite;
 import se.jbee.inject.container.Supplier;
 import se.jbee.inject.declare.Module;
 

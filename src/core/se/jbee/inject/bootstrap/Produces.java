@@ -13,10 +13,10 @@ import java.lang.reflect.Modifier;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Type;
 import se.jbee.inject.Typed;
-import se.jbee.inject.declare.Macro;
+import se.jbee.inject.declare.ValueBinder;
 
 /**
- * A {@link Produces} is the {@link Macro} expansion wrapper for a method bound
+ * A {@link Produces} is the {@link ValueBinder} expansion wrapper for a method bound
  * to a particular instance (if not static) that produces instances to inject.
  *
  * @param <T> type of the value yield by the factory method

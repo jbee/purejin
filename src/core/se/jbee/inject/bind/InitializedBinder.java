@@ -7,8 +7,8 @@ package se.jbee.inject.bind;
 
 import se.jbee.inject.Env;
 import se.jbee.inject.bind.Binder.RootBinder;
-import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.declare.Bindings;
 
 /**
  * A {@link RootBinder} that can be initialized using the

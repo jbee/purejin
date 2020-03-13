@@ -1,4 +1,4 @@
-package se.jbee.inject.config;
+package se.jbee.inject.bootstrap;
 
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
@@ -13,9 +13,9 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Type;
 import se.jbee.inject.Utils;
-import se.jbee.inject.bootstrap.InconsistentBinding;
-import se.jbee.inject.declare.Macro;
+import se.jbee.inject.declare.InconsistentBinding;
 import se.jbee.inject.declare.ModuleWith;
+import se.jbee.inject.declare.ValueBinder;
 
 public final class Environment implements Env {
 
@@ -96,13 +96,13 @@ public final class Environment implements Env {
 		return this;
 	}
 
-	public <T> Environment withMacro(Class<? extends Macro<T>> value) {
-		return withMacro(Utils.instance(value));
+	public <T> Environment withMacro(Class<? extends ValueBinder<T>> value) {
+		return withBinder(Utils.instance(value));
 	}
 
-	public <T> Environment withMacro(Macro<T> value) {
+	public <T> Environment withBinder(ValueBinder<T> value) {
 		@SuppressWarnings("unchecked")
-		Type<Macro<T>> type = (Type<Macro<T>>) Type.supertype(Macro.class,
+		Type<ValueBinder<T>> type = (Type<ValueBinder<T>>) Type.supertype(ValueBinder.class,
 				Type.raw(value.getClass()));
 		return with(type, value);
 	}

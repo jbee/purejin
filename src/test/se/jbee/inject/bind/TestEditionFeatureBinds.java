@@ -13,7 +13,6 @@ import org.junit.Test;
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.BootstrapperBundle;
 import se.jbee.inject.config.Edition;
 import se.jbee.inject.config.Feature;
 import se.jbee.inject.declare.Bundle;

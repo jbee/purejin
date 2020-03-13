@@ -10,7 +10,7 @@ import org.junit.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.decoration.Decorate;
+import se.jbee.inject.container.Decorate;
 
 /**
  * Test that demontrates how two {@link Injector} contexts can be linked

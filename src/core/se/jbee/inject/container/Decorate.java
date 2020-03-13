@@ -1,4 +1,4 @@
-package se.jbee.inject.decoration;
+package se.jbee.inject.container;
 
 import java.lang.reflect.Array;
 

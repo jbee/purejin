@@ -1,4 +1,4 @@
-package se.jbee.inject.bootstrap;
+package se.jbee.inject.declare;
 
 import se.jbee.inject.InconsistentDeclaration;
 import se.jbee.inject.Instance;

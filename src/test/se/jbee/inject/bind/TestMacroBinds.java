@@ -6,7 +6,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static se.jbee.inject.Type.fieldType;
-import static se.jbee.inject.bootstrap.BindingType.CONSTRUCTOR;
+import static se.jbee.inject.declare.BindingType.CONSTRUCTOR;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -24,19 +24,19 @@ import se.jbee.inject.Locator;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
-import se.jbee.inject.bootstrap.Binding;
-import se.jbee.inject.bootstrap.BindingType;
-import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Macros;
+import se.jbee.inject.bootstrap.DefaultBinders;
 import se.jbee.inject.bootstrap.New;
 import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.container.Supplier;
+import se.jbee.inject.declare.Binding;
+import se.jbee.inject.declare.BindingType;
+import se.jbee.inject.declare.Bindings;
 import se.jbee.inject.declare.Bundle;
-import se.jbee.inject.declare.Macro;
+import se.jbee.inject.declare.ValueBinder;
 
 /**
- * Demonstrates how to use {@link Macro}s to customize the and binding
+ * Demonstrates how to use {@link ValueBinder}s to customize the and binding
  * automatics.
  *
  * In particular the {@link InitialisationMacro} shows how one could initialize
@@ -93,7 +93,7 @@ public class TestMacroBinds {
 
 	}
 
-	private static final class CountMacro implements Macro<Binding<?>> {
+	private static final class CountMacro implements ValueBinder<Binding<?>> {
 
 		int expands = 0;
 
@@ -120,23 +120,23 @@ public class TestMacroBinds {
 	}
 
 	private static Injector injectorWithMacro(Class<? extends Bundle> root,
-			Macro<?> macro) {
-		return Bootstrap.injector(Bootstrap.ENV.withMacro(macro), root);
+			ValueBinder<?> macro) {
+		return Bootstrap.injector(Bootstrap.ENV.withBinder(macro), root);
 	}
 
 	/**
-	 * A {@link Macro} that add further bindings to make all types of used
+	 * A {@link ValueBinder} that add further bindings to make all types of used
 	 * {@link Constructor} parameters {@link DeclarationType#REQUIRED}.
 	 *
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	static final class RequiredConstructorParametersMacro
-			implements Macro<New<?>> {
+			implements ValueBinder<New<?>> {
 
 		@Override
 		public <T> void expand(Env env, New<?> value, Binding<T> incomplete,
 				Bindings bindings) {
-			Macros.NEW.expand(env, value, incomplete, bindings);
+			DefaultBinders.NEW.expand(env, value, incomplete, bindings);
 			Type<?>[] params = Type.parameterTypes(value.target);
 			for (int i = 0; i < params.length; i++) {
 				bindings.addExpanded(env, required(params[i], incomplete));
@@ -153,7 +153,7 @@ public class TestMacroBinds {
 
 	@Test(expected = NoResourceForDependency.class)
 	public void thatAllConstructorParameterTypesCanBeMadeRequired() {
-		Macro<?> required = new RequiredConstructorParametersMacro();
+		ValueBinder<?> required = new RequiredConstructorParametersMacro();
 		Injector injector = injectorWithMacro(MacroBindsModule.class, required);
 		assertNull("we should not get here", injector);
 	}
@@ -196,7 +196,7 @@ public class TestMacroBinds {
 	 *
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	static final class InitialisationMacro implements Macro<New<?>> {
+	static final class InitialisationMacro implements ValueBinder<New<?>> {
 
 		@Override
 		public <T> void expand(Env env, New<?> constructor,

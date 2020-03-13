@@ -12,7 +12,6 @@ import java.lang.annotation.Annotation;
 import se.jbee.inject.Env;
 import se.jbee.inject.Name;
 import se.jbee.inject.Type;
-import se.jbee.inject.bootstrap.Bindings;
 
 /**
  * A {@link ModuleWith} is an extension to a usual {@link Module} that depends

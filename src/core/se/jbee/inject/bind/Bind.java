@@ -13,11 +13,11 @@ import se.jbee.inject.Name;
 import se.jbee.inject.Scope;
 import se.jbee.inject.Source;
 import se.jbee.inject.Target;
-import se.jbee.inject.bootstrap.Binding;
-import se.jbee.inject.bootstrap.BindingType;
-import se.jbee.inject.bootstrap.Bindings;
 import se.jbee.inject.config.ScopesBy;
 import se.jbee.inject.container.Supplier;
+import se.jbee.inject.declare.Binding;
+import se.jbee.inject.declare.BindingType;
+import se.jbee.inject.declare.Bindings;
 
 /**
  * The data and behavior used to create binds.

@@ -25,9 +25,8 @@ import se.jbee.inject.Resource;
 import se.jbee.inject.Scope;
 import se.jbee.inject.UnresolvableDependency.DependencyCycle;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.BootstrapperBundle;
+import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.ConstructsBy;
-import se.jbee.inject.config.Environment;
 import se.jbee.inject.container.Supplier;
 import se.jbee.inject.declare.Bundle;
 

@@ -26,7 +26,6 @@ import se.jbee.inject.Scope;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency.UnstableDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.BootstrapperBundle;
 
 public class TestProviderBinds {
 

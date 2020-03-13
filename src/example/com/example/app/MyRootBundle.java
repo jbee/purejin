@@ -1,6 +1,6 @@
 package com.example.app;
 
-import se.jbee.inject.bootstrap.BootstrapperBundle;
+import se.jbee.inject.bind.BootstrapperBundle;
 
 public class MyRootBundle extends BootstrapperBundle {
 

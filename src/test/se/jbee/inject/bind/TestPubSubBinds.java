@@ -4,6 +4,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.declare.Bindings.constantSupplier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +14,6 @@ import org.junit.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bind.Binder.InitBinder;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.container.Initialiser;
 import se.jbee.inject.container.Supplier;
 import se.jbee.inject.declare.Bundle;
@@ -123,7 +123,7 @@ public class TestPubSubBinds {
 			bind(named("ref"), Service.class).to(AnotherService.class);
 
 			// a predefined (unknown constant) with aid of explicit multibind to Subscriber
-			Supplier<PredefinedService> predefined = Supply.constant(
+			Supplier<PredefinedService> predefined = constantSupplier(
 					new PredefinedService());
 			bind(named("pre"), Service.class).toSupplier(predefined);
 			multibind(Subscriber.class).toSupplier(predefined);
@@ -156,7 +156,7 @@ public class TestPubSubBinds {
 			multibind(Subscriber.class).to(AnotherService.class);
 
 			// a predefined (unknown constant) with aid of explicit multibind to Subscriber
-			Supplier<PredefinedService> predefined = Supply.constant(
+			Supplier<PredefinedService> predefined = constantSupplier(
 					new PredefinedService());
 			bind(named("pre"), Service.class).toSupplier(predefined);
 			multibind(Subscriber.class).toSupplier(predefined);

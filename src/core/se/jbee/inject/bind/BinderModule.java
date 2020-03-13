@@ -6,7 +6,7 @@
 package se.jbee.inject.bind;
 
 import se.jbee.inject.Env;
-import se.jbee.inject.bootstrap.Bindings;
+import se.jbee.inject.declare.Bindings;
 import se.jbee.inject.declare.Bootstrapper;
 import se.jbee.inject.declare.Bundle;
 import se.jbee.inject.declare.Module;
