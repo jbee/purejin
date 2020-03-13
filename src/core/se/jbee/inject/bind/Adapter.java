@@ -20,8 +20,8 @@ import se.jbee.inject.Scope;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Supply;
-import se.jbee.inject.config.Plugins;
 import se.jbee.inject.declare.Bootstrapper.Toggler;
+import se.jbee.inject.extend.Plugins;
 import se.jbee.inject.declare.Bundle;
 import se.jbee.inject.declare.Toggled;
 

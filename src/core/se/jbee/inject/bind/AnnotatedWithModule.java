@@ -13,8 +13,8 @@ import se.jbee.inject.AnnotatedWith;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Scope;
-import se.jbee.inject.config.Plugins;
 import se.jbee.inject.container.Supplier;
+import se.jbee.inject.extend.Plugins;
 
 /**
  * Provides a {@link Supplier} that can resolve all {@link AnnotatedWith}

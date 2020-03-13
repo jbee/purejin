@@ -3,8 +3,8 @@ package se.jbee.inject.bind;
 import java.lang.annotation.Annotation;
 import java.util.ServiceLoader;
 
-import se.jbee.inject.Link;
 import se.jbee.inject.Type;
+import se.jbee.inject.declare.Extends;
 import se.jbee.inject.declare.ModuleWith;
 
 public abstract class AnnotationModule extends BinderModule {
@@ -19,8 +19,8 @@ public abstract class AnnotationModule extends BinderModule {
 		for (ModuleWith<?> def : ServiceLoader.load(ModuleWith.class)) {
 			Type<? extends ModuleWith> genericModuleType = Type.supertype(
 					ModuleWith.class, Type.raw(def.getClass()));
-			if (def.getClass().isAnnotationPresent(Link.class)) {
-				Class<?> type = def.getClass().getAnnotation(Link.class).to();
+			if (def.getClass().isAnnotationPresent(Extends.class)) {
+				Class<?> type = def.getClass().getAnnotation(Extends.class).value();
 				if (type.isAnnotation()) {
 					declareDetected((Class<? extends Annotation>) type, def);
 				}

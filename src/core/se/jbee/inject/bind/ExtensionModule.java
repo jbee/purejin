@@ -6,33 +6,34 @@ import java.lang.reflect.Constructor;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
-import se.jbee.inject.SPI;
 import se.jbee.inject.Scope;
 import se.jbee.inject.bootstrap.New;
 import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.container.Supplier;
+import se.jbee.inject.extend.Extension;
 
 /**
  * Provides a {@link Supplier} that can resolve all types extending an
- * {@link SPI} should they not be bound otherwise.
+ * {@link Extension} should they not be bound otherwise.
  * 
- * This is the basis of the {@link SPI} functionality where any type
+ * This is the basis of the {@link Extension} functionality where any type
  * implementing the abstraction is constructed by the {@link Supplier}.
  * 
  * The created instance is an effective singleton per type, so there will be one
- * instance for each {@link SPI} implementation class.
+ * instance for each {@link Extension} implementation class.
  * 
  * @since 19.1
  */
-public class SPIModule extends BinderModule {
+// intentionally made default visible to not be confused with a module that is useful as a base class for user modules
+class ExtensionModule extends BinderModule {
 
 	@Override
 	protected void declare() {
 		ConstructsBy constructsBy = env(ConstructsBy.class);
 		asDefault() //
 				.per(Scope.dependencyType) //
-				.bind(raw(SPI.class).asUpperBound()) //
+				.bind(raw(Extension.class).asUpperBound()) //
 				.toSupplier((dep, context) -> //
 				extension(constructsBy, dep, context));
 	}

@@ -1,4 +1,4 @@
-package se.jbee.inject.config;
+package se.jbee.inject.extend;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
@@ -12,24 +12,23 @@ import static se.jbee.inject.Utils.orElse;
 import java.util.Optional;
 
 import se.jbee.inject.Dependency;
-import se.jbee.inject.SPI;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 
 /**
- * A {@link Config} is an {@link SPI} that uses the {@link Dependency}
+ * A {@link Config} is an {@link Extension} that uses the {@link Dependency}
  * hierarchy to effectively name-space configuration values to avoid name
  * collisions.
  * 
  * @since 19.1
  */
-public class Config implements SPI {
+public class Config implements Extension {
 
 	private final Injector context;
 	private final Instance<?> ns;
 
 	/**
-	 * Called by the {@link Injector} itself when used as an {@link SPI}
+	 * Called by the {@link Injector} itself when used as an {@link Extension}
 	 */
 	public Config(Injector context) {
 		this(context, null);

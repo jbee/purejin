@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
 import org.junit.Test;
 
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.config.Config;
+import se.jbee.inject.extend.Config;
 
 public class TestConfigBinds {
 

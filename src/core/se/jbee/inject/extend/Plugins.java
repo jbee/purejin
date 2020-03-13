@@ -1,21 +1,20 @@
-package se.jbee.inject.config;
+package se.jbee.inject.extend;
 
 import static se.jbee.inject.Type.raw;
 
 import se.jbee.inject.Dependency;
-import se.jbee.inject.SPI;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Name;
 
 /**
- * {@link Plugins} are an {@link SPI} that makes resolving plugged
+ * {@link Plugins} are an {@link Extension} that makes resolving plugged
  * {@link Class}es for specific plugin points more convenient and formalise the
- * convention the mechanism is based upon.
+ * convention of the mechanism.
  * 
  * @author Jan Bernitt
  * @since 19.1
  */
-public final class Plugins implements SPI {
+public final class Plugins implements Extension {
 
 	/**
 	 * The {@link Name} of the plugin-point.
@@ -34,7 +33,7 @@ public final class Plugins implements SPI {
 	private final Class<?> target;
 
 	/**
-	 * Called by the {@link Injector} itself when used as an {@link SPI}
+	 * Called by the {@link Injector} itself when used as an {@link Extension}
 	 */
 	public Plugins(Injector context) {
 		this(context, null);

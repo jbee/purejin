@@ -68,7 +68,7 @@ public final class Binding<T> extends Injectee<T>
 
 	public Binding<T> complete(BindingType type,
 			Supplier<? extends T> supplier) {
-		if (type == BindingType.MACRO)
+		if (type == BindingType.VALUE)
 			throw InconsistentBinding.illegalCompletion(this, type);
 		return new Binding<>(locator, type, supplier, scope, source);
 	}

@@ -18,7 +18,7 @@ import org.junit.Test;
 import se.jbee.inject.AnnotatedWith;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.config.Plugins;
+import se.jbee.inject.extend.Plugins;
 
 /**
  * A basic test that demonstrates how type level annotations become

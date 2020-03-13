@@ -14,8 +14,8 @@ import static se.jbee.inject.Target.targeting;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.isClassInstantiable;
 import static se.jbee.inject.Utils.newArray;
-import static se.jbee.inject.config.Plugins.pluginPoint;
 import static se.jbee.inject.container.Cast.initialiserTypeOf;
+import static se.jbee.inject.extend.Plugins.pluginPoint;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -40,7 +40,6 @@ import se.jbee.inject.bootstrap.Constant;
 import se.jbee.inject.bootstrap.New;
 import se.jbee.inject.bootstrap.Produces;
 import se.jbee.inject.bootstrap.Supply;
-import se.jbee.inject.config.Config;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.config.NamesBy;
@@ -52,6 +51,7 @@ import se.jbee.inject.declare.Binding;
 import se.jbee.inject.declare.BindingType;
 import se.jbee.inject.declare.Bindings;
 import se.jbee.inject.declare.Bundle;
+import se.jbee.inject.extend.Config;
 
 /**
  * The default implementation of a fluent binder interface that provides a lot
@@ -660,7 +660,7 @@ public class Binder {
 		}
 
 		protected final void expand(Object value) {
-			declareBindingsIn(bind().asType(locator, BindingType.MACRO, null),
+			declareBindingsIn(bind().asType(locator, BindingType.VALUE, null),
 					value);
 		}
 

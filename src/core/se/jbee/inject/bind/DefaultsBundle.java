@@ -14,7 +14,7 @@ public final class DefaultsBundle extends BootstrapperBundle {
 	protected void bootstrap() {
 		install(Adapter.SUB_CONTEXT, Adapter.ENV);
 		install(DefaultScopes.class);
-		install(SPIModule.class);
+		install(ExtensionModule.class);
 		install(AnnotatedWithModule.class);
 	}
 

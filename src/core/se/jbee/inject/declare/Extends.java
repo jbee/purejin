@@ -1,4 +1,4 @@
-package se.jbee.inject;
+package se.jbee.inject.declare;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -7,6 +7,9 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.ServiceLoader;
+
+import se.jbee.inject.Env;
+import se.jbee.inject.Injector;
 
 /**
  * {@link Annotation} used in connection with {@link ServiceLoader} mechanism to
@@ -17,13 +20,13 @@ import java.util.ServiceLoader;
  * 
  * Annotate a {@link se.jbee.inject.declare.ModuleWith} implementation that
  * should load via {@link ServiceLoader} to implement the effects of an type
- * level {@link Annotation} and have {@link Link#to()} point to the
+ * level {@link Annotation} and have {@link Extends#value()} point to the
  * {@link Annotation} type that triggers the implementation
  * {@link se.jbee.inject.declare.ModuleWith}. If the provided {@link Class} is
  * not an {@link Annotation} type the module is ignored.
  * 
  * Annotate a {@link se.jbee.inject.declare.Bundle} implementation that should
- * load via {@link ServiceLoader} have {@link Link#to()} be {@link Env}
+ * load via {@link ServiceLoader} have {@link Extends#value()} be {@link Env}
  * {@link Class} to add the bundle to those that should be loaded as part of the
  * {@link Env} instead of the {@link Injector} context.
  * 
@@ -31,7 +34,7 @@ import java.util.ServiceLoader;
  */
 @Retention(RUNTIME)
 @Target(TYPE)
-public @interface Link { //TODO rename to Extend?
+public @interface Extends {
 
-	Class<?> to();
+	Class<?> value();
 }

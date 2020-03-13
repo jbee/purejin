@@ -12,11 +12,11 @@ import static se.jbee.inject.Utils.isClassInstantiable;
 import static se.jbee.inject.bootstrap.Supply.constructor;
 import static se.jbee.inject.bootstrap.Supply.method;
 import static se.jbee.inject.bootstrap.Supply.parametrizedInstance;
-import static se.jbee.inject.config.Plugins.pluginPoint;
 import static se.jbee.inject.declare.BindingType.CONSTRUCTOR;
 import static se.jbee.inject.declare.BindingType.METHOD;
 import static se.jbee.inject.declare.BindingType.PREDEFINED;
 import static se.jbee.inject.declare.BindingType.REFERENCE;
+import static se.jbee.inject.extend.Plugins.pluginPoint;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;

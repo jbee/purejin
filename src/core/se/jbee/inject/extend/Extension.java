@@ -1,7 +1,11 @@
-package se.jbee.inject;
+package se.jbee.inject.extend;
+
+import se.jbee.inject.Injector;
+import se.jbee.inject.Utils;
 
 /**
- * Marker interface to mark classes should extend the {@link Injector} API.
+ * Marker interface to mark classes representing an {@link Injector} API
+ * {@link Extension}.
  * 
  * This means the marked type does not need to be bound explicitly. A singleton
  * instance per type is created using the type's
@@ -9,6 +13,6 @@ package se.jbee.inject;
  * 
  * @since 19.1
  */
-public interface SPI {
+public interface Extension {
 	// marker
 }

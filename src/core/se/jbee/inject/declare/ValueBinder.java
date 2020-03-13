@@ -56,39 +56,42 @@ import se.jbee.inject.container.Supplier;
  * 
  * @author Jan Bernitt (jan@jbee.se)
  * 
- * @param <V> The type of value that is expanded by this {@link ValueBinder}
+ * @param <S> The type of source value that is expanded by this
+ *            {@link ValueBinder}
  */
 @FunctionalInterface
-public interface ValueBinder<V> {
+public interface ValueBinder<S> {
 
 	/**
 	 * Expands the incomplete {@link Binding} and value given to a complete
 	 * {@link Binding}(s) that are added to {@link Bindings}.
 	 * 
-	 * @param src A {@link Class}, {@link Instance} or similar values that
+	 * @param src A {@link Class}, {@link Instance} or similar value that
 	 *            express the intent of the incomplete binding. This
-	 *            {@link ValueBinder} will use them especially to decide the
-	 *            {@link Supplier} used.
+	 *            {@link ValueBinder} will use it especially to decide the
+	 *            {@link Supplier} used and what further {@link Binding}s might
+	 *            be derived.
 	 * @param item A usually incomplete {@link Binding} (without a
 	 *            {@link Supplier})
-	 * @param target The collection of {@link Bindings} complete
-	 *            {@link Binding}s should be added to.
+	 * @param target complete {@link Binding}s are be added to it
 	 */
-	<T> void expand(Env env, V src, Binding<T> item, Bindings target);
+	<T> void expand(Env env, S src, Binding<T> item, Bindings target);
 
 	/**
 	 * A {@link Completion} just uses the passed value to
 	 * {@link Completion#complete(Binding, Object)} the {@link Binding} and add
-	 * it to the {@link Bindings}.
+	 * it to the {@link Bindings}. Its main purpose to to capture this recurring
+	 * pattern, reduce the duplication caused by it and make the code more
+	 * readable.
 	 */
-	interface Completion<V> extends ValueBinder<V> {
+	interface Completion<S> extends ValueBinder<S> {
 
 		@Override
-		public default <T> void expand(Env env, V src, Binding<T> item,
+		public default <T> void expand(Env env, S src, Binding<T> item,
 				Bindings target) {
 			target.addExpanded(env, complete(item, src));
 		}
 
-		<T> Binding<T> complete(Binding<T> item, V src);
+		<T> Binding<T> complete(Binding<T> item, S src);
 	}
 }

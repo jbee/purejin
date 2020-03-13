@@ -30,8 +30,8 @@ public enum BindingType {
 
 	/**
 	 * The instances are supplied from a {@link Supplier} that has been defined
-	 * before macro expansion. This might be user defined or hard-wired one
-	 * within the binder API.
+	 * before expansion. This might be user defined or hard-wired one within the
+	 * binder API.
 	 */
 	PREDEFINED,
 
@@ -46,8 +46,8 @@ public enum BindingType {
 	METHOD,
 
 	/**
-	 * The binding is an incomplete macro so far that changes to one of the
-	 * other types later on.
+	 * The binding is an incomplete. A value was provided that should be
+	 * expanded into a complete {@link Binding}.
 	 */
-	MACRO,
+	VALUE,
 }

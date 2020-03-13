@@ -24,7 +24,7 @@ import se.jbee.inject.Dependency;
 import se.jbee.inject.Provider;
 import se.jbee.inject.Scope;
 import se.jbee.inject.UnresolvableDependency;
-import se.jbee.inject.config.Config;
+import se.jbee.inject.extend.Config;
 
 /**
  * The {@link DiskScope} is a {@link Scope} that persists objects on disk.
