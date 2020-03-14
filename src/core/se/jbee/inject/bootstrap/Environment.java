@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import se.jbee.inject.Env;
+import se.jbee.inject.InconsistentDeclaration;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Type;
@@ -19,14 +20,13 @@ import se.jbee.inject.declare.ValueBinder;
 
 public final class Environment implements Env {
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static final Type<ModuleWith<Class<?>>> ANNOTATION = (Type) raw(
+			ModuleWith.class).parametized(Type.CLASS);
+
 	public static Environment override(Env overridden) {
 		return new Environment(false, new HashMap<Instance<?>, Object>(), true,
 				overridden);
-	}
-
-	public static Environment complete(Env completed) {
-		return new Environment(false, new HashMap<Instance<?>, Object>(), false,
-				completed);
 	}
 
 	private final boolean readonly;
@@ -50,6 +50,10 @@ public final class Environment implements Env {
 		return new Environment(true, values, override, decorated);
 	}
 
+	public Environment complete(Env completed) {
+		return new Environment(readonly, values, false, completed);
+	}
+
 	@SuppressWarnings("unchecked")
 	private HashMap<Instance<?>, Object> copyOfValues() {
 		return (HashMap<Instance<?>, Object>) values.clone();
@@ -61,7 +65,7 @@ public final class Environment implements Env {
 		if (decorated != null && !override) {
 			try {
 				return decorated.property(name, property, pkg);
-			} catch (InconsistentBinding e) {
+			} catch (InconsistentDeclaration e) {
 				// fall through and complement...
 			}
 		}
@@ -102,15 +106,14 @@ public final class Environment implements Env {
 
 	public <T> Environment withBinder(ValueBinder<T> value) {
 		@SuppressWarnings("unchecked")
-		Type<ValueBinder<T>> type = (Type<ValueBinder<T>>) Type.supertype(ValueBinder.class,
-				Type.raw(value.getClass()));
+		Type<ValueBinder<T>> type = (Type<ValueBinder<T>>) Type.supertype(
+				ValueBinder.class, Type.raw(value.getClass()));
 		return with(type, value);
 	}
 
 	public <A extends Annotation> Environment withAnnotation(Class<A> name,
 			ModuleWith<Class<?>> value) {
-		return with(named(name).toString(),
-				raw(ModuleWith.class).parametized(Type.CLASS), value);
+		return with(named(name).toString(), ANNOTATION, value);
 	}
 
 	@SafeVarargs

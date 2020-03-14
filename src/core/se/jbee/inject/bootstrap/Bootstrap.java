@@ -59,6 +59,14 @@ public final class Bootstrap {
 			.with(HintsBy.class, HintsBy.noParameters) //
 			.readonly();
 
+	public static Env env(Class<? extends Bundle> root) {
+		return ENV.complete(injector(root).asEnv());
+	}
+
+	public static Env env(Class<? extends Bundle> root, Env env) {
+		return ENV.complete(injector(env, root).asEnv());
+	}
+
 	@Deprecated
 	@SafeVarargs
 	public static Injector injector(Class<? extends Bundle>... roots) {

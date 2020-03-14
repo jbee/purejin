@@ -19,6 +19,7 @@ import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Scope;
 import se.jbee.inject.UnresolvableDependency.IllegalAcccess;
+import se.jbee.inject.bind.serviceloader.ServiceLoaderAnnotations;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.declare.Bundle;
 import se.jbee.inject.declare.ModuleWith;
@@ -133,7 +134,8 @@ public class TestCustomAnnotationBinds {
 	 */
 	@Test
 	public void customAnnotationsAddedViaServiceLoader() {
-		Injector injector = Bootstrap.injector(
+		Env env = Bootstrap.env(ServiceLoaderAnnotations.class);
+		Injector injector = Bootstrap.injector(env,
 				TestCustomAnnotationBindsModule2.class);
 		SomeOtherService service = injector.resolve(SomeOtherService.class);
 		assertNotNull(service);

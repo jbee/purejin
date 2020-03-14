@@ -3,9 +3,14 @@ package se.jbee.inject.bootstrap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.ServiceLoader;
+
 import org.junit.Test;
 
+import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
+import se.jbee.inject.bind.serviceloader.ServiceLoaderBundles;
+import se.jbee.inject.bind.serviceloader.ServiceLoaderEnvBundles;
 import se.jbee.inject.declare.Bundle;
 import se.jbee.inject.declare.Module;
 
@@ -19,12 +24,18 @@ import se.jbee.inject.declare.Module;
  * very basic example of one {@link Bundle} installing one {@link Module} which
  * is binding an int and {@link String} value. These example files can be found
  * in <code>src/example</code>.
+ * 
+ * The {@link ServiceLoader} as a source is hooked in explicitly by installing
+ * the {@link ServiceLoaderEnvBundles} when bootstrapping an {@link Env} and the
+ * {@link ServiceLoaderBundles} when bootstrapping an {@link Injector}. This
+ * gives same control as always for this feature as well.
  */
 public class TestServiceContextBootstrapping {
 
 	@Test
 	public void serviceLoaderCanBeUsedToDeclareModuleRoots() {
-		Injector context = null; //FIXME
+		Env env = Bootstrap.env(ServiceLoaderEnvBundles.class);
+		Injector context = Bootstrap.injector(env, ServiceLoaderBundles.class);
 		assertNotNull(context);
 		assertEquals(13, context.resolve(int.class).intValue());
 		assertEquals("com.example.app.MyFirstModule",
