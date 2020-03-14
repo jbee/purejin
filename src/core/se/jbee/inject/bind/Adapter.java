@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import se.jbee.inject.AnnotatedWith;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
@@ -25,6 +26,7 @@ import se.jbee.inject.declare.Bindings;
 import se.jbee.inject.declare.Bootstrapper.Toggler;
 import se.jbee.inject.declare.Bundle;
 import se.jbee.inject.declare.Toggled;
+import se.jbee.inject.extend.Extension;
 import se.jbee.inject.extend.Plugins;
 
 /**
@@ -66,7 +68,19 @@ public enum Adapter implements Toggled<Adapter> {
 	 * Adds: Binds the bootstrapping {@link Env} as the {@link Name#DEFAULT}
 	 * {@link Env} in the {@link Injector} context.
 	 */
-	ENV;
+	ENV,
+	/**
+	 * Adds: The {@link DefaultScopes}
+	 */
+	SCOPES,
+	/**
+	 * Adds: {@link Extension}s via {@link ExtensionModule}.
+	 */
+	EXTENSION,
+	/**
+	 * Adds: {@link AnnotatedWith} via {@link AnnotatedWithModule}.
+	 */
+	ANNOTATED_WITH,;
 
 	@Override
 	public void bootstrap(Toggler<Adapter> bootstrapper) {
@@ -78,6 +92,9 @@ public enum Adapter implements Toggled<Adapter> {
 		bootstrapper.install(OptionalBridgeModule.class, OPTIONAL);
 		bootstrapper.install(SubContextModule.class, SUB_CONTEXT);
 		bootstrapper.install(DefaultEnvModule.class, ENV);
+		bootstrapper.install(DefaultScopes.class, SCOPES);
+		bootstrapper.install(ExtensionModule.class, EXTENSION);
+		bootstrapper.install(AnnotatedWithModule.class, ANNOTATED_WITH);
 	}
 
 	private static class LoggerModule extends BinderModule {

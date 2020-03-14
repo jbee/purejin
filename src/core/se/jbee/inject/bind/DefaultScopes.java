@@ -27,8 +27,7 @@ import se.jbee.inject.scope.WorkerScope;
  * This includes {@link DiskScope}s that use their root folder as part of the
  * {@link Scope}'s {@link Name}.
  */
-public final class DefaultScopes extends BinderModule
-		implements Supplier<Scope> {
+final class DefaultScopes extends BinderModule implements Supplier<Scope> {
 
 	@Override
 	protected void declare() {

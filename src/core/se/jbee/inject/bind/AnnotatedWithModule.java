@@ -30,7 +30,7 @@ import se.jbee.inject.extend.Plugins;
  * 
  * @since 19.1
  */
-public class AnnotatedWithModule extends BinderModule {
+final class AnnotatedWithModule extends BinderModule {
 
 	@Override
 	protected void declare() {
