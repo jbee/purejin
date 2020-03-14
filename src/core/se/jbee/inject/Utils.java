@@ -7,6 +7,7 @@ package se.jbee.inject;
 
 import static java.lang.System.arraycopy;
 import static java.lang.reflect.Array.newInstance;
+import static java.lang.reflect.Modifier.isAbstract;
 import static java.lang.reflect.Modifier.isPrivate;
 import static java.lang.reflect.Modifier.isProtected;
 import static java.lang.reflect.Modifier.isPublic;
@@ -241,7 +242,7 @@ public final class Utils {
 	public static boolean isClassVirtual(Class<?> cls) {
 		return cls == null || cls.isInterface() || cls.isEnum()
 			|| cls.isAnnotation() || cls.isAnonymousClass() || cls.isPrimitive()
-			|| cls.isArray() || Modifier.isAbstract(cls.getModifiers())
+			|| cls.isArray() || isAbstract(cls.getModifiers())
 			|| cls == String.class || Number.class.isAssignableFrom(cls)
 			|| cls == Boolean.class || cls == Void.class || cls == Class.class
 			|| Collection.class.isAssignableFrom(cls)
@@ -270,9 +271,22 @@ public final class Utils {
 				return false;
 		for (Constructor<?> c : cls.getDeclaredConstructors())
 			// maybe arguments are passed to super-type so we check it too
-			if (c.getParameterTypes().length > 0)
+			if (c.getParameterCount() > 0)
 				return isClassMonomodal(cls.getSuperclass());
 		return true;
+	}
+
+	/**
+	 * @param cls a {@link Class}
+	 * @return true, if the argument is a {@link Class} that is a simple
+	 *         standard <code>class</code> with only a default constructor.
+	 */
+	public static boolean isClassBanal(Class<?> cls) {
+		return !cls.isInterface() && !isAbstract(cls.getModifiers())
+			&& !cls.isEnum() && !cls.isAnnotation() && !cls.isArray()
+			&& cls.getDeclaredConstructors().length == 1
+			&& cls.getDeclaredConstructors()[0].getParameterCount() == 0
+			&& isClassMonomodal(cls);
 	}
 
 	/* Members */

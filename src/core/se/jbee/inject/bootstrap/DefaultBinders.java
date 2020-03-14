@@ -8,6 +8,8 @@ package se.jbee.inject.bootstrap;
 import static se.jbee.inject.DeclarationType.MULTI;
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.Utils.instance;
+import static se.jbee.inject.Utils.isClassBanal;
 import static se.jbee.inject.Utils.isClassInstantiable;
 import static se.jbee.inject.bootstrap.Supply.constructor;
 import static se.jbee.inject.bootstrap.Supply.method;
@@ -49,7 +51,10 @@ public final class DefaultBinders {
 
 	public static final ValueBinder<Binding<?>> SUPER_TYPES = new SuperTypesBinder();
 	public static final ValueBinder<Class<?>> PARAMETRIZED_REF = new TypeParametrizedReferenceBinder();
-	public static final ValueBinder<Instance<?>> INSTANCE_REF = new ReferenceBinder();
+	public static final ValueBinder<Instance<?>> INSTANCE_REF = new ReferenceBinder(
+			false);
+	public static final ValueBinder<Instance<?>> INSTANCE_REF_LITE = new ReferenceBinder(
+			true);
 	public static final ValueBinder<Parameter<?>[]> ARRAY = new ArrayElementsBinder();
 	public static final ValueBinder<New<?>> NEW = new NewBinder();
 	public static final ValueBinder<Produces<?>> PRODUCES = new ProducesBinder();
@@ -63,17 +68,17 @@ public final class DefaultBinders {
 	static final class SuperTypesBinder implements ValueBinder<Binding<?>> {
 
 		@Override
-		public <T> void expand(Env env, Binding<?> untyped, Binding<T> binding,
-				Bindings bindings) {
-			bindings.add(binding);
-			DeclarationType declarationType = binding.source.declarationType;
+		public <T> void expand(Env env, Binding<?> src, Binding<T> item,
+				Bindings target) {
+			target.add(item);
+			DeclarationType declarationType = item.source.declarationType;
 			if (declarationType != DeclarationType.AUTO
 				&& declarationType != DeclarationType.PROVIDED)
 				return;
-			for (Type<? super T> supertype : binding.type().supertypes())
+			for (Type<? super T> supertype : item.type().supertypes())
 				// Object is of course a superclass but not indented when doing auto-binds
 				if (supertype.rawType != Object.class)
-					bindings.add(binding.typed(supertype));
+					target.add(item.typed(supertype));
 		}
 	}
 
@@ -82,10 +87,10 @@ public final class DefaultBinders {
 
 		@Override
 		@SuppressWarnings({ "unchecked", "rawtypes" })
-		public <T> Binding<T> complete(Binding<T> incomplete,
+		public <T> Binding<T> complete(Binding<T> item,
 				Parameter<?>[] elements) {
-			return incomplete.complete(PREDEFINED,
-					supplier((Type) incomplete.type(), elements));
+			return item.complete(PREDEFINED,
+					supplier((Type) item.type(), elements));
 		}
 
 		@SuppressWarnings("unchecked")
@@ -100,34 +105,34 @@ public final class DefaultBinders {
 	static final class NewBinder implements ValueBinder<New<?>> {
 
 		@Override
-		public <T> void expand(Env env, New<?> constructor,
-				Binding<T> incomplete, Bindings bindings) {
-			bindings.addExpanded(env, incomplete.complete(CONSTRUCTOR,
-					constructor(constructor.typed(incomplete.type()))));
-			Class<?> impl = constructor.target.getDeclaringClass();
-			Source source = incomplete.source;
-			bindings.addConstant(env, source.typed(MULTI), Name.DEFAULT,
-					Constructor.class, constructor.target);
-			plugAnnotationsInto(env, bindings, source, impl, ElementType.TYPE,
+		public <T> void expand(Env env, New<?> src, Binding<T> item,
+				Bindings target) {
+			target.addExpanded(env, item.complete(CONSTRUCTOR,
+					constructor(src.typed(item.type()))));
+			Class<?> impl = src.target.getDeclaringClass();
+			Source source = item.source;
+			target.addConstant(env, source.typed(MULTI), Name.DEFAULT,
+					Constructor.class, src.target);
+			plugAnnotationsInto(env, target, source, impl, ElementType.TYPE,
 					impl);
-			plugAnnotationsInto(env, bindings, source, impl,
-					ElementType.CONSTRUCTOR, constructor.target);
+			plugAnnotationsInto(env, target, source, impl,
+					ElementType.CONSTRUCTOR, src.target);
 		}
 	}
 
 	static final class ProducesBinder implements ValueBinder<Produces<?>> {
 
 		@Override
-		public <T> void expand(Env env, Produces<?> method,
-				Binding<T> incomplete, Bindings bindings) {
-			bindings.addExpanded(env, incomplete.complete(METHOD,
-					method(method.typed(incomplete.type()))));
-			Source source = incomplete.source;
-			bindings.addConstant(env, source.typed(MULTI), Name.DEFAULT,
-					Method.class, method.target);
-			plugAnnotationsInto(env, bindings, source,
-					method.target.getDeclaringClass(), ElementType.METHOD,
-					method.target);
+		public <T> void expand(Env env, Produces<?> src, Binding<T> item,
+				Bindings target) {
+			target.addExpanded(env,
+					item.complete(METHOD, method(src.typed(item.type()))));
+			Source source = item.source;
+			target.addConstant(env, source.typed(MULTI), Name.DEFAULT,
+					Method.class, src.target);
+			plugAnnotationsInto(env, target, source,
+					src.target.getDeclaringClass(), ElementType.METHOD,
+					src.target);
 		}
 	}
 
@@ -135,9 +140,9 @@ public final class DefaultBinders {
 			implements ValueBinder.Completion<Class<?>> {
 
 		@Override
-		public <T> Binding<T> complete(Binding<T> incomplete, Class<?> to) {
-			return incomplete.complete(REFERENCE, parametrizedInstance(
-					anyOf(raw(to).castTo(incomplete.type()))));
+		public <T> Binding<T> complete(Binding<T> item, Class<?> to) {
+			return item.complete(REFERENCE,
+					parametrizedInstance(anyOf(raw(to).castTo(item.type()))));
 		}
 
 	}
@@ -145,96 +150,107 @@ public final class DefaultBinders {
 	static final class ConstantBinder implements ValueBinder<Constant<?>> {
 
 		@Override
-		public <T> void expand(Env env, Constant<?> value,
-				Binding<T> incomplete, Bindings bindings) {
+		public <T> void expand(Env env, Constant<?> src, Binding<T> item,
+				Bindings target) {
 			Supplier<T> supplier = Bindings.constantSupplier(
-					incomplete.type().rawType.cast(value.value));
-			bindings.addExpanded(env,
-					incomplete.complete(BindingType.PREDEFINED, supplier));
+					item.type().rawType.cast(src.value));
+			target.addExpanded(env,
+					item.complete(BindingType.PREDEFINED, supplier));
 			// implicitly bind to the exact type of the constant
 			// should that differ from the binding type
-			if (incomplete.source.declarationType == DeclarationType.EXPLICIT
-				&& incomplete.type().rawType != value.value.getClass()) {
+			if (src.autoBindExactType
+				&& item.source.declarationType == DeclarationType.EXPLICIT
+				&& item.type().rawType != src.value.getClass()) {
 				@SuppressWarnings("unchecked")
-				Class<T> type = (Class<T>) value.value.getClass();
-				bindings.addExpanded(env, Binding.binding( //TODO maybe this should use addConstant? do we need the auto inheritance processing?
-						incomplete.locator.typed(raw(type)),
-						BindingType.PREDEFINED, supplier, incomplete.scope,
-						incomplete.source.typed(DeclarationType.IMPLICIT)));
+				Class<T> type = (Class<T>) src.value.getClass();
+				target.addExpanded(env,
+						Binding.binding(item.locator.typed(raw(type)),
+								BindingType.PREDEFINED, supplier, item.scope,
+								item.source.typed(DeclarationType.IMPLICIT)));
 			}
 		}
 	}
 
 	static final class ReferenceBinder implements ValueBinder<Instance<?>> {
 
+		private final boolean avoidReferences;
+
+		ReferenceBinder(boolean avoidReferences) {
+			this.avoidReferences = avoidReferences;
+		}
+
 		@Override
-		public <T> void expand(Env env, Instance<?> linked, Binding<T> binding,
-				Bindings bindings) {
-			Type<?> t = linked.type();
-			if (t.isAssignableTo(raw(Supplier.class))
-				&& !binding.type().isAssignableTo(raw(Supplier.class))) {
-				@SuppressWarnings("unchecked")
-				Class<? extends Supplier<? extends T>> supplier = (Class<? extends Supplier<? extends T>>) t.rawType;
-				bindings.addExpanded(env, binding.complete(REFERENCE,
-						Supply.reference(supplier)));
-				implicitlyBindToConstructor(env, binding, linked, bindings);
+		public <T> void expand(Env env, Instance<?> src, Binding<T> item,
+				Bindings target) {
+			Type<?> srcType = src.type();
+			if (avoidReferences && isClassBanal(srcType.rawType)) {
+				target.addExpanded(env, item,
+						new Constant<>(instance(srcType.rawType), false));
 				return;
 			}
-			final Type<? extends T> type = t.castTo(binding.type());
-			final Instance<T> bound = binding.locator.instance;
+			if (srcType.isAssignableTo(raw(Supplier.class))
+				&& !item.type().isAssignableTo(raw(Supplier.class))) {
+				@SuppressWarnings("unchecked")
+				Class<? extends Supplier<? extends T>> supplier = (Class<? extends Supplier<? extends T>>) srcType.rawType;
+				target.addExpanded(env,
+						item.complete(REFERENCE, Supply.reference(supplier)));
+				implicitlyBindToConstructor(env, src, item, target);
+				return;
+			}
+			final Type<? extends T> type = srcType.castTo(item.type());
+			final Instance<T> bound = item.locator.instance;
 			if (!bound.type().equalTo(type)
-				|| !linked.name.isCompatibleWith(bound.name)) {
-				bindings.addExpanded(env, binding.complete(REFERENCE,
-						Supply.instance(linked.typed(type))));
-				implicitlyBindToConstructor(env, binding, linked, bindings);
+				|| !src.name.isCompatibleWith(bound.name)) {
+				target.addExpanded(env, item.complete(REFERENCE,
+						Supply.instance(src.typed(type))));
+				implicitlyBindToConstructor(env, src, item, target);
 				Class<T> boundRawType = bound.type().rawType;
-				plugAnnotationsInto(env, bindings, binding.source, boundRawType,
+				plugAnnotationsInto(env, target, item.source, boundRawType,
 						ElementType.TYPE, boundRawType);
 				return;
 			}
 			if (type.isInterface())
-				throw InconsistentBinding.loop(binding, linked, bound);
-			bindToMirrorConstructor(env, bindings, binding, type.rawType);
+				throw InconsistentBinding.loop(item, src, bound);
+			bindToMirrorConstructor(env, type.rawType, item, target);
 		}
 
 	}
 
-	static <T> void implicitlyBindToConstructor(Env env, Binding<?> incomplete,
-			Instance<T> instance, Bindings bindings) {
-		Class<T> impl = instance.type().rawType;
+	static <T> void implicitlyBindToConstructor(Env env, Instance<T> src,
+			Binding<?> item, Bindings target) {
+		Class<T> impl = src.type().rawType;
 		if (isClassInstantiable(impl)) {
 			Binding<T> binding = Binding.binding(
-					new Locator<>(instance).indirect(
-							incomplete.locator.target.indirect),
-					BindingType.CONSTRUCTOR, null, incomplete.scope,
-					incomplete.source.typed(DeclarationType.IMPLICIT));
-			bindToMirrorConstructor(env, bindings, binding, impl);
+					new Locator<>(src).indirect(item.locator.target.indirect),
+					BindingType.CONSTRUCTOR, null, item.scope,
+					item.source.typed(DeclarationType.IMPLICIT));
+			bindToMirrorConstructor(env, impl, binding, target);
 		}
 	}
 
-	static <T> void bindToMirrorConstructor(Env env, Bindings bindings,
-			Binding<T> binding, Class<? extends T> impl) {
-		Constructor<? extends T> target = env.property(ConstructsBy.class,
-				binding.source.pkg()).reflect(impl);
-		if (target != null)
-			bindings.addExpanded(env, binding, New.bind(target));
+	static <T> void bindToMirrorConstructor(Env env, Class<? extends T> src,
+			Binding<T> item, Bindings target) {
+		Constructor<? extends T> c = env.property(ConstructsBy.class,
+				item.source.pkg()).reflect(src);
+		if (c != null)
+			target.addExpanded(env, item, New.bind(c));
 	}
 
-	static void plugAnnotationsInto(Env env, Bindings bindings, Source source,
+	static void plugAnnotationsInto(Env env, Bindings target, Source source,
 			Class<?> plugin, ElementType declaredType,
 			AnnotatedElement declaration) {
 		Annotation[] annotations = declaration.getAnnotations();
 		if (annotations.length > 0) {
 			for (Annotation a : annotations)
-				plugAnnotationInto(env, bindings, source, plugin, declaredType,
+				plugAnnotationInto(env, target, source, plugin, declaredType,
 						a.annotationType());
 		}
 	}
 
-	static void plugAnnotationInto(Env env, Bindings bindings, Source source,
+	static void plugAnnotationInto(Env env, Bindings target, Source source,
 			Class<?> plugin, ElementType declaredType,
 			Class<? extends Annotation> pluginPoint) {
-		bindings.addConstant(env, source.typed(DeclarationType.MULTI),
+		target.addConstant(env, source.typed(DeclarationType.MULTI),
 				pluginPoint(pluginPoint, declaredType.name()), Class.class,
 				plugin);
 	}

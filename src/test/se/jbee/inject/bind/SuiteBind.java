@@ -18,15 +18,15 @@ import org.junit.runners.Suite.SuiteClasses;
 		TestParentTargetBinds.class, TestModuleWithBinds.class,
 		TestRequiredProvidedBinds.class, TestStateDependentBinds.class,
 		TestPrimitiveArrayBinds.class, TestMultipleChoicesBinds.class,
-		TestMacroBinds.class, TestBootstrapper.class, TestLinker.class,
-		TestIssue1.class, TestDecoratorBinds.class, TestBinderModule.class,
-		TestExample1Binds.class, TestPluginBinds.class, TestMockingBinds.class,
-		TestLambdaBinds.class, TestInitialiserBinds.class,
-		TestEditionPackageBinds.class, TestPubSubBinds.class,
-		TestSetterInitialisationBinds.class, TestDynamicInitialiserBinds.class,
-		TestMacroBinds.class, TestGeneratorBinds.class,
-		TestDiskScopeBinds.class, TestConfigBinds.class,
-		TestInitialiserDecorationBinds.class,
+		TestCustomValueBinderBinds1.class, TestBootstrapper.class,
+		TestLinker.class, TestIssue1.class, TestDecoratorBinds.class,
+		TestBinderModule.class, TestExample1Binds.class, TestPluginBinds.class,
+		TestMockingBinds.class, TestLambdaBinds.class,
+		TestInitialiserBinds.class, TestEditionPackageBinds.class,
+		TestPubSubBinds.class, TestSetterInitialisationBinds.class,
+		TestDynamicInitialiserBinds.class, TestCustomValueBinderBinds1.class,
+		TestGeneratorBinds.class, TestDiskScopeBinds.class,
+		TestConfigBinds.class, TestInitialiserDecorationBinds.class,
 		TestInitialiserAnnotationBinds.class, TestPropertyAnnotationBinds.class,
 		TestInjectorHierarchy.class, TestAnnotatedWithBinds.class,
 		TestYieldListeners.class, TestCustomAnnotationBinds.class,
@@ -34,7 +34,8 @@ import org.junit.runners.Suite.SuiteClasses;
 		TestInstallInSubContextBinds.class, TestDefaultMacroBinds.class,
 		TestInjectorDecorationBinds.class,
 		TestServiceLoaderBootstrapBinds.class,
-		TestPrimitiveArrayBridgeBinds.class })
+		TestPrimitiveArrayBridgeBinds.class,
+		TestCustomValueBinderBinds2.class })
 public class SuiteBind {
 	// all tests in the bind package
 }

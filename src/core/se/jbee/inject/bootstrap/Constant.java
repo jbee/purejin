@@ -16,8 +16,15 @@ import se.jbee.inject.declare.ValueBinder;
 public final class Constant<T> {
 
 	public final T value;
+	public final boolean autoBindExactType;
 
 	public Constant(T value) {
-		this.value = value;
+		this(value, true);
 	}
+
+	public Constant(T value, boolean autoBindExactType) {
+		this.value = value;
+		this.autoBindExactType = autoBindExactType;
+	}
+
 }

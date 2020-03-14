@@ -39,17 +39,17 @@ import se.jbee.inject.declare.ValueBinder;
  * Demonstrates how to use {@link ValueBinder}s to customize the and binding
  * automatics.
  *
- * In particular the {@link InitialisationMacro} shows how one could initialize
+ * In particular the {@link FieldInjectionBinder} shows how one could initialize
  * fields when an instance is created by using a custom macro that decorates the
  * original {@link Supplier}.
  *
- * The {@link RequiredConstructorParametersMacro} shows how all parameters of a
+ * The {@link RequiredConstructorParametersBinder} shows how all parameters of a
  * type bound to a constructor can add bindings that make the parameter's types
  * required so that eager exception occurs if no type is known for a parameter.
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public class TestMacroBinds {
+public class TestCustomValueBinderBinds1 {
 
 	@Target({ METHOD, FIELD })
 	@Retention(RUNTIME)
@@ -71,7 +71,7 @@ public class TestMacroBinds {
 		String s;
 	}
 
-	private static class MacroBindsModule extends BinderModule {
+	private static class TestCustomValueBinderBinds1Module extends BinderModule {
 
 		@Override
 		protected void declare() {
@@ -93,11 +93,11 @@ public class TestMacroBinds {
 
 	}
 
-	private static final class CountMacro implements ValueBinder<Binding<?>> {
+	private static final class CountBinder implements ValueBinder<Binding<?>> {
 
 		int expands = 0;
 
-		CountMacro() {
+		CountBinder() {
 			// make visible
 		}
 
@@ -111,17 +111,17 @@ public class TestMacroBinds {
 
 	@Test
 	public void thatBindingsCanJustBeCounted() {
-		CountMacro count = new CountMacro();
-		CountMacro emptyCount = new CountMacro();
-		Injector injector = injectorWithMacro(MacroBindsModule.class, count);
-		injectorWithMacro(EmptyModule.class, emptyCount);
+		CountBinder count = new CountBinder();
+		CountBinder emptyCount = new CountBinder();
+		Injector injector = injectorWithEnv(TestCustomValueBinderBinds1Module.class, count);
+		injectorWithEnv(EmptyModule.class, emptyCount);
 		assertEquals(0, injector.resolve(Resource[].class).length);
 		assertEquals(6 + 2, count.expands - emptyCount.expands); // constructors cause 2 bindings each
 	}
 
-	private static Injector injectorWithMacro(Class<? extends Bundle> root,
-			ValueBinder<?> macro) {
-		return Bootstrap.injector(Bootstrap.ENV.withBinder(macro), root);
+	private static Injector injectorWithEnv(Class<? extends Bundle> root,
+			ValueBinder<?> binder) {
+		return Bootstrap.injector(Bootstrap.ENV.withBinder(binder), root);
 	}
 
 	/**
@@ -130,7 +130,7 @@ public class TestMacroBinds {
 	 *
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	static final class RequiredConstructorParametersMacro
+	static final class RequiredConstructorParametersBinder
 			implements ValueBinder<New<?>> {
 
 		@Override
@@ -153,25 +153,25 @@ public class TestMacroBinds {
 
 	@Test(expected = NoResourceForDependency.class)
 	public void thatAllConstructorParameterTypesCanBeMadeRequired() {
-		ValueBinder<?> required = new RequiredConstructorParametersMacro();
-		Injector injector = injectorWithMacro(MacroBindsModule.class, required);
+		ValueBinder<?> required = new RequiredConstructorParametersBinder();
+		Injector injector = injectorWithEnv(TestCustomValueBinderBinds1Module.class, required);
 		assertNull("we should not get here", injector);
 	}
 
 	/**
-	 * A simple example-wise {@link Supplier} that allows to initialized newly
+	 * A simple example-wise {@link Supplier} that allows to initialised newly
 	 * created instances.
 	 *
 	 * In this example a very basic field injection is build but it could be any
-	 * kind of context dependent instance initialization.
+	 * kind of context dependent instance initialisation.
 	 *
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	static final class InitialisationSupplier<T> implements Supplier<T> {
+	static final class FieldInjectionSupplier<T> implements Supplier<T> {
 
 		private final Supplier<T> decorated;
 
-		InitialisationSupplier(Supplier<T> decorated) {
+		FieldInjectionSupplier(Supplier<T> decorated) {
 			this.decorated = decorated;
 		}
 
@@ -196,12 +196,12 @@ public class TestMacroBinds {
 	 *
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	static final class InitialisationMacro implements ValueBinder<New<?>> {
+	static final class FieldInjectionBinder implements ValueBinder<New<?>> {
 
 		@Override
 		public <T> void expand(Env env, New<?> constructor,
 				Binding<T> incomplete, Bindings bindings) {
-			Supplier<T> supplier = new InitialisationSupplier<>(
+			Supplier<T> supplier = new FieldInjectionSupplier<>(
 					Supply.constructor(constructor.typed(incomplete.type())));
 			bindings.addExpanded(env,
 					incomplete.complete(CONSTRUCTOR, supplier));
@@ -211,8 +211,8 @@ public class TestMacroBinds {
 
 	@Test
 	public void thatCustomInitialisationCanBeAdded() {
-		Injector injector = injectorWithMacro(MacroBindsModule.class,
-				new InitialisationMacro());
+		Injector injector = injectorWithEnv(TestCustomValueBinderBinds1Module.class,
+				new FieldInjectionBinder());
 		assertEquals("answer", injector.resolve(Bar.class).s);
 	}
 }
