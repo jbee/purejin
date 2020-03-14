@@ -28,6 +28,7 @@ public class ServiceLoaderAnnotations extends BinderModule {
 
 	@Override
 	protected void declare() {
+		//TODO localise effect to package
 		for (ModuleWith<?> def : ServiceLoader.load(ModuleWith.class)) {
 			@SuppressWarnings("rawtypes")
 			Type<? extends ModuleWith> genericModuleType = Type.supertype(

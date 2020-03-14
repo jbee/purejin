@@ -265,8 +265,8 @@ public final class Container {
 			Type<T> type = dep.type();
 			Type<?> listType = type.rawType == Resource.class
 				|| type.rawType == Generator.class ? type.parameter(0) : type;
-			return new NoResourceForDependency(dep, resourcesForType(listType),
-					"");
+			return new NoResourceForDependency("", dep,
+					resourcesForType(listType));
 		}
 
 		@SuppressWarnings("unchecked")
@@ -275,8 +275,8 @@ public final class Container {
 			if (rawElemType == Resource.class || rawElemType == Generator.class)
 				return (T) resolveResources(dep, elemType.parameter(0));
 			if (dep.type().rawType.getComponentType().isPrimitive())
-				throw new NoResourceForDependency(dep, null,
-						"Primitive arrays cannot be used to inject all instances of the wrapper type. Use the wrapper array instead.");
+				throw new NoResourceForDependency("Primitive arrays cannot be used to inject all instances of the wrapper type. Use the wrapper array instead.", dep,
+						null);
 			Set<Integer> identities = new HashSet<>();
 			if (!elemType.isUpperBound()) {
 				List<E> elements = new ArrayList<>();

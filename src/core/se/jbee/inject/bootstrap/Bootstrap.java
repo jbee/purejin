@@ -67,15 +67,8 @@ public final class Bootstrap {
 		return ENV.complete(injector(env, root).asEnv());
 	}
 
-	@Deprecated
 	@SafeVarargs
-	public static Injector injector(Class<? extends Bundle>... roots) {
-		return injector(Bindings.newBindings(), ENV, roots);
-	}
-
-	@Deprecated
-	@SafeVarargs
-	public static Injector injector(Bindings bindings, Env env,
+	public static Injector injector(Env env, Bindings bindings,
 			Class<? extends Bundle>... roots) {
 		BuildinBootstrapper boots = new BuildinBootstrapper(env);
 		return injector(env, bindings, boots.modulesOf(boots.bundleAll(roots)));

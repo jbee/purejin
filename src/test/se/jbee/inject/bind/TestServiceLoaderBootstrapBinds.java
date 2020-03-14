@@ -1,4 +1,4 @@
-package se.jbee.inject.bootstrap;
+package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -11,6 +11,7 @@ import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bind.serviceloader.ServiceLoaderBundles;
 import se.jbee.inject.bind.serviceloader.ServiceLoaderEnvBundles;
+import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.declare.Bundle;
 import se.jbee.inject.declare.Module;
 
@@ -30,7 +31,7 @@ import se.jbee.inject.declare.Module;
  * {@link ServiceLoaderBundles} when bootstrapping an {@link Injector}. This
  * gives same control as always for this feature as well.
  */
-public class TestServiceContextBootstrapping {
+public class TestServiceLoaderBootstrapBinds {
 
 	@Test
 	public void serviceLoaderCanBeUsedToDeclareModuleRoots() {

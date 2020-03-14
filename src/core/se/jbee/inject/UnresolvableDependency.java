@@ -78,9 +78,9 @@ public abstract class UnresolvableDependency extends RuntimeException {
 	public static final class NoResourceForDependency
 			extends UnresolvableDependency {
 
-		public <T> NoResourceForDependency(Dependency<T> dependency,
-				Resource<?>[] available, String msg) {
-			super("No matching resource found.\n\t dependency: " + dependency
+		public <T> NoResourceForDependency(String msg, Dependency<T> dep,
+				Resource<?>... available) {
+			super("No matching resource found.\n\t dependency: " + dep
 				+ "\n\tavailable are (for same raw type): "
 				+ describe(available) + "\n\t" + msg);
 		}

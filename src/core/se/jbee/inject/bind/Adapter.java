@@ -17,13 +17,15 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Name;
 import se.jbee.inject.Provider;
 import se.jbee.inject.Scope;
+import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Supply;
+import se.jbee.inject.declare.Bindings;
 import se.jbee.inject.declare.Bootstrapper.Toggler;
-import se.jbee.inject.extend.Plugins;
 import se.jbee.inject.declare.Bundle;
 import se.jbee.inject.declare.Toggled;
+import se.jbee.inject.extend.Plugins;
 
 /**
  * Installs all the build-in functionality by using the core API.
@@ -144,22 +146,33 @@ public enum Adapter implements Toggled<Adapter> {
 
 	}
 
-	private static final class SubContextModule extends BinderModule {
+	private static final class SubContextModule extends BinderModule
+			implements se.jbee.inject.container.Supplier<Injector>, Injector {
 
 		@Override
 		protected void declare() {
 			asDefault().per(Scope.dependencyInstance).starbind(
-					Injector.class).toSupplier(SubContextModule::lazyInjector);
+					Injector.class).toSupplier(this);
 		}
 
-		final static Injector lazyInjector(Dependency<? super Injector> dep,
-				Injector context) {
+		@Override
+		public Injector supply(Dependency<? super Injector> dep,
+				Injector context) throws UnresolvableDependency {
 			@SuppressWarnings("unchecked")
 			Class<? extends Bundle>[] bundles = (Class<? extends Bundle>[]) //
 			context.resolve(Plugins.class).forPoint(Injector.class,
 					dep.instance.name.toString());
-			//TODO eventually forward the env here? get from context...
-			return Bootstrap.injector(bundles);
+			if (bundles.length == 0)
+				return this; // this module acts as an Injector that directly fails to resolve any Dependency 
+			return Bootstrap.injector(
+					context.resolve(Name.DEFAULT, Type.raw(Env.class)),
+					Bindings.newBindings(), bundles);
+		}
+
+		@Override
+		public <T> T resolve(Dependency<T> dep) throws UnresolvableDependency {
+			throw new UnresolvableDependency.NoResourceForDependency(
+					"Empty SubContext Injector", dep);
 		}
 
 	}
