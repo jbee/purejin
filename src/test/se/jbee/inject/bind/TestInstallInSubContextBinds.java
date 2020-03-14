@@ -3,9 +3,15 @@ package se.jbee.inject.bind;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static se.jbee.inject.Name.DEFAULT;
+import static se.jbee.inject.Type.raw;
 
 import org.junit.Test;
 
+import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -84,6 +90,20 @@ public class TestInstallInSubContextBinds {
 	public void anySubContextCanBeResolvedButItMightBeEmpty() {
 		Injector subContext = injector.subContext("withoutIntallIn");
 		assertNotNull(subContext);
+		try {
+			subContext.resolve(Injector.class);
+			fail("A non existing sub context shoudn't be able to resolve anything");
+		} catch (UnresolvableDependency e) {
+			assertTrue(e.getMessage().contains("Empty SubContext Injector"));
+		}
+	}
+
+	@Test
+	public void subContextEnvironmentIsSameAsRootContexts() {
+		Injector foo = injector.subContext("foo");
+		assertNotSame(foo, injector);
+		assertSame(injector.resolve(DEFAULT, raw(Env.class)),
+				foo.resolve(DEFAULT, raw(Env.class)));
 	}
 
 }
