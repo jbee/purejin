@@ -95,7 +95,6 @@ public final class Environment implements Env {
 			return new Environment(false, copyOfValues(), override, decorated) //
 					.with(name, property, value);
 		}
-		System.out.println(instance(named(name), property) + " => " + value);
 		values.put(instance(named(name), property), value);
 		return this;
 	}
