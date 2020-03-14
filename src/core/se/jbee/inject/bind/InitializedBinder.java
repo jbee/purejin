@@ -35,8 +35,12 @@ public abstract class InitializedBinder extends RootBinder {
 
 	protected final void __init__(Env env, Bindings bindings) {
 		Bootstrap.nonnullThrowsReentranceException(initialized);
-		this.bind = bind.into(env, bindings);
+		this.bind = init(bind.into(env, bindings));
 		initialized = true;
+	}
+
+	protected Bind init(Bind bind) {
+		return bind;
 	}
 
 }
