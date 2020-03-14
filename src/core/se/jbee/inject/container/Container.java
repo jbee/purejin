@@ -275,8 +275,9 @@ public final class Container {
 			if (rawElemType == Resource.class || rawElemType == Generator.class)
 				return (T) resolveResources(dep, elemType.parameter(0));
 			if (dep.type().rawType.getComponentType().isPrimitive())
-				throw new NoResourceForDependency("Primitive arrays cannot be used to inject all instances of the wrapper type. Use the wrapper array instead.", dep,
-						null);
+				throw new NoResourceForDependency(
+						"Primitive arrays cannot be used to inject all instances of the wrapper type. Use the wrapper array instead.",
+						dep);
 			Set<Integer> identities = new HashSet<>();
 			if (!elemType.isUpperBound()) {
 				List<E> elements = new ArrayList<>();

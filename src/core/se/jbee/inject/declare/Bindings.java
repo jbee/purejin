@@ -178,5 +178,10 @@ public final class Bindings {
 		public int hashCode() {
 			return constant == null ? super.hashCode() : constant.hashCode();
 		}
+
+		@Override
+		public String toString() {
+			return "constant " + String.valueOf(constant);
+		}
 	}
 }

@@ -33,7 +33,8 @@ import org.junit.runners.Suite.SuiteClasses;
 		TestArrayBinds.class, TestIndirectBinds.class,
 		TestInstallInSubContextBinds.class, TestDefaultMacroBinds.class,
 		TestInjectorDecorationBinds.class,
-		TestServiceLoaderBootstrapBinds.class })
+		TestServiceLoaderBootstrapBinds.class,
+		TestPrimitiveArrayBridgeBinds.class })
 public class SuiteBind {
 	// all tests in the bind package
 }

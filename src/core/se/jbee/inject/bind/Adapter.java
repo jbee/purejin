@@ -5,6 +5,9 @@
  */
 package se.jbee.inject.bind;
 
+import static se.jbee.inject.Scope.application;
+import static se.jbee.inject.Type.raw;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -80,7 +83,15 @@ public enum Adapter implements Toggled<Adapter> {
 	/**
 	 * Adds: {@link AnnotatedWith} via {@link AnnotatedWithModule}.
 	 */
-	ANNOTATED_WITH,;
+	ANNOTATED_WITH,
+	/**
+	 * Adds: That primitive arrays can be resolved for their wrapper types.
+	 * 
+	 * Note that this only supports one-dimensional arrays of int, long, float,
+	 * double and boolean. For further support add similar suppliers following
+	 * the example given.
+	 */
+	PRIMITIVE_ARRAYS;
 
 	@Override
 	public void bootstrap(Toggler<Adapter> bootstrapper) {
@@ -95,6 +106,7 @@ public enum Adapter implements Toggled<Adapter> {
 		bootstrapper.install(DefaultScopes.class, SCOPES);
 		bootstrapper.install(ExtensionModule.class, EXTENSION);
 		bootstrapper.install(AnnotatedWithModule.class, ANNOTATED_WITH);
+		bootstrapper.install(PrimitiveArraysModule.class, PRIMITIVE_ARRAYS);
 	}
 
 	private static class LoggerModule extends BinderModule {
@@ -201,6 +213,70 @@ public enum Adapter implements Toggled<Adapter> {
 			asDefault().bind(Env.class).to(env());
 		}
 
+	}
+
+	private static final class PrimitiveArraysModule extends BinderModule {
+
+		@Override
+		protected void declare() {
+			ScopedBinder asDefault = asDefault().per(application);
+			asDefault.bind(int[].class).toSupplier(PrimitiveArraysModule::ints);
+			asDefault.bind(long[].class).toSupplier(
+					PrimitiveArraysModule::longs);
+			asDefault.bind(float[].class).toSupplier(
+					PrimitiveArraysModule::floats);
+			asDefault.bind(double[].class).toSupplier(
+					PrimitiveArraysModule::doubles);
+			asDefault.bind(boolean[].class).toSupplier(
+					PrimitiveArraysModule::booleans);
+		}
+
+		private static int[] ints(Dependency<? super int[]> dep,
+				Injector context) {
+			Integer[] wrappers = context.resolve(
+					dep.typed(raw(Integer[].class)));
+			int[] ints = new int[wrappers.length];
+			for (int i = 0; i < ints.length; i++)
+				ints[i] = wrappers[i];
+			return ints;
+		}
+
+		public static long[] longs(Dependency<? super long[]> dep,
+				Injector context) {
+			Long[] wrappers = context.resolve(dep.typed(raw(Long[].class)));
+			long[] longs = new long[wrappers.length];
+			for (int i = 0; i < longs.length; i++)
+				longs[i] = wrappers[i];
+			return longs;
+		}
+
+		public static float[] floats(Dependency<? super float[]> dep,
+				Injector context) {
+			Float[] wrappers = context.resolve(dep.typed(raw(Float[].class)));
+			float[] floats = new float[wrappers.length];
+			for (int i = 0; i < floats.length; i++)
+				floats[i] = wrappers[i];
+			return floats;
+		}
+
+		public static double[] doubles(Dependency<? super double[]> dep,
+				Injector context) {
+			Double[] wrappers = context.resolve(dep.typed(raw(Double[].class)));
+			double[] doubles = new double[wrappers.length];
+			for (int i = 0; i < doubles.length; i++)
+				doubles[i] = wrappers[i];
+			return doubles;
+		}
+
+		public static boolean[] booleans(Dependency<? super boolean[]> dep,
+				Injector context) {
+			Boolean[] wrappers = context.resolve(
+					dep.typed(raw(Boolean[].class)));
+			boolean[] booleans = new boolean[wrappers.length];
+			for (int i = 0; i < booleans.length; i++)
+				booleans[i] = wrappers[i];
+			return booleans;
+		}
 	}
 
 }
