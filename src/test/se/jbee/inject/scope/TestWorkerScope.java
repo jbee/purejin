@@ -81,11 +81,9 @@ public class TestWorkerScope {
 			assertEquals("outer", yieldExisting(1, String.class));
 
 			// somewhere else where no access to level 0 controller is given
-			CompletableFuture<Void> waiter = new CompletableFuture<>();
 			Controller controllerLevel1 = getController();
 			Runnable asyncLevel2 = () -> {
 				controllerLevel1.allocate(); // transfer level 1 => 2
-				waiter.complete(null); // not level 1 can go on...
 				String actual = yieldExisting(1, String.class);
 				assertEquals("outer", actual);
 				controllerLevel1.deallocate();
@@ -93,8 +91,6 @@ public class TestWorkerScope {
 				asyncResult.complete(actual);
 			};
 			new Thread(asyncLevel2).start();
-			// need to make sure level 1 thread lasts long enough so that allocate in level 2 can occur
-			waitFor(waiter);
 
 			// back where allocate was done...
 			controllerLevel0.deallocate();

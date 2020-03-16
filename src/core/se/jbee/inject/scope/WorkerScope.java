@@ -55,12 +55,14 @@ public final class WorkerScope implements Scope {
 		final int generators;
 		final Thread src;
 		final ConcurrentMap<Thread, WorkerState> workerStates;
+		private volatile WorkerState srcWorkerState;
 
 		WorkerScopeController(int generators, Thread src,
 				ConcurrentMap<Thread, WorkerState> states) {
 			this.generators = generators;
 			this.src = src;
 			this.workerStates = states;
+			this.srcWorkerState = states.get(src);
 		}
 
 		@Override
@@ -74,9 +76,12 @@ public final class WorkerScope implements Scope {
 		}
 
 		private WorkerState getOrCreateState(Thread target) {
-			if (src == target)
-				return new WorkerState(new AtomicReferenceArray<>(generators));
-			WorkerState state = workerStates.get(src);
+			if (src == target) {
+				srcWorkerState = new WorkerState(
+						new AtomicReferenceArray<>(generators));
+				return srcWorkerState;
+			}
+			WorkerState state = srcWorkerState;
 			if (state == null)
 				throw contextNotAllocated("Transfer context");
 			return new WorkerState(state.instances);

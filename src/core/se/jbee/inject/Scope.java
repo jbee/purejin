@@ -148,7 +148,7 @@ public interface Scope {
 	public interface Controller {
 
 		/**
-		 * Activates a worker {@link Scope} to the current {@link Thread}.
+		 * Activates a worker {@link Scope} for the current {@link Thread}.
 		 * 
 		 * This method must be called by the worker {@link Thread} at the
 		 * beginning of starting a work item.
@@ -161,7 +161,7 @@ public interface Scope {
 		 * transferred to or shared with the current worker {@link Thread}.
 		 * Should the {@link Scope} be {@link #deallocate()}ed by the source of
 		 * the transfer it will continue to exist and be valid to use by this
-		 * worker {@link Thread} until it is also unlinked by it.
+		 * worker {@link Thread} until it is also deallocated by it.
 		 * 
 		 * Such transfer of {@link Scope} from one {@link Thread} to another
 		 * worker can occur whether or not the source created the {@link Scope}
@@ -170,8 +170,7 @@ public interface Scope {
 		void allocate();
 
 		/**
-		 * Deactivates an existing {@link Scope} from the current
-		 * {@link Thread}.
+		 * Deactivates an existing {@link Scope} for the current {@link Thread}.
 		 * 
 		 * This has no effect on the allocation state of other {@link Thread}s,
 		 * neither those receiving a transfer from the current {@link Thread}
