@@ -8,7 +8,7 @@ import se.jbee.inject.bind.BinderModuleWith;
 import se.jbee.inject.declare.Extends;
 
 /**
- * In contrast to {@link ServiceAnnotation} this will be bound to the annotation
+ * In contrast to {@code ServiceAnnotation} this will be bound to the annotation
  * using {@link ServiceLoader}.
  * 
  * There are two ways to link this class to an {@link Annotation}.
