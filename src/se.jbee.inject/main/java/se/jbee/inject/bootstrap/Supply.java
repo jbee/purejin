@@ -128,7 +128,7 @@ public final class Supply {
 		@SuppressWarnings("unchecked")
 		Resource<? extends T> resource = injector.resolve(
 				dep.typed(raw(Resource.class).parametized(dep.type())));
-		return () -> resource.yield(dep);
+		return () -> resource.yielt(dep);
 	}
 
 	private Supply() {

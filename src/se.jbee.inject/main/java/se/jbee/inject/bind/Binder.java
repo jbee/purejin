@@ -211,7 +211,7 @@ public class Binder {
 	}
 
 	/**
-	 * @see #installIn(String, Class)
+	 * @see #installIn(String, Class[])
 	 * @since 19.1
 	 */
 	@SafeVarargs
@@ -863,15 +863,15 @@ public class Binder {
 		}
 
 		@Override
-		public T yield(Dependency<? super T> dep)
+		public T yielt(Dependency<? super T> dep)
 				throws UnresolvableDependency {
-			return generator.yield(dep);
+			return generator.yielt(dep);
 		}
 
 		@Override
 		public T supply(Dependency<? super T> dep, Injector context)
 				throws UnresolvableDependency {
-			return yield(dep);
+			return yielt(dep);
 		}
 
 	}

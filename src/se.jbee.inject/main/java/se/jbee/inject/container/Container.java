@@ -77,7 +77,7 @@ public final class Container {
 
 	private static <T> void initEager(Resource<T> resource) {
 		if (resource.scoping.isEager())
-			resource.generator.yield(resource.locator.toDependency());
+			resource.generator.yielt(resource.locator.toDependency());
 	}
 
 	private Container() {
@@ -232,7 +232,7 @@ public final class Container {
 				return (T) this;
 			Resource<T> match = resourcesMatching(dep);
 			if (match != null)
-				return match.yield(dep);
+				return match.yielt(dep);
 			if (type.arrayDimensions() == 1)
 				return resolveArray(dep, type.baseType());
 			return resolveFromUpperBound(dep);
@@ -248,7 +248,7 @@ public final class Container {
 			Resource<?> match = arrayFindFirst(genericResources,
 					c -> dep.type().isAssignableTo(c.type()));
 			if (match != null)
-				return (T) match.yield((Dependency<Object>) dep);
+				return (T) match.yielt((Dependency<Object>) dep);
 			throw noResourceFor(dep);
 		}
 
@@ -333,7 +333,7 @@ public final class Container {
 			for (int i = 0; i < elementResources.length; i++) {
 				Resource<? extends E> elemResource = elementResources[i];
 				if (elemResource.locator.isMatching(elemDep)) {
-					E instance = elemResource.yield(elemDep);
+					E instance = elemResource.yielt(elemDep);
 					if (identities.add(identityHashCode(instance)))
 						elements.add(instance);
 				}
@@ -403,7 +403,7 @@ public final class Container {
 		}
 
 		@Override
-		public T yield(Dependency<? super T> dep)
+		public T yielt(Dependency<? super T> dep)
 				throws UnresolvableDependency {
 			return value.get(() -> supplier.supply(dep, injector));
 		}
@@ -441,7 +441,7 @@ public final class Container {
 		}
 
 		@Override
-		public T yield(Dependency<? super T> dep) {
+		public T yielt(Dependency<? super T> dep) {
 			dep.ensureNoIllegalDirectAccessOf(locator);
 			final Dependency<? super T> injected = dep.injectingInto(locator,
 					scoping);
@@ -505,7 +505,7 @@ public final class Container {
 			// this is not 100% generic as instance the type is derived from itself could be generic in a relevant way
 			// e.g. if List<String> should be initialised but not List<Integer> we just check for List here and fail later on
 			if (raw(type).isAssignableTo(initialiser.type().parameter(0)))
-				return (Initialiser<? super T>) resource.yield(
+				return (Initialiser<? super T>) resource.yielt(
 						dependency(initialiser.instance));
 			return null;
 		}

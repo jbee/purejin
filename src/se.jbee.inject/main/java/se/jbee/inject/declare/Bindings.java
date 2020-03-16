@@ -157,7 +157,7 @@ public final class Bindings {
 		}
 
 		@Override
-		public T yield(Dependency<? super T> dep)
+		public T yielt(Dependency<? super T> dep)
 				throws UnresolvableDependency {
 			return constant;
 		}
@@ -165,7 +165,7 @@ public final class Bindings {
 		@Override
 		public T supply(Dependency<? super T> dep, Injector context)
 				throws UnresolvableDependency {
-			return yield(dep);
+			return yielt(dep);
 		}
 
 		@Override
