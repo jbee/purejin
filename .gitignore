@@ -5,6 +5,7 @@ src/doc/
 lib/
 pom.*
 *~
+.bach
 .idea
 *.iml
 _site/
