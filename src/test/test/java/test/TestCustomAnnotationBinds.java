@@ -1,4 +1,4 @@
-package se.jbee.inject.bind;
+package test;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -19,6 +19,8 @@ import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Scope;
 import se.jbee.inject.UnresolvableDependency.IllegalAcccess;
+import se.jbee.inject.bind.BinderModule;
+import se.jbee.inject.bind.BinderModuleWith;
 import se.jbee.inject.bind.serviceloader.ServiceLoaderAnnotations;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.declare.Bundle;
