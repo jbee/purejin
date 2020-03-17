@@ -1,3 +1,4 @@
 language: java
 jdk: openjdk14
-install: jshell https://bit.do/bach-build
+install: jshell --version
+script: jshell https://bit.do/bach-build
