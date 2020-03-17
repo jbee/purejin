@@ -1,27 +1,3 @@
 language: java
-
-cache:
-  directories:
-  - '$HOME/lib'
-  - '$HOME/.sonar/cache'
-
-jdk:
-  - openjdk8
-  - openjdk9
-  - openjdk11
-
-install: ant test
-
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - ant
-      - ant-optional
-#  sonarcloud:
-#    organization: "jbee-github" # the key of the org you chose at step #3
-#    token:
-#      secure: "31be8765f44df02e40a5baaaaa83fcce0dee739a" # encrypted value of your token
-#script:
-#  - sonar-scanner
+jdk: openjdk14
+install: jshell https://bit.do/bach-build
