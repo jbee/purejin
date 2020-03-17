@@ -50,7 +50,7 @@ public class TestResolveResourceBinds {
 		Resource<String> resource = injector.resolve(
 				resourceTypeFor(String.class));
 		assertNotNull(resource);
-		assertEquals("foobar", resource.yield(dependency(String.class)));
+		assertEquals("foobar", resource.yielt(dependency(String.class)));
 	}
 
 	@Test
@@ -71,8 +71,8 @@ public class TestResolveResourceBinds {
 				resourcesTypeFor(String.class)).named("special");
 		Resource<String>[] rs = injector.resolve(dependency);
 		assertEquals(2, rs.length);
-		assertEquals("special-list", rs[0].yield(dependency(String.class)));
-		assertEquals("special", rs[1].yield(dependency(String.class)));
+		assertEquals("special-list", rs[0].yielt(dependency(String.class)));
+		assertEquals("special", rs[1].yielt(dependency(String.class)));
 	}
 
 	@Test
@@ -80,7 +80,7 @@ public class TestResolveResourceBinds {
 		Generator<String> generator = injector.resolve(
 				generatorTypeOf(raw(String.class)));
 		assertNotNull(generator);
-		assertEquals("foobar", generator.yield(dependency(String.class)));
+		assertEquals("foobar", generator.yielt(dependency(String.class)));
 	}
 
 	@Test

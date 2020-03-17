@@ -1,4 +1,4 @@
-module se.jbee.inject {
+open /*test*/ module se.jbee.inject /*overrides _main_ module*/ {
   exports se.jbee.inject;
   exports se.jbee.inject.action;
   exports se.jbee.inject.bind;
@@ -14,6 +14,7 @@ module se.jbee.inject {
   requires java.logging;
   requires java.desktop;
   requires java.management;
+  requires junit;
 
   uses se.jbee.inject.declare.Bundle;
   uses se.jbee.inject.declare.ModuleWith;

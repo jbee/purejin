@@ -41,11 +41,11 @@ public class TestArrayBinds {
 
 		@Override
 		protected void declare() {
-			bind(PRE_2, Double.class).to(new Double(2)); // used by both CMD_1 and CMD_2
+			bind(PRE_2, Double.class).to(2d); // used by both CMD_1 and CMD_2
 
 			bind(CMD_1, Command.class).toConstructor();
 			injectingInto(CMD_1, Command.class).multibind(Number.class).to(
-					new Integer(1));
+					1);
 			injectingInto(CMD_1, Command.class).multibind(Number.class).to(
 					PRE_2, Double.class);
 
@@ -53,9 +53,9 @@ public class TestArrayBinds {
 			injectingInto(CMD_2, Command.class).multibind(Number.class).to(
 					PRE_2, Double.class);
 			injectingInto(CMD_2, Command.class).multibind(Number.class).to(
-					new Float(3));
+					3f);
 			injectingInto(CMD_2, Command.class).multibind(Number.class).to(
-					new Long(5));
+					5L);
 
 			bind(CMD_3, Command.class).toConstructor();
 			injectingInto(CMD_3, Command.class).bind(Number.class).to(1, 6d, 8);

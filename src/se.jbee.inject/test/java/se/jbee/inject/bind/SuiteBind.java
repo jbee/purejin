@@ -29,7 +29,7 @@ import org.junit.runners.Suite.SuiteClasses;
 		TestConfigBinds.class, TestInitialiserDecorationBinds.class,
 		TestInitialiserAnnotationBinds.class, TestPropertyAnnotationBinds.class,
 		TestInjectorHierarchy.class, TestAnnotatedWithBinds.class,
-		TestYieldListeners.class, TestCustomAnnotationBinds.class,
+		TestYieldListeners.class,
 		TestArrayBinds.class, TestIndirectBinds.class,
 		TestInstallInSubContextBinds.class, TestDefaultMacroBinds.class,
 		TestInjectorDecorationBinds.class,
