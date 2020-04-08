@@ -38,19 +38,20 @@ public interface ConstructsBy {
 	ConstructsBy common = Utils::commonConstructorOrNull;
 
 	default ConstructsBy in(Packages filter) {
+		ConstructsBy self = this;
 		return new ConstructsBy() {
 
 			@Override
 			public <T> Constructor<T> reflect(Class<T> type) {
 				return filter.contains(Type.raw(type))
-					? this.reflect(type)
+					? self.reflect(type)
 					: null;
 			}
 		};
 	}
 
-	default ConstructsBy annotatedWith(
-			Class<? extends Annotation> marker) {
+	default ConstructsBy annotatedWith(Class<? extends Annotation> marker) {
+		ConstructsBy self = this;
 		return new ConstructsBy() {
 
 			@Override
@@ -59,9 +60,8 @@ public interface ConstructsBy {
 				Constructor<T>[] cs = (Constructor<T>[]) type.getDeclaredConstructors();
 				Constructor<T> marked = arrayFindFirst(cs,
 						c -> c.isAnnotationPresent(marker));
-				return marked != null ? marked : this.reflect(type);
+				return marked != null ? marked : self.reflect(type);
 			}
 		};
 	}
-
 }

@@ -6,11 +6,13 @@
 package se.jbee.inject;
 
 import static se.jbee.inject.Instance.anyOf;
+import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.arrayMap;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.Map;
 
 import se.jbee.inject.container.InjectionSite;
 
@@ -75,12 +77,12 @@ public final class Hint<T> implements Parameter<T> {
 
 	@SuppressWarnings("unchecked")
 	@SafeVarargs
-	public static <E> Hint<? extends E>[] bind(
+	public static <E> Hint<? extends E>[] match(
 			Parameter<? extends E>... elems) {
 		return arrayMap(elems, Hint.class, Parameter::asHint);
 	}
 
-	public static Hint<?>[] bind(Type<?>[] types, Parameter<?>... hints) {
+	public static Hint<?>[] match(Type<?>[] types, Parameter<?>... hints) {
 		if (types.length == 0)
 			return NO_PARAMS;
 		Hint<?>[] args = new Hint<?>[types.length];
@@ -160,6 +162,18 @@ public final class Hint<T> implements Parameter<T> {
 			return "value as " + asType;
 		return "ref to " + (absoluteRef != null ? absoluteRef : relativeRef)
 			+ " as " + asType;
+	}
+
+	public Hint<?> withActualType(java.lang.reflect.Parameter param,
+			Map<String, Type<?>> actualTypeArguments) {
+		if (value != null || absoluteRef != null)
+			return this;
+		java.lang.reflect.Type genericType = param.getParameterizedType();
+		Type<?> actualType = Type.type(genericType, actualTypeArguments);
+		if (param.getType() == Type.class) {
+			return constant(actualType.parameter(0));
+		}
+		return relativeReferenceTo(instance(relativeRef.name, actualType));
 	}
 
 }

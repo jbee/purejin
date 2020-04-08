@@ -5,7 +5,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static se.jbee.inject.Type.classType;
 import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.Type.returnType;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -45,6 +47,14 @@ public class TestType {
 
 	private interface XList<X extends Serializable, E> extends List<E> {
 		// needed to check supertypes() and isAssignableTo methods
+	}
+
+	public <E> XList<String, E> typeVariableWithActualTypeArgument() {
+		return null; // needed to check actual type arguments
+	}
+
+	public <E extends Number> XList<E, Integer> typeVariableWithActualTypeArgument2() {
+		return null; // needed to check actual type arguments
 	}
 
 	/**
@@ -332,6 +342,21 @@ public class TestType {
 		assertNotNull(raw(ArrayList.class).parametized(Integer.class).castTo(
 				raw(List.class).parametized(
 						Number.class).parametizedAsUpperBounds()));
+	}
+
+	@Test
+	public void actualTypeArguments() throws Exception {
+		assertEquals("{X=? extends java.io.Serializable, E=?}",
+				classType(XList.class).actualTypeArguments().toString());
+		assertEquals("{X=java.lang.String, E=java.lang.Integer}",
+				raw(XList.class).parametized(String.class,
+						Integer.class).actualTypeArguments().toString());
+		assertEquals("{X=java.lang.String, E=?}",
+				returnType(getClass().getMethod(
+						"typeVariableWithActualTypeArgument")).actualTypeArguments().toString());
+		assertEquals("{X=? extends java.lang.Number, E=java.lang.Integer}",
+				returnType(getClass().getMethod(
+						"typeVariableWithActualTypeArgument2")).actualTypeArguments().toString());
 	}
 
 	private static void assertContains(Type<?>[] actual, Type<?> expected) {

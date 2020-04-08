@@ -77,7 +77,7 @@ public final class Container {
 
 	private static <T> void initEager(Resource<T> resource) {
 		if (resource.scoping.isEager())
-			resource.generator.yield(resource.locator.toDependency());
+			resource.generator.generate(resource.locator.toDependency());
 	}
 
 	private Container() {
@@ -103,7 +103,7 @@ public final class Container {
 		final Resource<? extends Initialiser<?>>[] postConstruct;
 		Initialiser<Injector>[] injectorInitialisers;
 		Injector initialised;
-		final YieldListener listener;
+		final GeneratorListener listener;
 
 		InjectorImpl(Injectee<?>... injectees) {
 			this.generators = injectees.length;
@@ -113,17 +113,17 @@ public final class Container {
 			this.listener = initListeners();
 		}
 
-		private YieldListener initListeners() {
-			YieldListener[] listeners = resolve(YieldListener[].class);
+		private GeneratorListener initListeners() {
+			GeneratorListener[] listeners = resolve(GeneratorListener[].class);
 			if (listeners.length == 0)
 				return null;
 			if (listeners.length == 1)
 				return listeners[0];
-			return new YieldListener() {
+			return new GeneratorListener() {
 				@Override
 				public <T> void onStableInstanceGeneration(int serialID,
 						Locator<T> locator, Scoping scoping, T instance) {
-					for (YieldListener l : listeners)
+					for (GeneratorListener l : listeners)
 						l.onStableInstanceGeneration(serialID, locator, scoping,
 								instance);
 				}
@@ -198,9 +198,12 @@ public final class Container {
 				Map<Class<?>, Resource<?>[]> byType) {
 			List<Resource<?>> res = new ArrayList<>();
 			for (Resource<?>[] forType : byType.values())
-				for (Resource<?> resource : forType)
-					if (resource.type().isUpperBound())
+				for (Resource<?> resource : forType) {
+					Type<?> type = resource.type();
+					if (type.isUpperBound()
+						|| type.isParameterizedAsUpperBound())
 						res.add(resource);
+				}
 			Collections.sort(res);
 			return res.isEmpty() ? null : res.toArray(new Resource[res.size()]);
 		}
@@ -232,7 +235,7 @@ public final class Container {
 				return (T) this;
 			Resource<T> match = resourcesMatching(dep);
 			if (match != null)
-				return match.yield(dep);
+				return match.generate(dep);
 			if (type.arrayDimensions() == 1)
 				return resolveArray(dep, type.baseType());
 			return resolveFromUpperBound(dep);
@@ -248,7 +251,7 @@ public final class Container {
 			Resource<?> match = arrayFindFirst(genericResources,
 					c -> dep.type().isAssignableTo(c.type()));
 			if (match != null)
-				return (T) match.yield((Dependency<Object>) dep);
+				return (T) match.generate((Dependency<Object>) dep);
 			throw noResourceFor(dep);
 		}
 
@@ -333,7 +336,7 @@ public final class Container {
 			for (int i = 0; i < elementResources.length; i++) {
 				Resource<? extends E> elemResource = elementResources[i];
 				if (elemResource.locator.isMatching(elemDep)) {
-					E instance = elemResource.yield(elemDep);
+					E instance = elemResource.generate(elemDep);
 					if (identities.add(identityHashCode(instance)))
 						elements.add(instance);
 				}
@@ -403,7 +406,7 @@ public final class Container {
 		}
 
 		@Override
-		public T yield(Dependency<? super T> dep)
+		public T generate(Dependency<? super T> dep)
 				throws UnresolvableDependency {
 			return value.get(() -> supplier.supply(dep, injector));
 		}
@@ -441,7 +444,7 @@ public final class Container {
 		}
 
 		@Override
-		public T yield(Dependency<? super T> dep) {
+		public T generate(Dependency<? super T> dep) {
 			dep.ensureNoIllegalDirectAccessOf(locator);
 			final Dependency<? super T> injected = dep.injectingInto(locator,
 					scoping);
@@ -505,7 +508,7 @@ public final class Container {
 			// this is not 100% generic as instance the type is derived from itself could be generic in a relevant way
 			// e.g. if List<String> should be initialised but not List<Integer> we just check for List here and fail later on
 			if (raw(type).isAssignableTo(initialiser.type().parameter(0)))
-				return (Initialiser<? super T>) resource.yield(
+				return (Initialiser<? super T>) resource.generate(
 						dependency(initialiser.instance));
 			return null;
 		}

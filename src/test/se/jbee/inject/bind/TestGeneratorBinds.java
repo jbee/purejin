@@ -23,7 +23,7 @@ public class TestGeneratorBinds {
 		}
 
 		@Override
-		public String yield(Dependency<? super String> dep)
+		public String generate(Dependency<? super String> dep)
 				throws UnresolvableDependency {
 			return "hello world";
 		}

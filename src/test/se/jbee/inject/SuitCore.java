@@ -7,7 +7,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({ TestName.class, TestType.class, TestPackages.class,
 		TestMoreApplicable.class, TestTarget.class, TestDeclarationType.class,
-		TestEqualsHashCode.class, TestSerializable.class })
+		TestEqualsHashCode.class, TestSerializable.class,
+		TestTypeVariable.class })
 public class SuitCore {
 
 }

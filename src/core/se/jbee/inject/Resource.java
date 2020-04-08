@@ -54,8 +54,8 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 	}
 
 	@Override
-	public T yield(Dependency<? super T> dep) throws UnresolvableDependency {
-		return generator.yield(dep);
+	public T generate(Dependency<? super T> dep) throws UnresolvableDependency {
+		return generator.generate(dep);
 	}
 
 	public Type<T> type() {

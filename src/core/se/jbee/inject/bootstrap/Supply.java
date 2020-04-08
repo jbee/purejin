@@ -5,7 +5,8 @@
  */
 package se.jbee.inject.bootstrap;
 
-import static se.jbee.inject.Hint.bind;
+import static java.util.stream.Collectors.toMap;
+import static se.jbee.inject.Hint.match;
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Type.parameterTypes;
 import static se.jbee.inject.Type.raw;
@@ -15,7 +16,11 @@ import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.logging.Logger;
 
 import se.jbee.inject.Dependency;
@@ -27,6 +32,7 @@ import se.jbee.inject.Parameter;
 import se.jbee.inject.Provider;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Type;
+import se.jbee.inject.TypeVariable;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.Utils;
@@ -85,7 +91,7 @@ public final class Supply {
 
 	public static <E> Supplier<E[]> elements(Type<E[]> arrayType,
 			Parameter<? extends E>[] elements) {
-		return new PredefinedArraySupplier<>(arrayType, Hint.bind(elements));
+		return new PredefinedArraySupplier<>(arrayType, Hint.match(elements));
 	}
 
 	public static <T> Supplier<T> instance(Instance<T> instance) {
@@ -111,14 +117,23 @@ public final class Supply {
 		};
 	}
 
-	public static <T> Supplier<T> method(Produces<T> method) {
-		return new MethodSupplier<>(method,
-				bind(parameterTypes(method.target), method.hints));
+	public static <T> Supplier<T> method(Produces<T> producer) {
+		if (producer.hasTypeVariables && producer.requestsActualType()) {
+			// use a constant null hint to blank first parameter as it is filled in with actual type on method invocation
+			Hint<?> actualTypeHint = Hint.constantNull(
+					Type.parameterType(producer.target.getParameters()[0]));
+			return new Producer<>(producer,
+					match(parameterTypes(producer.target),
+							Utils.arrayPrepand(actualTypeHint, producer.hints)),
+					Dependency::type);
+		}
+		return new Producer<>(producer,
+				match(parameterTypes(producer.target), producer.hints), null);
 	}
 
 	public static <T> Supplier<T> constructor(New<T> constructor) {
 		return new ConstructorSupplier<>(constructor.target,
-				bind(parameterTypes(constructor.target), constructor.hints));
+				match(parameterTypes(constructor.target), constructor.hints));
 	}
 
 	public static <T> Provider<T> lazyProvider(Dependency<T> dep,
@@ -128,7 +143,7 @@ public final class Supply {
 		@SuppressWarnings("unchecked")
 		Resource<? extends T> resource = injector.resolve(
 				dep.typed(raw(Resource.class).parametized(dep.type())));
-		return () -> resource.yield(dep);
+		return () -> resource.generate(dep);
 	}
 
 	private Supply() {
@@ -198,29 +213,51 @@ public final class Supply {
 		}
 	}
 
-	private static final class MethodSupplier<T> extends WithArgs<T> {
+	private static final class Producer<T> extends WithArgs<T> {
 
 		private Object owner;
-		private final Produces<T> method;
+		private final Produces<T> producer;
 		private final Class<T> returns;
+		private final Map<String, UnaryOperator<Type<?>>> typeVariableResolvers;
 
-		MethodSupplier(Produces<T> method, Hint<?>[] args) {
-			super(args);
-			this.method = method;
-			this.returns = method.returns.rawType;
-			this.owner = method.owner;
+		Producer(Produces<T> producer, Hint<?>[] args,
+				Function<Dependency<?>, Object> supplyActual) {
+			super(args, supplyActual);
+			this.producer = producer;
+			this.returns = producer.returns.rawType;
+			this.owner = producer.owner;
+			this.typeVariableResolvers = producer.hasTypeVariables
+				? TypeVariable.typeVariables(
+						producer.target.getGenericReturnType())
+				: null;
 		}
 
 		@Override
 		protected T invoke(Object[] args, Injector context) {
-			if (method.isInstanceMethod && owner == null)
-				owner = context.resolve(method.target.getDeclaringClass());
-			return returns.cast(Utils.produce(method.target, owner, args));
+			if (producer.isInstanceMethod && owner == null)
+				owner = context.resolve(producer.target.getDeclaringClass());
+			return returns.cast(Utils.produce(producer.target, owner, args));
+		}
+
+		@Override
+		protected Hint<?>[] hintsFor(Dependency<? super T> dep) {
+			if (!producer.hasTypeVariables)
+				return hints;
+			Hint<?>[] actualTypeHints = hints.clone();
+			Map<String, Type<?>> actualTypes = typeVariableResolvers.entrySet().stream() //
+					.collect(toMap(Entry::getKey,
+							e -> e.getValue().apply(dep.type())));
+			java.lang.reflect.Parameter[] params = producer.target.getParameters();
+			for (int i = 0; i < actualTypeHints.length; i++) {
+				actualTypeHints[i] = actualTypeHints[i].withActualType(
+						params[i], actualTypes);
+			}
+			return actualTypeHints;
 		}
 
 		@Override
 		public String toString() {
-			return describe(method.target);
+			return describe(producer.target);
 		}
 	}
 
@@ -234,11 +271,18 @@ public final class Supply {
 
 	public abstract static class WithArgs<T> implements Supplier<T> {
 
-		private final Hint<?>[] args;
+		protected final Hint<?>[] hints;
+		private final Function<Dependency<?>, Object> supplyActual;
 		private InjectionSite previous;
 
-		WithArgs(Hint<?>[] args) {
-			this.args = args;
+		WithArgs(Hint<?>[] params) {
+			this(params, null);
+		}
+
+		WithArgs(Hint<?>[] hints,
+				Function<Dependency<?>, Object> supplyActual) {
+			this.hints = hints;
+			this.supplyActual = supplyActual;
 		}
 
 		protected abstract T invoke(Object[] args, Injector context);
@@ -251,12 +295,17 @@ public final class Supply {
 			// threads calling
 			InjectionSite local = previous;
 			if (local == null || !local.site.equalTo(dep)) {
-				local = new InjectionSite(context, dep, args);
+				local = new InjectionSite(context, dep, hintsFor(dep));
 				previous = local;
 			}
-			return invoke(local.args(context), context);
+			Object[] args = local.args(context);
+			if (supplyActual != null)
+				args[0] = supplyActual.apply(dep);
+			return invoke(args, context);
 		}
 
+		protected Hint<?>[] hintsFor(Dependency<? super T> dep) {
+			return hints;
+		}
 	}
-
 }

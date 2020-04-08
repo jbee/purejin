@@ -12,17 +12,17 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Locator;
 import se.jbee.inject.Scoping;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.container.YieldListener;
+import se.jbee.inject.container.GeneratorListener;
 
 /**
- * Test that demonstrates how {@link YieldListener} can be bound to track
+ * Test that demonstrates how {@link GeneratorListener} can be bound to track
  * the order of instance creation during the bootstrapping of an application
  * tree here simulated by types A, B and C.
  * 
  * This sort of thing can be used to later tear down such instances in reverse
  * order.
  */
-public class TestYieldListeners {
+public class TestGeneratorListener {
 
 	static class A {
 
@@ -47,7 +47,7 @@ public class TestYieldListeners {
 
 	}
 
-	static class CreationListener implements YieldListener {
+	static class CreationListener implements GeneratorListener {
 
 		final List<Object> created = new ArrayList<>();
 
@@ -65,7 +65,7 @@ public class TestYieldListeners {
 			construct(A.class);
 			construct(B.class);
 			construct(C.class);
-			multibind(YieldListener.class).to(CreationListener.class);
+			multibind(GeneratorListener.class).to(CreationListener.class);
 		}
 
 	}

@@ -11,7 +11,6 @@ import static se.jbee.inject.Type.returnType;
 import static se.jbee.inject.Utils.arrayFilter;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.TypeVariable;
@@ -33,15 +32,15 @@ import se.jbee.inject.Type;
 @FunctionalInterface
 public interface ProducesBy {
 
-	Method[] __noMethodsArray = new Method[0];
+	Method[] __noMethods = new Method[0];
 
 	/**
-	 * @return The {@link Member}s that should be used in the context this
+	 * @return The {@link Method}s that should be used in the context this
 	 *         {@link ProducesBy} is used.
 	 */
 	Method[] reflect(Class<?> impl);
 
-	ProducesBy noMethods = impl -> __noMethodsArray;
+	ProducesBy noMethods = impl -> __noMethods;
 	ProducesBy declaredMethods = ((ProducesBy) Class::getDeclaredMethods).ignoreSynthetic();
 	ProducesBy allMethods = ((ProducesBy) ProducesBy::allMethods).ignoreSynthetic();
 
@@ -85,7 +84,7 @@ public interface ProducesBy {
 	default ProducesBy in(Packages filter) {
 		return impl -> filter.contains(raw(impl))
 			? this.reflect(impl)
-			: __noMethodsArray;
+			: __noMethods;
 	}
 
 	static Method[] allMethods(Class<?> type) {
@@ -94,6 +93,6 @@ public interface ProducesBy {
 			all.addAll(asList(type.getDeclaredMethods()));
 			type = type.getSuperclass();
 		}
-		return all.toArray(new Method[0]);
+		return all.toArray(__noMethods);
 	}
 }

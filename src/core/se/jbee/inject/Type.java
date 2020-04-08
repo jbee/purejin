@@ -23,6 +23,7 @@ import java.lang.reflect.WildcardType;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -30,11 +31,11 @@ import java.util.Set;
 /**
  * A generic version of {@link Class} like {@link java.lang.reflect.Type} but
  * without a complex hierarchy. Instead all cases are represented as a general
- * model. The key difference is that this model just describes concrete types.
- * So there is no representation for a {@link TypeVariable}.
+ * model. The key difference is that this model just describes actual types.
+ * There is no representation for a {@link TypeVariable}.
  * 
- * There are some generic cases ({@code ? super X} types) that are not supported
- * right now because they haven't been needed.
+ * Lower bound types ({@code ? super X}) are not supported as they usually are
+ * not needed in context of injection.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
@@ -94,14 +95,15 @@ public final class Type<T>
 		Type<?>[] wildcards = new Type<?>[variables.length];
 		Arrays.fill(wildcards, WILDCARD);
 		for (int i = 0; i < variables.length; i++) {
-			if (variables[i].getBounds().length == 1) {
-				wildcards[i] = Type.type(
-						variables[i].getBounds()[0]).asUpperBound();
-			} else {
-				wildcards[i] = WILDCARD;
-			}
+			wildcards[i] = wildcard(variables[i]);
 		}
 		return wildcards;
+	}
+
+	private static Type<?> wildcard(TypeVariable<?> var) {
+		return var.getBounds().length == 1
+			? Type.type(var.getBounds()[0]).asUpperBound()
+			: WILDCARD;
 	}
 
 	public static <T> Type<T> raw(Class<T> type) {
@@ -118,15 +120,18 @@ public final class Type<T>
 		return type(type, Collections.emptyMap());
 	}
 
-	private static Type<?> type(java.lang.reflect.Type type,
+	public static Type<?> type(java.lang.reflect.Type type,
 			Map<String, Type<?>> actualTypeArguments) {
 		if (type instanceof Class<?>)
-			return raw((Class<?>) type); //TODO shouldn't this return the actual class type with all generics?
+			return classType((Class<?>) type);
 		if (type instanceof ParameterizedType)
 			return parameterizedType((ParameterizedType) type,
 					actualTypeArguments);
-		if (type instanceof TypeVariable<?>)
-			return actualTypeArguments.get(((TypeVariable<?>) type).getName());
+		if (type instanceof TypeVariable<?>) {
+			TypeVariable<?> var = (TypeVariable<?>) type;
+			Type<?> typeArgument = actualTypeArguments.get(var.getName());
+			return typeArgument == null ? wildcard(var) : typeArgument;
+		}
 		if (type instanceof GenericArrayType) {
 			GenericArrayType gat = (GenericArrayType) type;
 			return type(gat.getGenericComponentType()).addArrayDimension();
@@ -297,6 +302,15 @@ public final class Type<T>
 	 */
 	public boolean isUpperBound() {
 		return upperBound;
+	}
+
+	/**
+	 * @return true if this {@link Type#isParameterized()} and any of its
+	 *         parameters {@link #isUpperBound()}
+	 */
+	public boolean isParameterizedAsUpperBound() {
+		return isParameterized()
+			&& arrayContains(params, p -> p.isUpperBound());
 	}
 
 	/**
@@ -480,6 +494,10 @@ public final class Type<T>
 		return res;
 	}
 
+	public Map<String, Type<?>> actualTypeArguments() {
+		return actualTypeArguments(this);
+	}
+
 	/**
 	 * @return a list of all super-classes and super-interfaces of this type
 	 *         starting with the direct super-class followed by the direct
@@ -510,7 +528,7 @@ public final class Type<T>
 	}
 
 	private static <V> Map<String, Type<?>> actualTypeArguments(Type<V> type) {
-		Map<String, Type<?>> actualTypeArguments = new HashMap<>();
+		Map<String, Type<?>> actualTypeArguments = new LinkedHashMap<>();
 		TypeVariable<Class<V>>[] typeParams = type.rawType.getTypeParameters();
 		for (int i = 0; i < typeParams.length; i++) {
 			// it would be correct to use the joint type of the bounds but since it is not possible to create a type with illegal parameters it is ok to just use Object since there is no way to model a joint type

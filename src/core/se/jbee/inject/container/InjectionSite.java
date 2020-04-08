@@ -10,9 +10,9 @@ import static se.jbee.inject.container.Cast.resourceTypeFor;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Generator;
 import se.jbee.inject.Hint;
-import se.jbee.inject.Resource;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
+import se.jbee.inject.Resource;
 import se.jbee.inject.UnresolvableDependency;
 
 /**
@@ -76,6 +76,7 @@ public final class InjectionSite {
 						resourceTypeFor(ref.type)).named(ref.name);
 				Resource<?> resource = injector.resolve(resourceDep);
 				if (resource.scoping.isStableByDesign()) {
+					//TODO and not has type variable involved
 					preResolvedArgs[i] = yield(resource,
 							site.instanced(hint.relativeRef));
 				} else {
@@ -89,6 +90,6 @@ public final class InjectionSite {
 
 	@SuppressWarnings("unchecked")
 	private static <I> I yield(Generator<I> gen, Dependency<?> dep) {
-		return gen.yield((Dependency<? super I>) dep);
+		return gen.generate((Dependency<? super I>) dep);
 	}
 }

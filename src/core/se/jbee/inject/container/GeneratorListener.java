@@ -9,13 +9,13 @@ import se.jbee.inject.Scoping;
  * Listener interface invoked by the {@link Injector}. Implementations are bound
  * as part of the {@link Injector} context.
  * 
- * Keep in mind that any instance implementing {@link YieldListener} is created
- * ahead of the tracking so these cannot be tracked even if they qualify as
- * stable instances.
+ * Keep in mind that any instance implementing {@link GeneratorListener} is
+ * created ahead of the tracking so these cannot be tracked even if they qualify
+ * as stable instances.
  * 
  * @since 19.1
  */
-public interface YieldListener {
+public interface GeneratorListener {
 
 	/**
 	 * Called by the {@link Injector} when an instance which is

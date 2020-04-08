@@ -31,7 +31,7 @@ import se.jbee.inject.scope.WorkerScope;
  * are not just used within the actual {@link Supplier}s but also accessible
  * directly by resolving a {@link Constructor} or {@link Method} array.
  */
-public class TestDefaultMacroBinds {
+public class TestDefaultValueBinderBinds {
 
 	@Target(METHOD)
 	@Retention(RUNTIME)
@@ -58,7 +58,7 @@ public class TestDefaultMacroBinds {
 		}
 	}
 
-	static class TestDefaultMacroBindsModule extends BinderModule {
+	static class TestDefaultValueBinderBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
@@ -71,7 +71,7 @@ public class TestDefaultMacroBinds {
 	}
 
 	private final Injector injector = Bootstrap.injector(
-			TestDefaultMacroBindsModule.class);
+			TestDefaultValueBinderBindsModule.class);
 
 	/**
 	 * This isn't what this test wants to verify but this verifies the setup

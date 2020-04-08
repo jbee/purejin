@@ -45,6 +45,7 @@ import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.config.NamesBy;
 import se.jbee.inject.config.ProducesBy;
 import se.jbee.inject.config.ScopesBy;
+import se.jbee.inject.config.SharesBy;
 import se.jbee.inject.container.Initialiser;
 import se.jbee.inject.container.Supplier;
 import se.jbee.inject.declare.Binding;
@@ -360,6 +361,7 @@ public class Binder {
 	public static class AutoBinder {
 
 		private final ScopedBinder binder;
+		private final SharesBy sharesBy;
 		private final ConstructsBy constructsBy;
 		private final ProducesBy producesBy;
 		private final NamesBy namesBy;
@@ -371,6 +373,7 @@ public class Binder {
 			this.binder = binder.on(bind.asAuto()).on(bind.next()).per(scope);
 			Env env = bind.env;
 			Package where = bind.source.pkg();
+			this.sharesBy = env.property(SharesBy.class, where);
 			this.constructsBy = env.property(ConstructsBy.class, where);
 			this.producesBy = env.property(ProducesBy.class, where);
 			this.namesBy = env.property(NamesBy.class, where);
@@ -378,10 +381,11 @@ public class Binder {
 			this.hintsBy = env.property(HintsBy.class, where);
 		}
 
-		private AutoBinder(ScopedBinder binder, ConstructsBy constructsBy,
-				ProducesBy producesBy, NamesBy namesBy, ScopesBy scopesBy,
-				HintsBy hintsBy) {
+		private AutoBinder(ScopedBinder binder, SharesBy constantsBy,
+				ConstructsBy constructsBy, ProducesBy producesBy,
+				NamesBy namesBy, ScopesBy scopesBy, HintsBy hintsBy) {
 			this.binder = binder;
+			this.sharesBy = constantsBy;
 			this.constructsBy = constructsBy;
 			this.producesBy = producesBy;
 			this.namesBy = namesBy;
@@ -389,29 +393,34 @@ public class Binder {
 			this.hintsBy = hintsBy;
 		}
 
+		public AutoBinder sharesBy(SharesBy mirror) {
+			return new AutoBinder(binder, mirror, constructsBy, producesBy,
+					namesBy, scopesBy, hintsBy);
+		}
+
 		public AutoBinder constructBy(ConstructsBy mirror) {
-			return new AutoBinder(binder, mirror, producesBy, namesBy, scopesBy,
-					hintsBy);
+			return new AutoBinder(binder, sharesBy, mirror, producesBy, namesBy,
+					scopesBy, hintsBy);
 		}
 
 		public AutoBinder produceBy(ProducesBy mirror) {
-			return new AutoBinder(binder, constructsBy, mirror, namesBy,
-					scopesBy, hintsBy);
+			return new AutoBinder(binder, sharesBy, constructsBy, mirror,
+					namesBy, scopesBy, hintsBy);
 		}
 
 		public AutoBinder nameBy(NamesBy mirror) {
-			return new AutoBinder(binder, constructsBy, producesBy, mirror,
-					scopesBy, hintsBy);
+			return new AutoBinder(binder, sharesBy, constructsBy, producesBy,
+					mirror, scopesBy, hintsBy);
 		}
 
 		public AutoBinder scopeBy(ScopesBy mirror) {
-			return new AutoBinder(binder, constructsBy, producesBy, namesBy,
-					mirror, hintsBy);
+			return new AutoBinder(binder, sharesBy, constructsBy, producesBy,
+					namesBy, mirror, hintsBy);
 		}
 
 		public AutoBinder parameteriseBy(HintsBy mirror) {
-			return new AutoBinder(binder, constructsBy, producesBy, namesBy,
-					scopesBy, mirror);
+			return new AutoBinder(binder, sharesBy, constructsBy, producesBy,
+					namesBy, scopesBy, mirror);
 		}
 
 		public void in(Class<?> service) {
@@ -419,11 +428,11 @@ public class Binder {
 		}
 
 		public void in(Object service, Parameter<?>... hints) {
-			bindMirrorMethodsIn(service.getClass(), service, hints);
+			bindProducersIn(service.getClass(), service, hints);
 		}
 
 		public void in(Class<?> service, Parameter<?>... hints) {
-			boolean boundInstanceMethods = bindMirrorMethodsIn(service, null,
+			boolean boundInstanceMethods = bindProducersIn(service, null,
 					hints);
 			if (!boundInstanceMethods)
 				return; // do not try to construct the class
@@ -432,7 +441,7 @@ public class Binder {
 				bind(target, hints);
 		}
 
-		private boolean bindMirrorMethodsIn(Class<?> impl, Object instance,
+		private boolean bindProducersIn(Class<?> impl, Object instance,
 				Parameter<?>[] hints) {
 			boolean instanceMethods = false;
 			for (Method method : producesBy.reflect(impl)) {
@@ -863,15 +872,15 @@ public class Binder {
 		}
 
 		@Override
-		public T yield(Dependency<? super T> dep)
+		public T generate(Dependency<? super T> dep)
 				throws UnresolvableDependency {
-			return generator.yield(dep);
+			return generator.generate(dep);
 		}
 
 		@Override
 		public T supply(Dependency<? super T> dep, Injector context)
 				throws UnresolvableDependency {
-			return yield(dep);
+			return generate(dep);
 		}
 
 	}

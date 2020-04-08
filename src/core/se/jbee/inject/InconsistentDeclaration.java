@@ -21,7 +21,7 @@ public class InconsistentDeclaration extends RuntimeException {
 		super(cause);
 	}
 
-	protected InconsistentDeclaration(String msg) {
+	public InconsistentDeclaration(String msg) {
 		super(msg);
 	}
 

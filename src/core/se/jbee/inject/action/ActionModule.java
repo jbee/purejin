@@ -197,7 +197,7 @@ public abstract class ActionModule extends BinderModule {
 			this.injection = new InjectionSite(injector,
 					dependency(site.output).injectingInto(
 							site.action.getDeclaringClass()),
-					Hint.bind(types, Hint.constantNull(site.input)));
+					Hint.match(types, Hint.constantNull(site.input)));
 			this.inputIndex = asList(types).indexOf(site.input);
 		}
 

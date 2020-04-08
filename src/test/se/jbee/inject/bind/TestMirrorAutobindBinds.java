@@ -36,7 +36,7 @@ public class TestMirrorAutobindBinds {
 
 	static final StringBuffer STATE = new StringBuffer();
 
-	static class ReflectorAutobindBindsModule extends BinderModule {
+	static class TestMirrorAutobindBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
@@ -144,7 +144,7 @@ public class TestMirrorAutobindBinds {
 	}
 
 	private final Injector injector = Bootstrap.injector(
-			ReflectorAutobindBindsModule.class);
+			TestMirrorAutobindBindsModule.class);
 
 	@Test
 	public void thatInstanceFactoryMethodIsAvailable() {
