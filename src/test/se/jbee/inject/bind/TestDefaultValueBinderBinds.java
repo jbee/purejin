@@ -1,5 +1,6 @@
 package se.jbee.inject.bind;
 
+import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static java.util.Arrays.asList;
@@ -8,10 +9,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static se.jbee.inject.config.ProducesBy.allMethods;
+import static se.jbee.inject.config.SharesBy.allFields;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.HashSet;
@@ -33,13 +36,16 @@ import se.jbee.inject.scope.WorkerScope;
  */
 public class TestDefaultValueBinderBinds {
 
-	@Target(METHOD)
+	@Target({ METHOD, FIELD })
 	@Retention(RUNTIME)
 	static @interface Produces {
 
 	}
 
 	static class Example {
+
+		@Produces
+		static final Float CONSTANT = 42.0f;
 
 		private String value;
 
@@ -64,8 +70,10 @@ public class TestDefaultValueBinderBinds {
 		protected void declare() {
 			injectingInto(Example.class).bind(String.class).to("constant");
 			// use mirrors and an annotation to bind methods as Supplier
-			autobind().produceBy(allMethods.annotatedWith(Produces.class)).in(
-					Example.class);
+			autobind() //
+					.produceBy(allMethods.annotatedWith(Produces.class)) //
+					.shareBy(allFields.annotatedWith(Produces.class)) //
+					.in(Example.class);
 		}
 
 	}
@@ -88,7 +96,7 @@ public class TestDefaultValueBinderBinds {
 	}
 
 	@Test
-	public void macroNewBindsConstructor() {
+	public void valueBinderNewBindsConstructor() {
 		Constructor<?>[] constructors = injector.resolve(Constructor[].class);
 		assertTrue(constructors.length > 0);
 		assertNoDuplicates(constructors);
@@ -97,11 +105,19 @@ public class TestDefaultValueBinderBinds {
 	}
 
 	@Test
-	public void macroFactoryBindsMethod() {
+	public void valueBinderProducesBindsMethod() {
 		Method[] methods = injector.resolve(Method[].class);
 		assertTrue(methods.length > 0);
 		assertNoDuplicates(methods);
 		assertDeclaringClasses(methods, Example.class);
+	}
+
+	@Test
+	public void valueBinderSharesBindsField() {
+		Field[] constants = injector.resolve(Field[].class);
+		assertTrue(constants.length > 0);
+		assertNoDuplicates(constants);
+		assertDeclaringClasses(constants, Example.class);
 	}
 
 	private static void assertDeclaringClasses(Member[] actual,

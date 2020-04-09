@@ -8,6 +8,7 @@ import java.util.function.Function;
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
+import se.jbee.inject.Resource;
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.config.ProducesBy;
@@ -21,9 +22,17 @@ public class TestTypeVariableAutobindBinds {
 			autobind().produceBy(ProducesBy.declaredMethods).in(this);
 		}
 
-		<T> Function<T, String> actualTypeAndValue(
-				Type<Function<T, String>> valueType) {
-			return val -> valueType.toString() + ":" + val.toString();
+		/**
+		 * As the first parameter is the same {@link Type} as the return type of
+		 * the this method the actual expected return type is injected. This
+		 * allows to use methods with type variables as part of the dependency
+		 * injection. The actual return type results from the type that is
+		 * resolved by the {@link Injector}. If no {@link Resource} is bound to
+		 * the exact match generic {@link Resource} like this method match.
+		 */
+		<T> Function<T, String> injectsActualReturnType(
+				Type<Function<T, String>> actualReturnType) {
+			return val -> actualReturnType.toString() + ":" + val.toString();
 		}
 	}
 
@@ -31,7 +40,8 @@ public class TestTypeVariableAutobindBinds {
 			TestTypeVariableAutobindBindsModule.class);
 
 	@Test
-	public void test() {
+	public void actualReturnTypeIsInjectedAsFirstArgumentIfParameterTypeMatchesTypeOfReturnType() {
+		@SuppressWarnings("unchecked")
 		Function<Integer, String> f = context.resolve(
 				raw(Function.class).parametized(Integer.class, String.class));
 		assertEquals(
