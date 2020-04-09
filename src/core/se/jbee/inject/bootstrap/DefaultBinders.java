@@ -24,6 +24,7 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import se.jbee.inject.DeclarationType;
@@ -34,6 +35,7 @@ import se.jbee.inject.Name;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Source;
 import se.jbee.inject.Type;
+import se.jbee.inject.Utils;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.container.Supplier;
 import se.jbee.inject.declare.Binding;
@@ -58,6 +60,7 @@ public final class DefaultBinders {
 	public static final ValueBinder<Parameter<?>[]> ARRAY = new ArrayElementsBinder();
 	public static final ValueBinder<New<?>> NEW = new NewBinder();
 	public static final ValueBinder<Produces<?>> PRODUCES = new ProducesBinder();
+	public static final ValueBinder<Shares<?>> SHARES = new SharesBinder();
 	public static final ValueBinder<Constant<?>> CONSTANT = new ConstantBinder();
 
 	/**
@@ -120,6 +123,17 @@ public final class DefaultBinders {
 		}
 	}
 
+	static final class TypeParametrizedReferenceBinder
+			implements ValueBinder.Completion<Class<?>> {
+
+		@Override
+		public <T> Binding<T> complete(Binding<T> item, Class<?> to) {
+			return item.complete(REFERENCE,
+					parametrizedInstance(anyOf(raw(to).castTo(item.type()))));
+		}
+
+	}
+
 	static final class ProducesBinder implements ValueBinder<Produces<?>> {
 
 		@Override
@@ -136,13 +150,19 @@ public final class DefaultBinders {
 		}
 	}
 
-	static final class TypeParametrizedReferenceBinder
-			implements ValueBinder.Completion<Class<?>> {
+	static final class SharesBinder implements ValueBinder<Shares<?>> {
 
 		@Override
-		public <T> Binding<T> complete(Binding<T> item, Class<?> to) {
-			return item.complete(REFERENCE,
-					parametrizedInstance(anyOf(raw(to).castTo(item.type()))));
+		public <T> void expand(Env env, Shares<?> src, Binding<T> item,
+				Bindings target) {
+			Source source = item.source;
+			target.addExpanded(env, item, new Constant<>(
+					Utils.share(src.constant, src.owner), false));
+			target.addConstant(env, source.typed(MULTI), Name.DEFAULT,
+					Field.class, src.constant);
+			plugAnnotationsInto(env, target, source,
+					src.constant.getDeclaringClass(), ElementType.FIELD,
+					src.constant);
 		}
 
 	}

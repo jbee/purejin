@@ -14,7 +14,6 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
 import se.jbee.inject.Utils;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.config.ProducesBy;
 
 public class TestCollectionConverter {
 
@@ -23,19 +22,10 @@ public class TestCollectionConverter {
 		static final Converter<String, Integer> str2int = Integer::parseInt;
 		static final Converter<? extends Object[], List<?>> arr2list = Arrays::asList;
 
-		@Override
-		protected void declare() {
-			//TODO replace with autobind version using sharesBy
-			autobindConvertersIn(this);
-			autobind().produceBy(ProducesBy.declaredMethods).inModule();
-		}
-
 		static <B> Converter<String, B[]> arrayConverter(Type<B> elementType,
 				Converter<String, B> elementConverter) {
-			return in -> {
-				return Utils.arrayMap(in.split(","), elementType.rawType,
-						elementConverter::convert);
-			};
+			return in -> Utils.arrayMap(in.split(","), elementType.rawType,
+					elementConverter::convert);
 		}
 	}
 

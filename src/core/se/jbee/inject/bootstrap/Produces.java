@@ -5,11 +5,11 @@
  */
 package se.jbee.inject.bootstrap;
 
+import static java.lang.reflect.Modifier.isStatic;
 import static se.jbee.inject.Type.parameterType;
 import static se.jbee.inject.Utils.accessible;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Type;
@@ -25,7 +25,7 @@ import se.jbee.inject.declare.ValueBinder;
  */
 public final class Produces<T> implements Typed<T> {
 
-	public static Produces<?> bind(Object owner, Method target,
+	public static Produces<?> produces(Object owner, Method target,
 			Parameter<?>... hints) {
 		return new Produces<>(owner, target, hints);
 	}
@@ -43,7 +43,7 @@ public final class Produces<T> implements Typed<T> {
 		this.target = accessible(target);
 		this.hints = hints;
 		this.owner = owner;
-		this.isInstanceMethod = !Modifier.isStatic(target.getModifiers());
+		this.isInstanceMethod = !isStatic(target.getModifiers());
 		Type.returnType(target).toSupertype(returns); // make sure types are compatible
 		if (owner != null
 			&& !owner.getClass().isAssignableFrom(target.getDeclaringClass())) {

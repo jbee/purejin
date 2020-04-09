@@ -417,6 +417,14 @@ public final class Utils {
 		}
 	}
 
+	public static Object share(Field target, Object owner) throws SupplyFailed {
+		try {
+			return target.get(owner);
+		} catch (Exception e) {
+			throw SupplyFailed.valueOf(e, target);
+		}
+	}
+
 	public static <T> T instance(Class<T> type) {
 		return construct(accessible(noArgsConstructor(type)));
 	}

@@ -9,6 +9,6 @@ import org.junit.runners.Suite.SuiteClasses;
 		TestMoreApplicable.class, TestTarget.class, TestDeclarationType.class,
 		TestEqualsHashCode.class, TestSerializable.class,
 		TestTypeVariable.class })
-public class SuitCore {
+public class SuiteCore {
 
 }

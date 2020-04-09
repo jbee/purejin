@@ -20,13 +20,13 @@ import java.util.Set;
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Utils;
-import se.jbee.inject.config.SharesBy;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.config.Edition;
 import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.config.NamesBy;
 import se.jbee.inject.config.ProducesBy;
 import se.jbee.inject.config.ScopesBy;
+import se.jbee.inject.config.SharesBy;
 import se.jbee.inject.container.Container;
 import se.jbee.inject.declare.Binding;
 import se.jbee.inject.declare.Bindings;
@@ -50,6 +50,7 @@ public final class Bootstrap {
 			.withBinder(DefaultBinders.NEW) //
 			.withBinder(DefaultBinders.CONSTANT) //
 			.withBinder(DefaultBinders.PRODUCES) //
+			.withBinder(DefaultBinders.SHARES) //
 			.withBinder(DefaultBinders.INSTANCE_REF) //
 			.withBinder(DefaultBinders.PARAMETRIZED_REF) //
 			.withBinder(DefaultBinders.ARRAY) //

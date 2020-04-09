@@ -18,7 +18,7 @@ public class TestTypeVariableAutobindBinds {
 
 		@Override
 		protected void declare() {
-			autobind().produceBy(ProducesBy.declaredMethods).inModule();
+			autobind().produceBy(ProducesBy.declaredMethods).in(this);
 		}
 
 		<T> Function<T, String> actualTypeAndValue(

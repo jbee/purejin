@@ -5,8 +5,8 @@ import static org.junit.Assert.assertSame;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Packages.packageAndSubPackagesOf;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.config.NamesBy.defaultName;
 import static se.jbee.inject.config.HintsBy.noParameters;
+import static se.jbee.inject.config.NamesBy.defaultName;
 import static se.jbee.inject.config.ProducesBy.allMethods;
 import static se.jbee.inject.config.ProducesBy.declaredMethods;
 import static se.jbee.inject.container.Cast.providerTypeOf;
@@ -42,7 +42,7 @@ public class TestMirrorAutobindBinds {
 		protected void declare() {
 			autobind() //
 					.produceBy(declaredMethods) //
-					.inModule();
+					.in(this);
 			autobind() //
 					.produceBy(allMethods.annotatedWith(WebMethod.class)) //
 					.nameBy(defaultName.unlessAnnotatedWith(Resource.class)) //

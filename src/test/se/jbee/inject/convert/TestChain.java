@@ -9,7 +9,6 @@ import java.math.BigInteger;
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
-import se.jbee.inject.bind.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 
 public class TestChain {
@@ -25,18 +24,11 @@ public class TestChain {
 		}
 	}
 
-	private static class TestChainModule extends BinderModule {
+	static class TestChainModule extends ConverterModule {
 
-		@Override
-		protected void declare() {
-			//TODO use more elegant way to declare...
-			Converter<String, Long> str2int = Long::parseLong;
-			bind(raw(Converter.class) //
-					.parametized(String.class, Long.class)).to(str2int);
-			Converter<Long, Integer> long2int = Long::intValue;
-			bind(raw(Converter.class) //
-					.parametized(Long.class, Integer.class)).to(long2int);
-		}
+		Converter<String, Long> str2long = Long::parseLong;
+		Converter<Long, Integer> long2int = Long::intValue;
+
 	}
 
 	private final Injector context = Bootstrap.injector(TestChainModule.class);

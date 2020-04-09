@@ -65,7 +65,7 @@ public interface SharesBy {
 		return impl -> arrayFilter(this.reflect(impl), filter);
 	}
 
-	default SharesBy returnTypeAssignableTo(Type<?> supertype) {
+	default SharesBy typeAssignableTo(Type<?> supertype) {
 		return select(field -> fieldType(field).isAssignableTo(supertype));
 	}
 

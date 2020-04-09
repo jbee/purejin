@@ -102,8 +102,7 @@ public final class Chain<B> {
 						Name.named(nameAndType[0]),
 						imports.resolve(nameAndType[1]));
 			} else {
-				chainInstances[i] = defaultInstanceOf(
-						imports.resolve(chain[i]));
+				chainInstances[i] = Instance.anyOf(imports.resolve(chain[i]));
 			}
 		}
 		return chainInstances;

@@ -12,6 +12,7 @@ import static se.jbee.inject.Utils.annotationPropertyByType;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
 import se.jbee.inject.Name;
@@ -32,8 +33,16 @@ public interface NamesBy {
 
 	NamesBy defaultName = obj -> Name.DEFAULT;
 
-	default NamesBy unlessAnnotatedWith(
-			Class<? extends Annotation> naming) {
+	static NamesBy memberNameOr(NamesBy fallback) {
+		return obj -> {
+			if (obj instanceof Member) {
+				return Name.named(((Member) obj).getName());
+			}
+			return fallback.reflect(obj);
+		};
+	}
+
+	default NamesBy unlessAnnotatedWith(Class<? extends Annotation> naming) {
 		if (naming == null)
 			return this;
 		Method nameProperty = annotationPropertyByType(String.class, naming);

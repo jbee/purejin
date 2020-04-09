@@ -8,6 +8,6 @@ import se.jbee.inject.event.SuiteEventSlow;
 
 @RunWith(Suite.class)
 @SuiteClasses({ SuiteAllFast.class, SuiteEventSlow.class })
-public class SuitAllSlow {
+public class SuiteAllSlow {
 
 }

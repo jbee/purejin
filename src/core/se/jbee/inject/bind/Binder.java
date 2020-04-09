@@ -5,12 +5,14 @@
  */
 package se.jbee.inject.bind;
 
+import static java.lang.reflect.Modifier.isStatic;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Instance.defaultInstanceOf;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Source.source;
 import static se.jbee.inject.Target.targeting;
+import static se.jbee.inject.Type.fieldType;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.isClassInstantiable;
 import static se.jbee.inject.Utils.newArray;
@@ -18,8 +20,8 @@ import static se.jbee.inject.container.Cast.initialiserTypeOf;
 import static se.jbee.inject.extend.Plugins.pluginPoint;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.function.BiConsumer;
 
 import se.jbee.inject.Dependency;
@@ -39,6 +41,7 @@ import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bootstrap.Constant;
 import se.jbee.inject.bootstrap.New;
 import se.jbee.inject.bootstrap.Produces;
+import se.jbee.inject.bootstrap.Shares;
 import se.jbee.inject.bootstrap.Supply;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.config.HintsBy;
@@ -393,7 +396,7 @@ public class Binder {
 			this.hintsBy = hintsBy;
 		}
 
-		public AutoBinder sharesBy(SharesBy mirror) {
+		public AutoBinder shareBy(SharesBy mirror) {
 			return new AutoBinder(binder, mirror, constructsBy, producesBy,
 					namesBy, scopesBy, hintsBy);
 		}
@@ -428,35 +431,49 @@ public class Binder {
 		}
 
 		public void in(Object service, Parameter<?>... hints) {
-			bindProducersIn(service.getClass(), service, hints);
+			in(service.getClass(), service, hints);
 		}
 
 		public void in(Class<?> service, Parameter<?>... hints) {
-			boolean boundInstanceMethods = bindProducersIn(service, null,
-					hints);
-			if (!boundInstanceMethods)
+			in(service, null, hints);
+		}
+
+		private void in(Class<?> service, Object instance,
+				Parameter<?>... hints) {
+			boolean needsInstance1 = bindProducersIn(service, instance, hints);
+			boolean needsInstance2 = bindSharesIn(service, instance);
+			if (!needsInstance1 && !needsInstance2)
 				return; // do not try to construct the class
 			Constructor<?> target = constructsBy.reflect(service);
 			if (target != null)
 				bind(target, hints);
 		}
 
+		private <T> boolean bindSharesIn(Class<?> impl, Object instance) {
+			boolean needsInstance = false;
+			for (Field constant : sharesBy.reflect(impl)) {
+				binder.bind(namesBy.reflect(constant), fieldType(constant)).to(
+						instance, constant);
+				needsInstance |= !isStatic(constant.getModifiers());
+			}
+			return needsInstance;
+		}
+
 		private boolean bindProducersIn(Class<?> impl, Object instance,
 				Parameter<?>[] hints) {
-			boolean instanceMethods = false;
-			for (Method method : producesBy.reflect(impl)) {
-				Type<?> returns = Type.returnType(method);
+			boolean needsInstance = false;
+			for (Method producer : producesBy.reflect(impl)) {
+				Type<?> returns = Type.returnType(producer);
 				if (returns.rawType != void.class
 					&& returns.rawType != Void.class) {
 					if (hints.length == 0)
-						hints = hintsBy.reflect(method);
-					binder.bind(namesBy.reflect(method), returns).to(instance,
-							method, hints);
-					instanceMethods = instanceMethods
-						|| !Modifier.isStatic(method.getModifiers());
+						hints = hintsBy.reflect(producer);
+					binder.bind(namesBy.reflect(producer), returns).to(instance,
+							producer, hints);
+					needsInstance |= !isStatic(producer.getModifiers());
 				}
 			}
-			return instanceMethods;
+			return needsInstance;
 		}
 
 		private <T> void bind(Constructor<T> target, Parameter<?>... hints) {
@@ -479,10 +496,6 @@ public class Binder {
 			in(impl);
 			for (Class<?> i : more)
 				in(i);
-		}
-
-		public void inModule() {
-			in(binder.bind().source.ident);
 		}
 	}
 
@@ -665,7 +678,11 @@ public class Binder {
 				Parameter<?>... hints) {
 			if (hints.length == 0)
 				hints = env(HintsBy.class).reflect(target);
-			expand(Produces.bind(owner, target, hints));
+			expand(Produces.produces(owner, target, hints));
+		}
+
+		protected final void to(Object owner, Field constant) {
+			expand(Shares.shares(owner, constant));
 		}
 
 		protected final void expand(Object value) {
@@ -680,8 +697,7 @@ public class Binder {
 		}
 
 		private void declareBindingsIn(Binding<?> binding, Object value) {
-			Bindings bindings = bindings();
-			bindings.addExpanded(env(), binding, value);
+			bindings().addExpanded(env(), binding, value);
 		}
 
 		public void toSupplier(Supplier<? extends T> supplier) {
