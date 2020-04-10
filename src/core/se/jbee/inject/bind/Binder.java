@@ -363,7 +363,7 @@ public class Binder {
 	 */
 	public static class AutoBinder {
 
-		private final ScopedBinder binder;
+		private final RootBinder binder;
 		private final SharesBy sharesBy;
 		private final ConstructsBy constructsBy;
 		private final ProducesBy producesBy;
@@ -373,18 +373,20 @@ public class Binder {
 
 		protected AutoBinder(RootBinder binder, Name scope) {
 			Bind bind = binder.bind();
-			this.binder = binder.on(bind.asAuto()).on(bind.next()).per(scope);
+			this.binder = binder.on(bind.asAuto()).on(bind.next());
 			Env env = bind.env;
 			Package where = bind.source.pkg();
 			this.sharesBy = env.property(SharesBy.class, where);
 			this.constructsBy = env.property(ConstructsBy.class, where);
 			this.producesBy = env.property(ProducesBy.class, where);
 			this.namesBy = env.property(NamesBy.class, where);
-			this.scopesBy = env.property(ScopesBy.class, where);
 			this.hintsBy = env.property(HintsBy.class, where);
+			this.scopesBy = scope.equalTo(Scope.mirror)
+				? env.property(ScopesBy.class, where)
+				: target -> scope;
 		}
 
-		private AutoBinder(ScopedBinder binder, SharesBy constantsBy,
+		private AutoBinder(RootBinder binder, SharesBy constantsBy,
 				ConstructsBy constructsBy, ProducesBy producesBy,
 				NamesBy namesBy, ScopesBy scopesBy, HintsBy hintsBy) {
 			this.binder = binder;
@@ -440,7 +442,7 @@ public class Binder {
 
 		private void in(Class<?> service, Object instance,
 				Parameter<?>... hints) {
-			boolean needsInstance1 = bindProducersIn(service, instance, hints);
+			boolean needsInstance1 = bindProducesIn(service, instance, hints);
 			boolean needsInstance2 = bindSharesIn(service, instance);
 			if (!needsInstance1 && !needsInstance2)
 				return; // do not try to construct the class
@@ -452,14 +454,14 @@ public class Binder {
 		private <T> boolean bindSharesIn(Class<?> impl, Object instance) {
 			boolean needsInstance = false;
 			for (Field constant : sharesBy.reflect(impl)) {
-				binder.bind(namesBy.reflect(constant), fieldType(constant)).to(
-						instance, constant);
+				binder.per(Scope.container).bind(namesBy.reflect(constant),
+						fieldType(constant)).to(instance, constant);
 				needsInstance |= !isStatic(constant.getModifiers());
 			}
 			return needsInstance;
 		}
 
-		private boolean bindProducersIn(Class<?> impl, Object instance,
+		private boolean bindProducesIn(Class<?> impl, Object instance,
 				Parameter<?>[] hints) {
 			boolean needsInstance = false;
 			for (Method producer : producesBy.reflect(impl)) {
@@ -468,8 +470,9 @@ public class Binder {
 					&& returns.rawType != Void.class) {
 					if (hints.length == 0)
 						hints = hintsBy.reflect(producer);
-					binder.bind(namesBy.reflect(producer), returns).to(instance,
-							producer, hints);
+					binder.per(scopesBy.reflect(producer)) //
+							.bind(namesBy.reflect(producer), returns) //
+							.to(instance, producer, hints);
 					needsInstance |= !isStatic(producer.getModifiers());
 				}
 			}
@@ -481,7 +484,7 @@ public class Binder {
 			if (hints.length == 0)
 				hints = hintsBy.reflect(target);
 			Class<T> impl = target.getDeclaringClass();
-			Binder appBinder = binder.root.per(Scope.application).implicit();
+			Binder appBinder = binder.per(Scope.application).implicit();
 			if (name.isDefault()) {
 				appBinder.autobind(impl).to(target, hints);
 			} else {

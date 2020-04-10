@@ -59,14 +59,7 @@ public final class Container {
 	public static Injector injector(Injectee<?>... injectees) {
 		InjectorImpl impl = new InjectorImpl(injectees);
 		initEager(impl);
-		// run initialisers for the injector
-		Injector res = impl;
-		if (impl.injectorInitialisers != null)
-			for (Initialiser<Injector> init : impl.injectorInitialisers)
-				res = init.init(res, impl);
-		impl.injectorInitialisers = null; // no longer needed
-		impl.initialised = res;
-		return res;
+		return impl.getDecorated();
 	}
 
 	private static void initEager(Iterable<Resource<?>[]> byType) {
@@ -101,8 +94,8 @@ public final class Container {
 		private final Map<Class<?>, Resource<?>[]> resourcesByType;
 		private final Resource<?>[] genericResources;
 		final Resource<? extends Initialiser<?>>[] postConstruct;
-		Initialiser<Injector>[] injectorInitialisers;
-		Injector initialised;
+		private Initialiser<Injector>[] injectorInitialisers;
+		private final Injector initialised;
 		final GeneratorListener listener;
 
 		InjectorImpl(Injectee<?>... injectees) {
@@ -111,6 +104,18 @@ public final class Container {
 			this.genericResources = genericResources(resourcesByType);
 			this.postConstruct = initInitialisers();
 			this.listener = initListeners();
+			// run initialisers for the injector
+			Injector decorated = this;
+			if (injectorInitialisers != null) {
+				for (Initialiser<Injector> init : injectorInitialisers)
+					decorated = init.init(decorated, this);
+				injectorInitialisers = null; // no longer needed
+			}
+			this.initialised = decorated;
+		}
+
+		Injector getDecorated() {
+			return initialised;
 		}
 
 		private GeneratorListener initListeners() {
@@ -223,22 +228,30 @@ public final class Container {
 		public <T> T resolve(Dependency<T> dep) {
 			final Type<T> type = dep.type();
 			final Class<T> rawType = type.rawType;
-			if (rawType == Resource.class || rawType == Generator.class) {
-				Resource<?> res = resourcesMatching(dep.onTypeParameter());
-				if (res != null)
-					return (T) res;
-			}
 			if (rawType == Injector.class
 				&& (dep.instance.name.isAny() || dep.instance.name.isDefault()))
 				return (T) initialised;
 			if (rawType == Env.class && dep.instance.name.equalTo(Name.AS))
 				return (T) this;
-			Resource<T> match = resourcesMatching(dep);
-			if (match != null)
-				return match.generate(dep);
+			// Resource based...
+			boolean isResourceResolution = rawType == Resource.class
+				|| rawType == Generator.class;
+			if (isResourceResolution) {
+				Resource<?> res = resourcesMatching(dep.onTypeParameter());
+				if (res != null)
+					return (T) res;
+			} else {
+				Resource<T> match = resourcesMatching(dep);
+				if (match != null)
+					return match.generate(dep);
+			}
 			if (type.arrayDimensions() == 1)
 				return resolveArray(dep, type.baseType());
-			return resolveFromUpperBound(dep);
+			if (isResourceResolution) {
+				return (T) resolveFromUpperBound(dep.onTypeParameter());
+			}
+			return (T) resolveFromUpperBound(dep).generate(
+					(Dependency<Object>) dep);
 		}
 
 		/**
@@ -246,12 +259,12 @@ public final class Container {
 		 * wild-card binding, that is a binding capable of producing all
 		 * sub-types of a certain super-type.
 		 */
-		@SuppressWarnings("unchecked")
-		private <T> T resolveFromUpperBound(Dependency<T> dep) {
+		private <T> Resource<?> resolveFromUpperBound(Dependency<T> dep) {
+			Type<T> type = dep.type();
 			Resource<?> match = arrayFindFirst(genericResources,
-					c -> dep.type().isAssignableTo(c.type()));
+					c -> type.isAssignableTo(c.type()));
 			if (match != null)
-				return (T) match.generate((Dependency<Object>) dep);
+				return match;
 			throw noResourceFor(dep);
 		}
 
@@ -476,7 +489,7 @@ public final class Container {
 		}
 
 		private Injector injector() {
-			Injector initialised = injector.initialised;
+			Injector initialised = injector.getDecorated();
 			return initialised != null ? initialised : injector;
 		}
 

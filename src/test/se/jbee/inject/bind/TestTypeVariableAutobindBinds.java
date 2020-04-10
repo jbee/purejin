@@ -48,4 +48,5 @@ public class TestTypeVariableAutobindBinds {
 				"java.util.function.Function<java.lang.Integer,java.lang.String>:42",
 				f.apply(42));
 	}
+
 }

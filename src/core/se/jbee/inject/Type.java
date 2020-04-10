@@ -134,13 +134,14 @@ public final class Type<T>
 		}
 		if (type instanceof GenericArrayType) {
 			GenericArrayType gat = (GenericArrayType) type;
-			return type(gat.getGenericComponentType()).addArrayDimension();
+			return type(gat.getGenericComponentType(),
+					actualTypeArguments).addArrayDimension();
 		}
 		if (type instanceof WildcardType) {
 			WildcardType wt = (WildcardType) type;
 			java.lang.reflect.Type[] upperBounds = wt.getUpperBounds();
 			if (upperBounds.length == 1)
-				return type(upperBounds[0]).asUpperBound();
+				return type(upperBounds[0], actualTypeArguments).asUpperBound();
 		}
 		throw new UnsupportedOperationException(
 				"Type has no support yet: " + type);
@@ -278,11 +279,11 @@ public final class Type<T>
 		return asOther.allParametersAreAssignableTo(other);
 	}
 
-	private boolean allParametersAreAssignableTo(Type<?> other) {
+	public boolean allParametersAreAssignableTo(Type<?> other) {
 		return arrayEquals(params, other.params, Type::asParameterAssignableTo);
 	}
 
-	private boolean asParameterAssignableTo(Type<?> other) {
+	public boolean asParameterAssignableTo(Type<?> other) {
 		if (rawType == other.rawType)
 			return !isParameterized() || allParametersAreAssignableTo(other);
 		return other.isUpperBound() && isAssignableTo(other.asExactType());
@@ -309,8 +310,8 @@ public final class Type<T>
 	 *         parameters {@link #isUpperBound()}
 	 */
 	public boolean isParameterizedAsUpperBound() {
-		return isParameterized()
-			&& arrayContains(params, p -> p.isUpperBound());
+		return isParameterized() && arrayContains(params,
+				p -> p.isUpperBound() || p.isParameterizedAsUpperBound());
 	}
 
 	/**
@@ -385,7 +386,7 @@ public final class Type<T>
 			return isRawType()
 				? parametized(wildcards(rawType.getTypeParameters()))
 				: this;
-		if (areAllTypeParametersAreUpperBounds())
+		if (allTypeParametersAreUpperBounds())
 			return this;
 		return new Type<>(upperBound, rawType,
 				arrayMap(params, Type::asUpperBound));
@@ -402,7 +403,7 @@ public final class Type<T>
 	/**
 	 * @return True when all type parameters are upper bounds.
 	 */
-	public boolean areAllTypeParametersAreUpperBounds() {
+	public boolean allTypeParametersAreUpperBounds() {
 		return !arrayContains(params, p -> !p.isUpperBound());
 	}
 

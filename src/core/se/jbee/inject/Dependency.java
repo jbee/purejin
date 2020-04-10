@@ -88,9 +88,9 @@ public final class Dependency<T>
 	@Override
 	public String toString() {
 		StringBuilder b = new StringBuilder();
-		for (Injection i : hierarchy)
-			b.append(i.target).append(" -> ");
 		b.append(instance);
+		for (int i = hierarchy.length - 1; i >= 0; i--)
+			b.append(" :: ").append(hierarchy[i].target);
 		return b.toString();
 	}
 

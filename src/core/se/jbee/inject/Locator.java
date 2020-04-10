@@ -53,10 +53,22 @@ public final class Locator<T>
 	public boolean isAssignableTo(Dependency<? super T> dependency) {
 		Type<T> offered = instance.type();
 		Type<? super T> required = dependency.type();
-		return offered.isAssignableTo(required)
-			|| required.rawType.isAssignableFrom(offered.rawType)
-				&& offered.hasTypeParameter()
-				&& offered.areAllTypeParametersAreUpperBounds();
+		if (offered.isAssignableTo(required))
+			return true;
+		if (!required.rawType.isAssignableFrom(offered.rawType)
+			|| !offered.hasTypeParameter())
+			return false;
+		Type<?>[] offeredParams = offered.parameters();
+		for (int i = 0; i < offeredParams.length; i++) {
+			Type<?> offeredParam = offeredParams[i];
+			Type<?> requiredParam = required.parameter(i);
+			if (offeredParam.isUpperBound()) {
+				if (!offeredParam.isAssignableTo(requiredParam))
+					return false;
+			} else if (!offeredParam.asParameterAssignableTo(requiredParam))
+				return false;
+		}
+		return true;
 	}
 
 	/**

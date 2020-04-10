@@ -1,7 +1,6 @@
 package se.jbee.inject.convert;
 
 import static se.jbee.inject.Instance.defaultInstanceOf;
-import static se.jbee.inject.Type.raw;
 
 import java.util.Deque;
 import java.util.LinkedHashMap;
@@ -86,11 +85,10 @@ public final class Chain<B> {
 		return converterChain;
 	}
 
-	@SuppressWarnings("unchecked")
-	private static Link<?, ?> createLink(Type<?> in, Instance<?> out,
+	private static <A, B> Link<A, B> createLink(Type<A> in, Instance<B> out,
 			Injector context) {
-		return new Link<>(in, out.type, context.resolve(out.name,
-				raw(Converter.class).parametized(in, out.type)));
+		return new Link<>(in, out.type,
+				context.resolve(out.name, Converter.type(in, out.type)));
 	}
 
 	static Instance<?>[] instanceChain(Imported imports, String[] chain) {

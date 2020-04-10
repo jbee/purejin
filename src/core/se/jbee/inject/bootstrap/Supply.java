@@ -304,7 +304,8 @@ public final class Supply {
 			return invoke(args, context);
 		}
 
-		protected Hint<?>[] hintsFor(Dependency<? super T> dep) {
+		protected Hint<?>[] hintsFor(
+				@SuppressWarnings("unused") Dependency<? super T> dep) {
 			return hints;
 		}
 	}

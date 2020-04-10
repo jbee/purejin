@@ -1,5 +1,7 @@
 package se.jbee.inject.convert;
 
+import se.jbee.inject.Type;
+
 /**
  * 
  * @author Jan Bernitt
@@ -37,4 +39,14 @@ public interface Converter<A, B> {
 			}
 		};
 	}
+
+	static <A, B> Type<Converter<A, B>> type(Class<A> a, Class<B> b) {
+		return type(Type.raw(a), Type.raw(b));
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	static <A, B> Type<Converter<A, B>> type(Type<A> a, Type<B> b) {
+		return (Type) Type.raw(Converter.class).parametized(a, b);
+	}
+
 }

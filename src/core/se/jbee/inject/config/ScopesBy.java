@@ -7,10 +7,12 @@ import static se.jbee.inject.Utils.annotation;
 import static se.jbee.inject.Utils.annotationPropertyByType;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.Method;
 
 import se.jbee.inject.Name;
 import se.jbee.inject.Scope;
+import se.jbee.inject.TypeVariable;
 
 /**
  * Extracts the {@link Name} of the {@link Scope} to use for instances of a
@@ -21,7 +23,7 @@ import se.jbee.inject.Scope;
 @FunctionalInterface
 public interface ScopesBy {
 
-	Name reflect(Class<?> type);
+	Name reflect(GenericDeclaration type);
 
 	/**
 	 * A virtual scope used by the {@link ScopesBy} to indicate that no
@@ -30,10 +32,19 @@ public interface ScopesBy {
 	 */
 	Name auto = named("@auto");
 
-	ScopesBy alwaysDefault = type -> auto;
+	ScopesBy alwaysDefault = target -> auto;
+	ScopesBy type = target -> {
+		if (target instanceof Method) {
+			Method m = (Method) target;
+			return TypeVariable.typeVariables(
+					m.getGenericReturnType()).isEmpty()
+						? Scope.application
+						: Scope.dependencyType;
+		}
+		return Scope.application;
+	};
 
-	default ScopesBy unlessAnnotatedWith(
-			Class<? extends Annotation> naming) {
+	default ScopesBy unlessAnnotatedWith(Class<? extends Annotation> naming) {
 		if (naming == null)
 			return this;
 		Method nameProperty = annotationPropertyByType(String.class, naming);
@@ -44,4 +55,5 @@ public interface ScopesBy {
 			return name == null ? this.reflect(type) : name;
 		};
 	}
+
 }
