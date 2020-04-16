@@ -99,7 +99,7 @@ public final class Environment implements Env {
 		return this;
 	}
 
-	public <T> Environment withMacro(Class<? extends ValueBinder<T>> value) {
+	public <T> Environment withBinder(Class<? extends ValueBinder<T>> value) {
 		return withBinder(Utils.instance(value));
 	}
 

@@ -44,7 +44,7 @@ public class TestConverter {
 		Converter<String, Long> str2long = Long::parseLong;
 		Converter<Long, Integer> long2int = Long::intValue;
 		assertEquals(Integer.valueOf(13),
-				str2long.andThen(long2int).convert("13"));
+				str2long.before(long2int).convert("13"));
 	}
 
 	@Test
@@ -58,7 +58,7 @@ public class TestConverter {
 	@Test
 	public void errorsCanBeRecoveredUsingDefaultValues() {
 		Converter<String, Integer> str2int = Integer::parseInt;
-		assertEquals(13, str2int.orOnError(13).convert("illegal").intValue());
+		assertEquals(13, str2int.fallbackTo(13).convert("illegal").intValue());
 	}
 
 	private final Injector context = Bootstrap.injector(

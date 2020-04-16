@@ -12,10 +12,10 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Locator;
 import se.jbee.inject.Scoping;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.container.GeneratorListener;
+import se.jbee.inject.container.SingletonListener;
 
 /**
- * Test that demonstrates how {@link GeneratorListener} can be bound to track
+ * Test that demonstrates how {@link SingletonListener} can be bound to track
  * the order of instance creation during the bootstrapping of an application
  * tree here simulated by types A, B and C.
  * 
@@ -47,12 +47,12 @@ public class TestGeneratorListener {
 
 	}
 
-	static class CreationListener implements GeneratorListener {
+	static class CreationListener implements SingletonListener {
 
 		final List<Object> created = new ArrayList<>();
 
 		@Override
-		public <T> void onStableInstanceGeneration(int serialID,
+		public <T> void onSingletonCreated(int serialID,
 				Locator<T> locator, Scoping scoping, T instance) {
 			created.add(instance);
 		}
@@ -65,7 +65,7 @@ public class TestGeneratorListener {
 			construct(A.class);
 			construct(B.class);
 			construct(C.class);
-			multibind(GeneratorListener.class).to(CreationListener.class);
+			multibind(SingletonListener.class).to(CreationListener.class);
 		}
 
 	}

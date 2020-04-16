@@ -96,14 +96,14 @@ public final class Container {
 		final Resource<? extends Initialiser<?>>[] postConstruct;
 		private Initialiser<Injector>[] injectorInitialisers;
 		private final Injector initialised;
-		final GeneratorListener listener;
+		final SingletonListener singletonListener;
 
 		InjectorImpl(Injectee<?>... injectees) {
 			this.generators = injectees.length;
 			this.resourcesByType = initFrom(injectees);
 			this.genericResources = genericResources(resourcesByType);
 			this.postConstruct = initInitialisers();
-			this.listener = initListeners();
+			this.singletonListener = initSingletonListeners();
 			// run initialisers for the injector
 			Injector decorated = this;
 			if (injectorInitialisers != null) {
@@ -118,18 +118,18 @@ public final class Container {
 			return initialised;
 		}
 
-		private GeneratorListener initListeners() {
-			GeneratorListener[] listeners = resolve(GeneratorListener[].class);
+		private SingletonListener initSingletonListeners() {
+			SingletonListener[] listeners = resolve(SingletonListener[].class);
 			if (listeners.length == 0)
 				return null;
 			if (listeners.length == 1)
 				return listeners[0];
-			return new GeneratorListener() {
+			return new SingletonListener() {
 				@Override
-				public <T> void onStableInstanceGeneration(int serialID,
+				public <T> void onSingletonCreated(int serialID,
 						Locator<T> locator, Scoping scoping, T instance) {
-					for (GeneratorListener l : listeners)
-						l.onStableInstanceGeneration(serialID, locator, scoping,
+					for (SingletonListener l : listeners)
+						l.onSingletonCreated(serialID, locator, scoping,
 								instance);
 				}
 			};
@@ -481,8 +481,9 @@ public final class Container {
 			if (instance != null && injector.postConstruct != null
 				&& injector.postConstruct.length > 0)
 				instance = postConstruct(instance, injected);
-			if (scoping.isStableByDesign() && injector.listener != null) {
-				injector.listener.onStableInstanceGeneration(serialID, locator,
+			if (scoping.isStableByDesign()
+				&& injector.singletonListener != null) {
+				injector.singletonListener.onSingletonCreated(serialID, locator,
 						scoping, instance);
 			}
 			return instance;

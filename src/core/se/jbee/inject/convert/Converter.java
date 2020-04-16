@@ -22,7 +22,7 @@ public interface Converter<A, B> {
 	 */
 	B convert(A input);
 
-	default <T> Converter<A, T> andThen(Converter<B, T> next) {
+	default <T> Converter<A, T> before(Converter<B, T> next) {
 		return next.after(this);
 	}
 
@@ -30,12 +30,13 @@ public interface Converter<A, B> {
 		return in -> convert(prev.convert(in));
 	}
 
-	default Converter<A, B> orOnError(B returns) {
+	default Converter<A, B> fallbackTo(B constant) {
 		return in -> {
 			try {
-				return convert(in);
+				B res = convert(in);
+				return res == null ? constant : res;
 			} catch (IllegalArgumentException e) {
-				return returns;
+				return constant;
 			}
 		};
 	}

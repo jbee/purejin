@@ -8,7 +8,6 @@ import static org.junit.Assert.fail;
 import static se.jbee.inject.Dependency.dependency;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
@@ -137,15 +136,6 @@ public class TestWorkerScope {
 			fail("Expected " + SupplyFailed.class.getSimpleName());
 		} catch (UnresolvableDependency.SupplyFailed e) {
 			assertEquals("Scope error", e.getMessage());
-		}
-	}
-
-	private static void waitFor(CompletableFuture<Void> waiter)
-			throws AssertionError {
-		try {
-			waiter.get();
-		} catch (InterruptedException | ExecutionException e) {
-			throw new AssertionError(e);
 		}
 	}
 

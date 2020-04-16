@@ -66,7 +66,7 @@ public final class Bootstrap {
 		return ENV.complete(injector(root).asEnv());
 	}
 
-	public static Env env(Class<? extends Bundle> root, Env env) {
+	public static Env env(Env env, Class<? extends Bundle> root) {
 		return ENV.complete(injector(env, root).asEnv());
 	}
 

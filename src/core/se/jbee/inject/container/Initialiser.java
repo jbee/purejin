@@ -11,12 +11,8 @@ import se.jbee.inject.Injector;
  * An {@link Initialiser} is like an interceptor that is called after an object
  * is created.
  * 
- * Users can bind an implementation for this interface. The {@link Injector}
- * will resolve all of them and call their {@link #init(Object, Injector)}
- * method as soon as the context is done.
- * 
- * This gives users the possibility to run initialisation code once and build
- * more powerful mechanisms on top of it.
+ * {@link Initialiser}s allow to run initialisation code once and build more
+ * powerful mechanisms on top of it.
  * 
  * @since 19.1
  */
@@ -26,14 +22,14 @@ public interface Initialiser<T> {
 	/**
 	 * Is called when the target instance is created within the {@link Injector}
 	 * context. For {@link Injector} itself as target this is called as soon as
-	 * its state has been initialised. It can be used to decorate the injector
-	 * or other target instances.
+	 * its state has been initialised. It can be used to decorate the
+	 * {@link Injector} or any other target instance created within a context.
 	 * 
 	 * @param target the newly created instance to initialise. For
 	 *            {@link Initialiser} of the {@link Injector} this is always the
 	 *            decorated {@link Injector} in case decoration was done by
 	 *            other {@link Initialiser}s.
-	 * @param context use to receive instances that require further
+	 * @param context use to resolve instances that require further
 	 *            initialisation setup. For {@link Initialiser} of the
 	 *            {@link Injector} this is always the underlying
 	 *            {@link Injector} that isn't decorated in case decoration was
