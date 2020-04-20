@@ -22,7 +22,7 @@ import se.jbee.inject.container.SingletonListener;
  * This sort of thing can be used to later tear down such instances in reverse
  * order.
  */
-public class TestGeneratorListener {
+public class TestSingletonListener {
 
 	static class A {
 

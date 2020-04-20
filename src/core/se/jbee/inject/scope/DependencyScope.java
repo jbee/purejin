@@ -55,7 +55,7 @@ public final class DependencyScope implements Scope {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> T yield(int serialID, Dependency<? super T> dep,
+	public <T> T provide(int serialID, Dependency<? super T> dep,
 			Provider<T> provider, int generators)
 			throws UnresolvableDependency {
 		return (T) instances.computeIfAbsent(injectionKey.apply(dep),

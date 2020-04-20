@@ -11,6 +11,10 @@ import se.jbee.inject.Injector;
  * An {@link Initialiser} is like an interceptor that is called after an object
  * is created.
  * 
+ * {@link Initialiser}s are matched based on the actual type of the target
+ * argument. If target can be assigned to the {@link Initialiser}'s target type
+ * the {@link Initialiser#init(Object, Injector)} is called.
+ * 
  * {@link Initialiser}s allow to run initialisation code once and build more
  * powerful mechanisms on top of it.
  * 

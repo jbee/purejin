@@ -25,7 +25,6 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
-import java.util.Map;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -244,9 +243,7 @@ public final class Utils {
 			|| cls.isAnnotation() || cls.isAnonymousClass() || cls.isPrimitive()
 			|| cls.isArray() || isAbstract(cls.getModifiers())
 			|| cls == String.class || Number.class.isAssignableFrom(cls)
-			|| cls == Boolean.class || cls == Void.class || cls == Class.class
-			|| Collection.class.isAssignableFrom(cls)
-			|| Map.class.isAssignableFrom(cls);
+			|| cls == Boolean.class || cls == Void.class || cls == Class.class;
 	}
 
 	public static boolean isClassInstantiable(Class<?> cls) {

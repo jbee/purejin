@@ -29,13 +29,14 @@ import org.junit.runners.Suite.SuiteClasses;
 		TestConfigBinds.class, TestInitialiserDecorationBinds.class,
 		TestInitialiserAnnotationBinds.class, TestPropertyAnnotationBinds.class,
 		TestInjectorHierarchy.class, TestAnnotatedWithBinds.class,
-		TestGeneratorListener.class, TestCustomAnnotationBinds.class,
+		TestSingletonListener.class, TestCustomAnnotationBinds.class,
 		TestArrayBinds.class, TestIndirectBinds.class,
 		TestInstallInSubContextBinds.class, TestDefaultValueBinderBinds.class,
 		TestInjectorDecorationBinds.class,
 		TestServiceLoaderBootstrapBinds.class,
 		TestPrimitiveArrayBridgeBinds.class, TestCustomValueBinderBinds2.class,
-		TestTypeVariableAutobindBinds.class })
+		TestTypeVariableAutobindBinds.class,
+		TestInitialiserGenericBinds.class })
 public class SuiteBind {
 	// all tests in the bind package
 }

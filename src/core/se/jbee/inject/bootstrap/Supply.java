@@ -95,7 +95,7 @@ public final class Supply {
 	}
 
 	public static <T> Supplier<T> instance(Instance<T> instance) {
-		// Note that this is not "buffered" using specs as it is used to
+		// Note that this is not "buffered" using Resources as it is used to
 		// implement the plain resolution
 		return (dep, context) -> context.resolve(dep.instanced(instance));
 	}

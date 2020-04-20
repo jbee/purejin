@@ -40,7 +40,7 @@ public interface Scope {
 	 *         The information from the {@link Dependency} and {@link Resource}
 	 *         can be used to lookup existing instances.
 	 */
-	<T> T yield(int serialID, Dependency<? super T> dep, Provider<T> provider,
+	<T> T provide(int serialID, Dependency<? super T> dep, Provider<T> provider,
 			int generators) throws UnresolvableDependency;
 
 	/**
@@ -49,6 +49,13 @@ public interface Scope {
 	 * scope used.
 	 */
 	Name mirror = named("@mirror");
+
+	/**
+	 * A special virtual {@link Scope} that is used to bypass actual use of
+	 * {@link Scope} abstraction for type references. In such cases the actual
+	 * scope is determined by the referenced {@link Resource}.
+	 */
+	Name reference = named("@ref");
 
 	/**
 	 * Asks the {@link Provider} once per JVM. Once created the instance is

@@ -18,6 +18,7 @@ import se.jbee.inject.Env;
 import se.jbee.inject.Locator;
 import se.jbee.inject.Name;
 import se.jbee.inject.Qualifying;
+import se.jbee.inject.Scope;
 import se.jbee.inject.Source;
 import se.jbee.inject.Type;
 import se.jbee.inject.Typed;
@@ -70,7 +71,10 @@ public final class Binding<T> extends Injectee<T>
 			Supplier<? extends T> supplier) {
 		if (type == BindingType.VALUE)
 			throw InconsistentBinding.illegalCompletion(this, type);
-		return new Binding<>(locator, type, supplier, scope, source);
+		Name effectiveScope = type == BindingType.REFERENCE
+			? Scope.reference
+			: scope;
+		return new Binding<>(locator, type, supplier, effectiveScope, source);
 	}
 
 	@Override

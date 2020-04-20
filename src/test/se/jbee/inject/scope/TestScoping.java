@@ -34,10 +34,10 @@ public class TestScoping {
 		B b = new B();
 		Provider<A> ia = () -> a;
 		Provider<B> ib = () -> b;
-		assertSame(scope.yield(1, dependency(A.class), ia, 2), a);
-		assertSame(scope.yield(1, dependency(A.class), null, 2), a); // the null Provider shouldn't be called now
-		assertSame(scope.yield(2, dependency(B.class), ib, 2), b);
-		assertSame(scope.yield(2, dependency(B.class), null, 2), b); // the null Provider shouldn't be called now
+		assertSame(scope.provide(1, dependency(A.class), ia, 2), a);
+		assertSame(scope.provide(1, dependency(A.class), null, 2), a); // the null Provider shouldn't be called now
+		assertSame(scope.provide(2, dependency(B.class), ib, 2), b);
+		assertSame(scope.provide(2, dependency(B.class), null, 2), b); // the null Provider shouldn't be called now
 	}
 
 	@Test

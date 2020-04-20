@@ -32,11 +32,11 @@ public final class SnapshotScope implements Scope {
 	}
 
 	@Override
-	public <T> T yield(int serialID, Dependency<? super T> dep,
+	public <T> T provide(int serialID, Dependency<? super T> dep,
 			Provider<T> provider, int generators)
 			throws UnresolvableDependency {
-		return dest.yield(serialID, dep,
-				() -> src.yield(serialID, dep, provider, generators),
+		return dest.provide(serialID, dep,
+				() -> src.provide(serialID, dep, provider, generators),
 				generators);
 	}
 

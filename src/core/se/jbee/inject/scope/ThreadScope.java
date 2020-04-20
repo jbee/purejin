@@ -15,7 +15,7 @@ public final class ThreadScope implements Scope {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T yield(int serialID, Dependency<? super T> dep,
+	public <T> T provide(int serialID, Dependency<? super T> dep,
 			Provider<T> provider, int generators)
 			throws UnresolvableDependency {
 		Object[] objects = instances.get();

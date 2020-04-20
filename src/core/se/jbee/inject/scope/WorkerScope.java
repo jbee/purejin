@@ -29,7 +29,7 @@ public final class WorkerScope implements Scope {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T yield(int serialID, Dependency<? super T> dep,
+	public <T> T provide(int serialID, Dependency<? super T> dep,
 			Provider<T> provider, int generators)
 			throws UnresolvableDependency {
 		Thread target = Thread.currentThread();
