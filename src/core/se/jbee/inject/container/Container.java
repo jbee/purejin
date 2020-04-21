@@ -493,7 +493,7 @@ public final class Container {
 				throws UnresolvableDependency {
 			dep.ensureNoIllegalDirectAccessOf(resource.locator);
 			return value.get(() -> injector.createInstance(
-					dep.injectingInto(resource.locator, Scoping.singleton),
+					dep.injectingInto(resource.locator, resource.scoping),
 					supplier, resource));
 		}
 	}
