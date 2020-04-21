@@ -9,6 +9,8 @@ import static se.jbee.inject.Name.named;
 
 import java.io.File;
 
+import se.jbee.inject.config.ScopesBy;
+
 /**
  * A {@linkplain Scope} describes a particular lifecycle.
  * 
@@ -44,6 +46,12 @@ public interface Scope {
 			int generators) throws UnresolvableDependency;
 
 	/**
+	 * A virtual scope used by the {@link ScopesBy} to indicate that no
+	 * particular scope should be used. This falls back on {@link application}.
+	 */
+	Name auto = named("@auto");
+
+	/**
 	 * A special virtual {@link Scope} that can be used in binder APIs as
 	 * default to declare that the mirror should be used to determine the actual
 	 * scope used.
@@ -65,8 +73,8 @@ public interface Scope {
 
 	/**
 	 * A special {@link Scope} provided and created by the {@link Injector}
-	 * during bootstrapping the other {@link Scope}s. All {@link Scope} are
-	 * automatically bound in this scope.
+	 * during bootstrapping the other {@link Scope}s. All {@link Scope}
+	 * instances are automatically bound in this scope.
 	 */
 	Name container = named("container");
 

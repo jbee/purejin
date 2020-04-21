@@ -9,8 +9,7 @@ import java.util.List;
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
-import se.jbee.inject.Locator;
-import se.jbee.inject.Scoping;
+import se.jbee.inject.Resource;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.container.SingletonListener;
 
@@ -52,8 +51,7 @@ public class TestSingletonListener {
 		final List<Object> created = new ArrayList<>();
 
 		@Override
-		public <T> void onSingletonCreated(int serialID,
-				Locator<T> locator, Scoping scoping, T instance) {
+		public <T> void onSingletonCreated(Resource<T> resource, T instance) {
 			created.add(instance);
 		}
 	}

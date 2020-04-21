@@ -1,7 +1,6 @@
 package se.jbee.inject.config;
 
 import static se.jbee.inject.InconsistentDeclaration.annotationLacksProperty;
-import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Utils.annotatedName;
 import static se.jbee.inject.Utils.annotation;
 import static se.jbee.inject.Utils.annotationPropertyByType;
@@ -25,14 +24,8 @@ public interface ScopesBy {
 
 	Name reflect(GenericDeclaration type);
 
-	/**
-	 * A virtual scope used by the {@link ScopesBy} to indicate that no
-	 * particular scope should be used. This falls back on
-	 * {@link Scope#application}.
-	 */
-	Name auto = named("@auto");
+	ScopesBy alwaysDefault = target -> Scope.auto;
 
-	ScopesBy alwaysDefault = target -> auto;
 	ScopesBy type = target -> {
 		if (target instanceof Method) {
 			Method m = (Method) target;

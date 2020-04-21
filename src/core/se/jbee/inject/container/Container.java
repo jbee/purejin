@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import se.jbee.inject.Dependency;
@@ -93,29 +94,35 @@ public final class Container {
 		final int generators;
 		private final Map<Class<?>, Resource<?>[]> resourcesByType;
 		private final Resource<?>[] genericResources;
-		final Resource<? extends Initialiser<?>>[] postConstruct;
-		private Initialiser<Injector>[] injectorInitialisers;
+		private final Resource<? extends Initialiser<?>>[] postConstruct;
 		private final Injector initialised;
-		final SingletonListener singletonListener;
+		private final SingletonListener singletonListener;
+		private final Map<Class<?>, Initialiser<?>[]> postConstructByActualType = new ConcurrentHashMap<>();
 
 		InjectorImpl(Injectee<?>... injectees) {
 			this.generators = injectees.length;
-			this.resourcesByType = initFrom(injectees);
-			this.genericResources = genericResources(resourcesByType);
+			this.resourcesByType = createResources(injectees);
+			this.genericResources = selectGenericResources(resourcesByType);
 			this.postConstruct = initInitialisers();
 			this.singletonListener = initSingletonListeners();
-			// run initialisers for the injector
+			this.initialised = decoratedInjectorContext();
+		}
+
+		private Injector decoratedInjectorContext() {
 			Injector decorated = this;
-			if (injectorInitialisers != null) {
-				for (Initialiser<Injector> init : injectorInitialisers)
+			@SuppressWarnings("unchecked")
+			Initialiser<Injector>[] injectorPostConstruct = (Initialiser<Injector>[]) postConstructByActualType.get(
+					Injector.class);
+			if (injectorPostConstruct != null) {
+				for (Initialiser<Injector> init : injectorPostConstruct)
 					decorated = init.init(decorated, this);
-				injectorInitialisers = null; // no longer needed
+				postConstructByActualType.remove(Injector.class); // no longer needed
 			}
-			this.initialised = decorated;
+			return decorated;
 		}
 
 		Injector getDecorated() {
-			return initialised;
+			return initialised == null ? this : initialised;
 		}
 
 		private SingletonListener initSingletonListeners() {
@@ -125,12 +132,12 @@ public final class Container {
 			if (listeners.length == 1)
 				return listeners[0];
 			return new SingletonListener() {
+
 				@Override
-				public <T> void onSingletonCreated(int serialID,
-						Locator<T> locator, Scoping scoping, T instance) {
+				public <T> void onSingletonCreated(Resource<T> resource,
+						T instance) {
 					for (SingletonListener l : listeners)
-						l.onSingletonCreated(serialID, locator, scoping,
-								instance);
+						l.onSingletonCreated(resource, instance);
 				}
 			};
 		}
@@ -147,70 +154,67 @@ public final class Container {
 				return inits;
 			Type<Initialiser<Injector>> injectorInitType = initialiserTypeOf(
 					Injector.class);
-			injectorInitialisers = resolve(
+			Initialiser<Injector>[] injectorPostConstruct = resolve(
 					injectorInitType.addArrayDimension());
-			if (inits.length == injectorInitialisers.length)
+			postConstructByActualType.put(Injector.class,
+					injectorPostConstruct);
+			if (inits.length == injectorPostConstruct.length)
 				return copyOf(inits, 0); // no other dynamic initialisers
 			return arrayFilter(inits, c -> !c.type().equalTo(injectorInitType));
 		}
 
-		private <T> Map<Class<?>, Resource<?>[]> initFrom(
+		private <T> Map<Class<?>, Resource<?>[]> createResources(
 				Injectee<?>... injectees) {
 			Resource<?>[] list = new Resource<?>[injectees.length];
 			for (int i = 0; i < injectees.length; i++) {
 				@SuppressWarnings("unchecked")
 				Injectee<T> injectee = (Injectee<T>) injectees[i];
-				Name scope = injectee.scope;
-				Scoping scoping = scopingOf(scope);
-				Locator<T> locator = injectee.locator;
-				Generator<T> gen = generator(i, injectee, scope, scoping,
-						locator);
-				list[i] = new Resource<>(i, injectee.source, scoping, locator,
-						gen);
+				list[i] = new Resource<>(i, injectee.source,
+						scopingOf(injectee.scope), injectee.locator,
+						resource -> createGenerator(resource,
+								injectee.supplier));
 			}
 			Arrays.sort(list);
-			Map<Class<?>, Resource<?>[]> byType = new IdentityHashMap<>(
+			Map<Class<?>, Resource<?>[]> byRawType = new IdentityHashMap<>(
 					list.length);
 			if (list.length == 0)
-				return byType;
+				return byRawType;
 			Class<?> lastRawType = list[0].type().rawType;
 			int start = 0;
 			for (int i = 0; i < list.length; i++) {
 				Class<?> rawType = list[i].type().rawType;
 				if (rawType != lastRawType) {
-					byType.put(lastRawType, copyOfRange(list, start, i));
+					byRawType.put(lastRawType, copyOfRange(list, start, i));
 					start = i;
 				}
 				lastRawType = rawType;
 			}
-			byType.put(lastRawType, copyOfRange(list, start, list.length));
-			return byType;
+			byRawType.put(lastRawType, copyOfRange(list, start, list.length));
+			return byRawType;
 		}
 
 		@SuppressWarnings("unchecked")
-		private <T> Generator<T> generator(int serialID, Injectee<T> injectee,
-				Name scope, Scoping scoping, Locator<T> locator) {
-			Supplier<? extends T> supplier = injectee.supplier;
+		private <T> Generator<T> createGenerator(Resource<T> resource,
+				Supplier<? extends T> supplier) {
+			Name scope = resource.scoping.scope;
 			if (Generator.class.isAssignableFrom(supplier.getClass()))
 				return (Generator<T>) supplier;
-			if (Scope.class.isAssignableFrom(locator.type().rawType)
+			if (Scope.class.isAssignableFrom(resource.type().rawType)
 				|| Scope.container.equalTo(scope))
-				return new LazySingletonGenerator<>(this, supplier,
-						injectee.locator);
+				return new LazySingletonGenerator<>(this, supplier, resource);
 			if (Scope.reference.equalTo(scope))
-				return new ReferenceGenerator<>(this, supplier,
-						injectee.locator);
-			return new LazyScopedGenerator<>(serialID, this, injectee, scoping);
+				return new ReferenceGenerator<>(this, supplier, resource);
+			return new LazyScopedGenerator<>(this, resource, supplier);
 		}
 
-		private static Resource<?>[] genericResources(
-				Map<Class<?>, Resource<?>[]> byType) {
+		private static Resource<?>[] selectGenericResources(
+				Map<Class<?>, Resource<?>[]> byRawType) {
 			List<Resource<?>> res = new ArrayList<>();
-			for (Resource<?>[] forType : byType.values())
+			for (Resource<?>[] forType : byRawType.values())
 				for (Resource<?> resource : forType) {
 					Type<?> type = resource.type();
 					if (type.isUpperBound()
-						|| type.isParameterizedAsUpperBound())
+						|| type.isParameterizedAsUpperBound()) //TODO this should not be needed as this should match by raw type list
 						res.add(resource);
 				}
 			Collections.sort(res);
@@ -371,6 +375,60 @@ public final class Container {
 			return (Resource<T>[]) resourcesByType.get(type.rawType);
 		}
 
+		/**
+		 * Can be called by a {@link Generator} to create an instance from a
+		 * {@link Supplier} and have {@link Initialiser}s applied for it as well
+		 * as notifying {@link SingletonListener}s.
+		 */
+		<T> T createInstance(Dependency<? super T> injected,
+				Supplier<? extends T> supplier, Resource<T> resource) {
+			T instance = supplier.supply(injected, getDecorated());
+			if (instance != null && postConstruct != null
+				&& postConstruct.length > 0)
+				instance = postConstruct(instance, injected);
+			if (resource.scoping.isStableByDesign()
+				&& singletonListener != null) {
+				singletonListener.onSingletonCreated(resource, instance);
+			}
+			return instance;
+		}
+
+		@SuppressWarnings("unchecked")
+		private <T> T postConstruct(T instance, Dependency<?> context) {
+			Class<T> actualType = (Class<T>) instance.getClass();
+			if (actualType == Class.class || actualType == Resource.class
+				|| Initialiser.class.isAssignableFrom(actualType)) {
+				return instance;
+			}
+			Initialiser<? super T>[] cachedPostConstructs = (Initialiser<? super T>[]) //
+			postConstructByActualType.computeIfAbsent(actualType,
+					key -> arrayFlatmap(postConstruct, Initialiser.class,
+							rx -> matchAndGenerateInitialiser(actualType, rx,
+									context)));
+			if (cachedPostConstructs.length > 0)
+				for (Initialiser<? super T> ix : cachedPostConstructs)
+					instance = (T) ix.init(instance, getDecorated());
+			return instance;
+		}
+
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		private static <T, I extends Initialiser<?>> Initialiser<? super T> matchAndGenerateInitialiser(
+				Class<T> actualType, Resource<I> resource,
+				Dependency<?> context) {
+			Locator<I> initialiser = resource.locator;
+			if (!initialiser.target.isAvailableFor(context))
+				return null;
+			Type<?> required = initialiser.type().parameter(0);
+			if (!raw(actualType).isAssignableTo(required))
+				return null;
+			Type<?> provided = Type.supertype(required.rawType,
+					(Type) Type.classType(actualType));
+			if (!provided.isAssignableTo(required))
+				return null;
+			return (Initialiser<? super T>) resource.generate(
+					dependency(initialiser.instance));
+		}
+
 		@Override
 		public String toString() {
 			StringBuilder b = new StringBuilder();
@@ -397,39 +455,45 @@ public final class Container {
 	}
 
 	/**
-	 * The {@link Lazy} value makes sure the {@link Supplier} is only ever
-	 * called once.
-	 * 
 	 * This {@link Generator} represents the {@link Scope#container} where the
 	 * {@link LazySingletonGenerator#value} field holds the singleton value.
 	 * 
-	 * So in contrast to other scopes that are implemented as instances of
+	 * In contrast to other scopes that are implemented as instances of
 	 * {@link Scope} the {@link Scope#container} is "virtual". Its instances
 	 * exist in the different instances of the {@link LazyScopedGenerator}.
+	 * 
+	 * This is required to bootstrap {@link Scope} instances that cannot
+	 * dependent on themselves to already exist but it is also used to simplify
+	 * the "generation" for known constants (instances that are already
+	 * created).
+	 * 
+	 * The {@link Lazy} value makes sure the {@link Supplier} is only ever
+	 * called once.
 	 * 
 	 * @param <T> Type of the lazy value
 	 */
 	private static final class LazySingletonGenerator<T>
 			implements Generator<T> {
 
-		private final Injector injector;
+		private final InjectorImpl injector;
 		private final Supplier<? extends T> supplier;
 		private final Lazy<T> value = new Lazy<>();
-		private final Locator<T> locator;
+		private final Resource<T> resource;
 
-		LazySingletonGenerator(Injector injector,
-				Supplier<? extends T> supplier, Locator<T> locator) {
+		LazySingletonGenerator(InjectorImpl injector,
+				Supplier<? extends T> supplier, Resource<T> resource) {
 			this.injector = injector;
 			this.supplier = supplier;
-			this.locator = locator;
+			this.resource = resource;
 		}
 
 		@Override
 		public T generate(Dependency<? super T> dep)
 				throws UnresolvableDependency {
-			dep.ensureNoIllegalDirectAccessOf(locator);
-			return value.get(() -> supplier.supply(
-					dep.injectingInto(locator, Scoping.singleton), injector));
+			dep.ensureNoIllegalDirectAccessOf(resource.locator);
+			return value.get(() -> injector.createInstance(
+					dep.injectingInto(resource.locator, Scoping.singleton),
+					supplier, resource));
 		}
 	}
 
@@ -442,20 +506,21 @@ public final class Container {
 	private static final class ReferenceGenerator<T> implements Generator<T> {
 		private final Injector injector;
 		private final Supplier<? extends T> supplier;
-		private final Locator<T> locator;
+		private final Resource<T> resource;
 
 		ReferenceGenerator(Injector injector, Supplier<? extends T> supplier,
-				Locator<T> locator) {
+				Resource<T> resource) {
 			this.injector = injector;
 			this.supplier = supplier;
-			this.locator = locator;
+			this.resource = resource;
 		}
 
 		@Override
 		public T generate(Dependency<? super T> dep)
 				throws UnresolvableDependency {
-			dep.ensureNoIllegalDirectAccessOf(locator);
-			return supplier.supply(dep.injectingInto(locator, Scoping.ignore),
+			dep.ensureNoIllegalDirectAccessOf(resource.locator);
+			return supplier.supply(
+					dep.injectingInto(resource.locator, Scoping.ignore),
 					injector);
 		}
 	}
@@ -469,33 +534,26 @@ public final class Container {
 	private static final class LazyScopedGenerator<T> implements Generator<T> {
 
 		private final InjectorImpl injector;
-		private final int serialID;
 		private final Supplier<? extends T> supplier;
-		private final Scoping scoping;
-		private final Locator<T> locator;
 		private final Lazy<Scope> scope = new Lazy<>();
+		private final Resource<T> resource;
 
-		private Class<?> cachedForType;
-		private Initialiser<? super T>[] cachedPostConstructs;
-
-		LazyScopedGenerator(int serialID, InjectorImpl injector,
-				Injectee<T> injectee, Scoping scoping) {
-			this.serialID = serialID;
+		LazyScopedGenerator(InjectorImpl injector, Resource<T> resource,
+				Supplier<? extends T> supplier) {
+			this.resource = resource;
 			this.injector = injector;
-			this.scoping = scoping;
-			this.supplier = injectee.supplier;
-			this.locator = injectee.locator;
+			this.supplier = supplier;
 		}
 
 		private Scope resolveScope() {
-			return injector.resolve(scoping.scope, Scope.class);
+			return injector.resolve(resource.scoping.scope, Scope.class);
 		}
 
 		@Override
 		public T generate(Dependency<? super T> dep) {
-			dep.ensureNoIllegalDirectAccessOf(locator);
-			final Dependency<? super T> injected = dep.injectingInto(locator,
-					scoping);
+			dep.ensureNoIllegalDirectAccessOf(resource.locator);
+			final Dependency<? super T> injected = dep.injectingInto(
+					resource.locator, resource.scoping);
 			/**
 			 * This cache makes sure that within one thread even if the provider
 			 * (lambda below) is called multiple times (which can occur because
@@ -505,8 +563,8 @@ public final class Container {
 			 * supplier.
 			 */
 			AtomicReference<T> instanceCache = new AtomicReference<>();
-			return scope.get(this::resolveScope).provide(serialID, injected,
-					() -> // 
+			return scope.get(this::resolveScope).provide(resource.serialID,
+					injected, () -> // 
 					instanceCache.updateAndGet(instance -> instance != null
 						? instance
 						: createInstance(injected)),
@@ -514,57 +572,8 @@ public final class Container {
 		}
 
 		private T createInstance(Dependency<? super T> injected) {
-			T instance = supplier.supply(injected, injector());
-			if (instance != null && injector.postConstruct != null
-				&& injector.postConstruct.length > 0)
-				instance = postConstruct(instance, injected);
-			if (scoping.isStableByDesign()
-				&& injector.singletonListener != null) {
-				injector.singletonListener.onSingletonCreated(serialID, locator,
-						scoping, instance);
-			}
-			return instance;
+			return injector.createInstance(injected, supplier, resource);
 		}
 
-		private Injector injector() {
-			Injector initialised = injector.getDecorated();
-			return initialised != null ? initialised : injector;
-		}
-
-		@SuppressWarnings("unchecked")
-		private T postConstruct(T instance, Dependency<?> context) {
-			Class<T> actualType = (Class<T>) instance.getClass();
-			if (actualType == Class.class || actualType == Resource.class
-				|| Initialiser.class.isAssignableFrom(actualType)) {
-				return instance;
-			}
-			if (actualType != cachedForType) {
-				cachedForType = actualType;
-				cachedPostConstructs = arrayFlatmap(injector.postConstruct,
-						Initialiser.class,
-						rx -> matchAndGenerateInitialiser(actualType, rx, context));
-			}
-			if (cachedPostConstructs.length > 0)
-				for (Initialiser<? super T> ix : cachedPostConstructs)
-					instance = (T) ix.init(instance, injector());
-			return instance;
-		}
-
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		private <I extends Initialiser<?>> Initialiser<? super T> matchAndGenerateInitialiser(
-				Class<T> actualType, Resource<I> resource, Dependency<?> context) {
-			Locator<I> initialiser = resource.locator;
-			if (!initialiser.target.isAvailableFor(context))
-				return null;
-			Type<?> required = initialiser.type().parameter(0);
-			if (!raw(actualType).isAssignableTo(required))
-				return null;
-			Type<?> provided = Type.supertype(required.rawType,
-					(Type) Type.classType(actualType));
-			if (!provided.isAssignableTo(required))
-				return null;
-			return (Initialiser<? super T>) resource.generate(
-					dependency(initialiser.instance));
-		}
 	}
 }

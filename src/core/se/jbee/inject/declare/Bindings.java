@@ -106,6 +106,7 @@ public final class Bindings {
 
 	public <T> void addConstant(Env env, Source source, Instance<T> instance,
 			T constant) {
+		//TODO maybe only use Scope.container if scope is not set to application explicitly since container also bypasses postConstruct?
 		addExpanded(env,
 				Binding.binding(new Locator<>(instance), BindingType.PREDEFINED,
 						constantSupplier(constant), Scope.container, source));

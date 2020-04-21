@@ -5,11 +5,13 @@
  */
 package se.jbee.inject;
 
+import java.util.function.Function;
+
 /**
- * A {@link Resource} describes a injection situation or scenario through
- * its {@link #locator} and {@link #scoping}. If the {@link Resource}
- * applies to a actual {@link Dependency} situation its {@link #generator} is
- * used to create the instance injected should it not exist already.
+ * A {@link Resource} describes a injection situation or scenario through its
+ * {@link #locator} and {@link #scoping}. If the {@link Resource} applies to a
+ * actual {@link Dependency} situation its {@link #generator} is used to create
+ * the instance injected should it not exist already.
  * 
  * @since 19.1
  * 
@@ -45,12 +47,13 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 	public final int serialID;
 
 	public Resource(int serialID, Source source, Scoping scoping,
-			Locator<T> locator, Generator<T> generator) {
-		this.generator = generator;
+			Locator<T> locator, Function<Resource<T>, Generator<T>> generator) {
 		this.locator = locator;
 		this.source = source;
 		this.scoping = scoping;
 		this.serialID = serialID;
+		//OBS! must be last
+		this.generator = generator.apply(this);
 	}
 
 	@Override

@@ -1,7 +1,6 @@
 package se.jbee.inject.bind;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static se.jbee.inject.Name.named;
 
 import java.lang.reflect.Field;
@@ -50,7 +49,8 @@ public class TestInitialiserAnnotationBinds {
 								f.getType());
 						f.set(target, value);
 					} catch (Exception e) {
-						fail("failed to inject annotated field");
+						throw new AssertionError(
+								"failed to inject annotated field", e);
 					}
 				}
 			}

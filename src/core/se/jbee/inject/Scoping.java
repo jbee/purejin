@@ -27,6 +27,7 @@ public final class Scoping implements Serializable {
 
 	private static final Map<Name, Scoping> SCOPING_BY_SCOPE = new ConcurrentHashMap<>();
 
+	//TODO the Scoping context should become non static and something that is bootstrapped with the container
 	static {
 		ignore.stableByDesign();
 		singleton.stableByDesign();

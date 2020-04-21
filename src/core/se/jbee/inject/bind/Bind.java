@@ -109,7 +109,7 @@ public final class Bind {
 			? env.property(ScopesBy.class, source.pkg()).reflect(
 					locator.type().rawType)
 			: scope;
-		return effectiveScope.equalTo(ScopesBy.auto)
+		return effectiveScope.equalTo(Scope.auto)
 			? Scope.application
 			: effectiveScope;
 	}
