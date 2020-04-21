@@ -54,9 +54,7 @@ public final class Name implements Qualifying<Name>, Serializable {
 	}
 
 	public static Name named(String name) {
-		return name == null || name.trim().isEmpty()
-			? DEFAULT
-			: new Name(name.toLowerCase());
+		return name == null || name.trim().isEmpty() ? DEFAULT : new Name(name);
 	}
 
 	private Name(String value) {

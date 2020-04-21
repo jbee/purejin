@@ -121,7 +121,7 @@ public class TestTargetedBinds {
 		assertSame(BAR_EVERYWHERE_ELSE,
 				injector.resolve("special", Foo.class).bar);
 		assertSame(BAR_IN_AWESOME_FOO,
-				injector.resolve("Awesome", Foo.class).bar);
+				injector.resolve("awesome", Foo.class).bar);
 	}
 
 	@Test

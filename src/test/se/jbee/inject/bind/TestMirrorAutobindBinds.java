@@ -178,7 +178,7 @@ public class TestMirrorAutobindBinds {
 	 */
 	@Test
 	public void thatNamedWithAnnotationCanBeUsedToGetNamedResources() {
-		assertEquals(42d, injector.resolve("foo", double.class), 0.01d);
+		assertEquals(42d, injector.resolve("Foo", double.class), 0.01d);
 	}
 
 	@Test
