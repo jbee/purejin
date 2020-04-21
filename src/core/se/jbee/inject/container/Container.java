@@ -95,9 +95,9 @@ public final class Container {
 		private final Map<Class<?>, Resource<?>[]> resourcesByType;
 		private final Resource<?>[] genericResources;
 		private final Resource<? extends Initialiser<?>>[] postConstruct;
-		private final Injector initialised;
 		private final SingletonListener singletonListener;
 		private final Map<Class<?>, Initialiser<?>[]> postConstructByActualType = new ConcurrentHashMap<>();
+		private final Injector decorated;
 
 		InjectorImpl(Injectee<?>... injectees) {
 			this.generators = injectees.length;
@@ -105,7 +105,7 @@ public final class Container {
 			this.genericResources = selectGenericResources(resourcesByType);
 			this.postConstruct = initInitialisers();
 			this.singletonListener = initSingletonListeners();
-			this.initialised = decoratedInjectorContext();
+			this.decorated = decoratedInjectorContext();
 		}
 
 		private Injector decoratedInjectorContext() {
@@ -122,7 +122,7 @@ public final class Container {
 		}
 
 		Injector getDecorated() {
-			return initialised == null ? this : initialised;
+			return decorated == null ? this : decorated;
 		}
 
 		private SingletonListener initSingletonListeners() {
@@ -171,6 +171,7 @@ public final class Container {
 				Injectee<T> injectee = (Injectee<T>) injectees[i];
 				list[i] = new Resource<>(i, injectee.source,
 						scopingOf(injectee.scope), injectee.locator,
+						// NB. using the function is a way to allow both Resource and Generator implementation to be initialised with a final reference of each other
 						resource -> createGenerator(resource,
 								injectee.supplier));
 			}
@@ -238,7 +239,7 @@ public final class Container {
 			final Class<T> rawType = type.rawType;
 			if (rawType == Injector.class
 				&& (dep.instance.name.isAny() || dep.instance.name.isDefault()))
-				return (T) initialised;
+				return (T) decorated;
 			if (rawType == Env.class && dep.instance.name.equalTo(Name.AS))
 				return (T) this;
 			// Resource based...
