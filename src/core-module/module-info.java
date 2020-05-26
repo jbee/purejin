@@ -23,7 +23,7 @@ module se.jbee.inject {
   exports se.jbee.inject.extend;
   exports se.jbee.inject.scope;
 
-  requires java.logging;
+  requires transitive java.logging;
   requires java.desktop;
   requires java.management;
 
