@@ -53,7 +53,7 @@ public final class InjectionSite {
 			Hint<?> hint = hints[i];
 			args[i] = generators[i] == null
 				? injector.resolve(site.instanced(hint.relativeRef))
-				: yield(generators[i], site.instanced(hint.relativeRef));
+				: generate(generators[i], site.instanced(hint.relativeRef));
 		}
 		return args;
 	}
@@ -77,7 +77,7 @@ public final class InjectionSite {
 				Resource<?> resource = injector.resolve(resourceDep);
 				if (resource.scoping.isStableByDesign()) {
 					//TODO and not has type variable involved
-					preResolvedArgs[i] = yield(resource,
+					preResolvedArgs[i] = generate(resource,
 							site.instanced(hint.relativeRef));
 				} else {
 					lazyArgIndexes[lazyArgCount++] = i;
@@ -89,7 +89,7 @@ public final class InjectionSite {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <I> I yield(Generator<I> gen, Dependency<?> dep) {
+	private static <I> I generate(Generator<I> gen, Dependency<?> dep) {
 		return gen.generate((Dependency<? super I>) dep);
 	}
 }
