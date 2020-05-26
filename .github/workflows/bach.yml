@@ -1,0 +1,38 @@
+# This workflow builds a modular Java project with Bach.java
+# For more information see:
+# - https://help.github.com/en/actions/language-and-framework-guides/github-actions-for-java
+# - https://github.com/sormuras/bach
+
+name: 'Bach CI'
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: "Build (JDK-${{ matrix.java }}, ${{ matrix.os }})"
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        java: [14, 15-ea]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: 'Checkout sources'
+        uses: actions/checkout@v2
+      - name: 'Set up JDK'
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+      - name: 'Emit version of JShell (trigger creation of user''s preferences directory)'
+        run: jshell --version
+      - name: 'Build with Bach.java'
+        run: jshell https://sormuras.de/bach-build
+      - name: 'Upload build artifact'
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifact-${{ matrix.java }}-${{ matrix.os }}
+          path: .bach/workspace/summary.md
