@@ -11,14 +11,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/** Silk's build program. */
+/**
+ * Silk's build program.
+ */
 class Build {
   public static void main(String... args) {
     var silk =
         Bach.Project.builder()
             .title("Silk DI")
             .version("1-ea")
-            .setRealms(List.of(core()))
+            .setRealms(List.of(core(), example(), test()))
+            .requires("org.hamcrest") // By junit at runtime.
+            .requires("org.junit.vintage.engine") // Discovers and executes junit 3/4 tests.
+            .requires("org.junit.platform.console") // Launch the JUnit Platform.
             .newProject();
 
     Bach.of(silk).build().assertSuccessful();
@@ -38,5 +43,37 @@ class Build {
         Set.of(), // Set.of(Bach.Project.Realm.Flag.CREATE_API_DOCUMENTATION),
         Map.of(unit.descriptor().name(), unit),
         Set.of());
+  }
+
+  private static Bach.Project.Realm example() {
+    var example =
+        new Bach.Project.Unit(
+            Bach.Modules.describe(Path.of("src/example-module/module-info.java")),
+            List.of(
+                new Bach.Project.Source(Path.of("src/example"), 0),
+                new Bach.Project.Source(Path.of("src/example-module"), 0)),
+            List.of());
+
+    return new Bach.Project.Realm(
+        "example",
+        Set.of(Bach.Project.Realm.Flag.LAUNCH_TESTS),
+        Map.of(example.descriptor().name(), example),
+        Set.of("core"));
+  }
+
+  private static Bach.Project.Realm test() {
+    var test =
+        new Bach.Project.Unit(
+            Bach.Modules.describe(Path.of("src/test-module/module-info.java")),
+            List.of(
+                new Bach.Project.Source(Path.of("src/test"), 0),
+                new Bach.Project.Source(Path.of("src/test-module"), 0)),
+            List.of());
+
+    return new Bach.Project.Realm(
+        "test",
+        Set.of(Bach.Project.Realm.Flag.LAUNCH_TESTS),
+        Map.of(test.descriptor().name(), test),
+        Set.of("core"));
   }
 }
