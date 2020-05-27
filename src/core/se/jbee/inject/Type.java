@@ -429,8 +429,11 @@ public final class Type<T>
 			}
 			str.append("? extends ");
 		}
+		String canonicalNameOrNull = rawType.getCanonicalName();
 		String name = canonicalName
-			? rawType.getCanonicalName()
+			? canonicalNameOrNull != null
+				? canonicalNameOrNull
+				: rawType.getName()
 			: rawType.getSimpleName();
 		str.append(rawType.isArray()
 			? name.substring(0, name.indexOf('['))

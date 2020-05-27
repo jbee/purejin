@@ -92,7 +92,7 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 				return 1;
 			if (c2.isAssignableFrom(c1))
 				return -1;
-			return c1.getCanonicalName().compareTo(c2.getCanonicalName());
+			return c1.getName().compareTo(c2.getName());
 		}
 		return Qualifying.compare(l1, l2);
 	}

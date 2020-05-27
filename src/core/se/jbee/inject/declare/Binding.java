@@ -98,8 +98,8 @@ public final class Binding<T> extends Injectee<T>
 
 	@Override
 	public int compareTo(Binding<?> other) {
-		int res = locator.type().rawType.getCanonicalName().compareTo(
-				other.locator.type().rawType.getCanonicalName());
+		int res = locator.type().rawType.getName().compareTo(
+				other.locator.type().rawType.getName());
 		if (res != 0)
 			return res;
 		res = Qualifying.compare(locator.instance, other.locator.instance);
