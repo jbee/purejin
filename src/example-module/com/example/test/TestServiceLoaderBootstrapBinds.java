@@ -1,4 +1,4 @@
-package se.jbee.inject.bind;
+package com.example.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

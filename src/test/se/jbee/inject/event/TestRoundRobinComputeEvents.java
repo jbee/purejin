@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static se.jbee.inject.Name.named;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
@@ -48,6 +49,7 @@ public class TestRoundRobinComputeEvents {
 			TestRoundRobinComputeEventsModule.class);
 
 	@Test
+	@Ignore("TODO #80 // TestRoundRobinComputeEvents.computationUsesAllAvailableServices()")
 	public void computationUsesAllAvailableServices() {
 		Handler h = injector.resolve(Handler.class);
 		Service a = injector.resolve("a", Service.class);
