@@ -6,6 +6,7 @@
 
 // default package
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,7 @@ class Build {
     var javadoc = ToolProvider.findFirst("javadoc").orElseThrow();
     javadoc.run(System.out, System.err,
         "--module", "se.jbee.inject",
-        "--module-source-path", "se.jbee.inject=src/core;src/core-module",
+        "--module-source-path", "se.jbee.inject=src/core" + File.pathSeparator +  "src/core-module",
         "-d", ".bach/workspace/documentation/api",
         "-encoding", "UTF-8",
         "-quiet",
