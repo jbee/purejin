@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.spi.ToolProvider;
 
 /**
  * Silk's build program.
@@ -22,11 +23,20 @@ class Build {
             .version("1-ea")
             .setRealms(List.of(core(), example(), test()))
             .requires("org.hamcrest") // By junit at runtime.
-            .requires("org.junit.vintage.engine") // Discovers and executes junit 3/4 tests.
+            .requires("org.junit.vintage.engine") // Discovers and executes JUnit 3/4 tests.
             .requires("org.junit.platform.console") // Launch the JUnit Platform.
             .newProject();
 
-    Bach.of(silk).build().assertSuccessful();
+    Bach.of(silk).build();
+
+    var javadoc = ToolProvider.findFirst("javadoc").orElseThrow();
+    javadoc.run(System.out, System.err,
+        "--module", "se.jbee.inject",
+        "--module-source-path", "se.jbee.inject=src/core;src/core-module",
+        "-d", ".bach/workspace/documentation/api",
+        "-encoding", "UTF-8",
+        "-quiet",
+        "-Xdoclint:none");
   }
 
   private static Bach.Project.Realm core() {
