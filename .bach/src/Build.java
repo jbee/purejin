@@ -26,43 +26,13 @@ class Build {
                     .requires("org.hamcrest") // By junit at runtime.
                     .requires("org.junit.vintage.engine") // Discovers and executes junit 3/4 tests.
                     .requires("org.junit.platform.console") // Launch the JUnit Platform.
-            )
+            );
         .build(
             (args, project, context) -> {
               if (context.get("tool").equals("javadoc")) args.put("-Xdoclint:none");
             });
 
-    generateAndPackageApiDocumentation(version);
     generateMavenPomXml(version);
-  }
-
-  private static void generateAndPackageApiDocumentation(String version) {
-    var javadoc = ToolProvider.findFirst("javadoc").orElseThrow();
-    javadoc.run(
-        System.out,
-        System.err,
-        "--module",
-        "se.jbee.inject",
-        "--module-source-path",
-        "se.jbee.inject=src/core" + File.pathSeparator + "src/core-module",
-        "-d",
-        ".bach/workspace/documentation/api",
-        "-encoding",
-        "UTF-8",
-        "-quiet",
-        "-Xdoclint:none");
-
-    var jar = ToolProvider.findFirst("jar").orElseThrow();
-    jar.run(
-        System.out,
-        System.err,
-        "--create",
-        "--file",
-        ".bach/workspace/documentation/silk-" + version + "-javadoc.jar",
-        "--no-manifest",
-        "-C",
-        ".bach/workspace/documentation/api",
-        ".");
   }
 
   private static void generateMavenPomXml(String version) throws Exception {
