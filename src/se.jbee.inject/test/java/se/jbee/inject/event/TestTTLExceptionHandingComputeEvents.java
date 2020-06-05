@@ -15,6 +15,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
@@ -44,6 +45,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
  * events (calls) can time out. The TTL is set to just 5ms which causes every
  * second call to time out.
  */
+@Ignore
 public class TestTTLExceptionHandingComputeEvents {
 
 	private interface Handler {
@@ -92,8 +94,7 @@ public class TestTTLExceptionHandingComputeEvents {
 			construct(SlowService.class);
 			injectingInto(EventProcessor.class).bind(ExecutorService.class).to(
 					() -> Executors.newSingleThreadExecutor());
-			bind(EventMirror.class).to(
-					event -> EventPolicy.DEFAULT.withTTL(5));
+			bind(EventMirror.class).to(event -> EventPolicy.DEFAULT.withTTL(5));
 		}
 	}
 

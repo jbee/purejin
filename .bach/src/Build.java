@@ -17,16 +17,17 @@ import java.util.spi.ToolProvider;
 /** Silk's build program. */
 class Build {
 
-  public static void main(String... args0) {
-    Bach.of(
+  public static void main(String... args0) throws Exception {
+	  String version = "19.1-ea";
+	  Bach.of(
             scanner -> scanner.offset("src"),
             silk ->
                 silk.title("Silk DI")
-                    .version("19.1-ea")
+                    .version(version)
                     .requires("org.hamcrest") // By junit at runtime.
                     .requires("org.junit.vintage.engine") // Discovers and executes junit 3/4 tests.
                     .requires("org.junit.platform.console") // Launch the JUnit Platform.
-            );
+            )
         .build(
             (args, project, context) -> {
               if (context.get("tool").equals("javadoc")) args.put("-Xdoclint:none");
@@ -37,7 +38,7 @@ class Build {
 
   private static void generateMavenPomXml(String version) throws Exception {
     Files.write(
-        Path.of(".bach/workspace/se.jbee.inject@19.1-ea.pom.xml"),
+        Path.of(".bach/workspace/se.jbee.inject@" + version + ".pom.xml"),
         List.of(
             "<?xml version='1.0' encoding='UTF-8'?>",
             "<project xmlns='http://maven.apache.org/POM/4.0.0'",
