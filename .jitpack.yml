@@ -1,0 +1,16 @@
+before_install:
+  - wget https://github.com/sormuras/bach/raw/master/install-jdk.sh
+  - source install-jdk.sh --feature 14
+  - jshell --version
+
+install:
+  - unset JAVA_TOOL_OPTIONS
+  - jshell -R-Debug https://sormuras.de/bach/build
+  - VERSION="19.1-ea"
+  - MODULE_AND_VERSION="se.jbee.inject@${VERSION}"
+  - OUT=".bach/workspace"
+  - POM_FILE="-DpomFile=${OUT}/${MODULE_AND_VERSION}.pom.xml"
+  - JAR_FILE="-Dfile=${OUT}/modules/core/${MODULE_AND_VERSION}.jar"
+  - SRC_FILE="-Dsources=${OUT}/sources/core/${MODULE_AND_VERSION}-sources.jar"
+  - API_FILE="-Djavadoc=${OUT}/documentation/silk-${VERSION}-javadoc.jar"
+  - mvn install:install-file ${POM_FILE} ${JAR_FILE} ${SRC_FILE} ${API_FILE}
