@@ -8,7 +8,7 @@ open /*test*/ module se.jbee.inject { // <- module under test
   exports se.jbee.inject;
   exports se.jbee.inject.action;
   exports se.jbee.inject.bind;
-  // exports se.jbee.inject.bind.serviceloader; TODO No test is referencing a file from this package...
+  exports se.jbee.inject.bind.serviceloader;
   exports se.jbee.inject.bootstrap;
   exports se.jbee.inject.config;
   exports se.jbee.inject.container;
