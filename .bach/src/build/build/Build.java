@@ -1,37 +1,33 @@
-/*
- *  Copyright (c) 2012-2020, Jan Bernitt
- *
- *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
- */
+package build;
 
-// default package
-
-import java.io.File;
+import de.sormuras.bach.Bach;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.spi.ToolProvider;
 
-/** Silk's build program. */
 class Build {
+  public static void main(String... args) throws Exception {
+    var version = "19.1-ea";
 
-  public static void main(String... args0) throws Exception {
-	  String version = "19.1-ea";
-	  Bach.of(
+    var bach =
+        Bach.of(
             scanner -> scanner.offset("src"),
-            silk ->
-                silk.title("Silk DI")
+            project ->
+                project
+                    .title("Silk DI")
                     .version(version)
                     .requires("org.hamcrest") // By junit at runtime.
                     .requires("org.junit.vintage.engine") // Discovers and executes junit 3/4 tests.
                     .requires("org.junit.platform.console") // Launch the JUnit Platform.
-            )
-        .build(
-            (args, project, context) -> {
-              if (context.get("tool").equals("javadoc")) args.put("-Xdoclint:none");
-            });
+            );
+
+    bach.build(
+        (arguments, project, context) -> {
+          var tool = context.get("tool");
+          if ("javadoc".equals(tool)) arguments.put("-Xdoclint:none");
+          // if ("junit".equals(tool))
+          //  arguments.put("--include-classname", "se.jbee.inject.bind.TestDiskScopeBinds");
+        });
 
     generateMavenPomXml(version);
   }
@@ -75,5 +71,4 @@ class Build {
             "    </developers>",
             "</project>"));
   }
-
 }
