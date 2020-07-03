@@ -18,7 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        java: [14, 15-ea]
+        java: [11, 14, 15-ea]
     runs-on: ${{ matrix.os }}
     steps:
       - name: 'Checkout sources'
@@ -30,11 +30,9 @@ jobs:
       - name: 'Emit version of JShell (trigger creation of user''s preferences directory)'
         run: jshell --version
       - name: 'Build with Bach.java'
-        run: |
-          jshell https://sormuras.de/bach/boot
-          java -Debug --module-path .bach/lib --add-modules de.sormuras.bach .bach/src/build/build/Build.java
+        run: jshell https://sormuras.de/bach@11.3-M1/build
       - name: 'Upload build artifact'
         uses: actions/upload-artifact@v2
         with:
           name: artifact-${{ matrix.java }}-${{ matrix.os }}
-          path: .bach/workspace/summary.md
+          path: .bach/workspace/logbook.md
