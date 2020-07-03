@@ -31,7 +31,7 @@ jobs:
         run: jshell --version
       - name: 'Build with Bach.java'
         run: |
-          jshell https://sormuras.de/bach/boot
+          jshell https://github.com/sormuras/bach/raw/11.3-M1/src/bach/bach-boot.jsh
           java -Debug --module-path .bach/lib --add-modules de.sormuras.bach .bach/src/build/build/Build.java
       - name: 'Upload build artifact'
         uses: actions/upload-artifact@v2

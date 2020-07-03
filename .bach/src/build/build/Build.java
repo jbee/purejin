@@ -1,35 +1,51 @@
 package build;
 
 import de.sormuras.bach.Bach;
+import de.sormuras.bach.Builder;
+import de.sormuras.bach.project.Library;
+import de.sormuras.bach.tool.Javac;
+import de.sormuras.bach.tool.Javadoc;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
 class Build {
+
   public static void main(String... args) throws Exception {
     var version = "19.1-ea";
 
-    var bach =
-        Bach.of(
-            scanner -> scanner.offset("src"),
+    Bach.of(
             project ->
                 project
-                    .title("Silk DI")
-                    .version(version)
-                    .requires("org.hamcrest") // By junit at runtime.
-                    .requires("org.junit.vintage.engine") // Discovers and executes junit 3/4 tests.
-                    .requires("org.junit.platform.console") // Launch the JUnit Platform.
-            );
-
-    bach.build(
-        (arguments, project, context) -> {
-          var tool = context.get("tool");
-          if ("javadoc".equals(tool)) arguments.put("-Xdoclint:none");
-          // if ("junit".equals(tool))
-          //  arguments.put("--include-classname", "se.jbee.inject.bind.TestDiskScopeBinds");
-        });
+                    .withName("silk")
+                    .withVersion(version)
+                    .with(
+                        Library.of()
+                            .withRequires("org.hamcrest")
+                            .withRequires("org.junit.vintage.engine")
+                            .withRequires("org.junit.platform.console")))
+        .with(System.Logger.Level.DEBUG)
+        .with(CustomBuilder::new)
+        .buildProject();
 
     generateMavenPomXml(version);
+  }
+
+  private static class CustomBuilder extends Builder {
+
+    CustomBuilder(Bach bach) {
+      super(bach);
+    }
+
+    @Override
+    public Javac computeJavacForMainSources() {
+      return super.computeJavacForMainSources().with("-Xlint:-serial,-rawtypes,-varargs");
+    }
+
+    @Override
+    public Javadoc computeJavadocForMainSources() {
+      return super.computeJavadocForMainSources().without("-Xdoclint").with("-Xdoclint:none");
+    }
   }
 
   private static void generateMavenPomXml(String version) throws Exception {
