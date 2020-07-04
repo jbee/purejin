@@ -5,8 +5,7 @@ before_install:
 
 install:
   - unset JAVA_TOOL_OPTIONS
-  - jshell https://github.com/sormuras/bach/raw/11.3-M1/src/bach/bach-boot.jsh
-  - java -Debug --module-path .bach/lib --add-modules de.sormuras.bach .bach/src/build/build/Build.java
+  - jshell https://sormuras.de/bach@11.3-M1/build
   - VERSION="19.1-ea"
   - MODULE_AND_VERSION="se.jbee.inject@${VERSION}"
   - OUT=".bach/workspace"
