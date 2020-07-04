@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+/** Silk's build program. */
 class Build {
 
   public static void main(String... args) throws Exception {
@@ -37,7 +38,9 @@ class Build {
             .with(
                 Project.of("silk", version)
                     .with(Sources.of().with(MainSources.of().with(SourceUnits.of().with(unit))))
-                    .withTestSource("src/se.jbee.inject/test/java-module")
+                    .withTestSource("src/se.jbee.inject/test/java-module") // in-module tests
+                    .withTestSource("src/com.example.app/test/java") // silk's first client
+                    .withTestSource("src/com.example.test/test/java") // modular integration tests
                     .with(
                         Library.of()
                             .withRequires("org.hamcrest")
