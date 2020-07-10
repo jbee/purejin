@@ -58,7 +58,6 @@ public final class Bindings {
 		list.add(complete);
 	}
 
-	//TODO move out of here?
 	public void addExpanded(Env env, Binding<?> binding) {
 		addExpanded(env, binding, binding);
 	}
@@ -109,7 +108,7 @@ public final class Bindings {
 		//TODO maybe only use Scope.container if scope is not set to application explicitly since container also bypasses postConstruct?
 		addExpanded(env,
 				Binding.binding(new Locator<>(instance), BindingType.PREDEFINED,
-						constantSupplier(constant), Scope.container, source));
+						supplyConstant(constant), Scope.container, source));
 	}
 
 	public Binding<?>[] toArray() {
@@ -136,8 +135,24 @@ public final class Bindings {
 		}
 	}
 
-	public static <T> Supplier<T> constantSupplier(T constant) {
+	public static <T> Supplier<T> supplyConstant(T constant) {
 		return new ConstantSupplier<>(constant);
+	}
+
+	/**
+	 * In contrast to {@link #supplyConstant(Object)} which does supply the
+	 * constant as {@link Generator} and thereby does not support custom
+	 * {@link Scoping} or {@link Scope}s this way of supplying the constant will
+	 * treat the constant as bean, that is like any "dynamically" supplied
+	 * value.
+	 * 
+	 * @param <T> type of the constant
+	 * @param constant a bean that requires {@link Scoping} effects.
+	 * @return A {@link Supplier} that supplies the given constant with
+	 *         {@link Scoping} effects.
+	 */
+	public static <T> Supplier<T> supplyScopedConstant(T constant) {
+		return (dep, context) -> constant;
 	}
 
 	/**

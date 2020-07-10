@@ -1,6 +1,5 @@
 package se.jbee.inject.bind;
 
-import static java.util.Arrays.asList;
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Type.raw;
 
@@ -48,7 +47,12 @@ final class AnnotatedWithModule extends BinderModule {
 			Class<?>[] annotated = context.resolve(Plugins.class).forPoint(
 					point);
 			List<Object> res = new ArrayList<>();
-			for (Class<?> a : asList(annotated))
+			//FIXME not given that an annotated class can be resolved
+			// use ElementType.TYPE_USE to bind the resource type (would be a Type)
+			// bind actual return type for annotated methods
+			// bind actual field type for annotated fields
+			// use Type like Class for plugins => Metadata
+			for (Class<?> a : annotated)
 				res.add(context.resolve(a));
 			return res;
 		};

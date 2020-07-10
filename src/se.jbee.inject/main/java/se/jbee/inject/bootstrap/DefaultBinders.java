@@ -7,6 +7,7 @@ package se.jbee.inject.bootstrap;
 
 import static se.jbee.inject.DeclarationType.MULTI;
 import static se.jbee.inject.Instance.anyOf;
+import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.instance;
 import static se.jbee.inject.Utils.isClassBanal;
@@ -18,6 +19,8 @@ import static se.jbee.inject.declare.BindingType.CONSTRUCTOR;
 import static se.jbee.inject.declare.BindingType.METHOD;
 import static se.jbee.inject.declare.BindingType.PREDEFINED;
 import static se.jbee.inject.declare.BindingType.REFERENCE;
+import static se.jbee.inject.declare.Bindings.supplyScopedConstant;
+import static se.jbee.inject.declare.Bindings.supplyConstant;
 import static se.jbee.inject.extend.Plugins.pluginPoint;
 
 import java.lang.annotation.Annotation;
@@ -31,7 +34,6 @@ import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Env;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Locator;
-import se.jbee.inject.Name;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Source;
 import se.jbee.inject.Type;
@@ -114,8 +116,8 @@ public final class DefaultBinders {
 					constructor(src.typed(item.type()))));
 			Class<?> impl = src.target.getDeclaringClass();
 			Source source = item.source;
-			target.addConstant(env, source.typed(MULTI), Name.DEFAULT,
-					Constructor.class, src.target);
+			target.addConstant(env, source.typed(MULTI),
+					named(src.target.getName()), Constructor.class, src.target);
 			plugAnnotationsInto(env, target, source, impl, ElementType.TYPE,
 					impl);
 			plugAnnotationsInto(env, target, source, impl,
@@ -142,8 +144,8 @@ public final class DefaultBinders {
 			target.addExpanded(env,
 					item.complete(METHOD, method(src.typed(item.type()))));
 			Source source = item.source;
-			target.addConstant(env, source.typed(MULTI), Name.DEFAULT,
-					Method.class, src.target);
+			target.addConstant(env, source.typed(MULTI),
+					named(src.target.getName()), Method.class, src.target);
 			plugAnnotationsInto(env, target, source,
 					src.target.getDeclaringClass(), ElementType.METHOD,
 					src.target);
@@ -157,9 +159,11 @@ public final class DefaultBinders {
 				Bindings target) {
 			Source source = item.source;
 			target.addExpanded(env, item, new Constant<>(
-					Utils.share(src.constant, src.owner), false));
-			target.addConstant(env, source.typed(MULTI), Name.DEFAULT,
-					Field.class, src.constant);
+					Utils.share(src.constant, src.owner)).manual());
+			//TODO should the share be scoped or not?
+			// There is not right answer => sometimes it might be intended, often it is not
+			target.addConstant(env, source.typed(MULTI),
+					named(src.constant.getName()), Field.class, src.constant);
 			plugAnnotationsInto(env, target, source,
 					src.constant.getDeclaringClass(), ElementType.FIELD,
 					src.constant);
@@ -172,15 +176,20 @@ public final class DefaultBinders {
 		@Override
 		public <T> void expand(Env env, Constant<?> src, Binding<T> item,
 				Bindings target) {
-			Supplier<T> supplier = Bindings.constantSupplier(
-					item.type().rawType.cast(src.value));
+			T constant = item.type().rawType.cast(src.value);
+			Supplier<T> supplier = src.scoped
+				? supplyScopedConstant(constant)
+				: supplyConstant(constant);
 			target.addExpanded(env,
 					item.complete(BindingType.PREDEFINED, supplier));
+			Class<?> impl = src.value.getClass();
+			plugAnnotationsInto(env, target, item.source, impl,
+					ElementType.TYPE, impl);
 			// implicitly bind to the exact type of the constant
 			// should that differ from the binding type
 			if (src.autoBindExactType
 				&& item.source.declarationType == DeclarationType.EXPLICIT
-				&& item.type().rawType != src.value.getClass()) {
+				&& item.type().rawType != impl) {
 				@SuppressWarnings("unchecked")
 				Class<T> type = (Class<T>) src.value.getClass();
 				target.addExpanded(env,
@@ -205,7 +214,7 @@ public final class DefaultBinders {
 			Type<?> srcType = src.type();
 			if (avoidReferences && isClassBanal(srcType.rawType)) {
 				target.addExpanded(env, item,
-						new Constant<>(instance(srcType.rawType), false));
+						new Constant<>(instance(srcType.rawType)).manual());
 				return;
 			}
 			if (srcType.isAssignableTo(raw(Supplier.class))

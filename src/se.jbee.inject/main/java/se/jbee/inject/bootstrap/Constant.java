@@ -5,6 +5,7 @@
  */
 package se.jbee.inject.bootstrap;
 
+import se.jbee.inject.Scope;
 import se.jbee.inject.declare.ValueBinder;
 
 /**
@@ -17,14 +18,29 @@ public final class Constant<T> {
 
 	public final T value;
 	public final boolean autoBindExactType;
+	/**
+	 * True in case the {@link Scope} and its effects should be applied, else
+	 * false. By default constants are assumed to be value types that are not
+	 * scoped.
+	 */
+	public final boolean scoped;
 
 	public Constant(T value) {
-		this(value, true);
+		this(value, true, false);
 	}
 
-	public Constant(T value, boolean autoBindExactType) {
+	private Constant(T value, boolean autoBindExactType, boolean scoped) {
 		this.value = value;
 		this.autoBindExactType = autoBindExactType;
+		this.scoped = scoped;
+	}
+
+	public Constant<T> scoped() {
+		return new Constant<>(value, autoBindExactType, true);
+	}
+
+	public Constant<T> manual() {
+		return new Constant<>(value, false, scoped);
 	}
 
 }

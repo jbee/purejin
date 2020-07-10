@@ -31,6 +31,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Env;
@@ -426,8 +427,15 @@ public final class Container {
 					(Type) Type.classType(actualType));
 			if (!provided.isAssignableTo(required))
 				return null;
-			return (Initialiser<? super T>) resource.generate(
-					dependency(initialiser.instance));
+			I instance = resource.generate(dependency(initialiser.instance));
+			if (instance instanceof Predicate
+				&& Type.classType(instance.getClass()).isAssignableTo(
+						raw(Predicate.class).parametized(Class.class))) {
+				Predicate<Class<?>> filter = (Predicate<Class<?>>) instance;
+				if (!filter.test(actualType))
+					return null;
+			}
+			return (Initialiser<? super T>) instance;
 		}
 
 		@Override
@@ -478,8 +486,8 @@ public final class Container {
 
 		private final InjectorImpl injector;
 		private final Supplier<? extends T> supplier;
-		private final Lazy<T> value = new Lazy<>();
 		private final Resource<T> resource;
+		private final Lazy<T> value = new Lazy<>();
 
 		LazySingletonGenerator(InjectorImpl injector,
 				Supplier<? extends T> supplier, Resource<T> resource) {
@@ -505,6 +513,7 @@ public final class Container {
 	 * @param <T> Type of the generated value
 	 */
 	private static final class ReferenceGenerator<T> implements Generator<T> {
+
 		private final Injector injector;
 		private final Supplier<? extends T> supplier;
 		private final Resource<T> resource;
