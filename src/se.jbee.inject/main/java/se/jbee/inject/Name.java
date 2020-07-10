@@ -48,7 +48,7 @@ public final class Name implements Qualifying<Name>, Serializable {
 	public static Name named(Object name) {
 		if (name instanceof Class) {
 			Class<?> cls = (Class<?>) name;
-			return named(cls.getCanonicalName() + NAMESPACE);
+			return named(cls.getName() + NAMESPACE);
 		}
 		return named(String.valueOf(name));
 	}

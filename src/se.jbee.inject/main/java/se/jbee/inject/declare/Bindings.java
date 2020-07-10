@@ -86,8 +86,8 @@ public final class Bindings {
 					Name.named(a.annotationType()),
 					raw(ModuleWith.class).parametized(Type.CLASS),
 					annotated.getPackage());
-			//TODO add a meta annotation to mark annotation that are expected to be defined
-			// if such an annotation is present but no effect defined it is an binding error
+			//TODO add a meta annotation to mark annotations that are expected to be defined
+			// if such an annotation is present but no effect defined it is a binding error
 			if (then != null) {
 				then.declare(this, env, annotated);
 				n++;
