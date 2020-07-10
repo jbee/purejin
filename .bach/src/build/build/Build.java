@@ -1,14 +1,14 @@
 package build;
 
 import de.sormuras.bach.Bach;
-import de.sormuras.bach.Builder;
+import de.sormuras.bach.Configuration;
 import de.sormuras.bach.project.Library;
 import de.sormuras.bach.project.MainSources;
 import de.sormuras.bach.project.Project;
-import de.sormuras.bach.project.SourceDirectories;
 import de.sormuras.bach.project.SourceDirectory;
+import de.sormuras.bach.project.SourceDirectoryList;
 import de.sormuras.bach.project.SourceUnit;
-import de.sormuras.bach.project.SourceUnits;
+import de.sormuras.bach.project.SourceUnitMap;
 import de.sormuras.bach.project.Sources;
 import de.sormuras.bach.tool.Javac;
 import de.sormuras.bach.tool.Javadoc;
@@ -26,37 +26,35 @@ class Build {
     var unit =
         new SourceUnit(
             ModuleDescriptor.newModule("se.jbee.inject").build(),
-            new SourceDirectories(
+            new SourceDirectoryList(
                 List.of(
                     new SourceDirectory(Path.of("src/se.jbee.inject/main/java"), 8),
-                    SourceDirectory.of(Path.of("src/se.jbee.inject/main/java-9")))),
+                    new SourceDirectory(Path.of("src/se.jbee.inject/main/java-9"), 9))),
             List.of());
 
-    var bach =
-        Bach.ofSystem()
-            .with(System.Logger.Level.INFO)
-            .with(
-                Project.of("silk", version)
-                    .with(Sources.of().with(MainSources.of().with(SourceUnits.of().with(unit))))
-                    .withTestSource("src/se.jbee.inject/test/java-module") // in-module tests
-                    .withTestSource("src/com.example.app/test/java") // silk's first client
-                    .withTestSource("src/com.example.test/test/java") // modular integration tests
-                    .with(
-                        Library.of()
-                            .withRequires("org.hamcrest")
-                            .withRequires("org.junit.vintage.engine")
-                            .withRequires("org.junit.platform.console")))
-            .with(CustomBuilder::new);
+    var silk =
+        Project.of("silk", version)
+            .sources(
+                Sources.of().mainSources(MainSources.of().units(SourceUnitMap.of().with(unit))))
+            .withTestSource("src/se.jbee.inject/test/java-module") // in-module tests
+            .withTestSource("src/com.example.app/test/java") // silk's first client
+            .withTestSource("src/com.example.test/test/java") // modular integration tests
+            .library(
+                Library.of()
+                    .withRequires("org.hamcrest")
+                    .withRequires("org.junit.vintage.engine")
+                    .withRequires("org.junit.platform.console"));
 
-    bach.buildProject();
+    var configuration = Configuration.ofSystem().with(System.Logger.Level.INFO);
+    new CustomBach(configuration, silk).buildProject();
 
     generateMavenPomXml(version);
   }
 
-  private static class CustomBuilder extends Builder {
+  static class CustomBach extends Bach {
 
-    CustomBuilder(Bach bach) {
-      super(bach);
+    CustomBach(Configuration configuration, Project project) {
+      super(configuration, project);
     }
 
     @Override
