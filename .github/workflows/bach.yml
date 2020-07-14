@@ -21,7 +21,7 @@ jobs:
         java: [11, 14, 15-ea]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: 'Checkout sources'
+      - name: 'Check out sources'
         uses: actions/checkout@v2
       - name: 'Set up JDK'
         uses: actions/setup-java@v1
@@ -30,7 +30,7 @@ jobs:
       - name: 'Emit version of JShell (trigger creation of user''s preferences directory)'
         run: jshell --version
       - name: 'Build with Bach.java'
-        run: jshell https://sormuras.de/bach@11.3/build
+        run: jshell https://sormuras.de/bach@11.4/build
       - name: 'Upload build artifact'
         uses: actions/upload-artifact@v2
         with:
