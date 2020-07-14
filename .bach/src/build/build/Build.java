@@ -2,9 +2,9 @@ package build;
 
 import de.sormuras.bach.Bach;
 import de.sormuras.bach.Configuration;
-import de.sormuras.bach.project.Library;
+import de.sormuras.bach.Flag;
+import de.sormuras.bach.Project;
 import de.sormuras.bach.project.MainSources;
-import de.sormuras.bach.project.Project;
 import de.sormuras.bach.project.SourceDirectory;
 import de.sormuras.bach.project.SourceDirectoryList;
 import de.sormuras.bach.project.SourceUnit;
@@ -12,6 +12,7 @@ import de.sormuras.bach.project.SourceUnitMap;
 import de.sormuras.bach.project.Sources;
 import de.sormuras.bach.tool.Javac;
 import de.sormuras.bach.tool.Javadoc;
+import java.lang.System.Logger.Level;
 import java.lang.module.ModuleDescriptor;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,23 +31,27 @@ class Build {
                 List.of(
                     new SourceDirectory(Path.of("src/se.jbee.inject/main/java"), 8),
                     new SourceDirectory(Path.of("src/se.jbee.inject/main/java-9"), 9))),
-            List.of());
+            List.of() // no resources
+            );
 
     var silk =
-        Project.of("silk", version)
+        Project.of()
+            .name("silk")
+            .version(version)
+            // <main>
             .sources(
                 Sources.of().mainSources(MainSources.of().units(SourceUnitMap.of().with(unit))))
+            .with(MainSources.Modifier.NO_CUSTOM_RUNTIME_IMAGE)
+            // test
             .withTestSource("src/se.jbee.inject/test/java-module") // in-module tests
             .withTestSource("src/com.example.app/test/java") // silk's first client
             .withTestSource("src/com.example.test/test/java") // modular integration tests
-            .library(
-                Library.of()
-                    .withRequires("org.hamcrest")
-                    .withRequires("org.junit.vintage.engine")
-                    .withRequires("org.junit.platform.console"));
+            // lib/
+            .withLibraryRequires(
+                "org.hamcrest", "org.junit.vintage.engine", "org.junit.platform.console");
 
-    var configuration = Configuration.ofSystem().with(System.Logger.Level.INFO);
-    new CustomBach(configuration, silk).buildProject();
+    var configuration = Configuration.ofSystem().with(Level.INFO).with(Flag.SUMMARY_LINES_UNCUT);
+    new CustomBach(configuration, silk).build();
 
     generateMavenPomXml(version);
   }
