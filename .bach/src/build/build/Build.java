@@ -5,15 +5,9 @@ import de.sormuras.bach.Configuration;
 import de.sormuras.bach.Flag;
 import de.sormuras.bach.Project;
 import de.sormuras.bach.project.MainSources;
-import de.sormuras.bach.project.SourceDirectory;
-import de.sormuras.bach.project.SourceDirectoryList;
-import de.sormuras.bach.project.SourceUnit;
-import de.sormuras.bach.project.SourceUnitMap;
-import de.sormuras.bach.project.Sources;
 import de.sormuras.bach.tool.Javac;
 import de.sormuras.bach.tool.Javadoc;
 import java.lang.System.Logger.Level;
-import java.lang.module.ModuleDescriptor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -24,23 +18,12 @@ class Build {
   public static void main(String... args) throws Exception {
     var version = "19.1-ea";
 
-    var unit =
-        new SourceUnit(
-            ModuleDescriptor.newModule("se.jbee.inject").build(),
-            new SourceDirectoryList(
-                List.of(
-                    new SourceDirectory(Path.of("src/se.jbee.inject/main/java"), 8),
-                    new SourceDirectory(Path.of("src/se.jbee.inject/main/java-9"), 9))),
-            List.of() // no resources
-            );
-
     var silk =
         Project.of()
             .name("silk")
             .version(version)
             // <main>
-            .sources(
-                Sources.of().mainSources(MainSources.of().units(SourceUnitMap.of().with(unit))))
+            .withMainSource("src/se.jbee.inject/main/java-9", 8)
             .with(MainSources.Modifier.NO_CUSTOM_RUNTIME_IMAGE)
             // test
             .withTestSource("src/se.jbee.inject/test/java-module") // in-module tests

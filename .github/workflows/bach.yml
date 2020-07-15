@@ -30,7 +30,7 @@ jobs:
       - name: 'Emit version of JShell (trigger creation of user''s preferences directory)'
         run: jshell --version
       - name: 'Build with Bach.java'
-        run: jshell https://sormuras.de/bach@11.4/build
+        run: jshell https://sormuras.de/bach@11.5/build
       - name: 'Upload build artifact'
         uses: actions/upload-artifact@v2
         with:
