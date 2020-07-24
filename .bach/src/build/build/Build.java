@@ -4,9 +4,7 @@ import de.sormuras.bach.Bach;
 import de.sormuras.bach.Configuration;
 import de.sormuras.bach.Flag;
 import de.sormuras.bach.Project;
-import de.sormuras.bach.project.MainSources;
-import de.sormuras.bach.tool.Javac;
-import de.sormuras.bach.tool.Javadoc;
+import de.sormuras.bach.project.MainSpace;
 import java.lang.System.Logger.Level;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,39 +21,24 @@ class Build {
             .name("silk")
             .version(version)
             // <main>
-            .withMainSource("src/se.jbee.inject/main/java-9", 8)
-            .with(MainSources.Modifier.NO_CUSTOM_RUNTIME_IMAGE)
+            .withMainSpaceUnit("src/se.jbee.inject/main/java-9", 8)
+            .without(MainSpace.Modifier.CUSTOM_RUNTIME_IMAGE)
+            .withMainSpaceJavacTweak(
+                javac -> javac.without("-Xlint").with("-Xlint:-serial,-rawtypes,-varargs"))
+            .withMainSpaceJavadocTweak(
+                javadoc -> javadoc.without("-Xdoclint").with("-Xdoclint:none"))
             // test
-            .withTestSource("src/se.jbee.inject/test/java-module") // in-module tests
-            .withTestSource("src/com.example.app/test/java") // silk's first client
-            .withTestSource("src/com.example.test/test/java") // modular integration tests
+            .withTestSpaceUnit("src/se.jbee.inject/test/java-module") // in-module tests
+            .withTestSpaceUnit("src/com.example.app/test/java") // silk's first client
+            .withTestSpaceUnit("src/com.example.test/test/java") // modular integration tests
             // lib/
             .withLibraryRequires(
                 "org.hamcrest", "org.junit.vintage.engine", "org.junit.platform.console");
 
     var configuration = Configuration.ofSystem().with(Level.INFO).with(Flag.SUMMARY_LINES_UNCUT);
-    new CustomBach(configuration, silk).build();
+    new Bach(configuration, silk).build();
 
     generateMavenPomXml(version);
-  }
-
-  static class CustomBach extends Bach {
-
-    CustomBach(Configuration configuration, Project project) {
-      super(configuration, project);
-    }
-
-    @Override
-    public Javac computeJavacForMainSources() {
-      return super.computeJavacForMainSources()
-          .without("-Xlint")
-          .with("-Xlint:-serial,-rawtypes,-varargs");
-    }
-
-    @Override
-    public Javadoc computeJavadocForMainSources() {
-      return super.computeJavadocForMainSources().without("-Xdoclint").with("-Xdoclint:none");
-    }
   }
 
   private static void generateMavenPomXml(String version) throws Exception {
