@@ -5,9 +5,7 @@
  */
 package se.jbee.inject.bootstrap;
 
-import static se.jbee.inject.DeclarationType.MULTI;
 import static se.jbee.inject.Instance.anyOf;
-import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.instance;
 import static se.jbee.inject.Utils.isClassBanal;
@@ -19,23 +17,16 @@ import static se.jbee.inject.declare.BindingType.CONSTRUCTOR;
 import static se.jbee.inject.declare.BindingType.METHOD;
 import static se.jbee.inject.declare.BindingType.PREDEFINED;
 import static se.jbee.inject.declare.BindingType.REFERENCE;
-import static se.jbee.inject.declare.Bindings.supplyScopedConstant;
 import static se.jbee.inject.declare.Bindings.supplyConstant;
-import static se.jbee.inject.extend.Plugins.pluginPoint;
+import static se.jbee.inject.declare.Bindings.supplyScopedConstant;
 
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Env;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Locator;
 import se.jbee.inject.Parameter;
-import se.jbee.inject.Source;
 import se.jbee.inject.Type;
 import se.jbee.inject.Utils;
 import se.jbee.inject.config.ConstructsBy;
@@ -114,14 +105,6 @@ public final class DefaultBinders {
 				Bindings target) {
 			target.addExpanded(env, item.complete(CONSTRUCTOR,
 					constructor(src.typed(item.type()))));
-			Class<?> impl = src.target.getDeclaringClass();
-			Source source = item.source;
-			target.addConstant(env, source.typed(MULTI),
-					named(src.target.getName()), Constructor.class, src.target);
-			plugAnnotationsInto(env, target, source, impl, ElementType.TYPE,
-					impl);
-			plugAnnotationsInto(env, target, source, impl,
-					ElementType.CONSTRUCTOR, src.target);
 		}
 	}
 
@@ -143,12 +126,6 @@ public final class DefaultBinders {
 				Bindings target) {
 			target.addExpanded(env,
 					item.complete(METHOD, method(src.typed(item.type()))));
-			Source source = item.source;
-			target.addConstant(env, source.typed(MULTI),
-					named(src.target.getName()), Method.class, src.target);
-			plugAnnotationsInto(env, target, source,
-					src.target.getDeclaringClass(), ElementType.METHOD,
-					src.target);
 		}
 	}
 
@@ -157,16 +134,8 @@ public final class DefaultBinders {
 		@Override
 		public <T> void expand(Env env, Shares<?> src, Binding<T> item,
 				Bindings target) {
-			Source source = item.source;
 			target.addExpanded(env, item, new Constant<>(
 					Utils.share(src.constant, src.owner)).manual());
-			//TODO should the share be scoped or not?
-			// There is not right answer => sometimes it might be intended, often it is not
-			target.addConstant(env, source.typed(MULTI),
-					named(src.constant.getName()), Field.class, src.constant);
-			plugAnnotationsInto(env, target, source,
-					src.constant.getDeclaringClass(), ElementType.FIELD,
-					src.constant);
 		}
 
 	}
@@ -183,8 +152,6 @@ public final class DefaultBinders {
 			target.addExpanded(env,
 					item.complete(BindingType.PREDEFINED, supplier));
 			Class<?> impl = src.value.getClass();
-			plugAnnotationsInto(env, target, item.source, impl,
-					ElementType.TYPE, impl);
 			// implicitly bind to the exact type of the constant
 			// should that differ from the binding type
 			if (src.autoBindExactType
@@ -233,9 +200,6 @@ public final class DefaultBinders {
 				target.addExpanded(env, item.complete(REFERENCE,
 						Supply.instance(src.typed(type))));
 				implicitlyBindToConstructor(env, src, item, target);
-				Class<T> boundRawType = bound.type().rawType;
-				plugAnnotationsInto(env, target, item.source, boundRawType,
-						ElementType.TYPE, boundRawType);
 				return;
 			}
 			if (type.isInterface())
@@ -265,22 +229,4 @@ public final class DefaultBinders {
 			target.addExpanded(env, item, New.bind(c));
 	}
 
-	static void plugAnnotationsInto(Env env, Bindings target, Source source,
-			Class<?> plugin, ElementType declaredType,
-			AnnotatedElement declaration) {
-		Annotation[] annotations = declaration.getAnnotations();
-		if (annotations.length > 0) {
-			for (Annotation a : annotations)
-				plugAnnotationInto(env, target, source, plugin, declaredType,
-						a.annotationType());
-		}
-	}
-
-	static void plugAnnotationInto(Env env, Bindings target, Source source,
-			Class<?> plugin, ElementType declaredType,
-			Class<? extends Annotation> pluginPoint) {
-		target.addConstant(env, source.typed(DeclarationType.MULTI),
-				pluginPoint(pluginPoint, declaredType.name()), Class.class,
-				plugin);
-	}
 }

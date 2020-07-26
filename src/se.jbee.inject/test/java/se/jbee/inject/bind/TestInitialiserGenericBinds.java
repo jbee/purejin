@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.container.Cast.listTypeOf;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import org.junit.Test;
 
@@ -47,8 +48,8 @@ public class TestInitialiserGenericBinds {
 
 	@Test
 	public void initialisersOnlyAffectExactTypeMatches() {
-		assertEquals(asList("b", "a"),
-				context.resolve(listTypeOf(String.class)));
+		assertEquals(new HashSet<>(asList("b", "a")),
+				new HashSet<>(context.resolve(listTypeOf(String.class))));
 		assertEquals(asList(1), context.resolve(listTypeOf(Integer.class)));
 	}
 }

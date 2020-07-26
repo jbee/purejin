@@ -14,7 +14,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import se.jbee.inject.AnnotatedWith;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
@@ -105,7 +104,6 @@ public enum Adapter implements Toggled<Adapter> {
 		bootstrapper.install(DefaultEnvModule.class, ENV);
 		bootstrapper.install(DefaultScopes.class, SCOPES);
 		bootstrapper.install(ExtensionModule.class, EXTENSION);
-		bootstrapper.install(AnnotatedWithModule.class, ANNOTATED_WITH);
 		bootstrapper.install(PrimitiveArraysModule.class, PRIMITIVE_ARRAYS);
 	}
 

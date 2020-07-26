@@ -259,7 +259,7 @@ public class TestBootstrapper {
 		assertEquals(6, injector.resolve(Number.class));
 		Resource<?>[] rs = injector.resolve(Resource[].class);
 		//TODO can this be limited to cases with a certain Scope so that container can be excluded?
-		assertEquals(30, rs.length); // 3x Comparable, Float, Double, Integer and Number (3x Serializable has been nullified) + 11 Scope + 2 Annotation
+		assertEquals(25, rs.length); // 3x Comparable, Float, Double, Integer and Number (3x Serializable has been nullified) + 11 Scope + 2 Annotation
 		Resource<Number>[] forNumber = injector.resolve(
 				resourcesTypeFor(Number.class));
 		assertEquals(1, forNumber.length);

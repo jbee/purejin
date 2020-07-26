@@ -5,18 +5,10 @@
  */
 package se.jbee.inject;
 
-import static java.util.Collections.emptyList;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
-
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Knows how to *resolve* an instance for a given {@link Dependency}.
@@ -87,43 +79,4 @@ public interface Injector {
 		return resolve(name, Injector.class);
 	}
 
-	/**
-	 * Resolves all instances that are annotated with the given
-	 * {@link Annotation} type.
-	 * 
-	 * Note that this feature requires use of default macros which add
-	 * annotation information as plug-ins which is used by the build-in
-	 * {@link AnnotatedWith} supplier to assemble the returned list.
-	 * 
-	 * @since 19.1
-	 * 
-	 * @param type the {@link Annotation} which the returned instance's types
-	 *            are annotated with.
-	 * @return a collection (logical set) of instances of types which have an
-	 *         {@link Annotation} of the given type.
-	 */
-	default Collection<?> annotatedWith(Class<? extends Annotation> type) {
-		return resolve(Name.ANY,
-				raw(AnnotatedWith.class).parametized(type)).annotated();
-	}
-
-	default Collection<?> annotatedWith(Class<? extends Annotation> type,
-			ElementType target) {
-		return resolve(named(target.name()),
-				raw(AnnotatedWith.class).parametized(type)).annotated();
-	}
-
-	default Collection<?> annotatedWith(Class<? extends Annotation> type,
-			ElementType... anyOfTargets) {
-		if (anyOfTargets.length == 0)
-			return emptyList();
-		EnumSet<ElementType> include = EnumSet.of(anyOfTargets[0],
-				anyOfTargets);
-		if (include.equals(EnumSet.allOf(ElementType.class)))
-			return annotatedWith(type);
-		Set<Object> matches = new HashSet<>();
-		for (ElementType target : include)
-			matches.addAll(annotatedWith(type, target));
-		return matches;
-	}
 }
