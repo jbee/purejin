@@ -1,37 +1,42 @@
-/*
- *  Copyright (c) 2012-2020, Jan Bernitt
- *
- *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
- */
+package build;
 
-// default package
-
-import java.io.File;
+import de.sormuras.bach.Bach;
+import de.sormuras.bach.Configuration;
+import de.sormuras.bach.Flag;
+import de.sormuras.bach.Project;
+import de.sormuras.bach.project.MainSpace;
+import java.lang.System.Logger.Level;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.spi.ToolProvider;
 
 /** Silk's build program. */
 class Build {
 
-  public static void main(String... args0) throws Exception {
-	  String version = "19.1-ea";
-	  Bach.of(
-            scanner -> scanner.offset("src"),
-            silk ->
-                silk.title("Silk DI")
-                    .version(version)
-                    .requires("org.hamcrest") // By junit at runtime.
-                    .requires("org.junit.vintage.engine") // Discovers and executes junit 3/4 tests.
-                    .requires("org.junit.platform.console") // Launch the JUnit Platform.
-            )
-        .build(
-            (args, project, context) -> {
-              if (context.get("tool").equals("javadoc")) args.put("-Xdoclint:none");
-            });
+  public static void main(String... args) throws Exception {
+    var version = "19.1-ea";
+
+    var silk =
+        Project.of()
+            .name("silk")
+            .version(version)
+            // <main>
+            .withMainSpaceUnit("src/se.jbee.inject/main/java-9", 8)
+            .without(MainSpace.Modifier.CUSTOM_RUNTIME_IMAGE)
+            .withMainSpaceJavacTweak(
+                javac -> javac.without("-Xlint").with("-Xlint:-serial,-rawtypes,-varargs"))
+            .withMainSpaceJavadocTweak(
+                javadoc -> javadoc.without("-Xdoclint").with("-Xdoclint:none"))
+            // test
+            .withTestSpaceUnit("src/se.jbee.inject/test/java-module") // in-module tests
+            .withTestSpaceUnit("src/com.example.app/test/java") // silk's first client
+            .withTestSpaceUnit("src/com.example.test/test/java") // modular integration tests
+            // lib/
+            .withLibraryRequires(
+                "org.hamcrest", "org.junit.vintage.engine", "org.junit.platform.console");
+
+    var configuration = Configuration.ofSystem().with(Level.INFO).with(Flag.SUMMARY_LINES_UNCUT);
+    new Bach(configuration, silk).build();
 
     generateMavenPomXml(version);
   }
@@ -75,5 +80,4 @@ class Build {
             "    </developers>",
             "</project>"));
   }
-
 }
