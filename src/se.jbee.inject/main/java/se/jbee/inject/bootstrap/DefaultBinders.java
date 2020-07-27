@@ -10,10 +10,12 @@ import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.instance;
 import static se.jbee.inject.Utils.isClassBanal;
 import static se.jbee.inject.Utils.isClassInstantiable;
-import static se.jbee.inject.bootstrap.Supply.constructor;
-import static se.jbee.inject.bootstrap.Supply.method;
-import static se.jbee.inject.bootstrap.Supply.parametrizedInstance;
+import static se.jbee.inject.bootstrap.Supply.byAccess;
+import static se.jbee.inject.bootstrap.Supply.byNew;
+import static se.jbee.inject.bootstrap.Supply.byParametrizedInstanceReference;
+import static se.jbee.inject.bootstrap.Supply.byProducer;
 import static se.jbee.inject.declare.BindingType.CONSTRUCTOR;
+import static se.jbee.inject.declare.BindingType.FIELD;
 import static se.jbee.inject.declare.BindingType.METHOD;
 import static se.jbee.inject.declare.BindingType.PREDEFINED;
 import static se.jbee.inject.declare.BindingType.REFERENCE;
@@ -28,7 +30,6 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.Locator;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Type;
-import se.jbee.inject.Utils;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.container.Supplier;
 import se.jbee.inject.declare.Binding;
@@ -92,20 +93,10 @@ public final class DefaultBinders {
 		@SuppressWarnings("unchecked")
 		static <E> Supplier<E> supplier(Type<E[]> array,
 				Parameter<?>[] elements) {
-			return (Supplier<E>) Supply.elements(array,
+			return (Supplier<E>) Supply.fromElements(array,
 					(Parameter<? extends E>[]) elements);
 		}
 
-	}
-
-	static final class NewBinder implements ValueBinder<New<?>> {
-
-		@Override
-		public <T> void expand(Env env, New<?> src, Binding<T> item,
-				Bindings target) {
-			target.addExpanded(env, item.complete(CONSTRUCTOR,
-					constructor(src.typed(item.type()))));
-		}
 	}
 
 	static final class TypeParametrizedReferenceBinder
@@ -113,29 +104,35 @@ public final class DefaultBinders {
 
 		@Override
 		public <T> Binding<T> complete(Binding<T> item, Class<?> to) {
-			return item.complete(REFERENCE,
-					parametrizedInstance(anyOf(raw(to).castTo(item.type()))));
+			return item.complete(REFERENCE, byParametrizedInstanceReference(
+					anyOf(raw(to).castTo(item.type()))));
 		}
 
 	}
 
-	static final class ProducesBinder implements ValueBinder<Produces<?>> {
+	static final class NewBinder implements ValueBinder.Completion<New<?>> {
 
 		@Override
-		public <T> void expand(Env env, Produces<?> src, Binding<T> item,
-				Bindings target) {
-			target.addExpanded(env,
-					item.complete(METHOD, method(src.typed(item.type()))));
+		public <T> Binding<T> complete(Binding<T> item, New<?> src) {
+			return item.complete(CONSTRUCTOR, byNew(src.typed(item.type())));
 		}
 	}
 
-	static final class SharesBinder implements ValueBinder<Shares<?>> {
+	static final class ProducesBinder
+			implements ValueBinder.Completion<Produces<?>> {
 
 		@Override
-		public <T> void expand(Env env, Shares<?> src, Binding<T> item,
-				Bindings target) {
-			target.addExpanded(env, item, new Constant<>(
-					Utils.share(src.constant, src.owner)).manual());
+		public <T> Binding<T> complete(Binding<T> item, Produces<?> src) {
+			return item.complete(METHOD, byProducer(src.typed(item.type())));
+		}
+	}
+
+	static final class SharesBinder
+			implements ValueBinder.Completion<Shares<?>> {
+
+		@Override
+		public <T> Binding<T> complete(Binding<T> item, Shares<?> src) {
+			return item.complete(FIELD, byAccess(src.typed(item.type())));
 		}
 
 	}
@@ -188,8 +185,8 @@ public final class DefaultBinders {
 				&& !item.type().isAssignableTo(raw(Supplier.class))) {
 				@SuppressWarnings("unchecked")
 				Class<? extends Supplier<? extends T>> supplier = (Class<? extends Supplier<? extends T>>) srcType.rawType;
-				target.addExpanded(env,
-						item.complete(REFERENCE, Supply.reference(supplier)));
+				target.addExpanded(env, item.complete(REFERENCE,
+						Supply.bySupplierReference(supplier)));
 				implicitlyBindToConstructor(env, src, item, target);
 				return;
 			}
@@ -198,7 +195,7 @@ public final class DefaultBinders {
 			if (!bound.type().equalTo(type)
 				|| !src.name.isCompatibleWith(bound.name)) {
 				target.addExpanded(env, item.complete(REFERENCE,
-						Supply.instance(src.typed(type))));
+						Supply.byInstanceReference(src.typed(type))));
 				implicitlyBindToConstructor(env, src, item, target);
 				return;
 			}

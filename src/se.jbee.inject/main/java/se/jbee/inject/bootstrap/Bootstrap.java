@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import se.jbee.inject.Annotated;
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Utils;
@@ -60,6 +61,7 @@ public final class Bootstrap {
 			.with(NamesBy.class, NamesBy.defaultName) //
 			.with(ScopesBy.class, ScopesBy.alwaysDefault) //
 			.with(HintsBy.class, HintsBy.noParameters) //
+			.with(Annotated.ENV_AGGREGATOR_KEY, Annotated.AGGREGATOR) //
 			.readonly();
 
 	public static Env env(Class<? extends Bundle> root) {
@@ -89,8 +91,6 @@ public final class Bootstrap {
 			Bindings bindings) {
 		return injector(env, bindings, modulariser(env).modularise(root));
 	}
-
-	// TODO move env to be the first param everywhere
 
 	public static Injector injector(Env env, Bindings bindings,
 			Module[] modules) {

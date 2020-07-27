@@ -12,6 +12,7 @@ import static se.jbee.inject.Type.parameterTypes;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.newArray;
 
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -23,6 +24,7 @@ import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.logging.Logger;
 
+import se.jbee.inject.Annotated;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Hint;
 import se.jbee.inject.Injector;
@@ -47,7 +49,8 @@ import se.jbee.inject.container.Supplier;
 public final class Supply {
 
 	public static final Supplier<Provider<?>> PROVIDER = (dep, context) //
-	-> lazyProvider(dep.onTypeParameter().uninject().ignoredScoping(), context);
+	-> byLazyProvider(dep.onTypeParameter().uninject().ignoredScoping(),
+			context);
 
 	public static final Supplier<Logger> LOGGER = (dep, context) //
 	-> Logger.getLogger(dep.target(1).type().rawType.getCanonicalName());
@@ -83,31 +86,33 @@ public final class Supply {
 	/**
 	 * A {@link Supplier} => {@link Supplier} bridge.
 	 */
-	public static <T> Supplier<T> reference(
+	public static <T> Supplier<T> bySupplierReference(
 			Class<? extends Supplier<? extends T>> type) {
 		return (dep, context) -> context.resolve(dep.instanced(anyOf(type))) //
 				.supply(dep, context);
 	}
 
-	public static <E> Supplier<E[]> elements(Type<E[]> arrayType,
+	public static <E> Supplier<E[]> fromElements(Type<E[]> arrayType,
 			Parameter<? extends E>[] elements) {
 		return new PredefinedArraySupplier<>(arrayType, Hint.match(elements));
 	}
 
-	public static <T> Supplier<T> instance(Instance<T> instance) {
+	public static <T> Supplier<T> byInstanceReference(Instance<T> instance) {
 		// Note that this is not "buffered" using Resources as it is used to
 		// implement the plain resolution
 		return (dep, context) -> context.resolve(dep.instanced(instance));
 	}
 
-	public static <T> Supplier<T> dependency(Dependency<T> dependency) {
+	public static <T> Supplier<T> byDependencyReference(
+			Dependency<T> dependency) {
 		return (dep, context) -> context.resolve(dependency);
 	}
 
 	/**
 	 * E.g. used to "forward" Collection<T> to List<T>.
 	 */
-	public static <T> Supplier<T> parametrizedInstance(Instance<T> instance) {
+	public static <T> Supplier<T> byParametrizedInstanceReference(
+			Instance<T> instance) {
 		return (dep, context) -> {
 			Type<? super T> type = dep.type();
 			Instance<? extends T> parametrized = instance.typed(
@@ -117,7 +122,7 @@ public final class Supply {
 		};
 	}
 
-	public static <T> Supplier<T> method(Produces<T> producer) {
+	public static <T> Supplier<T> byProducer(Produces<T> producer) {
 		if (producer.hasTypeVariables && producer.requestsActualType()) {
 			// use a constant null hint to blank first parameter as it is filled in with actual type on method invocation
 			Hint<?> actualTypeHint = Hint.constantNull(
@@ -131,12 +136,16 @@ public final class Supply {
 				match(parameterTypes(producer.target), producer.hints), null);
 	}
 
-	public static <T> Supplier<T> constructor(New<T> constructor) {
-		return new ConstructorSupplier<>(constructor.target,
-				match(parameterTypes(constructor.target), constructor.hints));
+	public static <T> Supplier<T> byNew(New<T> instantiation) {
+		return new Instantiation<>(instantiation.target, match(
+				parameterTypes(instantiation.target), instantiation.hints));
 	}
 
-	public static <T> Provider<T> lazyProvider(Dependency<T> dep,
+	public static <T> Supplier<T> byAccess(Shares<T> constant) {
+		return new Access<>(constant);
+	}
+
+	public static <T> Provider<T> byLazyProvider(Dependency<T> dep,
 			Injector injector) {
 		if (dep.type().arrayDimensions() == 1)
 			return () -> injector.resolve(dep);
@@ -193,13 +202,41 @@ public final class Supply {
 		}
 	}
 
-	private static final class ConstructorSupplier<T> extends WithArgs<T> {
+	private static final class Access<T> implements Annotated, Supplier<T> {
+
+		private final Shares<T> field;
+
+		Access(Shares<T> field) {
+			this.field = field;
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public T supply(Dependency<? super T> dep, Injector context)
+				throws UnresolvableDependency {
+			return (T) Utils.share(field.target, field.owner);
+		}
+
+		@Override
+		public AnnotatedElement element() {
+			return field.target;
+		}
+
+	}
+
+	private static final class Instantiation<T> extends WithArgs<T>
+			implements Annotated {
 
 		private final Constructor<T> target;
 
-		ConstructorSupplier(Constructor<T> target, Hint<?>[] args) {
+		Instantiation(Constructor<T> target, Hint<?>[] args) {
 			super(args);
 			this.target = target;
+		}
+
+		@Override
+		public AnnotatedElement element() {
+			return target;
 		}
 
 		@Override
@@ -213,7 +250,8 @@ public final class Supply {
 		}
 	}
 
-	private static final class Producer<T> extends WithArgs<T> {
+	private static final class Producer<T> extends WithArgs<T>
+			implements Annotated {
 
 		private Object owner;
 		private final Produces<T> producer;
@@ -230,6 +268,11 @@ public final class Supply {
 				? TypeVariable.typeVariables(
 						producer.target.getGenericReturnType())
 				: null;
+		}
+
+		@Override
+		public AnnotatedElement element() {
+			return producer.target;
 		}
 
 		@Override

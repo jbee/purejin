@@ -205,7 +205,7 @@ public class TestCustomValueBinderBinds1 {
 		public <T> void expand(Env env, New<?> constructor,
 				Binding<T> incomplete, Bindings bindings) {
 			Supplier<T> supplier = new FieldInjectionSupplier<>(
-					Supply.constructor(constructor.typed(incomplete.type())));
+					Supply.byNew(constructor.typed(incomplete.type())));
 			bindings.addExpanded(env,
 					incomplete.complete(CONSTRUCTOR, supplier));
 		}

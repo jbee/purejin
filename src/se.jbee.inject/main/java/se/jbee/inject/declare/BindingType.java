@@ -46,6 +46,12 @@ public enum BindingType {
 	METHOD,
 
 	/**
+	 * The instance is supplied from a field. Field is read each time supply
+	 * occurs.
+	 */
+	FIELD,
+
+	/**
 	 * The binding is an incomplete. A value was provided that should be
 	 * expanded into a complete {@link Binding}.
 	 */

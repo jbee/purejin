@@ -10,6 +10,9 @@ import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
 
+import java.lang.annotation.Annotation;
+import java.util.List;
+
 /**
  * Knows how to *resolve* an instance for a given {@link Dependency}.
  *
@@ -79,4 +82,10 @@ public interface Injector {
 		return resolve(name, Injector.class);
 	}
 
+	@SuppressWarnings("unchecked")
+	default List<AnnotatedWith.AnnotatedInstance<?>> annotatedWith(
+			Class<? extends Annotation> annotationType) {
+		return resolve(raw(AnnotatedWith.class).parametized(
+				annotationType)).instances();
+	}
 }

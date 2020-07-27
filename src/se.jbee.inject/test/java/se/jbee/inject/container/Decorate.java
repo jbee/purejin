@@ -5,8 +5,8 @@ import java.lang.reflect.Array;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.UnresolvableDependency.NoMethodForDependency;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 
 public class Decorate {
 
