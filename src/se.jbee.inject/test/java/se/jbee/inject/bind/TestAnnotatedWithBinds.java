@@ -63,7 +63,7 @@ public class TestAnnotatedWithBinds {
 		public void verify() {
 			assertEquals(1, webServices.instances().size());
 			AnnotatedInstance<?> instance = webServices.instances().get(0);
-			assertSame(bean, instance.instance);
+			assertSame(bean, instance.instance.get());
 			assertEquals("foo", instance.annotations.getAnnotation(
 					WebService.class).value());
 		}
@@ -142,7 +142,8 @@ public class TestAnnotatedWithBinds {
 		List<AnnotatedInstance<?>> annotated = injector.annotatedWith(
 				MXBean.class);
 		assertEquals(1, annotated.size());
-		assertSame(injector.resolve(Service.class), annotated.get(0).instance);
+		assertSame(injector.resolve(Service.class),
+				annotated.get(0).instance.get());
 		assertEquals(ServiceImpl.class, annotated.get(0).role);
 	}
 
@@ -151,8 +152,9 @@ public class TestAnnotatedWithBinds {
 		List<AnnotatedInstance<?>> annotated = injector.annotatedWith(
 				Marker.class);
 		assertEquals(2, annotated.size());
-		assertEquals(new HashSet<>(asList(42, "foo")), new HashSet<>(
-				asList(annotated.get(0).instance, annotated.get(1).instance)));
+		assertEquals(new HashSet<>(asList(42, "foo")),
+				new HashSet<>(asList(annotated.get(0).instance.get(),
+						annotated.get(1).instance.get())));
 	}
 
 	@Test

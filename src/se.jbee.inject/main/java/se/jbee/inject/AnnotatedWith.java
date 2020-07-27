@@ -6,6 +6,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Allows to resolve bound instances annotated with a certain {@link Annotation}
@@ -35,6 +36,9 @@ import java.util.List;
 public interface AnnotatedWith<T extends Annotation> {
 
 	/**
+	 * Instances referenced in this are supplied by a {@link Supplier} as the
+	 * underlying source might allow changes to the result for multiple calls.
+	 * 
 	 * @return The list of instances that have the annotation {@code T} present.
 	 * 
 	 *         By default this means the annotation must be present at the
@@ -61,14 +65,19 @@ public interface AnnotatedWith<T extends Annotation> {
 	 * {@link Field} or a custom {@link AnnotatedElement} that implements custom
 	 * aggregation of annotation, for example including {@link Class} level
 	 * annotations for {@link Constructor}s.
+	 * 
+	 * The {@link #instance} is supplied indirectly as it might be affected by
+	 * scoping or underlying sources that return different (updated) result for
+	 * each invocation. If this is the case this is reflected by the
+	 * {@link Supplier}.
 	 */
 	final class AnnotatedInstance<T> {
 
-		public final T instance;
+		public final Supplier<T> instance;
 		public final Class<? super T> role;
 		public final AnnotatedElement annotations;
 
-		public AnnotatedInstance(T instance, Class<? super T> role,
+		public AnnotatedInstance(Supplier<T> instance, Class<? super T> role,
 				AnnotatedElement annotations) {
 			this.instance = instance;
 			this.role = role;
