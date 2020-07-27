@@ -5,6 +5,9 @@
  */
 package se.jbee.inject.container;
 
+import java.lang.annotation.Annotation;
+import java.util.function.Predicate;
+
 import se.jbee.inject.Injector;
 
 /**
@@ -17,6 +20,17 @@ import se.jbee.inject.Injector;
  * 
  * {@link Initialiser}s allow to run initialisation code once and build more
  * powerful mechanisms on top of it.
+ * 
+ * An {@link Initialiser} can also implement {@link Predicate} of {@link Class}
+ * to add a {@link Class} based filter so it does not automatically apply to all
+ * instances that are assignable to its type parameter.
+ * 
+ * For example an {@link Annotation} based match can be done by declaring a
+ * {@link Initialiser} for {@link Object} with a {@link Predicate} checking that
+ * passed {@link Class} for the annotation in question.
+ * 
+ * @param <T> type of the value initialised, all values assignable to this type
+ *            will match
  * 
  * @since 19.1
  */

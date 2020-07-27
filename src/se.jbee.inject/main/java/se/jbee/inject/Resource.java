@@ -46,12 +46,16 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 	 */
 	public final int serialID;
 
+	public final Annotated annotations;
+
 	public Resource(int serialID, Source source, Scoping scoping,
-			Locator<T> locator, Function<Resource<T>, Generator<T>> generator) {
+			Locator<T> locator, Function<Resource<T>, Generator<T>> generator,
+			Annotated annotations) {
 		this.locator = locator;
 		this.source = source;
 		this.scoping = scoping;
 		this.serialID = serialID;
+		this.annotations = annotations;
 		//OBS! must be last
 		this.generator = generator.apply(this);
 	}

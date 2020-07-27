@@ -708,6 +708,15 @@ public class Binder {
 		}
 
 		/**
+		 * This method will bind the provided {@link Generator} in a way that
+		 * bypasses {@link Scope} effects. The provided {@link Generator} is
+		 * directly called to generate the instance each time it should be
+		 * injected.
+		 * 
+		 * If a {@link Scope} should apply use {@link #toSupplier(Supplier)}
+		 * instead or create a {@link Generator} bridge that does not implement
+		 * {@link Generator} itself.
+		 * 
 		 * @since 19.1
 		 */
 		public void toGenerator(Generator<? extends T> generator) {
@@ -719,6 +728,24 @@ public class Binder {
 		 */
 		public void to(java.util.function.Supplier<? extends T> method) {
 			toSupplier((Dependency<? super T> d, Injector i) -> method.get());
+		}
+
+		/**
+		 * By default constants are not scoped. This implies that no
+		 * initialisation occurs for constants.
+		 * 
+		 * In contrast to {@link #to(Object)} a scoped constant exist within a
+		 * {@link Scope} like instances created by the container. This has the
+		 * effect of running initialisation for the provided constant similar to
+		 * the initialisation that occurs for instances created by the
+		 * container.
+		 * 
+		 * @since 19.1
+		 * 
+		 * @param constant a "bean" instance
+		 */
+		public final void toScoped(T constant) {
+			expand(new Constant<>(constant).scoped());
 		}
 
 		public final void to(T constant) {

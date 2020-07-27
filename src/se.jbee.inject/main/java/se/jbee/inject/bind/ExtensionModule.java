@@ -43,7 +43,7 @@ class ExtensionModule extends BinderModule {
 			Injector context) {
 		Constructor<T> constructor = (Constructor<T>) constructsBy.reflect(
 				dep.type().rawType);
-		return Supply.constructor(New.bind(constructor)).supply(
+		return Supply.byNew(New.bind(constructor)).supply(
 				(Dependency<? super T>) dep, context);
 	}
 }

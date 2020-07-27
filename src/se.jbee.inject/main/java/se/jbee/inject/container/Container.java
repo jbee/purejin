@@ -31,12 +31,17 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
+import se.jbee.inject.Annotated;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Env;
 import se.jbee.inject.Generator;
 import se.jbee.inject.InconsistentDeclaration;
 import se.jbee.inject.Injector;
+import se.jbee.inject.Instance;
 import se.jbee.inject.Locator;
 import se.jbee.inject.Name;
 import se.jbee.inject.Resource;
@@ -163,17 +168,39 @@ public final class Container {
 			return arrayFilter(inits, c -> !c.type().equalTo(injectorInitType));
 		}
 
+		@SuppressWarnings("unchecked")
+		private Env defaultEnv(Injectee<?>... injectees) {
+			Instance<Env> defaultEnvInstance = Instance.defaultInstanceOf(
+					raw(Env.class));
+			for (Injectee<?> injectee : injectees) {
+				if (injectee.locator.instance.equalTo(defaultEnvInstance))
+					return ((Supplier<? extends Env>) injectee.supplier).supply(
+							Dependency.dependency(defaultEnvInstance), this);
+			}
+			return null;
+		}
+
 		private <T> Map<Class<?>, Resource<?>[]> createResources(
 				Injectee<?>... injectees) {
 			Resource<?>[] list = new Resource<?>[injectees.length];
+			Env env = defaultEnv(injectees);
+			UnaryOperator<Annotated> aggregator = env == null
+				? Annotated.AGGREGATOR
+				: env.property(Annotated.ENV_AGGREGATOR_KEY,
+						Container.class.getPackage());
 			for (int i = 0; i < injectees.length; i++) {
 				@SuppressWarnings("unchecked")
 				Injectee<T> injectee = (Injectee<T>) injectees[i];
+				Annotated annotations = injectee.supplier instanceof Annotated
+					? aggregator.apply((Annotated) injectee.supplier)
+					: Annotated.WITH_NO_ANNOTATIONS;
+				// NB. using the function is a way to allow both Resource and Generator implementation to be initialised with a final reference of each other
+				Function<Resource<T>, Generator<T>> generatorFactory = //
+						resource -> createGenerator(resource,
+								injectee.supplier);
 				list[i] = new Resource<>(i, injectee.source,
 						scopingOf(injectee.scope), injectee.locator,
-						// NB. using the function is a way to allow both Resource and Generator implementation to be initialised with a final reference of each other
-						resource -> createGenerator(resource,
-								injectee.supplier));
+						generatorFactory, annotations);
 			}
 			Arrays.sort(list);
 			Map<Class<?>, Resource<?>[]> byRawType = new IdentityHashMap<>(
@@ -426,8 +453,15 @@ public final class Container {
 					(Type) Type.classType(actualType));
 			if (!provided.isAssignableTo(required))
 				return null;
-			return (Initialiser<? super T>) resource.generate(
-					dependency(initialiser.instance));
+			I instance = resource.generate(dependency(initialiser.instance));
+			if (instance instanceof Predicate
+				&& Type.classType(instance.getClass()).isAssignableTo(
+						raw(Predicate.class).parametized(Class.class))) {
+				Predicate<Class<?>> filter = (Predicate<Class<?>>) instance;
+				if (!filter.test(actualType))
+					return null;
+			}
+			return (Initialiser<? super T>) instance;
 		}
 
 		@Override
@@ -478,8 +512,8 @@ public final class Container {
 
 		private final InjectorImpl injector;
 		private final Supplier<? extends T> supplier;
-		private final Lazy<T> value = new Lazy<>();
 		private final Resource<T> resource;
+		private final Lazy<T> value = new Lazy<>();
 
 		LazySingletonGenerator(InjectorImpl injector,
 				Supplier<? extends T> supplier, Resource<T> resource) {
@@ -505,6 +539,7 @@ public final class Container {
 	 * @param <T> Type of the generated value
 	 */
 	private static final class ReferenceGenerator<T> implements Generator<T> {
+
 		private final Injector injector;
 		private final Supplier<? extends T> supplier;
 		private final Resource<T> resource;

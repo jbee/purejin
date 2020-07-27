@@ -105,8 +105,8 @@ public enum Adapter implements Toggled<Adapter> {
 		bootstrapper.install(DefaultEnvModule.class, ENV);
 		bootstrapper.install(DefaultScopes.class, SCOPES);
 		bootstrapper.install(ExtensionModule.class, EXTENSION);
-		bootstrapper.install(AnnotatedWithModule.class, ANNOTATED_WITH);
 		bootstrapper.install(PrimitiveArraysModule.class, PRIMITIVE_ARRAYS);
+		bootstrapper.install(AnnotatedWithModule.class, ANNOTATED_WITH);
 	}
 
 	private static class LoggerModule extends BinderModule {

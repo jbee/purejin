@@ -71,7 +71,8 @@ public class TestCustomValueBinderBinds1 {
 		String s;
 	}
 
-	private static class TestCustomValueBinderBinds1Module extends BinderModule {
+	private static class TestCustomValueBinderBinds1Module
+			extends BinderModule {
 
 		@Override
 		protected void declare() {
@@ -113,10 +114,11 @@ public class TestCustomValueBinderBinds1 {
 	public void thatBindingsCanJustBeCounted() {
 		CountBinder count = new CountBinder();
 		CountBinder emptyCount = new CountBinder();
-		Injector injector = injectorWithEnv(TestCustomValueBinderBinds1Module.class, count);
+		Injector injector = injectorWithEnv(
+				TestCustomValueBinderBinds1Module.class, count);
 		injectorWithEnv(EmptyModule.class, emptyCount);
 		assertEquals(0, injector.resolve(Resource[].class).length);
-		assertEquals(6 + 2, count.expands - emptyCount.expands); // constructors cause 2 bindings each
+		assertEquals(6, count.expands - emptyCount.expands);
 	}
 
 	private static Injector injectorWithEnv(Class<? extends Bundle> root,
@@ -154,7 +156,8 @@ public class TestCustomValueBinderBinds1 {
 	@Test(expected = NoResourceForDependency.class)
 	public void thatAllConstructorParameterTypesCanBeMadeRequired() {
 		ValueBinder<?> required = new RequiredConstructorParametersBinder();
-		Injector injector = injectorWithEnv(TestCustomValueBinderBinds1Module.class, required);
+		Injector injector = injectorWithEnv(
+				TestCustomValueBinderBinds1Module.class, required);
 		assertNull("we should not get here", injector);
 	}
 
@@ -202,7 +205,7 @@ public class TestCustomValueBinderBinds1 {
 		public <T> void expand(Env env, New<?> constructor,
 				Binding<T> incomplete, Bindings bindings) {
 			Supplier<T> supplier = new FieldInjectionSupplier<>(
-					Supply.constructor(constructor.typed(incomplete.type())));
+					Supply.byNew(constructor.typed(incomplete.type())));
 			bindings.addExpanded(env,
 					incomplete.complete(CONSTRUCTOR, supplier));
 		}
@@ -211,7 +214,8 @@ public class TestCustomValueBinderBinds1 {
 
 	@Test
 	public void thatCustomInitialisationCanBeAdded() {
-		Injector injector = injectorWithEnv(TestCustomValueBinderBinds1Module.class,
+		Injector injector = injectorWithEnv(
+				TestCustomValueBinderBinds1Module.class,
 				new FieldInjectionBinder());
 		assertEquals("answer", injector.resolve(Bar.class).s);
 	}
