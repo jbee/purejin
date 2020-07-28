@@ -1,5 +1,4 @@
 /**
- * <h3>Summary</h3>
  * <p>
  * This package contains the core API to create
  * {@link se.jbee.inject.declare.Binding}s as a source of
@@ -7,7 +6,7 @@
  * {@link se.jbee.inject.Injector} context from.
  * </p>
  * 
- * <h3>API</h3>
+ * <h2>API</h2>
  * <p>
  * The core element of composition is a {@link se.jbee.inject.declare.Bundle}.
  * Its task is to model the application's composition tree.

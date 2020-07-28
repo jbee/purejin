@@ -1,11 +1,10 @@
 /**
- * <h3>Summary</h3>
  * <p>
  * This package provides the high level fluent
  * {@link se.jbee.inject.bind.Binder} API.
  * </p>
  * 
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * Most notably the fluent API uses effective immutable objects. This means any
  * intermediate state of the fluent API can be "stored" and reused by assigning
@@ -24,7 +23,7 @@
  * {@link se.jbee.inject.bind.BinderModuleWith} API.
  * </p>
  * 
- * <h3>Defaults</h3>
+ * <h2>Defaults</h2>
  * <p>
  * The base classes mentioned in usage section all install the
  * {@link se.jbee.inject.bind.DefaultsBundle} which binds defaults for
@@ -33,14 +32,14 @@
  * overridden using explicit binds.
  * </p>
  * 
- * <h3>Utilities</h3>
+ * <h2>Utilities</h2>
  * <p>
  * The {@link se.jbee.inject.bind.AnnotatedWithModule} provides the default
  * implementation of the {@link se.jbee.inject.AnnotatedWith} utility type.
  * </p>
  * <p>
- * The {@link se.jbee.inject.bind.ExtensionModule} provides the default implementation
- * for {@link se.jbee.inject.extend.Extension} concept.
+ * The {@link se.jbee.inject.bind.ExtensionModule} provides the default
+ * implementation for {@link se.jbee.inject.extend.Extension} concept.
  * </p>
  * <p>
  * The {@link se.jbee.inject.bind.Adapter}
@@ -49,7 +48,7 @@
  * {@link se.jbee.inject.bind.Adapter#SUB_CONTEXT} are installed by default.
  * </p>
  * 
- * <h3>Custom Environments</h3>
+ * <h2>Custom Environments</h2>
  * <p>
  * The {@link se.jbee.inject.bind.EnvModule} provides a base
  * {@link se.jbee.inject.declare.Module} that is suitable to extend the

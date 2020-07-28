@@ -1,10 +1,9 @@
 /**
- * <h3>Summary</h3>
  * <p>
  * This package contains abstractions used to configure the binding process.
  * </p>
  * 
- * <h3>Software Editions</h3>
+ * <h2>Software Editions</h2>
  * <p>
  * {@link se.jbee.inject.config.Edition}s can be used to vary the set of
  * installed {@link se.jbee.inject.declare.Bundle}s and
@@ -24,7 +23,7 @@
  * {@link se.jbee.inject.config.Feature} {@link java.lang.Enum}s.
  * </p>
  * 
- * <h3>Customising Binding Backend</h3>
+ * <h2>Customising Binding Backend</h2>
  * <p>
  * The second way to configure the binding process is through the use of
  * "mirrors". These are pure functions that - when using "automatic" (not

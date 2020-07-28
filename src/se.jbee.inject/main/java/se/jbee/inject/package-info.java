@@ -1,23 +1,22 @@
 /**
- * <h3>Summary</h3>
  * <p>
  * The root package contains all essential concepts and types of the library.
  * The user facing API is the {@link se.jbee.inject.Injector}.
  * </p>
  * 
- * <h3>Code organisation</h3>
+ * <h2>Code organisation</h2>
  * <p>
  * The root package with it essential types does not depend on any of its
  * sub-packages, the sub-packages depend on the root.
  * </p>
- * </p>
+ * <p>
  * Dependency-wise each sub-packages represents a layer within the code-base.
  * That means there is an order in which they extend each other and the
  * functionality provided by all sub-packages in a lower layer. None of the
  * packages have cyclic dependencies on each other.
  * </p>
  * 
- * <h3>Sub-Packages</h3>
+ * <h2>Sub-Packages</h2>
  * <ul>
  * <li><b>container</b>: Contains the {@link se.jbee.inject.Injector}
  * implementation {@link se.jbee.inject.container.Container}</li>

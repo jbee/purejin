@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
  * {@linkplain Parameter}s are *not* about finding or identifying the
  * {@link Constructor} to use!
  * 
- * <h3>How {@linkplain Parameter}s are understood:</h3>
+ * <h2>How {@linkplain Parameter}s are understood:</h2>
  * <dl>
  * <dt>A {@link Class} (via Type)</dt>
  * <dd>Use the default instance of the given {@linkplain Class}</dd>

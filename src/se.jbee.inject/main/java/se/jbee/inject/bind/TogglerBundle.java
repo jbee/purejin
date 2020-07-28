@@ -16,7 +16,7 @@ import se.jbee.inject.declare.Toggled;
  * 
  * @author Jan Bernitt (jan@jbee.se)
  * 
- * @param C the type of the options values (usually an enum)
+ * @param <C> the type of the options values (usually an enum)
  */
 public abstract class TogglerBundle<C> implements Toggled<C>, Toggler<C> {
 

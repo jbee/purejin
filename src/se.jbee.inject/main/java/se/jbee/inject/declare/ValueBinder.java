@@ -19,7 +19,7 @@ import se.jbee.inject.container.Supplier;
  * of a certain type to one or more complete {@link Binding}s that are added to
  * the target set of {@link Bindings}.
  * 
- * <h3>How {@link ValueBinder}s Work</h3> Instead of binding a a {@link Locator}
+ * <h2>How {@link ValueBinder}s Work</h2> Instead of binding a a {@link Locator}
  * to a specific {@link Supplier} in one go a source value is created that holds
  * all information required to create an appropriate {@link Binding} with a
  * concrete {@link Supplier} from it. This allows to use the same binder API

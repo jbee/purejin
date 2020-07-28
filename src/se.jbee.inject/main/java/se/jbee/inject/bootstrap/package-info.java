@@ -1,12 +1,11 @@
 /**
- * <h3>Summary</h3>
  * <p>
  * This package contains core utility to
  * {@link se.jbee.inject.bootstrap.Bootstrap} a {@link se.jbee.inject.Injector}
  * from a root {@link se.jbee.inject.declare.Bundle}.
  * </p>
  * 
- * <h3>Custom Environments</h3>
+ * <h2>Custom Environments</h2>
  * <p>
  * The {@link se.jbee.inject.bootstrap.Environment} is a default implementation
  * of {@link se.jbee.inject.Env} in form of a map. More complex setup can be
@@ -19,7 +18,7 @@
  * runtime like command line arguments.
  * </p>
  * 
- * <h3>Defaults</h3>
+ * <h2>Defaults</h2>
  * <p>
  * This includes default implementations for
  * {@link se.jbee.inject.declare.ValueBinder}s (see

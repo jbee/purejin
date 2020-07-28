@@ -1,12 +1,11 @@
 /**
- * <h3>Summary</h3>
  * <p>
  * This package contains the {@link se.jbee.inject.extend.Extension} marker
  * interface and the default {@link se.jbee.inject.extend.Extension}s provided
  * by the library.
  * </p>
  * 
- * <h3>Provided Extensions</h3>
+ * <h2>Provided Extensions</h2>
  * <ul>
  * <li>{@link se.jbee.inject.extend.Config}: Access to configuration value with
  * name-space support and basic conversion and convenience functions.</li>
