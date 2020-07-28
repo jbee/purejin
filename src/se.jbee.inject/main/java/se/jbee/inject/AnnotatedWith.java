@@ -28,7 +28,8 @@ public interface AnnotatedWith<T extends Annotation> {
 	 * Instances referenced in this are supplied by a {@link Supplier} as the
 	 * underlying source might allow changes to the result for multiple calls.
 	 * 
-	 * @return The list of instances that have the annotation {@code T} present.
+	 * @return The collection of instances that have the annotation {@code T}
+	 *         present.
 	 * 
 	 *         By default this means the annotation must be present at the
 	 *         relevant location that supplies the instance. For example if the
