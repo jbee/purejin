@@ -19,7 +19,7 @@ import se.jbee.inject.container.Supplier;
  * of a certain type to one or more complete {@link Binding}s that are added to
  * the target set of {@link Bindings}.
  * 
- * <h3>How {@link ValueBinder}s Work</h3> Instead of binding a a {@link Locator}
+ * <h2>How {@link ValueBinder}s Work</h2> Instead of binding a a {@link Locator}
  * to a specific {@link Supplier} in one go a source value is created that holds
  * all information required to create an appropriate {@link Binding} with a
  * concrete {@link Supplier} from it. This allows to use the same binder API
@@ -45,7 +45,7 @@ import se.jbee.inject.container.Supplier;
  * resolved from the {@link Parameter}s</li>
  * <li>{@link Binding}: It is its task to actually do
  * {@link Bindings#add(Binding)}. All other {@link ValueBinder}s should use
- * {@link Bindings#addExpanded(Binding)} (called with a {@link Binding} as
+ * {@link Bindings#addExpanded(Env, Binding)} (called with a {@link Binding} as
  * value) so that any {@link Binding} created can be inspected by the
  * {@link ValueBinder} for {@link Binding} which might derive further
  * {@link Binding}s.</li>

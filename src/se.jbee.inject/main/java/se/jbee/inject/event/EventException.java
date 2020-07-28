@@ -32,7 +32,7 @@ public final class EventException extends RuntimeException {
 	 * @param event the event processed
 	 * @param func the function that may throw an {@link Exception}
 	 * @return the functions value
-	 * @throws Throwable This is either the exception thrown by the hander
+	 * @throws Exception This is either the exception thrown by the hander
 	 *             method or an {@link EventException} in case the problem was
 	 *             not within the handler method but a problem of processing the
 	 *             event in the {@link EventProcessor}.

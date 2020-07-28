@@ -102,6 +102,8 @@ public class Binder {
 	 * Allows access only via interface.
 	 * 
 	 * @since 19.1
+	 * 
+	 * @return fluent API
 	 */
 	public Binder withIndirectAccess() {
 		return with(bind().target.indirect());
@@ -155,6 +157,8 @@ public class Binder {
 	 * Bind something that is an {@link Initialiser} for the {@link Injector}.
 	 * 
 	 * @since 19.1
+	 * 
+	 * @return fluent API
 	 */
 	public TypedBinder<Initialiser<Injector>> initbind() {
 		return initbind(Injector.class);
@@ -162,6 +166,8 @@ public class Binder {
 
 	/**
 	 * @since 19.1
+	 * 
+	 * @return fluent API
 	 */
 	public <T> TypedBinder<Initialiser<T>> initbind(Class<T> type) {
 		return initbind(raw(type));
@@ -169,6 +175,8 @@ public class Binder {
 
 	/**
 	 * @since 19.1
+	 * 
+	 * @return fluent API
 	 */
 	public <T> TypedBinder<Initialiser<T>> initbind(Type<T> type) {
 		return multibind(initialiserTypeOf(type));
@@ -215,7 +223,7 @@ public class Binder {
 	}
 
 	/**
-	 * @see #installIn(String, Class)
+	 * @see #installIn(String, Class...)
 	 * @since 19.1
 	 */
 	@SafeVarargs

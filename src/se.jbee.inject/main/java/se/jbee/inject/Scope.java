@@ -14,9 +14,12 @@ import se.jbee.inject.config.ScopesBy;
 /**
  * A {@linkplain Scope} describes a particular lifecycle.
  * 
- * Thereby the {@linkplain Scope} itself acts as a factory for
- * {@link Repository}s. Each {@link Injector} has a single
- * {@linkplain Repository} for each {@linkplain Scope}.
+ * The {@linkplain Scope} itself acts as the source of instances. Each
+ * {@link Injector} has a single instance of each {@linkplain Scope} used.
+ * 
+ * All {@link Scope} instances themselves are container instances in the
+ * {@link #container} scope which is a special "singleton" scope used during
+ * bootstrapping of the {@link Injector} context.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  */
@@ -34,10 +37,9 @@ public interface Scope {
 	 * @param generators the total number of {@link Generator}s in the
 	 *            {@link Injector} context
 	 * @return Existing instances are returned, non-existing are received from
-	 *         the given {@link Provider} and added to this {@link Repository}
-	 *         (forever if it is an application wide singleton or shorter
-	 *         depending on the {@link Scope} that created this
-	 *         {@link Repository}).
+	 *         the given {@link Provider} and added to this {@link Scope} data
+	 *         structure (forever if it is an application wide singleton or
+	 *         shorter depending on the {@link Scope}).
 	 * 
 	 *         The information from the {@link Dependency} and {@link Resource}
 	 *         can be used to lookup existing instances.

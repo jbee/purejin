@@ -1,19 +1,18 @@
 /**
- * <h3>Summary</h3>
  * <p>
  * This package provides the default implementations of common
  * {@link se.jbee.inject.Scope}s. It is only dependent on the configuration and
  * base package.
  * </p>
  * 
- * <h3>Defaults</h3>
+ * <h2>Defaults</h2>
  * <p>
  * The {@link se.jbee.inject.bind.DefaultScopes}
  * {@link se.jbee.inject.declare.Module} is used to hook in the
  * {@link se.jbee.inject.Scope} implementations.
  * </p>
  * 
- * <h3>Provided Scopes</h3>
+ * <h2>Provided Scopes</h2>
  * <ul>
  * <li>{@link se.jbee.inject.scope.ApplicationScope}: A singleton within the
  * {@link se.jbee.inject.Injector} context.</li>

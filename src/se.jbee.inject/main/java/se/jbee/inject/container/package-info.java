@@ -1,5 +1,4 @@
 /**
- * <h3>Summary</h3>
  * <p>
  * This package contains the default implementation for the
  * {@link se.jbee.inject.Injector} context. It is created from a list of
@@ -8,7 +7,7 @@
  * the type of things it knows how to resolve is fixed.
  * </p>
  * 
- * <h3>Initialising Objects Created In Context</h3>
+ * <h2>Initialising Objects Created In Context</h2>
  * <p>
  * To initialise objects created in the {@link se.jbee.inject.Injector} bind a
  * {@link se.jbee.inject.container.Initialiser} for the
@@ -21,7 +20,7 @@
  * the outermost wrapper in that case.
  * </p>
  * 
- * <h3>{@link se.jbee.inject.Injector} Features</h3>
+ * <h2>{@link se.jbee.inject.Injector} Features</h2>
  * <p>
  * Many default features of the {@link se.jbee.inject.Injector} are actually
  * defined in user space in form of {@link se.jbee.inject.declare.Module}s. For
@@ -31,7 +30,7 @@
  * {@link se.jbee.inject.declare.Module}.
  * </p>
  * 
- * <h3>A Note on Independence</h3>
+ * <h2>A Note on Independence</h2>
  * <p>
  * The {@link se.jbee.inject.container.Container} implementation is independent
  * of the {@link se.jbee.inject.declare.Binding} based API which is build on top

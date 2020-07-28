@@ -15,6 +15,7 @@ import static se.jbee.inject.Utils.newArray;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -84,7 +85,7 @@ public final class Supply {
 	}
 
 	/**
-	 * A {@link Supplier} => {@link Supplier} bridge.
+	 * A {@link Supplier} to {@link Supplier} bridge.
 	 */
 	public static <T> Supplier<T> bySupplierReference(
 			Class<? extends Supplier<? extends T>> type) {
@@ -109,7 +110,8 @@ public final class Supply {
 	}
 
 	/**
-	 * E.g. used to "forward" Collection<T> to List<T>.
+	 * E.g. used to "forward" a {@link Collection} to {@link List} of same
+	 * element type.
 	 */
 	public static <T> Supplier<T> byParametrizedInstanceReference(
 			Instance<T> instance) {

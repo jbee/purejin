@@ -150,7 +150,9 @@ public final class Dependency<T>
 	}
 
 	/**
-	 * Means we inject into the argument target class.
+	 * @param target Means we inject into the argument target class.
+	 * @return a new {@link Dependency} similar to this with the given target
+	 *         {@link Class} added to the top of its {@link #hierarchy}
 	 */
 	public Dependency<T> injectingInto(Class<?> target)
 			throws DependencyCycle, UnstableDependency {

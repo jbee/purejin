@@ -16,9 +16,9 @@ import se.jbee.inject.Injector;
  * annotate service classes to point out the role they implement in cases where
  * this is ambiguous for the service interface they implement.
  *
- * <h3>Usages</h3>
+ * <h2>Usages</h2>
  * 
- * <h4>Providing Annotation Effects via ServiceLoader</h4>
+ * <h3>Providing Annotation Effects via ServiceLoader</h3>
  * <p>
  * Annotate a {@link se.jbee.inject.declare.ModuleWith} implementation that
  * should load via {@link ServiceLoader} to implement the effects of an type
@@ -28,7 +28,7 @@ import se.jbee.inject.Injector;
  * not an {@link Annotation} type the module is ignored.
  * </p>
  *
- * <h4>Providing Bundles via ServiceLoader</h4>
+ * <h3>Providing Bundles via ServiceLoader</h3>
  * <p>
  * Annotate a {@link se.jbee.inject.declare.Bundle} implementation that should
  * load via {@link ServiceLoader} have {@link Extends#value()} be {@link Env}

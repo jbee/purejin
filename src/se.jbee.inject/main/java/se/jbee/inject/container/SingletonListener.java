@@ -1,8 +1,6 @@
 package se.jbee.inject.container;
 
-import se.jbee.inject.Generator;
 import se.jbee.inject.Injector;
-import se.jbee.inject.Locator;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Scoping;
 
@@ -24,10 +22,8 @@ public interface SingletonListener {
 	 * "singleton" instances of an application.
 	 * 
 	 * @param <T> Type of the created instance
-	 * @param serialID {@link Injector} internal ID for the {@link Generator}
-	 *            that created the instance
-	 * @param locator the {@link Locator} representing the created instance
-	 * @param scoping the {@link Scoping} of the created instance
+	 * @param resource the {@link Resource} descriptor that is the source of the
+	 *            provided instance
 	 * @param instance the created instance
 	 */
 	<T> void onSingletonCreated(Resource<T> resource, T instance);

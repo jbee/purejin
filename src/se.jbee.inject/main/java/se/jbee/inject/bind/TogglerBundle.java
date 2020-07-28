@@ -1,25 +1,24 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bind;
 
 import se.jbee.inject.Type;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.declare.Bootstrapper.Toggler;
 import se.jbee.inject.declare.Bundle;
 import se.jbee.inject.declare.Toggled;
-import se.jbee.inject.declare.Bootstrapper.Toggler;
 
 /**
  * The default utility base class for {@link Toggled}s.
  * 
  * @author Jan Bernitt (jan@jbee.se)
  * 
- * @param O the type of the options values (usually an enum)
+ * @param <C> the type of the options values (usually an enum)
  */
-public abstract class TogglerBundle<C>
-		implements Toggled<C>, Toggler<C> {
+public abstract class TogglerBundle<C> implements Toggled<C>, Toggler<C> {
 
 	private Toggler<C> bootstrapper;
 

@@ -164,10 +164,9 @@ public final class Scoping implements Serializable {
 	}
 
 	/**
-	 * @return {@code true} in case the {@link Scope} represented implements the
-	 *         {@link Scope.SingletonScope} interface which is a marker for
-	 *         scopes that create instances that, once created, exist throughout
-	 *         the life-span of the application.
+	 * @return when {@code true} instances with this {@link Scoping} are stable,
+	 *         that means once created, they exist throughout the life-span of
+	 *         the application (the {@link Injector} context).
 	 */
 	public boolean isStableByDesign() {
 		return stableByDesign;
