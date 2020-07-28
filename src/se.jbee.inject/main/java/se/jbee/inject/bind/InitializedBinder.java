@@ -12,7 +12,7 @@ import se.jbee.inject.declare.Bindings;
 
 /**
  * A {@link RootBinder} that can be initialized using the
- * {@link #__init__(Bindings)} method.
+ * {@link #__init__(Env, Bindings)} method.
  *
  * This allows to change the start {@link Bind} once.
  *

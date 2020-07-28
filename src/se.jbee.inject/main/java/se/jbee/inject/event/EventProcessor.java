@@ -138,7 +138,7 @@ public interface EventProcessor extends AutoCloseable {
 	 * The given exception cases only apply to synchronised processing.
 	 * 
 	 * @param event the event to dispatch
-	 * @throws Throwable When synchronised the original exceptions thrown by the
+	 * @throws Exception When synchronised the original exceptions thrown by the
 	 *             implementing handler are thrown as long as the methods
 	 *             signature permits it. This is {@link Exception} as
 	 *             {@link InvocationTargetException#getTargetException()} is a
@@ -168,7 +168,7 @@ public interface EventProcessor extends AutoCloseable {
 	 * @return the result if the computation, usually this is the result
 	 *         returned by the {@link #register(Class, Object)}ed handler
 	 *         implementation called by this {@link EventProcessor}.
-	 * @throws Throwable A exceptions originally thrown by the implementing
+	 * @throws Exception A exceptions originally thrown by the implementing
 	 *             handler (as long as the methods signature permits it). This
 	 *             is {@link Exception} as
 	 *             {@link InvocationTargetException#getTargetException()} is a

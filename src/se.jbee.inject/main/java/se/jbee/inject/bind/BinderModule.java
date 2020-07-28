@@ -61,7 +61,7 @@ public abstract class BinderModule extends InitializedBinder
 	}
 
 	/**
-	 * @see Module#declare(Bindings)
+	 * @see Module#declare(Bindings, Env)
 	 */
 	protected abstract void declare();
 }

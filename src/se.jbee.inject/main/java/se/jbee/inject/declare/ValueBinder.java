@@ -45,7 +45,7 @@ import se.jbee.inject.container.Supplier;
  * resolved from the {@link Parameter}s</li>
  * <li>{@link Binding}: It is its task to actually do
  * {@link Bindings#add(Binding)}. All other {@link ValueBinder}s should use
- * {@link Bindings#addExpanded(Binding)} (called with a {@link Binding} as
+ * {@link Bindings#addExpanded(Env, Binding)} (called with a {@link Binding} as
  * value) so that any {@link Binding} created can be inspected by the
  * {@link ValueBinder} for {@link Binding} which might derive further
  * {@link Binding}s.</li>

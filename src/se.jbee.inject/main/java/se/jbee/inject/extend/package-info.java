@@ -7,7 +7,6 @@
  * </p>
  * 
  * <h3>Provided Extensions</h3>
- * <p>
  * <ul>
  * <li>{@link se.jbee.inject.extend.Config}: Access to configuration value with
  * name-space support and basic conversion and convenience functions.</li>
@@ -15,6 +14,5 @@
  * {@link se.jbee.inject.Resource}s made by the
  * {@link se.jbee.inject.bind.Binder.PluginBinder}.</li>
  * </ul>
- * </p>
  */
 package se.jbee.inject.extend;

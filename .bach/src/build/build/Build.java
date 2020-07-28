@@ -25,8 +25,6 @@ class Build {
             .without(MainSpace.Modifier.CUSTOM_RUNTIME_IMAGE)
             .withMainSpaceJavacTweak(
                 javac -> javac.without("-Xlint").with("-Xlint:-serial,-rawtypes,-varargs"))
-            .withMainSpaceJavadocTweak(
-                javadoc -> javadoc.without("-Xdoclint").with("-Xdoclint:none"))
             // test
             .withTestSpaceUnit("src/se.jbee.inject/test/java-module") // in-module tests
             .withTestSpaceUnit("src/com.example.app/test/java") // silk's first client

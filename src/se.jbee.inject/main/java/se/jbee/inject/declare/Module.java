@@ -22,6 +22,8 @@ public interface Module {
 
 	/**
 	 * @param bindings use to declare made bound within this {@link Module}.
+	 * @param env the {@link Env} used during the bootstrapping of the
+	 *            {@link Module}
 	 */
 	void declare(Bindings bindings, Env env);
 

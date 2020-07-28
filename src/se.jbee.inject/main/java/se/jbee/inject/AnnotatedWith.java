@@ -12,17 +12,6 @@ import java.util.function.Supplier;
  * Allows to resolve bound instances annotated with a certain {@link Annotation}
  * by usual mechanism of resolving a particular {@link Type}.
  * 
- * For example:
- * 
- * <pre>
- * List<AnnotatedInstance> annotatedInstances = injector.resolve(
- * 		Type.raw(AnnotatedWith.class).parametized(
- * 				MyAnnotation.class)).instances();
- * // is same as the shorthand:
- * List<AnnotatedInstance> annotatedInstances = injector.annotatedWith(
- * 		MyAnnotation.class);
- * </pre>
- * 
  * With the {@link AnnotatedWith} resolved the {@link #instances()} method is
  * used to access the instances.
  * 

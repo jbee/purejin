@@ -86,17 +86,28 @@ public final class Utils {
 	 * to n Bs but always returns a B. If {@code null} is returned this means
 	 * "zero" or remove the B. So length of {@code B[]} is always {@code <=}
 	 * length of {@code A[]}.
+	 * 
+	 * @param <A> source element type
+	 * @param <B> target element type
+	 * @param from source array
+	 * @param to target element {@link Class} (needed to create correct target
+	 *            array)
+	 * @param flatmapOp function applied to each source element to compute the
+	 *            target element, returns {@code null} for elements that should
+	 *            be filtered (not be included in target array)
+	 * @return target array with a similar or shorter length as the source
+	 *         array, never null
 	 */
-	public static <A, B> B[] arrayFlatmap(A[] as, Class<B> to,
+	public static <A, B> B[] arrayFlatmap(A[] from, Class<B> to,
 			Function<A, B> flatmapOp) {
-		B[] bs = newArray(to, as.length);
+		B[] bs = newArray(to, from.length);
 		int j = 0;
-		for (int i = 0; i < as.length; i++) {
-			B b = flatmapOp.apply(as[i]);
+		for (int i = 0; i < from.length; i++) {
+			B b = flatmapOp.apply(from[i]);
 			if (b != null)
 				bs[j++] = b;
 		}
-		return j == as.length ? bs : copyOf(bs, j);
+		return j == from.length ? bs : copyOf(bs, j);
 	}
 
 	public static <A, B> B[] arrayMap(A[] as, Class<B> to,
@@ -220,6 +231,8 @@ public final class Utils {
 	/* Classes / Types */
 
 	/**
+	 * @param <T> actual object type
+	 * @param obj the {@link AccessibleObject} to make accessible
 	 * @return the given object made accessible.
 	 */
 	public static <T extends AccessibleObject> T accessible(T obj) {
@@ -228,6 +241,7 @@ public final class Utils {
 	}
 
 	/**
+	 * @param cls Any {@link Class} object, not null
 	 * @return A {@link Class} counts as "virtual" when it is known that its not
 	 *         a type handled by an {@link Injector} context, either because it
 	 *         cannot be constructed at all or it does not make sense to let the
@@ -251,6 +265,7 @@ public final class Utils {
 	}
 
 	/**
+	 * @param cls Any {@link Class} object, not null
 	 * @return A {@link Class} is monomodal if it there is just a single
 	 *         possible initial state. All newly created instances can just have
 	 *         this similar initial state but due to internal state they could
@@ -274,7 +289,7 @@ public final class Utils {
 	}
 
 	/**
-	 * @param cls a {@link Class}
+	 * @param cls Any {@link Class} object, not null
 	 * @return true, if the argument is a {@link Class} that is a simple
 	 *         standard <code>class</code> with only a default constructor.
 	 */
@@ -310,6 +325,7 @@ public final class Utils {
 	 * Returns the constructor with most visible visibility and longest argument
 	 * list. Self-referencing constructors are ignored.
 	 *
+	 * @param <T> type that should be constructed/instantiated
 	 * @param type constructed type
 	 * @return The highest visibility constructor with the most parameters that
 	 *         does not have the declaring class itself as parameter type (some

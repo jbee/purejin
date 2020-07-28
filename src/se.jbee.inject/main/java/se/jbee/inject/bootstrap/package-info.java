@@ -27,11 +27,11 @@
  * {@link se.jbee.inject.container.Supplier} implementations they use (see
  * {@link se.jbee.inject.bootstrap.Supply}) as well as source value types
  * expended by the default {@link se.jbee.inject.declare.ValueBinder}s:
+ * </p>
  * <ul>
  * <li>{@link se.jbee.inject.bootstrap.New}</li>
  * <li>{@link se.jbee.inject.bootstrap.Constant}</li>
  * <li>{@link se.jbee.inject.bootstrap.Produces}</li>
  * </ul>
- * </p>
  */
 package se.jbee.inject.bootstrap;

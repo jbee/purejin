@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -18,6 +18,7 @@ package se.jbee.inject;
 public interface Qualifying<T extends Qualifying<T>> {
 
 	/**
+	 * @param other instance to compare with, not null
 	 * @return Whether or not this object or more qualified than the given one.
 	 * 
 	 *         Equal objects are do not define one of them as more qualified!
