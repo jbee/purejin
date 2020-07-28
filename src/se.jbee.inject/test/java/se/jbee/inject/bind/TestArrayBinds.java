@@ -13,9 +13,6 @@ import se.jbee.inject.bootstrap.Bootstrap;
 /**
  * How to inject different arrays into different instances of the same parent
  * type.
- *
- * @author jan
- *
  */
 public class TestArrayBinds {
 
@@ -41,11 +38,11 @@ public class TestArrayBinds {
 
 		@Override
 		protected void declare() {
-			bind(PRE_2, Double.class).to(new Double(2)); // used by both CMD_1 and CMD_2
+			bind(PRE_2, Double.class).to(Double.valueOf(2.0d)); // used by both CMD_1 and CMD_2
 
 			bind(CMD_1, Command.class).toConstructor();
 			injectingInto(CMD_1, Command.class).multibind(Number.class).to(
-					new Integer(1));
+					Integer.valueOf(1));
 			injectingInto(CMD_1, Command.class).multibind(Number.class).to(
 					PRE_2, Double.class);
 
@@ -53,9 +50,9 @@ public class TestArrayBinds {
 			injectingInto(CMD_2, Command.class).multibind(Number.class).to(
 					PRE_2, Double.class);
 			injectingInto(CMD_2, Command.class).multibind(Number.class).to(
-					new Float(3));
+					Float.valueOf(3f));
 			injectingInto(CMD_2, Command.class).multibind(Number.class).to(
-					new Long(5));
+					Long.valueOf(5L));
 
 			bind(CMD_3, Command.class).toConstructor();
 			injectingInto(CMD_3, Command.class).bind(Number.class).to(1, 6d, 8);

@@ -27,12 +27,10 @@ public class TestType {
 		// needed to check supertypes() method
 	}
 
-	@SuppressWarnings("synthetic-access")
 	private static class Bar<A, B> extends Foo<B, String> implements Baz<A> {
 		// needed to check supertypes() method
 	}
 
-	@SuppressWarnings("synthetic-access")
 	private static class Foo<A, B> extends Qux<A> {
 		// needed to check supertypes() method
 	}
