@@ -8,6 +8,8 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.function.Supplier;
 
+import se.jbee.inject.Annotated.Merge;
+
 /**
  * Allows to resolve bound instances annotated with a certain {@link Annotation}
  * by usual mechanism of resolving a particular {@link Type}.
@@ -44,8 +46,8 @@ public interface AnnotatedWith<T extends Annotation> {
 	 *         types (usually done by binding custom
 	 *         {@link se.jbee.inject.declare.ValueBinder}s in the {@link Env})
 	 *         or in general by using a custom {@link Annotated#NO_MERGE}
-	 *         function which is bound in the {@link Env} using the
-	 *         {@link Annotated#ENV_AGGREGATOR_KEY}.
+	 *         function which is bound in the {@link Env} for the {@link Merge}
+	 *         property.
 	 */
 	List<AnnotatedInstance<?>> instances();
 
