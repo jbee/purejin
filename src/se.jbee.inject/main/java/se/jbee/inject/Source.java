@@ -12,7 +12,8 @@ import java.io.Serializable;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public final class Source implements Qualifying<Source>, Serializable {
+public final class Source
+		implements Qualifying<Source>, Serializable, Comparable<Source> {
 
 	public static Source source(Class<?> module) {
 		return new Source(module, DeclarationType.EXPLICIT, 0, 0);
@@ -63,6 +64,17 @@ public final class Source implements Qualifying<Source>, Serializable {
 		return declarationType.moreQualiedThan(other.declarationType);
 	}
 
+	@Override
+	public int compareTo(Source other) {
+		int res = declarationType.compareTo(other.declarationType);
+		if (res != 0)
+			return res;
+		res = ident.getName().compareTo(other.ident.getName());
+		if (res != 0)
+			return res;
+		return Integer.compare(declarationNo, other.declarationNo);
+	}
+
 	public Source typed(DeclarationType type) {
 		return declarationType == type
 			? this
@@ -79,4 +91,5 @@ public final class Source implements Qualifying<Source>, Serializable {
 	public Package pkg() {
 		return ident.getPackage();
 	}
+
 }

@@ -5,6 +5,7 @@
  */
 package se.jbee.inject;
 
+import static se.jbee.inject.Utils.arrayCompare;
 import static se.jbee.inject.Utils.arrayContains;
 import static se.jbee.inject.Utils.arrayEquals;
 import static se.jbee.inject.Utils.arrayFindFirst;
@@ -40,8 +41,8 @@ import java.util.Set;
  * @author Jan Bernitt (jan@jbee.se)
  */
 @SuppressWarnings({ "squid:S1448", "squid:S1200" })
-public final class Type<T>
-		implements Qualifying<Type<?>>, Parameter<T>, Serializable {
+public final class Type<T> implements Qualifying<Type<?>>, Parameter<T>,
+		Serializable, Comparable<Type<?>> {
 
 	public static final Type<Object> OBJECT = Type.raw(Object.class);
 	public static final Type<Void> VOID = raw(Void.class);
@@ -368,6 +369,17 @@ public final class Type<T>
 			if (params[i].moreQualiedThan(other.params[0]))
 				moreQualified++;
 		return moreQualified > params.length - moreQualified;
+	}
+
+	@Override
+	public int compareTo(Type<?> other) {
+		int res = rawType.getName().compareTo(other.rawType.getName());
+		if (res != 0)
+			return res;
+		res = Boolean.compare(upperBound, other.upperBound);
+		if (res != 0)
+			return res;
+		return arrayCompare(params, other.params);
 	}
 
 	/**

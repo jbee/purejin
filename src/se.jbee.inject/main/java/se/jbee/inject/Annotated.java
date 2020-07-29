@@ -1,7 +1,5 @@
 package se.jbee.inject;
 
-import static se.jbee.inject.Type.raw;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
@@ -30,10 +28,10 @@ public interface Annotated {
 	 */
 	AnnotatedElement element();
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	Type<UnaryOperator<Annotated>> ENV_AGGREGATOR_KEY = (Type) raw(
-			UnaryOperator.class).parametized(Annotated.class);
-	UnaryOperator<Annotated> AGGREGATOR = a -> a;
+	interface Merge extends UnaryOperator<Annotated> {
+	}
+
+	Merge NO_MERGE = a -> a;
 
 	Annotated WITH_NO_ANNOTATIONS = () -> new AnnotatedElement() {
 

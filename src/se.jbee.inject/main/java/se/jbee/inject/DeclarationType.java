@@ -34,7 +34,7 @@ public enum DeclarationType implements Qualifying<DeclarationType> {
 
 	/**
 	 * Used to provide a default of required parts of a module that can be
-	 * replaced *once* to customize behavior.
+	 * replaced *once* to customise behaviour.
 	 * 
 	 * There can be just *one* default for each {@link Resource} and still just
 	 * one explicit replacement for it.

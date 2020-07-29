@@ -23,7 +23,7 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.Locator;
 import se.jbee.inject.Name;
 import se.jbee.inject.Scope;
-import se.jbee.inject.Scoping;
+import se.jbee.inject.ScopePermanence;
 import se.jbee.inject.Source;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
@@ -142,14 +142,14 @@ public final class Bindings {
 	/**
 	 * In contrast to {@link #supplyConstant(Object)} which does supply the
 	 * constant as {@link Generator} and thereby does not support custom
-	 * {@link Scoping} or {@link Scope}s this way of supplying the constant will
+	 * {@link ScopePermanence} or {@link Scope}s this way of supplying the constant will
 	 * treat the constant as bean, that is like any "dynamically" supplied
 	 * value.
 	 * 
 	 * @param <T> type of the constant
-	 * @param constant a bean that requires {@link Scoping} effects.
+	 * @param constant a bean that requires {@link ScopePermanence} effects.
 	 * @return A {@link Supplier} that supplies the given constant with
-	 *         {@link Scoping} effects.
+	 *         {@link ScopePermanence} effects.
 	 */
 	public static <T> Supplier<T> supplyScopedConstant(T constant) {
 		return (dep, context) -> constant;
@@ -157,7 +157,7 @@ public final class Bindings {
 
 	/**
 	 * Since the {@link Supplier} also implements {@link Generator} it is used
-	 * directly without any {@link Scoping} effects. Effectively a constant
+	 * directly without any {@link ScopePermanence} effects. Effectively a constant
 	 * always has the {@link Scope#container}.
 	 * 
 	 * The implementation also implements {@link #equals(Object)} and

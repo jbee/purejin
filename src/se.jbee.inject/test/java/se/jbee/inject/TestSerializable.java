@@ -63,14 +63,14 @@ public class TestSerializable {
 
 	@Test
 	public void scopingIsSerializable() {
-		assertSerializable(Scoping.ignore);
-		assertSerializable(Scoping.scopingOf(Scope.application));
+		assertSerializable(ScopePermanence.ignore);
+		assertSerializable(ScopePermanence.singleton.derive(Scope.application));
 	}
 
 	@Test
 	public void injectionIsSerializable() {
 		assertSerializable(new Injection(Instance.anyOf(String.class),
-				Locator.locator(String.class), Scoping.ignore));
+				Locator.locator(String.class), ScopePermanence.ignore));
 	}
 
 	@Test

@@ -2,7 +2,7 @@ package se.jbee.inject.container;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.Resource;
-import se.jbee.inject.Scoping;
+import se.jbee.inject.ScopePermanence;
 
 /**
  * Listener interface invoked by the {@link Injector}. Implementations are bound
@@ -18,7 +18,7 @@ public interface SingletonListener {
 
 	/**
 	 * Called by the {@link Injector} when an instance which is
-	 * {@link Scoping#isStableByDesign()} is created. These are typical
+	 * {@link ScopePermanence#isStableByNature()} is created. These are typical
 	 * "singleton" instances of an application.
 	 * 
 	 * @param <T> Type of the created instance

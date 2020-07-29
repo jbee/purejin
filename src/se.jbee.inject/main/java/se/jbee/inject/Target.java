@@ -21,7 +21,8 @@ import java.io.Serializable;
  * @author Jan Bernitt (jan@jbee.se)
  */
 @SuppressWarnings("squid:S1448")
-public final class Target implements Qualifying<Target>, Serializable {
+public final class Target
+		implements Qualifying<Target>, Serializable, Comparable<Target> {
 
 	public static final Target ANY = targeting(Instance.ANY);
 
@@ -169,6 +170,17 @@ public final class Target implements Qualifying<Target>, Serializable {
 		}
 		return Qualifying.compareRelated(instance, other.instance, packages,
 				other.packages);
+	}
+
+	@Override
+	public int compareTo(Target other) {
+		int res = instance.compareTo(other.instance);
+		if (res != 0)
+			return res;
+		res = parents.compareTo(other.parents);
+		if (res != 0)
+			return res;
+		return packages.compareTo(other.packages);
 	}
 
 	public boolean equalTo(Target other) {

@@ -62,8 +62,8 @@ public interface Scope {
 
 	/**
 	 * A special virtual {@link Scope} that is used to bypass actual use of
-	 * {@link Scope} abstraction for type references. In such cases the actual
-	 * scope is determined by the referenced {@link Resource}.
+	 * {@link Scope} abstraction for type references. In such cases the
+	 * effective scope is determined by the referenced {@link Resource}.
 	 */
 	Name reference = named("@ref");
 
@@ -130,7 +130,7 @@ public interface Scope {
 	public static final Scope INJECTION = Scope::injection;
 
 	@SuppressWarnings("unused")
-	public static <T> T injection(int serialID, Dependency<? super T> dep,
+	static <T> T injection(int serialID, Dependency<? super T> dep,
 			Provider<T> provider, int generators)
 			throws UnresolvableDependency {
 		return provider.provide();

@@ -66,7 +66,7 @@ v19.1 (upcoming)
 - renamed field `Injection#expiry` to `Injection#scoping`
 - renamed method `Injection#ignoredExpiry()` to `Injection#ignoredScoping()`
 - renamed field `InjectronInfo#expiry` to `Resource#scoping`
-- replaced `Expiry` with `Scoping` concept that is based on `Scope`  
+- replaced `Expiry` with `ScopePermanence` concept 
 - moved `Supplier` into `container` package (was wrongly located in main API)
 - moved `Scope`, `Repository` and `Provider` into root package `se.jbee.inject`
 - moved `Invoke`'s static methods to `Supply` (`Invoke` got removed)

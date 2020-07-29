@@ -16,10 +16,10 @@ public final class Injection implements Serializable {
 
 	public final Instance<?> dependency;
 	public final Locator<?> target;
-	public final Scoping scoping;
+	public final ScopePermanence scoping;
 
 	public Injection(Instance<?> dependency, Locator<?> target,
-			Scoping scoping) {
+			ScopePermanence scoping) {
 		this.dependency = dependency;
 		this.target = target;
 		this.scoping = scoping;
@@ -46,6 +46,6 @@ public final class Injection implements Serializable {
 	}
 
 	public Injection ignoredScoping() {
-		return new Injection(dependency, target, Scoping.ignore);
+		return new Injection(dependency, target, ScopePermanence.ignore);
 	}
 }

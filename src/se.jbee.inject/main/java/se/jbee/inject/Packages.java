@@ -5,6 +5,7 @@
  */
 package se.jbee.inject;
 
+import static se.jbee.inject.Utils.arrayCompare;
 import static se.jbee.inject.Utils.arrayContains;
 import static se.jbee.inject.Utils.arrayMap;
 import static se.jbee.inject.Utils.seqCount;
@@ -20,7 +21,8 @@ import java.util.Arrays;
  * @author Jan Bernitt (jan@jbee.se)
  */
 @SuppressWarnings("squid:S1448")
-public final class Packages implements Qualifying<Packages>, Serializable {
+public final class Packages
+		implements Qualifying<Packages>, Serializable, Comparable<Packages> {
 
 	/**
 	 * Contains all packages including the (default) package.
@@ -165,6 +167,18 @@ public final class Packages implements Qualifying<Packages>, Serializable {
 		if (includingSubpackages != other.includingSubpackages)
 			return !includingSubpackages;
 		return rootDepth != other.rootDepth && rootDepth > other.rootDepth;
+	}
+
+	@Override
+	public int compareTo(Packages other) {
+		int res = Boolean.compare(includingSubpackages,
+				other.includingSubpackages);
+		if (res != 0)
+			return res;
+		res = Integer.compare(rootDepth, other.rootDepth);
+		if (res != 0)
+			return res;
+		return arrayCompare(roots, other.roots);
 	}
 
 	@Override

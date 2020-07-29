@@ -17,8 +17,8 @@ import java.io.Serializable;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public final class Locator<T>
-		implements Typed<T>, Qualifying<Locator<?>>, Serializable {
+public final class Locator<T> implements Typed<T>, Qualifying<Locator<?>>,
+		Serializable, Comparable<Locator<?>> {
 
 	public static <T> Locator<T> locator(Class<T> type) {
 		return new Locator<>(Instance.anyOf(raw(type)));
@@ -102,6 +102,14 @@ public final class Locator<T>
 	public boolean moreQualiedThan(Locator<?> other) {
 		return Qualifying.compareRelated(instance, other.instance, target,
 				other.target);
+	}
+
+	@Override
+	public int compareTo(Locator<?> other) {
+		int res = instance.compareTo(other.instance);
+		if (res != 0)
+			return res;
+		return target.compareTo(other.target);
 	}
 
 	@Override

@@ -61,7 +61,7 @@ public final class Bootstrap {
 			.with(NamesBy.class, NamesBy.defaultName) //
 			.with(ScopesBy.class, ScopesBy.alwaysDefault) //
 			.with(HintsBy.class, HintsBy.noParameters) //
-			.with(Annotated.ENV_AGGREGATOR_KEY, Annotated.AGGREGATOR) //
+			.with(Annotated.Merge.class, Annotated.NO_MERGE) //
 			.readonly();
 
 	public static Env env(Class<? extends Bundle> root) {
