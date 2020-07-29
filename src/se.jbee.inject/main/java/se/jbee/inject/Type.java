@@ -433,7 +433,7 @@ public final class Type<T> implements Qualifying<Type<?>>, Parameter<T>,
 		return name(true);
 	}
 
-	void toString(StringBuilder str, boolean canonicalName) {
+	void toString(StringBuilder str, boolean fullName) {
 		if (isUpperBound()) {
 			if (rawType == Object.class) {
 				str.append("?");
@@ -441,21 +441,20 @@ public final class Type<T> implements Qualifying<Type<?>>, Parameter<T>,
 			}
 			str.append("? extends ");
 		}
-		String canonicalNameOrNull = rawType.getCanonicalName();
-		String name = canonicalName
-			? canonicalNameOrNull != null
-				? canonicalNameOrNull
-				: rawType.getName()
+		String name = fullName
+			? rawType.getCanonicalName()
 			: rawType.getSimpleName();
+		if (name == null) // fallback for anonymous inner classes which have no canonical or simple name
+			name = rawType.getName();
 		str.append(rawType.isArray()
 			? name.substring(0, name.indexOf('['))
 			: name);
 		if (isParameterized()) {
 			str.append('<');
-			params[0].toString(str, canonicalName);
+			params[0].toString(str, fullName);
 			for (int i = 1; i < params.length; i++) {
 				str.append(',');
-				params[i].toString(str, canonicalName);
+				params[i].toString(str, fullName);
 			}
 			str.append('>');
 		}
