@@ -252,7 +252,7 @@ public final class Container {
 					return new NoResourceForDependency(
 							"During bootstrapping only ", dep,
 							permanenceResourceByScope.values().toArray(
-									Resource[]::new));
+									new Resource[0]));
 				}
 			};
 		}
