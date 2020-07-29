@@ -169,6 +169,20 @@ public final class Utils {
 		return true;
 	}
 
+	public static <A extends Comparable<A>> int arrayCompare(A[] a, A[] b) {
+		if (a == b)
+			return 0;
+		int res = Integer.compare(a.length, b.length);
+		if (res != 0)
+			return res;
+		for (int i = 0; i < a.length; i++) {
+			res = a[i].compareTo(b[i]);
+			if (res != 0)
+				return res;
+		}
+		return 0;
+	}
+
 	@SuppressWarnings("unchecked")
 	public static <A> A[] newArray(A[] proto, int length) {
 		return (A[]) newArray(proto.getClass().getComponentType(), length);

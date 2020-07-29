@@ -5,6 +5,7 @@
  */
 package se.jbee.inject;
 
+import static se.jbee.inject.Utils.arrayCompare;
 import static se.jbee.inject.Utils.arrayContains;
 import static se.jbee.inject.Utils.arrayEquals;
 import static se.jbee.inject.Utils.arrayFindFirst;
@@ -378,7 +379,7 @@ public final class Type<T> implements Qualifying<Type<?>>, Parameter<T>,
 		res = Boolean.compare(upperBound, other.upperBound);
 		if (res != 0)
 			return res;
-		return Arrays.compare(params, other.params, Type::compareTo);
+		return arrayCompare(params, other.params);
 	}
 
 	/**

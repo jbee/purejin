@@ -5,6 +5,7 @@
  */
 package se.jbee.inject;
 
+import static se.jbee.inject.Utils.arrayCompare;
 import static se.jbee.inject.Utils.arrayContains;
 import static se.jbee.inject.Utils.arrayMap;
 import static se.jbee.inject.Utils.seqCount;
@@ -177,7 +178,7 @@ public final class Packages
 		res = Integer.compare(rootDepth, other.rootDepth);
 		if (res != 0)
 			return res;
-		return Arrays.compare(roots, other.roots);
+		return arrayCompare(roots, other.roots);
 	}
 
 	@Override

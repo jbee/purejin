@@ -6,6 +6,7 @@
 package se.jbee.inject;
 
 import static java.util.Arrays.asList;
+import static se.jbee.inject.Utils.arrayCompare;
 import static se.jbee.inject.Utils.arrayPrepand;
 
 import java.io.Serializable;
@@ -100,6 +101,6 @@ public final class Instances implements Qualifying<Instances>,
 
 	@Override
 	public int compareTo(Instances other) {
-		return Arrays.compare(hierarchy, other.hierarchy, Instance::compareTo);
+		return arrayCompare(hierarchy, other.hierarchy);
 	}
 }
