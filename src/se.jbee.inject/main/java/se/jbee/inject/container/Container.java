@@ -74,7 +74,7 @@ public final class Container {
 	}
 
 	private static <T> void initEager(Resource<T> resource) {
-		if (resource.scoping.isEager())
+		if (resource.permanence.isEager())
 			resource.generator.generate(resource.locator.toDependency());
 	}
 
@@ -187,17 +187,17 @@ public final class Container {
 				? Annotated.NO_MERGE
 				: env.property(Annotated.Merge.class,
 						Container.class.getPackage());
-			Map<Name, ScopePermanence> scopingByName = new HashMap<>();
+			Map<Name, ScopePermanence> permanenceByScope = new HashMap<>();
 			for (int i = 0; i < injectees.length; i++) {
 				if (injectees[i].locator.type().rawType == ScopePermanence.class) {
-					resources[i] = createScopingResource(i, injectees[i],
-							annotationMerger, scopingByName);
+					resources[i] = createScopePermanenceResource(i,
+							injectees[i], annotationMerger, permanenceByScope);
 				}
 			}
 			for (int i = 0; i < injectees.length; i++) {
 				if (resources[i] == null) {
 					resources[i] = createResource(i, injectees[i],
-							annotationMerger, scopingByName);
+							annotationMerger, permanenceByScope);
 				}
 			}
 			Arrays.sort(resources);
@@ -223,12 +223,12 @@ public final class Container {
 
 		private <T> Resource<T> createResource(int serialID,
 				Injectee<T> injectee, Annotated.Merge annotationMerger,
-				Map<Name, ScopePermanence> scopingByName) {
+				Map<Name, ScopePermanence> permanenceByScope) {
 			Annotated annotations = annotationsOf(injectee, annotationMerger);
 			// NB. using the function is a way to allow both Resource and Generator implementation to be initialised with a final reference of each other
 			Function<Resource<T>, Generator<T>> generatorFactory = //
 					resource -> createGenerator(resource, injectee.supplier);
-			ScopePermanence scoping = scopingByName.get(injectee.scope);
+			ScopePermanence scoping = permanenceByScope.get(injectee.scope);
 			if (scoping == null)
 				throw new InconsistentDeclaration("Scope `" + injectee.scope
 					+ "` is used but not defined for: " + injectee);
@@ -243,23 +243,25 @@ public final class Container {
 				: Annotated.WITH_NO_ANNOTATIONS;
 		}
 
-		private Resource<ScopePermanence> createScopingResource(int serialID,
-				Injectee<?> injectee, Annotated.Merge annotationMerger,
-				Map<Name, ScopePermanence> scopingByName) {
+		private Resource<ScopePermanence> createScopePermanenceResource(
+				int serialID, Injectee<?> injectee,
+				Annotated.Merge annotationMerger,
+				Map<Name, ScopePermanence> permanenceByScope) {
 			@SuppressWarnings("unchecked")
-			Injectee<ScopePermanence> scoping = (Injectee<ScopePermanence>) injectee;
-			ScopePermanence self = scoping.supplier.supply(
-					scoping.locator.toDependency(), this);
-			scopingByName.put(self.scope, self);
-			return new Resource<>(serialID, scoping.source, ScopePermanence.container,
-					scoping.locator, resource -> (gen -> self),
-					annotationsOf(scoping, annotationMerger));
+			Injectee<ScopePermanence> permanence = (Injectee<ScopePermanence>) injectee;
+			ScopePermanence self = permanence.supplier.supply(
+					permanence.locator.toDependency(), this);
+			permanenceByScope.put(self.scope, self);
+			return new Resource<>(serialID, permanence.source,
+					ScopePermanence.container, permanence.locator,
+					resource -> (gen -> self),
+					annotationsOf(permanence, annotationMerger));
 		}
 
 		@SuppressWarnings("unchecked")
 		private <T> Generator<T> createGenerator(Resource<T> resource,
 				Supplier<? extends T> supplier) {
-			Name scope = resource.scoping.scope;
+			Name scope = resource.permanence.scope;
 			if (Generator.class.isAssignableFrom(supplier.getClass()))
 				return (Generator<T>) supplier;
 			if (Scope.class.isAssignableFrom(resource.type().rawType)
@@ -449,7 +451,7 @@ public final class Container {
 			if (instance != null && postConstruct != null
 				&& postConstruct.length > 0)
 				instance = postConstruct(instance, injected);
-			if (resource.scoping.isStableByNature()
+			if (resource.permanence.isPermanent()
 				&& singletonListener != null) {
 				singletonListener.onSingletonCreated(resource, instance);
 			}
@@ -518,7 +520,7 @@ public final class Container {
 				b.append(r.type().simpleName()).append(' ');
 				b.append(r.instance.name).append(' ');
 				b.append(r.target).append(' ');
-				b.append(rx.scoping).append(' ');
+				b.append(rx.permanence).append(' ');
 				b.append(rx.source).append('\n');
 			}
 		}
@@ -562,7 +564,7 @@ public final class Container {
 				throws UnresolvableDependency {
 			dep.ensureNoIllegalDirectAccessOf(resource.locator);
 			return value.get(() -> injector.createInstance(
-					dep.injectingInto(resource.locator, resource.scoping),
+					dep.injectingInto(resource.locator, resource.permanence),
 					supplier, resource));
 		}
 	}
@@ -617,14 +619,14 @@ public final class Container {
 		}
 
 		private Scope resolveScope() {
-			return injector.resolve(resource.scoping.scope, Scope.class);
+			return injector.resolve(resource.permanence.scope, Scope.class);
 		}
 
 		@Override
 		public T generate(Dependency<? super T> dep) {
 			dep.ensureNoIllegalDirectAccessOf(resource.locator);
 			final Dependency<? super T> injected = dep.injectingInto(
-					resource.locator, resource.scoping);
+					resource.locator, resource.permanence);
 			/**
 			 * This cache makes sure that within one thread even if the provider
 			 * (lambda below) is called multiple times (which can occur because

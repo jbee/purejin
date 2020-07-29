@@ -62,7 +62,7 @@ public class TestSerializable {
 	}
 
 	@Test
-	public void scopingIsSerializable() {
+	public void scopePermanenceIsSerializable() {
 		assertSerializable(ScopePermanence.ignore);
 		assertSerializable(ScopePermanence.singleton.derive(Scope.application));
 	}

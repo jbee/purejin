@@ -75,7 +75,7 @@ public final class InjectionSite {
 				Dependency<? extends Resource<?>> resourceDep = site.typed(
 						resourceTypeFor(ref.type)).named(ref.name);
 				Resource<?> resource = injector.resolve(resourceDep);
-				if (resource.scoping.isStableByNature()) {
+				if (resource.permanence.isPermanent()) {
 					//TODO and not has type variable involved
 					preResolvedArgs[i] = generate(resource,
 							site.instanced(hint.relativeRef));

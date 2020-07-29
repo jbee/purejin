@@ -9,9 +9,9 @@ import java.util.function.Function;
 
 /**
  * A {@link Resource} describes a injection situation or scenario through its
- * {@link #locator} and {@link #scoping}. If the {@link Resource} applies to a
- * actual {@link Dependency} situation its {@link #generator} is used to create
- * the instance injected should it not exist already.
+ * {@link #locator} and {@link #permanence}. If the {@link Resource} applies to
+ * a actual {@link Dependency} situation its {@link #generator} is used to
+ * create the instance injected should it not exist already.
  * 
  * @since 19.1
  * 
@@ -37,7 +37,7 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 	 * The information on this {@link Scope} behaviour in relation to other
 	 * {@link Scope}s.
 	 */
-	public final ScopePermanence scoping;
+	public final ScopePermanence permanence;
 
 	/**
 	 * The serial ID of this {@link Resource}. It is unique within the same
@@ -48,12 +48,12 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 
 	public final Annotated annotations;
 
-	public Resource(int serialID, Source source, ScopePermanence scoping,
+	public Resource(int serialID, Source source, ScopePermanence permanence,
 			Locator<T> locator, Function<Resource<T>, Generator<T>> generator,
 			Annotated annotations) {
 		this.locator = locator;
 		this.source = source;
-		this.scoping = scoping;
+		this.permanence = permanence;
 		this.serialID = serialID;
 		this.annotations = annotations;
 		//OBS! must be last
@@ -71,7 +71,7 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 
 	@Override
 	public String toString() {
-		return "#" + serialID + " " + locator + " " + source + " " + scoping;
+		return "#" + serialID + " " + locator + " " + source + " " + permanence;
 	}
 
 	@Override

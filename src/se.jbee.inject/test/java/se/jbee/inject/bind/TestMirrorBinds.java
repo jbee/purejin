@@ -46,6 +46,6 @@ public class TestMirrorBinds {
 				injector.resolve(InjectionScoped.class));
 		Resource<InjectionScoped> resource = injector.resolve(
 				resourceTypeFor(InjectionScoped.class));
-		assertEquals(Scope.injection, resource.scoping.scope);
+		assertEquals(Scope.injection, resource.permanence.scope);
 	}
 }
