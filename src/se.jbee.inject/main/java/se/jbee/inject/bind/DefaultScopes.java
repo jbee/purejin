@@ -32,11 +32,6 @@ import se.jbee.inject.scope.WorkerScope;
  */
 final class DefaultScopes extends BinderModule implements Supplier<Scope> {
 
-	public static final ScopePermanence WORKER_SCOPE_PERMANENCE = unstable //
-			.derive(Scope.worker) //
-			.canBeInjectedInto(Scope.worker) //
-			.canBeInjectedInto(Scope.injection);
-
 	@Override
 	protected Bind init(Bind bind) {
 		return bind.asDefault();
@@ -58,7 +53,9 @@ final class DefaultScopes extends BinderModule implements Supplier<Scope> {
 				.canBeInjectedInto(Scope.injection)); //
 		bindScopePermanence(unstable.derive(Scope.injection) //
 				.canBeInjectedInto(Scope.injection));
-		bindScopePermanence(WORKER_SCOPE_PERMANENCE); //
+		bindScopePermanence(unstable.derive(Scope.worker) //
+				.canBeInjectedInto(Scope.worker) //
+				.canBeInjectedInto(Scope.injection)); //
 
 		bindScope(Scope.injection).to(Scope.INJECTION);
 		bindScope(Scope.application).to(ApplicationScope.class);

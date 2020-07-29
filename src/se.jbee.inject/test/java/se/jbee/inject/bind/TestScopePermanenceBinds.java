@@ -27,18 +27,19 @@ public class TestScopePermanenceBinds {
 
 	static final Name requestScope = Name.named("request");
 
-	static final class TestScopingBindsModule extends BinderModule {
+	static final class TestScopePermanenceBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			bindScopePermanence(
-					DefaultScopes.WORKER_SCOPE_PERMANENCE.derive(requestScope));
+			bindScopePermanence(requestScope).toFactory(
+					context -> context.resolve(Scope.worker,
+							ScopePermanence.class).derive(requestScope));
 		}
 
 	}
 
 	private final Injector injector = Bootstrap.injector(
-			TestScopingBindsModule.class);
+			TestScopePermanenceBindsModule.class);
 
 	private final Map<Name, ScopePermanence> permanenceByScope = new HashMap<>();
 

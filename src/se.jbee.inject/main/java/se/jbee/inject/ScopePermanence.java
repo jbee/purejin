@@ -54,9 +54,9 @@ public final class ScopePermanence implements Serializable {
 	private final ScopePermanence group;
 
 	private ScopePermanence(Name scope, Name[] consistentInScopes,
-			boolean stableByNature, boolean eager, ScopePermanence group) {
+			boolean permanent, boolean eager, ScopePermanence group) {
 		this.scope = scope;
-		this.permanent = stableByNature;
+		this.permanent = permanent;
 		this.consistentInScopes = consistentInScopes;
 		this.eager = eager;
 		this.group = group;
@@ -97,6 +97,9 @@ public final class ScopePermanence implements Serializable {
 	}
 
 	public ScopePermanence eager() {
+		if (!isPermanent())
+			throw new IllegalStateException(
+					"Must be permanent to become eager but was " + this);
 		return new ScopePermanence(scope, consistentInScopes, permanent, true,
 				group);
 	}

@@ -23,6 +23,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Env;
@@ -713,6 +714,19 @@ public class Binder {
 
 		public void toSupplier(Supplier<? extends T> supplier) {
 			to(supplier, BindingType.PREDEFINED);
+		}
+
+		/**
+		 * Utility method that creates the instances from the {@link Injector}
+		 * context given.
+		 * 
+		 * This is used when a full {@link Supplier} contract is not needed to
+		 * save stating the not needed {@link Dependency} argument.
+		 * 
+		 * @since 19.1
+		 */
+		public void toFactory(Function<Injector, T> factory) {
+			toSupplier((dep, context) -> factory.apply(context));
 		}
 
 		/**

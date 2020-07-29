@@ -187,19 +187,78 @@ public final class Container {
 				? Annotated.NO_MERGE
 				: env.property(Annotated.Merge.class,
 						Container.class.getPackage());
+			Map<Name, Resource<ScopePermanence>> permanenceResourceByScope = new HashMap<>();
 			Map<Name, ScopePermanence> permanenceByScope = new HashMap<>();
+			Injector bootrsappingContext = createBootstrappingContext(
+					permanenceResourceByScope, permanenceByScope);
+			// create ScopePermanence resources
 			for (int i = 0; i < injectees.length; i++) {
 				if (injectees[i].locator.type().rawType == ScopePermanence.class) {
-					resources[i] = createScopePermanenceResource(i,
-							injectees[i], annotationMerger, permanenceByScope);
+					Resource<?> r = createScopePermanenceResource(i,
+							injectees[i],
+							effectiveAnnotated(injectees[i], annotationMerger),
+							bootrsappingContext);
+					resources[i] = r;
+					@SuppressWarnings("unchecked")
+					Resource<ScopePermanence> r2 = (Resource<ScopePermanence>) r;
+					permanenceResourceByScope.put(r.locator.instance.name, r2);
 				}
 			}
+			// make sure all ScopePermanence are known
+			for (Entry<Name, Resource<ScopePermanence>> e : permanenceResourceByScope.entrySet()) {
+				if (!permanenceByScope.containsKey(e.getKey())) {
+					Resource<ScopePermanence> val = e.getValue();
+					permanenceByScope.put(e.getKey(),
+							val.generate(val.locator.toDependency()));
+				}
+			}
+			// create rest of resources
 			for (int i = 0; i < injectees.length; i++) {
 				if (resources[i] == null) {
 					resources[i] = createResource(i, injectees[i],
-							annotationMerger, permanenceByScope);
+							effectiveAnnotated(injectees[i], annotationMerger),
+							permanenceByScope);
 				}
 			}
+			return createResourcesByRawType(resources);
+		}
+
+		private static Injector createBootstrappingContext(
+				Map<Name, Resource<ScopePermanence>> permanenceResourceByScope,
+				Map<Name, ScopePermanence> permanenceByScope) {
+			return new Injector() {
+
+				@SuppressWarnings("unchecked")
+				@Override
+				public <E> E resolve(Dependency<E> dep)
+						throws UnresolvableDependency {
+					Class<E> rawType = dep.type().rawType;
+					if (rawType == Injector.class)
+						return (E) this;
+					if (rawType == ScopePermanence.class) {
+						Name scope = dep.instance.name;
+						if (!permanenceResourceByScope.containsKey(scope))
+							throw noResourceFor(dep);
+						Dependency<ScopePermanence> scopeDep = (Dependency<ScopePermanence>) dep;
+						return (E) permanenceByScope.computeIfAbsent(scope,
+								name -> permanenceResourceByScope.get(
+										name).generator.generate(scopeDep));
+					}
+					throw noResourceFor(dep);
+				}
+
+				private NoResourceForDependency noResourceFor(
+						Dependency<?> dep) {
+					return new NoResourceForDependency(
+							"During bootstrapping only ", dep,
+							permanenceResourceByScope.values().toArray(
+									Resource[]::new));
+				}
+			};
+		}
+
+		private static Map<Class<?>, Resource<?>[]> createResourcesByRawType(
+				Resource<?>[] resources) {
 			Arrays.sort(resources);
 			Map<Class<?>, Resource<?>[]> byRawType = new IdentityHashMap<>(
 					resources.length);
@@ -221,10 +280,16 @@ public final class Container {
 			return byRawType;
 		}
 
+		private static <T> Annotated effectiveAnnotated(Injectee<T> injectee,
+				Annotated.Merge merger) {
+			return injectee.supplier instanceof Annotated
+				? merger.apply((Annotated) injectee.supplier)
+				: Annotated.WITH_NO_ANNOTATIONS;
+		}
+
 		private <T> Resource<T> createResource(int serialID,
-				Injectee<T> injectee, Annotated.Merge annotationMerger,
+				Injectee<T> injectee, Annotated annotations,
 				Map<Name, ScopePermanence> permanenceByScope) {
-			Annotated annotations = annotationsOf(injectee, annotationMerger);
 			// NB. using the function is a way to allow both Resource and Generator implementation to be initialised with a final reference of each other
 			Function<Resource<T>, Generator<T>> generatorFactory = //
 					resource -> createGenerator(resource, injectee.supplier);
@@ -236,26 +301,14 @@ public final class Container {
 					injectee.locator, generatorFactory, annotations);
 		}
 
-		private static <T> Annotated annotationsOf(Injectee<T> injectee,
-				Annotated.Merge annotationMerger) {
-			return injectee.supplier instanceof Annotated
-				? annotationMerger.apply((Annotated) injectee.supplier)
-				: Annotated.WITH_NO_ANNOTATIONS;
-		}
-
-		private Resource<ScopePermanence> createScopePermanenceResource(
-				int serialID, Injectee<?> injectee,
-				Annotated.Merge annotationMerger,
-				Map<Name, ScopePermanence> permanenceByScope) {
-			@SuppressWarnings("unchecked")
-			Injectee<ScopePermanence> permanence = (Injectee<ScopePermanence>) injectee;
-			ScopePermanence self = permanence.supplier.supply(
-					permanence.locator.toDependency(), this);
-			permanenceByScope.put(self.scope, self);
-			return new Resource<>(serialID, permanence.source,
-					ScopePermanence.container, permanence.locator,
-					resource -> (gen -> self),
-					annotationsOf(permanence, annotationMerger));
+		private static <T> Resource<T> createScopePermanenceResource(
+				int serialID, Injectee<T> injectee, Annotated annotations,
+				Injector bootstrappingContext) {
+			return new Resource<>(serialID, injectee.source,
+					ScopePermanence.container, injectee.locator,
+					resource -> (dependency -> injectee.supplier.supply(
+							dependency, bootstrappingContext)),
+					annotations);
 		}
 
 		@SuppressWarnings("unchecked")
