@@ -130,7 +130,7 @@ public interface Scope {
 	public static final Scope INJECTION = Scope::injection;
 
 	@SuppressWarnings("unused")
-	private static <T> T injection(int serialID, Dependency<? super T> dep,
+	static <T> T injection(int serialID, Dependency<? super T> dep,
 			Provider<T> provider, int generators)
 			throws UnresolvableDependency {
 		return provider.provide();
