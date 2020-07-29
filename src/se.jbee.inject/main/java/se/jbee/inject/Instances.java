@@ -1,6 +1,6 @@
 /*
- *  Copyright (c) 2012-2019, Jan Bernitt 
- *			
+ *  Copyright (c) 2012-2019, Jan Bernitt
+ *	
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -17,8 +17,8 @@ import java.util.Iterator;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public final class Instances
-		implements Qualifying<Instances>, Iterable<Instance<?>>, Serializable {
+public final class Instances implements Qualifying<Instances>,
+		Iterable<Instance<?>>, Serializable, Comparable<Instances> {
 
 	public static final Instances ANY = new Instances();
 
@@ -96,5 +96,10 @@ public final class Instances
 				return false;
 		}
 		return false;
+	}
+
+	@Override
+	public int compareTo(Instances other) {
+		return Arrays.compare(hierarchy, other.hierarchy, Instance::compareTo);
 	}
 }

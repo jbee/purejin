@@ -23,10 +23,10 @@ public final class Lazy<V> extends AtomicReference<V> {
 
 	private final AtomicBoolean uninitialised = new AtomicBoolean();
 
-	public V get(Provider<V> provider) {
+	public V get(Provider<V> initialValue) {
 		V value;
 		if (uninitialised.compareAndSet(false, true)) {
-			value = provider.provide();
+			value = initialValue.provide();
 			set(value);
 		} else {
 			// another thread is about to initialise it

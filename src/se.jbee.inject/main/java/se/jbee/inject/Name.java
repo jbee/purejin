@@ -13,7 +13,8 @@ import java.io.Serializable;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public final class Name implements Qualifying<Name>, Serializable {
+public final class Name
+		implements Qualifying<Name>, Serializable, Comparable<Name> {
 
 	/**
 	 * Character used as wild-card when matching names.
@@ -112,6 +113,11 @@ public final class Name implements Qualifying<Name>, Serializable {
 			return !thisIsAny;
 		return value.length() > other.value.length()
 			&& value.startsWith(other.value);
+	}
+
+	@Override
+	public int compareTo(Name other) {
+		return value.compareTo(other.value);
 	}
 
 	public boolean isCompatibleWith(Name other) {

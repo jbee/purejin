@@ -43,7 +43,7 @@ public interface AnnotatedWith<T extends Annotation> {
 	 *         using custom {@link se.jbee.inject.container.Supplier}s for these
 	 *         types (usually done by binding custom
 	 *         {@link se.jbee.inject.declare.ValueBinder}s in the {@link Env})
-	 *         or in general by using a custom {@link Annotated#AGGREGATOR}
+	 *         or in general by using a custom {@link Annotated#NO_MERGE}
 	 *         function which is bound in the {@link Env} using the
 	 *         {@link Annotated#ENV_AGGREGATOR_KEY}.
 	 */

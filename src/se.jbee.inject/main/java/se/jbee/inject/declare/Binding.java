@@ -36,7 +36,7 @@ import se.jbee.inject.container.Supplier;
  * @param <T> The type of the bound value (instance)
  */
 public final class Binding<T> extends Injectee<T>
-		implements Comparable<Binding<?>>, Module, Typed<T> {
+		implements Module, Typed<T>, Comparable<Binding<?>> {
 
 	public static <T> Binding<T> binding(Locator<T> locator, BindingType type,
 			Supplier<? extends T> supplier, Name scope, Source source) {
@@ -105,13 +105,25 @@ public final class Binding<T> extends Injectee<T>
 		res = Qualifying.compare(locator.instance, other.locator.instance);
 		if (res != 0)
 			return res;
+		res = locator.instance.compareTo(other.locator.instance);
+		if (res != 0)
+			return res;
 		res = Qualifying.compare(locator.target, other.locator.target);
+		if (res != 0)
+			return res;
+		res = locator.target.compareTo(other.locator.target);
 		if (res != 0)
 			return res;
 		res = Qualifying.compare(source, other.source);
 		if (res != 0)
 			return res;
-		return -1; // keep order
+		res = source.compareTo(other.source);
+		if (res != 0)
+			return res;
+		res = scope.compareTo(other.scope);
+		if (res != 0)
+			return res;
+		return type.compareTo(other.type);
 	}
 
 	/**

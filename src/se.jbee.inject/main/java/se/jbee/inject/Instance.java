@@ -16,8 +16,8 @@ import java.io.Serializable;
  * @author Jan Bernitt (jan@jbee.se)
  *
  */
-public final class Instance<T>
-		implements Parameter<T>, Qualifying<Instance<?>>, Serializable {
+public final class Instance<T> implements Parameter<T>, Qualifying<Instance<?>>,
+		Serializable, Comparable<Instance<?>> {
 
 	/**
 	 * When a wildcard-type is used as bound instance type the bind will be
@@ -94,6 +94,14 @@ public final class Instance<T>
 	@Override
 	public boolean moreQualiedThan(Instance<?> other) {
 		return Qualifying.compareRelated(type, other.type, name, other.name);
+	}
+
+	@Override
+	public int compareTo(Instance<?> other) {
+		int res = name.compareTo(other.name);
+		if (res != 0)
+			return res;
+		return type.compareTo(other.type);
 	}
 
 	@Override

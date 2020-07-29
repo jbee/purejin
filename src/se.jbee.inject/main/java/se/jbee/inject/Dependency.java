@@ -166,19 +166,19 @@ public final class Dependency<T>
 
 	public <I> Dependency<T> injectingInto(Instance<I> target)
 			throws DependencyCycle, UnstableDependency {
-		return injectingInto(new Locator<>(target), Scoping.ignore);
+		return injectingInto(new Locator<>(target), ScopePermanence.ignore);
 	}
 
 	public <I> Dependency<T> injectingInto(Package pkg) {
 		Target target = Target.ANY.in(packageAndSubPackagesOf(pkg));
 		Injection injection = new Injection(Instance.ANY,
-				new Locator<>(Instance.ANY, target), Scoping.ignore);
+				new Locator<>(Instance.ANY, target), ScopePermanence.ignore);
 		if (hierarchy.length == 0)
 			return new Dependency<>(instance, injection);
 		return new Dependency<>(instance, arrayAppend(hierarchy, injection));
 	}
 
-	public Dependency<T> injectingInto(Locator<?> target, Scoping scoping)
+	public Dependency<T> injectingInto(Locator<?> target, ScopePermanence scoping)
 			throws DependencyCycle, UnstableDependency {
 		Injection injection = new Injection(instance, target, scoping);
 		if (hierarchy.length == 0)

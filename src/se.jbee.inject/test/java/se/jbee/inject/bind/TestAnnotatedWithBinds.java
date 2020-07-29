@@ -96,7 +96,7 @@ public class TestAnnotatedWithBinds {
 	}
 
 	private final Injector injector = Bootstrap.injector(
-			Bootstrap.ENV.with(Annotated.ENV_AGGREGATOR_KEY,
+			Bootstrap.ENV.with(Annotated.Merge.class,
 					TestAnnotatedWithBinds::advancedAnnotations),
 			TestAnnotatedWithBindsModule.class);
 

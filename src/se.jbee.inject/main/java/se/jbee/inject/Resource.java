@@ -37,7 +37,7 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 	 * The information on this {@link Scope} behaviour in relation to other
 	 * {@link Scope}s.
 	 */
-	public final Scoping scoping;
+	public final ScopePermanence scoping;
 
 	/**
 	 * The serial ID of this {@link Resource}. It is unique within the same
@@ -48,7 +48,7 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 
 	public final Annotated annotations;
 
-	public Resource(int serialID, Source source, Scoping scoping,
+	public Resource(int serialID, Source source, ScopePermanence scoping,
 			Locator<T> locator, Function<Resource<T>, Generator<T>> generator,
 			Annotated annotations) {
 		this.locator = locator;

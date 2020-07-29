@@ -10,7 +10,6 @@ import static java.util.Arrays.copyOf;
 import static java.util.Arrays.copyOfRange;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
-import static se.jbee.inject.Scoping.scopingOf;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.arrayFilter;
 import static se.jbee.inject.Utils.arrayFindFirst;
@@ -22,6 +21,7 @@ import static se.jbee.inject.container.Cast.resourcesTypeFor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -33,7 +33,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 
 import se.jbee.inject.Annotated;
 import se.jbee.inject.Dependency;
@@ -46,7 +45,7 @@ import se.jbee.inject.Locator;
 import se.jbee.inject.Name;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Scope;
-import se.jbee.inject.Scoping;
+import se.jbee.inject.ScopePermanence;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
@@ -182,43 +181,79 @@ public final class Container {
 
 		private <T> Map<Class<?>, Resource<?>[]> createResources(
 				Injectee<?>... injectees) {
-			Resource<?>[] list = new Resource<?>[injectees.length];
+			Resource<?>[] resources = new Resource<?>[injectees.length];
 			Env env = defaultEnv(injectees);
-			UnaryOperator<Annotated> aggregator = env == null
-				? Annotated.AGGREGATOR
-				: env.property(Annotated.ENV_AGGREGATOR_KEY,
+			Annotated.Merge annotationMerger = env == null
+				? Annotated.NO_MERGE
+				: env.property(Annotated.Merge.class,
 						Container.class.getPackage());
+			Map<Name, ScopePermanence> scopingByName = new HashMap<>();
 			for (int i = 0; i < injectees.length; i++) {
-				@SuppressWarnings("unchecked")
-				Injectee<T> injectee = (Injectee<T>) injectees[i];
-				Annotated annotations = injectee.supplier instanceof Annotated
-					? aggregator.apply((Annotated) injectee.supplier)
-					: Annotated.WITH_NO_ANNOTATIONS;
-				// NB. using the function is a way to allow both Resource and Generator implementation to be initialised with a final reference of each other
-				Function<Resource<T>, Generator<T>> generatorFactory = //
-						resource -> createGenerator(resource,
-								injectee.supplier);
-				list[i] = new Resource<>(i, injectee.source,
-						scopingOf(injectee.scope), injectee.locator,
-						generatorFactory, annotations);
+				if (injectees[i].locator.type().rawType == ScopePermanence.class) {
+					resources[i] = createScopingResource(i, injectees[i],
+							annotationMerger, scopingByName);
+				}
 			}
-			Arrays.sort(list);
+			for (int i = 0; i < injectees.length; i++) {
+				if (resources[i] == null) {
+					resources[i] = createResource(i, injectees[i],
+							annotationMerger, scopingByName);
+				}
+			}
+			Arrays.sort(resources);
 			Map<Class<?>, Resource<?>[]> byRawType = new IdentityHashMap<>(
-					list.length);
-			if (list.length == 0)
+					resources.length);
+			if (resources.length == 0)
 				return byRawType;
-			Class<?> lastRawType = list[0].type().rawType;
+			Class<?> lastRawType = resources[0].type().rawType;
 			int start = 0;
-			for (int i = 0; i < list.length; i++) {
-				Class<?> rawType = list[i].type().rawType;
+			for (int i = 0; i < resources.length; i++) {
+				Class<?> rawType = resources[i].type().rawType;
 				if (rawType != lastRawType) {
-					byRawType.put(lastRawType, copyOfRange(list, start, i));
+					byRawType.put(lastRawType,
+							copyOfRange(resources, start, i));
 					start = i;
 				}
 				lastRawType = rawType;
 			}
-			byRawType.put(lastRawType, copyOfRange(list, start, list.length));
+			byRawType.put(lastRawType,
+					copyOfRange(resources, start, resources.length));
 			return byRawType;
+		}
+
+		private <T> Resource<T> createResource(int serialID,
+				Injectee<T> injectee, Annotated.Merge annotationMerger,
+				Map<Name, ScopePermanence> scopingByName) {
+			Annotated annotations = annotationsOf(injectee, annotationMerger);
+			// NB. using the function is a way to allow both Resource and Generator implementation to be initialised with a final reference of each other
+			Function<Resource<T>, Generator<T>> generatorFactory = //
+					resource -> createGenerator(resource, injectee.supplier);
+			ScopePermanence scoping = scopingByName.get(injectee.scope);
+			if (scoping == null)
+				throw new InconsistentDeclaration("Scope `" + injectee.scope
+					+ "` is used but not defined for: " + injectee);
+			return new Resource<>(serialID, injectee.source, scoping,
+					injectee.locator, generatorFactory, annotations);
+		}
+
+		private static <T> Annotated annotationsOf(Injectee<T> injectee,
+				Annotated.Merge annotationMerger) {
+			return injectee.supplier instanceof Annotated
+				? annotationMerger.apply((Annotated) injectee.supplier)
+				: Annotated.WITH_NO_ANNOTATIONS;
+		}
+
+		private Resource<ScopePermanence> createScopingResource(int serialID,
+				Injectee<?> injectee, Annotated.Merge annotationMerger,
+				Map<Name, ScopePermanence> scopingByName) {
+			@SuppressWarnings("unchecked")
+			Injectee<ScopePermanence> scoping = (Injectee<ScopePermanence>) injectee;
+			ScopePermanence self = scoping.supplier.supply(
+					scoping.locator.toDependency(), this);
+			scopingByName.put(self.scope, self);
+			return new Resource<>(serialID, scoping.source, ScopePermanence.container,
+					scoping.locator, resource -> (gen -> self),
+					annotationsOf(scoping, annotationMerger));
 		}
 
 		@SuppressWarnings("unchecked")
@@ -414,7 +449,7 @@ public final class Container {
 			if (instance != null && postConstruct != null
 				&& postConstruct.length > 0)
 				instance = postConstruct(instance, injected);
-			if (resource.scoping.isStableByDesign()
+			if (resource.scoping.isStableByNature()
 				&& singletonListener != null) {
 				singletonListener.onSingletonCreated(resource, instance);
 			}
@@ -556,7 +591,7 @@ public final class Container {
 				throws UnresolvableDependency {
 			dep.ensureNoIllegalDirectAccessOf(resource.locator);
 			return supplier.supply(
-					dep.injectingInto(resource.locator, Scoping.ignore),
+					dep.injectingInto(resource.locator, ScopePermanence.ignore),
 					injector);
 		}
 	}

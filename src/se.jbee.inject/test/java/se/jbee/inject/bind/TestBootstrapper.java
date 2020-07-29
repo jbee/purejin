@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Scoping.scopingOf;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.config.ConstructsBy.common;
 import static se.jbee.inject.container.Cast.resourcesTypeFor;
@@ -23,6 +22,7 @@ import se.jbee.inject.Locator;
 import se.jbee.inject.Name;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Scope;
+import se.jbee.inject.ScopePermanence;
 import se.jbee.inject.UnresolvableDependency.DependencyCycle;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Environment;
@@ -161,6 +161,8 @@ public class TestBootstrapper {
 
 		@Override
 		protected void declare() {
+			bindScopePermanence(ScopePermanence.singleton.derive(
+					Scope.application).eager());
 			bind(named("eager"), String.class).toSupplier(this);
 			per(Scope.injection).bind(named("lazy"), String.class).toSupplier(
 					this);
@@ -257,9 +259,10 @@ public class TestBootstrapper {
 	public void thatBindingsAreReplacedByMoreQualiedOnes() {
 		Injector injector = Bootstrap.injector(ReplacingBindsModule.class);
 		assertEquals(6, injector.resolve(Number.class));
-		Resource<?>[] rs = injector.resolve(Resource[].class);
+		Resource<?>[] rs = injector.resolve(raw(Resource.class).parametized(
+				Number.class).parametizedAsUpperBounds().addArrayDimension());
 		//TODO can this be limited to cases with a certain Scope so that container can be excluded?
-		assertEquals(27, rs.length); // 3x Comparable, Float, Double, Integer and Number (3x Serializable has been nullified) + 11 Scope + 2 Annotation
+		assertEquals(4, rs.length);
 		Resource<Number>[] forNumber = injector.resolve(
 				resourcesTypeFor(Number.class));
 		assertEquals(1, forNumber.length);
@@ -271,12 +274,10 @@ public class TestBootstrapper {
 
 	@Test
 	public void thatEagerSingeltonsCanBeCreated() {
-		scopingOf(Scope.application).eager();
 		Injector injector = Bootstrap.injector(
 				EagerSingletonsBindsModule.class);
 		assertNotNull(injector);
 		assertEquals(1, EagerSingletonsBindsModule.eagers);
-		scopingOf(Scope.application).lazy();
 	}
 
 	@Test

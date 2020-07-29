@@ -5,7 +5,12 @@
  */
 package se.jbee.inject.bind;
 
+import static se.jbee.inject.Scope.container;
+
 import se.jbee.inject.Env;
+import se.jbee.inject.Name;
+import se.jbee.inject.Scope;
+import se.jbee.inject.ScopePermanence;
 import se.jbee.inject.declare.Bindings;
 import se.jbee.inject.declare.Bootstrapper;
 import se.jbee.inject.declare.Bundle;
@@ -58,6 +63,28 @@ public abstract class BinderModule extends InitializedBinder
 	@Override
 	public String toString() {
 		return "module " + getClass().getSimpleName();
+	}
+
+	/**
+	 * Binds a {@link ScopePermanence} with the needed {@link Scope#container}.
+	 * 
+	 * @since 19.1
+	 * @param sp instance to bind, not null
+	 */
+	protected final void bindScopePermanence(ScopePermanence sp) {
+		per(container).bind(sp.scope, ScopePermanence.class).to(sp);
+	}
+
+	/**
+	 * Starts the binding of a {@link Scope}.
+	 * 
+	 * @since 19.1
+	 * @param scope name of the scope to create
+	 * @return fluent API to invoke one of the {@code to} methods to provide the
+	 *         {@link Scope} or the indirection creating it.
+	 */
+	protected final TypedBinder<Scope> bindScope(Name scope) {
+		return per(container).bind(scope, Scope.class);
 	}
 
 	/**
