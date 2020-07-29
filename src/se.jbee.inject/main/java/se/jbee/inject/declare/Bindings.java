@@ -142,9 +142,9 @@ public final class Bindings {
 	/**
 	 * In contrast to {@link #supplyConstant(Object)} which does supply the
 	 * constant as {@link Generator} and thereby does not support custom
-	 * {@link ScopePermanence} or {@link Scope}s this way of supplying the constant will
-	 * treat the constant as bean, that is like any "dynamically" supplied
-	 * value.
+	 * {@link ScopePermanence} or {@link Scope}s this way of supplying the
+	 * constant will treat the constant as bean, that is like any "dynamically"
+	 * supplied value.
 	 * 
 	 * @param <T> type of the constant
 	 * @param constant a bean that requires {@link ScopePermanence} effects.
@@ -157,8 +157,8 @@ public final class Bindings {
 
 	/**
 	 * Since the {@link Supplier} also implements {@link Generator} it is used
-	 * directly without any {@link ScopePermanence} effects. Effectively a constant
-	 * always has the {@link Scope#container}.
+	 * directly without any {@link ScopePermanence} effects. Effectively a
+	 * constant always has the {@link Scope#container}.
 	 * 
 	 * The implementation also implements {@link #equals(Object)} and
 	 * {@link #hashCode()} to allow elimination of duplicate constant bindings.

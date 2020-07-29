@@ -65,8 +65,8 @@ public abstract class UnresolvableDependency extends RuntimeException {
 
 		public UnstableDependency(Injection parent, Injection injection) {
 			super("Unstable dependency injection\n\tof: " + injection.target
-				+ " " + injection.scoping + "\n\tinto: " + parent.target + " "
-				+ parent.scoping);
+				+ " " + injection.permanence + "\n\tinto: " + parent.target + " "
+				+ parent.permanence);
 		}
 
 	}

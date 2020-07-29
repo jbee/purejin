@@ -74,7 +74,7 @@ public final class Container {
 	}
 
 	private static <T> void initEager(Resource<T> resource) {
-		if (resource.scoping.isEager())
+		if (resource.permanence.isEager())
 			resource.generator.generate(resource.locator.toDependency());
 	}
 
@@ -187,19 +187,78 @@ public final class Container {
 				? Annotated.NO_MERGE
 				: env.property(Annotated.Merge.class,
 						Container.class.getPackage());
-			Map<Name, ScopePermanence> scopingByName = new HashMap<>();
+			Map<Name, Resource<ScopePermanence>> permanenceResourceByScope = new HashMap<>();
+			Map<Name, ScopePermanence> permanenceByScope = new HashMap<>();
+			Injector bootrsappingContext = createBootstrappingContext(
+					permanenceResourceByScope, permanenceByScope);
+			// create ScopePermanence resources
 			for (int i = 0; i < injectees.length; i++) {
 				if (injectees[i].locator.type().rawType == ScopePermanence.class) {
-					resources[i] = createScopingResource(i, injectees[i],
-							annotationMerger, scopingByName);
+					Resource<?> r = createScopePermanenceResource(i,
+							injectees[i],
+							effectiveAnnotated(injectees[i], annotationMerger),
+							bootrsappingContext);
+					resources[i] = r;
+					@SuppressWarnings("unchecked")
+					Resource<ScopePermanence> r2 = (Resource<ScopePermanence>) r;
+					permanenceResourceByScope.put(r.locator.instance.name, r2);
 				}
 			}
+			// make sure all ScopePermanence are known
+			for (Entry<Name, Resource<ScopePermanence>> e : permanenceResourceByScope.entrySet()) {
+				if (!permanenceByScope.containsKey(e.getKey())) {
+					Resource<ScopePermanence> val = e.getValue();
+					permanenceByScope.put(e.getKey(),
+							val.generate(val.locator.toDependency()));
+				}
+			}
+			// create rest of resources
 			for (int i = 0; i < injectees.length; i++) {
 				if (resources[i] == null) {
 					resources[i] = createResource(i, injectees[i],
-							annotationMerger, scopingByName);
+							effectiveAnnotated(injectees[i], annotationMerger),
+							permanenceByScope);
 				}
 			}
+			return createResourcesByRawType(resources);
+		}
+
+		private static Injector createBootstrappingContext(
+				Map<Name, Resource<ScopePermanence>> permanenceResourceByScope,
+				Map<Name, ScopePermanence> permanenceByScope) {
+			return new Injector() {
+
+				@SuppressWarnings("unchecked")
+				@Override
+				public <E> E resolve(Dependency<E> dep)
+						throws UnresolvableDependency {
+					Class<E> rawType = dep.type().rawType;
+					if (rawType == Injector.class)
+						return (E) this;
+					if (rawType == ScopePermanence.class) {
+						Name scope = dep.instance.name;
+						if (!permanenceResourceByScope.containsKey(scope))
+							throw noResourceFor(dep);
+						Dependency<ScopePermanence> scopeDep = (Dependency<ScopePermanence>) dep;
+						return (E) permanenceByScope.computeIfAbsent(scope,
+								name -> permanenceResourceByScope.get(
+										name).generator.generate(scopeDep));
+					}
+					throw noResourceFor(dep);
+				}
+
+				private NoResourceForDependency noResourceFor(
+						Dependency<?> dep) {
+					return new NoResourceForDependency(
+							"During bootstrapping only ", dep,
+							permanenceResourceByScope.values().toArray(
+									new Resource[0]));
+				}
+			};
+		}
+
+		private static Map<Class<?>, Resource<?>[]> createResourcesByRawType(
+				Resource<?>[] resources) {
 			Arrays.sort(resources);
 			Map<Class<?>, Resource<?>[]> byRawType = new IdentityHashMap<>(
 					resources.length);
@@ -221,14 +280,20 @@ public final class Container {
 			return byRawType;
 		}
 
+		private static <T> Annotated effectiveAnnotated(Injectee<T> injectee,
+				Annotated.Merge merger) {
+			return injectee.supplier instanceof Annotated
+				? merger.apply((Annotated) injectee.supplier)
+				: Annotated.WITH_NO_ANNOTATIONS;
+		}
+
 		private <T> Resource<T> createResource(int serialID,
-				Injectee<T> injectee, Annotated.Merge annotationMerger,
-				Map<Name, ScopePermanence> scopingByName) {
-			Annotated annotations = annotationsOf(injectee, annotationMerger);
+				Injectee<T> injectee, Annotated annotations,
+				Map<Name, ScopePermanence> permanenceByScope) {
 			// NB. using the function is a way to allow both Resource and Generator implementation to be initialised with a final reference of each other
 			Function<Resource<T>, Generator<T>> generatorFactory = //
 					resource -> createGenerator(resource, injectee.supplier);
-			ScopePermanence scoping = scopingByName.get(injectee.scope);
+			ScopePermanence scoping = permanenceByScope.get(injectee.scope);
 			if (scoping == null)
 				throw new InconsistentDeclaration("Scope `" + injectee.scope
 					+ "` is used but not defined for: " + injectee);
@@ -236,30 +301,20 @@ public final class Container {
 					injectee.locator, generatorFactory, annotations);
 		}
 
-		private static <T> Annotated annotationsOf(Injectee<T> injectee,
-				Annotated.Merge annotationMerger) {
-			return injectee.supplier instanceof Annotated
-				? annotationMerger.apply((Annotated) injectee.supplier)
-				: Annotated.WITH_NO_ANNOTATIONS;
-		}
-
-		private Resource<ScopePermanence> createScopingResource(int serialID,
-				Injectee<?> injectee, Annotated.Merge annotationMerger,
-				Map<Name, ScopePermanence> scopingByName) {
-			@SuppressWarnings("unchecked")
-			Injectee<ScopePermanence> scoping = (Injectee<ScopePermanence>) injectee;
-			ScopePermanence self = scoping.supplier.supply(
-					scoping.locator.toDependency(), this);
-			scopingByName.put(self.scope, self);
-			return new Resource<>(serialID, scoping.source, ScopePermanence.container,
-					scoping.locator, resource -> (gen -> self),
-					annotationsOf(scoping, annotationMerger));
+		private static <T> Resource<T> createScopePermanenceResource(
+				int serialID, Injectee<T> injectee, Annotated annotations,
+				Injector bootstrappingContext) {
+			return new Resource<>(serialID, injectee.source,
+					ScopePermanence.container, injectee.locator,
+					resource -> (dependency -> injectee.supplier.supply(
+							dependency, bootstrappingContext)),
+					annotations);
 		}
 
 		@SuppressWarnings("unchecked")
 		private <T> Generator<T> createGenerator(Resource<T> resource,
 				Supplier<? extends T> supplier) {
-			Name scope = resource.scoping.scope;
+			Name scope = resource.permanence.scope;
 			if (Generator.class.isAssignableFrom(supplier.getClass()))
 				return (Generator<T>) supplier;
 			if (Scope.class.isAssignableFrom(resource.type().rawType)
@@ -449,7 +504,7 @@ public final class Container {
 			if (instance != null && postConstruct != null
 				&& postConstruct.length > 0)
 				instance = postConstruct(instance, injected);
-			if (resource.scoping.isStableByNature()
+			if (resource.permanence.isPermanent()
 				&& singletonListener != null) {
 				singletonListener.onSingletonCreated(resource, instance);
 			}
@@ -518,7 +573,7 @@ public final class Container {
 				b.append(r.type().simpleName()).append(' ');
 				b.append(r.instance.name).append(' ');
 				b.append(r.target).append(' ');
-				b.append(rx.scoping).append(' ');
+				b.append(rx.permanence).append(' ');
 				b.append(rx.source).append('\n');
 			}
 		}
@@ -562,7 +617,7 @@ public final class Container {
 				throws UnresolvableDependency {
 			dep.ensureNoIllegalDirectAccessOf(resource.locator);
 			return value.get(() -> injector.createInstance(
-					dep.injectingInto(resource.locator, resource.scoping),
+					dep.injectingInto(resource.locator, resource.permanence),
 					supplier, resource));
 		}
 	}
@@ -617,14 +672,14 @@ public final class Container {
 		}
 
 		private Scope resolveScope() {
-			return injector.resolve(resource.scoping.scope, Scope.class);
+			return injector.resolve(resource.permanence.scope, Scope.class);
 		}
 
 		@Override
 		public T generate(Dependency<? super T> dep) {
 			dep.ensureNoIllegalDirectAccessOf(resource.locator);
 			final Dependency<? super T> injected = dep.injectingInto(
-					resource.locator, resource.scoping);
+					resource.locator, resource.permanence);
 			/**
 			 * This cache makes sure that within one thread even if the provider
 			 * (lambda below) is called multiple times (which can occur because

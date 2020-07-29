@@ -16,13 +16,13 @@ public final class Injection implements Serializable {
 
 	public final Instance<?> dependency;
 	public final Locator<?> target;
-	public final ScopePermanence scoping;
+	public final ScopePermanence permanence;
 
 	public Injection(Instance<?> dependency, Locator<?> target,
-			ScopePermanence scoping) {
+			ScopePermanence permanence) {
 		this.dependency = dependency;
 		this.target = target;
-		this.scoping = scoping;
+		this.permanence = permanence;
 	}
 
 	@Override

@@ -3,6 +3,7 @@ package se.jbee.inject.bind;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static se.jbee.inject.ScopePermanence.ignore;
 import static se.jbee.inject.container.Cast.resourcesTypeFor;
 
 import java.util.HashMap;
@@ -26,95 +27,95 @@ public class TestScopePermanenceBinds {
 
 	static final Name requestScope = Name.named("request");
 
-	static final class TestScopingBindsModule extends BinderModule {
+	static final class TestScopePermanenceBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			bindScopePermanence(
-					DefaultScopes.WORKER_SCOPE_PERMANENCE.derive(requestScope));
+			bindScopePermanence(requestScope).toFactory(
+					context -> context.resolve(Scope.worker,
+							ScopePermanence.class).derive(requestScope));
 		}
 
 	}
 
 	private final Injector injector = Bootstrap.injector(
-			TestScopingBindsModule.class);
+			TestScopePermanenceBindsModule.class);
 
-	private final Map<Name, ScopePermanence> scopingsByName = new HashMap<>();
+	private final Map<Name, ScopePermanence> permanenceByScope = new HashMap<>();
 
 	@Before
 	public void setup() {
 		for (ScopePermanence s : injector.resolve(ScopePermanence[].class))
-			scopingsByName.put(s.scope, s);
-		scopingsByName.put(ScopePermanence.ignore.scope,
-				ScopePermanence.ignore);
+			permanenceByScope.put(s.scope, s);
+		permanenceByScope.put(ignore.scope, ignore);
 	}
 
-	private ScopePermanence scopingOf(Name scope) {
-		return scopingsByName.get(scope);
-	}
-
-	@Test
-	public void injectionScopeIsNotStableInAnyOtherScope() {
-		assertIsNotStableIn(Scope.injection, Scope.application);
-		assertIsNotStableIn(Scope.injection, Scope.dependency);
-		assertIsNotStableIn(Scope.injection, Scope.dependencyInstance);
-		assertIsNotStableIn(Scope.injection, Scope.dependencyType);
-		assertIsNotStableIn(Scope.injection, Scope.targetInstance);
-		assertIsNotStableIn(Scope.injection, Scope.worker);
-		assertIsNotStableIn(Scope.injection, Scope.thread);
-		assertIsStableIn(Scope.injection, Scope.injection);
+	private ScopePermanence getPermanence(Name scope) {
+		return permanenceByScope.get(scope);
 	}
 
 	@Test
-	public void threadScopeIsNotStableInAnyOtherScopeExceptInjectionAndWorker() {
-		assertIsNotStableIn(Scope.thread, Scope.application);
-		assertIsNotStableIn(Scope.thread, Scope.dependency);
-		assertIsNotStableIn(Scope.thread, Scope.dependencyInstance);
-		assertIsNotStableIn(Scope.thread, Scope.dependencyType);
-		assertIsNotStableIn(Scope.thread, Scope.targetInstance);
-		assertIsStableIn(Scope.thread, Scope.thread);
-		assertIsStableIn(Scope.thread, Scope.injection);
-		assertIsStableIn(Scope.thread, Scope.worker);
+	public void injectionScopeIsNotConsistentInAnyOtherScope() {
+		assertIsNotConsistentIn(Scope.injection, Scope.application);
+		assertIsNotConsistentIn(Scope.injection, Scope.dependency);
+		assertIsNotConsistentIn(Scope.injection, Scope.dependencyInstance);
+		assertIsNotConsistentIn(Scope.injection, Scope.dependencyType);
+		assertIsNotConsistentIn(Scope.injection, Scope.targetInstance);
+		assertIsNotConsistentIn(Scope.injection, Scope.worker);
+		assertIsNotConsistentIn(Scope.injection, Scope.thread);
+		assertIsConsistentIn(Scope.injection, Scope.injection);
 	}
 
 	@Test
-	public void workerScopeIsNotStableInAnyOtherScopeExceptInjection() {
-		assertWorkerScopeStability(Scope.worker);
+	public void threadScopeIsNotConsistentInAnyOtherScopeExceptInjectionAndWorker() {
+		assertIsNotConsistentIn(Scope.thread, Scope.application);
+		assertIsNotConsistentIn(Scope.thread, Scope.dependency);
+		assertIsNotConsistentIn(Scope.thread, Scope.dependencyInstance);
+		assertIsNotConsistentIn(Scope.thread, Scope.dependencyType);
+		assertIsNotConsistentIn(Scope.thread, Scope.targetInstance);
+		assertIsConsistentIn(Scope.thread, Scope.thread);
+		assertIsConsistentIn(Scope.thread, Scope.injection);
+		assertIsConsistentIn(Scope.thread, Scope.worker);
 	}
 
 	@Test
-	public void customWorkerScopeIsAsStableAsWorkerGroupScope() {
-		assertWorkerScopeStability(requestScope);
-	}
-
-	private void assertWorkerScopeStability(Name worker) {
-		assertIsNotStableIn(worker, Scope.application);
-		assertIsNotStableIn(worker, Scope.dependency);
-		assertIsNotStableIn(worker, Scope.dependencyInstance);
-		assertIsNotStableIn(worker, Scope.dependencyType);
-		assertIsNotStableIn(worker, Scope.targetInstance);
-		assertIsNotStableIn(worker, Scope.thread);
-		assertIsStableIn(worker, worker);
-		assertIsStableIn(worker, Scope.worker);
-		assertIsStableIn(worker, Scope.injection);
+	public void workerScopeIsNotConsistentInAnyOtherScopeExceptInjection() {
+		assertWorkerScopePermanence(Scope.worker);
 	}
 
 	@Test
-	public void applicationIsStableInAnyOtherScope() {
-		assertStableScope(Scope.application);
+	public void customWorkerScopeIsAsConsistentAsWorkerGroupScope() {
+		assertWorkerScopePermanence(requestScope);
+	}
+
+	private void assertWorkerScopePermanence(Name worker) {
+		assertIsNotConsistentIn(worker, Scope.application);
+		assertIsNotConsistentIn(worker, Scope.dependency);
+		assertIsNotConsistentIn(worker, Scope.dependencyInstance);
+		assertIsNotConsistentIn(worker, Scope.dependencyType);
+		assertIsNotConsistentIn(worker, Scope.targetInstance);
+		assertIsNotConsistentIn(worker, Scope.thread);
+		assertIsConsistentIn(worker, worker);
+		assertIsConsistentIn(worker, Scope.worker);
+		assertIsConsistentIn(worker, Scope.injection);
 	}
 
 	@Test
-	public void dependencyBasedIsStableInAnyOtherScope() {
-		assertStableScope(Scope.dependency);
-		assertStableScope(Scope.dependencyInstance);
-		assertStableScope(Scope.dependencyType);
-		assertStableScope(Scope.targetInstance);
+	public void applicationIsConsistentInAnyOtherScope() {
+		assertPermanentScope(Scope.application);
 	}
 
 	@Test
-	public void ignoreIsStableInAnyOtherScope() {
-		assertStableScope(ScopePermanence.ignore);
+	public void dependencyBasedIsConsistentInAnyOtherScope() {
+		assertPermanentScope(Scope.dependency);
+		assertPermanentScope(Scope.dependencyInstance);
+		assertPermanentScope(Scope.dependencyType);
+		assertPermanentScope(Scope.targetInstance);
+	}
+
+	@Test
+	public void ignoreIsConsistentInAnyOtherScope() {
+		assertPermanentScope(ScopePermanence.ignore);
 	}
 
 	@Test
@@ -135,30 +136,32 @@ public class TestScopePermanenceBinds {
 		}
 	}
 
-	private void assertIsStableIn(Name leftScope, Name rightScope) {
-		assertTrue(scopingOf(leftScope).isStableIn(scopingOf(rightScope)));
+	private void assertIsConsistentIn(Name leftScope, Name rightScope) {
+		assertTrue(getPermanence(leftScope).isConsistentIn(
+				getPermanence(rightScope)));
 	}
 
-	private void assertIsNotStableIn(Name leftScope, Name rightScope) {
-		assertFalse(scopingOf(leftScope).isStableIn(scopingOf(rightScope)));
+	private void assertIsNotConsistentIn(Name leftScope, Name rightScope) {
+		assertFalse(getPermanence(leftScope).isConsistentIn(
+				getPermanence(rightScope)));
 	}
 
-	private void assertStableScope(Name scope) {
-		assertStableScope(scopingOf(scope));
+	private void assertPermanentScope(Name scope) {
+		assertPermanentScope(getPermanence(scope));
 	}
 
-	private void assertStableScope(ScopePermanence s) {
-		assertTrue(s.isStableByNature());
-		assertTrue(s.isStableIn(s));
-		Name scope = s.scope;
-		assertIsStableIn(scope, scope);
-		assertIsStableIn(scope, s.scope);
-		assertIsStableIn(scope, Scope.dependency);
-		assertIsStableIn(scope, Scope.dependencyInstance);
-		assertIsStableIn(scope, Scope.dependencyType);
-		assertIsStableIn(scope, Scope.targetInstance);
-		assertIsStableIn(scope, Scope.thread);
-		assertIsStableIn(scope, Scope.injection);
+	private void assertPermanentScope(ScopePermanence tested) {
+		assertTrue(tested.isPermanent());
+		assertTrue(tested.isConsistentIn(tested));
+		Name scope = tested.scope;
+		assertIsConsistentIn(scope, scope);
+		assertIsConsistentIn(scope, tested.scope);
+		assertIsConsistentIn(scope, Scope.dependency);
+		assertIsConsistentIn(scope, Scope.dependencyInstance);
+		assertIsConsistentIn(scope, Scope.dependencyType);
+		assertIsConsistentIn(scope, Scope.targetInstance);
+		assertIsConsistentIn(scope, Scope.thread);
+		assertIsConsistentIn(scope, Scope.injection);
 	}
 
 }

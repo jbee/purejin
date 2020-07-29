@@ -72,7 +72,12 @@ public abstract class BinderModule extends InitializedBinder
 	 * @param sp instance to bind, not null
 	 */
 	protected final void bindScopePermanence(ScopePermanence sp) {
-		per(container).bind(sp.scope, ScopePermanence.class).to(sp);
+		bindScopePermanence(sp.scope).to(sp);
+	}
+
+	protected final TypedBinder<ScopePermanence> bindScopePermanence(
+			Name scope) {
+		return per(container).bind(scope, ScopePermanence.class);
 	}
 
 	/**

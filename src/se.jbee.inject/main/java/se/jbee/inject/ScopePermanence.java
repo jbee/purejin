@@ -26,12 +26,12 @@ import java.io.Serializable;
 public final class ScopePermanence implements Serializable {
 
 	public static final ScopePermanence ignore = scopePermanence(
-			named("@ignore")).stableByNature();
+			named("@ignore")).permanent();
 	public static final ScopePermanence reference = scopePermanence(
-			Scope.reference).stableByNature();
+			Scope.reference).permanent();
 
 	public static final ScopePermanence singleton = scopePermanence(
-			named("@singleton")).stableByNature();
+			named("@singleton")).permanent();
 
 	public static final ScopePermanence container = singleton.derive(
 			Scope.container);
@@ -48,22 +48,23 @@ public final class ScopePermanence implements Serializable {
 	}
 
 	public final Name scope;
-	private final Name[] stableInScopes;
-	private final boolean stableByNature;
+	private final Name[] consistentInScopes;
+	private final boolean permanent;
 	private final boolean eager;
-	private final ScopePermanence kind;
+	private final ScopePermanence group;
 
-	private ScopePermanence(Name scope, Name[] stableInScopes,
-			boolean stableByNature, boolean eager, ScopePermanence kind) {
+	private ScopePermanence(Name scope, Name[] consistentInScopes,
+			boolean permanent, boolean eager, ScopePermanence group) {
 		this.scope = scope;
-		this.stableByNature = stableByNature;
-		this.stableInScopes = stableInScopes;
+		this.permanent = permanent;
+		this.consistentInScopes = consistentInScopes;
 		this.eager = eager;
-		this.kind = kind;
+		this.group = group;
 	}
 
-	public ScopePermanence stableByNature() {
-		return new ScopePermanence(scope, stableInScopes, true, eager, kind);
+	public ScopePermanence permanent() {
+		return new ScopePermanence(scope, consistentInScopes, true, eager,
+				group);
 	}
 
 	/**
@@ -78,55 +79,59 @@ public final class ScopePermanence implements Serializable {
 	 * @return this for chaining
 	 */
 	public ScopePermanence canBeInjectedInto(Name parent) {
-		return new ScopePermanence(scope, arrayAppend(stableInScopes, parent),
-				stableByNature, eager, kind);
+		return new ScopePermanence(scope,
+				arrayAppend(consistentInScopes, parent), permanent, eager,
+				group);
 	}
 
-	public ScopePermanence ofKind(ScopePermanence kind) {
-		if (!kind.isKind())
+	private ScopePermanence groupedAs(ScopePermanence group) {
+		if (!group.isGroup())
 			throw new IllegalArgumentException(
-					"Scoping is not a group: " + kind);
-		return new ScopePermanence(scope, kind.stableInScopes,
-				kind.stableByNature, kind.eager, kind);
+					"Scoping is not a group: " + group);
+		return new ScopePermanence(scope, group.consistentInScopes,
+				group.permanent, group.eager, group);
 	}
 
 	public ScopePermanence derive(Name scope) {
-		return scopePermanence(scope).ofKind(this);
+		return scopePermanence(scope).groupedAs(this);
 	}
 
 	public ScopePermanence eager() {
-		return new ScopePermanence(scope, stableInScopes, stableByNature, true,
-				kind);
+		if (!isPermanent())
+			throw new IllegalStateException(
+					"Must be permanent to become eager but was " + this);
+		return new ScopePermanence(scope, consistentInScopes, permanent, true,
+				group);
 	}
 
 	public ScopePermanence lazy() {
-		return new ScopePermanence(scope, stableInScopes, stableByNature, false,
-				kind);
+		return new ScopePermanence(scope, consistentInScopes, permanent, false,
+				group);
 	}
 
 	public boolean equalTo(ScopePermanence other) {
-		return scope.equalTo(other.scope)
-			&& stableByNature == other.stableByNature //
+		return scope.equalTo(other.scope) && permanent == other.permanent //
 			&& eager == other.eager //
-			&& arrayEquals(stableInScopes, other.stableInScopes, Name::equalTo)
-			&& (kind == other.kind || kind != null && other.kind != null
-				&& kind.equalTo(other.kind));
+			&& arrayEquals(consistentInScopes, other.consistentInScopes,
+					Name::equalTo)
+			&& (group == other.group || group != null && other.group != null
+				&& group.equalTo(other.group));
 	}
 
 	public boolean isEager() {
 		return eager;
 	}
 
-	public boolean isKind() {
+	public boolean isGroup() {
 		return scope.value.startsWith("@");
 	}
 
-	public boolean isStableIn(ScopePermanence parent) {
-		return isStableByNature() || parent.isIgnore() || isIgnore()
-			|| arrayContains(stableInScopes, s -> s.equalTo(parent.scope))
-			|| parent.kind != null && arrayContains(stableInScopes,
-					s -> s.equalTo(parent.kind.scope))
-			|| (kind != null && kind.isStableIn(parent));
+	public boolean isConsistentIn(ScopePermanence other) {
+		return isPermanent() || other.isIgnore() || isIgnore()
+			|| arrayContains(consistentInScopes, s -> s.equalTo(other.scope))
+			|| other.group != null && arrayContains(consistentInScopes,
+					s -> s.equalTo(other.group.scope))
+			|| (group != null && group.isConsistentIn(other));
 	}
 
 	@Override
@@ -153,8 +158,8 @@ public final class ScopePermanence implements Serializable {
 	 *         stable, that means once created, they exist throughout the
 	 *         life-span of the application (the {@link Injector} context).
 	 */
-	public boolean isStableByNature() {
-		return stableByNature;
+	public boolean isPermanent() {
+		return permanent;
 	}
 
 }

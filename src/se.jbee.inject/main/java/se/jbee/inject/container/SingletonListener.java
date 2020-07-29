@@ -18,7 +18,7 @@ public interface SingletonListener {
 
 	/**
 	 * Called by the {@link Injector} when an instance which is
-	 * {@link ScopePermanence#isStableByNature()} is created. These are typical
+	 * {@link ScopePermanence#isPermanent()} is created. These are typical
 	 * "singleton" instances of an application.
 	 * 
 	 * @param <T> Type of the created instance
