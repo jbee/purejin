@@ -460,7 +460,7 @@ public class Binder {
 				bind(target, hints);
 		}
 
-		private <T> boolean bindSharesIn(Class<?> impl, Object instance) {
+		private boolean bindSharesIn(Class<?> impl, Object instance) {
 			boolean needsInstance = false;
 			for (Field constant : sharesBy.reflect(impl)) {
 				binder.per(Scope.container).bind(namesBy.reflect(constant),

@@ -2,12 +2,13 @@ package se.jbee.inject.scope;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Provider;
+import se.jbee.inject.Resource;
 import se.jbee.inject.Scope;
 import se.jbee.inject.UnresolvableDependency;
 
 /**
- * Asks the {@link Provider} once per thread per binding which is understand
- * commonly as a usual 'per-thread' singleton.
+ * Asks the {@link Provider} once per thread per {@link Resource} which is
+ * understand commonly as a usual 'per-thread' singleton.
  */
 public final class ThreadScope implements Scope {
 

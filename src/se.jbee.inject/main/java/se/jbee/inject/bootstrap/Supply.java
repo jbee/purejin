@@ -57,8 +57,7 @@ public final class Supply {
 	-> Logger.getLogger(dep.target(1).type().rawType.getCanonicalName());
 
 	private static final Supplier<?> REQUIRED = (dep, context) -> {
-		throw new NoResourceForDependency("Should never be called!", dep,
-				new Resource[0]);
+		throw new NoResourceForDependency("Should never be called!", dep);
 	};
 
 	/**

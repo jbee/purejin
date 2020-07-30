@@ -20,6 +20,10 @@ import java.util.function.UnaryOperator;
  */
 public final class TypeVariable {
 
+	private TypeVariable() {
+		throw new UnsupportedOperationException("util");
+	}
+
 	/**
 	 * Returns a map with type variable names as keys and a {@link Function} as
 	 * value that given an actual {@link Type} of the declared

@@ -1,6 +1,7 @@
 package se.jbee.inject.container;
 
 import se.jbee.inject.Injector;
+import se.jbee.inject.Name;
 import se.jbee.inject.Resource;
 import se.jbee.inject.ScopePermanence;
 
@@ -14,6 +15,7 @@ import se.jbee.inject.ScopePermanence;
  * 
  * @since 19.1
  */
+@FunctionalInterface
 public interface SingletonListener {
 
 	/**
@@ -27,4 +29,18 @@ public interface SingletonListener {
 	 * @param instance the created instance
 	 */
 	<T> void onSingletonCreated(Resource<T> resource, T instance);
+
+	default SingletonListener inScope(Name scope) {
+		SingletonListener self = this;
+		return new SingletonListener() {
+
+			@Override
+			public <T> void onSingletonCreated(Resource<T> resource,
+					T instance) {
+				if (resource.permanence.scope.equalTo(scope)) {
+					self.onSingletonCreated(resource, instance);
+				}
+			}
+		};
+	}
 }

@@ -59,7 +59,7 @@ public final class InjectionSite {
 	}
 
 	private int preResolveArgs(Injector injector) {
-		int lazyArgCount = 0;
+		int lazyArgIndex = 0;
 		for (int i = 0; i < generators.length; i++) {
 			Hint<?> hint = hints[i];
 			if (hint.type().rawType == Injector.class) {
@@ -67,7 +67,7 @@ public final class InjectionSite {
 			} else if (hint.isConstant()) {
 				preResolvedArgs[i] = hint.value;
 			} else if (hint.type().arrayDimensions() == 1) {
-				lazyArgIndexes[lazyArgCount++] = i;
+				lazyArgIndexes[lazyArgIndex++] = i;
 			} else if (hint.absoluteRef != null) {
 				preResolvedArgs[i] = injector.resolve(hint.absoluteRef);
 			} else { // relative ref
@@ -80,12 +80,12 @@ public final class InjectionSite {
 					preResolvedArgs[i] = generate(resource,
 							site.instanced(hint.relativeRef));
 				} else {
-					lazyArgIndexes[lazyArgCount++] = i;
+					lazyArgIndexes[lazyArgIndex++] = i;
 					generators[i] = resource;
 				}
 			}
 		}
-		return lazyArgCount;
+		return lazyArgIndex;
 	}
 
 	@SuppressWarnings("unchecked")

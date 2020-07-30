@@ -9,7 +9,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import se.jbee.inject.bind.BinderModule;
-import se.jbee.inject.container.Initialiser;
 import se.jbee.inject.declare.Module;
 
 /**
@@ -39,7 +38,7 @@ public abstract class EventModule extends BinderModule {
 		if (!event.isInterface())
 			throw new IllegalArgumentException(
 					"Event type has to be an interface but was: " + event);
-		initbind(event).to((Initialiser<T>) (listener, injector) -> {
+		initbind(event).to((listener, injector) -> {
 			injector.resolve(EventProcessor.class).register(event, listener);
 			return listener;
 		});

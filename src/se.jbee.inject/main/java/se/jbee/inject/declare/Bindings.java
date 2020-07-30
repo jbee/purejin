@@ -197,7 +197,7 @@ public final class Bindings {
 
 		@Override
 		public String toString() {
-			return "constant " + String.valueOf(constant);
+			return "constant " + constant;
 		}
 	}
 }

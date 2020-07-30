@@ -57,6 +57,10 @@ public final class DefaultBinders {
 	public static final ValueBinder<Shares<?>> SHARES = new SharesBinder();
 	public static final ValueBinder<Constant<?>> CONSTANT = new ConstantBinder();
 
+	private DefaultBinders() {
+		throw new UnsupportedOperationException("util");
+	}
+
 	/**
 	 * This {@link ValueBinder} adds bindings to super-types for
 	 * {@link Binding}s declared with {@link DeclarationType#AUTO} or

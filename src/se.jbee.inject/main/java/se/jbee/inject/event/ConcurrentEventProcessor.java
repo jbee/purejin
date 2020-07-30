@@ -316,7 +316,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 
 		@SuppressWarnings("unchecked")
 		private <T> Object invoke(Method target, Object[] args, Type<T> result)
-				throws Throwable {
+				throws Exception {
 			Class<T> raw = result.rawType;
 			Event<E, T> e = new Event<>(event, prefs, result, target, args,
 					(BinaryOperator<T>) defaultAggregator(raw,
@@ -345,10 +345,14 @@ public class ConcurrentEventProcessor implements EventProcessor {
 			if (aggregator != null)
 				return aggregator;
 			if (rawReturnType == boolean.class
-				|| rawReturnType == Boolean.class)
-				return ((BinaryOperator<Boolean>) Boolean::logicalAnd);
-			if (rawReturnType == int.class || rawReturnType == Integer.class)
-				return ((BinaryOperator<Integer>) Integer::sum);
+				|| rawReturnType == Boolean.class) {
+				BinaryOperator<Boolean> op = Boolean::logicalAnd;
+				return op; // temp var is a workaround to avoid confusing the compiler
+			}
+			if (rawReturnType == int.class || rawReturnType == Integer.class) {
+				BinaryOperator<Integer> op = Integer::sum;
+				return op; // temp var is a workaround to avoid confusing the compiler
+			}
 			return null;
 		}
 

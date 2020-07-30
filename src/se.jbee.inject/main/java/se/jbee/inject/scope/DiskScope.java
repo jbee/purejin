@@ -74,7 +74,7 @@ public final class DiskScope implements Scope, Closeable {
 		this.dir = dir;
 		this.filenames = filenames;
 		this.syncInterval = config.of(DiskScope.class).longValue(SYNC_INTERVAL,
-				60 * 1000);
+				60 * 1000L);
 		if (syncInterval > 0) {
 			executor.scheduleAtFixedRate(this::syncToDisk, syncInterval,
 					syncInterval, TimeUnit.MILLISECONDS);

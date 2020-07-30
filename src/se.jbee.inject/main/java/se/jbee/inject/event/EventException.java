@@ -66,7 +66,7 @@ public final class EventException extends RuntimeException {
 	/**
 	 * Might be null in case of {@link InterruptedException}.
 	 */
-	public final Event<?, ?> event;
+	public final transient Event<?, ?> event;
 
 	public EventException(Event<?, ?> event, Exception cause) {
 		super(cause);

@@ -8,6 +8,7 @@ package se.jbee.inject.bind;
 import static se.jbee.inject.Scope.application;
 import static se.jbee.inject.Type.raw;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -229,53 +230,47 @@ public enum Adapter implements Toggled<Adapter> {
 					PrimitiveArraysModule::doubles);
 			asDefault.bind(boolean[].class).toSupplier(
 					PrimitiveArraysModule::booleans);
+			//TODO build a feature that allows to handle all arrays?
+			// for example: a special exception allowing Suppliers/Generators to reject a dependency
+			// or: a predicate interface allowing suppliers/generators to filter dependencies with custom logic
+		}
+
+		private static <T> T copyToPrimitiveArray(Object[] src, T dest) {
+			for (int i = 0; i < src.length; i++)
+				Array.set(dest, i, src[i]);
+			return dest;
 		}
 
 		private static int[] ints(Dependency<? super int[]> dep,
 				Injector context) {
 			Integer[] wrappers = context.resolve(
 					dep.typed(raw(Integer[].class)));
-			int[] ints = new int[wrappers.length];
-			for (int i = 0; i < ints.length; i++)
-				ints[i] = wrappers[i];
-			return ints;
+			return copyToPrimitiveArray(wrappers, new int[wrappers.length]);
 		}
 
 		public static long[] longs(Dependency<? super long[]> dep,
 				Injector context) {
 			Long[] wrappers = context.resolve(dep.typed(raw(Long[].class)));
-			long[] longs = new long[wrappers.length];
-			for (int i = 0; i < longs.length; i++)
-				longs[i] = wrappers[i];
-			return longs;
+			return copyToPrimitiveArray(wrappers, new long[wrappers.length]);
 		}
 
 		public static float[] floats(Dependency<? super float[]> dep,
 				Injector context) {
 			Float[] wrappers = context.resolve(dep.typed(raw(Float[].class)));
-			float[] floats = new float[wrappers.length];
-			for (int i = 0; i < floats.length; i++)
-				floats[i] = wrappers[i];
-			return floats;
+			return copyToPrimitiveArray(wrappers, new float[wrappers.length]);
 		}
 
 		public static double[] doubles(Dependency<? super double[]> dep,
 				Injector context) {
 			Double[] wrappers = context.resolve(dep.typed(raw(Double[].class)));
-			double[] doubles = new double[wrappers.length];
-			for (int i = 0; i < doubles.length; i++)
-				doubles[i] = wrappers[i];
-			return doubles;
+			return copyToPrimitiveArray(wrappers, new double[wrappers.length]);
 		}
 
 		public static boolean[] booleans(Dependency<? super boolean[]> dep,
 				Injector context) {
 			Boolean[] wrappers = context.resolve(
 					dep.typed(raw(Boolean[].class)));
-			boolean[] booleans = new boolean[wrappers.length];
-			for (int i = 0; i < booleans.length; i++)
-				booleans[i] = wrappers[i];
-			return booleans;
+			return copyToPrimitiveArray(wrappers, new boolean[wrappers.length]);
 		}
 	}
 

@@ -169,7 +169,7 @@ public final class Dependency<T>
 		return injectingInto(new Locator<>(target), ScopePermanence.ignore);
 	}
 
-	public <I> Dependency<T> injectingInto(Package pkg) {
+	public Dependency<T> injectingInto(Package pkg) {
 		Target target = Target.ANY.in(packageAndSubPackagesOf(pkg));
 		Injection injection = new Injection(Instance.ANY,
 				new Locator<>(Instance.ANY, target), ScopePermanence.ignore);
