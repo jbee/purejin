@@ -152,9 +152,9 @@ public final class EventPolicy implements Serializable {
 	}
 
 	public EventPolicy with(Flags flag) {
-		EnumSet<Flags> flags = EnumSet.copyOf(this.flags);
-		flags.add(flag);
-		return new EventPolicy(maxRetries, maxConcurrency, ttl, flags);
+		EnumSet<Flags> merged = EnumSet.copyOf(this.flags);
+		merged.add(flag);
+		return new EventPolicy(maxRetries, maxConcurrency, ttl, merged);
 	}
 
 	public EventPolicy with(Flags... flags) {

@@ -209,11 +209,10 @@ public final class Imported {
 			actualTypeParameters[i] = resolve(
 					signature.substring(start + 1, end));
 			start = end;
-			if (i == expectedTypeParameters - 1) {
-				if (signature.charAt(end) != '>') {
-					illegalAt("Expected end of generic type arguments",
-							signature, end);
-				}
+			if (i == expectedTypeParameters - 1
+				&& signature.charAt(end) != '>') {
+				illegalAt("Expected end of generic type arguments", signature,
+						end);
 			}
 		}
 		return base.parametized(actualTypeParameters);

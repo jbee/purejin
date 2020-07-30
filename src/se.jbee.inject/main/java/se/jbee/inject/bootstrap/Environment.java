@@ -25,8 +25,7 @@ public final class Environment implements Env {
 			ModuleWith.class).parametized(Type.CLASS);
 
 	public static Environment override(Env overridden) {
-		return new Environment(false, new HashMap<Instance<?>, Object>(), true,
-				overridden);
+		return new Environment(false, new HashMap<>(), true, overridden);
 	}
 
 	private final boolean readonly;

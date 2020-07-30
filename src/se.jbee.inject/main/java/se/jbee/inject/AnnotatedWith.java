@@ -21,10 +21,13 @@ import se.jbee.inject.Annotated.Merge;
  *
  * @since 19.1
  *
- * @param <T> {@link Annotation} type to resolve
+ * @param <A> {@link Annotation} type to resolve, it only exists so a full
+ *            generic type can be read using reflection to extract the
+ *            annotation type to resolve
  */
+@SuppressWarnings("squid:S2326")
 @FunctionalInterface
-public interface AnnotatedWith<T extends Annotation> {
+public interface AnnotatedWith<A extends Annotation> {
 
 	/**
 	 * Instances referenced in this are supplied by a {@link Supplier} as the

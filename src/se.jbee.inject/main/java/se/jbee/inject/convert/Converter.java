@@ -9,6 +9,7 @@ import se.jbee.inject.Type;
  * @param <A> type of the input value
  * @param <B> type of the output value (converted value)
  */
+@FunctionalInterface
 public interface Converter<A, B> {
 
 	/**

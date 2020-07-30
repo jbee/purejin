@@ -113,16 +113,16 @@ public final class Container {
 		}
 
 		private Injector decoratedInjectorContext() {
-			Injector decorated = this;
+			Injector res = this;
 			@SuppressWarnings("unchecked")
 			Initialiser<Injector>[] injectorPostConstruct = (Initialiser<Injector>[]) postConstructByActualType.get(
 					Injector.class);
 			if (injectorPostConstruct != null) {
 				for (Initialiser<Injector> init : injectorPostConstruct)
-					decorated = init.init(decorated, this);
+					res = init.init(res, this);
 				postConstructByActualType.remove(Injector.class); // no longer needed
 			}
-			return decorated;
+			return res;
 		}
 
 		Injector getDecorated() {
@@ -179,7 +179,7 @@ public final class Container {
 			return null;
 		}
 
-		private <T> Map<Class<?>, Resource<?>[]> createResources(
+		private Map<Class<?>, Resource<?>[]> createResources(
 				Injectee<?>... injectees) {
 			Resource<?>[] resources = new Resource<?>[injectees.length];
 			Env env = defaultEnv(injectees);
@@ -359,7 +359,12 @@ public final class Container {
 				return (T) decorated;
 			if (rawType == Env.class && dep.instance.name.equalTo(Name.AS))
 				return (T) this;
-			// Resource based...
+			return resolveFromResource(dep, type, rawType);
+		}
+
+		@SuppressWarnings("unchecked")
+		private <T> T resolveFromResource(Dependency<T> dep, final Type<T> type,
+				final Class<T> rawType) {
 			boolean isResourceResolution = rawType == Resource.class
 				|| rawType == Generator.class;
 			if (isResourceResolution) {

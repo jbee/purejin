@@ -224,23 +224,23 @@ public final class Bootstrap {
 		@SuppressWarnings("unchecked")
 		final Class<? extends Bundle>[] bundleAll(
 				Class<? extends Bundle>... roots) {
-			Set<Class<? extends Bundle>> installed = new LinkedHashSet<>();
+			Set<Class<? extends Bundle>> newlyInstalled = new LinkedHashSet<>();
 			for (Class<? extends Bundle> root : roots)
-				if (!installed.contains(root))
+				if (!newlyInstalled.contains(root))
 					install(root);
 			for (Class<? extends Bundle> root : roots)
-				addAllInstalledIn(root, installed);
-			return arrayOf(installed, Class.class);
+				addAllInstalledIn(root, newlyInstalled);
+			return arrayOf(newlyInstalled, Class.class);
 		}
 
 		final Module[] modulesOf(Class<? extends Bundle>[] bundles) {
-			List<Module> installed = new ArrayList<>(bundles.length);
+			List<Module> newlyInstalled = new ArrayList<>(bundles.length);
 			for (Class<? extends Bundle> b : bundles) {
 				List<Module> modules = bundleModules.get(b);
 				if (modules != null)
-					installed.addAll(modules);
+					newlyInstalled.addAll(modules);
 			}
-			return arrayOf(installed, Module.class);
+			return arrayOf(newlyInstalled, Module.class);
 		}
 
 		@Override

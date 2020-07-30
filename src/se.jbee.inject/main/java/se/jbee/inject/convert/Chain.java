@@ -94,7 +94,7 @@ public final class Chain<B> {
 	static Instance<?>[] instanceChain(Imported imports, String[] chain) {
 		Instance<?>[] chainInstances = new Instance[chain.length];
 		for (int i = 0; i < chain.length; i++) {
-			if (chain[i].indexOf(' ') > 0) {
+			if (chain[i].indexOf(' ') >= 0) {
 				String[] nameAndType = chain[i].split("\\s+");
 				chainInstances[i] = Instance.instance(
 						Name.named(nameAndType[0]),

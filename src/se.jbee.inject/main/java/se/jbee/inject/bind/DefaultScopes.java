@@ -64,7 +64,7 @@ final class DefaultScopes extends BinderModule implements Supplier<Scope> {
 		bindScope(Scope.worker).to(WorkerScope.class);
 		per(Scope.worker).bind(
 				Scope.Controller.forScope(Scope.worker)).toGenerator(
-						(gen) -> null); // dummy generator as the scope will supply
+						gen -> null); // dummy generator as the scope will supply
 
 		bindScope(Scope.dependency).to(() -> new DependencyScope(
 				DependencyScope::hierarchicalInstanceName));

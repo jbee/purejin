@@ -567,7 +567,7 @@ public final class Type<T> implements Qualifying<Type<?>>, Parameter<T>,
 		}
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "squid:S1541" })
 	public static <T> Class<T> primitiveAsWrapper(Class<T> type) {
 		if (!type.isPrimitive())
 			return type;

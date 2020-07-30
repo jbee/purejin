@@ -265,7 +265,7 @@ public final class Utils {
 	 *
 	 *         Note that this method just covers JRE types.
 	 */
-	@SuppressWarnings("squid:S1067")
+	@SuppressWarnings({ "squid:S1067", "squid:S1541" })
 	public static boolean isClassVirtual(Class<?> cls) {
 		return cls == null || cls.isInterface() || cls.isEnum()
 			|| cls.isAnnotation() || cls.isAnonymousClass() || cls.isPrimitive()
