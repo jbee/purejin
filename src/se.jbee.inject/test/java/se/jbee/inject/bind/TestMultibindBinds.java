@@ -51,8 +51,8 @@ public class TestMultibindBinds {
 		protected void bootstrap() {
 			install(MultibindBindsModule1.class);
 			install(MultibindBindsModule2.class);
-			install(Adapter.SET);
-			install(Adapter.LIST);
+			install(CoreFeature.SET);
+			install(CoreFeature.LIST);
 		}
 
 	}

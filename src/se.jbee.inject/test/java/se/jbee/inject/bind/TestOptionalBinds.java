@@ -33,7 +33,7 @@ public class TestOptionalBinds {
 		@Override
 		protected void bootstrap() {
 			install(TestOptionalBindsModule.class);
-			install(Adapter.OPTIONAL);
+			install(CoreFeature.OPTIONAL);
 		}
 
 	}

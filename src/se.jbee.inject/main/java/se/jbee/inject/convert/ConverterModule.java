@@ -4,6 +4,7 @@ import static se.jbee.inject.Type.classType;
 import static se.jbee.inject.config.NamesBy.defaultName;
 import static se.jbee.inject.config.NamesBy.memberNameOr;
 
+import se.jbee.inject.Converter;
 import se.jbee.inject.Type;
 import se.jbee.inject.bind.BinderModule;
 import se.jbee.inject.config.ProducesBy;
