@@ -29,12 +29,11 @@ public final class WorkerScope implements Scope {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T provide(int serialID, Dependency<? super T> dep,
-			Provider<T> provider, int generators)
-			throws UnresolvableDependency {
+	public <T> T provide(int serialID, int resources, Dependency<? super T> dep,
+			Provider<T> provider) throws UnresolvableDependency {
 		Thread target = Thread.currentThread();
 		if (dep.type().rawType == Controller.class) {
-			return (T) new WorkerScopeController(generators, target, states);
+			return (T) new WorkerScopeController(resources, target, states);
 		}
 		WorkerState state = states.get(target);
 		if (state == null) {

@@ -71,7 +71,7 @@ public final class DefaultBinders {
 		@Override
 		public <T> void expand(Env env, Binding<?> src, Binding<T> item,
 				Bindings target) {
-			target.add(item);
+			target.add(env, item);
 			DeclarationType declarationType = item.source.declarationType;
 			if (declarationType != DeclarationType.AUTO
 				&& declarationType != DeclarationType.PROVIDED)
@@ -79,7 +79,7 @@ public final class DefaultBinders {
 			for (Type<? super T> supertype : item.type().supertypes())
 				// Object is of course a superclass but not indented when doing auto-binds
 				if (supertype.rawType != Object.class)
-					target.add(item.typed(supertype));
+					target.add(env, item.typed(supertype));
 		}
 	}
 
@@ -161,7 +161,7 @@ public final class DefaultBinders {
 				@SuppressWarnings("unchecked")
 				Class<T> type = (Class<T>) src.value.getClass();
 				target.addExpanded(env,
-						Binding.binding(item.locator.typed(raw(type)),
+						Binding.binding(item.signature.typed(raw(type)),
 								BindingType.PREDEFINED, supplier, item.scope,
 								item.source.typed(DeclarationType.IMPLICIT)));
 			}
@@ -195,7 +195,7 @@ public final class DefaultBinders {
 				return;
 			}
 			final Type<? extends T> type = srcType.castTo(item.type());
-			final Instance<T> bound = item.locator.instance;
+			final Instance<T> bound = item.signature.instance;
 			if (!bound.type().equalTo(type)
 				|| !src.name.isCompatibleWith(bound.name)) {
 				target.addExpanded(env, item.complete(REFERENCE,
@@ -215,7 +215,7 @@ public final class DefaultBinders {
 		Class<T> impl = src.type().rawType;
 		if (isClassInstantiable(impl)) {
 			Binding<T> binding = Binding.binding(
-					new Locator<>(src).indirect(item.locator.target.indirect),
+					new Locator<>(src).indirect(item.signature.target.indirect),
 					BindingType.CONSTRUCTOR, null, item.scope,
 					item.source.typed(DeclarationType.IMPLICIT));
 			bindToMirrorConstructor(env, impl, binding, target);

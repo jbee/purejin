@@ -97,7 +97,7 @@ public abstract class UnresolvableDependency extends RuntimeException {
 			return "none";
 		StringBuilder b = new StringBuilder();
 		for (Resource<?> rx : rs)
-			b.append("\n    ").append(rx.locator.toString()).append(
+			b.append("\n    ").append(rx.signature.toString()).append(
 					" defined ").append(rx.source);
 		return b.toString();
 	}

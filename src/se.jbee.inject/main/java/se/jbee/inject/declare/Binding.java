@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import se.jbee.inject.Annotated;
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Env;
 import se.jbee.inject.Locator;
@@ -23,48 +24,59 @@ import se.jbee.inject.Source;
 import se.jbee.inject.Type;
 import se.jbee.inject.Typed;
 import se.jbee.inject.UnresolvableDependency;
-import se.jbee.inject.container.Injectee;
+import se.jbee.inject.container.ResourceDescriptor;
 import se.jbee.inject.container.Supplier;
 
 /**
- * A {@link Binding} is implements the {@link Injectee} created during the
- * bootstrapping process based on {@link Bindings}, {@link Bundle}s and
+ * A {@link Binding} is implements the {@link ResourceDescriptor} created during
+ * the bootstrapping process based on {@link Bindings}, {@link Bundle}s and
  * {@link Module}s.
  *
  * @author Jan Bernitt (jan@jbee.se)
  *
  * @param <T> The type of the bound value (instance)
  */
-public final class Binding<T> extends Injectee<T>
+public final class Binding<T> extends ResourceDescriptor<T>
 		implements Module, Typed<T>, Comparable<Binding<?>> {
 
-	public static <T> Binding<T> binding(Locator<T> locator, BindingType type,
+	public static <T> Binding<T> binding(Locator<T> signature, BindingType type,
 			Supplier<? extends T> supplier, Name scope, Source source) {
-		return new Binding<>(locator, type, supplier, scope, source);
+		return new Binding<>(signature, type, supplier, scope, source,
+				annotatedOf(supplier));
 	}
 
 	public final BindingType type;
 
-	private Binding(Locator<T> locator, BindingType type,
-			Supplier<? extends T> supplier, Name scope, Source source) {
-		super(scope, locator, supplier, source);
+	private Binding(Locator<T> signature, BindingType type,
+			Supplier<? extends T> supplier, Name scope, Source source,
+			Annotated annotations) {
+		super(scope, signature, supplier, source, annotations);
 		this.type = type;
 	}
 
 	@Override
 	public Type<T> type() {
-		return locator.type();
+		return signature.type();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public <E> Binding<E> typed(Type<E> type) {
-		return new Binding<>(locator.typed(type().toSupertype(type)), this.type,
-				(Supplier<? extends E>) supplier, scope, source);
+		return new Binding<>(signature.typed(type().toSupertype(type)),
+				this.type, (Supplier<? extends E>) supplier, scope, source,
+				annotations);
 	}
 
 	public boolean isComplete() {
 		return supplier != null;
+	}
+
+	@Override
+	public Binding<T> annotatedBy(Annotated annotations) {
+		if (annotations == this.annotations)
+			return this; // just a optimisation for a likely case
+		return new Binding<>(signature, type, supplier, scope, source,
+				annotations);
 	}
 
 	public Binding<T> complete(BindingType type,
@@ -74,12 +86,13 @@ public final class Binding<T> extends Injectee<T>
 		Name effectiveScope = type == BindingType.REFERENCE
 			? Scope.reference
 			: scope;
-		return new Binding<>(locator, type, supplier, effectiveScope, source);
+		return new Binding<>(signature, type, supplier, effectiveScope, source,
+				annotatedOf(supplier));
 	}
 
 	@Override
 	public void declare(Bindings bindings, Env env) {
-		bindings.add(this);
+		bindings.add(env, this);
 	}
 
 	@Override
@@ -87,31 +100,32 @@ public final class Binding<T> extends Injectee<T>
 		if (!(obj instanceof Binding))
 			return false;
 		Binding<?> other = (Binding<?>) obj;
-		return locator.equalTo(other.locator) && source.equalTo(other.source)
-			&& scope.equalTo(other.scope) && type == other.type;
+		return signature.equalTo(other.signature)
+			&& source.equalTo(other.source) && scope.equalTo(other.scope)
+			&& type == other.type;
 	}
 
 	@Override
 	public int hashCode() {
-		return locator.hashCode() ^ source.hashCode();
+		return signature.hashCode() ^ source.hashCode();
 	}
 
 	@Override
 	public int compareTo(Binding<?> other) {
-		int res = locator.type().rawType.getName().compareTo(
-				other.locator.type().rawType.getName());
+		int res = signature.type().rawType.getName().compareTo(
+				other.signature.type().rawType.getName());
 		if (res != 0)
 			return res;
-		res = Qualifying.compare(locator.instance, other.locator.instance);
+		res = Qualifying.compare(signature.instance, other.signature.instance);
 		if (res != 0)
 			return res;
-		res = locator.instance.compareTo(other.locator.instance);
+		res = signature.instance.compareTo(other.signature.instance);
 		if (res != 0)
 			return res;
-		res = Qualifying.compare(locator.target, other.locator.target);
+		res = Qualifying.compare(signature.target, other.signature.target);
 		if (res != 0)
 			return res;
-		res = locator.target.compareTo(other.locator.target);
+		res = signature.target.compareTo(other.signature.target);
 		if (res != 0)
 			return res;
 		res = Qualifying.compare(source, other.source);
@@ -142,14 +156,14 @@ public final class Binding<T> extends Injectee<T>
 		for (int i = 1; i < bindings.length; i++) {
 			Binding<?> lastUnique = bindings[lastUniqueIndex];
 			Binding<?> current = bindings[i];
-			final boolean equalResource = lastUnique.locator.equalTo(
-					current.locator);
+			final boolean equalResource = lastUnique.signature.equalTo(
+					current.signature);
 			DeclarationType lastType = lastUnique.source.declarationType;
 			DeclarationType curType = current.source.declarationType;
 			if (equalResource && lastType.clashesWith(curType))
 				throw InconsistentBinding.clash(lastUnique, current);
 			if (curType == DeclarationType.REQUIRED) {
-				required.add(current.locator.type());
+				required.add(current.signature.type());
 			} else if (equalResource && (lastType.droppedWith(curType))) {
 				if (isDuplicateIdenticalConstant(equalResource, lastUnique,
 						current)) {
@@ -184,7 +198,7 @@ public final class Binding<T> extends Injectee<T>
 			List<Binding<?>> dropped) {
 		List<Binding<?>> res = new ArrayList<>(bindings.size());
 		for (Binding<?> b : bindings) {
-			Type<?> type = b.locator.type();
+			Type<?> type = b.signature.type();
 			if (b.source.declarationType != DeclarationType.PROVIDED
 				|| required.contains(type)) {
 				res.add(b);

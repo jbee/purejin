@@ -84,9 +84,8 @@ public final class DiskScope implements Scope, Closeable {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T provide(int serialID, Dependency<? super T> dep,
-			Provider<T> provider, int generators)
-			throws UnresolvableDependency {
+	public <T> T provide(int serialID, int resources, Dependency<? super T> dep,
+			Provider<T> provider) throws UnresolvableDependency {
 		if (!dep.type().isAssignableTo(raw(Serializable.class)))
 			throw new UnresolvableDependency.SupplyFailed(
 					"Any disk type has to be serializable", null);

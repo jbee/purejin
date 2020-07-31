@@ -15,6 +15,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import se.jbee.inject.Annotated;
+import se.jbee.inject.Annotated.Merge;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Env;
 import se.jbee.inject.Generator;
@@ -51,11 +53,12 @@ public final class Bindings {
 	/**
 	 * Add (accumulate) a binding described by the 4-tuple given.
 	 */
-	public <T> void add(Binding<T> complete) {
+	public <T> void add(Env env, Binding<T> complete) {
 		if (!complete.isComplete())
 			throw InconsistentBinding.addingIncomplete(complete);
-		// NB. #64 here we can inform post binding that about the new binding
-		list.add(complete);
+		Merge merge = env.property(Annotated.Merge.class,
+				complete.source.ident.getPackage());
+		list.add(complete.annotatedBy(merge.apply(complete.annotations)));
 	}
 
 	public void addExpanded(Env env, Binding<?> binding) {
@@ -65,13 +68,14 @@ public final class Bindings {
 	public <V> void addExpanded(Env env, Binding<?> binding, V value) {
 		@SuppressWarnings("unchecked")
 		Class<V> type = (Class<V>) value.getClass();
+		Package scope = binding.source.ident.getPackage();
 		@SuppressWarnings("unchecked")
-		ValueBinder<V> macro = env.property(
+		ValueBinder<V> binder = env.property(
 				raw(ValueBinder.class).parametized(Type.classType(type)),
-				binding.source.ident.getPackage());
-		if (macro == null)
-			throw InconsistentBinding.undefinedMacroType(binding, type);
-		macro.expand(env, value, binding, this);
+				scope);
+		if (binder == null)
+			throw InconsistentBinding.undefinedValueBinderType(binding, type);
+		binder.expand(env, value, binding, this);
 	}
 
 	//TODO move out of here?

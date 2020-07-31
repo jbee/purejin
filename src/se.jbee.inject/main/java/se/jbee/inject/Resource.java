@@ -9,8 +9,8 @@ import java.util.function.Function;
 
 /**
  * A {@link Resource} describes a injection situation or scenario through its
- * {@link #locator} and {@link #permanence}. If the {@link Resource} applies to
- * a actual {@link Dependency} situation its {@link #generator} is used to
+ * {@link #signature} and {@link #permanence}. If the {@link Resource} applies
+ * to a actual {@link Dependency} situation its {@link #generator} is used to
  * create the instance injected should it not exist already.
  * 
  * @since 19.1
@@ -25,7 +25,7 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 	/**
 	 * The {@link Locator} represented by the {@link Generator} of this info.
 	 */
-	public final Locator<T> locator;
+	public final Locator<T> signature;
 
 	/**
 	 * The {@link Source} that {@link Injection} had been created from (e.g. did
@@ -49,9 +49,9 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 	public final Annotated annotations;
 
 	public Resource(int serialID, Source source, ScopePermanence permanence,
-			Locator<T> locator, Function<Resource<T>, Generator<T>> generator,
+			Locator<T> signature, Function<Resource<T>, Generator<T>> generator,
 			Annotated annotations) {
-		this.locator = locator;
+		this.signature = signature;
 		this.source = source;
 		this.permanence = permanence;
 		this.serialID = serialID;
@@ -65,13 +65,23 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 		return generator.generate(dep);
 	}
 
+	public T generate() throws UnresolvableDependency {
+		return generate(signature.toDependency());
+	}
+
+	public void init() {
+		if (permanence.isEager())
+			generate();
+	}
+
 	public Type<T> type() {
-		return locator.type();
+		return signature.type();
 	}
 
 	@Override
 	public String toString() {
-		return "#" + serialID + " " + locator + " " + source + " " + permanence;
+		return "#" + serialID + " " + signature + " " + source + " "
+			+ permanence;
 	}
 
 	@Override
@@ -87,8 +97,8 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 
 	@Override
 	public int compareTo(Resource<?> other) {
-		Locator<?> l1 = locator;
-		Locator<?> l2 = other.locator;
+		Locator<?> l1 = signature;
+		Locator<?> l2 = other.signature;
 		Class<?> c1 = l1.type().rawType;
 		Class<?> c2 = l2.type().rawType;
 		if (c1 != c2) {
@@ -103,7 +113,7 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 
 	@Override
 	public boolean moreQualiedThan(Resource<?> other) {
-		return locator.moreQualiedThan(other.locator);
+		return signature.moreQualiedThan(other.signature);
 	}
 
 }

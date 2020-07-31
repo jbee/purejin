@@ -16,12 +16,11 @@ public final class ThreadScope implements Scope {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T provide(int serialID, Dependency<? super T> dep,
-			Provider<T> provider, int generators)
-			throws UnresolvableDependency {
+	public <T> T provide(int serialID, int resources, Dependency<? super T> dep,
+			Provider<T> provider) throws UnresolvableDependency {
 		Object[] objects = instances.get();
 		if (objects == null) {
-			objects = new Object[generators];
+			objects = new Object[resources];
 			instances.set(objects);
 		}
 		Object res = objects[serialID];
