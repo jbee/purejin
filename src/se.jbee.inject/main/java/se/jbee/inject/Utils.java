@@ -452,7 +452,7 @@ public final class Utils {
 		}
 	}
 
-	public static <T> T instance(Class<T> type) {
+	public static <T> T instanciate(Class<T> type) {
 		return construct(accessible(noArgsConstructor(type)));
 	}
 }

@@ -12,7 +12,7 @@ import se.jbee.inject.extend.Config;
 
 public class TestConfigBinds {
 
-	private static final class SettingsBindsModule extends BinderModule {
+	private static final class TestConfigBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
@@ -25,7 +25,7 @@ public class TestConfigBinds {
 	}
 
 	private final Config config = Bootstrap.injector(
-			SettingsBindsModule.class).resolve(Config.class);
+			TestConfigBindsModule.class).resolve(Config.class);
 
 	@Test
 	public void generalConfiguration() {

@@ -24,7 +24,6 @@ import se.jbee.inject.Dependency;
 import se.jbee.inject.Provider;
 import se.jbee.inject.Scope;
 import se.jbee.inject.UnresolvableDependency;
-import se.jbee.inject.extend.Config;
 
 /**
  * The {@link DiskScope} is a {@link Scope} that persists objects on disk.
@@ -43,6 +42,7 @@ import se.jbee.inject.extend.Config;
  */
 public final class DiskScope implements Scope, Closeable {
 
+	public static final long SYNC_INTERVAL_DEFAULT_DURATION = 60 * 1000L;
 	public static final String SYNC_INTERVAL = "sync";
 
 	private static final class DiskEntry implements Serializable {
@@ -65,16 +65,13 @@ public final class DiskScope implements Scope, Closeable {
 	 * NB. {@link ConcurrentHashMap} does not allow updates while updating.
 	 */
 	private final Map<String, DiskEntry> loaded = new ConcurrentSkipListMap<>();
-	private final long syncInterval;
 	private final File dir;
 	private final Function<Dependency<?>, String> filenames;
 
-	public DiskScope(Config config, ScheduledExecutorService executor, File dir,
-			Function<Dependency<?>, String> filenames) {
+	public DiskScope(long syncInterval, ScheduledExecutorService executor,
+			File dir, Function<Dependency<?>, String> filenames) {
 		this.dir = dir;
 		this.filenames = filenames;
-		this.syncInterval = config.of(DiskScope.class).longValue(SYNC_INTERVAL,
-				60 * 1000L);
 		if (syncInterval > 0) {
 			executor.scheduleAtFixedRate(this::syncToDisk, syncInterval,
 					syncInterval, TimeUnit.MILLISECONDS);

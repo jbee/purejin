@@ -4,6 +4,8 @@ import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Scope.container;
 import static se.jbee.inject.ScopePermanence.singleton;
 import static se.jbee.inject.ScopePermanence.unstable;
+import static se.jbee.inject.scope.DiskScope.SYNC_INTERVAL;
+import static se.jbee.inject.scope.DiskScope.SYNC_INTERVAL_DEFAULT_DURATION;
 
 import java.io.File;
 import java.util.concurrent.Executors;
@@ -91,7 +93,9 @@ final class DefaultScopes extends BinderModule implements Supplier<Scope> {
 			throws UnresolvableDependency {
 		String disk = dep.instance.name.toString();
 		File dir = new File(disk.substring(5));
-		return new DiskScope(context.resolve(Config.class),
+		long syncInterval = context.resolve(Config.class) //
+				.longValue(SYNC_INTERVAL, SYNC_INTERVAL_DEFAULT_DURATION);
+		return new DiskScope(syncInterval,
 				context.resolve(ScheduledExecutorService.class), dir,
 				TypeDependentScope::instanceSignature);
 	}
