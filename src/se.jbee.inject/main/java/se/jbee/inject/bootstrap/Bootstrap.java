@@ -153,7 +153,7 @@ public final class Bootstrap {
 						key -> new LinkedHashSet<>()).add(bundle);
 			}
 			stack.push(bundle);
-			Bundle instance = Utils.instance(bundle);
+			Bundle instance = Utils.instanciate(bundle);
 			instance.bootstrap(this);
 			if (stack.pop() != bundle)
 				throw new IllegalStateException(bundle.getCanonicalName());
@@ -164,7 +164,7 @@ public final class Bootstrap {
 				Class<? extends Toggled<F>> bundle, final Class<F> flags) {
 			if (!edition.featured(bundle))
 				return;
-			Utils.instance(bundle).bootstrap((bundleForFlag, flag) -> {
+			Utils.instanciate(bundle).bootstrap((bundleForFlag, flag) -> {
 				// NB: null is a valid value to define what happens when no configuration is present
 				if (env.toggled(flags, flag, bundleForFlag.getPackage())) {
 					BuildinBootstrapper.this.install(bundleForFlag);

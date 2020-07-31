@@ -7,7 +7,7 @@ package se.jbee.inject.bootstrap;
 
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.Utils.instance;
+import static se.jbee.inject.Utils.instanciate;
 import static se.jbee.inject.Utils.isClassBanal;
 import static se.jbee.inject.Utils.isClassInstantiable;
 import static se.jbee.inject.bootstrap.Supply.byAccess;
@@ -182,7 +182,7 @@ public final class DefaultBinders {
 			Type<?> srcType = src.type();
 			if (avoidReferences && isClassBanal(srcType.rawType)) {
 				target.addExpanded(env, item,
-						new Constant<>(instance(srcType.rawType)).manual());
+						new Constant<>(instanciate(srcType.rawType)).manual());
 				return;
 			}
 			if (srcType.isAssignableTo(raw(Supplier.class))
