@@ -6,7 +6,7 @@ import se.jbee.inject.declare.Bundle;
 import se.jbee.inject.declare.Module;
 
 /**
- * A {@link Bundle} that installs all {@link Adapter} features active by
+ * A {@link Bundle} that installs all {@link CoreFeature} features active by
  * default. This means a {@link Injector} feature is implemented by providing a
  * {@link Resource} which is bound as a usual {@link Module}.
  * 
@@ -16,8 +16,9 @@ public final class DefaultsBundle extends BootstrapperBundle {
 
 	@Override
 	protected void bootstrap() {
-		install(Adapter.SUB_CONTEXT, Adapter.ENV, Adapter.SCOPES,
-				Adapter.EXTENSION, Adapter.ANNOTATED_WITH);
+		for (CoreFeature f : CoreFeature.values())
+			if (f.installedByDefault)
+				install(f);
 	}
 
 }

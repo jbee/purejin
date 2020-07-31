@@ -19,7 +19,7 @@ public class TestPrimitiveArrayBridgeBinds {
 
 		@Override
 		protected void bootstrap() {
-			install(Adapter.PRIMITIVE_ARRAYS);
+			install(CoreFeature.PRIMITIVE_ARRAYS);
 			install(TestPrimitiveArrayBridgeBindsModule.class);
 		}
 

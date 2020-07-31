@@ -40,7 +40,7 @@ public class TestCollectionBinds {
 
 		@Override
 		protected void bootstrap() {
-			installAll(Adapter.class);
+			installAll(CoreFeature.class);
 			install(CollectionBindsModule.class);
 		}
 
@@ -51,7 +51,7 @@ public class TestCollectionBinds {
 
 		@Override
 		protected void bootstrap() {
-			install(Adapter.LIST, Adapter.COLLECTION);
+			install(CoreFeature.LIST, CoreFeature.COLLECTION);
 			install(CollectionBindsModule.class);
 		}
 

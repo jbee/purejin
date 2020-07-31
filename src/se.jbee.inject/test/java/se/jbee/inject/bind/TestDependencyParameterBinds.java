@@ -33,7 +33,7 @@ public class TestDependencyParameterBinds {
 
 		@Override
 		protected void bootstrap() {
-			install(Adapter.LOGGER);
+			install(CoreFeature.LOGGER);
 			install(DependencyParameterBindsModule.class);
 		}
 

@@ -63,7 +63,7 @@ public class TestProviderBinds {
 
 		@Override
 		protected void bootstrap() {
-			installAll(Adapter.class);
+			installAll(CoreFeature.class);
 			install(ProviderBindsModule.class);
 		}
 

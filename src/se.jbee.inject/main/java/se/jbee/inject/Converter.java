@@ -1,6 +1,4 @@
-package se.jbee.inject.convert;
-
-import se.jbee.inject.Type;
+package se.jbee.inject;
 
 /**
  * 

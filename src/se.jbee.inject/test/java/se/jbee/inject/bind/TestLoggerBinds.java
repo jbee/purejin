@@ -27,7 +27,7 @@ public class TestLoggerBinds {
 
 		@Override
 		protected void bootstrap() {
-			install(Adapter.LOGGER);
+			install(CoreFeature.LOGGER);
 			install(LoggerBindsModule.class);
 		}
 

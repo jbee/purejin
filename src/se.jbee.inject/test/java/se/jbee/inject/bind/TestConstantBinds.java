@@ -27,7 +27,7 @@ public class TestConstantBinds {
 
 		@Override
 		protected void bootstrap() {
-			installAll(Adapter.class);
+			installAll(CoreFeature.class);
 			install(ConstantBindsModule.class);
 		}
 

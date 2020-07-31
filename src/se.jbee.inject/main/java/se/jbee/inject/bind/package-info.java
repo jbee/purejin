@@ -42,10 +42,10 @@
  * implementation for {@link se.jbee.inject.extend.Extension} concept.
  * </p>
  * <p>
- * The {@link se.jbee.inject.bind.Adapter}
+ * The {@link se.jbee.inject.bind.CoreFeature}
  * {@link se.jbee.inject.bind.TogglerBundle} provides type level adapters.
- * {@link se.jbee.inject.bind.Adapter#ENV} and
- * {@link se.jbee.inject.bind.Adapter#SUB_CONTEXT} are installed by default.
+ * {@link se.jbee.inject.bind.CoreFeature#ENV} and
+ * {@link se.jbee.inject.bind.CoreFeature#SUB_CONTEXT} are installed by default.
  * </p>
  * 
  * <h2>Custom Environments</h2>

@@ -36,55 +36,34 @@ import se.jbee.inject.extend.Plugins;
 /**
  * Installs all the build-in functionality by using the core API.
  */
-public enum Adapter implements Toggled<Adapter> {
+public enum CoreFeature implements Toggled<CoreFeature> {
 	/**
 	 * Adds: {@link Provider}s can be injected for all bound types.
 	 */
-	PROVIDER,
+	PROVIDER(false),
 	/**
 	 * Adds: {@link List}s can be injected for all bound types (via array
 	 * bridge)
 	 */
-	LIST,
+	LIST(false),
 	/**
 	 * Adds: {@link Set} can be injected for all bound types (via array bridge)
 	 */
-	SET,
+	SET(false),
 	/**
 	 * Adds: {@link Collection} can be injected instead of {@link List} (needs
 	 * explicit List bind).
 	 */
-	COLLECTION,
+	COLLECTION(false),
 	/**
 	 * Adds: {@link Logger}s can be injected per receiving class.
 	 */
-	LOGGER,
+	LOGGER(false),
 	/**
 	 * Adds: Support for injection of {@link Optional}s. If {@link Optional}
 	 * parameters cannot be resolved {@link Optional#empty()} is injected.
 	 */
-	OPTIONAL,
-	/**
-	 * Adds: Support for {@link Injector} sub-contexts.
-	 */
-	SUB_CONTEXT,
-	/**
-	 * Adds: Binds the bootstrapping {@link Env} as the {@link Name#DEFAULT}
-	 * {@link Env} in the {@link Injector} context.
-	 */
-	ENV,
-	/**
-	 * Adds: The {@link DefaultScopes}
-	 */
-	SCOPES,
-	/**
-	 * Adds: {@link Extension}s via {@link ExtensionModule}.
-	 */
-	EXTENSION,
-	/**
-	 * Adds: {@link AnnotatedWith} via {@link AnnotatedWithModule}.
-	 */
-	ANNOTATED_WITH,
+	OPTIONAL(false),
 	/**
 	 * Adds: That primitive arrays can be resolved for their wrapper types.
 	 * 
@@ -92,10 +71,37 @@ public enum Adapter implements Toggled<Adapter> {
 	 * double and boolean. For further support add similar suppliers following
 	 * the example given.
 	 */
-	PRIMITIVE_ARRAYS;
+	PRIMITIVE_ARRAYS(false),
+	/**
+	 * Adds: Support for {@link Injector} sub-contexts.
+	 */
+	SUB_CONTEXT(true),
+	/**
+	 * Adds: Binds the bootstrapping {@link Env} as the {@link Name#DEFAULT}
+	 * {@link Env} in the {@link Injector} context.
+	 */
+	ENV(true),
+	/**
+	 * Adds: The {@link DefaultScopes}
+	 */
+	SCOPES(true),
+	/**
+	 * Adds: {@link Extension}s via {@link ExtensionModule}.
+	 */
+	EXTENSION(true),
+	/**
+	 * Adds: {@link AnnotatedWith} via {@link AnnotatedWithModule}.
+	 */
+	ANNOTATED_WITH(true);
+
+	public final boolean installedByDefault;
+
+	private CoreFeature(boolean installedByDefault) {
+		this.installedByDefault = installedByDefault;
+	}
 
 	@Override
-	public void bootstrap(Toggler<Adapter> bootstrapper) {
+	public void bootstrap(Toggler<CoreFeature> bootstrapper) {
 		bootstrapper.install(ListBridgeModule.class, LIST);
 		bootstrapper.install(SetBridgeModule.class, SET);
 		bootstrapper.install(CollectionBridgeModule.class, COLLECTION);
@@ -114,8 +120,9 @@ public enum Adapter implements Toggled<Adapter> {
 
 		@Override
 		protected void declare() {
-			per(Scope.targetInstance).starbind(Logger.class).toSupplier(
-					Supply.LOGGER);
+			per(Scope.targetInstance)//
+					.starbind(Logger.class) //
+					.toSupplier(Supply.LOGGER);
 		}
 
 	}
@@ -124,8 +131,9 @@ public enum Adapter implements Toggled<Adapter> {
 
 		@Override
 		protected void declare() {
-			per(Scope.dependency).starbind(Provider.class).toSupplier(
-					Supply.PROVIDER);
+			per(Scope.dependency)//
+					.starbind(Provider.class) //
+					.toSupplier(Supply.PROVIDER);
 		}
 
 	}
@@ -134,8 +142,9 @@ public enum Adapter implements Toggled<Adapter> {
 
 		@Override
 		protected void declare() {
-			per(Scope.dependency).starbind(List.class).toSupplier(
-					Supply.LIST_BRIDGE);
+			per(Scope.dependency)//
+					.starbind(List.class) //
+					.toSupplier(Supply.LIST_BRIDGE);
 		}
 
 	}
@@ -144,8 +153,9 @@ public enum Adapter implements Toggled<Adapter> {
 
 		@Override
 		protected void declare() {
-			per(Scope.dependency).starbind(Set.class).toSupplier(
-					Supply.SET_BRIDGE);
+			per(Scope.dependency)//
+					.starbind(Set.class) //
+					.toSupplier(Supply.SET_BRIDGE);
 		}
 
 	}
@@ -154,8 +164,10 @@ public enum Adapter implements Toggled<Adapter> {
 
 		@Override
 		protected void declare() {
-			asDefault().per(Scope.dependency).starbind(
-					Collection.class).toParametrized(List.class);
+			asDefault() //
+					.per(Scope.dependency) //
+					.starbind(Collection.class) //
+					.toParametrized(List.class);
 		}
 	}
 
@@ -163,8 +175,10 @@ public enum Adapter implements Toggled<Adapter> {
 
 		@Override
 		protected void declare() {
-			asDefault().per(Scope.dependency).starbind(
-					Optional.class).toSupplier((dep, context) -> {
+			asDefault() //
+					.per(Scope.dependency) //
+					.starbind(Optional.class) //
+					.toSupplier((dep, context) -> {
 						try {
 							return Optional.ofNullable(
 									context.resolve(dep.onTypeParameter()));
@@ -181,8 +195,10 @@ public enum Adapter implements Toggled<Adapter> {
 
 		@Override
 		protected void declare() {
-			asDefault().per(Scope.dependencyInstance).starbind(
-					Injector.class).toSupplier(this);
+			asDefault() //
+					.per(Scope.dependencyInstance) //
+					.starbind(Injector.class) //
+					.toSupplier(this);
 		}
 
 		@Override

@@ -367,12 +367,18 @@ final class Resources implements Iterable<Resource<?>[]> {
 			 * supplier.
 			 */
 			AtomicReference<T> instanceCache = new AtomicReference<>();
-			return scope.get(scopeProvider).provide(resource.serialID,
+			T res = scope.get(scopeProvider).provide(resource.serialID,
 					resources, injected,
 					() -> instanceCache.updateAndGet(
 							instance -> instance != null
 								? instance
 								: inContext.generate(injected)));
+			if (res instanceof ContextAware) {
+				@SuppressWarnings("unchecked")
+				ContextAware<T> contextAware = (ContextAware<T>) res;
+				return contextAware.inContext(dep);
+			}
+			return res;
 		}
 
 	}

@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import se.jbee.inject.Converter;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Scope;

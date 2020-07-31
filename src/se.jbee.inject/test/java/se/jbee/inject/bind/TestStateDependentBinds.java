@@ -253,7 +253,7 @@ public class TestStateDependentBinds {
 		@Override
 		protected void bootstrap() {
 			install(StateDependentBindsModule1.class);
-			install(Adapter.PROVIDER);
+			install(CoreFeature.PROVIDER);
 		}
 
 	}
