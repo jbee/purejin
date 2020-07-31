@@ -32,9 +32,10 @@ import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.container.Supplier;
 
 /**
- * {@link Bindings} accumulate the {@link Binding} 4-tuples.
+ * {@link Bindings} accumulate the {@link Binding} during the bootstrapping.
  *
- * Any builder is just a utility to construct calls to {@link #add(Binding)}
+ * Any builder is just a utility to construct calls to
+ * {@link #add(Env, Binding)}
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
