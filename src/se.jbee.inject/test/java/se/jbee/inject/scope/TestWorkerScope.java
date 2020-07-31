@@ -108,9 +108,9 @@ public class TestWorkerScope {
 	}
 
 	private <T> T yieldExisting(int serialID, Class<T> type) {
-		return scope.provide(serialID, dependency(type), () -> {
+		return scope.provide(serialID, generators, dependency(type), () -> {
 			throw new IllegalAccessError();
-		}, generators);
+		});
 	}
 
 	private <T> T yieldProvided(int serialID, T constant) {
@@ -121,7 +121,7 @@ public class TestWorkerScope {
 			provided.set(true);
 			return constant;
 		};
-		T res = scope.provide(serialID, dependency(type), provider, generators);
+		T res = scope.provide(serialID, generators, dependency(type), provider);
 		assertTrue("Provider was not called", provided.get());
 		return res;
 	}

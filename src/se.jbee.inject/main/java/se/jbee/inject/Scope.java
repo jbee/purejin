@@ -29,13 +29,13 @@ public interface Scope {
 	/**
 	 * @param serialID ID number of this {@link Resource} with the
 	 *            {@link Injector} context
+	 * @param resources the total number of {@link Resource}s in the
+	 *            {@link Injector} context
 	 * @param dep currently served {@link Dependency}
 	 * @param provider constructor function yielding new instances if needed.
 	 *            All {@link Scope}s have to make sure they only ever call
 	 *            {@link Provider#provide()} once and only if it is actually
 	 *            required and yields the instance used.
-	 * @param generators the total number of {@link Generator}s in the
-	 *            {@link Injector} context
 	 * @return Existing instances are returned, non-existing are received from
 	 *         the given {@link Provider} and added to this {@link Scope} data
 	 *         structure (forever if it is an application wide singleton or
@@ -44,8 +44,8 @@ public interface Scope {
 	 *         The information from the {@link Dependency} and {@link Resource}
 	 *         can be used to lookup existing instances.
 	 */
-	<T> T provide(int serialID, Dependency<? super T> dep, Provider<T> provider,
-			int generators) throws UnresolvableDependency;
+	<T> T provide(int serialID, int resources, Dependency<? super T> dep,
+			Provider<T> provider) throws UnresolvableDependency;
 
 	/**
 	 * A virtual scope used by the {@link ScopesBy} to indicate that no
@@ -130,8 +130,8 @@ public interface Scope {
 	public static final Scope INJECTION = Scope::injection;
 
 	@SuppressWarnings("unused")
-	static <T> T injection(int serialID, Dependency<? super T> dep,
-			Provider<T> provider, int generators)
+	static <T> T injection(int serialID, int resources,
+			Dependency<? super T> dep, Provider<T> provider)
 			throws UnresolvableDependency {
 		return provider.provide();
 	}

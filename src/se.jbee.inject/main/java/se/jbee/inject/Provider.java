@@ -27,7 +27,9 @@ public interface Provider<T> {
 	 * @return The lazily resolved instance. Implementations should make sure
 	 *         that calling this method multiple times does cache the result if
 	 *         that is semantically correct.
-	 * @throws UnresolvableDependency
+	 * @throws UnresolvableDependency in case the underlying implementation
+	 *             could not provide the instance due to lack of suitable
+	 *             declarations.
 	 */
 	T provide() throws UnresolvableDependency;
 }

@@ -18,9 +18,9 @@ import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.container.Supplier;
 import se.jbee.inject.extend.Config;
 import se.jbee.inject.scope.ApplicationScope;
-import se.jbee.inject.scope.DependencyScope;
 import se.jbee.inject.scope.DiskScope;
 import se.jbee.inject.scope.ThreadScope;
+import se.jbee.inject.scope.TypeDependentScope;
 import se.jbee.inject.scope.WorkerScope;
 
 /**
@@ -60,20 +60,20 @@ final class DefaultScopes extends BinderModule implements Supplier<Scope> {
 		bindScope(Scope.injection).to(Scope.INJECTION);
 		bindScope(Scope.application).to(ApplicationScope.class);
 		bindScope(Scope.thread).to(ThreadScope.class);
-		bindScope(Scope.jvm).to(DependencyScope.JVM);
+		bindScope(Scope.jvm).to(TypeDependentScope.JVM);
 		bindScope(Scope.worker).to(WorkerScope.class);
 		per(Scope.worker).bind(
 				Scope.Controller.forScope(Scope.worker)).toGenerator(
 						gen -> null); // dummy generator as the scope will supply
 
-		bindScope(Scope.dependency).to(() -> new DependencyScope(
-				DependencyScope::hierarchicalInstanceName));
-		bindScope(Scope.dependencyInstance).to(
-				() -> new DependencyScope(DependencyScope::instanceName));
-		bindScope(Scope.dependencyType).to(
-				() -> new DependencyScope(DependencyScope::typeName));
-		bindScope(Scope.targetInstance).to(
-				() -> new DependencyScope(DependencyScope::targetInstanceName));
+		bindScope(Scope.dependency).to(() -> new TypeDependentScope(
+				TypeDependentScope::hierarchicalInstanceSignature));
+		bindScope(Scope.dependencyInstance).to(() -> new TypeDependentScope(
+				TypeDependentScope::instanceSignature));
+		bindScope(Scope.dependencyType).to(() -> new TypeDependentScope(
+				TypeDependentScope::typeSignature));
+		bindScope(Scope.targetInstance).to(() -> new TypeDependentScope(
+				TypeDependentScope::targetInstanceSignature));
 
 		bindScope(named("disk:*")).toSupplier(this);
 		per(container).bind(ScheduledExecutorService.class).to(
@@ -93,7 +93,7 @@ final class DefaultScopes extends BinderModule implements Supplier<Scope> {
 		File dir = new File(disk.substring(5));
 		return new DiskScope(context.resolve(Config.class),
 				context.resolve(ScheduledExecutorService.class), dir,
-				DependencyScope::instanceName);
+				TypeDependentScope::instanceSignature);
 	}
 
 }

@@ -28,7 +28,7 @@ public class InconsistentBinding extends InconsistentDeclaration {
 				"Attempt to add an incomplete binding: " + complete);
 	}
 
-	public static InconsistentBinding undefinedMacroType(Binding<?> expanded,
+	public static InconsistentBinding undefinedValueBinderType(Binding<?> expanded,
 			Class<?> macro) {
 		return new InconsistentBinding(
 				"Attempt to expand value of type " + macro.getName()
@@ -36,10 +36,10 @@ public class InconsistentBinding extends InconsistentDeclaration {
 	}
 
 	public static InconsistentBinding undefinedEnvProperty(Name name,
-			Type<?> property, Package pkg) {
+			Type<?> property, Package scope) {
 		return new InconsistentBinding(
 				"Attempt to resolve environment property failed, no value was bound to "
-					+ name + " of type " + property + " in " + pkg);
+					+ name + " of type " + property + " in " + scope);
 	}
 
 	public static InconsistentBinding illegalCompletion(Binding<?> completing,

@@ -11,29 +11,42 @@ import se.jbee.inject.Provider;
 import se.jbee.inject.Scope;
 import se.jbee.inject.UnresolvableDependency;
 
-public final class DependencyScope implements Scope {
+/**
+ * A {@link Scope} that maintains a map of instances where the key is derived
+ * from the {@link Dependency} itself. In the simplest case this is the
+ * {@link #typeSignature(Dependency)} or the
+ * {@link #instanceSignature(Dependency)} but it can also include the injection
+ * hierarchy as used by {@link #hierarchicalInstanceSignature(Dependency)}.
+ * 
+ * One use case are {@link #JVM} singletons. As the scope is kept in a normal
+ * constant that is shared within the JVM this effectively shares the map's
+ * instances within the same JVM.
+ * 
+ * @since 19.1
+ */
+public final class TypeDependentScope implements Scope {
 
 	/**
 	 * Effectively gives a JVM singleton per {@link Instance}.
 	 * 
 	 * @since 19.1
 	 */
-	public static final Scope JVM = new DependencyScope(
-			DependencyScope::instanceName);
+	public static final Scope JVM = new TypeDependentScope(
+			TypeDependentScope::instanceSignature);
 
-	public static String typeName(Dependency<?> dep) {
+	public static String typeSignature(Dependency<?> dep) {
 		return dep.type().toString();
 	}
 
-	public static String instanceName(Dependency<?> dep) {
+	public static String instanceSignature(Dependency<?> dep) {
 		return dep.instance.name.toString() + "@" + dep.type().toString();
 	}
 
-	public static String hierarchicalInstanceName(Dependency<?> dep) {
-		return instanceName(dep) + targetInstanceName(dep);
+	public static String hierarchicalInstanceSignature(Dependency<?> dep) {
+		return instanceSignature(dep) + targetInstanceSignature(dep);
 	}
 
-	public static String targetInstanceName(Dependency<?> dep) {
+	public static String targetInstanceSignature(Dependency<?> dep) {
 		StringBuilder b = new StringBuilder();
 		for (int i = dep.injectionDepth() - 1; i >= 0; i--)
 			b.append(dep.target(i));
@@ -49,15 +62,14 @@ public final class DependencyScope implements Scope {
 	private final ConcurrentMap<String, Object> instances = new ConcurrentSkipListMap<>();
 	private final Function<Dependency<?>, String> injectionKey;
 
-	public DependencyScope(Function<Dependency<?>, String> injectionKey) {
+	public TypeDependentScope(Function<Dependency<?>, String> injectionKey) {
 		this.injectionKey = injectionKey;
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> T provide(int serialID, Dependency<? super T> dep,
-			Provider<T> provider, int generators)
-			throws UnresolvableDependency {
+	public <T> T provide(int serialID, int resources, Dependency<? super T> dep,
+			Provider<T> provider) throws UnresolvableDependency {
 		return (T) instances.computeIfAbsent(injectionKey.apply(dep),
 				k -> provider.provide());
 	}

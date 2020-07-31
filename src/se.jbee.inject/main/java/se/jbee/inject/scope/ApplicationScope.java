@@ -23,12 +23,11 @@ public final class ApplicationScope implements Scope {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T provide(int serialID, Dependency<? super T> dep,
-			Provider<T> provider, int generators)
-			throws UnresolvableDependency {
+	public <T> T provide(int serialID, int resources, Dependency<? super T> dep,
+			Provider<T> provider) throws UnresolvableDependency {
 		return (T) instances.updateAndGet(objs -> objs != null
 			? objs
-			: new AtomicReferenceArray<>(generators)).updateAndGet(serialID,
+			: new AtomicReferenceArray<>(resources)).updateAndGet(serialID,
 					obj -> obj != null ? obj : provider.provide());
 	}
 }

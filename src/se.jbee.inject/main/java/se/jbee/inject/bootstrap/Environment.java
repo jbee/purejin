@@ -60,10 +60,10 @@ public final class Environment implements Env {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T property(Name name, Type<T> property, Package pkg) {
+	public <T> T property(Name name, Type<T> property, Package scope) {
 		if (decorated != null && !override) {
 			try {
-				return decorated.property(name, property, pkg);
+				return decorated.property(name, property, scope);
 			} catch (InconsistentDeclaration e) {
 				// fall through and complement...
 			}
@@ -73,8 +73,8 @@ public final class Environment implements Env {
 		if (value != null || values.containsKey(key))
 			return (T) value;
 		if (decorated != null && override)
-			return decorated.property(name, property, pkg);
-		throw InconsistentBinding.undefinedEnvProperty(name, property, pkg);
+			return decorated.property(name, property, scope);
+		throw InconsistentBinding.undefinedEnvProperty(name, property, scope);
 	}
 
 	public <T> Environment with(Class<T> property, T value) {

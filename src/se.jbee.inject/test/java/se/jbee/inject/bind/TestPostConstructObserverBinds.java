@@ -11,17 +11,17 @@ import org.junit.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Resource;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.container.SingletonListener;
+import se.jbee.inject.container.PostConstructObserver;
 
 /**
- * Test that demonstrates how {@link SingletonListener} can be bound to track
+ * Test that demonstrates how {@link PostConstructObserver} can be bound to track
  * the order of instance creation during the bootstrapping of an application
  * tree here simulated by types A, B and C.
  * 
  * This sort of thing can be used to later tear down such instances in reverse
  * order.
  */
-public class TestSingletonListener {
+public class TestPostConstructObserverBinds {
 
 	static class A {
 
@@ -46,34 +46,34 @@ public class TestSingletonListener {
 
 	}
 
-	static class CreationListener implements SingletonListener {
+	static class CreationObserver implements PostConstructObserver {
 
 		final List<Object> created = new ArrayList<>();
 
 		@Override
-		public <T> void onSingletonCreated(Resource<T> resource, T instance) {
+		public <T> void afterPostConstruct(Resource<T> resource, T instance) {
 			created.add(instance);
 		}
 	}
 
-	static class TestInjectionListenersModule extends BinderModule {
+	static class TestPostConstructObserverBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
 			construct(A.class);
 			construct(B.class);
 			construct(C.class);
-			multibind(SingletonListener.class).to(CreationListener.class);
+			multibind(PostConstructObserver.class).to(CreationObserver.class);
 		}
 
 	}
 
 	private Injector injector = Bootstrap.injector(
-			TestInjectionListenersModule.class);
+			TestPostConstructObserverBindsModule.class);
 
 	@Test
 	public void orderOfCreationCanBeRecordedUsingInjectionListeners() {
-		CreationListener creation = injector.resolve(CreationListener.class);
+		CreationObserver creation = injector.resolve(CreationObserver.class);
 		assertEquals(0, creation.created.size());
 		A a = injector.resolve(A.class);
 		assertNotNull(a);

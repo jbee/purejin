@@ -122,7 +122,7 @@ public class TestScopePermanenceBinds {
 	public void defaultScopePermanencesAreBoundAsDefaults() {
 		for (Resource<ScopePermanence> r : injector.resolve(
 				resourcesTypeFor(ScopePermanence.class))) {
-			if (!r.locator.instance.name.equalTo(requestScope))
+			if (!r.signature.instance.name.equalTo(requestScope))
 				assertEquals(DeclarationType.DEFAULT, r.source.declarationType);
 		}
 	}
@@ -131,7 +131,7 @@ public class TestScopePermanenceBinds {
 	public void defaultScopesAreBoundAsDefaults() {
 		for (Resource<Scope> r : injector.resolve(
 				resourcesTypeFor(Scope.class))) {
-			if (!r.locator.instance.name.equalTo(requestScope))
+			if (!r.signature.instance.name.equalTo(requestScope))
 				assertEquals(DeclarationType.DEFAULT, r.source.declarationType);
 		}
 	}

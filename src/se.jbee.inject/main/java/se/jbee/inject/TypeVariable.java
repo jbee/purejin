@@ -8,7 +8,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.WildcardType;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 /**
@@ -25,14 +24,17 @@ public final class TypeVariable {
 	}
 
 	/**
-	 * Returns a map with type variable names as keys and a {@link Function} as
-	 * value that given an actual {@link Type} of the declared
-	 * {@link java.lang.reflect.Type} will extract the actual {@link Type} for
-	 * the type variable.
+	 * Returns a map with type variable names as keys and a
+	 * {@link UnaryOperator} as value that given an actual {@link Type} of the
+	 * declared {@link java.lang.reflect.Type} will extract the actual
+	 * {@link Type} for the type variable.
 	 * 
 	 * @param type a generic type as returned by Java reflect for generic type
 	 *            of for methods, fields or parameters
-	 * @return
+	 * @return a mapping which for each type variable (name) holds a
+	 *         {@link UnaryOperator} which resolves the actual type of that
+	 *         variable for the actual {@link Type} for the provided
+	 *         {@link java.lang.reflect.Type}.
 	 */
 	public static Map<String, UnaryOperator<Type<?>>> typeVariables(
 			java.lang.reflect.Type type) {

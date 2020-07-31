@@ -2,7 +2,7 @@
  * <p>
  * This package contains the default implementation for the
  * {@link se.jbee.inject.Injector} context. It is created from a list of
- * {@link se.jbee.inject.container.Injectee}s. Once a context is created the
+ * {@link se.jbee.inject.container.ResourceDescriptor}s. Once a context is created the
  * list of {@link se.jbee.inject.Resource}s it contains it immutable. This means
  * the type of things it knows how to resolve is fixed.
  * </p>
@@ -16,7 +16,7 @@
  * that the effect is not given by an annotated method but by the provided
  * {@link se.jbee.inject.container.Initialiser} function. This can equally be
  * applied to the {@link se.jbee.inject.Injector} itself to wrap it.
- * {@link se.jbee.inject.container.Container#injector(Injectee...)} will return
+ * {@link se.jbee.inject.container.Container#injector(ResourceDescriptor...)} will return
  * the outermost wrapper in that case.
  * </p>
  * 
@@ -34,7 +34,7 @@
  * <p>
  * The {@link se.jbee.inject.container.Container} implementation is independent
  * of the {@link se.jbee.inject.declare.Binding} based API which is build on top
- * of {@link se.jbee.inject.container.Injectee}, the
+ * of {@link se.jbee.inject.container.ResourceDescriptor}, the
  * {@link se.jbee.inject.bootstrap.Bootstrap} utility which builds on top of the
  * {@link se.jbee.inject.declare.Binding} API and the utility
  * {@link se.jbee.inject.declare.Module} and

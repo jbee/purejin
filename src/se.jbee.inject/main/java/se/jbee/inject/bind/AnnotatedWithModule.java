@@ -64,8 +64,8 @@ final class AnnotatedWithModule extends BinderModule {
 					if (element.isAnnotationPresent(
 							(Class<? extends Annotation>) key)) {
 						annotated.add(new AnnotatedWith.AnnotatedInstance<>(
-								() -> context.resolve(r.locator.toDependency()),
-								r.locator.type().rawType, element));
+								() -> context.resolve(r.signature.toDependency()),
+								r.signature.type().rawType, element));
 					}
 				}
 				return unmodifiableList(annotated);
