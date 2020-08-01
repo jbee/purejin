@@ -12,6 +12,7 @@ import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.arrayFilter;
 import static se.jbee.inject.Utils.arrayFindFirst;
 import static se.jbee.inject.Utils.arrayOf;
+import static se.jbee.inject.Utils.orElse;
 import static se.jbee.inject.container.Cast.initialiserTypeOf;
 import static se.jbee.inject.container.Cast.resourcesTypeFor;
 
@@ -57,6 +58,8 @@ public final class Container implements Injector, Env {
 		this.resources = new Resources(this::supplyInContext,
 				scope -> resolve(scope, Scope.class), descriptors);
 		this.postConstruct = new PostConstruct(
+				orElse((t, arr) -> arr,
+						() -> resolve(Initialiser.Sorter.class)),
 				resolve(resourcesTypeFor(initialiserTypeOf(Type.WILDCARD))));
 		this.postConstructObserver = resolvePostConstructObserver();
 		this.decorated = postConstruct.postConstruct(this);

@@ -58,4 +58,29 @@ public interface Initialiser<T> {
 	 */
 	T init(T target, Injector context);
 
+	/**
+	 * Can be bound to implement a defined custom ordering in which
+	 * {@link Initialiser}s are applied by an {@link Injector} context.
+	 * 
+	 * @since 19.1
+	 */
+	@FunctionalInterface
+	interface Sorter {
+
+		/**
+		 * Called for each actual type once to sort the {@link Initialiser}s
+		 * that apply for that type.
+		 * 
+		 * @param actualType the actual type of the initialised object
+		 * @param set the set if {@link Initialiser}s to order, this is not
+		 *            (necessarily) the full set of {@link Initialiser} defined
+		 *            in a {@link Injector} context but a set as it applies to
+		 *            the initialisation of a particular instance.
+		 * @return the sorted set, the set might also be sorted in place. Return
+		 *         is mostly for convenience using this within expressions like
+		 *         lambdas.
+		 */
+		Initialiser<?>[] sort(Class<?> actualType, Initialiser<?>[] set);
+	}
+
 }

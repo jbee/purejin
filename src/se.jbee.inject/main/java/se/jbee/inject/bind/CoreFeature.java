@@ -237,18 +237,16 @@ public enum CoreFeature implements Toggled<CoreFeature> {
 		@Override
 		protected void declare() {
 			ScopedBinder asDefault = asDefault().per(application);
-			asDefault.bind(int[].class).toSupplier(PrimitiveArraysModule::ints);
-			asDefault.bind(long[].class).toSupplier(
-					PrimitiveArraysModule::longs);
-			asDefault.bind(float[].class).toSupplier(
-					PrimitiveArraysModule::floats);
-			asDefault.bind(double[].class).toSupplier(
-					PrimitiveArraysModule::doubles);
-			asDefault.bind(boolean[].class).toSupplier(
-					PrimitiveArraysModule::booleans);
-			//TODO build a feature that allows to handle all arrays?
-			// for example: a special exception allowing Suppliers/Generators to reject a dependency
-			// or: a predicate interface allowing suppliers/generators to filter dependencies with custom logic
+			asDefault.bind(int[].class) //
+					.toSupplier(PrimitiveArraysModule::ints);
+			asDefault.bind(long[].class) //
+					.toSupplier(PrimitiveArraysModule::longs);
+			asDefault.bind(float[].class) //
+					.toSupplier(PrimitiveArraysModule::floats);
+			asDefault.bind(double[].class) //
+					.toSupplier(PrimitiveArraysModule::doubles);
+			asDefault.bind(boolean[].class) //
+					.toSupplier(PrimitiveArraysModule::booleans);
 		}
 
 		private static <T> T copyToPrimitiveArray(Object[] src, T dest) {
