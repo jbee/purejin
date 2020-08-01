@@ -128,12 +128,12 @@ public final class Supply {
 			// use a constant null hint to blank first parameter as it is filled in with actual type on method invocation
 			Hint<?> actualTypeHint = Hint.constantNull(
 					Type.parameterType(producer.target.getParameters()[0]));
-			return new Producer<>(producer,
+			return new Call<>(producer,
 					match(parameterTypes(producer.target),
 							Utils.arrayPrepand(actualTypeHint, producer.hints)),
 					Dependency::type);
 		}
-		return new Producer<>(producer,
+		return new Call<>(producer,
 				match(parameterTypes(producer.target), producer.hints), null);
 	}
 
@@ -251,7 +251,7 @@ public final class Supply {
 		}
 	}
 
-	private static final class Producer<T> extends WithArgs<T>
+	private static final class Call<T> extends WithArgs<T>
 			implements Annotated {
 
 		private Object owner;
@@ -259,7 +259,7 @@ public final class Supply {
 		private final Class<T> returns;
 		private final Map<String, UnaryOperator<Type<?>>> typeVariableResolvers;
 
-		Producer(Produces<T> producer, Hint<?>[] args,
+		Call(Produces<T> producer, Hint<?>[] args,
 				Function<Dependency<?>, Object> supplyActual) {
 			super(args, supplyActual);
 			this.producer = producer;

@@ -25,10 +25,13 @@ import se.jbee.inject.Type;
  */
 public final class PostConstruct {
 
+	private final Initialiser.Sorter sorter;
 	private final Resource<? extends Initialiser<?>>[] resources;
 	private final Map<Class<?>, Initialiser<?>[]> byTargetRawType = new ConcurrentHashMap<>();
 
-	public PostConstruct(Resource<? extends Initialiser<?>>[] inits) {
+	public PostConstruct(Initialiser.Sorter sorter,
+			Resource<? extends Initialiser<?>>[] inits) {
+		this.sorter = sorter;
 		this.resources = withoutInjectorResources(inits);
 	}
 
@@ -38,9 +41,10 @@ public final class PostConstruct {
 			return inits;
 		Type<Initialiser<Injector>> injectorInitType = initialiserTypeOf(
 				Injector.class);
-		Initialiser<?>[] injectorInits = arrayMap(
-				arrayFilter(inits, e -> e.type().equalTo(injectorInitType)),
-				Initialiser.class, Resource::generate);
+		Initialiser<?>[] injectorInits = sorter.sort(Injector.class,
+				arrayMap(arrayFilter(inits, //
+						e -> e.type().equalTo(injectorInitType)),
+						Initialiser.class, Resource::generate));
 		byTargetRawType.put(Injector.class, injectorInits);
 		if (inits.length == injectorInits.length)
 			return copyOf(inits, 0); // no other dynamic initialisers
@@ -64,8 +68,13 @@ public final class PostConstruct {
 		}
 		return applyPostConstruct(instance, context,
 				byTargetRawType.computeIfAbsent(actualType,
-						key -> arrayFlatmap(resources, Initialiser.class,
-								rx -> createInit(key, rx, injected))));
+						key -> matchingInits(injected, key)));
+	}
+
+	private Initialiser<?>[] matchingInits(Dependency<?> injected,
+			Class<?> actualType) {
+		return sorter.sort(actualType, arrayFlatmap(resources,
+				Initialiser.class, rx -> createInit(actualType, rx, injected)));
 	}
 
 	@SuppressWarnings("unchecked")
