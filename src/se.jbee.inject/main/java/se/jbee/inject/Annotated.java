@@ -10,12 +10,12 @@ import java.util.function.UnaryOperator;
 /**
  * Can be implemented by {@link Supplier}s to communicate the annotations
  * present on the underlying source used to supply instances.
- * 
+ *
  * For example a {@link Method}, {@link Constructor} or {@link Field} but also
  * any form of user defined source.
- * 
+ *
  * @author Jan Bernitt
- * 
+ *
  * @since 19.1
  */
 @FunctionalInterface
@@ -26,6 +26,7 @@ public interface Annotated {
 	 */
 	AnnotatedElement element();
 
+	@FunctionalInterface
 	interface Merge extends UnaryOperator<Annotated> {
 	}
 

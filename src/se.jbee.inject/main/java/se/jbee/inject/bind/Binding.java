@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bind;
@@ -165,14 +165,12 @@ public final class Binding<T> extends ResourceDescriptor<T>
 			if (curType == DeclarationType.REQUIRED) {
 				required.add(current.signature.type());
 			} else if (equalResource && (lastType.droppedWith(curType))) {
-				if (isDuplicateIdenticalConstant(equalResource, lastUnique,
+				if (!isDuplicateIdenticalConstant(true, lastUnique,
 						current)) {
-					dropped.add(current);
-				} else {
 					if (i - 1 == lastUniqueIndex)
 						dropped.add(uniques.remove(uniques.size() - 1));
-					dropped.add(current);
 				}
+				dropped.add(current);
 			} else if (!equalResource || !curType.replacedBy(lastType)) {
 				if (current.source.declarationType == DeclarationType.MULTI
 					&& isDuplicateIdenticalConstant(equalResource, lastUnique,

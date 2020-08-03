@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -64,10 +64,6 @@ public final class Instance<T> implements Parameter<T>, Qualifying<Instance<?>>,
 		return type.equalTo(other.type) && name.equals(other.name);
 	}
 
-	public Instance<T> discriminableBy(Name name) {
-		return new Instance<>(name, type);
-	}
-
 	@Override
 	public Type<T> type() {
 		return type;
@@ -92,7 +88,7 @@ public final class Instance<T> implements Parameter<T>, Qualifying<Instance<?>>,
 	}
 
 	@Override
-	public boolean moreQualiedThan(Instance<?> other) {
+	public boolean moreQualifiedThan(Instance<?> other) {
 		return Qualifying.compareRelated(type, other.type, name, other.name);
 	}
 

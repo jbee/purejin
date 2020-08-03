@@ -1,14 +1,6 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-import static se.jbee.inject.Packages.packageAndSubPackagesOf;
-import static se.jbee.inject.Packages.packageOf;
-import static se.jbee.inject.Packages.subPackagesOf;
-
 import org.junit.Test;
-
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Packages;
@@ -18,6 +10,9 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.config.Edition;
 import se.jbee.inject.defaults.DefaultsBundle;
+
+import static org.junit.Assert.*;
+import static se.jbee.inject.Packages.*;
 
 /**
  * The test demonstrates how to assemble different editions based on the

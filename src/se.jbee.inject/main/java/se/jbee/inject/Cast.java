@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -13,7 +13,7 @@ import java.util.Set;
 
 /**
  * Utility to get rid of warnings for known generic {@link Type}s.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -83,13 +83,13 @@ public final class Cast {
 	}
 
 	public static <T> Type<Initialiser<T>> initialiserTypeOf(
-			Class<T> intialisedType) {
-		return (Type) raw(Initialiser.class).parametized(intialisedType);
+			Class<T> initialisedType) {
+		return (Type) raw(Initialiser.class).parametized(initialisedType);
 	}
 
 	public static <T> Type<Initialiser<T>> initialiserTypeOf(
-			Type<T> intialisedType) {
-		return (Type) raw(Initialiser.class).parametized(intialisedType);
+			Type<T> initialisedType) {
+		return (Type) raw(Initialiser.class).parametized(initialisedType);
 	}
 
 }

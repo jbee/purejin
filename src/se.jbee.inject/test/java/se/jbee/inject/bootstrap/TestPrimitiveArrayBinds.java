@@ -1,15 +1,13 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertArrayEquals;
-import static se.jbee.inject.Name.named;
-
 import org.junit.Test;
-
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
+
+import static org.junit.Assert.assertArrayEquals;
+import static se.jbee.inject.Name.named;
 
 /**
  * This test demonstrates how to add automatic primitive array support.

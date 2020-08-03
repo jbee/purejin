@@ -1,31 +1,17 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static se.jbee.inject.Cast.generatorTypeOf;
-import static se.jbee.inject.Cast.generatorsTypeFor;
-import static se.jbee.inject.Cast.resourceTypeFor;
-import static se.jbee.inject.Cast.resourcesTypeFor;
-import static se.jbee.inject.Dependency.dependency;
-import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Type.raw;
+import org.junit.Test;
+import se.jbee.inject.*;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import se.jbee.inject.binder.BinderModule;
 
 import java.util.List;
 
-import org.junit.Test;
-
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Generator;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Name;
-import se.jbee.inject.Resource;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
-import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
+import static org.junit.Assert.*;
+import static se.jbee.inject.Cast.*;
+import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Name.named;
+import static se.jbee.inject.Type.raw;
 
 public class TestResolveResourceBinds {
 

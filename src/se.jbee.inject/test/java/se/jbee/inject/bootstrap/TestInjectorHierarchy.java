@@ -1,22 +1,20 @@
 package se.jbee.inject.bootstrap;
 
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-
-import java.util.HashSet;
-
 import org.junit.Test;
-
 import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
 import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.container.Decorate;
+
+import java.util.HashSet;
+
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test that demontrates how two {@link Injector} contexts can be linked
  * together in a {@link Injector#hierarchy(Injector, Injector)}.
- * 
+ *
  * @author Jan Bernitt
  */
 public class TestInjectorHierarchy {

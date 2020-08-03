@@ -1,28 +1,24 @@
 package se.jbee.inject.bootstrap;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
-import static java.util.Collections.singletonList;
-import static se.jbee.inject.Cast.collectionTypeOf;
-import static se.jbee.inject.Cast.listTypeOf;
-import static se.jbee.inject.Cast.setTypeOf;
-import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Type.raw;
+import org.junit.Test;
+import se.jbee.inject.Cast;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Type;
+import se.jbee.inject.binder.BinderModule;
+import se.jbee.inject.binder.BootstrapperBundle;
+import se.jbee.inject.defaults.CoreFeature;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.junit.Test;
-
-import se.jbee.inject.Cast;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Type;
-import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.binder.BootstrapperBundle;
-import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.defaults.CoreFeature;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
+import static java.util.Collections.singletonList;
+import static se.jbee.inject.Cast.*;
+import static se.jbee.inject.Name.named;
+import static se.jbee.inject.Type.raw;
 
 public class TestCollectionBinds {
 

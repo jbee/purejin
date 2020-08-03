@@ -1,14 +1,12 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
-
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
-import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.defaults.DefaultScopes;
+
+import static org.junit.Assert.assertEquals;
 
 public class TestLinker {
 

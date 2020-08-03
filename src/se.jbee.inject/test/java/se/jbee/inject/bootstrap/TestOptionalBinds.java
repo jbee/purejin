@@ -1,21 +1,19 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertEquals;
-import static se.jbee.inject.Type.raw;
-
-import java.util.Optional;
-
 import org.junit.Test;
-
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
-import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.defaults.CoreFeature;
+
+import java.util.Optional;
+
+import static org.junit.Assert.assertEquals;
+import static se.jbee.inject.Type.raw;
 
 /**
  * Simply demonstration of how to add injection of {@link Optional} parameters.
- * 
+ *
  * Dependencies that are available are injected wrapped in the {@link Optional},
  * dependencies that are not available are injected as {@link Optional#empty()}.
  */

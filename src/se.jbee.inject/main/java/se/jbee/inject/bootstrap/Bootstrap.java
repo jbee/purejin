@@ -122,6 +122,7 @@ public final class Bootstrap {
 	private static final class BuiltinBootstrapper
 			implements Bootstrapper, Bundler, Modulariser {
 
+		@SuppressWarnings("rawtypes")
 		public static final Type<Function> INJECTOR_PROVIDER_TYPE = raw(
 				Function.class).parametized(Class[].class,
 				Injector.class);
@@ -173,7 +174,7 @@ public final class Bootstrap {
 						key -> new LinkedHashSet<>()).add(bundle);
 			}
 			stack.push(bundle);
-			Bundle instance = Utils.instanciate(bundle);
+			Bundle instance = Utils.instantiate(bundle);
 			instance.bootstrap(this);
 			if (stack.pop() != bundle)
 				throw new IllegalStateException(bundle.getCanonicalName());
@@ -184,7 +185,7 @@ public final class Bootstrap {
 				Class<? extends Toggled<F>> bundle, final Class<F> flags) {
 			if (!edition.featured(bundle))
 				return;
-			Utils.instanciate(bundle).bootstrap((bundleForFlag, flag) -> {
+			Utils.instantiate(bundle).bootstrap((bundleForFlag, flag) -> {
 				// NB: null is a valid value to define what happens when no configuration is present
 				if (env.toggled(flags, flag, bundleForFlag.getPackage())) {
 					BuiltinBootstrapper.this.install(bundleForFlag);

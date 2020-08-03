@@ -1,18 +1,12 @@
 package se.jbee.inject.bootstrap;
 
+import org.junit.Test;
+import se.jbee.inject.*;
+import se.jbee.inject.binder.BinderModule;
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static se.jbee.inject.Name.named;
-
-import org.junit.Test;
-
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Initialiser;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Supplier;
-import se.jbee.inject.UnresolvableDependency;
-import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
 
 /**
  * A test that demonstrates that the {@link Injector} can be decorated using a

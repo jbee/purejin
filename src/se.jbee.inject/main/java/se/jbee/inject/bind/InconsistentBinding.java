@@ -7,16 +7,20 @@ import se.jbee.inject.Type;
 
 /**
  * Problems related to {@link Binding} and the bootstrapping process.
- * 
+ *
  * @since 19.1
  */
-public class InconsistentBinding extends InconsistentDeclaration {
+public final class InconsistentBinding extends InconsistentDeclaration {
 
 	private InconsistentBinding(String msg) {
 		super(msg);
 	}
 
 	// Text should answer: What is the problem with the binding or in the binding process?
+
+	public static InconsistentBinding generic(String msg) {
+		return new InconsistentBinding(msg);
+	}
 
 	public static InconsistentBinding contextAlreadyInitialised() {
 		return new InconsistentBinding(
@@ -65,7 +69,7 @@ public class InconsistentBinding extends InconsistentDeclaration {
 	public static InconsistentBinding noTypeAnnotation(Class<?> type) {
 		int annotations = type.getAnnotations().length;
 		return new InconsistentBinding(
-				"Exepected an annotation on type but found none "
+				"Expected an annotation on type but found none "
 					+ (annotations == 0 ? "" : "that has a custom definition")
 					+ ": " + type.getName());
 	}

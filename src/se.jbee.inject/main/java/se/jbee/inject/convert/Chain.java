@@ -112,7 +112,7 @@ public final class Chain<B> {
 		Converter<A, B> res = (Converter<A, B>) headsByInputType.get(type);
 		if (res == null)
 			throw new UnsupportedOperationException(
-					"Conversion from " + type + "not avaiable");
+					"Conversion from " + type + "not available");
 		return res;
 	}
 

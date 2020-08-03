@@ -7,7 +7,7 @@ package se.jbee.inject.defaults;
 
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.Utils.instanciate;
+import static se.jbee.inject.Utils.instantiate;
 import static se.jbee.inject.Utils.isClassBanal;
 import static se.jbee.inject.Utils.isClassInstantiable;
 import static se.jbee.inject.bind.BindingType.CONSTRUCTOR;
@@ -187,7 +187,7 @@ public final class DefaultValueBinders {
 			Type<?> srcType = src.type();
 			if (avoidReferences && isClassBanal(srcType.rawType)) {
 				target.addExpanded(env, item,
-						new Constant<>(instanciate(srcType.rawType)).manual());
+						new Constant<>(instantiate(srcType.rawType)).manual());
 				return;
 			}
 			if (srcType.isAssignableTo(raw(Supplier.class))

@@ -1,19 +1,17 @@
 package se.jbee.inject.bootstrap;
 
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static se.jbee.inject.Name.named;
+import org.junit.Test;
+import se.jbee.inject.Injector;
+import se.jbee.inject.binder.BinderModule;
+import se.jbee.inject.binder.BootstrapperBundle;
+import se.jbee.inject.defaults.CoreFeature;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Test;
-
-import se.jbee.inject.Injector;
-import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.binder.BootstrapperBundle;
-import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.defaults.CoreFeature;
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
+import static se.jbee.inject.Name.named;
 
 public class TestPrimitiveArrayBridgeBinds {
 

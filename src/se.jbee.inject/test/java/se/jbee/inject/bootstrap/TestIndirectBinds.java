@@ -1,18 +1,15 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
+import org.junit.Test;
+import se.jbee.inject.Injector;
+import se.jbee.inject.UnresolvableDependency;
+import se.jbee.inject.UnresolvableDependency.IllegalAccess;
+import se.jbee.inject.binder.Binder;
+import se.jbee.inject.binder.BinderModule;
 
 import java.io.Serializable;
 
-import org.junit.Test;
-
-import se.jbee.inject.Injector;
-import se.jbee.inject.UnresolvableDependency.IllegalAcccess;
-import se.jbee.inject.binder.Binder;
-import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
+import static org.junit.Assert.*;
 
 /**
  * This tests demonstrates how the {@link Binder#withIndirectAccess()} method
@@ -122,22 +119,22 @@ public class TestIndirectBinds {
 				ValidNestedReceiver.class).valid.abs.getClass());
 	}
 
-	@Test(expected = IllegalAcccess.class)
+	@Test(expected = IllegalAccess.class)
 	public void indirectReferencedResourcesCannotBeResolvedDirectly() {
 		assertNotNull(injector.resolve(Implementation.class));
 	}
 
-	@Test(expected = IllegalAcccess.class)
+	@Test(expected = UnresolvableDependency.IllegalAccess.class)
 	public void indirectAutoboundResourcesCannotBeResolvedDirectly() {
 		assertNotNull(injector.resolve(Implementation2.class));
 	}
 
-	@Test(expected = IllegalAcccess.class)
+	@Test(expected = UnresolvableDependency.IllegalAccess.class)
 	public void indirectResourcesCannotBeInjectedDirectly() {
 		assertNotNull(injector.resolve(InvalidReceiver.class).impl);
 	}
 
-	@Test(expected = IllegalAcccess.class)
+	@Test(expected = UnresolvableDependency.IllegalAccess.class)
 	public void indirectResourcesCannotBeInjectedDirectlyInHierarchy() {
 		assertNotNull(
 				injector.resolve(InvalidNestedReceiver.class).invalid.impl);

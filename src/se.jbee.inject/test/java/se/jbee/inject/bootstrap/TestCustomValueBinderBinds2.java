@@ -1,14 +1,6 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
-
-import java.io.Serializable;
-import java.util.RandomAccess;
-
 import org.junit.Test;
-
 import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bind.BindingType;
@@ -16,6 +8,11 @@ import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.bind.ValueBinder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.defaults.DefaultValueBinders;
+
+import java.io.Serializable;
+import java.util.RandomAccess;
+
+import static org.junit.Assert.*;
 
 /**
  * A test that demonstrates how the
@@ -26,7 +23,7 @@ import se.jbee.inject.defaults.DefaultValueBinders;
  * {@link DefaultValueBinders#INSTANCE_REF_LITE} will not create a reference to
  * the referenced type and a implicit bind to constructor but a direct bind to a
  * constant instance created during bootstrapping.
- * 
+ *
  * This might make sense in some situation but cause issues in others when there
  * cannot be multiple instances of the same type anyway for some reason.
  */

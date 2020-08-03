@@ -23,8 +23,6 @@ module se.jbee.inject {
   exports se.jbee.inject.scope;
 
   requires transitive java.logging;
-  requires java.desktop;
-  requires java.management;
 
   uses se.jbee.inject.bind.Bundle;
   uses se.jbee.inject.bind.ModuleWith;

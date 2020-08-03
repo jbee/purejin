@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -19,7 +19,7 @@ import se.jbee.inject.container.InjectionSite;
 /**
  * A {@link Hint} is a suggested reference for parameters of a
  * {@link Constructor} or {@link Method} to inject.
- * 
+ *
  * @since 19.1
  *
  * @param <T> The {@link Type} of the argument
@@ -31,7 +31,7 @@ public final class Hint<T> implements Parameter<T> {
 	/**
 	 * A {@link Type} reference is relative to the {@link InjectionSite#site}
 	 * hierarchy. It can be pre-resolved for each site.
-	 * 
+	 *
 	 * @param target The type to resolve as parameter within the hierarchy
 	 * @return A {@link Hint} representing the relative reference
 	 */
@@ -43,7 +43,7 @@ public final class Hint<T> implements Parameter<T> {
 	 * An {@link Instance} reference is relative to the
 	 * {@link InjectionSite#site} hierarchy. It can be pre-resolved for each
 	 * site.
-	 * 
+	 *
 	 * @param target The {@link Instance} to resolve as parameter within the
 	 *            hierarchy
 	 * @return A {@link Hint} representing the relative reference
@@ -55,7 +55,7 @@ public final class Hint<T> implements Parameter<T> {
 	/**
 	 * A {@link Dependency} reference is absolute. That means it ignores the
 	 * {@link InjectionSite#site} hierarchy.
-	 * 
+	 *
 	 * @param target The {@link Dependency} to resolve as parameter
 	 * @return A {@link Hint} representing the absolute reference
 	 */
@@ -65,7 +65,7 @@ public final class Hint<T> implements Parameter<T> {
 
 	public static <T> Hint<T> constant(T constant) {
 		if (constant == null)
-			throw InconsistentDeclaration.incomprehensiveHint(null);
+			throw InconsistentDeclaration.incomprehensibleHint(null);
 		@SuppressWarnings("unchecked")
 		Type<T> type = (Type<T>) raw(constant.getClass());
 		return new Hint<>(type, constant, null, null);
@@ -89,7 +89,7 @@ public final class Hint<T> implements Parameter<T> {
 		for (Parameter<?> hint : hints) {
 			int i = indexForType(types, hint, args);
 			if (i < 0)
-				throw InconsistentDeclaration.incomprehensiveHint(hint);
+				throw InconsistentDeclaration.incomprehensibleHint(hint);
 			args[i] = hint.asHint();
 		}
 		for (int i = 0; i < args.length; i++)

@@ -1,14 +1,6 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static se.jbee.inject.bootstrap.AssertInjects.assertEqualSets;
-
-import java.io.Serializable;
-import java.util.concurrent.Callable;
-
 import org.junit.Test;
-
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bind.Module;
@@ -16,6 +8,13 @@ import se.jbee.inject.binder.Binder;
 import se.jbee.inject.binder.Binder.PluginBinder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.config.Plugins;
+
+import java.io.Serializable;
+import java.util.concurrent.Callable;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static se.jbee.inject.bootstrap.AssertInjects.assertEqualSets;
 
 /**
  * Plug-in-binds are a convenient way to define a named set of classes. The name

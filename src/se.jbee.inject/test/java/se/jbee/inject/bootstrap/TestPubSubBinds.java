@@ -1,16 +1,6 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.bind.Bindings.supplyConstant;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Test;
-
 import se.jbee.inject.Initialiser;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Supplier;
@@ -18,6 +8,15 @@ import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.binder.Binder;
 import se.jbee.inject.binder.Binder.InitBinder;
 import se.jbee.inject.binder.BinderModule;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static se.jbee.inject.Name.named;
+import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.bind.Bindings.supplyConstant;
 
 /**
  * A tests the shows how {@link Initialiser}s behind {@link Binder#init(Class)}

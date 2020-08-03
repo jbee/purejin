@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.binder;
@@ -68,7 +68,7 @@ public final class Supply {
 	 * a more precise binding) return all known
 	 */
 	public static final ArrayBridge<List<?>> LIST_BRIDGE = Arrays::asList;
-	public static final ArrayBridge<Set<?>> SET_BRIDGE = // 
+	public static final ArrayBridge<Set<?>> SET_BRIDGE = //
 			elems -> new HashSet<>(Arrays.asList(elems));
 
 	private static final String SUPPLIES = "supplies";
@@ -164,7 +164,7 @@ public final class Supply {
 	public interface ArrayBridge<T> extends Supplier<T> {
 
 		@Override
-		public default T supply(Dependency<? super T> dep, Injector context) {
+		default T supply(Dependency<? super T> dep, Injector context) {
 			return bridge(context.resolve(
 					dep.typed(dep.type().parameter(0).addArrayDimension())));
 		}
@@ -189,6 +189,7 @@ public final class Supply {
 			this.arrayType = arrayType;
 		}
 
+		@SuppressWarnings("SuspiciousSystemArraycopy")
 		@Override
 		protected E[] invoke(Object[] args, Injector context) {
 			@SuppressWarnings("unchecked")

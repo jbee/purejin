@@ -1,15 +1,13 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertNotSame;
-
 import org.junit.Test;
-
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Scope;
 import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
+
+import static org.junit.Assert.assertNotSame;
 
 /**
  * This tests demonstrates 2 different ways to solve the <i>Robot legs

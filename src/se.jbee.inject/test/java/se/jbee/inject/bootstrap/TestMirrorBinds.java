@@ -1,20 +1,17 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static se.jbee.inject.Cast.resourceTypeFor;
-
 import org.junit.Test;
-
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Scope;
 import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.ScopesBy;
 import se.jbee.inject.util.Scoped;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static se.jbee.inject.Cast.resourceTypeFor;
 
 public class TestMirrorBinds {
 

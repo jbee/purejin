@@ -1,14 +1,12 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.fail;
-
 import org.junit.Test;
-
 import se.jbee.inject.Injector;
 import se.jbee.inject.Scope;
 import se.jbee.inject.UnresolvableDependency.UnstableDependency;
 import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
+
+import static org.junit.Assert.fail;
 
 public class TestScopedBinds {
 

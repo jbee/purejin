@@ -1,22 +1,20 @@
 package se.jbee.inject.bootstrap;
 
+import org.junit.Test;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Name;
+import se.jbee.inject.binder.BinderModule;
+import se.jbee.inject.binder.BootstrapperBundle;
+import se.jbee.inject.defaults.CoreFeature;
+
+import java.util.List;
+import java.util.Set;
+
 import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Cast.listTypeOf;
 import static se.jbee.inject.Cast.setTypeOf;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.bootstrap.AssertInjects.assertEqualSets;
-
-import java.util.List;
-import java.util.Set;
-
-import org.junit.Test;
-
-import se.jbee.inject.Injector;
-import se.jbee.inject.Name;
-import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.binder.BootstrapperBundle;
-import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.defaults.CoreFeature;
 
 public class TestMultibindBinds {
 

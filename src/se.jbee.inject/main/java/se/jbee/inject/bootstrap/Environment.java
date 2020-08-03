@@ -95,7 +95,7 @@ public final class Environment implements Env {
 	}
 
 	public <T> Environment withBinder(Class<? extends ValueBinder<T>> value) {
-		return withBinder(Utils.instanciate(value));
+		return withBinder(Utils.instantiate(value));
 	}
 
 	public <T> Environment withBinder(ValueBinder<T> value) {

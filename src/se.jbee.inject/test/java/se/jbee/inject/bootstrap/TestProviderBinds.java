@@ -1,33 +1,23 @@
 package se.jbee.inject.bootstrap;
 
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
-import static se.jbee.inject.Cast.listTypeOf;
-import static se.jbee.inject.Cast.providerTypeOf;
-import static se.jbee.inject.Instance.instance;
-import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Type.raw;
+import org.junit.Test;
+import se.jbee.inject.*;
+import se.jbee.inject.UnresolvableDependency.UnstableDependency;
+import se.jbee.inject.binder.BinderModule;
+import se.jbee.inject.binder.BootstrapperBundle;
+import se.jbee.inject.defaults.CoreFeature;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Test;
-
-import se.jbee.inject.Injector;
-import se.jbee.inject.Instance;
-import se.jbee.inject.Name;
-import se.jbee.inject.Provider;
-import se.jbee.inject.Scope;
-import se.jbee.inject.Type;
-import se.jbee.inject.UnresolvableDependency.UnstableDependency;
-import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.binder.BootstrapperBundle;
-import se.jbee.inject.defaults.CoreFeature;
+import static java.util.Arrays.asList;
+import static org.junit.Assert.*;
+import static se.jbee.inject.Cast.listTypeOf;
+import static se.jbee.inject.Cast.providerTypeOf;
+import static se.jbee.inject.Instance.instance;
+import static se.jbee.inject.Name.named;
+import static se.jbee.inject.Type.raw;
 
 public class TestProviderBinds {
 

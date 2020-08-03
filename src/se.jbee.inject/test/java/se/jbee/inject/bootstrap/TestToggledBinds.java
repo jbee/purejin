@@ -1,9 +1,6 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertArrayEquals;
-
 import org.junit.Test;
-
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bind.Bundle;
@@ -13,7 +10,8 @@ import se.jbee.inject.binder.Binder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.binder.TogglerBundle;
-import se.jbee.inject.bootstrap.Bootstrap;
+
+import static org.junit.Assert.assertArrayEquals;
 
 /**
  * The test demonstrates how to use {@link Toggled} and the

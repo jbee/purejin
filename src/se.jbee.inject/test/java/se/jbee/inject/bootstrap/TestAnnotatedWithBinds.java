@@ -1,51 +1,49 @@
 package se.jbee.inject.bootstrap;
 
+import org.junit.Test;
+import se.jbee.inject.Annotated;
+import se.jbee.inject.AnnotatedWith;
+import se.jbee.inject.AnnotatedWith.AnnotatedInstance;
+import se.jbee.inject.Env;
+import se.jbee.inject.Injector;
+import se.jbee.inject.binder.BinderModule;
+
+import java.lang.annotation.*;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Constructor;
+import java.util.HashSet;
+import java.util.List;
+
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static se.jbee.inject.config.ProducesBy.declaredMethods;
 import static se.jbee.inject.config.SharesBy.declaredFields;
 
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Constructor;
-import java.util.HashSet;
-import java.util.List;
-
-import javax.management.MXBean;
-
-import org.junit.Test;
-
-import se.jbee.inject.Annotated;
-import se.jbee.inject.AnnotatedWith;
-import se.jbee.inject.AnnotatedWith.AnnotatedInstance;
-import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.Env;
-import se.jbee.inject.Injector;
-
 public class TestAnnotatedWithBinds {
 
+	@Target({ ElementType.TYPE, ElementType.ANNOTATION_TYPE })
+	@Retention(RetentionPolicy.RUNTIME)
+	@interface MXBean {
+
+	}
+
 	@MXBean
-	static interface Service {
+	interface Service {
 
 		void verify();
 	}
 
 	@Target(ElementType.TYPE)
 	@Retention(RetentionPolicy.RUNTIME)
-	static @interface WebService {
+	@interface WebService {
 
 		String value();
 	}
 
 	@Target({ ElementType.METHOD, ElementType.FIELD })
 	@Retention(RetentionPolicy.RUNTIME)
-	static @interface Marker {
+	@interface Marker {
 
 	}
 
@@ -139,7 +137,7 @@ public class TestAnnotatedWithBinds {
 	}
 
 	@Test
-	public void annotatedInstancesCanBeResolvedProgramatically() {
+	public void annotatedInstancesCanBeResolvedProgrammatically() {
 		List<AnnotatedInstance<?>> annotated = injector.annotatedWith(
 				MXBean.class);
 		assertEquals(1, annotated.size());

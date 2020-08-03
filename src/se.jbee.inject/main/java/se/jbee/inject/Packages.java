@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -172,7 +172,7 @@ public final class Packages
 	}
 
 	@Override
-	public boolean moreQualiedThan(Packages other) {
+	public boolean moreQualifiedThan(Packages other) {
 		if (includingSubpackages != other.includingSubpackages)
 			return !includingSubpackages;
 		return rootDepth != other.rootDepth && rootDepth > other.rootDepth;
@@ -197,8 +197,8 @@ public final class Packages
 		if (roots.length == 1)
 			return toString(roots[0]);
 		StringBuilder b = new StringBuilder();
-		for (int i = 0; i < roots.length; i++)
-			b.append('+').append(toString(roots[i]));
+		for (String root : roots)
+			b.append('+').append(toString(root));
 		return b.substring(1);
 	}
 

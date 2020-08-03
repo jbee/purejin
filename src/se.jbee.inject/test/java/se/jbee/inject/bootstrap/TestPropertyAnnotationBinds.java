@@ -1,13 +1,9 @@
 package se.jbee.inject.bootstrap;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.PARAMETER;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.junit.Assert.assertEquals;
-import static se.jbee.inject.Instance.instance;
-import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Type.parameterType;
-import static se.jbee.inject.Type.raw;
+import org.junit.Test;
+import se.jbee.inject.*;
+import se.jbee.inject.binder.BinderModuleWith;
+import se.jbee.inject.config.HintsBy;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -16,21 +12,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.junit.Test;
-
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Env;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Instance;
-import se.jbee.inject.Name;
-import se.jbee.inject.Parameter;
-import se.jbee.inject.Scope;
-import se.jbee.inject.Supplier;
-import se.jbee.inject.UnresolvableDependency;
-import se.jbee.inject.binder.BinderModuleWith;
-import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
-import se.jbee.inject.config.HintsBy;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.junit.Assert.assertEquals;
+import static se.jbee.inject.Instance.instance;
+import static se.jbee.inject.Name.named;
+import static se.jbee.inject.Type.parameterType;
+import static se.jbee.inject.Type.raw;
 
 /**
  * This test illustrates how to extends the {@link Injector} so it does inject

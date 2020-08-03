@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -12,7 +12,7 @@ import java.lang.annotation.Annotation;
  * in the context of a container) this exception is thrown during bootstrapping.
  * It is never thrown after the bootstrapping step has finished (a
  * {@link Injector} was created successfully).
- * 
+ *
  * @see UnresolvableDependency
  */
 public class InconsistentDeclaration extends RuntimeException {
@@ -27,12 +27,12 @@ public class InconsistentDeclaration extends RuntimeException {
 
 	// Text should answer: What is the problem with the binding or in the binding process?
 
-	public static InconsistentDeclaration notConstructible(Class<?> impl) {
+	public static InconsistentDeclaration notConstructable(Class<?> impl) {
 		return new InconsistentDeclaration(
-				"Attempt to bind a non-constructible type: " + impl);
+				"Attempt to bind a non-constructable type: " + impl);
 	}
 
-	public static InconsistentDeclaration incomprehensiveHint(
+	public static InconsistentDeclaration incomprehensibleHint(
 			Parameter<?> hint) {
 		return new InconsistentDeclaration(
 				"Attempt to give a parameter hint that does not fit the target: "

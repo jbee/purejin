@@ -1,17 +1,13 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.junit.Test;
-
 import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.bind.Module;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
-import se.jbee.inject.bootstrap.Bootstrap;
+
+import static org.junit.Assert.*;
 
 /**
  * The test shows very loose coupling using {@link BinderModule#require(Class)}

@@ -1,12 +1,11 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.binder;
 
 import se.jbee.inject.Type;
-import se.jbee.inject.bind.Bootstrapper;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.bind.InconsistentBinding;
 import se.jbee.inject.bind.Toggled;
@@ -14,9 +13,9 @@ import se.jbee.inject.bind.Bootstrapper.Toggler;
 
 /**
  * The default utility base class for {@link Toggled}s.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
- * 
+ *
  * @param <C> the type of the options values (usually an enum)
  */
 public abstract class TogglerBundle<C> implements Toggled<C>, Toggler<C> {

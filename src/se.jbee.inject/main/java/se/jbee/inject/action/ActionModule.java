@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.action;
@@ -203,7 +203,7 @@ public abstract class ActionModule extends BinderModule {
 
 		@Override
 		public O run(I input) throws ActionExecutionFailed {
-			Object[] args = null;
+			Object[] args;
 			try {
 				args = injection.args(injector);
 			} catch (UnresolvableDependency e) {

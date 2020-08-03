@@ -1,23 +1,21 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Name;
+import se.jbee.inject.Scope;
+import se.jbee.inject.binder.BinderModule;
+import se.jbee.inject.scope.DiskScope;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import se.jbee.inject.Injector;
-import se.jbee.inject.Name;
-import se.jbee.inject.Scope;
-import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.scope.DiskScope;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class TestDiskScopeBinds {
 

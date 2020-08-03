@@ -1,24 +1,22 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.Test;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Resource;
+import se.jbee.inject.binder.BinderModule;
+import se.jbee.inject.container.PostConstructObserver;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
-
-import se.jbee.inject.Injector;
-import se.jbee.inject.Resource;
-import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.container.PostConstructObserver;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Test that demonstrates how {@link PostConstructObserver} can be bound to track
  * the order of instance creation during the bootstrapping of an application
  * tree here simulated by types A, B and C.
- * 
+ *
  * This sort of thing can be used to later tear down such instances in reverse
  * order.
  */

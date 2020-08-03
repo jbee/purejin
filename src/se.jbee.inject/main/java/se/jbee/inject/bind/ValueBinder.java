@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bind;
@@ -13,15 +13,12 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.Locator;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.Supplier;
-import se.jbee.inject.binder.Constant;
-import se.jbee.inject.binder.New;
-import se.jbee.inject.binder.Produces;
 
 /**
  * A {@linkplain ValueBinder} is a pure function that transforms a source value
  * of a certain type to one or more complete {@link Binding}s that are added to
  * the target set of {@link Bindings}.
- * 
+ *
  * <h2>How {@link ValueBinder}s Work</h2> Instead of binding a a {@link Locator}
  * to a specific {@link Supplier} in one go a source value is created that holds
  * all information required to create an appropriate {@link Binding} with a
@@ -33,7 +30,7 @@ import se.jbee.inject.binder.Produces;
  * the matching {@link ValueBinder} is resolved and used to convert the source
  * value into complete {@link Binding}s. This allows to customise and add logic
  * on low level.
- * 
+ *
  * The core source values are:
  * <ul>
  * <li>{@link se.jbee.inject.binder.New}: Creates instances from
@@ -53,12 +50,12 @@ import se.jbee.inject.binder.Produces;
  * {@link ValueBinder} for {@link Binding} which might derive further
  * {@link Binding}s.</li>
  * </ul>
- * 
+ *
  * Further custom types can be added. In that case the {@link Env} must be
  * extended to include the {@link ValueBinder} that can handle the custom type.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
- * 
+ *
  * @param <S> The type of source value that is expanded by this
  *            {@link ValueBinder}
  */
@@ -68,7 +65,7 @@ public interface ValueBinder<S> {
 	/**
 	 * Expands the incomplete {@link Binding} and value given to a complete
 	 * {@link Binding}(s) that are added to {@link Bindings}.
-	 * 
+	 *
 	 * @param src A {@link Class}, {@link Instance} or similar value that
 	 *            express the intent of the incomplete binding. This
 	 *            {@link ValueBinder} will use it especially to decide the
@@ -90,7 +87,7 @@ public interface ValueBinder<S> {
 	interface Completion<S> extends ValueBinder<S> {
 
 		@Override
-		public default <T> void expand(Env env, S src, Binding<T> item,
+		default <T> void expand(Env env, S src, Binding<T> item,
 				Bindings target) {
 			target.addExpanded(env, complete(item, src));
 		}

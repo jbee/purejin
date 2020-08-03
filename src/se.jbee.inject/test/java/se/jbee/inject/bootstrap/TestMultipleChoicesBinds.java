@@ -1,15 +1,13 @@
 package se.jbee.inject.bootstrap;
 
-import static se.jbee.inject.bootstrap.AssertInjects.assertEqualSets;
-
 import org.junit.Test;
-
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.binder.TogglerBundle;
-import se.jbee.inject.bootstrap.Bootstrap;
+
+import static se.jbee.inject.bootstrap.AssertInjects.assertEqualSets;
 
 public class TestMultipleChoicesBinds {
 

@@ -1,39 +1,23 @@
 package se.jbee.inject.bootstrap;
 
-import static java.lang.reflect.Proxy.isProxyClass;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static se.jbee.inject.Dependency.dependency;
-import static se.jbee.inject.Instance.anyOf;
-import static se.jbee.inject.Instance.instance;
-import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.Type.returnType;
+import org.junit.Test;
+import se.jbee.inject.*;
+import se.jbee.inject.binder.BinderModule;
 
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.event.MouseListener;
-import java.awt.geom.PathIterator;
 import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.EventListener;
 
-import org.junit.Test;
-
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Name;
-import se.jbee.inject.Scope;
-import se.jbee.inject.Supplier;
-import se.jbee.inject.Type;
-import se.jbee.inject.UnresolvableDependency;
-import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
+import static java.lang.reflect.Proxy.isProxyClass;
+import static org.junit.Assert.*;
+import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Instance.anyOf;
+import static se.jbee.inject.Instance.instance;
+import static se.jbee.inject.Name.named;
+import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.Type.returnType;
 
 /**
  * This test illustrates how to use binds with {@link Type#asUpperBound()} types
@@ -45,6 +29,35 @@ import se.jbee.inject.bootstrap.Bootstrap;
  * custom supplier is enough to achieve this.
  */
 public class TestMockingBinds {
+
+	interface Shape {
+
+		PathIterator getPathIterator(Object arg);
+
+		Rectangle getBounds();
+
+		Rectangle2D getBounds2D();
+	}
+
+	interface PathIterator {
+
+		boolean isDone();
+	}
+
+	interface MouseListener extends EventListener {
+
+	}
+
+	static class Rectangle {
+
+		public Rectangle(int w, int h, int x, int y) {
+		}
+
+	}
+
+	static class Rectangle2D {
+
+	}
 
 	static class TestMockingBindsModule extends BinderModule {
 

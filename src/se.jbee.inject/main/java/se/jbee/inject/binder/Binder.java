@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.binder;
@@ -60,7 +60,7 @@ import se.jbee.inject.config.SharesBy;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-@SuppressWarnings({ "squid:S1448", "squid:S1200" })
+@SuppressWarnings({ "squid:S1448", "squid:S1200", "ClassReferencesSubclass" })
 public class Binder {
 
 	public static RootBinder create(Bind bind) {
@@ -97,9 +97,9 @@ public class Binder {
 
 	/**
 	 * Allows access only via interface.
-	 * 
+	 *
 	 * @since 19.1
-	 * 
+	 *
 	 * @return fluent API
 	 */
 	public Binder withIndirectAccess() {
@@ -152,9 +152,9 @@ public class Binder {
 
 	/**
 	 * Bind something that is an {@link Initialiser} for the {@link Injector}.
-	 * 
+	 *
 	 * @since 19.1
-	 * 
+	 *
 	 * @return fluent API
 	 */
 	public TypedBinder<Initialiser<Injector>> initbind() {
@@ -163,7 +163,7 @@ public class Binder {
 
 	/**
 	 * @since 19.1
-	 * 
+	 *
 	 * @return fluent API
 	 */
 	public <T> TypedBinder<Initialiser<T>> initbind(Class<T> type) {
@@ -172,7 +172,7 @@ public class Binder {
 
 	/**
 	 * @since 19.1
-	 * 
+	 *
 	 * @return fluent API
 	 */
 	public <T> TypedBinder<Initialiser<T>> initbind(Type<T> type) {
@@ -234,11 +234,11 @@ public class Binder {
 	 * {@link Injector}. The {@link Injector} is bootstrapped lazily on first
 	 * usage. Use {@link Injector#subContext(String)} to resolve the sub-context
 	 * by name.
-	 * 
+	 *
 	 * @param subContext the name of the lazy {@link Injector} sub-context
 	 * @param lazyInstalled the {@link Bundle} to install in the sub-context
 	 *            lazy {@link Injector}
-	 * 
+	 *
 	 * @since 19.1
 	 */
 	@SafeVarargs
@@ -251,7 +251,7 @@ public class Binder {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param target the type whose instances should be initialised by calling
 	 *            some method
 	 * @since 19.1
@@ -267,14 +267,14 @@ public class Binder {
 	/**
 	 * Small utility to make initialisation calls that depend on instances
 	 * managed by the {@link Injector} easier.
-	 * 
+	 *
 	 * The basic principle is that the {@link #target} {@link Instance} is
 	 * initialised on the basis of some other dependency instance that is
 	 * resolved during initialisation phase and provided to the
 	 * {@link BiConsumer} function.
-	 * 
+	 *
 	 * @param <T> type of the instances that should be initialised
-	 * 
+	 *
 	 * @since 19.1
 	 */
 	public static class InitBinder<T> {
@@ -305,9 +305,9 @@ public class Binder {
 			});
 		}
 
-		public <C> void by(Class<? extends C> depencency,
+		public <C> void by(Class<? extends C> dependency,
 				BiConsumer<T, C> initialiser) {
-			by(defaultInstanceOf(raw(depencency)), initialiser);
+			by(defaultInstanceOf(raw(dependency)), initialiser);
 		}
 
 		public <C> void by(Name depName, Class<? extends C> depType,
@@ -363,7 +363,7 @@ public class Binder {
 	 * The {@link AutoBinder} makes use of mirrors to select and bind
 	 * constructors for beans and methods as factories and {@link Name} these
 	 * instances as well as provide {@link Parameter} hints.
-	 * 
+	 *
 	 * @since 19.1
 	 */
 	public static class AutoBinder {
@@ -552,7 +552,7 @@ public class Binder {
 
 		/**
 		 * Root for container "global" configuration.
-		 * 
+		 *
 		 * @since 19.1
 		 */
 		public TargetedBinder config() {
@@ -561,7 +561,7 @@ public class Binder {
 
 		/**
 		 * Root for target type specific configuration.
-		 * 
+		 *
 		 * @since 19.1
 		 */
 		public TargetedBinder config(Class<?> ns) {
@@ -570,7 +570,7 @@ public class Binder {
 
 		/**
 		 * Root for {@link Instance} specific configuration.
-		 * 
+		 *
 		 * @since 19.1
 		 */
 		public TargetedBinder config(Instance<?> ns) {
@@ -599,7 +599,7 @@ public class Binder {
 
 		/**
 		 * Bind {@link Method}s and {@link Constructor}s based on mirrors.
-		 * 
+		 *
 		 * @since 19.1
 		 */
 		public AutoBinder autobind() {
@@ -715,10 +715,10 @@ public class Binder {
 		/**
 		 * Utility method that creates the instances from the {@link Injector}
 		 * context given.
-		 * 
+		 *
 		 * This is used when a full {@link Supplier} contract is not needed to
 		 * save stating the not needed {@link Dependency} argument.
-		 * 
+		 *
 		 * @since 19.1
 		 */
 		public void toFactory(Function<Injector, T> factory) {
@@ -730,11 +730,11 @@ public class Binder {
 		 * bypasses {@link Scope} effects. The provided {@link Generator} is
 		 * directly called to generate the instance each time it should be
 		 * injected.
-		 * 
+		 *
 		 * If a {@link Scope} should apply use {@link #toSupplier(Supplier)}
 		 * instead or create a {@link Generator} bridge that does not implement
 		 * {@link Generator} itself.
-		 * 
+		 *
 		 * @since 19.1
 		 */
 		public void toGenerator(Generator<? extends T> generator) {
@@ -751,15 +751,15 @@ public class Binder {
 		/**
 		 * By default constants are not scoped. This implies that no
 		 * initialisation occurs for constants.
-		 * 
+		 *
 		 * In contrast to {@link #to(Object)} a scoped constant exist within a
 		 * {@link Scope} like instances created by the container. This has the
 		 * effect of running initialisation for the provided constant similar to
 		 * the initialisation that occurs for instances created by the
 		 * container.
-		 * 
+		 *
 		 * @since 19.1
-		 * 
+		 *
 		 * @param constant a "bean" instance
 		 */
 		public final void toScoped(T constant) {
@@ -782,8 +782,8 @@ public class Binder {
 		@SafeVarargs
 		public final void to(T constant1, T... constants) {
 			TypedBinder<T> multibinder = onMulti().toConstant(constant1);
-			for (int i = 0; i < constants.length; i++)
-				multibinder.toConstant(constants[i]);
+			for (T constant : constants)
+				multibinder.toConstant(constant);
 		}
 
 		public void toConstructor() {
@@ -793,7 +793,7 @@ public class Binder {
 		public void toConstructor(Class<? extends T> impl,
 				Parameter<?>... hints) {
 			if (!isClassInstantiable(impl))
-				throw InconsistentDeclaration.notConstructible(impl);
+				throw InconsistentDeclaration.notConstructable(impl);
 			to(env(ConstructsBy.class).reflect(impl), hints);
 		}
 
@@ -888,7 +888,7 @@ public class Binder {
 		}
 
 		@SafeVarargs
-		private final void expandElements(Parameter<? extends E>... hints) {
+		private void expandElements(Parameter<? extends E>... hints) {
 			expand(hints);
 		}
 
@@ -906,7 +906,7 @@ public class Binder {
 
 		@SafeVarargs
 		public final void toElements(E... constants) {
-			to(array(constants));
+			to(array((Object[]) constants));
 		}
 
 		@SuppressWarnings("unchecked")

@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.container;
@@ -42,7 +42,7 @@ import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
  * {@link Resources} created from {@link ResourceDescriptor}s.
  *
  * @author Jan Bernitt (jan@jbee.se)
- * 
+ *
  * @see Resources for bootstrapping of the {@link Injector} context
  * @see PostConstruct for instance initialisation
  */
@@ -90,7 +90,7 @@ public final class Container implements Injector, Env {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "ChainOfInstanceofChecks" })
 	@Override
 	public <T> T resolve(Dependency<T> dep) {
 		final Type<T> type = dep.type();
@@ -217,8 +217,7 @@ public final class Container implements Injector, Env {
 			Set<Integer> identities, Dependency<T> dep, Type<E> elementType,
 			Resource<? extends E>[] elementResources) {
 		Dependency<E> elemDep = dep.typed(elementType);
-		for (int i = 0; i < elementResources.length; i++) {
-			Resource<? extends E> elemResource = elementResources[i];
+		for (Resource<? extends E> elemResource : elementResources) {
 			if (elemResource.signature.isMatching(elemDep)) {
 				E instance = elemResource.generate(elemDep);
 				if (identities.add(identityHashCode(instance)))

@@ -22,17 +22,17 @@ import se.jbee.inject.Scope;
 import se.jbee.inject.binder.BinderModule;
 
 /**
- * Provides a {@link Supplier} that can resolve all {@link AnnotatedWith}
+ * Provides a {@link se.jbee.inject.Supplier} that can resolve all {@link AnnotatedWith}
  * dependencies.
- * 
+ *
  * This allows to inject a {@link Collection} of instances which are annotated
  * with the {@link Annotation} referenced by the type parameter of
  * {@link AnnotatedWith}.
- * 
+ *
  * The {@link Injector} provides a convenience method to access the resolved
  * instances using {@link Injector#annotatedWith(Class)}. This will only work if
  * this module is installed.
- * 
+ *
  * @since 19.1
  */
 final class AnnotatedWithModule extends BinderModule {
@@ -44,7 +44,7 @@ final class AnnotatedWithModule extends BinderModule {
 	@Override
 	protected void declare() {
 		asDefault().bind(CACHE).to(new HashMap<>());
-		asDefault() // 
+		asDefault() //
 				.per(Scope.dependencyType) //
 				.bind(anyOf(
 						raw(AnnotatedWith.class).parametizedAsUpperBounds())) //

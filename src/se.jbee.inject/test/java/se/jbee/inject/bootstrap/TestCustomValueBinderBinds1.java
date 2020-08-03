@@ -1,5 +1,19 @@
 package se.jbee.inject.bootstrap;
 
+import org.junit.Test;
+import se.jbee.inject.*;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import se.jbee.inject.bind.*;
+import se.jbee.inject.binder.BinderModule;
+import se.jbee.inject.binder.New;
+import se.jbee.inject.binder.Supply;
+import se.jbee.inject.defaults.DefaultValueBinders;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -7,33 +21,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static se.jbee.inject.Type.fieldType;
 import static se.jbee.inject.bind.BindingType.CONSTRUCTOR;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-
-import org.junit.Test;
-
-import se.jbee.inject.DeclarationType;
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Env;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Instance;
-import se.jbee.inject.Locator;
-import se.jbee.inject.Resource;
-import se.jbee.inject.Supplier;
-import se.jbee.inject.Type;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
-import se.jbee.inject.bind.Binding;
-import se.jbee.inject.bind.BindingType;
-import se.jbee.inject.bind.Bindings;
-import se.jbee.inject.bind.Bundle;
-import se.jbee.inject.bind.ValueBinder;
-import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.binder.New;
-import se.jbee.inject.binder.Supply;
-import se.jbee.inject.defaults.DefaultValueBinders;
 
 /**
  * Demonstrates how to use {@link ValueBinder}s to customize the and binding

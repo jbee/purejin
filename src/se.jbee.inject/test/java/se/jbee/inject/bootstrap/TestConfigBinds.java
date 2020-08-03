@@ -1,19 +1,17 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static se.jbee.inject.Name.named;
+import org.junit.Test;
+import se.jbee.inject.Converter;
+import se.jbee.inject.Injector;
+import se.jbee.inject.binder.BinderModule;
+import se.jbee.inject.config.Config;
 
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import org.junit.Test;
-
-import se.jbee.inject.Converter;
-import se.jbee.inject.Injector;
-import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.config.Config;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static se.jbee.inject.Name.named;
 
 public class TestConfigBinds {
 

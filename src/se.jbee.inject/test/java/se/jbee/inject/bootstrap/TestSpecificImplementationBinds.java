@@ -1,16 +1,14 @@
 package se.jbee.inject.bootstrap;
 
+import org.junit.Test;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Instance;
+import se.jbee.inject.binder.BinderModule;
+
 import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
-
-import org.junit.Test;
-
-import se.jbee.inject.Injector;
-import se.jbee.inject.Instance;
-import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
 
 /**
  * Test illustrates how to inject specific implementation for same interface

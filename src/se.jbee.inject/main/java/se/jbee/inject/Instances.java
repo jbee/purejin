@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -84,16 +84,16 @@ public final class Instances implements Qualifying<Instances>,
 	 *         precise hierarchy element.
 	 */
 	@Override
-	public boolean moreQualiedThan(Instances other) {
+	public boolean moreQualifiedThan(Instances other) {
 		if (this == other)
 			return false;
-		if (hierarchy.length != other.hierarchy.length) {
+		if (other.hierarchy.length != hierarchy.length) {
 			return hierarchy.length > other.hierarchy.length;
 		}
 		for (int i = 0; i < hierarchy.length; i++) {
-			if (hierarchy[i].moreQualiedThan(other.hierarchy[i]))
+			if (hierarchy[i].moreQualifiedThan(other.hierarchy[i]))
 				return true;
-			if (other.hierarchy[i].moreQualiedThan(hierarchy[i]))
+			if (other.hierarchy[i].moreQualifiedThan(hierarchy[i]))
 				return false;
 		}
 		return false;

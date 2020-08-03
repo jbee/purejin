@@ -1,15 +1,13 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
-
 import se.jbee.inject.Injector;
 import se.jbee.inject.bind.Bootstrapper;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.InitializedBinder;
-import se.jbee.inject.bootstrap.Bootstrap;
+
+import static org.junit.Assert.assertEquals;
 
 public class TestLambdaBinds {
 

@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.event;
@@ -30,7 +30,7 @@ import se.jbee.inject.Type;
 /**
  * Default implementation of the {@link EventProcessor} supporting all
  * {@link EventPolicy}.
- * 
+ *
  * @since 19.1
  */
 public class ConcurrentEventProcessor implements EventProcessor {
@@ -51,7 +51,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 		 * If the use succeeds (result is true) the end of usage should be
 		 * marked by calling {@link #release()} so that this handler can
 		 * continue to keep track of the concurrent using threads.
-		 * 
+		 *
 		 * @return true if this handler could be reserved for usage by the
 		 *         calling thread, else false.
 		 */
@@ -79,7 +79,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 		 * {@link #release(EventHandler)} right after usage ends unless its
 		 * handler reference became collected. In that case the handler became
 		 * out-dated.
-		 * 
+		 *
 		 * @return a free handler to use or null if there is no such handler
 		 */
 		EventHandler<E> acquire(Event<E, ?> e) {
@@ -155,7 +155,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	}
 
 	@Override
-	public <E> void deregister(Class<E> event, E handler) {
+	public <E> void unregister(Class<E> event, E handler) {
 		EventHandlers<?> hs = handlersByEventType.get(event);
 		if (hs != null && !hs.isEmpty())
 			hs.removeIf(h -> h.handler == handler);
@@ -194,7 +194,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	// - what to do when giving up?
 	// - how often should I retry?
 	// note: these can be programmed as a utility on top with basically the same effect and little extra overhead for a corner case
-	//       as long as there is a clear contract: namely that failure is always indicated by a EventEception
+	//       as long as there is a clear contract: namely that failure is always indicated by a EventException
 	@Override
 	public <E, T> T compute(Event<E, T> event) throws Exception {
 		return unwrapGet(event, submit(event, () -> doProcess(event)));
@@ -254,10 +254,12 @@ public class ConcurrentEventProcessor implements EventProcessor {
 				return res;
 			for (int j = 0; j < size; j++) {
 				EventHandler<E> h = needRetry.pollFirst();
-				if (h.acquire(event)) {
-					res = doAggregate(event, h, res);
-				} else {
-					needRetry.addLast(h);
+				if (h != null) {
+					if (h.acquire(event)) {
+						res = doAggregate(event, h, res);
+					} else {
+						needRetry.addLast(h);
+					}
 				}
 			}
 		}
@@ -272,7 +274,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 			return aggregator == null || res == null
 				? res1
 				: aggregator.apply(res, res1);
-			// TODO shoudn't there be a catch here so each handler's errors are isolated?
+			// TODO shouldn't there be a catch here so each handler's errors are isolated?
 		} finally {
 			h.release();
 		}
@@ -322,7 +324,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 					(BinaryOperator<T>) defaultAggregator(raw,
 							target.getParameterTypes(), args));
 			if (e.returnsVoid()) {
-				processor.dispatch((Event<E, Void>) e);
+				processor.dispatch(e);
 				return null;
 			}
 			if (raw == Future.class) {

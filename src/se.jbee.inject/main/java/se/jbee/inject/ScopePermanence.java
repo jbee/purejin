@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -16,11 +16,11 @@ import java.io.Serializable;
  * A {@link ScopePermanence} is a description for the life-cycle relations
  * between one {@link Scope} and other {@link Scope}s which determines which
  * {@link Scope}s are valid to nest within each other and which are not.
- * 
+ *
  * The {@link #scope} can also be made {@link #eager()} to have instances within
  * this {@link Scope} be created during bootstrapping when an {@link Injector}
  * context is created.
- * 
+ *
  * @since 19.1
  */
 public final class ScopePermanence implements Serializable {
@@ -70,11 +70,11 @@ public final class ScopePermanence implements Serializable {
 	/**
 	 * Declares this {@link ScopePermanence} as being stable in the given
 	 * parent.
-	 * 
+	 *
 	 * Declares the given parent {@link Scope} at least as stable as this scope.
 	 * This means this {@link Scope} can be injected into the given parent
 	 * {@link Scope} without wrapping it in a {@link Provider} or alike.
-	 * 
+	 *
 	 * @param parent another {@link Scope} type
 	 * @return this for chaining
 	 */
@@ -100,7 +100,7 @@ public final class ScopePermanence implements Serializable {
 		if (!isPermanent())
 			throw new IllegalStateException(
 					"Must be permanent to become eager but was " + this);
-		return new ScopePermanence(scope, consistentInScopes, permanent, true,
+		return new ScopePermanence(scope, consistentInScopes, true, true,
 				group);
 	}
 

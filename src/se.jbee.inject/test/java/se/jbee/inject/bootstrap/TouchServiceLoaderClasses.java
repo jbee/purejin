@@ -1,7 +1,6 @@
 package se.jbee.inject.bootstrap;
 
 import org.junit.Test;
-
 import se.jbee.inject.binder.ServiceLoaderAnnotations;
 import se.jbee.inject.binder.ServiceLoaderBundles;
 import se.jbee.inject.binder.ServiceLoaderEnvBundles;

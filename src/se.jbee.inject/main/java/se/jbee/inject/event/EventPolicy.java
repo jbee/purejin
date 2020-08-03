@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.event;
@@ -16,14 +16,14 @@ import java.util.function.BinaryOperator;
 /**
  * A {@link EventPolicy} controls how the {@link Event}s are processed by a
  * {@link EventProcessor}.
- * 
+ *
  * {@link EventProcessor} are optimised for throughput. Therefore some fault
  * tolerance features make less sense. A bulkhead is about flow control and
  * deliberately introduces waiting which is not desirable for an
  * {@link EventProcessor}. A timeout or circuit breaker for individual handlers
  * are no good fit for a multi-dispatch system. Fault tolerance comes from
  * redundancy (multiple handlers) and eventually retrying.
- * 
+ *
  * @since 19.1
  */
 public final class EventPolicy implements Serializable {
@@ -34,9 +34,9 @@ public final class EventPolicy implements Serializable {
 		/**
 		 * Whether or not to use multi-dispatch for methods with return type
 		 * {@link Void} or {@code void}.
-		 * 
+		 *
 		 * Default is {@code true} (do multi-dispatch to all handlers).
-		 * 
+		 *
 		 * Methods with other returns types are dispatched to one of the
 		 * registered handlers switched by a round robin strategy.
 		 */
@@ -45,7 +45,7 @@ public final class EventPolicy implements Serializable {
 		/**
 		 * Whether or not to block and wait for multi-dispatch until all
 		 * handlers complete the call.
-		 * 
+		 *
 		 * Default is {@code false} (no sync).
 		 */
 		MULTI_DISPATCH_SYNC,
@@ -53,12 +53,12 @@ public final class EventPolicy implements Serializable {
 		/**
 		 * Whether or not to use multi-dispatch and aggregate the individual
 		 * results.
-		 * 
+		 *
 		 * For return type {@link Boolean} or {@code boolean} aggregation is AND
 		 * operator. For integers it is {@link Integer#sum(int, int)}. Other
 		 * aggregation functions are picked up dynamically in case the last
 		 * method parameter is of raw type {@link BinaryOperator}.
-		 * 
+		 *
 		 * Default is {@code false} (no aggregation).
 		 */
 		MULTI_DISPATCH_AGGREGATED,
@@ -69,7 +69,7 @@ public final class EventPolicy implements Serializable {
 		 * there is no handler for the event instead of throwing an
 		 * {@link EventException}.
 		 */
-		RETURN_NO_HANDLER_AS_NULL;
+		RETURN_NO_HANDLER_AS_NULL
 	}
 
 	public static final EventPolicy DEFAULT = new EventPolicy(Integer.MAX_VALUE,
@@ -85,7 +85,7 @@ public final class EventPolicy implements Serializable {
 	/**
 	 * The maximum number of threads that should be allowed to run *any* of the
 	 * event interfaces methods concurrently.
-	 * 
+	 *
 	 * So any threading issue within any of the methods can be avoided by
 	 * setting this to 1 which assures isolation across *all* methods of the
 	 * event interface. That means if any thread calls any of the methods no
@@ -100,11 +100,11 @@ public final class EventPolicy implements Serializable {
 	/**
 	 * The maximum number of milliseconds the event may be in the queue (before
 	 * starting processing) that is still accepted and processed.
-	 * 
+	 *
 	 * If the TTL is exceeded before the processing is started the event will
 	 * throw a {@link EventException} with a cause of a
 	 * {@link TimeoutException}.
-	 * 
+	 *
 	 * A zero or negative TTL means there is no Time To Live and all events are
 	 * processed no matter how long they wait in the queue.
 	 */
@@ -113,7 +113,7 @@ public final class EventPolicy implements Serializable {
 	@SuppressWarnings("squid:S1319")
 	private final EnumSet<Flags> flags;
 
-	//TODO what is Success? disptach to 1 of many in round robin, dispatch to all?, dispatch to x% of many?
+	//TODO what is Success? dispatch to 1 of many in round robin, dispatch to all?, dispatch to x% of many?
 
 	private EventPolicy(int maxAttempts, int maxConcurrency, int ttl,
 			EnumSet<Flags> flags) {

@@ -1,5 +1,15 @@
 package se.jbee.inject.bootstrap;
 
+import org.junit.Test;
+import se.jbee.inject.*;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import se.jbee.inject.binder.BinderModule;
+import se.jbee.inject.util.Resource;
+import se.jbee.inject.util.WebMethod;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static se.jbee.inject.Cast.providerTypeOf;
@@ -10,22 +20,6 @@ import static se.jbee.inject.config.HintsBy.noParameters;
 import static se.jbee.inject.config.NamesBy.defaultName;
 import static se.jbee.inject.config.ProducesBy.allMethods;
 import static se.jbee.inject.config.ProducesBy.declaredMethods;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-
-import org.junit.Test;
-
-import se.jbee.inject.Injector;
-import se.jbee.inject.Instance;
-import se.jbee.inject.Name;
-import se.jbee.inject.Provider;
-import se.jbee.inject.Scope;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
-import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.util.Resource;
-import se.jbee.inject.util.WebMethod;
 
 /**
  * This test demonstrates the use of mirrors to semi-automatically bind

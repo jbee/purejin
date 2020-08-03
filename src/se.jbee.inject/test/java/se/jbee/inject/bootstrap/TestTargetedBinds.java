@@ -1,21 +1,19 @@
 package se.jbee.inject.bootstrap;
 
+import org.junit.Test;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Instance;
+import se.jbee.inject.Name;
+import se.jbee.inject.binder.Binder.ScopedBinder;
+import se.jbee.inject.binder.BinderModule;
+
+import java.io.Serializable;
+
 import static org.junit.Assert.assertSame;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
-
-import java.io.Serializable;
-
-import org.junit.Test;
-
-import se.jbee.inject.Injector;
-import se.jbee.inject.Instance;
-import se.jbee.inject.Name;
-import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.binder.Binder.ScopedBinder;
-import se.jbee.inject.bootstrap.Bootstrap;
 
 /**
  * A test that demonstrates how to inject a specific instance into another type

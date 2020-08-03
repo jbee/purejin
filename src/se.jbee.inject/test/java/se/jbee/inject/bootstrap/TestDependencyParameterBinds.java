@@ -1,20 +1,18 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertSame;
-import static se.jbee.inject.Dependency.dependency;
-
-import java.util.logging.Logger;
-
 import org.junit.Test;
-
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Parameter;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
-import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.defaults.CoreFeature;
+
+import java.util.logging.Logger;
+
+import static org.junit.Assert.assertSame;
+import static se.jbee.inject.Dependency.dependency;
 
 /**
  * This test demonstrates the most powerful {@link Parameter} hint: a

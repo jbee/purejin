@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -13,14 +13,14 @@ import se.jbee.inject.config.ScopesBy;
 
 /**
  * A {@linkplain Scope} describes a particular lifecycle.
- * 
+ *
  * The {@linkplain Scope} itself acts as the source of instances. Each
  * {@link Injector} has a single instance of each {@linkplain Scope} used.
- * 
+ *
  * All {@link Scope} instances themselves are container instances in the
  * {@link #container} scope which is a special "singleton" scope used during
  * bootstrapping of the {@link Injector} context.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 @FunctionalInterface
@@ -40,7 +40,7 @@ public interface Scope {
 	 *         the given {@link Provider} and added to this {@link Scope} data
 	 *         structure (forever if it is an application wide singleton or
 	 *         shorter depending on the {@link Scope}).
-	 * 
+	 *
 	 *         The information from the {@link Dependency} and {@link Resource}
 	 *         can be used to lookup existing instances.
 	 */
@@ -49,7 +49,7 @@ public interface Scope {
 
 	/**
 	 * A virtual scope used by the {@link ScopesBy} to indicate that no
-	 * particular scope should be used. This falls back on {@link application}.
+	 * particular scope should be used. This falls back on {@link #application}.
 	 */
 	Name auto = named("@auto");
 
@@ -105,7 +105,7 @@ public interface Scope {
 	 * threads that a linked to a fresh scope for each work item. In contrast to
 	 * a {@link #thread} scope the worker scope resets when it is unlinked and
 	 * linked again for the same {@link Thread}.
-	 * 
+	 *
 	 * A typical example of a worker scope is a 'per-request' scope in a HTTP
 	 * server.
 	 */
@@ -119,7 +119,7 @@ public interface Scope {
 
 	Name targetInstance = named("target-instance");
 
-	public static Name disk(File dir) {
+	static Name disk(File dir) {
 		return Name.named("disk:" + dir.getAbsolutePath());
 	}
 
@@ -127,7 +127,7 @@ public interface Scope {
 	 * Often called the 'default' or 'prototype'-scope. Asks the
 	 * {@link Provider} once per injection.
 	 */
-	public static final Scope INJECTION = Scope::injection;
+	Scope INJECTION = Scope::injection;
 
 	@SuppressWarnings("unused")
 	static <T> T injection(int serialID, int resources,
@@ -138,48 +138,48 @@ public interface Scope {
 
 	/**
 	 * SPI for temporary {@link Thread} bound {@link Scope}s.
-	 * 
+	 *
 	 * For example to {@link #allocate()} and {@link #deallocate()} the
 	 * {@link Scope#worker} to a worker {@link Thread}.
-	 * 
+	 *
 	 * An instance of the {@link Controller} is resolved from the
 	 * {@link Injector} using the {@link Scope}'s {@link Name} as
 	 * {@link Instance} name for the {@link Controller} {@link Dependency}.
-	 * 
+	 *
 	 * To create a fresh {@link Scope} context resolve the instance with the
 	 * worker {@link Thread}.
-	 * 
+	 *
 	 * To transfer an existing {@link Scope} context to a worker {@link Thread}
 	 * resolve the instance with the {@link Thread} that should be the source of
 	 * the transfer. The source must be {@link #allocate()}ed already. A
 	 * transfer is used to e.g. perform asynchronous computation as part of a
 	 * work item where the asynchronous computation should have access to
 	 * resources of the outer work item.
-	 * 
+	 *
 	 * This interface is usually implemented by binding the {@link Controller}
 	 * in the {@link Scope} it controls so that its implementation can return
 	 * the controller implementation.
-	 * 
+	 *
 	 * @since 19.1
 	 */
-	public interface Controller {
+	interface Controller {
 
 		/**
 		 * Activates a worker {@link Scope} for the current {@link Thread}.
-		 * 
+		 *
 		 * This method must be called by the worker {@link Thread} at the
 		 * beginning of starting a work item.
-		 * 
+		 *
 		 * When this {@link Controller} was resolved within the worker
 		 * {@link Thread} a fresh empty {@link Scope} context is created.
-		 * 
+		 *
 		 * When this {@link Controller} was resolved by another {@link Thread}
 		 * the existing {@link Scope} context of that {@link Thread} is
 		 * transferred to or shared with the current worker {@link Thread}.
 		 * Should the {@link Scope} be {@link #deallocate()}ed by the source of
 		 * the transfer it will continue to exist and be valid to use by this
 		 * worker {@link Thread} until it is also deallocated by it.
-		 * 
+		 *
 		 * Such transfer of {@link Scope} from one {@link Thread} to another
 		 * worker can occur whether or not the source created the {@link Scope}
 		 * or received it by transfer itself.
@@ -188,14 +188,14 @@ public interface Scope {
 
 		/**
 		 * Deactivates an existing {@link Scope} for the current {@link Thread}.
-		 * 
+		 *
 		 * This has no effect on the allocation state of other {@link Thread}s,
 		 * neither those receiving a transfer from the current {@link Thread}
 		 * nor those that transferred to the current worker {@link Thread}.
-		 * 
+		 *
 		 * This method must be called by the worker {@link Thread} at the end of
 		 * working a work item.
-		 * 
+		 *
 		 * If no {@link Scope} context was allocated for the current
 		 * {@link Thread} the call has no effect.
 		 */

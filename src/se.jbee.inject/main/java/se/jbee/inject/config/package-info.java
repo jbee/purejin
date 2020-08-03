@@ -2,7 +2,7 @@
  * <p>
  * This package contains abstractions used to configure the binding process.
  * </p>
- * 
+ *
  * <h2>Software Editions</h2>
  * <p>
  * {@link se.jbee.inject.config.Edition}s can be used to vary the set of
@@ -22,7 +22,7 @@
  * One way to select members of an {@link se.jbee.inject.config.Edition} are
  * {@link se.jbee.inject.config.Feature} {@link java.lang.Enum}s.
  * </p>
- * 
+ *
  * <h2>Customising Binding Backend</h2>
  * <p>
  * The second way to configure the binding process is through the use of
@@ -42,7 +42,7 @@
  * {@link se.jbee.inject.binder.BinderModule#autobind()} and the
  * {@link se.jbee.inject.binder.Binder.AutoBinder} methods. These only replace
  * them for the currently used fluent API binder.
- * 
+ *
  * <h2>Ad-hoc Extension</h2>
  * <p>
  * An {@link se.jbee.inject.config.Extension} is a marker interface to mark
@@ -59,6 +59,5 @@
  * {@link se.jbee.inject.Resource}s made by the
  * {@link se.jbee.inject.binder.Binder.PluginBinder}.</li>
  * </ul>
- * </p>
  */
 package se.jbee.inject.config;

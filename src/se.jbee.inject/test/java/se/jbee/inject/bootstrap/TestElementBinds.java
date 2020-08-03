@@ -1,21 +1,17 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static se.jbee.inject.Type.raw;
+import org.junit.Test;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Parameter;
+import se.jbee.inject.binder.Binder.TypedElementBinder;
+import se.jbee.inject.binder.BinderModule;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.junit.Test;
-
-import se.jbee.inject.Injector;
-import se.jbee.inject.Parameter;
-import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.binder.Binder.TypedElementBinder;
-import se.jbee.inject.bootstrap.Bootstrap;
+import static org.junit.Assert.*;
+import static se.jbee.inject.Type.raw;
 
 /**
  * Tests that demonstrates how to overlay the default behavior of 1-dimensional

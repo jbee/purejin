@@ -1,17 +1,15 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertEquals;
-import static se.jbee.inject.DeclarationType.EXPLICIT;
-
 import org.junit.Test;
-
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.bind.Binding;
 import se.jbee.inject.bind.Bindings;
 import se.jbee.inject.bind.Module;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
-import se.jbee.inject.bootstrap.Bootstrap;
+
+import static org.junit.Assert.assertEquals;
+import static se.jbee.inject.DeclarationType.EXPLICIT;
 
 /**
  * Making sure the general functions of the {@link BinderModule} work as

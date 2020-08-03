@@ -1,26 +1,17 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static se.jbee.inject.Cast.resourcesTypeFor;
-import static se.jbee.inject.ScopePermanence.ignore;
+import org.junit.Before;
+import org.junit.Test;
+import se.jbee.inject.*;
+import se.jbee.inject.binder.BinderModule;
+import se.jbee.inject.defaults.DefaultScopes;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import se.jbee.inject.DeclarationType;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Name;
-import se.jbee.inject.Resource;
-import se.jbee.inject.Scope;
-import se.jbee.inject.ScopePermanence;
-import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.defaults.DefaultScopes;
+import static org.junit.Assert.*;
+import static se.jbee.inject.Cast.resourcesTypeFor;
+import static se.jbee.inject.ScopePermanence.ignore;
 
 /**
  * Verifies the {@link ScopePermanence} of the {@link DefaultScopes}.

@@ -1,22 +1,20 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertEquals;
-import static se.jbee.inject.Name.named;
-
-import java.lang.reflect.Field;
-
 import org.junit.Test;
-
 import se.jbee.inject.Initialiser;
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.util.Resource;
+
+import java.lang.reflect.Field;
+
+import static org.junit.Assert.assertEquals;
+import static se.jbee.inject.Name.named;
 
 /**
  * This test demonstrates how a {@link Initialiser} for {@link Object} can be
  * used to add annotation based injection to the {@link Injector}.
- * 
+ *
  * In this basic example the {@link Resource} annotation is used to mark field
  * that should be injected. The naive implementation of the annotation
  * {@link Initialiser} then iterates the {@link Field}s of the target to check

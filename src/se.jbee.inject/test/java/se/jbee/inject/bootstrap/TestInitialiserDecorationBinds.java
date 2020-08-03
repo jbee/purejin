@@ -1,28 +1,34 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
-import java.awt.Shape;
-import java.awt.geom.Area;
-import java.lang.reflect.Proxy;
-
 import org.junit.Test;
-
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Initialiser;
 import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
+
+import java.lang.reflect.Proxy;
+
+import static org.junit.Assert.*;
 
 /**
  * Tests demonstrates how to use {@link Initialiser}s to decorate the
  * {@link Injector} or bound instances.
  */
 public class TestInitialiserDecorationBinds {
+
+	interface Shape {
+
+		Object getBounds();
+	}
+
+	static final class Area implements Shape {
+
+		@Override
+		public Object getBounds() {
+			return new Object();
+		}
+	}
 
 	private static class TestInitialiserDecorationModule extends BinderModule
 			implements Initialiser<Shape> {

@@ -1,20 +1,18 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertEquals;
-import static se.jbee.inject.Type.raw;
-
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.Test;
-
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.binder.Binder;
 import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
+
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static se.jbee.inject.Type.raw;
 
 /**
  * The tests demonstrates the meaning of a {@link Binder#autobind(Class)} call.

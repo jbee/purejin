@@ -184,6 +184,7 @@ public enum CoreFeature implements Toggled<CoreFeature> {
 	private static final class SubContextModule extends BinderModule
 			implements se.jbee.inject.Supplier<Injector>, Injector {
 
+		@SuppressWarnings("rawtypes")
 		public static final Type<Function> INJECTOR_PROVIDER_TYPE = raw(
 				Function.class).parametized(Class[].class, Injector.class);
 

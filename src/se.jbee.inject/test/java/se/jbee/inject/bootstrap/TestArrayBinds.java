@@ -1,15 +1,13 @@
 package se.jbee.inject.bootstrap;
 
-import static se.jbee.inject.Name.named;
-import static se.jbee.inject.bootstrap.AssertInjects.assertEqualSets;
-
 import org.junit.Test;
-
 import se.jbee.inject.Hint;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Name;
 import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
+
+import static se.jbee.inject.Name.named;
+import static se.jbee.inject.bootstrap.AssertInjects.assertEqualSets;
 
 /**
  * How to inject different arrays into different instances of the same parent

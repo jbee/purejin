@@ -1,25 +1,18 @@
 package se.jbee.inject.bootstrap;
 
-import static se.jbee.inject.bootstrap.AssertInjects.assertEqualSets;
-
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.junit.Test;
-
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
-import se.jbee.inject.bind.Bootstrapper;
-import se.jbee.inject.bind.Toggled;
 import se.jbee.inject.bind.Bootstrapper.Toggler;
+import se.jbee.inject.bind.Toggled;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
-import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.config.Edition;
 import se.jbee.inject.config.Feature;
+
+import java.lang.annotation.*;
+
+import static se.jbee.inject.bootstrap.AssertInjects.assertEqualSets;
 
 /**
  * A test that demonstrates how to use {@link Feature}s and {@link Edition}s to

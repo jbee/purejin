@@ -1,37 +1,24 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-import static se.jbee.inject.Cast.resourcesTypeFor;
-import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.config.ConstructsBy.common;
-
-import java.beans.ConstructorProperties;
-
 import org.junit.Test;
-
-import se.jbee.inject.DeclarationType;
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Env;
-import se.jbee.inject.Generator;
-import se.jbee.inject.InconsistentDeclaration;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Locator;
-import se.jbee.inject.Name;
-import se.jbee.inject.Resource;
-import se.jbee.inject.Scope;
-import se.jbee.inject.ScopePermanence;
-import se.jbee.inject.Supplier;
+import se.jbee.inject.*;
 import se.jbee.inject.UnresolvableDependency.DependencyCycle;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
-import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.defaults.DefaultScopes;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import static org.junit.Assert.*;
+import static se.jbee.inject.Cast.resourcesTypeFor;
+import static se.jbee.inject.Name.named;
+import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.config.ConstructsBy.common;
 
 /**
  * The tests shows an example of cyclic depended {@link Bundle}s. It shows that
@@ -192,13 +179,19 @@ public class TestBootstrapper {
 		}
 	}
 
+	@Target(ElementType.CONSTRUCTOR)
+	@Retention(RetentionPolicy.RUNTIME)
+	@interface ConstructFrom {
+
+	}
+
 	private static class CustomMirrorModule extends BinderModule {
 
 		@Override
 		protected Env configure(Env env) {
 			return Environment.override(env) //
 					.with(ConstructsBy.class,
-							common.annotatedWith(ConstructorProperties.class));
+							common.annotatedWith(ConstructFrom.class));
 		}
 
 		@Override
@@ -213,7 +206,7 @@ public class TestBootstrapper {
 
 		final String s;
 
-		@ConstructorProperties({})
+		@ConstructFrom
 		D(String s) {
 			this.s = s;
 

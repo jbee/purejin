@@ -1,16 +1,14 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static se.jbee.inject.Name.named;
-
 import org.junit.Test;
-
 import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static se.jbee.inject.Name.named;
 
 /**
  * In Silk primitives and wrapper {@link Class}es are the same {@link Type}.

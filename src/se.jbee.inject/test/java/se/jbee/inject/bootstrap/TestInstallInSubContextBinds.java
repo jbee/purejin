@@ -1,28 +1,21 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static se.jbee.inject.Name.DEFAULT;
-import static se.jbee.inject.Type.raw;
-
 import org.junit.Test;
-
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
+
+import static org.junit.Assert.*;
+import static se.jbee.inject.Name.DEFAULT;
+import static se.jbee.inject.Type.raw;
 
 /**
  * A test that demonstrates how {@link Bundle}s (here in form of
  * {@link BinderModule}s) are installed for lazy bootstrapped {@link Injector}
  * sub-contexts.
- * 
+ *
  * This form of {@link Injector} nesting is not limited to any depth. In this
  * example the first level is the "foo" sub-context, the second level is the
  * "bar" sub-context defined in "foo".

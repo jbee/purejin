@@ -1,21 +1,16 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static se.jbee.inject.Cast.initialiserTypeOf;
-import static se.jbee.inject.Type.raw;
-
 import org.junit.Test;
-
 import se.jbee.inject.Env;
 import se.jbee.inject.Initialiser;
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.Binder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BinderModuleWith;
-import se.jbee.inject.bootstrap.Bootstrap;
+
+import static org.junit.Assert.*;
+import static se.jbee.inject.Cast.initialiserTypeOf;
+import static se.jbee.inject.Type.raw;
 
 /**
  * The tests demonstrates how the {@link Initialiser} and

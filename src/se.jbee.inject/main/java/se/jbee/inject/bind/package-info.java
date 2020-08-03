@@ -3,7 +3,7 @@
  * This package provides the high level fluent
  * {@link se.jbee.inject.binder.Binder} API.
  * </p>
- * 
+ *
  * *
  * <p>
  * This package contains the core API to create
@@ -11,7 +11,7 @@
  * {@link se.jbee.inject.ResourceDescriptor}s to create a
  * {@link se.jbee.inject.Injector} context from.
  * </p>
- * 
+ *
  * <h2>API</h2>
  * <p>
  * The core element of composition is a {@link se.jbee.inject.bind.Bundle}. Its
@@ -37,7 +37,7 @@
  * accessible through a {@link java.lang.Enum} and its constants. This is the
  * equivalent of an interface for {@link se.jbee.inject.bind.Bundle} classes.
  * </p>
- * 
+ *
  * <h2>Fluent API Usage</h2>
  * <p>
  * Most notably the fluent API uses effective immutable objects. This means any
@@ -56,33 +56,7 @@
  * {@link se.jbee.inject.bind.ModuleWith} is usually implemented using the
  * {@link se.jbee.inject.binder.BinderModuleWith} API.
  * </p>
- * 
- * <h2>Defaults</h2>
- * <p>
- * The base classes mentioned in usage section all install the
- * {@link se.jbee.inject.defaults.DefaultsBundle} which binds defaults for
- * {@link se.jbee.inject.Scope}s, {@link se.jbee.inject.AnnotatedWith} and
- * {@link se.jbee.inject.config.Extension}. As always this can be uninstalled or
- * overridden using explicit binds.
- * </p>
- * 
- * <h2>Utilities</h2>
- * <p>
- * The {@link se.jbee.inject.defaults.AnnotatedWithModule} provides the default
- * implementation of the {@link se.jbee.inject.AnnotatedWith} utility type.
- * </p>
- * <p>
- * The {@link se.jbee.inject.defaults.ExtensionModule} provides the default
- * implementation for {@link se.jbee.inject.config.Extension} concept.
- * </p>
- * <p>
- * The {@link se.jbee.inject.defaults.CoreFeature}
- * {@link se.jbee.inject.binder.TogglerBundle} provides type level adapters.
- * {@link se.jbee.inject.defaults.CoreFeature#ENV} and
- * {@link se.jbee.inject.defaults.CoreFeature#SUB_CONTEXT} are installed by
- * default.
- * </p>
- * 
+ *
  * <h2>Custom Environments</h2>
  * <p>
  * The {@link se.jbee.inject.binder.EnvModule} provides a base

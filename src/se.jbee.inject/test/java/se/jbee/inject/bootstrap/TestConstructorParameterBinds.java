@@ -1,24 +1,18 @@
 package se.jbee.inject.bootstrap;
 
+import org.junit.Test;
+import se.jbee.inject.*;
+import se.jbee.inject.binder.BinderModule;
+
+import java.io.Serializable;
+import java.lang.reflect.Constructor;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static se.jbee.inject.Hint.constant;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
-
-import java.io.Serializable;
-import java.lang.reflect.Constructor;
-
-import org.junit.Test;
-
-import se.jbee.inject.Hint;
-import se.jbee.inject.InconsistentDeclaration;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Instance;
-import se.jbee.inject.Parameter;
-import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
 
 /**
  * The test illustrates how to use {@link Parameter}s to give hints which

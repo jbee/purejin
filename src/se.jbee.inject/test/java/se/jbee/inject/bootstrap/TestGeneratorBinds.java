@@ -1,17 +1,15 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertEquals;
-import static se.jbee.inject.Cast.resourceTypeFor;
-import static se.jbee.inject.Type.raw;
-
 import org.junit.Test;
-
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Generator;
 import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
+
+import static org.junit.Assert.assertEquals;
+import static se.jbee.inject.Cast.resourceTypeFor;
+import static se.jbee.inject.Type.raw;
 
 public class TestGeneratorBinds {
 

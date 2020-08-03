@@ -1,20 +1,18 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertEquals;
-import static se.jbee.inject.Instance.instance;
-import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Type.raw;
-
-import java.util.Properties;
-
 import org.junit.Test;
-
 import se.jbee.inject.Env;
 import se.jbee.inject.Hint;
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BinderModuleWith;
-import se.jbee.inject.bootstrap.Bootstrap;
+
+import java.util.Properties;
+
+import static org.junit.Assert.assertEquals;
+import static se.jbee.inject.Instance.instance;
+import static se.jbee.inject.Name.named;
+import static se.jbee.inject.Type.raw;
 
 /**
  * In reply to https://groups.google.com/forum/#!topic/silk-di/JhBnvF7k6Q4

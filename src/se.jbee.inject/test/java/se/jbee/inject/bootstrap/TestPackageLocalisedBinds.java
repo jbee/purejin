@@ -1,20 +1,18 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertEquals;
-import static se.jbee.inject.Dependency.dependency;
-import static se.jbee.inject.Packages.subPackagesOf;
+import org.junit.Test;
+import se.jbee.inject.Dependency;
+import se.jbee.inject.Injector;
+import se.jbee.inject.binder.Binder.TargetedBinder;
+import se.jbee.inject.binder.BinderModule;
 
-import java.awt.Canvas;
+import java.nio.LongBuffer;
 import java.text.Format;
 import java.util.List;
 
-import org.junit.Test;
-
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Injector;
-import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.binder.Binder.TargetedBinder;
-import se.jbee.inject.bootstrap.Bootstrap;
+import static org.junit.Assert.assertEquals;
+import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Packages.subPackagesOf;
 
 /**
  * A test that demonstrates how to overlay general binds in specified packages
@@ -23,7 +21,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
  * {@link TargetedBinder#inPackageOf(Class)},
  * {@link TargetedBinder#inSubPackagesOf(Class)},
  * {@link TargetedBinder#inPackageAndSubPackagesOf(Class)}.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public class TestPackageLocalisedBinds {
@@ -38,8 +36,8 @@ public class TestPackageLocalisedBinds {
 			inSubPackagesOf(Object.class).bind(String.class).to("java-lang.*");
 			inPackageAndSubPackagesOf(List.class).bind(String.class).to(
 					"java-util.*");
-			in(subPackagesOf(Canvas.class, Format.class)).bind(String.class).to(
-					"java-awt.* & java-text.*");
+			in(subPackagesOf(LongBuffer.class, Format.class)).bind(String.class).to(
+					"java-nio.* & java-text.*");
 		}
 
 	}
@@ -94,7 +92,7 @@ public class TestPackageLocalisedBinds {
 	public void thatDependencyWithTargetResolvedToRelevantMultiSubPackagesBind() {
 		Dependency<String> stringInUtil = stringGlobal.injectingInto(
 				java.text.spi.NumberFormatProvider.class);
-		assertEquals("java-awt.* & java-text.*",
+		assertEquals("java-nio.* & java-text.*",
 				injector.resolve(stringInUtil));
 	}
 

@@ -1,17 +1,15 @@
 package se.jbee.inject.bootstrap;
 
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Type;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import se.jbee.inject.Injector;
-import se.jbee.inject.Type;
+import static java.util.Arrays.asList;
+import static org.junit.Assert.*;
 
 public class AssertInjects {
 

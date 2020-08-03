@@ -1,13 +1,11 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertNotSame;
-import static se.jbee.inject.Name.named;
-
 import org.junit.Test;
-
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
+
+import static org.junit.Assert.assertNotSame;
+import static se.jbee.inject.Name.named;
 
 /**
  * This illustrates how to use different named instances for the same interface

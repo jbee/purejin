@@ -1,17 +1,15 @@
 package se.jbee.inject.bootstrap;
 
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static se.jbee.inject.Cast.listTypeOf;
+import org.junit.Test;
+import se.jbee.inject.Injector;
+import se.jbee.inject.binder.BinderModule;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import org.junit.Test;
-
-import se.jbee.inject.Injector;
-import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
+import static se.jbee.inject.Cast.listTypeOf;
 
 public class TestInitialiserGenericBinds {
 

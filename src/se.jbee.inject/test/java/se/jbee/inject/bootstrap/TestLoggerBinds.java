@@ -1,18 +1,16 @@
 package se.jbee.inject.bootstrap;
 
-import static org.junit.Assert.assertSame;
-
-import java.util.logging.Logger;
-
 import org.junit.Test;
-
 import se.jbee.inject.Injector;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.binder.Supply;
-import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.defaults.CoreFeature;
+
+import java.util.logging.Logger;
+
+import static org.junit.Assert.assertSame;
 
 /**
  * A test that demonstrates how to extend the DI so that e.g. a class gets its

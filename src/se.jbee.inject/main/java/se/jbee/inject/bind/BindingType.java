@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bind;
@@ -8,8 +8,8 @@ package se.jbee.inject.bind;
 import se.jbee.inject.Supplier;
 
 /**
- * What is suppling instances for a {@link Binding}?
- * 
+ * What is supplying instances for a {@link Binding}?
+ *
  * As we cannot look into the implementation of a {@link Supplier} this type
  * groups concrete ways to supply instances.
  */

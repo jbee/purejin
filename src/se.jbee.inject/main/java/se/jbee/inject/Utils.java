@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -43,9 +43,10 @@ public final class Utils {
 
 	/**
 	 * Function that determines of two elements of the same type are equal.
-	 * 
+	 *
 	 * @param <T> type of the elements compared
 	 */
+	@FunctionalInterface
 	public interface Eq<T> extends BiPredicate<T, T> {
 	}
 
@@ -56,9 +57,9 @@ public final class Utils {
 			return arr;
 		A[] accepted = newArray(arr, arr.length);
 		int j = 0;
-		for (int i = 0; i < arr.length; i++)
-			if (accept.test(arr[i]))
-				accepted[j++] = arr[i];
+		for (A a : arr)
+			if (accept.test(a))
+				accepted[j++] = a;
 		return j == arr.length ? arr : copyOf(accepted, j);
 	}
 
@@ -86,7 +87,7 @@ public final class Utils {
 	 * to n Bs but always returns a B. If {@code null} is returned this means
 	 * "zero" or remove the B. So length of {@code B[]} is always {@code <=}
 	 * length of {@code A[]}.
-	 * 
+	 *
 	 * @param <A> source element type
 	 * @param <B> target element type
 	 * @param from source array
@@ -102,8 +103,8 @@ public final class Utils {
 			Function<A, B> flatmapOp) {
 		B[] bs = newArray(to, from.length);
 		int j = 0;
-		for (int i = 0; i < from.length; i++) {
-			B b = flatmapOp.apply(from[i]);
+		for (A a : from) {
+			B b = flatmapOp.apply(a);
 			if (b != null)
 				bs[j++] = b;
 		}
@@ -139,9 +140,9 @@ public final class Utils {
 	public static <A> A arrayFindFirst(A[] arr, Predicate<A> test) {
 		if (arr == null || arr.length == 0)
 			return null;
-		for (int i = 0; i < arr.length; i++)
-			if (test.test(arr[i]))
-				return arr[i];
+		for (A a : arr)
+			if (test.test(a))
+				return a;
 		return null;
 	}
 
@@ -152,8 +153,8 @@ public final class Utils {
 	public static <A> boolean arrayContains(A[] arr, A e, Eq<A> eq) {
 		if (arr == null || arr.length == 0)
 			return false;
-		for (int i = 0; i < arr.length; i++)
-			if (eq.test(arr[i], e))
+		for (A a : arr)
+			if (eq.test(a, e))
 				return true;
 		return false;
 	}
@@ -218,6 +219,7 @@ public final class Utils {
 		return null;
 	}
 
+	@SuppressWarnings("LoopConditionNotUpdatedInsideLoop")
 	public static <A extends Annotation> A annotation(Class<A> type,
 			AnnotatedElement obj) {
 		A res = obj.getAnnotation(type);
@@ -344,7 +346,7 @@ public final class Utils {
 	 * @return The highest visibility constructor with the most parameters that
 	 *         does not have the declaring class itself as parameter type (some
 	 *         compiler seam to generate such a synthetic constructor)
-	 * @throws NoMethodForDependency in case the type is not constructible (has
+	 * @throws NoMethodForDependency in case the type is not constructable (has
 	 *             no constructors at all)
 	 */
 	public static <T> Constructor<T> commonConstructor(Class<T> type)
@@ -452,7 +454,7 @@ public final class Utils {
 		}
 	}
 
-	public static <T> T instanciate(Class<T> type) {
+	public static <T> T instantiate(Class<T> type) {
 		return construct(accessible(noArgsConstructor(type)));
 	}
 }

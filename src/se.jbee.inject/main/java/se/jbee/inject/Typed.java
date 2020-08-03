@@ -1,17 +1,18 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
 
 /**
  * <i>Has a</i> {@link Type}, {@link #typed(Type)} as...
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
- * 
+ *
  * @param <T> The actual type ({@link Class})
  */
+@SuppressWarnings("ClassReferencesSubclass")
 public interface Typed<T> {
 
 	/**
@@ -21,7 +22,7 @@ public interface Typed<T> {
 
 	/**
 	 * @return This object with the given {@link Type}.
-	 * 
+	 *
 	 * @throws ClassCastException in case this cannot be typed as the type
 	 *             given.
 	 */

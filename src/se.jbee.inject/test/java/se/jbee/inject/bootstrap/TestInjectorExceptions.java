@@ -1,14 +1,12 @@
 package se.jbee.inject.bootstrap;
 
-import static se.jbee.inject.Name.named;
-
 import org.junit.Test;
-
 import se.jbee.inject.Injector;
 import se.jbee.inject.Name;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
+
+import static se.jbee.inject.Name.named;
 
 public class TestInjectorExceptions {
 

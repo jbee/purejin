@@ -4,14 +4,14 @@
  * {@link se.jbee.inject.Scope}s. It is only dependent on the configuration and
  * base package.
  * </p>
- * 
+ *
  * <h2>Defaults</h2>
  * <p>
- * The {@link se.jbee.inject.bind.DefaultScopes}
+ * The {@link se.jbee.inject.defaults.DefaultScopes}
  * {@link se.jbee.inject.bind.Module} is used to hook in the
  * {@link se.jbee.inject.Scope} implementations.
  * </p>
- * 
+ *
  * <h2>Provided Scopes</h2>
  * <ul>
  * <li>{@link se.jbee.inject.scope.ApplicationScope}: A singleton within the

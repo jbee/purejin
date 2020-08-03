@@ -1,23 +1,21 @@
 package se.jbee.inject.bootstrap;
 
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+import se.jbee.inject.Initialiser;
+import se.jbee.inject.Injector;
+import se.jbee.inject.binder.BinderModule;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Test;
-
-import se.jbee.inject.Initialiser;
-import se.jbee.inject.Injector;
-import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.bootstrap.Bootstrap;
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
 
 /**
  * A test that demonstrates how the {@link Initialiser.Sorter} can be used to
  * order {@link Initialiser}s.
- * 
+ *
  * In this example the initialisers are sorted in reverse alphabetically order
  * of their class names. One of them is a lambda which means the name starts
  * with the name of the surrounding {@link TestInitialiserSorterBinds} class.

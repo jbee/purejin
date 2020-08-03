@@ -1,31 +1,23 @@
 package se.jbee.inject.bootstrap;
 
+import org.junit.Test;
+import se.jbee.inject.*;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import se.jbee.inject.binder.Binder.RootBinder;
+import se.jbee.inject.binder.BinderModule;
+import se.jbee.inject.binder.BootstrapperBundle;
+import se.jbee.inject.defaults.CoreFeature;
+import se.jbee.inject.util.Resource;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static se.jbee.inject.Cast.providerTypeOf;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.config.NamesBy.defaultName;
 import static se.jbee.inject.config.HintsBy.noParameters;
+import static se.jbee.inject.config.NamesBy.defaultName;
 import static se.jbee.inject.config.ProducesBy.allMethods;
-
-import org.junit.Test;
-
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Instance;
-import se.jbee.inject.Provider;
-import se.jbee.inject.Scope;
-import se.jbee.inject.Supplier;
-import se.jbee.inject.Type;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
-import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.binder.BootstrapperBundle;
-import se.jbee.inject.binder.Binder.RootBinder;
-import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.defaults.CoreFeature;
-import se.jbee.inject.util.Resource;
 
 /**
  * This test demonstrates how to switch between different implementations during
