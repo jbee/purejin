@@ -44,7 +44,7 @@ final class AnnotatedWithModule extends BinderModule {
 	@Override
 	protected void declare() {
 		asDefault().bind(CACHE).to(new HashMap<>());
-		asDefault() //
+		asDefault() // 
 				.per(Scope.dependencyType) //
 				.bind(anyOf(
 						raw(AnnotatedWith.class).parametizedAsUpperBounds())) //
