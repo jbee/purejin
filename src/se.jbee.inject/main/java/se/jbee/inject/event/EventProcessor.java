@@ -10,7 +10,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeoutException;
 
-import se.jbee.inject.container.Initialiser;
+import se.jbee.inject.Initialiser;
 
 /**
  * The {@link EventProcessor} is the unit that functionally connects the

@@ -6,6 +6,8 @@
 package se.jbee.inject.container;
 
 import static java.lang.System.identityHashCode;
+import static se.jbee.inject.Cast.initialiserTypeOf;
+import static se.jbee.inject.Cast.resourcesTypeFor;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Type.raw;
@@ -13,8 +15,6 @@ import static se.jbee.inject.Utils.arrayFilter;
 import static se.jbee.inject.Utils.arrayFindFirst;
 import static se.jbee.inject.Utils.arrayOf;
 import static se.jbee.inject.Utils.orElse;
-import static se.jbee.inject.container.Cast.initialiserTypeOf;
-import static se.jbee.inject.container.Cast.resourcesTypeFor;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,10 +26,13 @@ import se.jbee.inject.Dependency;
 import se.jbee.inject.Env;
 import se.jbee.inject.Generator;
 import se.jbee.inject.InconsistentDeclaration;
+import se.jbee.inject.Initialiser;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Name;
 import se.jbee.inject.Resource;
+import se.jbee.inject.ResourceDescriptor;
 import se.jbee.inject.Scope;
+import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;

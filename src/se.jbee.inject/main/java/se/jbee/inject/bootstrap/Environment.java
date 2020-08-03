@@ -14,15 +14,11 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.Type;
 import se.jbee.inject.Utils;
-import se.jbee.inject.declare.InconsistentBinding;
-import se.jbee.inject.declare.ModuleWith;
-import se.jbee.inject.declare.ValueBinder;
+import se.jbee.inject.bind.InconsistentBinding;
+import se.jbee.inject.bind.ModuleWith;
+import se.jbee.inject.bind.ValueBinder;
 
 public final class Environment implements Env {
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static final Type<ModuleWith<Class<?>>> ANNOTATION = (Type) raw(
-			ModuleWith.class).parametized(Type.CLASS);
 
 	public static Environment override(Env overridden) {
 		return new Environment(false, new HashMap<>(), true, overridden);
@@ -111,7 +107,7 @@ public final class Environment implements Env {
 
 	public <A extends Annotation> Environment withAnnotation(Class<A> name,
 			ModuleWith<Class<?>> value) {
-		return with(named(name).toString(), ANNOTATION, value);
+		return with(named(name).toString(), ModuleWith.ANNOTATION, value);
 	}
 
 	@SafeVarargs

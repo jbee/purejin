@@ -5,7 +5,7 @@
  */
 package se.jbee.inject.container;
 
-import static se.jbee.inject.container.Cast.resourceTypeFor;
+import static se.jbee.inject.Cast.resourceTypeFor;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Generator;

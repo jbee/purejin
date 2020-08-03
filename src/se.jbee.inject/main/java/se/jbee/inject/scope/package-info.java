@@ -8,7 +8,7 @@
  * <h2>Defaults</h2>
  * <p>
  * The {@link se.jbee.inject.bind.DefaultScopes}
- * {@link se.jbee.inject.declare.Module} is used to hook in the
+ * {@link se.jbee.inject.bind.Module} is used to hook in the
  * {@link se.jbee.inject.Scope} implementations.
  * </p>
  * 

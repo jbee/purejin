@@ -5,6 +5,7 @@
  */
 package se.jbee.inject;
 
+import static java.util.Arrays.asList;
 import static se.jbee.inject.Utils.arrayCompare;
 import static se.jbee.inject.Utils.arrayContains;
 import static se.jbee.inject.Utils.arrayMap;
@@ -13,6 +14,7 @@ import static se.jbee.inject.Utils.seqRegionEquals;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 
 /**
  * A set of {@link Package}s described one or more root packages (on the same
@@ -100,6 +102,13 @@ public final class Packages
 		this.roots = roots;
 		this.includingSubpackages = includingSubpackages;
 		this.rootDepth = rootDepth(roots);
+	}
+
+	public Packages and(Packages further) {
+		LinkedHashSet<String> set = new LinkedHashSet<>(asList(roots));
+		set.addAll(asList(further.roots));
+		return new Packages(set.toArray(new String[0]),
+				includingSubpackages || further.includingSubpackages);
 	}
 
 	public Packages parents() {

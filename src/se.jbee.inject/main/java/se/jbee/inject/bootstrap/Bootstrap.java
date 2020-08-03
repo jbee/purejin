@@ -21,6 +21,14 @@ import se.jbee.inject.Annotated;
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Utils;
+import se.jbee.inject.bind.Binding;
+import se.jbee.inject.bind.Bindings;
+import se.jbee.inject.bind.Bootstrapper;
+import se.jbee.inject.bind.Bundle;
+import se.jbee.inject.bind.Bundler;
+import se.jbee.inject.bind.Modulariser;
+import se.jbee.inject.bind.Module;
+import se.jbee.inject.bind.Toggled;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.config.Edition;
 import se.jbee.inject.config.HintsBy;
@@ -29,13 +37,8 @@ import se.jbee.inject.config.ProducesBy;
 import se.jbee.inject.config.ScopesBy;
 import se.jbee.inject.config.SharesBy;
 import se.jbee.inject.container.Container;
-import se.jbee.inject.declare.Binding;
-import se.jbee.inject.declare.Bindings;
-import se.jbee.inject.declare.Bootstrapper;
-import se.jbee.inject.declare.Bundle;
-import se.jbee.inject.declare.InconsistentBinding;
-import se.jbee.inject.declare.Module;
-import se.jbee.inject.declare.Toggled;
+import se.jbee.inject.defaults.DefaultValueBinders;
+import se.jbee.inject.defaults.DefaultsBundle;
 
 /**
  * Utility to create an {@link Injector} context from {@link Bundle}s and
@@ -47,14 +50,14 @@ public final class Bootstrap {
 
 	public static final Environment ENV = new Environment() //
 			.with(Edition.class, Edition.FULL) //
-			.withBinder(DefaultBinders.SUPER_TYPES) //
-			.withBinder(DefaultBinders.NEW) //
-			.withBinder(DefaultBinders.CONSTANT) //
-			.withBinder(DefaultBinders.PRODUCES) //
-			.withBinder(DefaultBinders.SHARES) //
-			.withBinder(DefaultBinders.INSTANCE_REF) //
-			.withBinder(DefaultBinders.PARAMETRIZED_REF) //
-			.withBinder(DefaultBinders.ARRAY) //
+			.withBinder(DefaultValueBinders.SUPER_TYPES) //
+			.withBinder(DefaultValueBinders.NEW) //
+			.withBinder(DefaultValueBinders.CONSTANT) //
+			.withBinder(DefaultValueBinders.PRODUCES) //
+			.withBinder(DefaultValueBinders.SHARES) //
+			.withBinder(DefaultValueBinders.INSTANCE_REF) //
+			.withBinder(DefaultValueBinders.PARAMETRIZED_REF) //
+			.withBinder(DefaultValueBinders.ARRAY) //
 			.with(ConstructsBy.class, ConstructsBy.common) //
 			.with(SharesBy.class, SharesBy.noFields) //
 			.with(ProducesBy.class, ProducesBy.noMethods) //
@@ -112,11 +115,6 @@ public final class Bootstrap {
 				.declaredFrom(env, modulariser(env).modularise(root)));
 	}
 
-	public static void nonnullThrowsReentranceException(Object field) {
-		if (field != null)
-			throw InconsistentBinding.contextAlreadyInitialised();
-	}
-
 	private Bootstrap() {
 		throw new UnsupportedOperationException("util");
 	}
@@ -135,6 +133,11 @@ public final class Bootstrap {
 		BuildinBootstrapper(Env env) {
 			this.env = env;
 			this.edition = env.property(Edition.class, Env.class.getPackage());
+		}
+
+		@Override
+		public void installDefaults() {
+			install(DefaultsBundle.class);
 		}
 
 		@Override

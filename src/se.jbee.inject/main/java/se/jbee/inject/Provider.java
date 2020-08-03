@@ -5,15 +5,13 @@
  */
 package se.jbee.inject;
 
-import se.jbee.inject.container.Supplier;
-
 /**
  * A indirection that resolves the instance lazily when {@link #provide()} is
  * invoked. This is mainly used to allow the injection and usage of instances
  * that have a more unstable scope into an instance of a more stable scope.
  * 
  * Usage of {@link Provider}s to circumvent scoping limitations is explicitly
- * installed using the buildin-{@link se.jbee.inject.declare.Bundle}.
+ * installed using the buildin-{@link se.jbee.inject.bind.Bundle}.
  * 
  * But it is also very easy to use another similar provider interface by
  * installing a similar bridge {@link Supplier}.

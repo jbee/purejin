@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
+import se.jbee.inject.ContextAware;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Generator;
 import se.jbee.inject.InconsistentDeclaration;
@@ -23,8 +24,10 @@ import se.jbee.inject.Locator;
 import se.jbee.inject.Name;
 import se.jbee.inject.Provider;
 import se.jbee.inject.Resource;
+import se.jbee.inject.ResourceDescriptor;
 import se.jbee.inject.Scope;
 import se.jbee.inject.ScopePermanence;
+import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;

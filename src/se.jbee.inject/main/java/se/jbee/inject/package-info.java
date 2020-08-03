@@ -27,18 +27,31 @@
  * contents of a {@link se.jbee.inject.Injector} context.</li>
  * <li><b>bootstrap</b>: Contains the default implementation to
  * {@link se.jbee.inject.bootstrap.Bootstrap} an {@link se.jbee.inject.Injector}
- * context from a root {@link se.jbee.inject.declare.Bundle}.</li>
+ * context from a root {@link se.jbee.inject.bind.Bundle}.</li>
  * <li><b>bind</b>: Contains the high level fluent API to make bindings.</li>
  * <li><b>config</b>: Defines the abstractions API that can be used to configure
  * the bootstrapping process.</li>
  * <li><b>extend</b>: Defines the abstraction API for
- * {@link se.jbee.inject.extend.Extension}s and implementations for convenient
- * access to {@link se.jbee.inject.extend.Plugins} and application level
- * {@link se.jbee.inject.extend.Config}s.</li>
+ * {@link se.jbee.inject.config.Extension}s and implementations for convenient
+ * access to {@link se.jbee.inject.config.Plugins} and application level
+ * {@link se.jbee.inject.config.Config}s.</li>
  * <li><b>action</b>: Contains a level utility for loosely coupled application
  * composition on the basis of unique parameter types.</li>
  * <li><b>event</b>: Contains an experimental high level utility for event based
  * application level execution.</li>
  * </ul>
+ * 
+ * <h2>Initialising Objects Created In Context</h2>
+ * <p>
+ * To initialise objects created in the {@link se.jbee.inject.Injector} bind a
+ * {@link se.jbee.inject.Initialiser} for the {@link se.jbee.inject.Type} of
+ * objects it should initialise. This is mostly equivalent to a
+ * <code>javax.annotation.PostConstruct</code> annotation just that the effect
+ * is not given by an annotated method but by the provided
+ * {@link se.jbee.inject.Initialiser} function. This can equally be applied to
+ * the {@link se.jbee.inject.Injector} itself to wrap it.
+ * {@link se.jbee.inject.container.Container#injector(ResourceDescriptor...)}
+ * will return the outermost wrapper in that case.
+ * </p>
  */
 package se.jbee.inject;

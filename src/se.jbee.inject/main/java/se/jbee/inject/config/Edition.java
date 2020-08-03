@@ -10,8 +10,8 @@ import java.util.EnumSet;
 
 import se.jbee.inject.Packages;
 import se.jbee.inject.Type;
-import se.jbee.inject.declare.Bundle;
-import se.jbee.inject.declare.Module;
+import se.jbee.inject.bind.Bundle;
+import se.jbee.inject.bind.Module;
 
 /**
  * An {@link Edition} decides which features are contained in a specific setup.
