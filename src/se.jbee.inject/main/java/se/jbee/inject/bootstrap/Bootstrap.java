@@ -1,10 +1,11 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bootstrap;
 
+import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.arrayOf;
 
 import java.util.ArrayList;
@@ -16,11 +17,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
-import se.jbee.inject.Annotated;
-import se.jbee.inject.Env;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Utils;
+import se.jbee.inject.*;
 import se.jbee.inject.bind.Binding;
 import se.jbee.inject.bind.Bindings;
 import se.jbee.inject.bind.Bootstrapper;
@@ -29,6 +28,7 @@ import se.jbee.inject.bind.Bundler;
 import se.jbee.inject.bind.Modulariser;
 import se.jbee.inject.bind.Module;
 import se.jbee.inject.bind.Toggled;
+import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.config.Edition;
 import se.jbee.inject.config.HintsBy;
@@ -78,7 +78,7 @@ public final class Bootstrap {
 	@SafeVarargs
 	public static Injector injector(Env env, Bindings bindings,
 			Class<? extends Bundle>... roots) {
-		BuildinBootstrapper boots = new BuildinBootstrapper(env);
+		BuiltinBootstrapper boots = new BuiltinBootstrapper(env);
 		return injector(env, bindings, boots.modulesOf(boots.bundleAll(roots)));
 	}
 
@@ -102,11 +102,11 @@ public final class Bootstrap {
 	}
 
 	public static Modulariser modulariser(Env env) {
-		return new BuildinBootstrapper(env);
+		return new BuiltinBootstrapper(env);
 	}
 
 	public static Bundler bundler(Env env) {
-		return new BuildinBootstrapper(env);
+		return new BuiltinBootstrapper(env);
 	}
 
 	public static Binding<?>[] bindings(Env env, Class<? extends Bundle> root,
@@ -119,8 +119,12 @@ public final class Bootstrap {
 		throw new UnsupportedOperationException("util");
 	}
 
-	private static final class BuildinBootstrapper
+	private static final class BuiltinBootstrapper
 			implements Bootstrapper, Bundler, Modulariser {
+
+		public static final Type<Function> INJECTOR_PROVIDER_TYPE = raw(
+				Function.class).parametized(Class[].class,
+				Injector.class);
 
 		private final Map<Class<? extends Bundle>, Set<Class<? extends Bundle>>> bundleChildren = new IdentityHashMap<>();
 		private final Map<Class<? extends Bundle>, List<Module>> bundleModules = new IdentityHashMap<>();
@@ -130,14 +134,27 @@ public final class Bootstrap {
 		private final Env env;
 		private final Edition edition;
 
-		BuildinBootstrapper(Env env) {
+		BuiltinBootstrapper(Env env) {
 			this.env = env;
 			this.edition = env.property(Edition.class, Env.class.getPackage());
 		}
 
 		@Override
 		public void installDefaults() {
-			install(DefaultsBundle.class);
+			if (!installed.contains(DefaultsBundle.class)) {
+				// this check is needed because of the anonymous module which would install multiple times otherwise
+				install(DefaultsBundle.class);
+				Function<Class<? extends Bundle>[], Injector> f = this::createSubContextFromRootBundles;
+				install(new BinderModule() {
+					@Override protected void declare() {
+						asDefault().bind(INJECTOR_PROVIDER_TYPE).to(f);
+					}
+				});
+			}
+		}
+
+		private Injector createSubContextFromRootBundles(Class<? extends Bundle>[] roots) {
+			return Bootstrap.injector(env, Bindings.newBindings(), roots);
 		}
 
 		@Override
@@ -170,7 +187,7 @@ public final class Bootstrap {
 			Utils.instanciate(bundle).bootstrap((bundleForFlag, flag) -> {
 				// NB: null is a valid value to define what happens when no configuration is present
 				if (env.toggled(flags, flag, bundleForFlag.getPackage())) {
-					BuildinBootstrapper.this.install(bundleForFlag);
+					BuiltinBootstrapper.this.install(bundleForFlag);
 				}
 			});
 		}
@@ -185,7 +202,7 @@ public final class Bootstrap {
 				final EnumSet<F> installing = EnumSet.of(flag0, flags);
 				flag0.bootstrap((bundle, flag) -> {
 					if (installing.contains(flag))
-						BuildinBootstrapper.this.install(bundle);
+						BuiltinBootstrapper.this.install(bundle);
 				});
 			}
 		}

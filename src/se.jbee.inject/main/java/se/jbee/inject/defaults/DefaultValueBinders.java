@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.defaults;
@@ -36,7 +36,6 @@ import se.jbee.inject.bind.BindingType;
 import se.jbee.inject.bind.Bindings;
 import se.jbee.inject.bind.InconsistentBinding;
 import se.jbee.inject.bind.ValueBinder;
-import se.jbee.inject.bind.ValueBinder.Completion;
 import se.jbee.inject.binder.Constant;
 import se.jbee.inject.binder.New;
 import se.jbee.inject.binder.Produces;

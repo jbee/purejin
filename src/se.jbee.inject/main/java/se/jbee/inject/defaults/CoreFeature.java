@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.defaults;
@@ -13,24 +13,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.logging.Logger;
 
-import se.jbee.inject.AnnotatedWith;
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Env;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Name;
-import se.jbee.inject.Provider;
-import se.jbee.inject.Scope;
-import se.jbee.inject.Type;
-import se.jbee.inject.UnresolvableDependency;
-import se.jbee.inject.bind.Bindings;
+import se.jbee.inject.*;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.bind.Toggled;
 import se.jbee.inject.bind.Bootstrapper.Toggler;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Supply;
-import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.config.Extension;
 import se.jbee.inject.config.Plugins;
 
@@ -67,7 +58,7 @@ public enum CoreFeature implements Toggled<CoreFeature> {
 	OPTIONAL(false),
 	/**
 	 * Adds: That primitive arrays can be resolved for their wrapper types.
-	 * 
+	 *
 	 * Note that this only supports one-dimensional arrays of int, long, float,
 	 * double and boolean. For further support add similar suppliers following
 	 * the example given.
@@ -97,7 +88,7 @@ public enum CoreFeature implements Toggled<CoreFeature> {
 
 	public final boolean installedByDefault;
 
-	private CoreFeature(boolean installedByDefault) {
+	CoreFeature(boolean installedByDefault) {
 		this.installedByDefault = installedByDefault;
 	}
 
@@ -188,14 +179,17 @@ public enum CoreFeature implements Toggled<CoreFeature> {
 						}
 					});
 		}
-
 	}
 
 	private static final class SubContextModule extends BinderModule
 			implements se.jbee.inject.Supplier<Injector>, Injector {
 
+		public static final Type<Function> INJECTOR_PROVIDER_TYPE = raw(
+				Function.class).parametized(Class[].class, Injector.class);
+
 		@Override
 		protected void declare() {
+			require(INJECTOR_PROVIDER_TYPE);
 			asDefault() //
 					.per(Scope.dependencyInstance) //
 					.starbind(Injector.class) //
@@ -203,6 +197,7 @@ public enum CoreFeature implements Toggled<CoreFeature> {
 		}
 
 		@Override
+		@SuppressWarnings("unchecked")
 		public Injector supply(Dependency<? super Injector> dep,
 				Injector context) throws UnresolvableDependency {
 			@SuppressWarnings("unchecked")
@@ -210,10 +205,8 @@ public enum CoreFeature implements Toggled<CoreFeature> {
 			context.resolve(Plugins.class).forPoint(Injector.class,
 					dep.instance.name.toString());
 			if (bundles.length == 0)
-				return this; // this module acts as an Injector that directly fails to resolve any Dependency 
-			return Bootstrap.injector(
-					context.resolve(Name.DEFAULT, Type.raw(Env.class)),
-					Bindings.newBindings(), bundles);
+				return this; // this module acts as an Injector that directly fails to resolve any Dependency
+			return (Injector) context.resolve(INJECTOR_PROVIDER_TYPE).apply(bundles);
 		}
 
 		@Override

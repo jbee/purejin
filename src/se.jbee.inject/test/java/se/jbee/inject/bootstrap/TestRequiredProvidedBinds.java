@@ -112,7 +112,7 @@ public class TestRequiredProvidedBinds {
 			fail("Should not be bound and therefore throw below exception");
 		} catch (NoResourceForDependency e) {
 			// expected this
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			fail("Expected another exception but got: " + e);
 		}
 	}

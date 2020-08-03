@@ -4,8 +4,8 @@ import java.lang.annotation.Annotation;
 import java.util.ServiceLoader;
 
 import se.jbee.inject.Scope;
-import se.jbee.inject.bind.BinderModuleWith;
-import se.jbee.inject.declare.Extends;
+import se.jbee.inject.binder.BinderModuleWith;
+import se.jbee.inject.Extends;
 
 /**
  * In contrast to {@link ServiceAnnotation} this will be bound to the annotation

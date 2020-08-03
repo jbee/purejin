@@ -10,14 +10,12 @@ import java.util.EnumSet;
 
 import se.jbee.inject.Packages;
 import se.jbee.inject.Type;
-import se.jbee.inject.bind.Bundle;
-import se.jbee.inject.bind.Module;
 
 /**
  * An {@link Edition} decides which features are contained in a specific setup.
  * 
  * The particular mechanism how a {@link Edition} decides an the basis of a
- * {@link Bundle} or {@link Module} {@link Class} reference if it is
+ * {@link se.jbee.inject.bind.Bundle} or {@link se.jbee.inject.bind.Module} {@link Class} reference if it is
  * {@link #featured(Class)} is abstract and can be implemented in many ways.
  * 
  * Common ways are to utilise type level {@link Annotation}s to indicate which
@@ -31,7 +29,7 @@ public interface Edition {
 
 	/**
 	 * Default {@link Edition} that has all features. Or in other words will
-	 * install all {@link Bundle}s and {@link Module}s.
+	 * install all {@link se.jbee.inject.bind.Bundle}s and {@link se.jbee.inject.bind.Module}s.
 	 */
 	Edition FULL = bundleOrModule -> true;
 
