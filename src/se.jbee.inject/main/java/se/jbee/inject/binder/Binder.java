@@ -888,7 +888,7 @@ public class Binder {
 		}
 
 		@SafeVarargs
-		private void expandElements(Parameter<? extends E>... hints) {
+		private final void expandElements(Parameter<? extends E>... hints) {
 			expand(hints);
 		}
 
