@@ -1,6 +1,6 @@
 package com.example.app;
 
-import se.jbee.inject.bind.BinderModuleWith;
+import se.jbee.inject.binder.BinderModuleWith;
 
 public class MyFirstModule extends BinderModuleWith<Integer> {
 

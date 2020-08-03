@@ -4,6 +4,7 @@ import se.jbee.inject.Dependency;
 import se.jbee.inject.Generator;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Resource;
+import se.jbee.inject.Supplier;
 
 /**
  * The {@link ResourceLink} is an abstraction to the internals of a

@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.action;
@@ -24,16 +24,16 @@ import se.jbee.inject.Hint;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Scope;
+import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.SupplyFailed;
 import se.jbee.inject.Utils;
-import se.jbee.inject.bind.BinderModule;
+import se.jbee.inject.bind.Module;
+import se.jbee.inject.binder.BinderModule;
+import se.jbee.inject.config.Plugins;
 import se.jbee.inject.config.ProducesBy;
 import se.jbee.inject.container.InjectionSite;
-import se.jbee.inject.container.Supplier;
-import se.jbee.inject.declare.Module;
-import se.jbee.inject.extend.Plugins;
 
 /**
  * When binding {@link Action}s this {@link Module} can be extended.
@@ -203,7 +203,7 @@ public abstract class ActionModule extends BinderModule {
 
 		@Override
 		public O run(I input) throws ActionExecutionFailed {
-			Object[] args = null;
+			Object[] args;
 			try {
 				args = injection.args(injector);
 			} catch (UnresolvableDependency e) {

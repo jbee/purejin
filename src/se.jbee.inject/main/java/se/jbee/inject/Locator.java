@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -99,7 +99,7 @@ public final class Locator<T> implements Typed<T>, Qualifying<Locator<?>>,
 	}
 
 	@Override
-	public boolean moreQualiedThan(Locator<?> other) {
+	public boolean moreQualifiedThan(Locator<?> other) {
 		return Qualifying.compareRelated(instance, other.instance, target,
 				other.target);
 	}

@@ -1,10 +1,11 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
 
+import static java.util.Arrays.asList;
 import static se.jbee.inject.Utils.arrayCompare;
 import static se.jbee.inject.Utils.arrayContains;
 import static se.jbee.inject.Utils.arrayMap;
@@ -13,6 +14,7 @@ import static se.jbee.inject.Utils.seqRegionEquals;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 
 /**
  * A set of {@link Package}s described one or more root packages (on the same
@@ -102,6 +104,13 @@ public final class Packages
 		this.rootDepth = rootDepth(roots);
 	}
 
+	public Packages and(Packages further) {
+		LinkedHashSet<String> set = new LinkedHashSet<>(asList(roots));
+		set.addAll(asList(further.roots));
+		return new Packages(set.toArray(new String[0]),
+				includingSubpackages || further.includingSubpackages);
+	}
+
 	public Packages parents() {
 		if (rootDepth == 0)
 			return this;
@@ -163,7 +172,7 @@ public final class Packages
 	}
 
 	@Override
-	public boolean moreQualiedThan(Packages other) {
+	public boolean moreQualifiedThan(Packages other) {
 		if (includingSubpackages != other.includingSubpackages)
 			return !includingSubpackages;
 		return rootDepth != other.rootDepth && rootDepth > other.rootDepth;
@@ -188,8 +197,8 @@ public final class Packages
 		if (roots.length == 1)
 			return toString(roots[0]);
 		StringBuilder b = new StringBuilder();
-		for (int i = 0; i < roots.length; i++)
-			b.append('+').append(toString(roots[i]));
+		for (String root : roots)
+			b.append('+').append(toString(root));
 		return b.substring(1);
 	}
 

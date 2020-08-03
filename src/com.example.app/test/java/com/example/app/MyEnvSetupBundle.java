@@ -1,8 +1,8 @@
 package com.example.app;
 
 import se.jbee.inject.Env;
-import se.jbee.inject.bind.BinderModule;
-import se.jbee.inject.declare.Extends;
+import se.jbee.inject.Extends;
+import se.jbee.inject.binder.BinderModule;
 
 @Extends(Env.class)
 public class MyEnvSetupBundle extends BinderModule {

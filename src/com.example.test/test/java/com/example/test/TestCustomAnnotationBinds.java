@@ -18,19 +18,19 @@ import com.example.app.Support;
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Scope;
-import se.jbee.inject.UnresolvableDependency.IllegalAcccess;
-import se.jbee.inject.bind.BinderModule;
-import se.jbee.inject.bind.BinderModuleWith;
-import se.jbee.inject.bind.serviceloader.ServiceLoaderAnnotations;
+import se.jbee.inject.UnresolvableDependency.IllegalAccess;
+import se.jbee.inject.binder.BinderModule;
+import se.jbee.inject.binder.BinderModuleWith;
+import se.jbee.inject.binder.ServiceLoaderAnnotations;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.declare.Bundle;
-import se.jbee.inject.declare.ModuleWith;
+import se.jbee.inject.bind.Bundle;
+import se.jbee.inject.bind.ModuleWith;
 
 /**
  * A test that demonstrates how a custom annotation is defined as
  * {@link ModuleWith} (here {@link ServiceAnnotation}), how it is added to the
  * bootstrapping configuration and how to request its use.
- * 
+ *
  * Second example shows that custom annotations can also be provided via
  * {@link ServiceLoader} using {@link ModuleWith} as contract. This has the
  * benefit of plugging into the bootstrapping without additional setup code but
@@ -123,7 +123,7 @@ public class TestCustomAnnotationBinds {
 		try {
 			injector.resolve(SomeServiceImpl.class);
 			fail("Expected interface must be used");
-		} catch (IllegalAcccess e) {
+		} catch (IllegalAccess e) {
 		}
 	}
 

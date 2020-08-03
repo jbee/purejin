@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -11,10 +11,10 @@ import java.lang.reflect.Method;
 /**
  * {@linkplain Parameter}s identify what to inject as argument to a
  * {@link Constructor} or {@link Method} parameter.
- * 
+ *
  * {@linkplain Parameter}s are *not* about finding or identifying the
  * {@link Constructor} to use!
- * 
+ *
  * <h2>How {@linkplain Parameter}s are understood:</h2>
  * <dl>
  * <dt>A {@link Class} (via Type)</dt>
@@ -31,9 +31,10 @@ import java.lang.reflect.Method;
  * <dd>Use the given {@linkplain Object} (for the first parameter it is
  * assignable to)</dd>
  * </dl>
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
+@SuppressWarnings("ClassReferencesSubclass")
 public interface Parameter<T> extends Typed<T> {
 
 	Parameter<?>[] noParameters = new Parameter<?>[0];

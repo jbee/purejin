@@ -25,7 +25,7 @@ public class TestMoreApplicable {
 		}
 
 		@Override
-		public boolean moreQualiedThan(HigherNumberIsMoreApplicable other) {
+		public boolean moreQualifiedThan(HigherNumberIsMoreApplicable other) {
 			return value > other.value;
 		}
 
@@ -37,17 +37,17 @@ public class TestMoreApplicable {
 
 	@Test
 	public void thatMoreApplicabilityEvalsToTrue() {
-		assertTrue(hip(2).moreQualiedThan(hip(1)));
+		assertTrue(hip(2).moreQualifiedThan(hip(1)));
 	}
 
 	@Test
 	public void thatEqualApplicabilityEvalsToFalse() {
-		assertFalse(hip(2).moreQualiedThan(hip(2)));
+		assertFalse(hip(2).moreQualifiedThan(hip(2)));
 	}
 
 	@Test
 	public void thatLessApplicabilityEvalsToFalse() {
-		assertFalse(hip(1).moreQualiedThan(hip(2)));
+		assertFalse(hip(1).moreQualifiedThan(hip(2)));
 	}
 
 	@Test
@@ -78,12 +78,12 @@ public class TestMoreApplicable {
 
 	@Test
 	public void thatUnnamedIsMoreApplicableThanNamed() {
-		assertTrue(Name.DEFAULT.moreQualiedThan(named("foo")));
+		assertTrue(Name.DEFAULT.moreQualifiedThan(named("foo")));
 	}
 
 	@Test
 	public void thatNamedIsNotMoreApplicableThanUnnamed() {
-		assertFalse(named("bar").moreQualiedThan(Name.DEFAULT));
+		assertFalse(named("bar").moreQualifiedThan(Name.DEFAULT));
 	}
 
 	@Test
@@ -112,7 +112,7 @@ public class TestMoreApplicable {
 	public void thatApplicablityIsGivenByOrdinalStartingWithLowest() {
 		DeclarationType[] types = DeclarationType.values();
 		for (int i = 1; i < types.length; i++) {
-			assertTrue(types[i].moreQualiedThan(types[i - 1]));
+			assertTrue(types[i].moreQualifiedThan(types[i - 1]));
 		}
 	}
 
@@ -125,13 +125,13 @@ public class TestMoreApplicable {
 
 	private static <T extends Qualifying<? super T>> void assertMoreApplicable(
 			T morePrecise, T lessPrecise) {
-		assertTrue(morePrecise.moreQualiedThan(lessPrecise));
-		assertFalse(lessPrecise.moreQualiedThan(morePrecise));
+		assertTrue(morePrecise.moreQualifiedThan(lessPrecise));
+		assertFalse(lessPrecise.moreQualifiedThan(morePrecise));
 	}
 
 	private static <T extends Qualifying<? super T>> void assertNotMoreApplicableThanItself(
 			T type) {
-		assertFalse(type.moreQualiedThan(type));
+		assertFalse(type.moreQualifiedThan(type));
 		assertEquals(0, Qualifying.compare(type, type));
 	}
 

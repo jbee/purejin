@@ -1,6 +1,6 @@
 package se.jbee.inject.convert;
 
-import se.jbee.inject.bind.BinderModule;
+import se.jbee.inject.binder.BinderModule;
 
 public class ConvertModule extends BinderModule {
 

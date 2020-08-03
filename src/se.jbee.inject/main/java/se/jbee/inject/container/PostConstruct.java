@@ -1,17 +1,18 @@
 package se.jbee.inject.container;
 
 import static java.util.Arrays.copyOf;
+import static se.jbee.inject.Cast.initialiserTypeOf;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.arrayFilter;
 import static se.jbee.inject.Utils.arrayFlatmap;
 import static se.jbee.inject.Utils.arrayMap;
-import static se.jbee.inject.container.Cast.initialiserTypeOf;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 import se.jbee.inject.Dependency;
+import se.jbee.inject.Initialiser;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Locator;
 import se.jbee.inject.Resource;

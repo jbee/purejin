@@ -62,13 +62,13 @@ import se.jbee.inject.Type;
  * multi-threaded fashion. Instead threads should use the {@link #fork()} method
  * should they start from a shared {@link Imported} base.
  * </p>
- * 
+ *
  * <h4>Example Inputs</h4>
  * <p>
  * All of the following input are valid and converted to the expected
  * {@link Type} value.
  * </p>
- * 
+ *
  * <pre>
  * String
  * List&lt;String&gt;
@@ -76,7 +76,7 @@ import se.jbee.inject.Type;
  * List&lt;? extends Number&gt;
  * Function&lt;?, List&lt;?&gt;&gt;
  * </pre>
- * 
+ *
  * @author Jan Bernitt
  * @since 19.1
  */
@@ -99,7 +99,7 @@ public final class Imported {
 			Serializable.class, Comparable.class, Cloneable.class,
 			Closeable.class,
 			// common collection interface types...
-			Collection.class, Iterable.class, Stream.class, // 
+			Collection.class, Iterable.class, Stream.class, //
 			List.class, Set.class, //
 			Map.class, ConcurrentMap.class,
 			// common collection implementation types...
@@ -148,7 +148,7 @@ public final class Imported {
 
 	/**
 	 * Adds all provided types to this {@link Imported} context.
-	 * 
+	 *
 	 * @param types list of types to add to this context (mutable change)
 	 * @return this context for chaining
 	 */
@@ -222,7 +222,7 @@ public final class Imported {
 		char[] pad = new char[index];
 		Arrays.fill(pad, ' ');
 		throw new IllegalArgumentException(
-				msg + ":\n" + signature + "\n" + new String(pad) + "^ here");
+				msg + ":\n" + signature + "\n" + String.valueOf(pad) + "^ here");
 	}
 
 	private Type<?> resolveNonGenericNonArrayType(String signature) {

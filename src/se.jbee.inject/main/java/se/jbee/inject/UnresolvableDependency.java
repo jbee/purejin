@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -14,16 +14,16 @@ import java.util.List;
 /**
  * A {@link Dependency} that should be resolved during the injection or
  * resolution process.
- * 
+ *
  * This is a grouping {@link RuntimeException} the problem specific exceptions
  * are derived from.
- * 
+ *
  * @see DependencyCycle
  * @see UnstableDependency
  * @see NoResourceForDependency
  * @see NoMethodForDependency
  * @see SupplyFailed
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public abstract class UnresolvableDependency extends RuntimeException {
@@ -143,9 +143,9 @@ public abstract class UnresolvableDependency extends RuntimeException {
 		}
 	}
 
-	public static final class IllegalAcccess extends UnresolvableDependency {
+	public static final class IllegalAccess extends UnresolvableDependency {
 
-		public <T> IllegalAcccess(Locator<T> target,
+		public <T> IllegalAccess(Locator<T> target,
 				Dependency<? super T> dep) {
 			super("Cannot access " + target + " directly for " + dep);
 		}

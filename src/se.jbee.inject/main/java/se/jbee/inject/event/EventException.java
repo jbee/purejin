@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.event;
@@ -15,9 +15,9 @@ import java.util.concurrent.TimeoutException;
 /**
  * Is thrown by the event interface proxy for calls that should return a value
  * to the caller.
- * 
+ *
  * It {@link #getCause()} indicates what went wrong.
- * 
+ *
  * @since 19.1
  */
 public final class EventException extends RuntimeException {
@@ -28,11 +28,11 @@ public final class EventException extends RuntimeException {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param event the event processed
 	 * @param func the function that may throw an {@link Exception}
 	 * @return the functions value
-	 * @throws Exception This is either the exception thrown by the hander
+	 * @throws Exception This is either the exception thrown by the handler
 	 *             method or an {@link EventException} in case the problem was
 	 *             not within the handler method but a problem of processing the
 	 *             event in the {@link EventProcessor}.

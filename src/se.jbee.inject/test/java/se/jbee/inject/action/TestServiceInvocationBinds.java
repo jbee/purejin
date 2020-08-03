@@ -10,9 +10,9 @@ import org.junit.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency.SupplyFailed;
-import se.jbee.inject.bind.BootstrapperBundle;
-import se.jbee.inject.Utils;
+import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.Utils;
 
 /**
  * This test show how to bring back custom behaviour before or after

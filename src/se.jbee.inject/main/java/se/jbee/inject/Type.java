@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -34,10 +34,10 @@ import java.util.Set;
  * without a complex hierarchy. Instead all cases are represented as a general
  * model. The key difference is that this model just describes actual types.
  * There is no representation for a {@link TypeVariable}.
- * 
+ *
  * Lower bound types ({@code ? super X}) are not supported as they usually are
  * not needed in context of injection.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 @SuppressWarnings({ "squid:S1448", "squid:S1200" })
@@ -121,6 +121,7 @@ public final class Type<T> implements Qualifying<Type<?>>, Parameter<T>,
 		return type(type, Collections.emptyMap());
 	}
 
+	@SuppressWarnings("ChainOfInstanceofChecks")
 	public static Type<?> type(java.lang.reflect.Type type,
 			Map<String, Type<?>> actualTypeArguments) {
 		if (type instanceof Class<?>)
@@ -327,7 +328,7 @@ public final class Type<T> implements Qualifying<Type<?>>, Parameter<T>,
 
 	/**
 	 * @see #isParameterized() To check if actual type parameters are given.
-	 * 
+	 *
 	 * @return true when the {@link Class} defines type parameters (generics).
 	 */
 	public boolean hasTypeParameter() {
@@ -345,7 +346,7 @@ public final class Type<T> implements Qualifying<Type<?>>, Parameter<T>,
 	}
 
 	@Override
-	public boolean moreQualiedThan(Type<?> other) {
+	public boolean moreQualifiedThan(Type<?> other) {
 		if (!rawType.isAssignableFrom(other.rawType))
 			return true;
 		if ((hasTypeParameter() && !isParameterized())
@@ -363,10 +364,10 @@ public final class Type<T> implements Qualifying<Type<?>>, Parameter<T>,
 
 	private boolean moreQualifiedParametersThan(Type<?> other) {
 		if (params.length == 1)
-			return params[0].moreQualiedThan(other.params[0]);
+			return params[0].moreQualifiedThan(other.params[0]);
 		int moreQualified = 0;
-		for (int i = 0; i < params.length; i++)
-			if (params[i].moreQualiedThan(other.params[0]))
+		for (Type<?> param : params)
+			if (param.moreQualifiedThan(other.params[0]))
 				moreQualified++;
 		return moreQualified > params.length - moreQualified;
 	}
@@ -384,11 +385,11 @@ public final class Type<T> implements Qualifying<Type<?>>, Parameter<T>,
 
 	/**
 	 * Example - <i>typeOf</i>
-	 * 
+	 *
 	 * <pre>
 	 * Map&lt;String,String&gt; =&gt; Map&lt;? extends String, ? extends String&gt;
 	 * </pre>
-	 * 
+	 *
 	 * @return A {@link Type} having all its type arguments
 	 *         {@link #asUpperBound()}s. Use this to model &lt;?&gt; wildcard
 	 *         generic.
@@ -567,7 +568,7 @@ public final class Type<T> implements Qualifying<Type<?>>, Parameter<T>,
 		}
 	}
 
-	@SuppressWarnings({ "unchecked", "squid:S1541" })
+	@SuppressWarnings({ "unchecked", "squid:S1541", "ChainOfInstanceofChecks" })
 	public static <T> Class<T> primitiveAsWrapper(Class<T> type) {
 		if (!type.isPrimitive())
 			return type;

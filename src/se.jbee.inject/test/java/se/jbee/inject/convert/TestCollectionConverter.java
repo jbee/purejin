@@ -3,9 +3,9 @@ package se.jbee.inject.convert;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static se.jbee.inject.Cast.listTypeOf;
 import static se.jbee.inject.Type.raw;
 import static se.jbee.inject.Utils.arrayMap;
-import static se.jbee.inject.container.Cast.listTypeOf;
 
 import java.util.Arrays;
 import java.util.List;

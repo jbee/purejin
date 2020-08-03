@@ -4,13 +4,7 @@ import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static se.jbee.inject.Type.raw;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,17 +21,17 @@ import se.jbee.inject.UnresolvableDependency;
 
 /**
  * The {@link DiskScope} is a {@link Scope} that persists objects on disk.
- * 
+ *
  * Therefore there isn't *the* disk scope but particular scopes for particular
  * directories can be created using {@link Scope#disk(File)} which is
  * automatically bound to an instance of the {@link DiskScope} if the defaults
  * are in place.
- * 
+ *
  * {@link DiskScope}s are limited to {@link Serializable} types.
- * 
+ *
  * This implementation is not heavily optimised. It does the job and illustrates
  * the principle.
- * 
+ *
  * @since 19.1
  */
 public final class DiskScope implements Scope, Closeable {
@@ -99,7 +93,7 @@ public final class DiskScope implements Scope, Closeable {
 			return value; // still valid
 		if (file.exists()) {
 			try (ObjectInputStream in = new ObjectInputStream(
-					new FileInputStream(file))) {
+					new BufferedInputStream(new FileInputStream(file)))) {
 				return new DiskEntry((Serializable) in.readObject(),
 						lastModified, file);
 			} catch (Exception e) {

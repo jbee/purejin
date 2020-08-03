@@ -45,9 +45,9 @@ public interface AnnotatedWith<A extends Annotation> {
 	 *         must be present on the {@link Field}.
 	 * 
 	 *         This default behaviour can be customised on individual level by
-	 *         using custom {@link se.jbee.inject.container.Supplier}s for these
+	 *         using custom {@link se.jbee.inject.Supplier}s for these
 	 *         types (usually done by binding custom
-	 *         {@link se.jbee.inject.declare.ValueBinder}s in the {@link Env})
+	 *         {@link se.jbee.inject.bind.ValueBinder}s in the {@link Env})
 	 *         or in general by using a custom {@link Annotated#NO_MERGE}
 	 *         function which is bound in the {@link Env} for the {@link Merge}
 	 *         property.

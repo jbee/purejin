@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -32,7 +32,7 @@ public final class Name
 	 * is the most qualified name of all because it is the first to try. If the
 	 * dependency asks for a specific name the default name will not match an
 	 * thus continue trying less qualifying names.
-	 * 
+	 *
 	 * @see #ANY
 	 */
 	public static final Name DEFAULT = new Name("");
@@ -102,7 +102,7 @@ public final class Name
 	}
 
 	@Override
-	public boolean moreQualiedThan(Name other) {
+	public boolean moreQualifiedThan(Name other) {
 		final boolean thisIsDefault = isDefault();
 		final boolean otherIsDefault = other.isDefault();
 		if (thisIsDefault || otherIsDefault)

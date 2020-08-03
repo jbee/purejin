@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -57,7 +57,7 @@ public final class Target
 
 	/**
 	 * @since 19.1
-	 * 
+	 *
 	 * @return Same as this {@link Target} but also {@link #indirect}
 	 */
 	public Target indirect() {
@@ -157,15 +157,15 @@ public final class Target
 	}
 
 	@Override
-	public boolean moreQualiedThan(Target other) {
+	public boolean moreQualifiedThan(Target other) {
 		final int ol = other.parents.depth();
 		final int l = parents.depth();
 		if (ol != l)
 			return l > ol;
 		if (l > 0) { // length is known to be equal
-			if (parents.moreQualiedThan(other.parents))
+			if (parents.moreQualifiedThan(other.parents))
 				return true;
-			if (other.parents.moreQualiedThan(parents))
+			if (other.parents.moreQualifiedThan(parents))
 				return false;
 		}
 		return Qualifying.compareRelated(instance, other.instance, packages,

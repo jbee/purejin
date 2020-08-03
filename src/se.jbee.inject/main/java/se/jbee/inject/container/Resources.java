@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
+import se.jbee.inject.ContextAware;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Generator;
 import se.jbee.inject.InconsistentDeclaration;
@@ -23,8 +24,10 @@ import se.jbee.inject.Locator;
 import se.jbee.inject.Name;
 import se.jbee.inject.Provider;
 import se.jbee.inject.Resource;
+import se.jbee.inject.ResourceDescriptor;
 import se.jbee.inject.Scope;
 import se.jbee.inject.ScopePermanence;
+import se.jbee.inject.Supplier;
 import se.jbee.inject.Type;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
@@ -32,13 +35,13 @@ import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 /**
  * A set of {@link Resources} encapsulates the state and bootstrapping of
  * {@link Resource}s from {@link ResourceDescriptor}s.
- * 
+ *
  * As {@link Resource}s operate within an {@link Injector} context they need
  * some way of delegating actual instantiation (or supply) of generated
  * instances back to the {@link Injector} context which they are a part of so
  * that the context can do further processing. This backwards link is supplied
  * as the {@link ResourceLink}.
- * 
+ *
  * @since 19.1
  */
 final class Resources implements Iterable<Resource<?>[]> {
@@ -50,7 +53,7 @@ final class Resources implements Iterable<Resource<?>[]> {
 	/**
 	 * Creates a set of grouped {@link Resource} from
 	 * {@link ResourceDescriptor}s.
-	 * 
+	 *
 	 * @param link backlink to the internals of the {@link Injector} context
 	 *            this resources is created for which is provided by the
 	 *            {@link Injector} implementation
@@ -125,7 +128,7 @@ final class Resources implements Iterable<Resource<?>[]> {
 					res.add(resource);
 			}
 		Collections.sort(res);
-		return res.isEmpty() ? null : res.toArray(new Resource[res.size()]);
+		return res.isEmpty() ? null : res.toArray(new Resource[0]);
 	}
 
 	private Map<Class<?>, Resource<?>[]> createResources(ResourceLink link,
@@ -169,7 +172,7 @@ final class Resources implements Iterable<Resource<?>[]> {
 			Map<Name, ScopePermanence> permanenceByScope) {
 		return new Injector() {
 
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings({ "unchecked", "ChainOfInstanceofChecks" })
 			@Override
 			public <E> E resolve(Dependency<E> dep)
 					throws UnresolvableDependency {
@@ -265,20 +268,20 @@ final class Resources implements Iterable<Resource<?>[]> {
 	/**
 	 * This {@link Generator} represents the {@link Scope#container} where the
 	 * {@link LazySingletonGenerator#value} field holds the singleton value.
-	 * 
+	 *
 	 * In contrast to other scopes that are implemented as instances of
 	 * {@link Scope} the {@link Scope#container} is "virtual". Its instances
 	 * exist in the different instances of the {@link LazySingletonGenerator}.
-	 * 
+	 *
 	 * This is required to bootstrap {@link Scope} instances that cannot
 	 * dependent on themselves to already exist but it is also used to simplify
 	 * the "generation" for known constants (instances that are already
 	 * created).
-	 * 
+	 *
 	 * The {@link Lazy} {@link #value} makes sure the {@link #inContext}
 	 * {@link Generator} is only ever called once to actually yield a fresh
 	 * instance.
-	 * 
+	 *
 	 * @param <T> Type of the lazy value generated
 	 */
 	private static final class LazySingletonGenerator<T>
@@ -334,7 +337,7 @@ final class Resources implements Iterable<Resource<?>[]> {
 	/**
 	 * Default {@link Generator} that uses a {@link Scope} implementation to
 	 * manage the value.
-	 * 
+	 *
 	 * @param <T> Type of the generated value
 	 */
 	private static final class LazyScopedGenerator<T> implements Generator<T> {
@@ -358,7 +361,7 @@ final class Resources implements Iterable<Resource<?>[]> {
 			dep.ensureNoIllegalDirectAccessOf(resource.signature);
 			final Dependency<? super T> injected = dep.injectingInto(
 					resource.signature, resource.permanence);
-			/**
+			/*
 			 * This cache makes sure that within one thread even if the provider
 			 * (lambda below) is called multiple times (which can occur because
 			 * methods like {@code updateAndGet} on atomics have a loop) will

@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -37,23 +37,18 @@ public final class Dependency<T>
 	 * {@link Dependency} does not depend on the actual hierarchy. This is the
 	 * default.
 	 */
-	private static final Injection[] UNTARGETED = new Injection[0];
+	private static final Injection[] NO_TARGET = new Injection[0];
 
 	public static <T> Dependency<T> dependency(Class<T> type) {
 		return dependency(raw(type));
 	}
 
 	public static <T> Dependency<T> dependency(Type<T> type) {
-		return dependency(type, UNTARGETED);
+		return dependency(Instance.instance(Name.ANY, type), NO_TARGET);
 	}
 
 	public static <T> Dependency<T> dependency(Instance<T> instance) {
-		return dependency(instance, UNTARGETED);
-	}
-
-	private static <T> Dependency<T> dependency(Type<T> type,
-			Injection[] hierarchy) {
-		return dependency(Instance.instance(Name.ANY, type), hierarchy);
+		return dependency(instance, NO_TARGET);
 	}
 
 	private static <T> Dependency<T> dependency(Instance<T> instance,
@@ -121,7 +116,7 @@ public final class Dependency<T>
 	}
 
 	public Dependency<T> untargeted() {
-		return dependency(instance, UNTARGETED);
+		return dependency(instance, NO_TARGET);
 	}
 
 	public Dependency<T> ignoredScoping() {
@@ -218,11 +213,11 @@ public final class Dependency<T>
 		for (int level = 0; level < injectionDepth(); level++) {
 			Instance<?> parent = target(level);
 			if (!required.isAssignableTo(parent.type()))
-				throw new UnresolvableDependency.IllegalAcccess(locator, this);
+				throw new UnresolvableDependency.IllegalAccess(locator, this);
 			if (parent.type.rawType.isInterface())
 				return;
 		}
-		throw new UnresolvableDependency.IllegalAcccess(locator, this);
+		throw new UnresolvableDependency.IllegalAccess(locator, this);
 	}
 
 	@Override

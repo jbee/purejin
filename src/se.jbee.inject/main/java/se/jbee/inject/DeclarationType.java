@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -9,17 +9,17 @@ package se.jbee.inject;
  * The {@link DeclarationType} is used to keep track of the origin of binding
  * declarations. They describe how or why a binding has been made whereby they
  * get different significance and meaning.
- * 
+ *
  * While binds consciously done by API calls through the programmer result in
  * {@link #EXPLICIT} or {@link #MULTI} there are 3 weaker types for those binds
  * that added indirectly. They provide a convenient fall-back behaviour that
  * allows to omit simple self-evident binds but allow to override these
  * fall-backs explicitly.
- * 
+ *
  * It is important to distinguish binds in that way since binds always have to
  * be unambiguous. Two equivalent binds would
  * {@link #clashesWith(DeclarationType)} each other.
- * 
+ *
  * @author Jan Bernitt (jan@jbee.se)
  */
 public enum DeclarationType implements Qualifying<DeclarationType> {
@@ -35,7 +35,7 @@ public enum DeclarationType implements Qualifying<DeclarationType> {
 	/**
 	 * Used to provide a default of required parts of a module that can be
 	 * replaced *once* to customise behaviour.
-	 * 
+	 *
 	 * There can be just *one* default for each {@link Resource} and still just
 	 * one explicit replacement for it.
 	 */
@@ -75,7 +75,7 @@ public enum DeclarationType implements Qualifying<DeclarationType> {
 	REQUIRED;
 
 	@Override
-	public boolean moreQualiedThan(DeclarationType other) {
+	public boolean moreQualifiedThan(DeclarationType other) {
 		return ordinal() > other.ordinal();
 	}
 
@@ -92,7 +92,7 @@ public enum DeclarationType implements Qualifying<DeclarationType> {
 	/**
 	 * Bindings are dropped if they exist for convenience. In case of ambiguity
 	 * all of them are dropped (ignored) so that the effect is predictable.
-	 * 
+	 *
 	 * @param other type of another binding
 	 * @return True if both this and the other binding should be dropped, else
 	 *         false

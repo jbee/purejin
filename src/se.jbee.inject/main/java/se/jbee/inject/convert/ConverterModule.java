@@ -6,7 +6,7 @@ import static se.jbee.inject.config.NamesBy.memberNameOr;
 
 import se.jbee.inject.Converter;
 import se.jbee.inject.Type;
-import se.jbee.inject.bind.BinderModule;
+import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.config.NamesBy;
 import se.jbee.inject.config.ProducesBy;
 import se.jbee.inject.config.ScopesBy;

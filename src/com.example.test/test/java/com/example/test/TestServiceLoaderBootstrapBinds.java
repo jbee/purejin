@@ -9,11 +9,11 @@ import org.junit.Test;
 
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
-import se.jbee.inject.bind.serviceloader.ServiceLoaderBundles;
-import se.jbee.inject.bind.serviceloader.ServiceLoaderEnvBundles;
+import se.jbee.inject.binder.ServiceLoaderBundles;
+import se.jbee.inject.binder.ServiceLoaderEnvBundles;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.declare.Bundle;
-import se.jbee.inject.declare.Module;
+import se.jbee.inject.bind.Bundle;
+import se.jbee.inject.bind.Module;
 
 /**
  * This test demonstrates how the {@link java.util.ServiceLoader} concept is
