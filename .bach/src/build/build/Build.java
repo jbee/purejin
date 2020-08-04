@@ -21,14 +21,14 @@ class Build {
             .name("silk")
             .version(version)
             // <main>
-            .withMainSpaceUnit("src/se.jbee.inject/main/java-9", 8)
+            .withMainSpaceUnit("src/se.jbee.inject.api/main/java-9", 8)
             .without(MainSpace.Modifier.CUSTOM_RUNTIME_IMAGE)
             .withMainSpaceJavacTweak(
                 javac -> javac.without("-Xlint").with("-Xlint:-serial,-rawtypes,-varargs"))
             .withMainSpaceJavadocTweak(
-                javadoc -> javadoc.without("-Xdoclint").with("-Xdoclint:all,-missing"))            
+                javadoc -> javadoc.without("-Xdoclint").with("-Xdoclint:all,-missing"))
             // test
-            .withTestSpaceUnit("src/se.jbee.inject/test/java-module") // in-module tests
+            .withTestSpaceUnit("src/test.integration/test/java") // extra-module tests
             .withTestSpaceUnit("src/com.example.app/test/java") // silk's first client
             .withTestSpaceUnit("src/com.example.test/test/java") // modular integration tests
             // lib/
