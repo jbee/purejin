@@ -1,10 +1,8 @@
 /**
- * <p>
- * This package contains core utility to
+ * Contains the core utility to
  * {@link se.jbee.inject.bootstrap.Bootstrap} a {@link se.jbee.inject.Injector}
- * from a root {@link se.jbee.inject.bind.Bundle}.
- * </p>
- * 
+ * or {@link se.jbee.inject.Env} from a root {@link se.jbee.inject.bind.Bundle}.
+ *
  * <h2>Custom Environments</h2>
  * <p>
  * The {@link se.jbee.inject.bootstrap.Environment} is a default implementation

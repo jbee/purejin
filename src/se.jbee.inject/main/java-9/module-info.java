@@ -1,3 +1,6 @@
+/**
+ * A BOM type module that references the core modules of the library
+ */
 module se.jbee.inject {
 
 	requires transitive se.jbee.inject.api;

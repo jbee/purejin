@@ -1,15 +1,14 @@
 /**
  * <p>
- * This package provides the default implementations of common
- * {@link se.jbee.inject.Scope}s. It is only dependent on the configuration and
- * base package.
+ * Contains the default implementations of common {@link se.jbee.inject.Scope}s.
+ * In the library a scope implementation is a managed container instance.
  * </p>
  *
  * <h2>Defaults</h2>
  * <p>
- * The {@link se.jbee.inject.defaults.DefaultScopes}
- * {@link se.jbee.inject.bind.Module} is used to hook in the
- * {@link se.jbee.inject.Scope} implementations.
+ * The {@link se.jbee.inject.defaults.DefaultScopes} {@link
+ * se.jbee.inject.bind.Module} is used to define the common {@link
+ * se.jbee.inject.Scope} implementations.
  * </p>
  *
  * <h2>Provided Scopes</h2>

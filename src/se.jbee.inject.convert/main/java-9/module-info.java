@@ -1,3 +1,7 @@
+/**
+ * Contains an add-on for convenient type conversion based on the {@link
+ * se.jbee.inject.Converter} abstraction.
+ */
 module se.jbee.inject.convert {
 
 	requires se.jbee.inject.api;

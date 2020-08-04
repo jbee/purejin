@@ -1,3 +1,12 @@
+/**
+ * Contains the defaults for {@link se.jbee.inject.Scope} and {@link
+ * se.jbee.inject.bind.ValueBinder}s required to {@link
+ * se.jbee.inject.bootstrap.Bootstrap} a {@link se.jbee.inject.Injector} from
+ * {@link se.jbee.inject.bind.Binding}s.
+ * <p>
+ * In multi-module application this module should only be required in the single
+ * module responsible for bootstrapping the application.
+ */
 module se.jbee.inject.bootstrap {
 
 	requires java.logging;
