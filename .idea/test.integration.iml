@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/src/test.integration">
+      <sourceFolder url="file://$MODULE_DIR$/src/test.integration/test/java" isTestSource="true" />
+    </content>
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="se.jbee.inject.api" scope="TEST" />
+    <orderEntry type="module" module-name="se.jbee.inject.bind" scope="TEST" />
+    <orderEntry type="module" module-name="se.jbee.inject.container" scope="TEST" />
+    <orderEntry type="module" module-name="se.jbee.inject.action" scope="TEST" />
+    <orderEntry type="module" module-name="se.jbee.inject" scope="TEST" />
+    <orderEntry type="library" name="lib" level="project" />
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="module" module-name="se.jbee.inject.convert" scope="TEST" />
+    <orderEntry type="module" module-name="se.jbee.inject.event" scope="TEST" />
+    <orderEntry type="module" module-name="com.example.app" scope="TEST" />
+  </component>
+</module>
