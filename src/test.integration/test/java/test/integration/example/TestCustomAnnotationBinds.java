@@ -1,4 +1,4 @@
-package com.example.test;
+package test.integration.example;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;

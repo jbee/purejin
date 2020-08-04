@@ -1,7 +1,7 @@
 module com.example.app {
 
   exports com.example.app;
-  requires transitive se.jbee.inject.api;
+  requires transitive se.jbee.inject;
 
   provides se.jbee.inject.bind.Bundle with
       com.example.app.MyRootBundle,
