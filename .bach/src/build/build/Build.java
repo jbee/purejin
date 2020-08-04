@@ -48,7 +48,6 @@ class Build {
             // test
             .withTestSpaceUnit("src/test.integration/test/java") // extra-module tests
             .withTestSpaceUnit("src/com.example.app/test/java") // silk's first client
-            .withTestSpaceUnit("src/com.example.test/test/java") // modular integration tests
             // lib/
             .withLibraryRequires(
                     "org.hamcrest", "org.junit.vintage.engine", "org.junit.platform.console");
