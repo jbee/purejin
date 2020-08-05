@@ -1,3 +1,7 @@
+/**
+ * Contains an example application used in tests to test the {@link
+ * java.util.ServiceLoader} based features.
+ */
 module com.example.app {
 
   exports com.example.app;

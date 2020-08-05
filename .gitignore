@@ -5,6 +5,4 @@ src/doc/
 lib/
 pom.*
 *~
-.idea
-*.iml
 _site/

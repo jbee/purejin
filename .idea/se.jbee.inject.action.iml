@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/src/se.jbee.inject.action">
+      <sourceFolder url="file://$MODULE_DIR$/src/se.jbee.inject.action/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/se.jbee.inject.action/main/java-9" isTestSource="false" />
+    </content>
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="se.jbee.inject.bind" />
+    <orderEntry type="module" module-name="se.jbee.inject.api" />
+    <orderEntry type="module" module-name="se.jbee.inject.lang" />
+    <orderEntry type="inheritedJdk" />
+  </component>
+</module>

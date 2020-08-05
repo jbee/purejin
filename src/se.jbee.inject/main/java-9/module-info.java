@@ -1,29 +1,11 @@
-/*
- *  Copyright (c) 2012-2020, Jan Bernitt
- *
- *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
- */
-
 /**
- * Defines the API of Silk DI.
- *
- * @uses se.jbee.inject.bind.Bundle
- * @uses se.jbee.inject.bind.ModuleWith
+ * A BOM type module that references the core modules of the library
  */
 module se.jbee.inject {
-  exports se.jbee.inject;
-  exports se.jbee.inject.action;
-  exports se.jbee.inject.bind;
-  exports se.jbee.inject.binder;
-  exports se.jbee.inject.bootstrap;
-  exports se.jbee.inject.config;
-  exports se.jbee.inject.container;
-  exports se.jbee.inject.defaults;
-  exports se.jbee.inject.event;
-  exports se.jbee.inject.scope;
 
-  requires transitive java.logging;
-
-  uses se.jbee.inject.bind.Bundle;
-  uses se.jbee.inject.bind.ModuleWith;
+	requires transitive se.jbee.inject.lang;
+	requires transitive se.jbee.inject.api;
+	requires transitive se.jbee.inject.bind;
+	requires transitive se.jbee.inject.container;
+	requires transitive se.jbee.inject.bootstrap;
 }
