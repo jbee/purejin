@@ -1,14 +1,16 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
 
+import se.jbee.inject.lang.Type;
+
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
@@ -20,7 +22,7 @@ import java.util.List;
  *
  * Once created a {@link Injector} container consists of a fixed set of
  * {@link Resource}s.
- * 
+ *
  * Calls to {@link #resolve(Dependency)} always have the same result for the
  * same {@linkplain Dependency}. The only exception to this are scoping effects
  * (expiring and parallel instances).
@@ -34,7 +36,7 @@ public interface Injector {
 	 * To resolve all matching implementations create a {@link Dependency} on
 	 * the array type of the implementations. When list or set bridges have been
 	 * installed this can also be resolved as list or set.
-	 * 
+	 *
 	 * @param dependency describes the absolute instance to resolve. This
 	 *            includes nesting within the resolution process and other
 	 *            details of a {@link Dependency} to consider.

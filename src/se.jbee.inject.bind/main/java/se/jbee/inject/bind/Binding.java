@@ -5,7 +5,7 @@
  */
 package se.jbee.inject.bind;
 
-import static se.jbee.inject.Utils.arrayOf;
+import static se.jbee.inject.lang.Utils.arrayOf;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,13 +18,13 @@ import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Env;
 import se.jbee.inject.Locator;
 import se.jbee.inject.Name;
-import se.jbee.inject.Qualifying;
+import se.jbee.inject.lang.Qualifying;
 import se.jbee.inject.ResourceDescriptor;
 import se.jbee.inject.Scope;
 import se.jbee.inject.Source;
 import se.jbee.inject.Supplier;
-import se.jbee.inject.Type;
-import se.jbee.inject.Typed;
+import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.Typed;
 import se.jbee.inject.UnresolvableDependency;
 
 /**

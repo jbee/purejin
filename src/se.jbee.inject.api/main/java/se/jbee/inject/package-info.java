@@ -11,7 +11,7 @@
  * <h2>Initialising Objects Created In Context</h2>
  * <p>
  * To initialise objects created in the {@link se.jbee.inject.Injector} bind a
- * {@link se.jbee.inject.Initialiser} for the {@link se.jbee.inject.Type} of
+ * {@link se.jbee.inject.Initialiser} for the {@link se.jbee.inject.lang.Type} of
  * objects it should initialise. This is mostly equivalent to a
  * <code>javax.annotation.PostConstruct</code> annotation just that the effect
  * is not given by an annotated method but by the provided {@link

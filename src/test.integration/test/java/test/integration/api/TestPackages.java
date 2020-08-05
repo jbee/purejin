@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static se.jbee.inject.Packages.packageOf;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 
 import java.text.Format;
 import java.text.spi.DateFormatProvider;
@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
 import se.jbee.inject.Packages;
-import se.jbee.inject.Type;
+import se.jbee.inject.lang.Type;
 
 public class TestPackages {
 

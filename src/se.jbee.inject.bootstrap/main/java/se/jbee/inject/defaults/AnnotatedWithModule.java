@@ -3,7 +3,7 @@ package se.jbee.inject.defaults;
 import static java.util.Collections.unmodifiableList;
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;

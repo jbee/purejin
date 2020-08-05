@@ -5,13 +5,13 @@
  */
 package se.jbee.inject.bind;
 
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 
 import java.lang.annotation.Annotation;
 
 import se.jbee.inject.Env;
 import se.jbee.inject.Name;
-import se.jbee.inject.Type;
+import se.jbee.inject.lang.Type;
 
 /**
  * A {@link ModuleWith} is an extension to a usual {@link Module} that depends

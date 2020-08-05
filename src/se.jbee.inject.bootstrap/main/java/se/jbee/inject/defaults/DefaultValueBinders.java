@@ -6,10 +6,10 @@
 package se.jbee.inject.defaults;
 
 import static se.jbee.inject.Instance.anyOf;
-import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.Utils.instantiate;
-import static se.jbee.inject.Utils.isClassBanal;
-import static se.jbee.inject.Utils.isClassInstantiable;
+import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.inject.lang.Utils.instantiate;
+import static se.jbee.inject.lang.Utils.isClassBanal;
+import static se.jbee.inject.lang.Utils.isClassInstantiable;
 import static se.jbee.inject.bind.BindingType.CONSTRUCTOR;
 import static se.jbee.inject.bind.BindingType.FIELD;
 import static se.jbee.inject.bind.BindingType.METHOD;
@@ -24,13 +24,7 @@ import static se.jbee.inject.binder.Supply.byProducer;
 
 import java.lang.reflect.Constructor;
 
-import se.jbee.inject.DeclarationType;
-import se.jbee.inject.Env;
-import se.jbee.inject.Instance;
-import se.jbee.inject.Locator;
-import se.jbee.inject.Parameter;
-import se.jbee.inject.Supplier;
-import se.jbee.inject.Type;
+import se.jbee.inject.*;
 import se.jbee.inject.bind.Binding;
 import se.jbee.inject.bind.BindingType;
 import se.jbee.inject.bind.Bindings;
@@ -42,6 +36,7 @@ import se.jbee.inject.binder.Produces;
 import se.jbee.inject.binder.Shares;
 import se.jbee.inject.binder.Supply;
 import se.jbee.inject.config.ConstructsBy;
+import se.jbee.inject.lang.Type;
 
 /**
  * Utility with default {@link ValueBinder}s.
@@ -56,7 +51,7 @@ public final class DefaultValueBinders {
 			false);
 	public static final ValueBinder<Instance<?>> INSTANCE_REF_LITE = new ReferenceBinder(
 			true);
-	public static final ValueBinder<Parameter<?>[]> ARRAY = new ArrayElementsBinder();
+	public static final ValueBinder<Hint<?>[]> ARRAY = new ArrayElementsBinder();
 	public static final ValueBinder<New<?>> NEW = new NewBinder();
 	public static final ValueBinder<Produces<?>> PRODUCES = new ProducesBinder();
 	public static final ValueBinder<Shares<?>> SHARES = new SharesBinder();
@@ -89,21 +84,21 @@ public final class DefaultValueBinders {
 	}
 
 	static final class ArrayElementsBinder
-			implements ValueBinder.Completion<Parameter<?>[]> {
+			implements ValueBinder.Completion<Hint<?>[]> {
 
 		@Override
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public <T> Binding<T> complete(Binding<T> item,
-				Parameter<?>[] elements) {
+				Hint<?>[] elements) {
 			return item.complete(PREDEFINED,
 					supplier((Type) item.type(), elements));
 		}
 
 		@SuppressWarnings("unchecked")
 		static <E> Supplier<E> supplier(Type<E[]> array,
-				Parameter<?>[] elements) {
+				Hint<?>[] elements) {
 			return (Supplier<E>) Supply.fromElements(array,
-					(Parameter<? extends E>[]) elements);
+					(Hint<? extends E>[]) elements);
 		}
 
 	}
@@ -187,7 +182,9 @@ public final class DefaultValueBinders {
 			Type<?> srcType = src.type();
 			if (avoidReferences && isClassBanal(srcType.rawType)) {
 				target.addExpanded(env, item,
-						new Constant<>(instantiate(srcType.rawType)).manual());
+						new Constant<>(instantiate(srcType.rawType,
+								RuntimeException::new)).manual());
+						//TODO shouldn't this use New instead?
 				return;
 			}
 			if (srcType.isAssignableTo(raw(Supplier.class))

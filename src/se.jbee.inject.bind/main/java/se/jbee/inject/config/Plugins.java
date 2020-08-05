@@ -1,6 +1,6 @@
 package se.jbee.inject.config;
 
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
@@ -10,7 +10,7 @@ import se.jbee.inject.Name;
  * {@link Plugins} are an {@link Extension} that makes resolving plugged
  * {@link Class}es for specific plugin points more convenient and formalise the
  * convention of the mechanism.
- * 
+ *
  * @author Jan Bernitt
  * @since 19.1
  */
@@ -18,7 +18,7 @@ public final class Plugins implements Extension {
 
 	/**
 	 * The {@link Name} of the plugin-point.
-	 * 
+	 *
 	 * @param point point class used as the main name-space
 	 * @param property property name used as sub-space, use
 	 *            {@link Class#getCanonicalName()} in case no specific property

@@ -6,8 +6,8 @@ import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.defaultInstanceOf;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.Utils.orElse;
+import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.inject.lang.Utils.orElse;
 
 import java.util.Optional;
 
@@ -21,7 +21,7 @@ import se.jbee.inject.Instance;
  * A {@link Config} is an {@link Extension} that uses the {@link Dependency}
  * hierarchy to effectively name-space configuration values to avoid name
  * collisions.
- * 
+ *
  * @since 19.1
  */
 public class Config implements ContextAware<Config>, Extension {
@@ -80,7 +80,7 @@ public class Config implements ContextAware<Config>, Extension {
 		public <B> Optional<B> as(Class<B> type) {
 			Converter<A, B> converter = orElse(null,
 					() -> Config.this.context.resolve(
-							Converter.type(from, type)));
+							Converter.converterTypeOf(from, type)));
 			if (converter == null)
 				return empty();
 			return Config.this.optionalValue(from, property) //

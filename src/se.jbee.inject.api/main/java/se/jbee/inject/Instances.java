@@ -5,9 +5,11 @@
  */
 package se.jbee.inject;
 
+import se.jbee.inject.lang.Qualifying;
+
 import static java.util.Arrays.asList;
-import static se.jbee.inject.Utils.arrayCompare;
-import static se.jbee.inject.Utils.arrayPrepand;
+import static se.jbee.inject.lang.Utils.arrayCompare;
+import static se.jbee.inject.lang.Utils.arrayPrepand;
 
 import java.io.Serializable;
 import java.util.Arrays;

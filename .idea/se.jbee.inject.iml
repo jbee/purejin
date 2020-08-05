@@ -11,5 +11,6 @@
     <orderEntry type="module" module-name="se.jbee.inject.bind" exported="" />
     <orderEntry type="module" module-name="se.jbee.inject.container" exported="" />
     <orderEntry type="module" module-name="se.jbee.inject.bootstrap" exported="" />
+    <orderEntry type="module" module-name="se.jbee.inject.lang" exported="" />
   </component>
 </module>

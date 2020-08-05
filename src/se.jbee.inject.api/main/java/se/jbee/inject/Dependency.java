@@ -8,13 +8,13 @@ package se.jbee.inject;
 import static java.util.Arrays.asList;
 import static se.jbee.inject.Instance.defaultInstanceOf;
 import static se.jbee.inject.Packages.packageAndSubPackagesOf;
-import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.Utils.arrayAppend;
-import static se.jbee.inject.Utils.arrayContains;
-import static se.jbee.inject.Utils.arrayDropTail;
-import static se.jbee.inject.Utils.arrayEquals;
-import static se.jbee.inject.Utils.arrayFindFirst;
-import static se.jbee.inject.Utils.arrayMap;
+import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.inject.lang.Utils.arrayAppend;
+import static se.jbee.inject.lang.Utils.arrayContains;
+import static se.jbee.inject.lang.Utils.arrayDropTail;
+import static se.jbee.inject.lang.Utils.arrayEquals;
+import static se.jbee.inject.lang.Utils.arrayFindFirst;
+import static se.jbee.inject.lang.Utils.arrayMap;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -22,6 +22,8 @@ import java.util.Iterator;
 
 import se.jbee.inject.UnresolvableDependency.DependencyCycle;
 import se.jbee.inject.UnresolvableDependency.UnstableDependency;
+import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.Typed;
 
 /**
  * Describes what is wanted/needed as parameter to construct a instance of T.
@@ -30,7 +32,7 @@ import se.jbee.inject.UnresolvableDependency.UnstableDependency;
  */
 @SuppressWarnings("squid:S1448")
 public final class Dependency<T>
-		implements Parameter<T>, Iterable<Injection>, Serializable {
+		implements Typed<T>, Iterable<Injection>, Serializable {
 
 	/**
 	 * A empty {@link Injection} hierarchy. It is used whenever the
@@ -225,7 +227,6 @@ public final class Dependency<T>
 		return asList(hierarchy).iterator();
 	}
 
-	@Override
 	public Hint<T> asHint() {
 		return Hint.absoluteReferenceTo(this);
 	}

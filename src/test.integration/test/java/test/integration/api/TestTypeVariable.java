@@ -2,7 +2,7 @@ package test.integration.api;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 
 import java.util.List;
 import java.util.Map;
@@ -10,8 +10,8 @@ import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 import org.junit.Test;
-import se.jbee.inject.Type;
-import se.jbee.inject.TypeVariable;
+import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.TypeVariable;
 
 /**
  * Tests {@link TypeVariable} utility for formal correctness.

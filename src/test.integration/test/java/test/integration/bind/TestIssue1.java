@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 import static test.integration.bind.AssertInjects.assertEqualSets;
 
 /**

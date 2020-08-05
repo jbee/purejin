@@ -2,10 +2,10 @@ package se.jbee.inject.container;
 
 import static java.util.Arrays.copyOf;
 import static se.jbee.inject.Cast.initialiserTypeOf;
-import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.Utils.arrayFilter;
-import static se.jbee.inject.Utils.arrayFlatmap;
-import static se.jbee.inject.Utils.arrayMap;
+import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.inject.lang.Utils.arrayFilter;
+import static se.jbee.inject.lang.Utils.arrayFlatmap;
+import static se.jbee.inject.lang.Utils.arrayMap;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,7 +16,7 @@ import se.jbee.inject.Initialiser;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Locator;
 import se.jbee.inject.Resource;
-import se.jbee.inject.Type;
+import se.jbee.inject.lang.Type;
 
 /**
  * A {@link PostConstruct} encapsulates the state and processing of

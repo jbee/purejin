@@ -5,8 +5,12 @@
  */
 package se.jbee.inject;
 
+import se.jbee.inject.lang.Qualifying;
+import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.Typed;
+
 import static se.jbee.inject.Dependency.dependency;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 
 import java.io.Serializable;
 

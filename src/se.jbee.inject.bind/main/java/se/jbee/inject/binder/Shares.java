@@ -1,19 +1,19 @@
 package se.jbee.inject.binder;
 
 import static java.lang.reflect.Modifier.isStatic;
-import static se.jbee.inject.Type.fieldType;
-import static se.jbee.inject.Utils.accessible;
+import static se.jbee.inject.lang.Type.fieldType;
+import static se.jbee.inject.lang.Utils.accessible;
 
 import java.lang.reflect.Field;
 
 import se.jbee.inject.Supplier;
-import se.jbee.inject.Type;
-import se.jbee.inject.Typed;
+import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.Typed;
 
 /**
  * Shares a value that is extracted from a field. The field is read each time
  * the {@link Supplier} supplying is asked to supply the value.
- * 
+ *
  * @author Jan Bernitt
  * @since 19.1
  *

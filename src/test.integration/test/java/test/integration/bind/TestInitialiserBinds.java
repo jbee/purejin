@@ -11,7 +11,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
 
 import static org.junit.Assert.*;
 import static se.jbee.inject.Cast.initialiserTypeOf;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * The tests demonstrates how the {@link Initialiser} and

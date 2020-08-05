@@ -5,10 +5,12 @@
  */
 package se.jbee.inject;
 
+import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.Typed;
+
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Instance.instance;
-import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.Utils.arrayMap;
+import static se.jbee.inject.lang.Type.raw;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -22,9 +24,17 @@ import java.util.Map;
  *
  * @param <T> The {@link Type} of the argument
  */
-public final class Hint<T> implements Parameter<T> {
+public final class Hint<T> implements Typed<T> {
 
 	private static final Hint<?>[] NO_PARAMS = new Hint<?>[0];
+
+	public static Hint<?>[] none() {
+		return NO_PARAMS;
+	}
+
+	public static <T> Hint<T> relativeReferenceTo(Class<T> target) {
+		return relativeReferenceTo(raw(target));
+	}
 
 	/**
 	 * A {@link Type} reference is relative to the injection site
@@ -73,30 +83,23 @@ public final class Hint<T> implements Parameter<T> {
 		return new Hint<>(asType, null, null, null);
 	}
 
-	@SuppressWarnings("unchecked")
-	@SafeVarargs
-	public static <E> Hint<? extends E>[] match(
-			Parameter<? extends E>... elems) {
-		return arrayMap(elems, Hint.class, Parameter::asHint);
-	}
-
-	public static Hint<?>[] match(Type<?>[] types, Parameter<?>... hints) {
+	public static Hint<?>[] match(Type<?>[] types, Hint<?>... hints) {
 		if (types.length == 0)
 			return NO_PARAMS;
 		Hint<?>[] args = new Hint<?>[types.length];
-		for (Parameter<?> hint : hints) {
+		for (Hint<?> hint : hints) {
 			int i = indexForType(types, hint, args);
 			if (i < 0)
 				throw InconsistentDeclaration.incomprehensibleHint(hint);
-			args[i] = hint.asHint();
+			args[i] = hint;
 		}
 		for (int i = 0; i < args.length; i++)
 			if (args[i] == null)
-				args[i] = types[i].asHint();
+				args[i] = Hint.relativeReferenceTo(types[i]);
 		return args;
 	}
 
-	private static int indexForType(Type<?>[] types, Parameter<?> hint,
+	private static int indexForType(Type<?>[] types, Hint<?> hint,
 			Hint<?>[] args) {
 		for (int i = 0; i < types.length; i++)
 			if (args[i] == null && hint.type().isAssignableTo(types[i]))
@@ -118,11 +121,6 @@ public final class Hint<T> implements Parameter<T> {
 	}
 
 	@Override
-	public Hint<T> asHint() {
-		return this;
-	}
-
-	@Override
 	public Type<T> type() {
 		return asType;
 	}
@@ -131,12 +129,10 @@ public final class Hint<T> implements Parameter<T> {
 		return relativeRef == null && absoluteRef == null;
 	}
 
-	@Override
 	public <S> Hint<S> asType(Type<S> supertype) {
 		return typed(supertype);
 	}
 
-	@Override
 	public <S> Hint<S> asType(Class<S> supertype) {
 		return typed(raw(supertype));
 	}

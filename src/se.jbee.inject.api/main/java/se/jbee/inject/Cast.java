@@ -5,14 +5,19 @@
  */
 package se.jbee.inject;
 
-import static se.jbee.inject.Type.raw;
+import se.jbee.inject.lang.Type;
+
+import static se.jbee.inject.lang.Type.raw;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * Utility to get rid of warnings for known generic {@link Type}s.
+ *
+ * @see Converter#converterTypeOf(Type, Type)
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
@@ -92,4 +97,11 @@ public final class Cast {
 		return (Type) raw(Initialiser.class).parametized(initialisedType);
 	}
 
+	public static <A, B> Type<Function<A,B>> functionTypeOf(Class<A> a, Class<B> b) {
+		return functionTypeOf(raw(a), raw(b));
+	}
+
+	public static <A, B> Type<Function<A,B>> functionTypeOf(Type<A> a, Type<B> b) {
+		return (Type) Type.raw(Function.class).parametized(a, b);
+	}
 }

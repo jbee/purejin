@@ -1,14 +1,14 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.config;
 
 import static se.jbee.inject.InconsistentDeclaration.annotationLacksProperty;
-import static se.jbee.inject.Utils.annotatedName;
-import static se.jbee.inject.Utils.annotation;
-import static se.jbee.inject.Utils.annotationPropertyByType;
+import static se.jbee.inject.lang.Utils.annotatedName;
+import static se.jbee.inject.lang.Utils.annotation;
+import static se.jbee.inject.lang.Utils.annotationPropertyByType;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
@@ -19,7 +19,7 @@ import se.jbee.inject.Name;
 
 /**
  * Extracts the {@link Name} used for instance being bound.
- * 
+ *
  * @since 19.1
  */
 @FunctionalInterface
@@ -49,8 +49,8 @@ public interface NamesBy {
 		if (nameProperty == null)
 			throw annotationLacksProperty(String.class, naming);
 		return obj -> {
-			Name name = annotatedName(nameProperty, annotation(naming, obj));
-			return name == null ? this.reflect(obj) : name;
+			String name = annotatedName(nameProperty, annotation(naming, obj));
+			return name == null ? this.reflect(obj) : Name.named(name);
 		};
 	}
 

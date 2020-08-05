@@ -3,7 +3,7 @@ package test.integration.bind;
 import org.junit.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Resource;
-import se.jbee.inject.Type;
+import se.jbee.inject.lang.Type;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.config.ProducesBy;
@@ -11,7 +11,7 @@ import se.jbee.inject.config.ProducesBy;
 import java.util.function.Function;
 
 import static org.junit.Assert.assertEquals;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 
 public class TestTypeVariableAutobindBinds {
 

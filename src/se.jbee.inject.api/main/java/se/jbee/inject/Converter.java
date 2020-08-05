@@ -1,7 +1,9 @@
 package se.jbee.inject;
 
+import se.jbee.inject.lang.Type;
+
 /**
- * 
+ *
  * @author Jan Bernitt
  *
  * @param <A> type of the input value
@@ -13,7 +15,7 @@ public interface Converter<A, B> {
 	/**
 	 * Converts input to the corresponding value of the output type of this
 	 * {@link Converter}.
-	 * 
+	 *
 	 * @param input any value including {@code null}
 	 * @return output value including {@code null}
 	 * @throws IllegalArgumentException In case the input value cannot be
@@ -40,12 +42,12 @@ public interface Converter<A, B> {
 		};
 	}
 
-	static <A, B> Type<Converter<A, B>> type(Class<A> a, Class<B> b) {
-		return type(Type.raw(a), Type.raw(b));
+	static <A, B> Type<Converter<A, B>> converterTypeOf(Class<A> a, Class<B> b) {
+		return converterTypeOf(Type.raw(a), Type.raw(b));
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	static <A, B> Type<Converter<A, B>> type(Type<A> a, Type<B> b) {
+	static <A, B> Type<Converter<A, B>> converterTypeOf(Type<A> a, Type<B> b) {
 		return (Type) Type.raw(Converter.class).parametized(a, b);
 	}
 

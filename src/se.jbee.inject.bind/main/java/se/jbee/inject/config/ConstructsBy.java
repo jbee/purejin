@@ -1,23 +1,23 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.config;
 
-import static se.jbee.inject.Utils.arrayFindFirst;
+import static se.jbee.inject.lang.Utils.arrayFindFirst;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 
 import se.jbee.inject.Packages;
-import se.jbee.inject.Type;
-import se.jbee.inject.Utils;
+import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.Utils;
 
 /**
  * Picks the {@link Constructor} to use to construct objects of a given
  * {@link Class}.
- * 
+ *
  * @since 19.1
  */
 @FunctionalInterface
@@ -27,7 +27,7 @@ public interface ConstructsBy {
 	 * @return The {@link Constructor} considered to be the reasonable or right
 	 *         way to construct a object of the given type. In case one with
 	 *         parameters is returned the these are solved (injected).
-	 * 
+	 *
 	 *         Returns {@code null} when no suitable constructor was found.
 	 */
 	<T> Constructor<T> reflect(Class<T> type);

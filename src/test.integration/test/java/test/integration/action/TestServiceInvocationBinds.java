@@ -3,17 +3,17 @@ package test.integration.action;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 
 import org.junit.Test;
 
 import se.jbee.inject.Injector;
-import se.jbee.inject.Type;
+import se.jbee.inject.lang.Type;
 import se.jbee.inject.UnresolvableDependency.SupplyFailed;
 import se.jbee.inject.action.*;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.Utils;
+import se.jbee.inject.lang.Utils;
 
 /**
  * This test show how to bring back custom behaviour before or after
@@ -145,7 +145,8 @@ public class TestServiceInvocationBinds {
 			O res;
 			try {
 				res = site.output.rawType.cast(
-						Utils.produce(site.action, site.owner, args));
+						Utils.produce(site.action, site.owner, args, //
+								e -> SupplyFailed.valueOf(e, site.action)));
 			} catch (SupplyFailed e) {
 				Exception ex = e;
 				if (e.getCause() instanceof Exception) {

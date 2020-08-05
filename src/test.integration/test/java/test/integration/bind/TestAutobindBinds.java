@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * The tests demonstrates the meaning of a {@link Binder#autobind(Class)} call.

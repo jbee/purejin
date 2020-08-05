@@ -6,9 +6,9 @@
 package se.jbee.inject;
 
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Utils.arrayAppend;
-import static se.jbee.inject.Utils.arrayContains;
-import static se.jbee.inject.Utils.arrayEquals;
+import static se.jbee.inject.lang.Utils.arrayAppend;
+import static se.jbee.inject.lang.Utils.arrayContains;
+import static se.jbee.inject.lang.Utils.arrayEquals;
 
 import java.io.Serializable;
 

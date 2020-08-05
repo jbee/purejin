@@ -37,7 +37,7 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
-import se.jbee.inject.Type;
+import se.jbee.inject.lang.Type;
 
 /**
  * <p>

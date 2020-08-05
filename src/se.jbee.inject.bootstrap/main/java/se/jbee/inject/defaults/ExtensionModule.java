@@ -1,6 +1,6 @@
 package se.jbee.inject.defaults;
 
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 
 import java.lang.reflect.Constructor;
 
@@ -17,13 +17,13 @@ import se.jbee.inject.config.Extension;
 /**
  * Provides a {@link Supplier} that can resolve all types extending an
  * {@link Extension} should they not be bound otherwise.
- * 
+ *
  * This is the basis of the {@link Extension} functionality where any type
  * implementing the abstraction is constructed by the {@link Supplier}.
- * 
+ *
  * The created instance is an effective singleton per type, so there will be one
  * instance for each {@link Extension} implementation class.
- * 
+ *
  * @since 19.1
  */
 // intentionally made default visible to not be confused with a module that is useful as a base class for user modules

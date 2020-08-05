@@ -8,6 +8,9 @@ package se.jbee.inject.binder;
 import se.jbee.inject.*;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.InjectionSite;
+import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.TypeVariable;
+import se.jbee.inject.lang.Utils;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
@@ -17,11 +20,10 @@ import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 import static java.util.stream.Collectors.toMap;
-import static se.jbee.inject.Hint.match;
 import static se.jbee.inject.Instance.anyOf;
-import static se.jbee.inject.Type.parameterTypes;
-import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.Utils.newArray;
+import static se.jbee.inject.lang.Type.parameterTypes;
+import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.inject.lang.Utils.newArray;
 
 /**
  * Utility as a factory to create different kinds of {@link Supplier}s.
@@ -71,8 +73,8 @@ public final class Supply {
 	}
 
 	public static <E> Supplier<E[]> fromElements(Type<E[]> arrayType,
-			Parameter<? extends E>[] elements) {
-		return new PredefinedArraySupplier<>(arrayType, Hint.match(elements));
+			Hint<? extends E>[] elements) {
+		return new PredefinedArraySupplier<>(arrayType, elements);
 	}
 
 	public static <T> Supplier<T> byInstanceReference(Instance<T> instance) {
@@ -107,16 +109,16 @@ public final class Supply {
 			Hint<?> actualTypeHint = Hint.constantNull(
 					Type.parameterType(producer.target.getParameters()[0]));
 			return new Call<>(producer,
-					match(parameterTypes(producer.target),
+					Hint.match(parameterTypes(producer.target),
 							Utils.arrayPrepand(actualTypeHint, producer.hints)),
 					Dependency::type);
 		}
 		return new Call<>(producer,
-				match(parameterTypes(producer.target), producer.hints), null);
+				Hint.match(parameterTypes(producer.target), producer.hints), null);
 	}
 
 	public static <T> Supplier<T> byNew(New<T> instantiation) {
-		return new Instantiation<>(instantiation.target, match(
+		return new Instantiation<>(instantiation.target, Hint.match(
 				parameterTypes(instantiation.target), instantiation.hints));
 	}
 
@@ -194,7 +196,8 @@ public final class Supply {
 		@Override
 		public T supply(Dependency<? super T> dep, Injector context)
 				throws UnresolvableDependency {
-			return (T) Utils.share(field.target, field.owner);
+			return (T) Utils.share(field.target, field.owner,
+					e -> UnresolvableDependency.SupplyFailed.valueOf(e, field.target));
 		}
 
 		@Override
@@ -221,7 +224,8 @@ public final class Supply {
 
 		@Override
 		protected T invoke(Object[] args, Injector context) {
-			return Utils.construct(target, args);
+			return Utils.construct(target, args,
+					e -> UnresolvableDependency.SupplyFailed.valueOf(e, target));
 		}
 
 		@Override
@@ -259,7 +263,8 @@ public final class Supply {
 		protected T invoke(Object[] args, Injector context) {
 			if (producer.isInstanceMethod && owner == null)
 				owner = context.resolve(producer.target.getDeclaringClass());
-			return returns.cast(Utils.produce(producer.target, owner, args));
+			return returns.cast(Utils.produce(producer.target, owner, args,
+					e -> UnresolvableDependency.SupplyFailed.valueOf(e, producer.target)));
 		}
 
 		@Override

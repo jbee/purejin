@@ -3,10 +3,10 @@
  *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject;
+package se.jbee.inject.lang;
 
 /**
- * When determining what {@link Locator} is used to inject a {@link Dependency}
+ * When determining what resource is used to inject a dependency
  * everything is sorted starting with the most {@link Qualifying}. The most
  * qualified match is injected.
  *

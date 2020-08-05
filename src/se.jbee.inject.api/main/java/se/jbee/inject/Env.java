@@ -1,7 +1,9 @@
 package se.jbee.inject;
 
+import se.jbee.inject.lang.Type;
+
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 
 @FunctionalInterface
 public interface Env {

@@ -11,7 +11,6 @@ import java.lang.reflect.Method;
 import se.jbee.inject.Env;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Locator;
-import se.jbee.inject.Parameter;
 import se.jbee.inject.Supplier;
 
 /**
@@ -41,8 +40,8 @@ import se.jbee.inject.Supplier;
  * constant value.</li>
  * <li>{@link Class}: Creates a reference to the target type</li>
  * <li>{@link Instance}: Creates a reference to the {@link Instance}</li>
- * <li>{@link Parameter[]}: Creates an array instance with elements lazily
- * resolved from the {@link Parameter}s</li>
+ * <li>{@link se.jbee.inject.Hint[]}: Creates an array instance with elements lazily
+ * resolved from the {@link se.jbee.inject.Hint}s</li>
  * <li>{@link Binding}: It is its task to actually do
  * {@link Bindings#add(Env, Binding)}. All other {@link ValueBinder}s should use
  * {@link Bindings#addExpanded(Env, Binding)} (called with a {@link Binding} as

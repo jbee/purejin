@@ -10,7 +10,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
 
 import static org.junit.Assert.*;
 import static se.jbee.inject.Name.DEFAULT;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * A test that demonstrates how {@link Bundle}s (here in form of

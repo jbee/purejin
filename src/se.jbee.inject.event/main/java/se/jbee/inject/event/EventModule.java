@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.event;
@@ -14,7 +14,7 @@ import se.jbee.inject.binder.BinderModule;
 /**
  * Base {@link Module} for modules that want to make known a handler to the
  * event system using {@link #handle(Class)}.
- * 
+ *
  * @since 19.1
  */
 public abstract class EventModule extends BinderModule {
@@ -26,24 +26,24 @@ public abstract class EventModule extends BinderModule {
 	/**
 	 * Registers the given event type so that it is handled by the
 	 * {@link EventProcessor} system.
-	 * 
+	 *
 	 * That means classes implementing the given event interface "automatically"
 	 * receive calls to any of the interface methods. When The event interface
 	 * should be injected to signal/call one of its methods a
 	 * {@link EventProcessor#getProxy(Class)} is injected.
-	 * 
-	 * @param event the type of the event/listener (must be an interface)
+	 *
+	 * @param handlerType the type of the event/listener (must be an interface)
 	 */
-	protected <T> void handle(Class<T> event) {
-		if (!event.isInterface())
+	protected <T> void handle(Class<T> handlerType) {
+		if (!handlerType.isInterface())
 			throw new IllegalArgumentException(
-					"Event type has to be an interface but was: " + event);
-		initbind(event).to((listener, injector) -> {
-			injector.resolve(EventProcessor.class).register(event, listener);
+					"Event type has to be an interface but was: " + handlerType);
+		initbind(handlerType).to((listener, injector) -> {
+			injector.resolve(EventProcessor.class).register(handlerType, listener);
 			return listener;
 		});
-		bind(event).toSupplier((dep, context) -> // 
-		context.resolve(EventProcessor.class).getProxy(event));
+		bind(handlerType).toSupplier((dep, context) -> //
+			context.resolve(EventProcessor.class).getProxy(handlerType));
 	}
 
 	private static final class EventBaseModule extends BinderModule {
@@ -52,8 +52,8 @@ public abstract class EventModule extends BinderModule {
 		protected void declare() {
 			asDefault().bind(EventProcessor.class).to(
 					ConcurrentEventProcessor.class);
-			asDefault().bind(EventMirror.class).to(
-					event -> EventPolicy.DEFAULT);
+			asDefault().bind(PolicyProvider.class).to(
+					handlerType -> EventPolicy.DEFAULT);
 			asDefault().injectingInto(EventProcessor.class).bind(
 					ExecutorService.class).to(Executors::newWorkStealingPool);
 		}

@@ -1,7 +1,7 @@
 package test.integration.action;
 
 import static org.junit.Assert.assertEquals;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.action.ActionModule.actionDependency;
 
 import org.junit.Test;
@@ -10,7 +10,7 @@ import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Scope;
 import se.jbee.inject.Supplier;
-import se.jbee.inject.Type;
+import se.jbee.inject.lang.Type;
 import se.jbee.inject.action.Action;
 import se.jbee.inject.action.ActionModule;
 import se.jbee.inject.bootstrap.Bootstrap;

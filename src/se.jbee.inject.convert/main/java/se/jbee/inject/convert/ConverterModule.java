@@ -1,11 +1,11 @@
 package se.jbee.inject.convert;
 
-import static se.jbee.inject.Type.classType;
+import static se.jbee.inject.lang.Type.classType;
 import static se.jbee.inject.config.NamesBy.defaultName;
 import static se.jbee.inject.config.NamesBy.memberNameOr;
 
 import se.jbee.inject.Converter;
-import se.jbee.inject.Type;
+import se.jbee.inject.lang.Type;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.config.NamesBy;
 import se.jbee.inject.config.ProducesBy;

@@ -5,9 +5,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static se.jbee.inject.Type.classType;
-import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.Type.returnType;
+import static se.jbee.inject.lang.Type.classType;
+import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.inject.lang.Type.returnType;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -19,7 +19,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
-import se.jbee.inject.Type;
+import se.jbee.inject.lang.Type;
 
 @SuppressWarnings({ "rawtypes" })
 public class TestType {

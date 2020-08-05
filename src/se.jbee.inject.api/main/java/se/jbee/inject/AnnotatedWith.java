@@ -9,14 +9,15 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import se.jbee.inject.Annotated.Merge;
+import se.jbee.inject.lang.Type;
 
 /**
  * Allows to resolve bound instances annotated with a certain {@link Annotation}
  * by usual mechanism of resolving a particular {@link Type}.
- * 
+ *
  * With the {@link AnnotatedWith} resolved the {@link #instances()} method is
  * used to access the instances.
- * 
+ *
  * This is equivalent to use: {@link Injector#annotatedWith(Class)}
  *
  * @since 19.1
@@ -32,10 +33,10 @@ public interface AnnotatedWith<A extends Annotation> {
 	/**
 	 * Instances referenced in this are supplied by a {@link Supplier} as the
 	 * underlying source might allow changes to the result for multiple calls.
-	 * 
+	 *
 	 * @return The collection of instances that have the annotation {@code T}
 	 *         present.
-	 * 
+	 *
 	 *         By default this means the annotation must be present at the
 	 *         relevant location that supplies the instance. For example if the
 	 *         instance is created from a {@link Constructor} the annotation
@@ -43,7 +44,7 @@ public interface AnnotatedWith<A extends Annotation> {
 	 *         a factory {@link Method} the annotation must be present on that
 	 *         method, or if it is shared from a {@link Field} the annotation
 	 *         must be present on the {@link Field}.
-	 * 
+	 *
 	 *         This default behaviour can be customised on individual level by
 	 *         using custom {@link se.jbee.inject.Supplier}s for these
 	 *         types (usually done by binding custom
@@ -60,7 +61,7 @@ public interface AnnotatedWith<A extends Annotation> {
 	 * {@link Field} or a custom {@link AnnotatedElement} that implements custom
 	 * aggregation of annotation, for example including {@link Class} level
 	 * annotations for {@link Constructor}s.
-	 * 
+	 *
 	 * The {@link #instance} is supplied indirectly as it might be affected by
 	 * scoping or underlying sources that return different (updated) result for
 	 * each invocation. If this is the case this is reflected by the

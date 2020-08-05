@@ -9,10 +9,10 @@ import static java.util.Arrays.asList;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Type.parameterTypes;
-import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.Type.returnType;
-import static se.jbee.inject.Utils.arrayFindFirst;
+import static se.jbee.inject.lang.Type.parameterTypes;
+import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.inject.lang.Type.returnType;
+import static se.jbee.inject.lang.Utils.arrayFindFirst;
 import static se.jbee.inject.config.ProducesBy.allMethods;
 
 import java.lang.reflect.Method;
@@ -25,10 +25,11 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Scope;
 import se.jbee.inject.Supplier;
-import se.jbee.inject.Type;
+import se.jbee.inject.lang.Type;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.SupplyFailed;
-import se.jbee.inject.Utils;
+import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.Utils;
 import se.jbee.inject.bind.Module;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.config.Plugins;
@@ -93,7 +94,8 @@ public abstract class ActionModule extends BinderModule {
 		public <I, O> O run(ActionSite<I, O> site, Object[] args, I value) {
 			try {
 				return site.output.rawType.cast(
-						Utils.produce(site.action, site.owner, args));
+						Utils.produce(site.action, site.owner, args,
+								e -> SupplyFailed.valueOf(e, site.action)));
 			} catch (SupplyFailed e) {
 				Exception ex = e;
 				if (e.getCause() instanceof Exception) {

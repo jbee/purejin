@@ -9,6 +9,7 @@ import se.jbee.inject.binder.New;
 import se.jbee.inject.binder.Supply;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.defaults.DefaultValueBinders;
+import se.jbee.inject.lang.Type;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -20,7 +21,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static se.jbee.inject.Type.fieldType;
+import static se.jbee.inject.lang.Type.fieldType;
 import static se.jbee.inject.bind.BindingType.CONSTRUCTOR;
 
 /**

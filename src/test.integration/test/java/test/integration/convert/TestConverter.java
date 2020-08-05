@@ -4,9 +4,9 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Cast.listTypeOf;
 import static se.jbee.inject.Cast.resourceTypeFor;
-import static se.jbee.inject.Type.classType;
-import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.Utils.arrayMap;
+import static se.jbee.inject.lang.Type.classType;
+import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.inject.lang.Utils.arrayMap;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ import se.jbee.inject.Converter;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Resource;
 import se.jbee.inject.Scope;
-import se.jbee.inject.Type;
+import se.jbee.inject.lang.Type;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.convert.ConverterModule;
 
@@ -70,7 +70,7 @@ public class TestConverter {
 	public void converterMethodsWithTypeVariableUseScopeDependencyType() {
 		@SuppressWarnings("rawtypes")
 		Resource<Converter<String, List>> str2ints = context.resolve(
-				resourceTypeFor(Converter.type(raw(String.class),
+				resourceTypeFor(Converter.converterTypeOf(raw(String.class),
 						classType(List.class))));
 		assertEquals(Scope.dependencyType, str2ints.permanence.scope);
 	}
@@ -78,10 +78,10 @@ public class TestConverter {
 	@Test
 	public void genericMethodConverters() {
 		Converter<String, List<Integer>> str2ints = context.resolve(
-				Converter.type(raw(String.class), listTypeOf(Integer.class)));
+				Converter.converterTypeOf(raw(String.class), listTypeOf(Integer.class)));
 		assertEquals(asList(42, 13), str2ints.convert("42, 13"));
 		Converter<String, List<Long>> str2longs = context.resolve(
-				Converter.type(raw(String.class), listTypeOf(Long.class)));
+				Converter.converterTypeOf(raw(String.class), listTypeOf(Long.class)));
 		assertEquals(asList(42L, 13L), str2longs.convert("42, 13"));
 	}
 }

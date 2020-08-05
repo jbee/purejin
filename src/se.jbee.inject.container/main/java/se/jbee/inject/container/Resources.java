@@ -28,7 +28,7 @@ import se.jbee.inject.ResourceDescriptor;
 import se.jbee.inject.Scope;
 import se.jbee.inject.ScopePermanence;
 import se.jbee.inject.Supplier;
-import se.jbee.inject.Type;
+import se.jbee.inject.lang.Type;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 

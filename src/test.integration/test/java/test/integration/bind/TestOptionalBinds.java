@@ -10,7 +10,7 @@ import se.jbee.inject.defaults.CoreFeature;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * Simply demonstration of how to add injection of {@link Optional} parameters.

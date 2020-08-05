@@ -1,14 +1,14 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.config;
 
 import static java.util.Arrays.asList;
-import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.Type.returnType;
-import static se.jbee.inject.Utils.arrayFilter;
+import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.inject.lang.Type.returnType;
+import static se.jbee.inject.lang.Utils.arrayFilter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -20,13 +20,13 @@ import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 
 import se.jbee.inject.Packages;
-import se.jbee.inject.Type;
+import se.jbee.inject.lang.Type;
 
 /**
  * Extracts the relevant {@link Method}s for a given target {@link Class}. These
  * can be methods for different purposes. For example factory methods or methods
  * that are used in advanced abstractions like actions.
- * 
+ *
  * @since 19.1
  */
 @FunctionalInterface

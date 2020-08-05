@@ -13,24 +13,24 @@ import static org.junit.Assert.assertNotNull;
 import static se.jbee.inject.Hint.constant;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 
 /**
- * The test illustrates how to use {@link Parameter}s to give hints which
+ * The test illustrates how to use {@link Hint}s to give hints which
  * resources should be injected as constructor arguments.
  *
- * Thereby it is important to notice that the list of {@linkplain Parameter}s
+ * Thereby it is important to notice that the list of {@linkplain Hint}s
  * does *not* describe which {@link Constructor} to use! Hence the sequence does
  * *not* has to match the parameter sequence in the constructor definition. As
- * long as types are not assignable a {@linkplain Parameter} is tried to used as
+ * long as types are not assignable a {@linkplain Hint} is tried to used as
  * the next constructor parameter. The first assignable is used.
  *
- * @see TestDependencyParameterBinds
+ * @see TestDependencyHintBinds
  *
  * @author Jan Bernitt (jan@jbee.se)
  *
  */
-public class TestConstructorParameterBinds {
+public class TestConstructorHintBinds {
 
 	private static class Foo {
 
@@ -88,12 +88,12 @@ public class TestConstructorParameterBinds {
 			bind(named("x"), String.class).to("x");
 			bind(y).to("y");
 			bind(Integer.class).to(42);
-			bind(Foo.class).toConstructor(raw(String.class));
-			bind(Bar.class).toConstructor(raw(Integer.class), y);
-			bind(Baz.class).toConstructor(y, y);
+			bind(Foo.class).toConstructor(Hint.relativeReferenceTo(String.class));
+			bind(Bar.class).toConstructor(Hint.relativeReferenceTo(Integer.class), y.asHint());
+			bind(Baz.class).toConstructor(y.asHint(), y.asHint());
 			bind(CharSequence.class).to(String.class); // should not be used
 			bind(Serializable.class).to(Integer.class); // should not be used
-			bind(Qux.class).toConstructor(y.asType(CharSequence.class),
+			bind(Qux.class).toConstructor(y.asHint().asType(CharSequence.class),
 					constant(1980).asType(Number.class));
 		}
 	}
@@ -103,7 +103,7 @@ public class TestConstructorParameterBinds {
 
 		@Override
 		protected void declare() {
-			bind(Bar.class).toConstructor(raw(Float.class));
+			bind(Bar.class).toConstructor(Hint.relativeReferenceTo(Float.class));
 		}
 
 	}
@@ -128,12 +128,12 @@ public class TestConstructorParameterBinds {
 	}
 
 	/**
-	 * We can see that {@link Hint#asType(Class, Parameter)} works because the
+	 * We can see that {@link Hint#asType(Class)} works because the
 	 * instance y would also been assignable to the 1st parameter of type
 	 * {@link Serializable} (in {@link Qux}) but since we typed it as a
 	 * {@link CharSequence} it no longer is assignable to 1st argument and will
 	 * be used as 2nd argument where the as well {@link Serializable}
-	 * {@link Number} constant used as 2nd {@link Parameter} is used for as the
+	 * {@link Number} constant used as 2nd {@link Hint} is used for as the
 	 * 1st argument.
 	 */
 	@Test

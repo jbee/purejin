@@ -5,6 +5,8 @@
  */
 package se.jbee.inject;
 
+import se.jbee.inject.lang.Type;
+
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -103,7 +105,7 @@ public abstract class UnresolvableDependency extends RuntimeException {
 	}
 
 	/**
-	 * A method has been described by its return and {@link Parameter}
+	 * A method has been described by its return and {@link Hint}
 	 * {@link Type}s (e.g. for use as factory or service) but such a method
 	 * cannot be found. That usual means the defining class hasn't been bound
 	 * correctly or the signature has changed.

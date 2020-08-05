@@ -3,14 +3,14 @@
  *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject;
+package se.jbee.inject.lang;
 
-import static se.jbee.inject.Utils.arrayCompare;
-import static se.jbee.inject.Utils.arrayContains;
-import static se.jbee.inject.Utils.arrayEquals;
-import static se.jbee.inject.Utils.arrayFindFirst;
-import static se.jbee.inject.Utils.arrayMap;
-import static se.jbee.inject.Utils.newArray;
+import static se.jbee.inject.lang.Utils.arrayCompare;
+import static se.jbee.inject.lang.Utils.arrayContains;
+import static se.jbee.inject.lang.Utils.arrayEquals;
+import static se.jbee.inject.lang.Utils.arrayFindFirst;
+import static se.jbee.inject.lang.Utils.arrayMap;
+import static se.jbee.inject.lang.Utils.newArray;
 
 import java.io.Serializable;
 import java.lang.reflect.Executable;
@@ -41,7 +41,7 @@ import java.util.Set;
  * @author Jan Bernitt (jan@jbee.se)
  */
 @SuppressWarnings({ "squid:S1448", "squid:S1200" })
-public final class Type<T> implements Qualifying<Type<?>>, Parameter<T>,
+public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 		Serializable, Comparable<Type<?>> {
 
 	public static final Type<Object> OBJECT = Type.raw(Object.class);
@@ -89,7 +89,7 @@ public final class Type<T> implements Qualifying<Type<?>>, Parameter<T>,
 
 	private static Type<?>[] parameterTypes(
 			java.lang.reflect.Type[] genericParameterTypes) {
-		return arrayMap(genericParameterTypes, Type.class, Type::type);
+		return Utils.arrayMap(genericParameterTypes, Type.class, Type::type);
 	}
 
 	public static Type<?>[] wildcards(TypeVariable<?>... variables) {
@@ -113,7 +113,7 @@ public final class Type<T> implements Qualifying<Type<?>>, Parameter<T>,
 
 	private static Type<?>[] types(java.lang.reflect.Type[] parameters,
 			Map<String, Type<?>> actualTypeArguments) {
-		return arrayMap(parameters, Type.class,
+		return Utils.arrayMap(parameters, Type.class,
 				p -> type(p, actualTypeArguments));
 	}
 
@@ -219,14 +219,14 @@ public final class Type<T> implements Qualifying<Type<?>>, Parameter<T>,
 
 	@SuppressWarnings("unchecked")
 	public Type<T[]> addArrayDimension() {
-		Object proto = newArray(rawType, 0);
+		Object proto = Utils.newArray(rawType, 0);
 		return new Type<>(upperBound, (Class<T[]>) proto.getClass(), params);
 	}
 
 	public boolean equalTo(Type<?> other) {
 		return this == other
 			|| rawType == other.rawType && upperBound == other.upperBound
-				&& arrayEquals(params, other.params, Type::equalTo);
+				&& Utils.arrayEquals(params, other.params, Type::equalTo);
 	}
 
 	@Override
@@ -282,7 +282,7 @@ public final class Type<T> implements Qualifying<Type<?>>, Parameter<T>,
 	}
 
 	public boolean allParametersAreAssignableTo(Type<?> other) {
-		return arrayEquals(params, other.params, Type::asParameterAssignableTo);
+		return Utils.arrayEquals(params, other.params, Type::asParameterAssignableTo);
 	}
 
 	public boolean asParameterAssignableTo(Type<?> other) {
@@ -312,7 +312,7 @@ public final class Type<T> implements Qualifying<Type<?>>, Parameter<T>,
 	 *         parameters {@link #isUpperBound()}
 	 */
 	public boolean isParameterizedAsUpperBound() {
-		return isParameterized() && arrayContains(params,
+		return isParameterized() && Utils.arrayContains(params,
 				p -> p.isUpperBound() || p.isParameterizedAsUpperBound());
 	}
 
@@ -380,7 +380,7 @@ public final class Type<T> implements Qualifying<Type<?>>, Parameter<T>,
 		res = Boolean.compare(upperBound, other.upperBound);
 		if (res != 0)
 			return res;
-		return arrayCompare(params, other.params);
+		return Utils.arrayCompare(params, other.params);
 	}
 
 	/**
@@ -402,7 +402,7 @@ public final class Type<T> implements Qualifying<Type<?>>, Parameter<T>,
 		if (allTypeParametersAreUpperBounds())
 			return this;
 		return new Type<>(upperBound, rawType,
-				arrayMap(params, Type::asUpperBound));
+				Utils.arrayMap(params, Type::asUpperBound));
 	}
 
 	/**
@@ -417,11 +417,11 @@ public final class Type<T> implements Qualifying<Type<?>>, Parameter<T>,
 	 * @return True when all type parameters are upper bounds.
 	 */
 	public boolean allTypeParametersAreUpperBounds() {
-		return !arrayContains(params, p -> !p.isUpperBound());
+		return !Utils.arrayContains(params, p -> !p.isUpperBound());
 	}
 
 	public Type<T> parametized(Class<?>... typeParams) {
-		return parametized(arrayMap(typeParams, Type.class, Type::raw));
+		return parametized(Utils.arrayMap(typeParams, Type.class, Type::raw));
 	}
 
 	public Type<T> parametized(Type<?>... params) {
@@ -502,7 +502,7 @@ public final class Type<T> implements Qualifying<Type<?>>, Parameter<T>,
 		if (supertype.getTypeParameters().length == 0)
 			return raw(supertype); // just for better performance
 		@SuppressWarnings("unchecked")
-		Type<? extends S> res = (Type<? extends S>) arrayFindFirst(
+		Type<? extends S> res = (Type<? extends S>) Utils.arrayFindFirst(
 				type.supertypes(), s -> s.rawType == supertype);
 		if (res == null)
 			throw new ClassCastException("`" + supertype
@@ -594,8 +594,4 @@ public final class Type<T> implements Qualifying<Type<?>>, Parameter<T>,
 				"The primitive " + type + " cannot be wrapped yet!");
 	}
 
-	@Override
-	public Hint<T> asHint() {
-		return Hint.relativeReferenceTo(this);
-	}
 }

@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.action.ActionModule.actionDependency;
 
 import org.junit.Test;

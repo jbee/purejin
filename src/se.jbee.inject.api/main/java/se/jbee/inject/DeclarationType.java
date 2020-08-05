@@ -5,6 +5,8 @@
  */
 package se.jbee.inject;
 
+import se.jbee.inject.lang.Qualifying;
+
 /**
  * The {@link DeclarationType} is used to keep track of the origin of binding
  * declarations. They describe how or why a binding has been made whereby they

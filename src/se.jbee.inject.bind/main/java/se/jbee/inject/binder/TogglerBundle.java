@@ -5,7 +5,7 @@
  */
 package se.jbee.inject.binder;
 
-import se.jbee.inject.Type;
+import se.jbee.inject.lang.Type;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.bind.InconsistentBinding;
 import se.jbee.inject.bind.Toggled;

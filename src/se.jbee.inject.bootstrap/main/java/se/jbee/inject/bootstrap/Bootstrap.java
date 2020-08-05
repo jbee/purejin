@@ -5,8 +5,8 @@
  */
 package se.jbee.inject.bootstrap;
 
-import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.Utils.arrayOf;
+import static se.jbee.inject.Cast.functionTypeOf;
+import static se.jbee.inject.lang.Utils.arrayOf;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -17,7 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 
 import se.jbee.inject.*;
 import se.jbee.inject.bind.Binding;
@@ -28,7 +27,6 @@ import se.jbee.inject.bind.Bundler;
 import se.jbee.inject.bind.Modulariser;
 import se.jbee.inject.bind.Module;
 import se.jbee.inject.bind.Toggled;
-import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.config.Edition;
 import se.jbee.inject.config.HintsBy;
@@ -39,6 +37,7 @@ import se.jbee.inject.config.SharesBy;
 import se.jbee.inject.container.Container;
 import se.jbee.inject.defaults.DefaultValueBinders;
 import se.jbee.inject.defaults.DefaultsBundle;
+import se.jbee.inject.lang.Utils;
 
 /**
  * Utility to create an {@link Injector} context from {@link Bundle}s and
@@ -122,11 +121,6 @@ public final class Bootstrap {
 	private static final class BuiltinBootstrapper
 			implements Bootstrapper, Bundler, Modulariser {
 
-		@SuppressWarnings("rawtypes")
-		public static final Type<Function> INJECTOR_PROVIDER_TYPE = raw(
-				Function.class).parametized(Class[].class,
-				Injector.class);
-
 		private final Map<Class<? extends Bundle>, Set<Class<? extends Bundle>>> bundleChildren = new IdentityHashMap<>();
 		private final Map<Class<? extends Bundle>, List<Module>> bundleModules = new IdentityHashMap<>();
 		private final Set<Class<? extends Bundle>> uninstalled = new HashSet<>();
@@ -142,20 +136,9 @@ public final class Bootstrap {
 
 		@Override
 		public void installDefaults() {
-			if (!installed.contains(DefaultsBundle.class)) {
-				// this check is needed because of the anonymous module which would install multiple times otherwise
-				install(DefaultsBundle.class);
-				Function<Class<? extends Bundle>[], Injector> f = this::createSubContextFromRootBundles;
-				install(new BinderModule() {
-					@Override protected void declare() {
-						asDefault().bind(INJECTOR_PROVIDER_TYPE).to(f);
-					}
-				});
-			}
-		}
-
-		private Injector createSubContextFromRootBundles(Class<? extends Bundle>[] roots) {
-			return Bootstrap.injector(env, Bindings.newBindings(), roots);
+			install(DefaultsBundle.class);
+			install(InjectorFeature.SUB_CONTEXT_FUNCTION,
+					InjectorFeature.INSTANCE_RESOLVE_FUNCTION);
 		}
 
 		@Override
@@ -174,10 +157,15 @@ public final class Bootstrap {
 						key -> new LinkedHashSet<>()).add(bundle);
 			}
 			stack.push(bundle);
-			Bundle instance = Utils.instantiate(bundle);
+			Bundle instance = createBundle(bundle);
 			instance.bootstrap(this);
 			if (stack.pop() != bundle)
 				throw new IllegalStateException(bundle.getCanonicalName());
+		}
+
+		private <T> T createBundle(Class<T> bundle) {
+			return Utils.instantiate(bundle,
+					e -> new InconsistentDeclaration("Failed to create bundle: " + bundle, e));
 		}
 
 		@Override
@@ -185,7 +173,7 @@ public final class Bootstrap {
 				Class<? extends Toggled<F>> bundle, final Class<F> flags) {
 			if (!edition.featured(bundle))
 				return;
-			Utils.instantiate(bundle).bootstrap((bundleForFlag, flag) -> {
+			createBundle(bundle).bootstrap((bundleForFlag, flag) -> {
 				// NB: null is a valid value to define what happens when no configuration is present
 				if (env.toggled(flags, flag, bundleForFlag.getPackage())) {
 					BuiltinBootstrapper.this.install(bundleForFlag);

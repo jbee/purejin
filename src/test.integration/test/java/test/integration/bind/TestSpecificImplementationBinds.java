@@ -1,6 +1,7 @@
 package test.integration.bind;
 
 import org.junit.Test;
+import se.jbee.inject.Hint;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.binder.BinderModule;
@@ -9,7 +10,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
 import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * Test illustrates how to inject specific implementation for same interface
@@ -68,7 +69,8 @@ public class TestSpecificImplementationBinds {
 					raw(GenericAction.class));
 			Instance<GenericAction> c = instance(named("c"),
 					raw(GenericAction.class));
-			bind(Receiver.class).toConstructor(raw(ActionA.class), b, c);
+			bind(Receiver.class).toConstructor(
+					Hint.relativeReferenceTo(ActionA.class), b.asHint(), c.asHint());
 			bind(ActionA.class).toConstructor();
 			bind(b).to(new GenericAction("this is b"));
 			bind(c).toConstructor();

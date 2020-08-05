@@ -5,6 +5,8 @@
  */
 package se.jbee.inject.event;
 
+import se.jbee.inject.Name;
+
 import static java.lang.Math.max;
 
 import java.io.Serializable;
@@ -27,6 +29,11 @@ import java.util.function.BinaryOperator;
  * @since 19.1
  */
 public final class EventPolicy implements Serializable {
+
+	//TODO 2020-08-05: Add...
+	// 1. How to Dispatch enum: MULTI, ROUND_ROBIN, ...
+	// 2. What is success? one handled it, all handled it, n-m handled it (within what timeframe?)
+	// 3. how to indicate failure? throw exception, return null, return default, ...
 
 	public enum Flags {
 
@@ -73,7 +80,7 @@ public final class EventPolicy implements Serializable {
 	}
 
 	public static final EventPolicy DEFAULT = new EventPolicy(Integer.MAX_VALUE,
-			Runtime.getRuntime().availableProcessors(), 0,
+			Runtime.getRuntime().availableProcessors(), 0, "aggregator",
 			EnumSet.of(Flags.MULTI_DISPATCH));
 
 	/**
@@ -110,16 +117,22 @@ public final class EventPolicy implements Serializable {
 	 */
 	public final int ttl;
 
+	/**
+	 * The name used when trying to resolve an {@link BinaryOperator} aggregator
+	 * function using the context.
+	 */
+	public final String aggregatorName;
 	@SuppressWarnings("squid:S1319")
 	private final EnumSet<Flags> flags;
 
 	//TODO what is Success? dispatch to 1 of many in round robin, dispatch to all?, dispatch to x% of many?
 
-	private EventPolicy(int maxAttempts, int maxConcurrency, int ttl,
+	private EventPolicy(int maxAttempts, int maxConcurrency, int ttl, String aggregatorName,
 			EnumSet<Flags> flags) {
 		this.maxRetries = max(0, maxAttempts);
 		this.maxConcurrency = max(1, maxConcurrency);
 		this.ttl = ttl;
+		this.aggregatorName = aggregatorName;
 		this.flags = flags;
 	}
 
@@ -140,27 +153,31 @@ public final class EventPolicy implements Serializable {
 	}
 
 	public EventPolicy withTTL(int ttl) {
-		return new EventPolicy(maxRetries, maxConcurrency, ttl, flags);
+		return new EventPolicy(maxRetries, maxConcurrency, ttl, aggregatorName, flags);
 	}
 
 	public EventPolicy withMaxConcurrency(int n) {
-		return new EventPolicy(maxRetries, n, ttl, flags);
+		return new EventPolicy(maxRetries, n, ttl, aggregatorName, flags);
 	}
 
 	public EventPolicy withMaxRetries(int n) {
-		return new EventPolicy(n, maxConcurrency, ttl, flags);
+		return new EventPolicy(n, maxConcurrency, ttl, aggregatorName, flags);
+	}
+
+	public EventPolicy withAggregator(String name) {
+		return new EventPolicy(maxRetries, maxConcurrency, ttl, name, flags);
 	}
 
 	public EventPolicy with(Flags flag) {
 		EnumSet<Flags> merged = EnumSet.copyOf(this.flags);
 		merged.add(flag);
-		return new EventPolicy(maxRetries, maxConcurrency, ttl, merged);
+		return new EventPolicy(maxRetries, maxConcurrency, ttl, aggregatorName, merged);
 	}
 
 	public EventPolicy with(Flags... flags) {
 		EnumSet<Flags> fs = EnumSet.copyOf(this.flags);
 		fs.addAll(Arrays.asList(flags));
-		return new EventPolicy(maxRetries, maxConcurrency, ttl, fs);
+		return new EventPolicy(maxRetries, maxConcurrency, ttl, aggregatorName, fs);
 	}
 
 	@Override

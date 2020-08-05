@@ -5,7 +5,11 @@
  */
 package se.jbee.inject;
 
-import static se.jbee.inject.Type.raw;
+import se.jbee.inject.lang.Qualifying;
+import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.Typed;
+
+import static se.jbee.inject.lang.Type.raw;
 
 import java.io.Serializable;
 
@@ -16,7 +20,7 @@ import java.io.Serializable;
  * @author Jan Bernitt (jan@jbee.se)
  *
  */
-public final class Instance<T> implements Parameter<T>, Qualifying<Instance<?>>,
+public final class Instance<T> implements Typed<T>, Qualifying<Instance<?>>,
 		Serializable, Comparable<Instance<?>> {
 
 	/**
@@ -100,7 +104,6 @@ public final class Instance<T> implements Parameter<T>, Qualifying<Instance<?>>,
 		return type.compareTo(other.type);
 	}
 
-	@Override
 	public Hint<T> asHint() {
 		return Hint.relativeReferenceTo(this);
 	}

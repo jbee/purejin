@@ -1,19 +1,19 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.binder;
 
 import static java.lang.reflect.Modifier.isStatic;
-import static se.jbee.inject.Type.parameterType;
-import static se.jbee.inject.Utils.accessible;
+import static se.jbee.inject.lang.Type.parameterType;
+import static se.jbee.inject.lang.Utils.accessible;
 
 import java.lang.reflect.Method;
 
-import se.jbee.inject.Parameter;
-import se.jbee.inject.Type;
-import se.jbee.inject.Typed;
+import se.jbee.inject.Hint;
+import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.Typed;
 import se.jbee.inject.bind.ValueBinder;
 
 /**
@@ -26,19 +26,19 @@ import se.jbee.inject.bind.ValueBinder;
 public final class Produces<T> implements Typed<T> {
 
 	public static Produces<?> produces(Object owner, Method target,
-			Parameter<?>... hints) {
+			Hint<?>... hints) {
 		return new Produces<>(owner, target, hints);
 	}
 
 	public final Object owner;
 	public final Method target;
 	public final Type<T> returns;
-	public final Parameter<?>[] hints;
+	public final Hint<?>[] hints;
 	public final boolean isInstanceMethod;
 	public final boolean hasTypeVariables;
 
 	@SuppressWarnings("unchecked")
-	private Produces(Object owner, Method target, Parameter<?>[] hints) {
+	private Produces(Object owner, Method target, Hint<?>[] hints) {
 		this.returns = (Type<T>) Type.returnType(target);
 		this.target = accessible(target);
 		this.hints = hints;

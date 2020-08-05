@@ -1,7 +1,7 @@
 package test.integration.bind;
 
 import se.jbee.inject.Injector;
-import se.jbee.inject.Type;
+import se.jbee.inject.lang.Type;
 
 import java.util.Arrays;
 import java.util.Collection;

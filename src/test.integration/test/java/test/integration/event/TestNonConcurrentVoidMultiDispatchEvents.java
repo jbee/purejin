@@ -13,7 +13,7 @@ import org.junit.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Scope;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.event.EventMirror;
+import se.jbee.inject.event.PolicyProvider;
 import se.jbee.inject.event.EventModule;
 import se.jbee.inject.event.EventPolicy;
 import se.jbee.inject.event.EventProcessor;
@@ -93,7 +93,7 @@ public class TestNonConcurrentVoidMultiDispatchEvents {
 			handle(Listener.class);
 			per(Scope.injection).construct(Service.class); // dirty way to get multiple services
 			// makes observed calls "single threaded"
-			bind(EventMirror.class).to(
+			bind(PolicyProvider.class).to(
 					event -> EventPolicy.DEFAULT.withMaxConcurrency(1));
 		}
 

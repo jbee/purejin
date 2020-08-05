@@ -8,6 +8,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/se.jbee.inject.api/main/java-9" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="se.jbee.inject.lang" />
     <orderEntry type="inheritedJdk" />
   </component>
 </module>

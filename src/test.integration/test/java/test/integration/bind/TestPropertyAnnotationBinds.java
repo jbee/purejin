@@ -20,8 +20,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Type.parameterType;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.parameterType;
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * This test illustrates how to extends the {@link Injector} so it does inject
@@ -62,19 +62,19 @@ public class TestPropertyAnnotationBinds {
 		 * called when resolving the namespaced {@link String}. It extracts the
 		 * property from the name and resolves it from the properties.
 		 */
-		private Parameter<?>[] hints(Executable obj) {
-			List<Parameter<?>> hints = new ArrayList<>();
+		private Hint<?>[] hints(Executable obj) {
+			List<Hint<?>> hints = new ArrayList<>();
 			for (java.lang.reflect.Parameter param : obj.getParameters()) {
 				if (param.isAnnotationPresent(Property.class)) {
 					Name name = named(Property.class).concat(
 							param.getAnnotation(Property.class).value());
 					Instance<?> hint = instance(name, parameterType(param));
-					hints.add(hint);
+					hints.add(hint.asHint());
 				}
 			}
 			return hints.isEmpty()
-				? Parameter.noParameters
-				: hints.toArray(new Parameter[0]);
+				? Hint.none()
+				: hints.toArray(new Hint[0]);
 		}
 
 		@Override

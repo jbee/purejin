@@ -6,7 +6,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
-import static se.jbee.inject.Utils.newArray;
+import static se.jbee.inject.lang.Utils.newArray;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -15,6 +15,8 @@ import java.lang.reflect.Modifier;
 
 import org.junit.Test;
 import se.jbee.inject.*;
+import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.Utils;
 
 /**
  * Check the basic {@link #equals(Object)} and {@link #hashCode()}

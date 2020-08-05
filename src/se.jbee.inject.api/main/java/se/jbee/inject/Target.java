@@ -5,10 +5,13 @@
  */
 package se.jbee.inject;
 
+import se.jbee.inject.lang.Qualifying;
+import se.jbee.inject.lang.Type;
+
 import static se.jbee.inject.Packages.packageAndSubPackagesOf;
 import static se.jbee.inject.Packages.packageOf;
 import static se.jbee.inject.Packages.subPackagesOf;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 
 import java.io.Serializable;
 

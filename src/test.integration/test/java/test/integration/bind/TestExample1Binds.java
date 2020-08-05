@@ -13,7 +13,7 @@ import java.util.Properties;
 import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * In reply to https://groups.google.com/forum/#!topic/silk-di/JhBnvF7k6Q4
@@ -47,8 +47,8 @@ public class TestExample1Binds {
 		@Override
 		protected void declare() {
 			bind(MyClass.class).toConstructor(
-					instance(named("foo"), raw(String.class)),
-					instance(named("bar"), raw(int.class)));
+					instance(named("foo"), raw(String.class)).asHint(),
+					instance(named("bar"), raw(int.class)).asHint());
 			// the below may of course appear in any other module
 			bind(named("foo"), String.class).to("abc");
 			bind(named("bar"), int.class).to(12);

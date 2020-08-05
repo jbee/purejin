@@ -1,9 +1,9 @@
 package se.jbee.inject.config;
 
 import static java.util.Arrays.asList;
-import static se.jbee.inject.Type.fieldType;
-import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.Utils.arrayFilter;
+import static se.jbee.inject.lang.Type.fieldType;
+import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.inject.lang.Utils.arrayFilter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -15,18 +15,18 @@ import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 
 import se.jbee.inject.Packages;
-import se.jbee.inject.Type;
+import se.jbee.inject.lang.Type;
 
 /**
  * Picks the {@link Field}s that are bound as constants for the {@link Field}'s
  * {@link Type}.
- * 
+ *
  * This is mainly used to allow declaring the bound {@link Type} simply by
  * making a field of that type. This way the {@link Type} is automatically
  * constructed and the user can use the normal Java language to define the
  * field. Also this makes sure the constant of the field value is assignable to
  * the bound type.
- * 
+ *
  * @since 19.1
  */
 @FunctionalInterface

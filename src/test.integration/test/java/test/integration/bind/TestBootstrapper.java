@@ -18,8 +18,9 @@ import java.lang.annotation.Target;
 
 import static org.junit.Assert.*;
 import static se.jbee.inject.Cast.resourcesTypeFor;
+import static se.jbee.inject.Hint.relativeReferenceTo;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.config.ConstructsBy.common;
 
 /**
@@ -129,8 +130,8 @@ public class TestBootstrapper {
 
 		@Override
 		protected void declare() {
-			bind(Foo.class).toConstructor(raw(Bar.class));
-			bind(Bar.class).toConstructor(raw(Foo.class));
+			bind(Foo.class).toConstructor(relativeReferenceTo(Bar.class));
+			bind(Bar.class).toConstructor(relativeReferenceTo(Foo.class));
 		}
 
 	}
@@ -139,9 +140,9 @@ public class TestBootstrapper {
 
 		@Override
 		protected void declare() {
-			bind(A.class).toConstructor(raw(B.class));
-			bind(B.class).toConstructor(raw(C.class));
-			bind(C.class).toConstructor(raw(A.class));
+			bind(A.class).toConstructor(relativeReferenceTo(B.class));
+			bind(B.class).toConstructor(relativeReferenceTo(C.class));
+			bind(C.class).toConstructor(relativeReferenceTo(A.class));
 		}
 
 	}

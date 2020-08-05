@@ -1,9 +1,9 @@
 package se.jbee.inject.config;
 
 import static se.jbee.inject.InconsistentDeclaration.annotationLacksProperty;
-import static se.jbee.inject.Utils.annotatedName;
-import static se.jbee.inject.Utils.annotation;
-import static se.jbee.inject.Utils.annotationPropertyByType;
+import static se.jbee.inject.lang.Utils.annotatedName;
+import static se.jbee.inject.lang.Utils.annotation;
+import static se.jbee.inject.lang.Utils.annotationPropertyByType;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.GenericDeclaration;
@@ -11,12 +11,12 @@ import java.lang.reflect.Method;
 
 import se.jbee.inject.Name;
 import se.jbee.inject.Scope;
-import se.jbee.inject.TypeVariable;
+import se.jbee.inject.lang.TypeVariable;
 
 /**
  * Extracts the {@link Name} of the {@link Scope} to use for instances of a
  * given type. This can be used to implement scope annotations.
- * 
+ *
  * @since 19.1
  */
 @FunctionalInterface
@@ -44,8 +44,8 @@ public interface ScopesBy {
 		if (nameProperty == null)
 			throw annotationLacksProperty(String.class, naming);
 		return type -> {
-			Name name = annotatedName(nameProperty, annotation(naming, type));
-			return name == null ? this.reflect(type) : name;
+			String name = annotatedName(nameProperty, annotation(naming, type));
+			return name == null ? this.reflect(type) : Name.named(name);
 		};
 	}
 

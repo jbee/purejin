@@ -3,7 +3,7 @@ package test.integration.bind;
 import org.junit.Test;
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
-import se.jbee.inject.Type;
+import se.jbee.inject.lang.Type;
 import se.jbee.inject.binder.BinderModuleWith;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bootstrap;

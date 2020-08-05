@@ -1,4 +1,4 @@
-package se.jbee.inject;
+package se.jbee.inject.lang;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;

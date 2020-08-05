@@ -15,7 +15,7 @@ import org.junit.Test;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.event.EventMirror;
+import se.jbee.inject.event.PolicyProvider;
 import se.jbee.inject.event.EventModule;
 import se.jbee.inject.event.EventPolicy;
 import se.jbee.inject.event.EventPolicy.Flags;
@@ -72,7 +72,7 @@ public class TestAggregatingEvents {
 			handle(Handler.class);
 			bind(named("a"), Handler.class).to(new Service(true, 1));
 			bind(named("b"), Handler.class).to(new Service(false, 2));
-			bind(EventMirror.class).to(handler -> {
+			bind(PolicyProvider.class).to(handler -> {
 				return EventPolicy.DEFAULT.with(
 						Flags.MULTI_DISPATCH_AGGREGATED);
 			});

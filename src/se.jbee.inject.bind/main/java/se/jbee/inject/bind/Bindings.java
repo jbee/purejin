@@ -1,13 +1,13 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bind;
 
-import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.Utils.arrayOf;
-import static se.jbee.inject.Utils.isClassMonomodal;
+import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.inject.lang.Utils.arrayOf;
+import static se.jbee.inject.lang.Utils.isClassMonomodal;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ import se.jbee.inject.Scope;
 import se.jbee.inject.ScopePermanence;
 import se.jbee.inject.Source;
 import se.jbee.inject.Supplier;
-import se.jbee.inject.Type;
+import se.jbee.inject.lang.Type;
 import se.jbee.inject.UnresolvableDependency;
 
 /**
@@ -150,7 +150,7 @@ public final class Bindings {
 	 * {@link ScopePermanence} or {@link Scope}s this way of supplying the
 	 * constant will treat the constant as bean, that is like any "dynamically"
 	 * supplied value.
-	 * 
+	 *
 	 * @param <T> type of the constant
 	 * @param constant a bean that requires {@link ScopePermanence} effects.
 	 * @return A {@link Supplier} that supplies the given constant with
@@ -164,7 +164,7 @@ public final class Bindings {
 	 * Since the {@link Supplier} also implements {@link Generator} it is used
 	 * directly without any {@link ScopePermanence} effects. Effectively a
 	 * constant always has the {@link Scope#container}.
-	 * 
+	 *
 	 * The implementation also implements {@link #equals(Object)} and
 	 * {@link #hashCode()} to allow elimination of duplicate constant bindings.
 	 */

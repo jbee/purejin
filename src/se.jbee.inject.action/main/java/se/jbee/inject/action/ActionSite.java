@@ -1,21 +1,21 @@
 package se.jbee.inject.action;
 
-import static se.jbee.inject.Utils.accessible;
+import static se.jbee.inject.lang.Utils.accessible;
 
 import java.lang.reflect.Method;
 
-import se.jbee.inject.Type;
+import se.jbee.inject.lang.Type;
 
 /**
  * Describes a unique action implementation point. That is the particular
  * {@link Method} that implements the {@link Action} for the input parameter
  * {@link Type}.
- * 
+ *
  * @author Jan Bernitt
  *
  * @param <I> Type of the input parameter
  * @param <O> Type of the output value
- * 
+ *
  * @since 19.1
  */
 public final class ActionSite<I, O> {

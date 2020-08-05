@@ -5,19 +5,10 @@
  */
 package se.jbee.inject.binder;
 
-import static java.lang.reflect.Modifier.isStatic;
-import static se.jbee.inject.Cast.initialiserTypeOf;
-import static se.jbee.inject.Dependency.dependency;
-import static se.jbee.inject.Instance.anyOf;
-import static se.jbee.inject.Instance.defaultInstanceOf;
-import static se.jbee.inject.Instance.instance;
-import static se.jbee.inject.Source.source;
-import static se.jbee.inject.Target.targeting;
-import static se.jbee.inject.Type.fieldType;
-import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.Utils.isClassInstantiable;
-import static se.jbee.inject.Utils.newArray;
-import static se.jbee.inject.config.Plugins.pluginPoint;
+import se.jbee.inject.*;
+import se.jbee.inject.bind.*;
+import se.jbee.inject.config.*;
+import se.jbee.inject.lang.Type;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -25,34 +16,19 @@ import java.lang.reflect.Method;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Env;
-import se.jbee.inject.Generator;
-import se.jbee.inject.InconsistentDeclaration;
-import se.jbee.inject.Initialiser;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Instance;
-import se.jbee.inject.Locator;
-import se.jbee.inject.Name;
-import se.jbee.inject.Packages;
-import se.jbee.inject.Parameter;
-import se.jbee.inject.Scope;
-import se.jbee.inject.Supplier;
-import se.jbee.inject.Target;
-import se.jbee.inject.Type;
-import se.jbee.inject.UnresolvableDependency;
-import se.jbee.inject.bind.Bind;
-import se.jbee.inject.bind.Binding;
-import se.jbee.inject.bind.BindingType;
-import se.jbee.inject.bind.Bindings;
-import se.jbee.inject.bind.Bundle;
-import se.jbee.inject.config.Config;
-import se.jbee.inject.config.ConstructsBy;
-import se.jbee.inject.config.HintsBy;
-import se.jbee.inject.config.NamesBy;
-import se.jbee.inject.config.ProducesBy;
-import se.jbee.inject.config.ScopesBy;
-import se.jbee.inject.config.SharesBy;
+import static java.lang.reflect.Modifier.isStatic;
+import static java.util.Arrays.stream;
+import static se.jbee.inject.Cast.initialiserTypeOf;
+import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Hint.relativeReferenceTo;
+import static se.jbee.inject.Instance.*;
+import static se.jbee.inject.Source.source;
+import static se.jbee.inject.Target.targeting;
+import static se.jbee.inject.lang.Type.fieldType;
+import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.inject.lang.Utils.isClassInstantiable;
+import static se.jbee.inject.lang.Utils.newArray;
+import static se.jbee.inject.config.Plugins.pluginPoint;
 
 /**
  * The default implementation of a fluent binder interface that provides a lot
@@ -362,7 +338,7 @@ public class Binder {
 	/**
 	 * The {@link AutoBinder} makes use of mirrors to select and bind
 	 * constructors for beans and methods as factories and {@link Name} these
-	 * instances as well as provide {@link Parameter} hints.
+	 * instances as well as provide {@link Hint}s.
 	 *
 	 * @since 19.1
 	 */
@@ -428,25 +404,25 @@ public class Binder {
 					namesBy, mirror, hintsBy);
 		}
 
-		public AutoBinder parameteriseBy(HintsBy mirror) {
+		public AutoBinder hintBy(HintsBy mirror) {
 			return new AutoBinder(binder, sharesBy, constructsBy, producesBy,
 					namesBy, scopesBy, mirror);
 		}
 
 		public void in(Class<?> service) {
-			in(service, Parameter.noParameters);
+			in(service, Hint.none());
 		}
 
-		public void in(Object service, Parameter<?>... hints) {
+		public void in(Object service, Hint<?>... hints) {
 			in(service.getClass(), service, hints);
 		}
 
-		public void in(Class<?> service, Parameter<?>... hints) {
+		public void in(Class<?> service, Hint<?>... hints) {
 			in(service, null, hints);
 		}
 
 		private void in(Class<?> service, Object instance,
-				Parameter<?>... hints) {
+				Hint<?>... hints) {
 			boolean needsInstance1 = bindProducesIn(service, instance, hints);
 			boolean needsInstance2 = bindSharesIn(service, instance);
 			if (!needsInstance1 && !needsInstance2)
@@ -467,7 +443,7 @@ public class Binder {
 		}
 
 		private boolean bindProducesIn(Class<?> impl, Object instance,
-				Parameter<?>[] hints) {
+				Hint<?>[] hints) {
 			boolean needsInstance = false;
 			for (Method producer : producesBy.reflect(impl)) {
 				Type<?> returns = Type.returnType(producer);
@@ -484,7 +460,7 @@ public class Binder {
 			return needsInstance;
 		}
 
-		private <T> void bind(Constructor<T> target, Parameter<?>... hints) {
+		private <T> void bind(Constructor<T> target, Hint<?>... hints) {
 			Name name = namesBy.reflect(target);
 			if (hints.length == 0)
 				hints = hintsBy.reflect(target);
@@ -524,7 +500,7 @@ public class Binder {
 		// OPEN also allow naming for provided instances - this is used for
 		// value objects that become parameter; settings required and provided
 
-		public <T> void provide(Class<T> impl, Parameter<?>... hints) {
+		public <T> void provide(Class<T> impl, Hint<?>... hints) {
 			on(bind().asProvided()).bind(impl).toConstructor(hints);
 		}
 
@@ -676,14 +652,14 @@ public class Binder {
 			to(Instance.anyOf(raw(impl)));
 		}
 
-		public void to(Constructor<? extends T> target, Parameter<?>... hints) {
+		public void to(Constructor<? extends T> target, Hint<?>... hints) {
 			if (hints.length == 0)
 				hints = env(HintsBy.class).reflect(target);
 			expand(New.bind(target, hints));
 		}
 
 		protected final void to(Object owner, Method target,
-				Parameter<?>... hints) {
+				Hint<?>... hints) {
 			if (hints.length == 0)
 				hints = env(HintsBy.class).reflect(target);
 			expand(Produces.produces(owner, target, hints));
@@ -791,13 +767,13 @@ public class Binder {
 		}
 
 		public void toConstructor(Class<? extends T> impl,
-				Parameter<?>... hints) {
+				Hint<?>... hints) {
 			if (!isClassInstantiable(impl))
 				throw InconsistentDeclaration.notConstructable(impl);
 			to(env(ConstructsBy.class).reflect(impl), hints);
 		}
 
-		public void toConstructor(Parameter<?>... hints) {
+		public void toConstructor(Hint<?>... hints) {
 			toConstructor(getType().rawType, hints);
 		}
 
@@ -868,40 +844,17 @@ public class Binder {
 			super(bind.asMulti().next(), instance);
 		}
 
-		public void toElements(Parameter<? extends E> elem1) {
-			expandElements(elem1);
-		}
-
-		public void toElements(Parameter<? extends E> elem1,
-				Parameter<? extends E> elem2) {
-			expandElements(elem1, elem2);
-		}
-
-		public void toElements(Parameter<? extends E> elem1,
-				Parameter<? extends E> elem2, Parameter<? extends E> elem3) {
-			expandElements(elem1, elem2, elem3);
+		@SafeVarargs
+		@SuppressWarnings("unchecked")
+		public final void toElements(Class<? extends  E>... elems) {
+			toElements(stream(elems) //
+					.map(e -> relativeReferenceTo(raw(e))) //
+					.toArray(Hint[]::new));
 		}
 
 		@SafeVarargs
-		public final void toElements(Parameter<? extends E>... elems) {
+		public final void toElements(Hint<? extends E>... elems) {
 			expand(elems);
-		}
-
-		@SafeVarargs
-		private final void expandElements(Parameter<? extends E>... hints) {
-			expand(hints);
-		}
-
-		public void toElements(E c1) {
-			to(array(c1));
-		}
-
-		public void toElements(E c1, E c2) {
-			to(array(c1, c2));
-		}
-
-		public void toElements(E c1, E c2, E c3) {
-			to(array(c1, c2, c3));
 		}
 
 		@SafeVarargs

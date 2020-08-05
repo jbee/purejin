@@ -2,7 +2,7 @@ package se.jbee.inject.bootstrap;
 
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
@@ -12,8 +12,8 @@ import se.jbee.inject.Env;
 import se.jbee.inject.InconsistentDeclaration;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
-import se.jbee.inject.Type;
-import se.jbee.inject.Utils;
+import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.Utils;
 import se.jbee.inject.bind.InconsistentBinding;
 import se.jbee.inject.bind.ModuleWith;
 import se.jbee.inject.bind.ValueBinder;
@@ -95,7 +95,8 @@ public final class Environment implements Env {
 	}
 
 	public <T> Environment withBinder(Class<? extends ValueBinder<T>> value) {
-		return withBinder(Utils.instantiate(value));
+		return withBinder(Utils.instantiate(value,
+				e -> new InconsistentDeclaration("Failed to create ValueBinder of type: " + value, e)));
 	}
 
 	public <T> Environment withBinder(ValueBinder<T> value) {

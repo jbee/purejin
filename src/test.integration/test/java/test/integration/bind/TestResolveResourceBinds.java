@@ -12,7 +12,7 @@ import static org.junit.Assert.*;
 import static se.jbee.inject.Cast.*;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 
 public class TestResolveResourceBinds {
 

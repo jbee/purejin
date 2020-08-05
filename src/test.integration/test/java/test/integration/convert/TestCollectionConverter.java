@@ -4,8 +4,8 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Cast.listTypeOf;
-import static se.jbee.inject.Type.raw;
-import static se.jbee.inject.Utils.arrayMap;
+import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.inject.lang.Utils.arrayMap;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,7 +14,7 @@ import org.junit.Test;
 
 import se.jbee.inject.Converter;
 import se.jbee.inject.Injector;
-import se.jbee.inject.Type;
+import se.jbee.inject.lang.Type;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.convert.ConverterModule;
 
@@ -38,14 +38,14 @@ public class TestCollectionConverter {
 	@Test
 	public void genericArrayToCollectionConverterCanBeDefined() {
 		Converter<Number[], List<Number>> arr2list = context.resolve(
-				Converter.type(raw(Number[].class), listTypeOf(Number.class)));
+				Converter.converterTypeOf(raw(Number[].class), listTypeOf(Number.class)));
 		assertEquals(asList(1, 2), arr2list.convert(new Number[] { 1, 2 }));
 	}
 
 	@Test
 	public void genericStringToArrayConverterCanBeDefined() {
 		Converter<String, Integer[]> str2intArr = context.resolve(
-				Converter.type(String.class, Integer[].class));
+				Converter.converterTypeOf(String.class, Integer[].class));
 		assertArrayEquals(new Integer[] { 42, 13 },
 				str2intArr.convert("42,13"));
 	}

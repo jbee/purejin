@@ -11,7 +11,7 @@ import se.jbee.inject.Converter;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
-import se.jbee.inject.Type;
+import se.jbee.inject.lang.Type;
 
 public final class Chain<B> {
 
@@ -89,7 +89,7 @@ public final class Chain<B> {
 	private static <A, B> Link<A, B> createLink(Type<A> in, Instance<B> out,
 			Injector context) {
 		return new Link<>(in, out.type,
-				context.resolve(out.name, Converter.type(in, out.type)));
+				context.resolve(out.name, Converter.converterTypeOf(in, out.type)));
 	}
 
 	static Instance<?>[] instanceChain(Imported imports, String[] chain) {

@@ -12,6 +12,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/se.jbee.inject.container.iml" filepath="$PROJECT_DIR$/.idea/se.jbee.inject.container.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/se.jbee.inject.convert.iml" filepath="$PROJECT_DIR$/.idea/se.jbee.inject.convert.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/se.jbee.inject.event.iml" filepath="$PROJECT_DIR$/.idea/se.jbee.inject.event.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/se.jbee.inject.lang.iml" filepath="$PROJECT_DIR$/.idea/se.jbee.inject.lang.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/silk.iml" filepath="$PROJECT_DIR$/.idea/silk.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/test.integration.iml" filepath="$PROJECT_DIR$/.idea/test.integration.iml" />
     </modules>

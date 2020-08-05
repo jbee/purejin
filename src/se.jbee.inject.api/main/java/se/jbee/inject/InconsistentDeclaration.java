@@ -17,8 +17,12 @@ import java.lang.annotation.Annotation;
  */
 public class InconsistentDeclaration extends RuntimeException {
 
-	public InconsistentDeclaration(UnresolvableDependency cause) {
+	public InconsistentDeclaration(Exception cause) {
 		super(cause);
+	}
+
+	public InconsistentDeclaration(String msg, Exception cause) {
+		super(msg, cause);
 	}
 
 	public InconsistentDeclaration(String msg) {
@@ -33,7 +37,7 @@ public class InconsistentDeclaration extends RuntimeException {
 	}
 
 	public static InconsistentDeclaration incomprehensibleHint(
-			Parameter<?> hint) {
+			Hint<?> hint) {
 		return new InconsistentDeclaration(
 				"Attempt to give a parameter hint that does not fit the target: "
 					+ hint);

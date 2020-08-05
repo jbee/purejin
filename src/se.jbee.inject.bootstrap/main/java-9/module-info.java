@@ -10,6 +10,8 @@
 module se.jbee.inject.bootstrap {
 
 	requires java.logging;
+
+	requires se.jbee.inject.lang;
 	requires se.jbee.inject.api;
 	requires se.jbee.inject.bind;
 	requires se.jbee.inject.container;
@@ -18,5 +20,6 @@ module se.jbee.inject.bootstrap {
 	exports se.jbee.inject.defaults;
 	exports se.jbee.inject.scope;
 
-	opens se.jbee.inject.defaults to se.jbee.inject.api;
+	opens se.jbee.inject.defaults to se.jbee.inject.lang;
+	opens se.jbee.inject.bootstrap to se.jbee.inject.lang;
 }

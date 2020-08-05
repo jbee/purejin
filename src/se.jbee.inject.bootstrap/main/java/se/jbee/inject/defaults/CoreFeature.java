@@ -5,8 +5,9 @@
  */
 package se.jbee.inject.defaults;
 
+import static se.jbee.inject.Cast.functionTypeOf;
 import static se.jbee.inject.Scope.application;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
@@ -24,6 +25,7 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Supply;
 import se.jbee.inject.config.Extension;
 import se.jbee.inject.config.Plugins;
+import se.jbee.inject.lang.Type;
 
 /**
  * Installs all the build-in functionality by using the core API.
@@ -188,8 +190,8 @@ public enum CoreFeature implements Toggled<CoreFeature> {
 			implements se.jbee.inject.Supplier<Injector>, Injector {
 
 		@SuppressWarnings("rawtypes")
-		public static final Type<Function> INJECTOR_PROVIDER_TYPE = raw(
-				Function.class).parametized(Class[].class, Injector.class);
+		public static final Type<Function<Class[], Injector>> INJECTOR_PROVIDER_TYPE = functionTypeOf(
+				Class[].class, Injector.class);
 
 		@Override
 		protected void declare() {
@@ -210,7 +212,7 @@ public enum CoreFeature implements Toggled<CoreFeature> {
 					dep.instance.name.toString());
 			if (bundles.length == 0)
 				return this; // this module acts as an Injector that directly fails to resolve any Dependency
-			return (Injector) context.resolve(INJECTOR_PROVIDER_TYPE).apply(bundles);
+			return context.resolve(INJECTOR_PROVIDER_TYPE).apply(bundles);
 		}
 
 		@Override

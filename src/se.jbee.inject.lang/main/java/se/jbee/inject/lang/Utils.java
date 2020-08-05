@@ -3,7 +3,7 @@
  *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject;
+package se.jbee.inject.lang;
 
 import static java.lang.System.arraycopy;
 import static java.lang.reflect.Array.newInstance;
@@ -12,7 +12,7 @@ import static java.lang.reflect.Modifier.isPrivate;
 import static java.lang.reflect.Modifier.isProtected;
 import static java.lang.reflect.Modifier.isPublic;
 import static java.util.Arrays.copyOf;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
@@ -25,13 +25,10 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
-import java.util.function.BiPredicate;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
+import java.util.NoSuchElementException;
+import java.util.function.*;
 
-import se.jbee.inject.UnresolvableDependency.NoMethodForDependency;
-import se.jbee.inject.UnresolvableDependency.SupplyFailed;
+import se.jbee.inject.lang.Type;
 
 /**
  * Language level utility methods for the library.
@@ -206,13 +203,13 @@ public final class Utils {
 				m -> m.getReturnType() == type);
 	}
 
-	public static Name annotatedName(Method nameProperty, Annotation obj) {
+	public static String annotatedName(Method nameProperty, Annotation obj) {
 		if (obj == null)
 			return null;
 		try {
 			String name = (String) nameProperty.invoke(obj);
 			if (!name.isEmpty() && !name.equals(nameProperty.getDefaultValue()))
-				return Name.named(name);
+				return name;
 		} catch (Exception e) {
 			// fall through
 		}
@@ -259,9 +256,9 @@ public final class Utils {
 	/**
 	 * @param cls Any {@link Class} object, not null
 	 * @return A {@link Class} counts as "virtual" when it is known that its not
-	 *         a type handled by an {@link Injector} context, either because it
+	 *         a type handled by an injector context, either because it
 	 *         cannot be constructed at all or it does not make sense to let the
-	 *         {@link Injector} take care of it. This includes value types,
+	 *         injector take care of it. This includes value types,
 	 *         enums, collection types (including arrays) or any type than
 	 *         cannot be instantiated by its nature (abstract types).
 	 *
@@ -346,15 +343,14 @@ public final class Utils {
 	 * @return The highest visibility constructor with the most parameters that
 	 *         does not have the declaring class itself as parameter type (some
 	 *         compiler seam to generate such a synthetic constructor)
-	 * @throws NoMethodForDependency in case the type is not constructable (has
+	 * @throws NoSuchElementException in case the type is not constructable (has
 	 *             no constructors at all)
 	 */
-	public static <T> Constructor<T> commonConstructor(Class<T> type)
-			throws NoMethodForDependency {
+	public static <T> Constructor<T> commonConstructor(Class<T> type) {
 		@SuppressWarnings("unchecked")
 		Constructor<T>[] cs = (Constructor<T>[]) type.getDeclaredConstructors();
 		if (cs.length == 0)
-			throw new NoMethodForDependency(raw(type));
+			throw new NoSuchElementException("Type does not declare any constructors: " + type);
 		if (cs.length == 1)
 			return cs[0];
 		Constructor<T> mostParamsConstructor = null;
@@ -362,7 +358,7 @@ public final class Utils {
 			mostParamsConstructor = commonConstructor(type,
 					mostParamsConstructor, c);
 		if (mostParamsConstructor == null)
-			throw new NoMethodForDependency(raw(type));
+			throw new NoSuchElementException("Type does not declare any constructors: " + type);
 		return mostParamsConstructor;
 	}
 
@@ -377,20 +373,20 @@ public final class Utils {
 	public static <T> Constructor<T> commonConstructorOrNull(Class<T> type) {
 		try {
 			return commonConstructor(type);
-		} catch (RuntimeException e) {
+		} catch (NoSuchElementException e) {
 			return null;
 		}
 	}
 
 	public static <T> Constructor<T> noArgsConstructor(Class<T> type) {
 		if (type.isInterface() || type.isEnum() || type.isPrimitive())
-			throw new NoMethodForDependency(raw(type));
+			throw new IllegalArgumentException("Type is not constructed: " + raw(type).toString());
 		try {
 			return type.getDeclaredConstructor();
 		} catch (RuntimeException e) {
 			throw e;
 		} catch (Exception e) {
-			throw new NoMethodForDependency(raw(type), new Type[0], e);
+			throw new IllegalArgumentException("Failed to access no argument constructor for type: " + raw(type), e);
 		}
 	}
 
@@ -418,43 +414,46 @@ public final class Utils {
 
 	/* Exception Handling */
 
-	public static <T> T orElse(T defaultValue, Provider<T> src) {
+	public static <T> T orElse(T defaultValue, Supplier<T> src) {
 		try {
-			return src.provide();
-		} catch (UnresolvableDependency e) {
+			return src.get();
+		} catch (Exception e) {
 			return defaultValue;
 		}
 	}
 
 	/* Object Instantiation and Method Invocation */
 
-	public static <T> T construct(Constructor<T> target, Object... args)
-			throws SupplyFailed {
+	public static <T> T construct(Constructor<T> target, Object[] args,
+			Function<Exception, ? extends RuntimeException> exceptionTransformer) {
 		try {
 			return target.newInstance(args);
 		} catch (Exception e) {
-			throw SupplyFailed.valueOf(e, target);
+			throw exceptionTransformer.apply(e);
 		}
 	}
 
-	public static Object produce(Method target, Object owner, Object... args)
-			throws SupplyFailed {
+	public static Object produce(Method target, Object owner, Object[] args,
+			Function<Exception, ? extends RuntimeException> exceptionTransformer) {
 		try {
 			return target.invoke(owner, args);
 		} catch (Exception e) {
-			throw SupplyFailed.valueOf(e, target);
+			throw exceptionTransformer.apply(e);
 		}
 	}
 
-	public static Object share(Field target, Object owner) throws SupplyFailed {
+	public static Object share(Field target, Object owner,
+			Function<Exception, ? extends RuntimeException> exceptionTransformer) {
 		try {
 			return target.get(owner);
 		} catch (Exception e) {
-			throw SupplyFailed.valueOf(e, target);
+			throw exceptionTransformer.apply(e);
 		}
 	}
 
-	public static <T> T instantiate(Class<T> type) {
-		return construct(accessible(noArgsConstructor(type)));
+	public static <T> T instantiate(Class<T> type,
+			Function<Exception, ? extends RuntimeException> exceptionTransformer) {
+		return construct(accessible(noArgsConstructor(type)), new Object[0],
+				exceptionTransformer);
 	}
 }

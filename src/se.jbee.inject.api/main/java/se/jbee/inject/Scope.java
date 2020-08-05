@@ -5,6 +5,8 @@
  */
 package se.jbee.inject;
 
+import se.jbee.inject.lang.Type;
+
 import static se.jbee.inject.Name.named;
 
 import java.io.File;

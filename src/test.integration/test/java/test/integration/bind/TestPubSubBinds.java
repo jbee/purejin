@@ -9,6 +9,7 @@ import se.jbee.inject.binder.Binder;
 import se.jbee.inject.binder.Binder.InitBinder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.lang.Type;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.List;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.bind.Bindings.supplyConstant;
 
 /**
@@ -138,7 +139,7 @@ public class TestPubSubBinds {
 
 	/**
 	 * An alternative way is to use {@link #multibind(Class)} and
-	 * {@link InitBinder#forEach(se.jbee.inject.Type, java.util.function.BiConsumer)}.
+	 * {@link InitBinder#forEach(Type, java.util.function.BiConsumer)}.
 	 */
 	private static class PubSubBindsModule2 extends BinderModule {
 

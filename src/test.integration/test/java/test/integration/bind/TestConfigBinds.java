@@ -35,7 +35,7 @@ public class TestConfigBinds {
 			TargetedBinder testConfig = config(Bean.class);
 			testConfig.bind(named("foo"), String.class).to("que");
 			testConfig.bind(named("foo"), int.class).to(42);
-			bind(Converter.type(String.class, UUID.class)).to(UUID::fromString);
+			bind(Converter.converterTypeOf(String.class, UUID.class)).to(UUID::fromString);
 			config().bind(named("uuid"), String.class).to(
 					UUID.randomUUID().toString());
 		}

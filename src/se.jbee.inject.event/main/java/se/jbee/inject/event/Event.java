@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.event;
@@ -10,13 +10,13 @@ import static java.lang.System.currentTimeMillis;
 import java.lang.reflect.Method;
 import java.util.function.BinaryOperator;
 
-import se.jbee.inject.Type;
+import se.jbee.inject.lang.Type;
 
 /**
  * The message describing the handler interface method invocation as data.
- * 
+ *
  * @since 19.1
- * 
+ *
  * @param <E> type of the event handler interface
  * @param <T> return type of the {@link #target} method
  */
@@ -26,7 +26,7 @@ public final class Event<E, T> {
 	 * The timestamp used to compute if a events TTL has expired or not.
 	 */
 	public final long created;
-	public final Class<E> type;
+	public final Class<E> handlerType;
 	public final EventPolicy policy;
 	public final Type<T> result;
 	public final Method target;
@@ -38,9 +38,9 @@ public final class Event<E, T> {
 	 */
 	public final BinaryOperator<T> aggregator;
 
-	public Event(Class<E> event, EventPolicy policy, Type<T> result,
+	public Event(Class<E> handlerType, EventPolicy policy, Type<T> result,
 			Method target, Object[] args, BinaryOperator<T> aggregator) {
-		this.type = event;
+		this.handlerType = handlerType;
 		this.policy = policy;
 		this.result = result;
 		this.target = target;
@@ -51,7 +51,7 @@ public final class Event<E, T> {
 
 	@Override
 	public String toString() {
-		return "[" + type.getSimpleName() + "]:" + target.getName();
+		return "[" + handlerType.getSimpleName() + "]:" + target.getName();
 	}
 
 	public boolean isNonConcurrent() {

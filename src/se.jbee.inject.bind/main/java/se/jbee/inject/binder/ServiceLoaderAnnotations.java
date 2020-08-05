@@ -6,7 +6,7 @@ import java.util.ServiceLoader;
 import se.jbee.inject.Env;
 import se.jbee.inject.Extends;
 import se.jbee.inject.Name;
-import se.jbee.inject.Type;
+import se.jbee.inject.lang.Type;
 import se.jbee.inject.bind.Module;
 import se.jbee.inject.bind.ModuleWith;
 
@@ -19,7 +19,7 @@ import se.jbee.inject.bind.ModuleWith;
  * {@link Extends} annotation (use {@link Extends#value()}) or by annotated the
  * implementation class with the target {@link Annotation} itself. In that case
  * that {@link Annotation} must be the only runtime annotation present.
- * 
+ *
  * @since 19.1
  */
 public class ServiceLoaderAnnotations extends BinderModule {

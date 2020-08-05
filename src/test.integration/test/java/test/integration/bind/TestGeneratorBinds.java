@@ -10,7 +10,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
 
 import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.Cast.resourceTypeFor;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 
 public class TestGeneratorBinds {
 

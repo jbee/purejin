@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.config;
@@ -8,9 +8,9 @@ package se.jbee.inject.config;
 import static se.jbee.inject.InconsistentDeclaration.annotationLacksProperty;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Type.parameterTypes;
-import static se.jbee.inject.Utils.annotationPropertyByType;
-import static se.jbee.inject.Utils.arrayFindFirst;
+import static se.jbee.inject.lang.Type.parameterTypes;
+import static se.jbee.inject.lang.Utils.annotationPropertyByType;
+import static se.jbee.inject.lang.Utils.arrayFindFirst;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -18,29 +18,29 @@ import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 
 import se.jbee.inject.Dependency;
+import se.jbee.inject.Hint;
 import se.jbee.inject.Name;
-import se.jbee.inject.Parameter;
-import se.jbee.inject.Type;
+import se.jbee.inject.lang.Type;
 
 /**
- * Extracts the {@link Parameter} hints used to resolve the {@link Dependency}s
+ * Extracts the {@link Hint} hints used to resolve the {@link Dependency}s
  * of a {@link Method} or {@link Constructor} being injected.
- * 
+ *
  * @since 19.1
  */
 @FunctionalInterface
 public interface HintsBy {
 
 	/**
-	 * @return The {@link Parameter} hints for the construction/invocation of
+	 * @return The {@link Hint} hints for the construction/invocation of
 	 *         the given object. This is either a
 	 *         {@link java.lang.reflect.Constructor} or a
 	 *         {@link java.lang.reflect.Method} Use a zero length array if there
 	 *         are no hits.
 	 */
-	Parameter<?>[] reflect(Executable obj);
+	Hint<?>[] reflect(Executable obj);
 
-	HintsBy noParameters = obj -> Parameter.noParameters;
+	HintsBy noParameters = obj -> Hint.none();
 
 	/**
 	 * A {@link HintsBy} that allows to specify the
@@ -57,10 +57,10 @@ public interface HintsBy {
 		return obj -> {
 			Annotation[][] ais = obj.getParameterAnnotations();
 			Type<?>[] tis = parameterTypes(obj);
-			Parameter<?>[] res = new Parameter[tis.length];
+			Hint<?>[] res = new Hint[tis.length];
 			int named = 0;
 			for (int i = 0; i < res.length; i++) {
-				res[i] = tis[i]; // default
+				res[i] = Hint.relativeReferenceTo(tis[i]); // default
 				Annotation instance = arrayFindFirst(ais[i],
 						a -> naming == a.annotationType());
 				if (instance != null) {
@@ -69,7 +69,7 @@ public interface HintsBy {
 						String name = (String) nameProperty.invoke(instance);
 						if (!name.isEmpty()
 							&& !name.equals(nameProperty.getDefaultValue())) {
-							res[i] = instance(named(name), tis[i]);
+							res[i] = instance(named(name), tis[i]).asHint();
 							named++;
 						}
 					} catch (Exception e) {

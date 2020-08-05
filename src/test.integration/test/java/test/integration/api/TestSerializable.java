@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.junit.Test;
 import se.jbee.inject.*;
+import se.jbee.inject.lang.Type;
 
 /**
  * Make sure the value objects of the library are {@link Serializable}.

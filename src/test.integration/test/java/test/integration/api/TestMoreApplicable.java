@@ -6,13 +6,15 @@ import static org.junit.Assert.assertTrue;
 import static se.jbee.inject.Instance.defaultInstanceOf;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.Type.raw;
+import static se.jbee.inject.lang.Type.raw;
 
 import java.util.Arrays;
 import java.util.Comparator;
 
 import org.junit.Test;
 import se.jbee.inject.*;
+import se.jbee.inject.lang.Qualifying;
+import se.jbee.inject.lang.Type;
 
 public class TestMoreApplicable {
 

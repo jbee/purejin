@@ -6,7 +6,7 @@
 package se.jbee.inject.event;
 
 import static java.lang.reflect.Proxy.newProxyInstance;
-import static se.jbee.inject.Type.returnType;
+import static se.jbee.inject.lang.Type.returnType;
 import static se.jbee.inject.event.EventException.unwrapGet;
 
 import java.lang.reflect.InvocationHandler;
@@ -25,7 +25,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BinaryOperator;
 
-import se.jbee.inject.Type;
+import se.jbee.inject.lang.Type;
 
 /**
  * Default implementation of the {@link EventProcessor} supporting all
@@ -102,14 +102,14 @@ public class ConcurrentEventProcessor implements EventProcessor {
 		}
 	}
 
-	private final Map<Class<?>, Object> proxiesByEventType = new ConcurrentHashMap<>();
-	private final Map<Class<?>, EventHandlers<?>> handlersByEventType = new ConcurrentHashMap<>();
-	private final Map<Class<?>, EventPolicy> prefsByEventType = new ConcurrentHashMap<>();
+	private final Map<Class<?>, Object> proxiesByHandlerType = new ConcurrentHashMap<>();
+	private final Map<Class<?>, EventHandlers<?>> handlersByType = new ConcurrentHashMap<>();
+	private final Map<Class<?>, EventPolicy> policyByHandlerType = new ConcurrentHashMap<>();
 	private final ExecutorService executor;
-	private final EventMirror mirror;
+	private final PolicyProvider policyProvider;
 
-	ConcurrentEventProcessor(EventMirror mirror, ExecutorService executor) {
-		this.mirror = mirror;
+	ConcurrentEventProcessor(PolicyProvider policyProvider, ExecutorService executor) {
+		this.policyProvider = policyProvider;
 		this.executor = executor;
 	}
 
@@ -128,8 +128,8 @@ public class ConcurrentEventProcessor implements EventProcessor {
 		}
 	}
 
-	private EventPolicy getPrefs(Class<?> event) {
-		return prefsByEventType.computeIfAbsent(event, mirror::reflect);
+	private EventPolicy getPolicy(Class<?> event) {
+		return policyByHandlerType.computeIfAbsent(event, policyProvider::reflect);
 	}
 
 	@Override
@@ -147,26 +147,26 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <E> EventHandlers<E> getHandlers(Class<E> event, boolean init) {
+	private <E> EventHandlers<E> getHandlers(Class<E> handlerType, boolean init) {
 		return (EventHandlers<E>) (init
-			? handlersByEventType.computeIfAbsent(event,
+			? handlersByType.computeIfAbsent(handlerType,
 					k -> new EventHandlers<>())
-			: handlersByEventType.get(event));
+			: handlersByType.get(handlerType));
 	}
 
 	@Override
-	public <E> void unregister(Class<E> event, E handler) {
-		EventHandlers<?> hs = handlersByEventType.get(event);
+	public <E> void unregister(Class<E> handlerType, E handler) {
+		EventHandlers<?> hs = handlersByType.get(handlerType);
 		if (hs != null && !hs.isEmpty())
 			hs.removeIf(h -> h.handler == handler);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <E> E getProxy(Class<E> event) {
-		return (E) proxiesByEventType.computeIfAbsent(event,
+	public <E> E getProxy(Class<E> handlerType) {
+		return (E) proxiesByHandlerType.computeIfAbsent(handlerType,
 				e -> newProxyInstance(e.getClassLoader(), new Class[] { e },
-						new ProxyEventHandler<>(e, getPrefs(e), this)));
+						new ProxyEventHandler<>(e, getPolicy(e), this)));
 	}
 
 	//TODO event processing has to be done in a way that makes a try for each target handler - should the event not be completely handled it has to requeue for retries so that other events are processed in the meantime
@@ -214,7 +214,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 
 	private <E, T> T doCompute(Event<E, T> event) throws EventException {
 		ensureNotExpired(event);
-		EventHandlers<E> hs = getHandlers(event.type, false);
+		EventHandlers<E> hs = getHandlers(event.handlerType, false);
 		if (hs == null)
 			throw new EventException(event, null);
 		EventHandler<E> h = hs.acquire(event);
@@ -229,7 +229,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 
 	private <E, T> T doDispatch(Event<E, T> event) throws EventException {
 		ensureNotExpired(event);
-		EventHandlers<E> hs = getHandlers(event.type, false);
+		EventHandlers<E> hs = getHandlers(event.handlerType, false);
 		if (hs == null || hs.isEmpty())
 			return null;
 		LinkedList<EventHandler<E>> needRetry = null;
@@ -299,14 +299,14 @@ public class ConcurrentEventProcessor implements EventProcessor {
 
 	static class ProxyEventHandler<E> implements InvocationHandler {
 
-		final Class<E> event;
-		final EventPolicy prefs;
+		final Class<E> handlerType;
+		final EventPolicy policy;
 		final EventProcessor processor;
 
-		public ProxyEventHandler(Class<E> event, EventPolicy prefs,
+		public ProxyEventHandler(Class<E> handlerType, EventPolicy policy,
 				EventProcessor processor) {
-			this.event = event;
-			this.prefs = prefs;
+			this.handlerType = handlerType;
+			this.policy = policy;
 			this.processor = processor;
 		}
 
@@ -320,7 +320,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 		private <T> Object invoke(Method target, Object[] args, Type<T> result)
 				throws Exception {
 			Class<T> raw = result.rawType;
-			Event<E, T> e = new Event<>(event, prefs, result, target, args,
+			Event<E, T> e = new Event<>(handlerType, policy, result, target, args,
 					(BinaryOperator<T>) defaultAggregator(raw,
 							target.getParameterTypes(), args));
 			if (e.returnsVoid()) {
@@ -346,6 +346,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 							: null;
 			if (aggregator != null)
 				return aggregator;
+			//TODO otherwise resolve an aggregator function for the type from Injector context
 			if (rawReturnType == boolean.class
 				|| rawReturnType == Boolean.class) {
 				BinaryOperator<Boolean> op = Boolean::logicalAnd;

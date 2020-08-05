@@ -5,7 +5,7 @@
  */
 package test.integration.action;
 
-import se.jbee.inject.Type;
+import se.jbee.inject.lang.Type;
 import se.jbee.inject.action.Action;
 
 /**
