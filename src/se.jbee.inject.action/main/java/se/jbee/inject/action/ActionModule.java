@@ -28,7 +28,6 @@ import se.jbee.inject.Supplier;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.SupplyFailed;
-import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.Utils;
 import se.jbee.inject.bind.Module;
 import se.jbee.inject.binder.BinderModule;

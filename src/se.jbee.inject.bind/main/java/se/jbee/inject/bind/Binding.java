@@ -166,8 +166,7 @@ public final class Binding<T> extends ResourceDescriptor<T>
 				required.add(current.signature.type());
 			} else if (equalResource && (lastType.droppedWith(curType))) {
 				if (!isDuplicateIdenticalConstant(true, lastUnique,
-						current)) {
-					if (i - 1 == lastUniqueIndex)
+						current) && i - 1 == lastUniqueIndex) {
 						dropped.add(uniques.remove(uniques.size() - 1));
 				}
 				dropped.add(current);

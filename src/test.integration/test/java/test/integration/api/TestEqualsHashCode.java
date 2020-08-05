@@ -2,10 +2,7 @@ package test.integration.api;
 
 import static java.lang.reflect.Modifier.isFinal;
 import static java.lang.reflect.Modifier.isPublic;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static se.jbee.inject.lang.Utils.newArray;
 
 import java.lang.reflect.Constructor;
@@ -88,10 +85,10 @@ public class TestEqualsHashCode {
 		assertEquals(a.hashCode(), a2.hashCode());
 		assertNotSame(a, b);
 		assertNotSame(a, a2);
-		assertFalse(a.equals(b));
-		assertFalse(b.equals(a));
-		assertFalse(a.equals(null));
-		assertFalse(b.equals(null));
+		assertNotEquals(a, b);
+		assertNotEquals(b, a);
+		assertNotEquals(a, null);
+		assertNotEquals(b, null);
 
 		assertTrue("Value type is not final.", isFinal(cls.getModifiers()));
 		for (Field f : cls.getDeclaredFields()) {

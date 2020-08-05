@@ -5,7 +5,6 @@
  */
 package se.jbee.inject.bootstrap;
 
-import static se.jbee.inject.Cast.functionTypeOf;
 import static se.jbee.inject.lang.Utils.arrayOf;
 
 import java.util.ArrayList;

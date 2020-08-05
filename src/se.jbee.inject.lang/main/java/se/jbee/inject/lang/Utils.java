@@ -28,8 +28,6 @@ import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.function.*;
 
-import se.jbee.inject.lang.Type;
-
 /**
  * Language level utility methods for the library.
  *
@@ -66,7 +64,7 @@ public final class Utils {
 		return copy;
 	}
 
-	public static <A> A[] arrayPrepand(A e, A[] arr) {
+	public static <A> A[] arrayPrepend(A e, A[] arr) {
 		A[] copy = newArray(arr, arr.length + 1);
 		arraycopy(arr, 0, copy, 1, arr.length);
 		copy[0] = e;

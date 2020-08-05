@@ -55,14 +55,10 @@ public class TestEditionPackageBinds {
 				Edition.includes(subPackagesOf(TestEditionPackageBinds.class) //
 						.and(packageOf(DefaultsBundle.class)
 						.and(packageOf(Bootstrap.class)))));
-		injector = Bootstrap.injector(env, EditionPackageBindsBundle.class);
-		try {
-			Integer res = injector.resolve(int.class);
-			assertNull(res);
-			fail("Should have thrown exception since EditionPackageBindsModule should not have been installed");
-		} catch (NoResourceForDependency e) {
-			// expected this
-		}
+
+		Injector context = Bootstrap.injector(env, EditionPackageBindsBundle.class);
+		assertThrows("Should have thrown exception since EditionPackageBindsModule should not have been installed",
+				NoResourceForDependency.class, () -> context.resolve(int.class));
 
 		// an edition including the module in this test
 		env = Bootstrap.ENV.with(Edition.class, Edition.includes(

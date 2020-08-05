@@ -69,8 +69,9 @@ public final class Locator<T> implements Typed<T>, Qualifying<Locator<?>>,
 			if (offeredParam.isUpperBound()) {
 				if (!offeredParam.isAssignableTo(requiredParam))
 					return false;
-			} else if (!offeredParam.asParameterAssignableTo(requiredParam))
-				return false;
+			} else
+				if (!offeredParam.asParameterAssignableTo(requiredParam))
+					return false;
 		}
 		return true;
 	}

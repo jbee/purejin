@@ -11,7 +11,7 @@ package se.jbee.inject;
  * that have a more unstable scope into an instance of a more stable scope.
  *
  * Usage of {@link Provider}s to circumvent scoping limitations is explicitly
- * installed using the builtin-{@link se.jbee.inject.bind.Bundle}.
+ * installed using the {@code CoreFeature#PROVIDER}.
  *
  * But it is also very easy to use another similar provider interface by
  * installing a similar bridge {@link Supplier}.

@@ -7,7 +7,6 @@ package se.jbee.inject.binder;
 
 import se.jbee.inject.*;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
-import se.jbee.inject.InjectionSite;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.TypeVariable;
 import se.jbee.inject.lang.Utils;
@@ -110,7 +109,7 @@ public final class Supply {
 					Type.parameterType(producer.target.getParameters()[0]));
 			return new Call<>(producer,
 					Hint.match(parameterTypes(producer.target),
-							Utils.arrayPrepand(actualTypeHint, producer.hints)),
+							Utils.arrayPrepend(actualTypeHint, producer.hints)),
 					Dependency::type);
 		}
 		return new Call<>(producer,
