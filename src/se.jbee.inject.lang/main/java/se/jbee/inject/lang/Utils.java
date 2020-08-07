@@ -251,9 +251,8 @@ public final class Utils {
 	 * @return the given object made accessible.
 	 */
 	public static <T extends AccessibleObject> T accessible(T obj) {
-		if (!obj.canAccess(null)) {
+		/* J11: if (!obj.canAccess(null)) */
 			obj.setAccessible(true);
-		}
 		return obj;
 	}
 
