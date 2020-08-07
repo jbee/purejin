@@ -36,7 +36,13 @@ class Build {
                             javac -> javac.without("-Xlint").with("-Xlint:-serial,-rawtypes,-varargs"))
 
                     .tweakJavadocCall(
-                            javadoc -> javadoc.without("-Xdoclint").with("-Xdoclint:-missing"))
+                            javadoc -> javadoc
+                                .without("-Xdoclint")
+                                .with("-Xdoclint:-missing")
+                                .with("-group", "API", "se.jbee.inject:se.jbee.inject.api:se.jbee.inject.bind:se.jbee.inject.lang")
+                                .with("-group", "Container", "se.jbee.inject.bootstrap:se.jbee.inject.container")
+                                .with("-group", "Add-ons", "se.jbee.inject.action:se.jbee.inject.event:se.jbee.inject.convert")
+                    )
                     // test
                     .withTestModule("src/test.integration/test/java") // extra-module tests
                     .withTestModule("src/com.example.app/test/java") // silk's first client
