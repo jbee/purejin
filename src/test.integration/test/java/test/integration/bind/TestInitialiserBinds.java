@@ -8,6 +8,7 @@ import se.jbee.inject.binder.Binder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BinderModuleWith;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.Environment;
 
 import static org.junit.Assert.*;
 import static se.jbee.inject.Cast.initialiserTypeOf;
@@ -64,7 +65,7 @@ public class TestInitialiserBinds {
 		}
 	}
 
-	static class AutoCloseableInitialiser implements Initialiser<Injector> {
+	public static class AutoCloseableInitialiser implements Initialiser<Injector> {
 
 		public AutoCloseableInitialiser(AutoCloseable[] autoCloseables) {
 			// since this instance is created by the container it is also properly injected.
@@ -102,7 +103,7 @@ public class TestInitialiserBinds {
 	 * This class simulates some singleton that needs to be closed like a DB
 	 * connection instance.
 	 */
-	static class SingletonResource implements AutoCloseable {
+	public static class SingletonResource implements AutoCloseable {
 
 		boolean isClosed = false;
 
@@ -134,7 +135,7 @@ public class TestInitialiserBinds {
 
 	@Test
 	public void initialisersCanMakeUseOfParammetersUsingArgumentedModules() {
-		Env env = Bootstrap.ENV.with(Integer.class, 42); // setup some parameter
+		Env env = Environment.DEFAULT.with(Integer.class, 42); // setup some parameter
 		Injector injector = Bootstrap.injector(
 				env, TestInitialiserBindsModuleWith.class);
 

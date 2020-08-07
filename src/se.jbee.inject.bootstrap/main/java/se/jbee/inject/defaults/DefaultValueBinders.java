@@ -88,7 +88,7 @@ public final class DefaultValueBinders {
 
 		@Override
 		@SuppressWarnings({ "unchecked", "rawtypes" })
-		public <T> Binding<T> complete(Binding<T> item,
+		public <T> Binding<T> complete(Env env, Binding<T> item,
 				Hint<?>[] elements) {
 			return item.complete(PREDEFINED,
 					supplier((Type) item.type(), elements));
@@ -107,7 +107,7 @@ public final class DefaultValueBinders {
 			implements ValueBinder.Completion<Class<?>> {
 
 		@Override
-		public <T> Binding<T> complete(Binding<T> item, Class<?> to) {
+		public <T> Binding<T> complete(Env env, Binding<T> item, Class<?> to) {
 			return item.complete(REFERENCE, byParametrizedInstanceReference(
 					anyOf(raw(to).castTo(item.type()))));
 		}
@@ -117,7 +117,8 @@ public final class DefaultValueBinders {
 	static final class NewBinder implements ValueBinder.Completion<New<?>> {
 
 		@Override
-		public <T> Binding<T> complete(Binding<T> item, New<?> src) {
+		public <T> Binding<T> complete(Env env, Binding<T> item, New<?> src) {
+			env.accessible(src.target);
 			return item.complete(CONSTRUCTOR, byNew(src.typed(item.type())));
 		}
 	}
@@ -126,7 +127,8 @@ public final class DefaultValueBinders {
 			implements ValueBinder.Completion<Produces<?>> {
 
 		@Override
-		public <T> Binding<T> complete(Binding<T> item, Produces<?> src) {
+		public <T> Binding<T> complete(Env env, Binding<T> item, Produces<?> src) {
+			env.accessible(src.target);
 			return item.complete(METHOD, byProducer(src.typed(item.type())));
 		}
 	}
@@ -135,7 +137,8 @@ public final class DefaultValueBinders {
 			implements ValueBinder.Completion<Shares<?>> {
 
 		@Override
-		public <T> Binding<T> complete(Binding<T> item, Shares<?> src) {
+		public <T> Binding<T> complete(Env env, Binding<T> item, Shares<?> src) {
+			env.accessible(src.target);
 			return item.complete(FIELD, byAccess(src.typed(item.type())));
 		}
 
@@ -182,7 +185,7 @@ public final class DefaultValueBinders {
 			Type<?> srcType = src.type();
 			if (avoidReferences && isClassBanal(srcType.rawType)) {
 				target.addExpanded(env, item,
-						new Constant<>(instantiate(srcType.rawType,
+						new Constant<>(instantiate(srcType.rawType, env::accessible,
 								RuntimeException::new)).manual());
 						//TODO shouldn't this use New instead?
 				return;
@@ -229,7 +232,7 @@ public final class DefaultValueBinders {
 		Constructor<? extends T> c = env.property(ConstructsBy.class,
 				item.source.pkg()).reflect(src);
 		if (c != null)
-			target.addExpanded(env, item, New.bind(c));
+			target.addExpanded(env, item, New.newInstance(c));
 	}
 
 }

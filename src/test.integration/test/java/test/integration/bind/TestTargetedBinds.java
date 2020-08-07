@@ -57,40 +57,37 @@ public class TestTargetedBinds {
 		}
 	}
 
-	private static class Foo {
+	public static class Foo {
 
 		final Bar bar;
 
-		@SuppressWarnings("unused")
-		Foo(Bar bar) {
+		public Foo(Bar bar) {
 			this.bar = bar;
 		}
 
 	}
 
-	private static class Bar {
+	public static class Bar {
 
-		Bar() {
+		public Bar() {
 			// make visible
 		}
 	}
 
-	private static class Baz implements Serializable {
+	public static class Baz implements Serializable {
 
 		final Bar bar;
 
-		@SuppressWarnings("unused")
-		Baz(Bar bar) {
+		public Baz(Bar bar) {
 			this.bar = bar;
 		}
 	}
 
-	private static class Qux implements Serializable {
+	public static class Qux implements Serializable {
 
 		final Bar bar;
 
-		@SuppressWarnings("unused")
-		Qux(Bar bar) {
+		public Qux(Bar bar) {
 			this.bar = bar;
 		}
 	}

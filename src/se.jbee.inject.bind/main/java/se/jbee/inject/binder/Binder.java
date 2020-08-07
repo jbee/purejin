@@ -9,10 +9,14 @@ import se.jbee.inject.*;
 import se.jbee.inject.bind.*;
 import se.jbee.inject.config.*;
 import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.Utils;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -655,7 +659,7 @@ public class Binder {
 		public void to(Constructor<? extends T> target, Hint<?>... hints) {
 			if (hints.length == 0)
 				hints = env(HintsBy.class).reflect(target);
-			expand(New.bind(target, hints));
+			expand(New.newInstance(target, hints));
 		}
 
 		protected final void to(Object owner, Method target,
@@ -686,6 +690,13 @@ public class Binder {
 
 		public void toSupplier(Supplier<? extends T> supplier) {
 			to(supplier, BindingType.PREDEFINED);
+		}
+
+		public <I extends Supplier<? extends T>> void toSupplier(Function<Injector, I> factory) {
+			AtomicReference<I> cache = new AtomicReference<>();
+			toSupplier((Supplier<? extends T>) (dep, context) ->
+					cache.updateAndGet(e -> e != null ? e :
+							factory.apply(context)).supply(dep, context));
 		}
 
 		/**

@@ -23,7 +23,7 @@ public class TestPrimitiveArrayBinds {
 		protected void declare() {
 			bind(Integer.class).to(7);
 			bind(named("answer"), Integer.class).to(42);
-			bind(int[].class).toSupplier(IntArraySupplier.class);
+			bind(int[].class).toSupplier(new IntArraySupplier());
 		}
 	}
 

@@ -20,12 +20,12 @@ import se.jbee.inject.convert.ConverterModule;
 
 public class TestCollectionConverter {
 
-	static class TestCollectionConverterModule extends ConverterModule {
+	public static class TestCollectionConverterModule extends ConverterModule {
 
-		static final Converter<String, Integer> str2int = Integer::parseInt;
-		static final Converter<? extends Object[], List<?>> arr2list = Arrays::asList;
+		public static final Converter<String, Integer> str2int = Integer::parseInt;
+		public static final Converter<? extends Object[], List<?>> arr2list = Arrays::asList;
 
-		static <B> Converter<String, B[]> toArray(Type<B> elementType,
+		public static <B> Converter<String, B[]> toArray(Type<B> elementType,
 				Converter<String, B> elementConverter) {
 			return in -> arrayMap(in.split(","), elementType.rawType,
 					elementConverter::convert);

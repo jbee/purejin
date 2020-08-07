@@ -59,7 +59,7 @@ public class TestInitialiserAnnotationBinds {
 
 	}
 
-	static class SomeBean {
+	public static class SomeBean {
 
 		@Resource
 		Integer someField;

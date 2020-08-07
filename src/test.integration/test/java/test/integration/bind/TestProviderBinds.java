@@ -63,28 +63,26 @@ public class TestProviderBinds {
 
 	}
 
-	private static class DynamicState {
+	public static class DynamicState {
 
-		DynamicState() {
+		public DynamicState() {
 			// this is constructed per injection so it is "changing over time"
 		}
 	}
 
-	private static class FaultyStateConsumer {
+	public static class FaultyStateConsumer {
 
-		@SuppressWarnings("unused")
-		FaultyStateConsumer(DynamicState state) {
+		public FaultyStateConsumer(DynamicState state) {
 			// using the state directly is faulty since the state changes.
 		}
 	}
 
-	private static class WorkingStateConsumer {
+	public static class WorkingStateConsumer {
 
 		final Provider<DynamicState> state;
 		final Provider<String[]> strings;
 
-		@SuppressWarnings("unused")
-		WorkingStateConsumer(Provider<DynamicState> state,
+		public WorkingStateConsumer(Provider<DynamicState> state,
 				Provider<String[]> strings) {
 			this.state = state;
 			this.strings = strings;

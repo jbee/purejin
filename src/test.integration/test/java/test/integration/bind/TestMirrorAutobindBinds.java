@@ -32,7 +32,7 @@ public class TestMirrorAutobindBinds {
 
 	static final StringBuffer STATE = new StringBuffer();
 
-	static class TestMirrorAutobindBindsModule extends BinderModule {
+	public static class TestMirrorAutobindBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
@@ -60,80 +60,80 @@ public class TestMirrorAutobindBinds {
 					.in(FactoryImpl.class);
 		}
 
-		static int staticFactoryMethod() {
+		public static int staticFactoryMethod() {
 			return 42;
 		}
 
-		static long staticFactoryMethodWithParameters(int factor) {
+		public static long staticFactoryMethodWithParameters(int factor) {
 			return factor * 2L;
 		}
 	}
 
-	static class FactoryImpl {
+	public static class FactoryImpl {
 
 		byte i = 0;
 
-		byte throwAwayInstanceFactoryMethod() {
+		public byte throwAwayInstanceFactoryMethod() {
 			return i++;
 		}
 	}
 
-	static class Implementor1 {
+	public static class Implementor1 {
 
 		@WebMethod
-		float instanceFactoryMethod() {
+		public float instanceFactoryMethod() {
 			return 42f;
 		}
 
 		@WebMethod
 		@Resource("twentyone")
-		float instanceFactoryMethodWithName() {
+		public float instanceFactoryMethodWithName() {
 			return 21f;
 		}
 
 		@WebMethod
 		@Resource("Foo")
-		double instanceFactoryMethodWithParameters(
+		public double instanceFactoryMethodWithParameters(
 				@Resource("twentyone") float factor) {
 			return factor * 2d;
 		}
 
-		float shouldNotBeBoundSinceItIsNotAnnotated() {
+		public float shouldNotBeBoundSinceItIsNotAnnotated() {
 			return 0f;
 		}
 	}
 
-	static class Implementor2 {
+	public static class Implementor2 {
 
-		Provider<Boolean> assignableToProvider() {
+		public Provider<Boolean> assignableToProvider() {
 			return () -> true;
 		}
 
-		Character shouldNotBeBoundSinceItDoesNotReturnTypeThatIsAssignableToProvider() {
+		public Character shouldNotBeBoundSinceItDoesNotReturnTypeThatIsAssignableToProvider() {
 			return 'N';
 		}
 	}
 
-	static class Implementor3 {
+	public static class Implementor3 {
 
-		Name typeInProjectPackage() {
+		public Name typeInProjectPackage() {
 			return Name.named("foobar");
 		}
 
-		String shouldNotBeBoundSinceItDoesNotReturnTypeThatIsInProjectPackage() {
+		public String shouldNotBeBoundSinceItDoesNotReturnTypeThatIsInProjectPackage() {
 			return "foobar";
 		}
 	}
 
-	static class Implementor4 {
+	public static class Implementor4 {
 
 		final StringBuffer state;
 
-		Implementor4(StringBuffer state) {
+		public Implementor4(StringBuffer state) {
 			this.state = state;
 		}
 
-		StringBuffer valueFromStatefullMirrorObject() {
+		public StringBuffer valueFromStatefullMirrorObject() {
 			return state;
 		}
 	}

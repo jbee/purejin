@@ -66,15 +66,16 @@ public class TestCommandBinds {
 		@Override
 		protected void declare() {
 			bindActionsIn(MathService.class);
-			per(Scope.dependencyType).starbind(Command.class).toSupplier(
-					CommandSupplier.class);
+			per(Scope.dependencyType) //
+					.starbind(Command.class) //
+					.toSupplier(new CommandSupplier());
 		}
 
 	}
 
-	static class MathService {
+	public static class MathService {
 
-		Long square(Integer value) {
+		public Long square(Integer value) {
 			return value.longValue() * value;
 		}
 	}

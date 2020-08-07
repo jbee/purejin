@@ -11,6 +11,7 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.binder.TogglerBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.Environment;
 
 import static org.junit.Assert.assertArrayEquals;
 
@@ -100,7 +101,7 @@ public class TestToggledBinds {
 
 	private static void assertChoiceResolvedToValue(Machine actualChoice,
 			String expected) {
-		Env env = Bootstrap.ENV.withToggled(Machine.class, actualChoice);
+		Env env = Environment.DEFAULT.withToggled(Machine.class, actualChoice);
 		Injector injector = Bootstrap.injector(env, ModularBindsBundle.class);
 		assertArrayEquals(new String[] { expected },
 				injector.resolve(String[].class));

@@ -164,6 +164,7 @@ final class Resources implements Iterable<Resource<?>[]> {
 			if (res[i] == null)
 				res[i] = createResource(link, scopes, i, descriptors[i],
 						permanenceByScope);
+			//TODO make a special resource for all resources
 		return createResourcesByRawType(res);
 	}
 

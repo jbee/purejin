@@ -8,6 +8,7 @@ import se.jbee.inject.bind.Module;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.Environment;
 
 import static org.junit.Assert.assertEquals;
 import static se.jbee.inject.DeclarationType.EXPLICIT;
@@ -50,7 +51,7 @@ public class TestBinderModule {
 
 	@Test
 	public void thatBindingSourceReflectsTheOrigin() {
-		Binding<?>[] bindings = Bootstrap.bindings(Bootstrap.ENV,
+		Binding<?>[] bindings = Bootstrap.bindings(Environment.DEFAULT,
 				TestBinderModuleBundle.class, Bindings.newBindings());
 
 		assertBinding(TestBinderModuleModule1.class, 1, EXPLICIT,

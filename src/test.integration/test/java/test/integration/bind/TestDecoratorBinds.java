@@ -17,7 +17,7 @@ public class TestDecoratorBinds {
 		// the used abstraction
 	}
 
-	static class Decorator implements Foo {
+	public static class Decorator implements Foo {
 
 		final Foo decorated;
 
@@ -27,7 +27,7 @@ public class TestDecoratorBinds {
 
 	}
 
-	static class Bar implements Foo {
+	public static class Bar implements Foo {
 		// a special Foo for the Decorator
 	}
 
@@ -42,7 +42,7 @@ public class TestDecoratorBinds {
 	}
 
 	@Test
-	public void test() {
+	public void decoratorPatternCanBeUsed() {
 		Injector injector = Bootstrap.injector(DecoratorBindsModule.class);
 		assertEquals(Decorator.class, injector.resolve(Foo.class).getClass());
 	}

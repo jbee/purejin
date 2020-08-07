@@ -31,14 +31,14 @@ public class TestActionMirrorBinds {
 
 	}
 
-	static class ActionMirrorBindsActions {
+	public static class ActionMirrorBindsActions {
 
-		int notBoundSinceNotAnnotated() {
+		public int notBoundSinceNotAnnotated() {
 			return 13;
 		}
 
 		@Resource
-		int anActionYieldingInts() {
+		public int anActionYieldingInts() {
 			return 42;
 		}
 	}

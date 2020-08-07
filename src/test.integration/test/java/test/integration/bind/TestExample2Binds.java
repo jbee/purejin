@@ -19,7 +19,7 @@ public class TestExample2Binds {
 
 	}
 
-	static class DefaultImpl implements Decoupling {
+	public static class DefaultImpl implements Decoupling {
 
 	}
 

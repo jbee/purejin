@@ -205,17 +205,17 @@ public class TestBootstrapper {
 	}
 
 	@SuppressWarnings("unused")
-	private static class D {
+	public static class D {
 
 		final String s;
 
 		@ConstructFrom
-		D(String s) {
+		public D(String s) {
 			this.s = s;
 
 		}
 
-		D() {
+		public D() {
 			this("would be picked normally");
 		}
 	}

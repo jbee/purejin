@@ -18,23 +18,23 @@ import static org.junit.Assert.*;
  */
 public class TestIndirectBinds {
 
-	static interface Abstraction {
+	interface Abstraction {
 
 	}
 
-	static class Implementation implements Abstraction {
+	public static class Implementation implements Abstraction {
 
 	}
 
-	static interface Abstraction2 {
+	interface Abstraction2 {
 
 	}
 
-	static class Implementation2 implements Abstraction2 {
+	public static class Implementation2 implements Abstraction2 {
 
 	}
 
-	static class ValidReceiver {
+	public static class ValidReceiver {
 
 		final Abstraction abs;
 
@@ -43,30 +43,30 @@ public class TestIndirectBinds {
 		}
 	}
 
-	static class InvalidReceiver {
+	public static class InvalidReceiver {
 
 		final Implementation impl;
 
-		InvalidReceiver(Implementation impl) {
+		public InvalidReceiver(Implementation impl) {
 			this.impl = impl;
 		}
 	}
 
-	static class InvalidNestedReceiver {
+	public static class InvalidNestedReceiver {
 
 		final InvalidReceiver invalid;
 
-		InvalidNestedReceiver(InvalidReceiver invalid) {
+		public InvalidNestedReceiver(InvalidReceiver invalid) {
 			this.invalid = invalid;
 		}
 
 	}
 
-	static class ValidNestedReceiver {
+	public static class ValidNestedReceiver {
 
 		final ValidReceiver valid;
 
-		ValidNestedReceiver(ValidReceiver valid) {
+		public ValidNestedReceiver(ValidReceiver valid) {
 			this.valid = valid;
 		}
 	}

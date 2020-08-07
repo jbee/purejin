@@ -16,7 +16,7 @@ import static se.jbee.inject.Name.named;
 
 public class TestConfigBinds {
 
-	static final class Bean {
+	public static final class Bean {
 
 		final Config config;
 

@@ -19,21 +19,15 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Hint;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Instance;
-import se.jbee.inject.Scope;
-import se.jbee.inject.Supplier;
+import se.jbee.inject.*;
+import se.jbee.inject.UnresolvableDependency.NoMethodForDependency;
 import se.jbee.inject.lang.Type;
-import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.SupplyFailed;
 import se.jbee.inject.lang.Utils;
 import se.jbee.inject.bind.Module;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.config.Plugins;
 import se.jbee.inject.config.ProducesBy;
-import se.jbee.inject.InjectionSite;
 
 /**
  * When binding {@link Action}s this {@link Module} can be extended.
@@ -78,11 +72,11 @@ public abstract class ActionModule extends BinderModule {
 		@Override
 		public void declare() {
 			asDefault().per(Scope.dependencyType).starbind(
-					Action.class).toSupplier(ActionSupplier.class);
+					Action.class).toSupplier(ActionSupplier::new);
 			asDefault().per(Scope.application).bind(ACTION_MIRROR).to(
 					allMethods);
 			asDefault().per(Scope.application).bind(Executor.class).to(
-					DirectExecutor.class);
+					new DirectExecutor());
 		}
 
 	}
@@ -106,7 +100,7 @@ public abstract class ActionModule extends BinderModule {
 		}
 	}
 
-	static final class ActionSupplier implements Supplier<Action<?, ?>> {
+	public static final class ActionSupplier implements Supplier<Action<?, ?>> {
 
 		/**
 		 * A list of discovered methods for each implementation class.
@@ -118,6 +112,7 @@ public abstract class ActionModule extends BinderModule {
 		 */
 		private final Map<String, Action<?, ?>> cachedActions = new ConcurrentHashMap<>();
 
+		private final Env env;
 		private final Injector injector;
 		private final ProducesBy actionMirror;
 		private final Executor executor;
@@ -125,6 +120,7 @@ public abstract class ActionModule extends BinderModule {
 
 		public ActionSupplier(Injector injector) {
 			this.injector = injector;
+			this.env = injector.resolve(Env.class);
 			this.executor = injector.resolve(Executor.class);
 			this.implementationClasses = injector.resolve(
 					Plugins.class).forPoint(Action.class);
@@ -150,6 +146,7 @@ public abstract class ActionModule extends BinderModule {
 		private <I, O> Action<?, ?> newAction(Type<I> input, Type<O> output) {
 			Method method = resolveAction(input, output);
 			Object impl = injector.resolve(method.getDeclaringClass());
+			env.accessible(method);
 			return new ExecutorRunAction<>(injector, executor,
 					new ActionSite<>(impl, method, input, output));
 		}
@@ -161,8 +158,7 @@ public abstract class ActionModule extends BinderModule {
 				if (action != null)
 					return action;
 			}
-			throw new UnresolvableDependency.NoMethodForDependency(output,
-					input);
+			throw new NoMethodForDependency(output, input);
 		}
 
 		private static <I, O> boolean isActionForTypes(Method candidate,

@@ -9,6 +9,7 @@ import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.Edition;
 import se.jbee.inject.defaults.DefaultsBundle;
 
@@ -51,7 +52,7 @@ public class TestEditionPackageBinds {
 		assertEquals(42, injector.resolve(int.class).intValue());
 
 		// an edition without the module in this test
-		Env env = Bootstrap.ENV.with(Edition.class,
+		Env env = Environment.DEFAULT.with(Edition.class,
 				Edition.includes(subPackagesOf(TestEditionPackageBinds.class) //
 						.and(packageOf(DefaultsBundle.class)
 						.and(packageOf(Bootstrap.class)))));
@@ -61,7 +62,7 @@ public class TestEditionPackageBinds {
 				NoResourceForDependency.class, () -> context.resolve(int.class));
 
 		// an edition including the module in this test
-		env = Bootstrap.ENV.with(Edition.class, Edition.includes(
+		env = Environment.DEFAULT.with(Edition.class, Edition.includes(
 				packageAndSubPackagesOf(TestEditionPackageBinds.class) //
 						.and(packageOf(DefaultsBundle.class))
 						.and(packageOf(Bootstrap.class))));

@@ -16,7 +16,7 @@ import static se.jbee.inject.Name.named;
  */
 public class TestSetterInitialisationBinds {
 
-	private static class Bean {
+	public static class Bean {
 
 		String foo;
 		AnotherBean bar;
@@ -31,7 +31,7 @@ public class TestSetterInitialisationBinds {
 		}
 	}
 
-	private static class AnotherBean {
+	public static class AnotherBean {
 
 	}
 

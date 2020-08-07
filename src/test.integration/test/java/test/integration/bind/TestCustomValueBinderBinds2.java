@@ -8,6 +8,7 @@ import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.bind.ValueBinder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.defaults.DefaultValueBinders;
 
 import java.io.Serializable;
@@ -30,11 +31,11 @@ import static org.junit.Assert.*;
  */
 public class TestCustomValueBinderBinds2 {
 
-	static class BanalBean implements Serializable {
+	public static class BanalBean implements Serializable {
 		// no state, default constructor
 	}
 
-	static class NonBanalBean implements RandomAccess {
+	public static class NonBanalBean implements RandomAccess {
 
 		public NonBanalBean(@SuppressWarnings("unused") Serializable arg) {
 		}
@@ -75,6 +76,6 @@ public class TestCustomValueBinderBinds2 {
 
 	private static Injector injectorWithEnv(Class<? extends Bundle> root,
 			ValueBinder<?> binder) {
-		return Bootstrap.injector(Bootstrap.ENV.withBinder(binder), root);
+		return Bootstrap.injector(Environment.DEFAULT.withBinder(binder), root);
 	}
 }

@@ -98,12 +98,12 @@ public class TestPropertyAnnotationBinds {
 		}
 	}
 
-	static class ExampleBean {
+	public static class ExampleBean {
 
 		final String property1;
 		final String property2;
 
-		ExampleBean(@Property("foo") String property1,
+		public ExampleBean(@Property("foo") String property1,
 				@Property("bar") String property2) {
 			this.property1 = property1;
 			this.property2 = property2;
@@ -115,7 +115,7 @@ public class TestPropertyAnnotationBinds {
 		Properties properties = new Properties();
 		properties.put("foo", "property1");
 		properties.put("bar", "property2");
-		Env env = Bootstrap.ENV.with(Properties.class, properties);
+		Env env = Environment.DEFAULT.with(Properties.class, properties);
 		Injector injector = Bootstrap.injector(
 				env, TestPropertyAnnotationBindsModule.class);
 		ExampleBean bean = injector.resolve(ExampleBean.class);

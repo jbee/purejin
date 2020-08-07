@@ -81,15 +81,16 @@ public class TestServiceBinds {
 		@Override
 		protected void declare() {
 			bindActionsIn(MathService.class);
-			per(Scope.dependencyType).starbind(Service.class).toSupplier(
-					ServiceSupplier.class);
+			per(Scope.dependencyType)
+					.starbind(Service.class) //
+					.toSupplier(new ServiceSupplier());
 		}
 
 	}
 
-	static class MathService {
+	public static class MathService {
 
-		Long square(Integer value) {
+		public Long square(Integer value) {
 			return value.longValue() * value;
 		}
 	}
