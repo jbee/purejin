@@ -9,7 +9,7 @@ import se.jbee.inject.lang.Qualifying;
 
 import static java.util.Arrays.asList;
 import static se.jbee.inject.lang.Utils.arrayCompare;
-import static se.jbee.inject.lang.Utils.arrayPrepand;
+import static se.jbee.inject.lang.Utils.arrayPrepend;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -46,7 +46,7 @@ public final class Instances implements Qualifying<Instances>,
 	public Instances push(Instance<?> top) {
 		if (isAny())
 			return new Instances(top);
-		return new Instances(arrayPrepand(top, hierarchy));
+		return new Instances(arrayPrepend(top, hierarchy));
 	}
 
 	public boolean equalTo(Instances other) {

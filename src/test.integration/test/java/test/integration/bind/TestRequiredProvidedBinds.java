@@ -12,7 +12,7 @@ import static org.junit.Assert.*;
 
 /**
  * The test shows very loose coupling using {@link BinderModule#require(Class)}
- * and {@link BinderModule#provide(Class, se.jbee.inject.Parameter...)}
+ * and {@link BinderModule#provide(Class, se.jbee.inject.Hint...)}
  * bindings.
  *
  * Here a {@link Module} just expresses the need for a particular implementation
@@ -24,19 +24,19 @@ import static org.junit.Assert.*;
  */
 public class TestRequiredProvidedBinds {
 
-	private interface ExampleService {
+	interface ExampleService {
 		// a classic singleton bean
 	}
 
-	private static class ExampleServiceImpl implements ExampleService {
+	public static class ExampleServiceImpl implements ExampleService {
 		// and its implementation
 	}
 
-	private static class ExplicitExampleService implements ExampleService {
+	public static class ExplicitExampleService implements ExampleService {
 		// this is bound explicit in one test and should replace the provided impl. above
 	}
 
-	private static class UnusedImpl {
+	public static class UnusedImpl {
 		// just something we provide but do not require
 	}
 

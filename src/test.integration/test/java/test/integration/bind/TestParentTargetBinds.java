@@ -27,31 +27,31 @@ public class TestParentTargetBinds {
 		}
 	}
 
-	private static class Grandparent {
+	public static class Grandparent {
 
 		final Parent parent;
 
-		private Grandparent(Parent parent) {
+		public Grandparent(Parent parent) {
 			this.parent = parent;
 		}
 
 	}
 
-	private static class Parent {
+	public static class Parent {
 
 		final Child child;
 
-		private Parent(Child child) {
+		public Parent(Child child) {
 			this.child = child;
 		}
 
 	}
 
-	private static class Child {
+	public static class Child {
 
 		final String value;
 
-		private Child(String value) {
+		public Child(String value) {
 			this.value = value;
 		}
 

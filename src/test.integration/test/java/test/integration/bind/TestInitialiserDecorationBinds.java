@@ -54,11 +54,11 @@ public class TestInitialiserDecorationBinds {
 
 	}
 
-	static class Foo {
+	public static class Foo {
 
 		final Injector injector;
 
-		Foo(Injector injector) {
+		public Foo(Injector injector) {
 			this.injector = injector;
 		}
 	}

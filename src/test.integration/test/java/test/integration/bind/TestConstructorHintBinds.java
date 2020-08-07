@@ -32,48 +32,43 @@ import static se.jbee.inject.lang.Type.raw;
  */
 public class TestConstructorHintBinds {
 
-	private static class Foo {
+	public static class Foo {
 
-		@SuppressWarnings("unused")
 		final Integer baz;
 
-		@SuppressWarnings("unused")
-		Foo(String bar, Integer baz) {
+		public Foo(String bar, Integer baz) {
 			this.baz = baz;
 			// no use
 		}
 	}
 
-	private static class Bar {
+	public static class Bar {
 
 		final String foo;
 
-		@SuppressWarnings("unused")
-		Bar(String foo, Integer baz) {
+		public Bar(String foo, Integer baz) {
 			this.foo = foo;
 		}
 	}
 
-	private static class Baz {
+	public static class Baz {
 
 		final String foo;
 		final String bar;
 
-		@SuppressWarnings("unused")
-		Baz(String foo, String bar) {
+		public Baz(String foo, String bar) {
 			this.foo = foo;
 			this.bar = bar;
 
 		}
 	}
 
-	private static class Qux {
+	public static class Qux {
 
 		final Serializable value;
 		final CharSequence sequence;
 
-		@SuppressWarnings("unused")
-		Qux(Serializable value, CharSequence sequence) {
+		public Qux(Serializable value, CharSequence sequence) {
 			this.value = value;
 			this.sequence = sequence;
 		}

@@ -108,7 +108,7 @@ public class ConcurrentEventProcessor implements EventProcessor {
 	private final ExecutorService executor;
 	private final PolicyProvider policyProvider;
 
-	ConcurrentEventProcessor(PolicyProvider policyProvider, ExecutorService executor) {
+	public ConcurrentEventProcessor(PolicyProvider policyProvider, ExecutorService executor) {
 		this.policyProvider = policyProvider;
 		this.executor = executor;
 	}

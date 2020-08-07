@@ -8,6 +8,7 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.New;
 import se.jbee.inject.binder.Supply;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.defaults.DefaultValueBinders;
 import se.jbee.inject.lang.Type;
 
@@ -42,19 +43,19 @@ public class TestCustomValueBinderBinds1 {
 
 	@Target({ METHOD, FIELD })
 	@Retention(RUNTIME)
-	private @interface Initialisation {
+	public @interface Initialisation {
 
 	}
 
-	private static class Foo {
+	public static class Foo {
 
 		@SuppressWarnings("unused")
 		Foo(Integer i, Float f) {
-			// no further useage
+			// no further usage
 		}
 	}
 
-	private static class Bar {
+	public static class Bar {
 
 		@Initialisation
 		String s;
@@ -112,7 +113,7 @@ public class TestCustomValueBinderBinds1 {
 
 	private static Injector injectorWithEnv(Class<? extends Bundle> root,
 			ValueBinder<?> binder) {
-		return Bootstrap.injector(Bootstrap.ENV.withBinder(binder), root);
+		return Bootstrap.injector(Environment.DEFAULT.withBinder(binder), root);
 	}
 
 	/**
@@ -129,8 +130,8 @@ public class TestCustomValueBinderBinds1 {
 				Bindings bindings) {
 			DefaultValueBinders.NEW.expand(env, value, incomplete, bindings);
 			Type<?>[] params = Type.parameterTypes(value.target);
-			for (int i = 0; i < params.length; i++) {
-				bindings.addExpanded(env, required(params[i], incomplete));
+			for (Type<?> param : params) {
+				bindings.addExpanded(env, required(param, incomplete));
 			}
 		}
 
@@ -193,6 +194,7 @@ public class TestCustomValueBinderBinds1 {
 		@Override
 		public <T> void expand(Env env, New<?> constructor,
 				Binding<T> incomplete, Bindings bindings) {
+			env.accessible(constructor.target);
 			Supplier<T> supplier = new FieldInjectionSupplier<>(
 					Supply.byNew(constructor.typed(incomplete.type())));
 			bindings.addExpanded(env,

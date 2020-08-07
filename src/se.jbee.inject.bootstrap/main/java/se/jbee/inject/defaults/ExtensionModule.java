@@ -1,15 +1,12 @@
 package se.jbee.inject.defaults;
 
+import static se.jbee.inject.binder.New.newInstance;
 import static se.jbee.inject.lang.Type.raw;
 
 import java.lang.reflect.Constructor;
 
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Scope;
-import se.jbee.inject.Supplier;
+import se.jbee.inject.*;
 import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.binder.New;
 import se.jbee.inject.binder.Supply;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.config.Extension;
@@ -42,9 +39,10 @@ class ExtensionModule extends BinderModule {
 	@SuppressWarnings("unchecked")
 	private static <T> T extension(ConstructsBy constructsBy, Dependency<?> dep,
 			Injector context) {
-		Constructor<T> constructor = (Constructor<T>) constructsBy.reflect(
+		Constructor<T> ext = (Constructor<T>) constructsBy.reflect(
 				dep.type().rawType);
-		return Supply.byNew(New.bind(constructor)) //
+		context.resolve(Env.class).accessible(ext);
+		return Supply.byNew(newInstance(ext)) //
 				.supply((Dependency<? super T>) dep, context);
 	}
 }

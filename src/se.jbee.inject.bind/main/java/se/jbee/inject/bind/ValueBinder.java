@@ -78,7 +78,7 @@ public interface ValueBinder<S> {
 
 	/**
 	 * A {@link Completion} just uses the passed value to
-	 * {@link Completion#complete(Binding, Object)} the {@link Binding} and add
+	 * {@link Completion#complete(Env, Binding, Object)} the {@link Binding} and add
 	 * it to the {@link Bindings}. Its main purpose to to capture this recurring
 	 * pattern, reduce the duplication caused by it and make the code more
 	 * readable.
@@ -88,9 +88,9 @@ public interface ValueBinder<S> {
 		@Override
 		default <T> void expand(Env env, S src, Binding<T> item,
 				Bindings target) {
-			target.addExpanded(env, complete(item, src));
+			target.addExpanded(env, complete(env, item, src));
 		}
 
-		<T> Binding<T> complete(Binding<T> item, S src);
+		<T> Binding<T> complete(Env env, Binding<T> item, S src);
 	}
 }

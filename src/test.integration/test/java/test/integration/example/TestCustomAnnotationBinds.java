@@ -25,6 +25,7 @@ import se.jbee.inject.binder.ServiceLoaderAnnotations;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.bind.ModuleWith;
+import se.jbee.inject.bootstrap.Environment;
 
 /**
  * A test that demonstrates how a custom annotation is defined as
@@ -43,7 +44,7 @@ public class TestCustomAnnotationBinds {
 
 	@Target(TYPE)
 	@Retention(RUNTIME)
-	static @interface Service {
+	@interface Service {
 
 	}
 
@@ -61,19 +62,19 @@ public class TestCustomAnnotationBinds {
 
 	/* Assume following to be defined in another software module... */
 
-	static interface SomeService {
+	interface SomeService {
 
 	}
 
 	@Service
-	static class SomeServiceImpl implements Serializable, SomeService {
+	public static class SomeServiceImpl implements Serializable, SomeService {
 
 	}
 
 	/* Assume following to be defined in another software module... */
 
 	@Support // annotation and its effect is defined in the com.example.app test dependency
-	static class SomeOtherService {
+	public static class SomeOtherService {
 
 	}
 
@@ -110,7 +111,7 @@ public class TestCustomAnnotationBinds {
 
 	@Test
 	public void customAnnotationsAddedProgrammaticallyToGlobals() {
-		Env env = Bootstrap.ENV.withAnnotation(Service.class,
+		Env env = Environment.DEFAULT.withAnnotation(Service.class,
 				new ServiceAnnotation());
 		Injector injector = Bootstrap.injector(env,
 				TestCustomAnnotationBindsModule1.class);

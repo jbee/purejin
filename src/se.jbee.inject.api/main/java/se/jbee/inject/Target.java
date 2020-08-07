@@ -108,7 +108,7 @@ public final class Target
 
 	private boolean isCompatibleWith(Instance<?> target) {
 		return instance.name.isCompatibleWith(target.name)
-			&& isAssingableTo(instance.type(), target.type());
+			&& isAssignableTo(instance.type(), target.type());
 	}
 
 	private boolean areParentsCompatibleWith(Dependency<?> dep) {
@@ -121,7 +121,7 @@ public final class Target
 		}
 		int pi = 0;
 		while (pl <= il && pl > 0) {
-			if (isAssingableTo(parents.at(pi).type(), dep.target(il).type())) {
+			if (isAssignableTo(parents.at(pi).type(), dep.target(il).type())) {
 				pl--;
 				pi++;
 			}
@@ -130,7 +130,7 @@ public final class Target
 		return pl == 0;
 	}
 
-	private static boolean isAssingableTo(Type<?> type, Type<?> targetType) {
+	private static boolean isAssignableTo(Type<?> type, Type<?> targetType) {
 		return type.isInterface() || type.isAbstract()
 			? targetType.isAssignableTo(type)
 			: targetType.equalTo(type);

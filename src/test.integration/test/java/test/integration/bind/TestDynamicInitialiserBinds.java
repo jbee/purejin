@@ -26,12 +26,12 @@ import static org.junit.Assert.assertNotNull;
  */
 public class TestDynamicInitialiserBinds {
 
-	private static interface MyListener {
+	public interface MyListener {
 
 		MyListener inc(int n);
 	}
 
-	static class MyService implements MyListener {
+	public static class MyService implements MyListener {
 
 		int sum;
 
@@ -43,11 +43,11 @@ public class TestDynamicInitialiserBinds {
 
 	}
 
-	private static class MyServiceExtension extends MyService {
+	public static class MyServiceExtension extends MyService {
 
 	}
 
-	private static class MyOtherService {
+	public static class MyOtherService {
 
 	}
 

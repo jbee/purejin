@@ -25,18 +25,18 @@ import se.jbee.inject.convert.ConverterModule;
  */
 public class TestConverter {
 
-	static class TestConverterModule extends ConverterModule {
+	public static class TestConverterModule extends ConverterModule {
 
-		Converter<String, Integer> str2int = Integer::parseInt;
-		Converter<String, Long> str2long = Long::parseLong;
+		public Converter<String, Integer> str2int = Integer::parseInt;
+		public Converter<String, Long> str2long = Long::parseLong;
 
-		<B> Converter<String, B[]> toArray(Type<B> elementType,
+		public <B> Converter<String, B[]> toArray(Type<B> elementType,
 				Converter<String, B> element) {
 			return input -> arrayMap(input.split("\\s*,\\s*"),
 					elementType.rawType, element::convert);
 		}
 
-		<B> Converter<String, List<B>> toList(Converter<String, B[]> array) {
+		public <B> Converter<String, List<B>> toList(Converter<String, B[]> array) {
 			return input -> asList(array.convert(input));
 		}
 	}

@@ -14,7 +14,7 @@ import static org.junit.Assert.*;
  */
 public class TestInstanceBinds {
 
-	private static class Foo {
+	public static class Foo {
 
 	}
 

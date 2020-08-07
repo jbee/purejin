@@ -5,8 +5,6 @@
  */
 package se.jbee.inject.binder;
 
-import static se.jbee.inject.lang.Utils.accessible;
-
 import java.lang.reflect.Constructor;
 
 import se.jbee.inject.Hint;
@@ -22,7 +20,7 @@ import se.jbee.inject.bind.ValueBinder;
  */
 public final class New<T> implements Typed<T> {
 
-	public static <T> New<T> bind(Constructor<T> target, Hint<?>... params) {
+	public static <T> New<T> newInstance(Constructor<T> target, Hint<?>... params) {
 		return new New<>(target, params);
 	}
 
@@ -30,7 +28,7 @@ public final class New<T> implements Typed<T> {
 	public final Hint<?>[] hints;
 
 	private New(Constructor<T> target, Hint<?>[] hints) {
-		this.target = accessible(target);
+		this.target = target;
 		this.hints = hints;
 	}
 

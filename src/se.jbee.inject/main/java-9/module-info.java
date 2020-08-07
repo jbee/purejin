@@ -1,6 +1,7 @@
 /**
  * A BOM type module that references the core modules of the library
  */
+@SuppressWarnings("Java9RedundantRequiresStatement")
 module se.jbee.inject {
 
 	requires transitive se.jbee.inject.lang;

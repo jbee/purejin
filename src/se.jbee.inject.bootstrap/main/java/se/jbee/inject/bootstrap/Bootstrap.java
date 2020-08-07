@@ -5,7 +5,6 @@
  */
 package se.jbee.inject.bootstrap;
 
-import static se.jbee.inject.Cast.functionTypeOf;
 import static se.jbee.inject.lang.Utils.arrayOf;
 
 import java.util.ArrayList;
@@ -27,15 +26,8 @@ import se.jbee.inject.bind.Bundler;
 import se.jbee.inject.bind.Modulariser;
 import se.jbee.inject.bind.Module;
 import se.jbee.inject.bind.Toggled;
-import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.config.Edition;
-import se.jbee.inject.config.HintsBy;
-import se.jbee.inject.config.NamesBy;
-import se.jbee.inject.config.ProducesBy;
-import se.jbee.inject.config.ScopesBy;
-import se.jbee.inject.config.SharesBy;
 import se.jbee.inject.container.Container;
-import se.jbee.inject.defaults.DefaultValueBinders;
 import se.jbee.inject.defaults.DefaultsBundle;
 import se.jbee.inject.lang.Utils;
 
@@ -47,31 +39,12 @@ import se.jbee.inject.lang.Utils;
  */
 public final class Bootstrap {
 
-	public static final Environment ENV = new Environment() //
-			.with(Edition.class, Edition.FULL) //
-			.withBinder(DefaultValueBinders.SUPER_TYPES) //
-			.withBinder(DefaultValueBinders.NEW) //
-			.withBinder(DefaultValueBinders.CONSTANT) //
-			.withBinder(DefaultValueBinders.PRODUCES) //
-			.withBinder(DefaultValueBinders.SHARES) //
-			.withBinder(DefaultValueBinders.INSTANCE_REF) //
-			.withBinder(DefaultValueBinders.PARAMETRIZED_REF) //
-			.withBinder(DefaultValueBinders.ARRAY) //
-			.with(ConstructsBy.class, ConstructsBy.common) //
-			.with(SharesBy.class, SharesBy.noFields) //
-			.with(ProducesBy.class, ProducesBy.noMethods) //
-			.with(NamesBy.class, NamesBy.defaultName) //
-			.with(ScopesBy.class, ScopesBy.alwaysDefault) //
-			.with(HintsBy.class, HintsBy.noParameters) //
-			.with(Annotated.Merge.class, Annotated.NO_MERGE) //
-			.readonly();
-
 	public static Env env(Class<? extends Bundle> root) {
-		return ENV.complete(injector(root).asEnv());
+		return Environment.DEFAULT.complete(injector(root).asEnv());
 	}
 
 	public static Env env(Env env, Class<? extends Bundle> root) {
-		return ENV.complete(injector(env, root).asEnv());
+		return Environment.DEFAULT.complete(injector(env, root).asEnv());
 	}
 
 	@SafeVarargs
@@ -82,7 +55,7 @@ public final class Bootstrap {
 	}
 
 	public static Injector injector(Class<? extends Bundle> root) {
-		return injector(ENV, root);
+		return injector(Environment.DEFAULT, root);
 	}
 
 	public static Injector injector(Env env, Class<? extends Bundle> root) {
@@ -164,7 +137,9 @@ public final class Bootstrap {
 		}
 
 		private <T> T createBundle(Class<T> bundle) {
-			return Utils.instantiate(bundle,
+			// OBS: Here we do not use the env but always make the bundles accessible
+			// as this is kind of designed into the concept
+			return Utils.instantiate(bundle, Utils::accessible,
 					e -> new InconsistentDeclaration("Failed to create bundle: " + bundle, e));
 		}
 

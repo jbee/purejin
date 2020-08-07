@@ -82,7 +82,7 @@ public class TestModuleWithBinds {
 	private final Injector injector = injector();
 
 	private static Injector injector() {
-		Env env = Bootstrap.ENV //
+		Env env = Environment.DEFAULT //
 				.with(Properties.class, exampleProperties()) //
 				.with(listTypeOf(String.class), asList("a", "b")) //
 				.with(listTypeOf(Integer.class), asList(1, 2));

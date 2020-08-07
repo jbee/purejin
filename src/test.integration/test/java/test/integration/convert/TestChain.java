@@ -20,7 +20,7 @@ public class TestChain {
 
 	@Imports({ String.class, Integer.class })
 	@Converts({ "String", "Long", "Integer" })
-	static final class ExampleConverter
+	public static final class ExampleConverter
 			implements Converter<Integer, BigInteger> {
 
 		@Override
@@ -29,10 +29,10 @@ public class TestChain {
 		}
 	}
 
-	static class TestChainModule extends ConverterModule {
+	public static class TestChainModule extends ConverterModule {
 
-		Converter<String, Long> str2long = Long::parseLong;
-		Converter<Long, Integer> long2int = Long::intValue;
+		public Converter<String, Long> str2long = Long::parseLong;
+		public Converter<Long, Integer> long2int = Long::intValue;
 
 	}
 

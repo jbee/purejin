@@ -50,19 +50,19 @@ import static se.jbee.inject.bind.Bindings.supplyConstant;
  */
 public class TestPubSubBinds {
 
-	private static interface Subscriber {
+	interface Subscriber {
 
 		void onEvent();
 	}
 
-	private static interface Publisher {
+	interface Publisher {
 
 		public void publish();
 
 		void subscribe(Subscriber sub);
 	}
 
-	private static class PublisherImpl implements Publisher {
+	public static class PublisherImpl implements Publisher {
 
 		private final List<Subscriber> subs = new ArrayList<>();
 
@@ -77,10 +77,10 @@ public class TestPubSubBinds {
 		}
 	}
 
-	static interface Service {
+	interface Service {
 	}
 
-	static class SomeService implements Service, Subscriber {
+	public static class SomeService implements Service, Subscriber {
 
 		boolean event;
 
@@ -91,7 +91,7 @@ public class TestPubSubBinds {
 
 	}
 
-	static class AnotherService implements Service, Subscriber {
+	public static class AnotherService implements Service, Subscriber {
 
 		boolean event;
 
@@ -101,7 +101,7 @@ public class TestPubSubBinds {
 		}
 	}
 
-	static class PredefinedService implements Service, Subscriber {
+	public static class PredefinedService implements Service, Subscriber {
 
 		boolean event;
 

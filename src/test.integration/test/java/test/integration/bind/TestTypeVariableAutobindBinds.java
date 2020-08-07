@@ -15,7 +15,7 @@ import static se.jbee.inject.lang.Type.raw;
 
 public class TestTypeVariableAutobindBinds {
 
-	static class TestTypeVariableAutobindBindsModule extends BinderModule {
+	public static class TestTypeVariableAutobindBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
@@ -30,7 +30,7 @@ public class TestTypeVariableAutobindBinds {
 		 * resolved by the {@link Injector}. If no {@link Resource} is bound to
 		 * the exact match generic {@link Resource} like this method match.
 		 */
-		<T> Function<T, String> injectsActualReturnType(
+		public <T> Function<T, String> injectsActualReturnType(
 				Type<Function<T, String>> actualReturnType) {
 			return val -> actualReturnType.toString() + ":" + val.toString();
 		}

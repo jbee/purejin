@@ -50,12 +50,12 @@ public class TestDependencyHintBinds {
 
 	}
 
-	private static class Bean {
+	public static class Bean {
 
 		final Logger logger;
 
 		@SuppressWarnings("unused")
-		Bean(Logger logger) {
+		public Bean(Logger logger) {
 			this.logger = logger;
 		}
 	}

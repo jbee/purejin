@@ -43,7 +43,7 @@ public class TestNonConcurrentVoidMultiDispatchEvents {
 		void onY(int y);
 	}
 
-	private static final class Service implements Listener {
+	public static final class Service implements Listener {
 
 		static char nextName = 'a';
 

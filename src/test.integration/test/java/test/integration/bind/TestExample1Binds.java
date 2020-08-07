@@ -7,6 +7,7 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BinderModuleWith;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.Environment;
 
 import java.util.Properties;
 
@@ -20,7 +21,7 @@ import static se.jbee.inject.lang.Type.raw;
  */
 public class TestExample1Binds {
 
-	static class MyClass {
+	public static class MyClass {
 
 		final String abc;
 		final int twelve;
@@ -60,7 +61,7 @@ public class TestExample1Binds {
 		Properties props = new Properties();
 		props.put("x", "abc");
 		props.put("y", 12);
-		Env env = Bootstrap.ENV.with(Properties.class, props);
+		Env env = Environment.DEFAULT.with(Properties.class, props);
 		Injector injector = Bootstrap.injector(env, Example1Module1.class);
 		MyClass obj = injector.resolve(MyClass.class);
 		assertEquals(12, obj.twelve);

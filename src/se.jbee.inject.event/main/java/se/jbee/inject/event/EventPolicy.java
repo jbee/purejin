@@ -5,8 +5,6 @@
  */
 package se.jbee.inject.event;
 
-import se.jbee.inject.Name;
-
 import static java.lang.Math.max;
 
 import java.io.Serializable;

@@ -22,16 +22,15 @@ import static org.junit.Assert.assertNotSame;
  */
 public class TestRobotLegsProblemBinds {
 
-	private static class Foot {
+	public static class Foot {
 		// the left and right foot
 	}
 
-	private static class Leg {
+	public static class Leg {
 
 		final Foot foot;
 
-		@SuppressWarnings("unused")
-		Leg(Foot foot) {
+		public Leg(Foot foot) {
 			this.foot = foot;
 
 		}

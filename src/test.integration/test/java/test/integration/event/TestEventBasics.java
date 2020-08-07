@@ -38,7 +38,7 @@ public class TestEventBasics {
 
 	}
 
-	private static class Service implements Handler {
+	public static class Service implements Handler {
 
 		List<String> messages = new ArrayList<>();
 

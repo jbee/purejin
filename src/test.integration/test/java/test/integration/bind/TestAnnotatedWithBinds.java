@@ -8,6 +8,7 @@ import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.Environment;
 
 import java.lang.annotation.*;
 import java.lang.reflect.AnnotatedElement;
@@ -49,7 +50,7 @@ public class TestAnnotatedWithBinds {
 	}
 
 	@MXBean
-	static class ServiceImpl implements Service {
+	public static class ServiceImpl implements Service {
 
 		final AnnotatedWith<WebService> webServices;
 		final Bean bean;
@@ -70,14 +71,14 @@ public class TestAnnotatedWithBinds {
 	}
 
 	@WebService("foo")
-	static class Bean {
+	public static class Bean {
 
 	}
 
-	static class TestAnnotatedWithBindsModule extends BinderModule {
+	public static class TestAnnotatedWithBindsModule extends BinderModule {
 
 		@Marker
-		final String fieldResource = "foo";
+		public final String fieldResource = "foo";
 
 		@Override
 		protected void declare() {
@@ -90,13 +91,13 @@ public class TestAnnotatedWithBinds {
 		}
 
 		@Marker
-		int methodResource() {
+		public int methodResource() {
 			return 42;
 		}
 	}
 
 	private final Injector injector = Bootstrap.injector(
-			Bootstrap.ENV.with(Annotated.Merge.class,
+			Environment.DEFAULT.with(Annotated.Merge.class,
 					TestAnnotatedWithBinds::advancedAnnotations),
 			TestAnnotatedWithBindsModule.class);
 

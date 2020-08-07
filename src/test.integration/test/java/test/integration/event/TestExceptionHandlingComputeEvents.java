@@ -27,7 +27,7 @@ public class TestExceptionHandlingComputeEvents {
 		boolean throwsUncheckedException();
 	}
 
-	private static final class Service implements Handler {
+	public static final class Service implements Handler {
 
 		@Override
 		public boolean throwsTimeoutException() throws TimeoutException {

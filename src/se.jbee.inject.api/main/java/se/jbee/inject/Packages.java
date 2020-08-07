@@ -149,6 +149,10 @@ public final class Packages
 		return seqCount(s, '.');
 	}
 
+	public boolean contains(Class<?> type) {
+		return contains(Type.raw(type));
+	}
+
 	public boolean contains(Type<?> type) {
 		if (includesAll())
 			return true;

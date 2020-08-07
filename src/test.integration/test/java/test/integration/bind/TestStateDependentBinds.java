@@ -31,16 +31,16 @@ import static se.jbee.inject.config.ProducesBy.allMethods;
  */
 public class TestStateDependentBinds {
 
-	private interface Validator {
+	interface Validator {
 
 		boolean valid(String input);
 	}
 
-	private enum ValidationStrength {
+	enum ValidationStrength {
 		PERMISSIVE, STRICT
 	}
 
-	private static class Permissive implements Validator {
+	public static class Permissive implements Validator {
 
 		@Override
 		public boolean valid(String input) {
@@ -49,7 +49,7 @@ public class TestStateDependentBinds {
 
 	}
 
-	private static class Strict implements Validator {
+	public static class Strict implements Validator {
 
 		@Override
 		public boolean valid(String input) {
@@ -58,7 +58,7 @@ public class TestStateDependentBinds {
 
 	}
 
-	private static class StatefulObject {
+	public static class StatefulObject {
 
 		private ValidationStrength validationStrength;
 		private Integer number;
@@ -66,7 +66,6 @@ public class TestStateDependentBinds {
 		/**
 		 * Will be detected as service method and thereby used
 		 */
-		@SuppressWarnings("unused")
 		public ValidationStrength getValidationStrength() {
 			return validationStrength;
 		}
@@ -132,13 +131,13 @@ public class TestStateDependentBinds {
 	 *
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	private static final class StateDependentSupplier<T, S>
+	public static final class StateDependentSupplier<T, S>
 			implements Supplier<T> {
 
 		private final Type<T> type;
 		private final Dependency<S> state;
 
-		StateDependentSupplier(Type<T> type, Dependency<S> state) {
+		public StateDependentSupplier(Type<T> type, Dependency<S> state) {
 			this.type = type;
 			this.state = state;
 		}

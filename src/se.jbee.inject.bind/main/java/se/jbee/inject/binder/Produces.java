@@ -7,7 +7,6 @@ package se.jbee.inject.binder;
 
 import static java.lang.reflect.Modifier.isStatic;
 import static se.jbee.inject.lang.Type.parameterType;
-import static se.jbee.inject.lang.Utils.accessible;
 
 import java.lang.reflect.Method;
 
@@ -40,7 +39,7 @@ public final class Produces<T> implements Typed<T> {
 	@SuppressWarnings("unchecked")
 	private Produces(Object owner, Method target, Hint<?>[] hints) {
 		this.returns = (Type<T>) Type.returnType(target);
-		this.target = accessible(target);
+		this.target = target;
 		this.hints = hints;
 		this.owner = owner;
 		this.isInstanceMethod = !isStatic(target.getModifiers());

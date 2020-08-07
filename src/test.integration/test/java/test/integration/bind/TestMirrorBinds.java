@@ -33,7 +33,7 @@ public class TestMirrorBinds {
 	}
 
 	@Scoped("injection")
-	private static final class InjectionScoped {
+	public static final class InjectionScoped {
 
 	}
 

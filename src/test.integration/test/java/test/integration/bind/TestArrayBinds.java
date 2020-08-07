@@ -16,7 +16,7 @@ import static test.integration.bind.AssertInjects.assertEqualSets;
  */
 public class TestArrayBinds {
 
-	static class Command {
+	public static class Command {
 
 		final Number[] preconds;
 

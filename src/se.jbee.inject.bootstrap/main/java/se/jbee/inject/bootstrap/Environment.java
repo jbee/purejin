@@ -8,10 +8,9 @@ import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import se.jbee.inject.Env;
-import se.jbee.inject.InconsistentDeclaration;
-import se.jbee.inject.Instance;
-import se.jbee.inject.Name;
+import se.jbee.inject.*;
+import se.jbee.inject.config.*;
+import se.jbee.inject.defaults.DefaultValueBinders;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.Utils;
 import se.jbee.inject.bind.InconsistentBinding;
@@ -19,6 +18,27 @@ import se.jbee.inject.bind.ModuleWith;
 import se.jbee.inject.bind.ValueBinder;
 
 public final class Environment implements Env {
+
+	public static final Environment DEFAULT = new Environment() //
+			.with(Edition.class, Edition.FULL) //
+			.withBinder(DefaultValueBinders.SUPER_TYPES) //
+			.withBinder(DefaultValueBinders.NEW) //
+			.withBinder(DefaultValueBinders.CONSTANT) //
+			.withBinder(DefaultValueBinders.PRODUCES) //
+			.withBinder(DefaultValueBinders.SHARES) //
+			.withBinder(DefaultValueBinders.INSTANCE_REF) //
+			.withBinder(DefaultValueBinders.PARAMETRIZED_REF) //
+			.withBinder(DefaultValueBinders.ARRAY) //
+			.with(ConstructsBy.class, ConstructsBy.common) //
+			.with(SharesBy.class, SharesBy.noFields) //
+			.with(ProducesBy.class, ProducesBy.noMethods) //
+			.with(NamesBy.class, NamesBy.defaultName) //
+			.with(ScopesBy.class, ScopesBy.alwaysDefault) //
+			.with(HintsBy.class, HintsBy.noParameters) //
+			.with(Annotated.Merge.class, Annotated.NO_MERGE) //
+			.with(Env.GP_USE_DEEP_REFLECTION, boolean.class, false)
+			.with(Env.GP_DEEP_REFLECTION_PACKAGES, Packages.class, Packages.ALL)
+			.readonly();
 
 	public static Environment override(Env overridden) {
 		return new Environment(false, new HashMap<>(), true, overridden);
@@ -95,7 +115,7 @@ public final class Environment implements Env {
 	}
 
 	public <T> Environment withBinder(Class<? extends ValueBinder<T>> value) {
-		return withBinder(Utils.instantiate(value,
+		return withBinder(Utils.instantiate(value, this::accessible,
 				e -> new InconsistentDeclaration("Failed to create ValueBinder of type: " + value, e)));
 	}
 

@@ -44,12 +44,12 @@ public class TestLoggerBinds {
 
 	}
 
-	private static class Foo {
+	public static class Foo {
 
 		final Logger logger;
 
 		@SuppressWarnings("unused")
-		Foo(Logger logger) {
+		public Foo(Logger logger) {
 			this.logger = logger;
 		}
 	}

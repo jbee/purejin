@@ -17,7 +17,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
 
 public class TestActionBinds {
 
-	private static class ActionBindsModule extends ActionModule {
+	public static class ActionBindsModule extends ActionModule {
 
 		@Override
 		protected void declare() {
@@ -27,7 +27,7 @@ public class TestActionBinds {
 
 	}
 
-	static class MyService {
+	public static class MyService {
 
 		public Integer negate(Number value) {
 			return -value.intValue();
@@ -38,7 +38,7 @@ public class TestActionBinds {
 		}
 	}
 
-	static class MyOtherService {
+	public static class MyOtherService {
 
 		public int mul2(int value, Action<Float, Integer> service) {
 			return value * 2 + service.run(2.8f);

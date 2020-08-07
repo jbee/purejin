@@ -5,13 +5,6 @@
  */
 package se.jbee.inject.lang;
 
-import static se.jbee.inject.lang.Utils.arrayCompare;
-import static se.jbee.inject.lang.Utils.arrayContains;
-import static se.jbee.inject.lang.Utils.arrayEquals;
-import static se.jbee.inject.lang.Utils.arrayFindFirst;
-import static se.jbee.inject.lang.Utils.arrayMap;
-import static se.jbee.inject.lang.Utils.newArray;
-
 import java.io.Serializable;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Field;

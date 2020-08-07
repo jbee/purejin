@@ -14,10 +14,10 @@ import static se.jbee.inject.Cast.listTypeOf;
 
 public class TestInitialiserGenericBinds {
 
-	static class StringList extends ArrayList<String> {
+	public static class StringList extends ArrayList<String> {
 	}
 
-	static class IntegerList extends ArrayList<Integer> {
+	public static class IntegerList extends ArrayList<Integer> {
 
 	}
 

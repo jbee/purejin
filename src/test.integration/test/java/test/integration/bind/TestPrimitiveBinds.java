@@ -33,7 +33,7 @@ public class TestPrimitiveBinds {
 
 	}
 
-	private static class PrimitiveBindsBean {
+	public static class PrimitiveBindsBean {
 
 		final int i;
 		final float f;
@@ -42,8 +42,7 @@ public class TestPrimitiveBinds {
 		final Float bigF;
 		final Boolean bigB;
 
-		@SuppressWarnings("unused")
-		PrimitiveBindsBean(int i, float f, boolean b, Integer bigI, Float bigF,
+		public PrimitiveBindsBean(int i, float f, boolean b, Integer bigI, Float bigF,
 				Boolean bigB) {
 			this.i = i;
 			this.f = f;
@@ -102,7 +101,7 @@ public class TestPrimitiveBinds {
 	 * loot of code for all the primitives for a little benefit.
 	 */
 	@Test(expected = NoResourceForDependency.class)
-	public void thatPrimitveArrayNotWorkAsWrapperArrayClasses() {
+	public void thatPrimitiveArrayNotWorkAsWrapperArrayClasses() {
 		assertArrayEquals(new int[42], injector.resolve(int[].class));
 	}
 

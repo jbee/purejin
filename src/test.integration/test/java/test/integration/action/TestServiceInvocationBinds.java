@@ -44,8 +44,7 @@ public class TestServiceInvocationBinds {
 
 	}
 
-	@SuppressWarnings("unused")
-	private static class ServiceInvocationBindsService {
+	public static class ServiceInvocationBindsService {
 
 		public int hashCode(String s) {
 			return s.hashCode();
@@ -56,7 +55,7 @@ public class TestServiceInvocationBinds {
 		}
 	}
 
-	private static class AssertInvocation implements ServiceInterceptor<Long> {
+	public static class AssertInvocation implements ServiceInterceptor<Long> {
 
 		int afterCount;
 		int beforeCount;
@@ -130,11 +129,11 @@ public class TestServiceInvocationBinds {
 		assertEquals(invocations[0].getClass(), AssertInvocation.class);
 	}
 
-	static final class InstrumentedExecutor implements Executor {
+	public static final class InstrumentedExecutor implements Executor {
 
 		private final ServiceInterceptor<?>[] invocations;
 
-		InstrumentedExecutor(ServiceInterceptor<?>[] invocations) {
+		public InstrumentedExecutor(ServiceInterceptor<?>[] invocations) {
 			this.invocations = invocations;
 		}
 

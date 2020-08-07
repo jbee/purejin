@@ -7,6 +7,7 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.binder.TogglerBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.Environment;
 
 import static test.integration.bind.AssertInjects.assertEqualSets;
 
@@ -78,7 +79,7 @@ public class TestMultipleChoicesBinds {
 
 	@Test
 	public void thatMultipleChoicesArePossible() {
-		Env env = Bootstrap.ENV.withToggled(Text.class, Text.A, Text.D);
+		Env env = Environment.DEFAULT.withToggled(Text.class, Text.A, Text.D);
 		Injector injector = Bootstrap.injector(env, RootBundle.class);
 		assertEqualSets(new String[] { "A", "D" },
 				injector.resolve(String[].class));

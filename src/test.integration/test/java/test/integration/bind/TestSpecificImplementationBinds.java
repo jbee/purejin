@@ -24,7 +24,7 @@ public class TestSpecificImplementationBinds {
 		String doIt();
 	}
 
-	static class Receiver {
+	public static class Receiver {
 
 		final Action a;
 		final Action b;
@@ -37,7 +37,7 @@ public class TestSpecificImplementationBinds {
 		}
 	}
 
-	static class ActionA implements Action {
+	public static class ActionA implements Action {
 
 		@Override
 		public String doIt() {
@@ -46,11 +46,11 @@ public class TestSpecificImplementationBinds {
 
 	}
 
-	static class GenericAction implements Action {
+	public static class GenericAction implements Action {
 
 		public final String state;
 
-		GenericAction(String state) {
+		public GenericAction(String state) {
 			this.state = state;
 		}
 

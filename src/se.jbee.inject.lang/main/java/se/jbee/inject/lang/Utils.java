@@ -28,8 +28,6 @@ import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.function.*;
 
-import se.jbee.inject.lang.Type;
-
 /**
  * Language level utility methods for the library.
  *
@@ -37,6 +35,10 @@ import se.jbee.inject.lang.Type;
  */
 @SuppressWarnings({ "squid:S1200", "squid:S1448" })
 public final class Utils {
+
+	private Utils() {
+		throw new UnsupportedOperationException("util");
+	}
 
 	/**
 	 * Function that determines of two elements of the same type are equal.
@@ -66,7 +68,7 @@ public final class Utils {
 		return copy;
 	}
 
-	public static <A> A[] arrayPrepand(A e, A[] arr) {
+	public static <A> A[] arrayPrepend(A e, A[] arr) {
 		A[] copy = newArray(arr, arr.length + 1);
 		arraycopy(arr, 0, copy, 1, arr.length);
 		copy[0] = e;
@@ -249,7 +251,8 @@ public final class Utils {
 	 * @return the given object made accessible.
 	 */
 	public static <T extends AccessibleObject> T accessible(T obj) {
-		obj.setAccessible(true);
+		/* J11: if (!obj.canAccess(null)) */
+			obj.setAccessible(true);
 		return obj;
 	}
 
@@ -429,7 +432,7 @@ public final class Utils {
 		try {
 			return target.newInstance(args);
 		} catch (Exception e) {
-			throw exceptionTransformer.apply(e);
+			throw wrap(exceptionTransformer).apply(e);
 		}
 	}
 
@@ -438,7 +441,7 @@ public final class Utils {
 		try {
 			return target.invoke(owner, args);
 		} catch (Exception e) {
-			throw exceptionTransformer.apply(e);
+			throw wrap(exceptionTransformer).apply(e);
 		}
 	}
 
@@ -447,13 +450,28 @@ public final class Utils {
 		try {
 			return target.get(owner);
 		} catch (Exception e) {
-			throw exceptionTransformer.apply(e);
+			throw wrap(exceptionTransformer).apply(e);
 		}
 	}
 
+	private static Function<Exception, ? extends RuntimeException> wrap(Function<Exception, ? extends RuntimeException> exceptionTransformer) {
+		return e -> {
+			if (e instanceof IllegalAccessException) {
+				IllegalAccessException extended = new IllegalAccessException(
+						e.getMessage() + "\n\tEither make the member accessible by making it public or switch on deep reflection by setting Env.GP_USE_DEEP_REFLECTION property to true before bootstrapping the Injector context");
+				extended.setStackTrace(e.getStackTrace());
+				extended.initCause(e.getCause());
+				e = extended;
+			}
+			return exceptionTransformer.apply(e);
+		};
+	}
+
 	public static <T> T instantiate(Class<T> type,
+			Consumer<Constructor> init,
 			Function<Exception, ? extends RuntimeException> exceptionTransformer) {
-		return construct(accessible(noArgsConstructor(type)), new Object[0],
-				exceptionTransformer);
+		Constructor<T> target = noArgsConstructor(type);
+		init.accept(target);
+		return construct(target, new Object[0], exceptionTransformer);
 	}
 }

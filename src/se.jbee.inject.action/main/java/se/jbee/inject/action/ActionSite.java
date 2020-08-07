@@ -1,7 +1,5 @@
 package se.jbee.inject.action;
 
-import static se.jbee.inject.lang.Utils.accessible;
-
 import java.lang.reflect.Method;
 
 import se.jbee.inject.lang.Type;
@@ -31,7 +29,7 @@ public final class ActionSite<I, O> {
 	public ActionSite(Object owner, Method action, Type<I> input,
 			Type<O> output) {
 		this.owner = owner;
-		this.action = accessible(action);
+		this.action = action;
 		this.input = input;
 		this.output = output;
 	}

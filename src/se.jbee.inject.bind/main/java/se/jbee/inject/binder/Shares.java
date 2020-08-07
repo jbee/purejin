@@ -2,7 +2,6 @@ package se.jbee.inject.binder;
 
 import static java.lang.reflect.Modifier.isStatic;
 import static se.jbee.inject.lang.Type.fieldType;
-import static se.jbee.inject.lang.Utils.accessible;
 
 import java.lang.reflect.Field;
 
@@ -34,7 +33,7 @@ public final class Shares<T> implements Typed<T> {
 	private Shares(Object owner, Field target) {
 		this.isInstanceField = !isStatic(target.getModifiers());
 		this.owner = isInstanceField ? owner : null;
-		this.target = accessible(target);
+		this.target = target;
 		this.type = (Type<T>) fieldType(target);
 	}
 

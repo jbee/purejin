@@ -26,20 +26,20 @@ public class TestIssue1 {
 
 	}
 
-	static class B implements A {
+	public static class B implements A {
 
 		final A[] as;
 
-		B(A[] as) {
+		public B(A[] as) {
 			this.as = as;
 		}
 	}
 
-	static class C implements A {
+	public static class C implements A {
 
 	}
 
-	static class D implements A {
+	public static class D implements A {
 
 	}
 

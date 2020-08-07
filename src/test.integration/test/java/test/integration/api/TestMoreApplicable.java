@@ -58,7 +58,7 @@ public class TestMoreApplicable {
 		HigherNumberIsMoreApplicable[] values = new HigherNumberIsMoreApplicable[] {
 				hip(1), hip(2) };
 		Arrays.sort(values, comparator(HigherNumberIsMoreApplicable.class));
-		assertTrue(values[0].value == 2);
+		assertEquals(2, values[0].value);
 	}
 
 	@Test

@@ -23,30 +23,30 @@ import static org.junit.Assert.assertNotNull;
  */
 public class TestPostConstructObserverBinds {
 
-	static class A {
+	public static class A {
 
 		B b;
 
-		A(B b) {
+		public A(B b) {
 			this.b = b;
 		}
 
 	}
 
-	static class B {
+	public static class B {
 
 		C c;
 
-		B(C c) {
+		public B(C c) {
 			this.c = c;
 		}
 	}
 
-	static class C {
+	public static class C {
 
 	}
 
-	static class CreationObserver implements PostConstructObserver {
+	public static class CreationObserver implements PostConstructObserver {
 
 		final List<Object> created = new ArrayList<>();
 

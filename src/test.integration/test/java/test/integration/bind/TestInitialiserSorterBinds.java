@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestInitialiserSorterBinds {
 
-	static final class Bean {
+	public static final class Bean {
 
 		List<String> names = new ArrayList<>();
 	}
@@ -53,7 +53,7 @@ public class TestInitialiserSorterBinds {
 
 	}
 
-	static final class InitA implements Initialiser<Bean> {
+	public static final class InitA implements Initialiser<Bean> {
 
 		@Override
 		public Bean init(Bean bean, Injector context) {
@@ -63,7 +63,7 @@ public class TestInitialiserSorterBinds {
 
 	}
 
-	static final class InitB implements Initialiser<Bean> {
+	public static final class InitB implements Initialiser<Bean> {
 
 		@Override
 		public Bean init(Bean bean, Injector context) {

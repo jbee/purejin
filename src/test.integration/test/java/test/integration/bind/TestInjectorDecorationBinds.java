@@ -16,11 +16,11 @@ import static se.jbee.inject.Name.named;
  */
 public class TestInjectorDecorationBinds {
 
-	static class DecoratingInjector implements Injector, Initialiser<Injector> {
+	public static class DecoratingInjector implements Injector, Initialiser<Injector> {
 
 		private final Injector decorated;
 
-		DecoratingInjector(Injector decorated) {
+		public DecoratingInjector(Injector decorated) {
 			this.decorated = decorated;
 		}
 
@@ -39,9 +39,9 @@ public class TestInjectorDecorationBinds {
 
 	}
 
-	static class Bean {
+	public static class Bean {
 
-		Bean(Injector injector) {
+		public Bean(Injector injector) {
 			assertSame(DecoratingInjector.class, injector.getClass());
 		}
 	}
