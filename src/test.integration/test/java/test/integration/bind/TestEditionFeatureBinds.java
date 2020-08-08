@@ -3,7 +3,7 @@ package test.integration.bind;
 import org.junit.Test;
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
-import se.jbee.inject.bind.Bootstrapper.Toggler;
+import se.jbee.inject.bind.Bootstrapper;
 import se.jbee.inject.bind.Toggled;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
@@ -92,7 +92,7 @@ public class TestEditionFeatureBinds {
 
 		@Override
 		public void bootstrap(
-				Toggler<FeaturedOptionBundle> bootstrapper) {
+				Bootstrapper.ToggledBootstrapper<FeaturedOptionBundle> bootstrapper) {
 			bootstrapper.install(AnotherModule.class, QUX);
 		}
 

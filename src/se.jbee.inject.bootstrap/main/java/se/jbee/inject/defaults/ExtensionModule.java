@@ -16,7 +16,7 @@ import se.jbee.inject.config.Extension;
  * {@link Extension} should they not be bound otherwise.
  *
  * This is the basis of the {@link Extension} functionality where any type
- * implementing the abstraction is constructed by the {@link Supplier}.
+ * implementing the abstraction is constructed by that {@link Supplier}.
  *
  * The created instance is an effective singleton per type, so there will be one
  * instance for each {@link Extension} implementation class.

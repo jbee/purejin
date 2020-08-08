@@ -17,8 +17,18 @@ import se.jbee.inject.bind.InconsistentBinding;
 import se.jbee.inject.bind.ModuleWith;
 import se.jbee.inject.bind.ValueBinder;
 
+/**
+ * The {@link Environment} is the map based implementation of an {@link Env}
+ * that mainly exists to solve the hen-egg situation that originates from {@link
+ * Env} at times themselves being bootstrapped on the basis of an {@link Env}.
+ */
 public final class Environment implements Env {
 
+	/**
+	 * The most basic {@link Env} that is used by default to bootstrap {@link
+	 * Injector} contexts from root {@link se.jbee.inject.bind.Bundle} (s) or
+	 * even a bootstrapped {@link Env} itself.
+	 */
 	public static final Environment DEFAULT = new Environment() //
 			.with(Edition.class, Edition.FULL) //
 			.withBinder(DefaultValueBinders.SUPER_TYPES) //
