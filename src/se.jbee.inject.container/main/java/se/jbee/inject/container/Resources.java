@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -44,10 +43,11 @@ import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
  *
  * @since 19.1
  */
-final class Resources implements Iterable<Resource<?>[]> {
+final class Resources {
 
 	private final int resourceCount;
 	private final Map<Class<?>, Resource<?>[]> resourcesByType;
+	private final Resource<?>[] resources;
 	private final Resource<?>[] genericResources;
 
 	/**
@@ -68,13 +68,9 @@ final class Resources implements Iterable<Resource<?>[]> {
 	Resources(ResourceLink link, Function<Name, Scope> scopes,
 			ResourceDescriptor<?>... descriptors) {
 		this.resourceCount = descriptors.length;
-		this.resourcesByType = createResources(link, scopes, descriptors);
+		this.resources = createResources(link, scopes, descriptors);
+		this.resourcesByType = createResourcesByRawType(resources);
 		this.genericResources = selectGenericResources(resourcesByType);
-	}
-
-	@Override
-	public Iterator<Resource<?>[]> iterator() {
-		return resourcesByType.values().iterator();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -113,9 +109,8 @@ final class Resources implements Iterable<Resource<?>[]> {
 	}
 
 	public void initEager() {
-		for (Resource<?>[] sameType : this)
-			for (Resource<?> eager : sameType)
-				eager.init();
+		for (Resource<?> eager : resources)
+			eager.init();
 	}
 
 	private static Resource<?>[] selectGenericResources(
@@ -131,20 +126,20 @@ final class Resources implements Iterable<Resource<?>[]> {
 		return res.isEmpty() ? null : res.toArray(new Resource[0]);
 	}
 
-	private Map<Class<?>, Resource<?>[]> createResources(ResourceLink link,
+	private Resource<?>[] createResources(ResourceLink link,
 			Function<Name, Scope> scopes, ResourceDescriptor<?>[] descriptors) {
 		Resource<?>[] res = new Resource<?>[descriptors.length];
 
 		Map<Name, Resource<ScopePermanence>> permanenceResourceByScope = new HashMap<>();
 		Map<Name, ScopePermanence> permanenceByScope = new HashMap<>();
-		Injector bootrsappingContext = createBootstrappingContext(
+		Injector bootstrappingContext = createBootstrappingContext(
 				permanenceResourceByScope, permanenceByScope);
 		// create ScopePermanence resources
 		for (int i = 0; i < descriptors.length; i++) {
 			ResourceDescriptor<?> descriptor = descriptors[i];
 			if (descriptor.signature.type().rawType == ScopePermanence.class) {
 				Resource<?> r = createScopePermanenceResource(i, descriptor,
-						bootrsappingContext);
+						bootstrappingContext);
 				res[i] = r;
 				@SuppressWarnings("unchecked")
 				Resource<ScopePermanence> r2 = (Resource<ScopePermanence>) r;
@@ -164,8 +159,7 @@ final class Resources implements Iterable<Resource<?>[]> {
 			if (res[i] == null)
 				res[i] = createResource(link, scopes, i, descriptors[i],
 						permanenceByScope);
-			//TODO make a special resource for all resources
-		return createResourcesByRawType(res);
+		return res;
 	}
 
 	private static Injector createBootstrappingContext(
@@ -235,24 +229,25 @@ final class Resources implements Iterable<Resource<?>[]> {
 			throw new InconsistentDeclaration("Scope `" + descriptor.scope
 				+ "` is used but not defined for: " + descriptor);
 		return new Resource<>(serialID, descriptor.source, scoping,
-				descriptor.signature, generatorFactory, descriptor.annotations);
+				descriptor.signature, descriptor.annotations,
+				descriptor.verifier, generatorFactory);
 	}
 
 	private static <T> Resource<T> createScopePermanenceResource(int serialID,
 			ResourceDescriptor<T> descriptor, Injector bootstrappingContext) {
 		return new Resource<>(serialID, descriptor.source,
 				ScopePermanence.container, descriptor.signature,
-				resource -> (dependency -> descriptor.supplier.supply(
-						dependency, bootstrappingContext)),
-				descriptor.annotations);
+				descriptor.annotations, descriptor.verifier,
+					resource -> (dependency ->	descriptor.supplier
+							.supply(dependency, bootstrappingContext)));
 	}
 
 	@SuppressWarnings("unchecked")
 	private <T> Generator<T> createGenerator(ResourceLink link,
 			Function<Name, Scope> scopes, Resource<T> resource,
 			Supplier<? extends T> supplier) {
-		if (Generator.class.isAssignableFrom(supplier.getClass()))
-			return (Generator<T>) supplier;
+		if (supplier.isGenerator())
+			return (Generator<T>) supplier.asGenerator();
 		Name scope = resource.permanence.scope;
 		Generator<T> inContext = dep -> link.supplyInContext(dep, supplier,
 				resource);
@@ -264,6 +259,11 @@ final class Resources implements Iterable<Resource<?>[]> {
 		// default is a scoped generator...
 		return new LazyScopedGenerator<>(inContext, resource, resourceCount,
 				() -> scopes.apply(resource.permanence.scope));
+	}
+
+	public void verifyIn(Injector context) {
+		for (Resource<?> r : resources)
+			r.verifier.verifyIn(context);
 	}
 
 	/**

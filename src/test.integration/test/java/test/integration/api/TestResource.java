@@ -31,7 +31,8 @@ public class TestResource {
 	private Resource<?> createResourceOf(int serialID, Type<?> type) {
 		Source source = Source.source(getClass());
 		return new Resource<>(serialID, source, ScopePermanence.ignore,
-				new Locator<>(Instance.anyOf(type)), resource -> (dep -> null),
-				Annotated.WITH_NO_ANNOTATIONS);
+				new Locator<>(Instance.anyOf(type)),
+				Annotated.WITH_NO_ANNOTATIONS, Verifier.AOK,
+				resource -> (dep -> null));
 	}
 }

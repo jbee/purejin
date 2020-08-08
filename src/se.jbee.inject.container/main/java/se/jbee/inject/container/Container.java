@@ -66,6 +66,7 @@ public final class Container implements Injector, Env {
 				resolve(resourcesTypeFor(initialiserTypeOf(Type.WILDCARD))));
 		this.postConstructObserver = resolvePostConstructObserver();
 		this.decorated = postConstruct.postConstruct(this);
+		resources.verifyIn(this);
 		resources.initEager();
 	}
 

@@ -18,9 +18,9 @@ import java.util.function.Function;
 import java.util.logging.Logger;
 
 import se.jbee.inject.*;
+import se.jbee.inject.bind.Bootstrapper;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.bind.Toggled;
-import se.jbee.inject.bind.Bootstrapper.Toggler;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Supply;
 import se.jbee.inject.config.Extension;
@@ -95,7 +95,8 @@ public enum CoreFeature implements Toggled<CoreFeature> {
 	}
 
 	@Override
-	public void bootstrap(Toggler<CoreFeature> bootstrapper) {
+	public void bootstrap(
+			Bootstrapper.ToggledBootstrapper<CoreFeature> bootstrapper) {
 		bootstrapper.install(ListBridgeModule.class, LIST);
 		bootstrapper.install(SetBridgeModule.class, SET);
 		bootstrapper.install(CollectionBridgeModule.class, COLLECTION);

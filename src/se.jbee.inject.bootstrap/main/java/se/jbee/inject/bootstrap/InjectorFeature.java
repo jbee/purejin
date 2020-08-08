@@ -25,17 +25,11 @@ public enum InjectorFeature implements Toggled<InjectorFeature> {
 	 */
 	SUB_CONTEXT_FUNCTION,
 
-	/**
-	 * Binds a {@link Function} that given an {@link Instance} resolves it in
-	 * the {@link Injector} context. This is just an indirect way to call {@link
-	 * Injector#resolve(Instance)} without becoming directly dependent on the
-	 * {@link Injector} abstraction.
-	 */
-	INSTANCE_RESOLVE_FUNCTION,
 	;
 
 	@Override
-	public void bootstrap(Bootstrapper.Toggler<InjectorFeature> bootstrapper) {
+	public void bootstrap(
+			Bootstrapper.ToggledBootstrapper<InjectorFeature> bootstrapper) {
 		bootstrapper.install(SubContextFunction.class, SUB_CONTEXT_FUNCTION);
 	}
 
@@ -54,19 +48,4 @@ public enum InjectorFeature implements Toggled<InjectorFeature> {
 		}
 	}
 
-	static final class ResolveInstanceFunction extends BinderModule {
-
-		@Override
-		protected void declare() {
-			asDefault().bind(functionTypeOf(Instance.class, Object.class)) //
-					.toSupplier(ResolveInstanceFunction::resolveInstance);
-		}
-
-		@SuppressWarnings("rawtypes")
-		private static Function<Instance, Object> resolveInstance(
-				Dependency<? super Function<Instance, Object>> dep,
-				Injector context) {
-			return context::resolve;
-		}
-	}
 }

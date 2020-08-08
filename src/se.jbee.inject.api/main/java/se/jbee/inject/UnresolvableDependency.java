@@ -66,9 +66,9 @@ public abstract class UnresolvableDependency extends RuntimeException {
 			extends UnresolvableDependency {
 
 		public UnstableDependency(Injection parent, Injection injection) {
-			super("Unstable dependency injection\n\tof: " + injection.target
-				+ " " + injection.permanence + "\n\tinto: " + parent.target + " "
-				+ parent.permanence);
+			super("Unstable dependency injection" +
+					"\n\t  of: " + injection.target + " scoped " + injection.permanence +
+					"\n\tinto: " + parent.target + " scoped " + parent.permanence);
 		}
 
 	}
@@ -99,8 +99,8 @@ public abstract class UnresolvableDependency extends RuntimeException {
 			return "none";
 		StringBuilder b = new StringBuilder();
 		for (Resource<?> rx : rs)
-			b.append("\n    ").append(rx.signature.toString()).append(
-					" defined ").append(rx.source);
+			b.append("\n\t- ").append(rx.signature.toString()).append(
+					" from ").append(rx.source);
 		return b.toString();
 	}
 

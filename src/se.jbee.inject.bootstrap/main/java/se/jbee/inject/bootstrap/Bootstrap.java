@@ -110,8 +110,7 @@ public final class Bootstrap {
 		@Override
 		public void installDefaults() {
 			install(DefaultsBundle.class);
-			install(InjectorFeature.SUB_CONTEXT_FUNCTION,
-					InjectorFeature.INSTANCE_RESOLVE_FUNCTION);
+			install(InjectorFeature.SUB_CONTEXT_FUNCTION);
 		}
 
 		@Override
@@ -150,7 +149,7 @@ public final class Bootstrap {
 				return;
 			createBundle(bundle).bootstrap((bundleForFlag, flag) -> {
 				// NB: null is a valid value to define what happens when no configuration is present
-				if (env.toggled(flags, flag, bundleForFlag.getPackage())) {
+				if (env.toggled(flags, flag)) {
 					BuiltinBootstrapper.this.install(bundleForFlag);
 				}
 			});
@@ -190,8 +189,8 @@ public final class Bootstrap {
 			if (uninstalled.contains(bundle)
 				|| !edition.featured(module.getClass()))
 				return;
-			bundleModules.computeIfAbsent(bundle, key -> new ArrayList<>()).add(
-					module);
+			bundleModules.computeIfAbsent(bundle, //
+					key -> new ArrayList<>()).add(module);
 		}
 
 		@Override

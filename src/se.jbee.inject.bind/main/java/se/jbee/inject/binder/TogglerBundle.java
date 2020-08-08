@@ -5,11 +5,12 @@
  */
 package se.jbee.inject.binder;
 
+import se.jbee.inject.bind.Bootstrapper;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.bind.InconsistentBinding;
 import se.jbee.inject.bind.Toggled;
-import se.jbee.inject.bind.Bootstrapper.Toggler;
+import se.jbee.inject.bind.Bootstrapper.ToggledBootstrapper;
 
 /**
  * The default utility base class for {@link Toggled}s.
@@ -18,12 +19,13 @@ import se.jbee.inject.bind.Bootstrapper.Toggler;
  *
  * @param <C> the type of the options values (usually an enum)
  */
-public abstract class TogglerBundle<C> implements Toggled<C>, Toggler<C> {
+public abstract class TogglerBundle<C> implements Toggled<C>,
+		ToggledBootstrapper<C> {
 
-	private Toggler<C> bootstrapper;
+	private Bootstrapper.ToggledBootstrapper<C> bootstrapper;
 
 	@Override
-	public void bootstrap(Toggler<C> bs) {
+	public void bootstrap(Bootstrapper.ToggledBootstrapper<C> bs) {
 		InconsistentBinding.nonnullThrowsReentranceException(bootstrapper);
 		this.bootstrapper = bs;
 		bootstrap();

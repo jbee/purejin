@@ -31,8 +31,8 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 	public final Locator<T> signature;
 
 	/**
-	 * The {@link Source} that {@link Injection} had been created from (e.g. did
-	 * define the bind).
+	 * The {@link Source} that that defined the binding which corresponds to
+	 * this {@link Resource}).
 	 */
 	public final Source source;
 
@@ -49,16 +49,29 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 	 */
 	public final int serialID;
 
+	/**
+	 * Access to the annotations that should be considered in connection with
+	 * this {@link Resource}. For example the annotation of the {@link
+	 * java.lang.reflect.Constructor} that internally is used to create a
+	 * instance.
+	 */
 	public final Annotated annotations;
 
+	/**
+	 * An optional verification check for this {@link Resource} executed at the
+	 * end of the bootstrapping phase.
+	 */
+	public final Verifier verifier;
+
 	public Resource(int serialID, Source source, ScopePermanence permanence,
-			Locator<T> signature, Function<Resource<T>, Generator<T>> generator,
-			Annotated annotations) {
+			Locator<T> signature, Annotated annotations, Verifier verifier,
+			Function<Resource<T>, Generator<T>> generator) {
 		this.signature = signature;
 		this.source = source;
 		this.permanence = permanence;
 		this.serialID = serialID;
 		this.annotations = annotations;
+		this.verifier = verifier;
 		//OBS! must be last
 		this.generator = generator.apply(this);
 	}
@@ -72,6 +85,9 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 		return generate(signature.toDependency());
 	}
 
+	/**
+	 * Called during bootstrapping to initialise eager {@link Resource}s.
+	 */
 	public void init() {
 		if (permanence.isEager())
 			generate();

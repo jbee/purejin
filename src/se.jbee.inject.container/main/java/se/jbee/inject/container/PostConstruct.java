@@ -109,13 +109,6 @@ public final class PostConstruct {
 
 	private static <T, I extends Initialiser<?>> boolean matchesInitFilter(
 			I instance, Class<T> actualType) {
-		if (instance instanceof Predicate
-			&& Type.classType(instance.getClass()).isAssignableTo(
-					raw(Predicate.class).parametized(Class.class))) {
-			@SuppressWarnings("unchecked")
-			Predicate<Class<?>> filter = (Predicate<Class<?>>) instance;
-			return filter.test(actualType);
-		}
-		return true; // does not have a filter so it matches
+		return !instance.isFiltered() || instance.asFilter().test(actualType);
 	}
 }

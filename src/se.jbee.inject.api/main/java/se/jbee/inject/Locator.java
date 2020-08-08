@@ -119,7 +119,7 @@ public final class Locator<T> implements Typed<T>, Qualifying<Locator<?>>,
 
 	@Override
 	public String toString() {
-		return instance + " " + target;
+		return instance + "" + target;
 	}
 
 	@Override

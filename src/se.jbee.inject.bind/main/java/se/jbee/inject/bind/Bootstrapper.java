@@ -85,11 +85,11 @@ public interface Bootstrapper {
 	 *            {@link Toggled}
 	 */
 	@FunctionalInterface
-	interface Toggler<F> {
+	interface ToggledBootstrapper<F> {
 
 		/**
 		 * Installs the {@link Bundle} when the given flag is
-		 * {@link Env#toggled(Class, Enum, Package)}. The set of toggled flags
+		 * {@link Env#toggled(Class, Enum)}. The set of toggled flags
 		 * is always constant during the bootstrapping process.
 		 *
 		 * If the flag isn't toggled the this call has no effect. No
