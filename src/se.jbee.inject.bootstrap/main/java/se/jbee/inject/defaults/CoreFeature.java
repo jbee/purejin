@@ -6,14 +6,12 @@
 package se.jbee.inject.defaults;
 
 import static se.jbee.inject.Cast.functionTypeOf;
+import static se.jbee.inject.Cast.resourcesTypeFor;
 import static se.jbee.inject.Scope.application;
 import static se.jbee.inject.lang.Type.raw;
 
 import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
@@ -25,7 +23,9 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Supply;
 import se.jbee.inject.config.Extension;
 import se.jbee.inject.config.Plugins;
+import se.jbee.inject.container.Lazy;
 import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.Utils;
 
 /**
  * Installs all the build-in functionality by using the core API.
@@ -86,7 +86,13 @@ public enum CoreFeature implements Toggled<CoreFeature> {
 	/**
 	 * Adds: {@link AnnotatedWith} via {@link AnnotatedWithModule}.
 	 */
-	ANNOTATED_WITH(true);
+	ANNOTATED_WITH(true),
+	/**
+	 * Adds: {@link Obtainable}s
+	 */
+	OBTAINABLE(true)
+
+	;
 
 	public final boolean installedByDefault;
 
@@ -109,6 +115,7 @@ public enum CoreFeature implements Toggled<CoreFeature> {
 		bootstrapper.install(ExtensionModule.class, EXTENSION);
 		bootstrapper.install(PrimitiveArraysModule.class, PRIMITIVE_ARRAYS);
 		bootstrapper.install(AnnotatedWithModule.class, ANNOTATED_WITH);
+		bootstrapper.install(ObtainableModule.class, OBTAINABLE);
 	}
 
 	private static class LoggerModule extends BinderModule {
@@ -176,14 +183,17 @@ public enum CoreFeature implements Toggled<CoreFeature> {
 			asDefault() //
 					.per(Scope.dependency) //
 					.starbind(Optional.class) //
-					.toSupplier((dep, context) -> {
-						try {
-							return Optional.ofNullable(
-									context.resolve(dep.onTypeParameter()));
-						} catch (UnresolvableDependency e) {
-							return Optional.empty();
-						}
-					});
+					.toSupplier((dep, context) -> optional(dep, context));
+		}
+
+		@SuppressWarnings("unchecked")
+		<T> Optional<T> optional(Dependency<? super Optional<T>> dep, Injector context) {
+			try {
+				return Optional.ofNullable(
+						(T) context.resolve(dep.onTypeParameter().uninject()));
+			} catch (UnresolvableDependency e) {
+				return Optional.empty();
+			}
 		}
 	}
 
@@ -222,6 +232,95 @@ public enum CoreFeature implements Toggled<CoreFeature> {
 					"Empty SubContext Injector", dep);
 		}
 
+	}
+
+	private static final class ObtainableModule extends BinderModule {
+
+		@Override
+		protected void declare() {
+			asDefault() //
+					.per(Scope.dependency) //
+					.starbind(Obtainable.class) //
+					.toSupplier((dep, context) -> obtain(dep, context));
+		}
+
+		@SuppressWarnings("unchecked")
+		<T, E> Obtainable<T> obtain(Dependency<? super Obtainable<T>> dep, Injector context) {
+			Dependency<T> targetDep = (Dependency<T>) dep.onTypeParameter().uninject();
+			Type<T> targetType = targetDep.type();
+			if (targetType.arrayDimensions() == 1) {
+				Dependency<E> elementDep = (Dependency<E>) dep.typed(targetType.baseType());
+				return new ObtainableCollection<>(context, elementDep);
+			}
+			return new ObtainableInstance<>(() -> context.resolve(targetDep));
+		}
+
+		static final class ObtainableCollection<T, E> implements Obtainable<T> {
+
+			private final Injector context;
+			private final Dependency<E> dep;
+			private final Lazy<T> value = new Lazy<>();
+
+			ObtainableCollection(Injector context, Dependency<E> dep) {
+				this.context = context;
+				this.dep = dep;
+			}
+
+			@SuppressWarnings("unchecked")
+			private T resolve() {
+				Resource<E>[] resources = context.resolve(
+						dep.typed(resourcesTypeFor(dep.type())));
+				List<E> elements = new ArrayList<>();
+				for (Resource<E> r : resources) {
+					try {
+						elements.add(r.generate(dep));
+					} catch (UnresolvableDependency e) {
+						// ignored
+					}
+				}
+				return (T) Utils.arrayOf(elements, dep.type().rawType);
+			}
+
+			@Override
+			public T obtain() {
+				return value.get(this::resolve);
+			}
+		}
+
+		static final class ObtainableInstance<T> implements Obtainable<T> {
+
+			private final Provider<T> resolver;
+			private final Lazy<T> value = new Lazy<>();
+			private UnresolvableDependency caught;
+
+			ObtainableInstance(Provider<T> resolver) {
+				this.resolver = resolver;
+			}
+
+			private T resolve() {
+				try {
+					return resolver.provide();
+				} catch (UnresolvableDependency e) {
+					caught = e;
+					return null;
+				}
+			}
+
+			@Override
+			public T obtain() {
+				return value.get(this::resolve);
+			}
+
+			@Override
+			public <X extends Exception> T orElseThrow(
+					Function<UnresolvableDependency, ? extends X> exceptionTransformer)
+					throws X {
+				T res = obtain();
+				if (res != null)
+					return res;
+				throw exceptionTransformer.apply(caught);
+			}
+		}
 	}
 
 	private static final class DefaultEnvModule extends BinderModule {

@@ -21,11 +21,11 @@ import se.jbee.inject.Provider;
  */
 public final class Lazy<V> extends AtomicReference<V> {
 
-	private final AtomicBoolean uninitialised = new AtomicBoolean();
+	private final AtomicBoolean initialised = new AtomicBoolean();
 
 	public V get(Provider<V> initialValue) {
 		V value;
-		if (uninitialised.compareAndSet(false, true)) {
+		if (initialised.compareAndSet(false, true)) {
 			value = initialValue.provide();
 			set(value);
 		} else {
@@ -35,5 +35,9 @@ public final class Lazy<V> extends AtomicReference<V> {
 			} while (value == null);
 		}
 		return value;
+	}
+
+	public boolean isInitialised() {
+		return initialised.get();
 	}
 }
