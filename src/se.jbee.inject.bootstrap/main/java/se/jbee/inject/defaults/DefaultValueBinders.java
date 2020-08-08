@@ -119,7 +119,8 @@ public final class DefaultValueBinders {
 		@Override
 		public <T> Binding<T> complete(Env env, Binding<T> item, New<?> src) {
 			env.accessible(src.target);
-			return item.complete(CONSTRUCTOR, byNew(src.typed(item.type())));
+			return item.complete(CONSTRUCTOR, byNew(src.typed(item.type())))
+					.verifiedBy(env.verifierFor(src));
 		}
 	}
 
@@ -129,7 +130,8 @@ public final class DefaultValueBinders {
 		@Override
 		public <T> Binding<T> complete(Env env, Binding<T> item, Produces<?> src) {
 			env.accessible(src.target);
-			return item.complete(METHOD, byProducer(src.typed(item.type())));
+			return item.complete(METHOD, byProducer(src.typed(item.type())))
+					.verifiedBy(env.verifierFor(src));
 		}
 	}
 
@@ -139,7 +141,8 @@ public final class DefaultValueBinders {
 		@Override
 		public <T> Binding<T> complete(Env env, Binding<T> item, Shares<?> src) {
 			env.accessible(src.target);
-			return item.complete(FIELD, byAccess(src.typed(item.type())));
+			return item.complete(FIELD, byAccess(src.typed(item.type())))
+					.verifiedBy(env.verifierFor(src));
 		}
 
 	}

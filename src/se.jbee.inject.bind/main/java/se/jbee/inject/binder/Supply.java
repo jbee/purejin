@@ -95,9 +95,9 @@ public final class Supply {
 			Instance<T> instance) {
 		return (dep, context) -> {
 			Type<? super T> type = dep.type();
-			Instance<? extends T> parametrized = instance.typed(
-					instance.type().parametized(type.parameters()).upperBound(
-							dep.type().isUpperBound()));
+			Instance<? extends T> parametrized = instance.typed(instance.type() //
+							.parametized(type.parameters()) //
+							.upperBound(dep.type().isUpperBound()));
 			return context.resolve(dep.instanced(parametrized));
 		};
 	}
@@ -125,6 +125,12 @@ public final class Supply {
 		return new Access<>(constant);
 	}
 
+	/**
+	 * This effectively avoid redoing {@link Resource} resolution for each
+	 * invocation. Instead the {@link Resource} is resolved once and
+	 * continiously used from there on to {@link Resource#generate(Dependency)}
+	 * the values.
+	 */
 	public static <T> Provider<T> byLazyProvider(Dependency<T> dep,
 			Injector injector) {
 		if (dep.type().arrayDimensions() == 1)

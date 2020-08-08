@@ -142,9 +142,9 @@ public class TestProviderBinds {
 			injector.resolve(FaultyStateConsumer.class);
 			fail("expected " + UnstableDependency.class.getSimpleName());
 		} catch (UnstableDependency e) {
-			assertEquals("Unstable dependency injection\n"
-				+ "	of: test.integration.bind.TestProviderBinds.DynamicState  {* => *, [*] } injection\n"
-				+ "	into: test.integration.bind.TestProviderBinds.FaultyStateConsumer  {* => *, [*] } application",
+			assertEquals("Unstable dependency injection" +
+							"\n" + "\t  of: test.integration.bind.TestProviderBinds.DynamicState  in * into * => *  scoped injection" +
+							"\n" + "\tinto: test.integration.bind.TestProviderBinds.FaultyStateConsumer  in * into * => *  scoped application",
 					e.getMessage());
 		}
 	}

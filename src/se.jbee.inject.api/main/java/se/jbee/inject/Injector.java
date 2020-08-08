@@ -87,7 +87,7 @@ public interface Injector {
 	@SuppressWarnings("unchecked")
 	default List<AnnotatedWith.AnnotatedInstance<?>> annotatedWith(
 			Class<? extends Annotation> annotationType) {
-		return resolve(raw(AnnotatedWith.class).parametized(
-				annotationType)).instances();
+		return resolve(raw(AnnotatedWith.class) //
+				.parametized(annotationType)).instances();
 	}
 }

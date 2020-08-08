@@ -5,6 +5,7 @@ import se.jbee.inject.lang.Utils;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Member;
+import java.util.function.Function;
 
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.lang.Type.raw;
@@ -24,6 +25,8 @@ public interface Env {
 	 */
 	String GP_DEEP_REFLECTION_PACKAGES = "deep-reflection-packages";
 
+	String GP_USE_VERIFICATION = "verify";
+
 	<T> T property(Name name, Type<T> property, Package scope)
 			throws InconsistentDeclaration;
 
@@ -37,9 +40,17 @@ public interface Env {
 		return property(Name.DEFAULT, property, scope);
 	}
 
+	default <T> T globalProperty(Type<T> property, T defaultValue) {
+		return globalProperty(Name.DEFAULT.value, property, defaultValue);
+	}
+
 	default boolean globalProperty(String name, boolean defaultValue) {
+		return globalProperty(name, raw(boolean.class), defaultValue);
+	}
+
+	default <T> T globalProperty(String name, Type<T> property, T defaultValue) {
 		try {
-			return globalProperty(name, raw(boolean.class));
+			return globalProperty(name, property);
 		} catch (InconsistentDeclaration e) {
 			return defaultValue;
 		}
@@ -77,5 +88,14 @@ public interface Env {
 			if (where.contains(target.getDeclaringClass()))
 				Utils.accessible(target);
 		}
+	}
+
+	default <T> Verifier verifierFor(T target) {
+		if (!globalProperty(Env.GP_USE_VERIFICATION, false))
+			return Verifier.AOK;
+		Class<T> targetClass = (Class<T>) target.getClass();
+		Function<T, Verifier> factory = globalProperty(Cast.functionTypeOf(
+				targetClass, Verifier.class), null);
+		return factory == null ? Verifier.AOK : factory.apply(target);
 	}
 }

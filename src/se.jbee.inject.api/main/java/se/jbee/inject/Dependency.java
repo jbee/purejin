@@ -5,25 +5,20 @@
  */
 package se.jbee.inject;
 
-import static java.util.Arrays.asList;
-import static se.jbee.inject.Instance.defaultInstanceOf;
-import static se.jbee.inject.Packages.packageAndSubPackagesOf;
-import static se.jbee.inject.lang.Type.raw;
-import static se.jbee.inject.lang.Utils.arrayAppend;
-import static se.jbee.inject.lang.Utils.arrayContains;
-import static se.jbee.inject.lang.Utils.arrayDropTail;
-import static se.jbee.inject.lang.Utils.arrayEquals;
-import static se.jbee.inject.lang.Utils.arrayFindFirst;
-import static se.jbee.inject.lang.Utils.arrayMap;
+import se.jbee.inject.UnresolvableDependency.DependencyCycle;
+import se.jbee.inject.UnresolvableDependency.UnstableDependency;
+import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.Typed;
 
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import se.jbee.inject.UnresolvableDependency.DependencyCycle;
-import se.jbee.inject.UnresolvableDependency.UnstableDependency;
-import se.jbee.inject.lang.Type;
-import se.jbee.inject.lang.Typed;
+import static java.util.Arrays.asList;
+import static se.jbee.inject.Instance.defaultInstanceOf;
+import static se.jbee.inject.Packages.packageAndSubPackagesOf;
+import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.inject.lang.Utils.*;
 
 /**
  * Describes what is wanted/needed as parameter to construct a instance of T.

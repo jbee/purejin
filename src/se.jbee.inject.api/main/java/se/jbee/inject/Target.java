@@ -142,9 +142,9 @@ public final class Target
 
 	@Override
 	public String toString() {
-		return "{" + parents + " => "
-			+ (instance.isAny() ? "*" : instance.toString()) + ", [" + packages
-			+ "] }" + (indirect ? "!" : "");
+		String symbolic = instance.isAny() ? "*" : instance.toString();
+		return (indirect ? "!" : "") + " in " + packages + " into "
+				+ parents + " => " + symbolic + " ";
 	}
 
 	public Target inPackageAndSubPackagesOf(Class<?> type) {

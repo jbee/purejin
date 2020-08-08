@@ -13,19 +13,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import se.jbee.inject.Annotated;
-import se.jbee.inject.DeclarationType;
-import se.jbee.inject.Env;
-import se.jbee.inject.Locator;
-import se.jbee.inject.Name;
+import se.jbee.inject.*;
 import se.jbee.inject.lang.Qualifying;
-import se.jbee.inject.ResourceDescriptor;
-import se.jbee.inject.Scope;
-import se.jbee.inject.Source;
-import se.jbee.inject.Supplier;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.Typed;
-import se.jbee.inject.UnresolvableDependency;
 
 /**
  * A {@link Binding} is implements the {@link ResourceDescriptor} created during
@@ -42,15 +33,15 @@ public final class Binding<T> extends ResourceDescriptor<T>
 	public static <T> Binding<T> binding(Locator<T> signature, BindingType type,
 			Supplier<? extends T> supplier, Name scope, Source source) {
 		return new Binding<>(signature, type, supplier, scope, source,
-				annotatedOf(supplier));
+				annotatedOf(supplier), Verifier.AOK);
 	}
 
 	public final BindingType type;
 
 	private Binding(Locator<T> signature, BindingType type,
 			Supplier<? extends T> supplier, Name scope, Source source,
-			Annotated annotations) {
-		super(scope, signature, supplier, source, annotations);
+			Annotated annotations, Verifier verifier) {
+		super(scope, signature, supplier, source, annotations, verifier);
 		this.type = type;
 	}
 
@@ -64,7 +55,7 @@ public final class Binding<T> extends ResourceDescriptor<T>
 	public <E> Binding<E> typed(Type<E> type) {
 		return new Binding<>(signature.typed(type().toSupertype(type)),
 				this.type, (Supplier<? extends E>) supplier, scope, source,
-				annotations);
+				annotations, verifier);
 	}
 
 	public boolean isComplete() {
@@ -76,7 +67,15 @@ public final class Binding<T> extends ResourceDescriptor<T>
 		if (annotations == this.annotations)
 			return this; // just a optimisation for a likely case
 		return new Binding<>(signature, type, supplier, scope, source,
-				annotations);
+				annotations, verifier);
+	}
+
+	@Override
+	public Binding<T> verifiedBy(Verifier verifier) {
+		if (verifier == this.verifier)
+			return this;
+		return new Binding<>(signature, type, supplier, scope, source,
+				annotations, verifier);
 	}
 
 	public Binding<T> complete(BindingType type,
@@ -87,7 +86,7 @@ public final class Binding<T> extends ResourceDescriptor<T>
 			? Scope.reference
 			: scope;
 		return new Binding<>(signature, type, supplier, effectiveScope, source,
-				annotatedOf(supplier));
+				annotatedOf(supplier), verifier);
 	}
 
 	@Override
