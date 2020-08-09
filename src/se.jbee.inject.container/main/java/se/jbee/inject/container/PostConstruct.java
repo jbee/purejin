@@ -9,13 +9,8 @@ import static se.jbee.inject.lang.Utils.arrayMap;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Predicate;
 
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Initialiser;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Locator;
-import se.jbee.inject.Resource;
+import se.jbee.inject.*;
 import se.jbee.inject.lang.Type;
 
 /**
@@ -101,14 +96,16 @@ public final class PostConstruct {
 				(Type) Type.classType(actualType));
 		if (!provided.isAssignableTo(required))
 			return null;
-		I instance = resource.generate();
-		if (!matchesInitFilter(instance, actualType))
+		I init = resource.generate();
+		if (!matchesInitFilter(init, context.instance, actualType))
 			return null;
-		return (Initialiser<? super T>) instance;
+		return (Initialiser<? super T>) init;
 	}
 
 	private static <T, I extends Initialiser<?>> boolean matchesInitFilter(
-			I instance, Class<T> actualType) {
-		return !instance.isFiltered() || instance.asFilter().test(actualType);
+			I init, Instance<?> contract, Class<T> actualType) {
+		if (init.isFiltered())
+			return init.asFilter().test(actualType);
+		return true;
 	}
 }

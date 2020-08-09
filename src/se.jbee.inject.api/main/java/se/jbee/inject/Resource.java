@@ -76,6 +76,18 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 		this.generator = generator.apply(this);
 	}
 
+	private Resource( int serialID,  Source source,
+			ScopePermanence permanence, Locator<T> signature, Annotated annotations,
+			Verifier verifier, Generator<T> generator) {
+		this.generator = generator;
+		this.signature = signature;
+		this.source = source;
+		this.permanence = permanence;
+		this.serialID = serialID;
+		this.annotations = annotations;
+		this.verifier = verifier;
+	}
+
 	@Override
 	public T generate(Dependency<? super T> dep) throws UnresolvableDependency {
 		return generator.generate(dep);
@@ -91,6 +103,11 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 	public void init() {
 		if (permanence.isEager())
 			generate();
+	}
+
+	public Resource<T> withGenerator(Generator<T> generator) {
+		return new Resource<>(serialID, source, permanence, signature,
+				annotations, verifier, generator);
 	}
 
 	public Type<T> type() {
