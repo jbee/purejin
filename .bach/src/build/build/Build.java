@@ -10,7 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-/** Silk's build program. */
+/** purejin's build program. */
 class Build {
 
   public static void main(String... args) throws Exception {
@@ -18,7 +18,7 @@ class Build {
 
     var silk =
             Project.of()
-                    .name("silk")
+                    .name("purejin")
                     .version(version)
                     // <main>
                     .module("src/se.jbee.inject/main/java-9", 8)
@@ -56,46 +56,6 @@ class Build {
       bach.executeDefaultBuildActions();
     });
 
-    generateMavenPomXml(version);
   }
 
-  private static void generateMavenPomXml(String version) throws Exception {
-    Files.write(
-            Path.of(".bach/workspace/se.jbee.inject@" + version + ".pom.xml"),
-            List.of(
-                    "<?xml version='1.0' encoding='UTF-8'?>",
-                    "<project xmlns='http://maven.apache.org/POM/4.0.0'",
-                    "    xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'",
-                    "    xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd'>",
-                    "    <modelVersion>4.0.0</modelVersion>",
-                    "",
-                    "    <groupId>se.jbee</groupId>",
-                    "    <artifactId>se.jbee.inject</artifactId>",
-                    "    <version>" + version + "</version>",
-                    "",
-                    "    <name>Silk DI</name>",
-                    "    <description>Silk Java dependency injection framework</description>",
-                    "",
-                    "    <url>http://www.silkdi.com</url>",
-                    "   <licenses>",
-                    "        <license>",
-                    "            <name>Apache License, Version 2.0</name>",
-                    "            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>",
-                    "            <distribution>repo</distribution>",
-                    "        </license>",
-                    "    </licenses>",
-                    "    <scm>",
-                    "        <url>https://github.com/jbee/silk</url>",
-                    "        <connection>https://github.com/jbee/silk.git</connection>",
-                    "   </scm>",
-                    "",
-                    "    <developers>",
-                    "        <developer>",
-                    "            <id>jan</id>",
-                    "            <name>Jan Bernitt</name>",
-                    "            <email>jan@jbee.se</email>",
-                    "        </developer>",
-                    "    </developers>",
-                    "</project>"));
-  }
 }
