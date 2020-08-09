@@ -5,11 +5,10 @@
  */
 package se.jbee.inject;
 
-import se.jbee.inject.lang.Type;
-
 import java.lang.annotation.Annotation;
 import java.util.function.Predicate;
 
+import static se.jbee.inject.lang.Type.classType;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
@@ -63,17 +62,22 @@ public interface Initialiser<T> {
 	/**
 	 * Mostly defined to capture the contract by convention that when a {@link
 	 * Initialiser} class does implement {@link Predicate} of {@link Class} the
-	 * {@link Predicate#test(Object)} method is used to filter any actual target
-	 * type. This allows {@link Initialiser} to only apply to a subset of
-	 * instances even though their type signature matches the target instance.
+	 * {@link Predicate#test(Object)} method is used to check if the {@link
+	 * Initialiser} should be applied to the actual initialised target type.
+	 * This allows {@link Initialiser} to only apply to a subset of instances
+	 * even though their type signature matches the target instance.
+	 * <p>
+	 * While such a check could be done within the {@link Initialiser}s
+	 * implementation implementing the {@link Predicate} prevents non matching
+	 * {@link Initialiser}s from being invoked at all.
 	 *
 	 * @return true, if this {@link Initialiser} does support the {@link
 	 * #asFilter()} method and wants it to be used.
 	 */
 	default boolean isFiltered() {
 		return this instanceof Predicate
-				&& Type.classType(getClass()) //
-					.isAssignableTo(raw(Predicate.class).parametized(Class.class));
+				&& classType(getClass()).isAssignableTo( //
+						raw(Predicate.class).parametized(Class.class));
 	}
 
 	/**
@@ -82,6 +86,7 @@ public interface Initialiser<T> {
 	 *
 	 * @see #isFiltered()
 	 */
+	@SuppressWarnings("unchecked")
 	default Predicate<Class<?>> asFilter() {
 		return (Predicate<Class<?>>) this;
 	}
