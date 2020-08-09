@@ -3,11 +3,12 @@
 v19.1 (upcoming)
 ==============
 
+First release under the new name `purejin`
+
 > Mechanics of Scope/Scoping as well as Injectrons were refined.
 > Initialisers, Extensions and Configs were added.
 > Mirrors replaced the Inspector.
 > Injection Hints as data replace BoundParameter
-> Resolve dependencies based on annotations
 > Named lazy Injector sub-contexts
 
 **General Notes**
@@ -15,9 +16,10 @@ v19.1 (upcoming)
 
 **Additions**
 - added build in extension for `Optional` parameter injection
-- added `SPI` extension mechanism
+- added `Obtainable` for injection with error recovery
+- added `Extension` extension mechanism
 - added `DiskScope`
-- added `Config` for namespaced configuration (avoid name collisions)
+- added `Config` for name-spaced configuration (avoid name collisions)
 - added `Serializable` to `Type`, `Name`, `Instance`, `Instances`, `Packages`, 
   `Target`, `Resource`, `Source`, `Scoping`, `Injection`, `Dependency`,
   `Options`

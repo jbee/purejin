@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/build.iml" filepath="$PROJECT_DIR$/.idea/build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/com.example.app.iml" filepath="$PROJECT_DIR$/.idea/com.example.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/purejin.iml" filepath="$PROJECT_DIR$/.idea/purejin.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/se.jbee.inject.iml" filepath="$PROJECT_DIR$/.idea/se.jbee.inject.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/se.jbee.inject.action.iml" filepath="$PROJECT_DIR$/.idea/se.jbee.inject.action.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/se.jbee.inject.api.iml" filepath="$PROJECT_DIR$/.idea/se.jbee.inject.api.iml" />
@@ -13,7 +14,6 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/se.jbee.inject.convert.iml" filepath="$PROJECT_DIR$/.idea/se.jbee.inject.convert.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/se.jbee.inject.event.iml" filepath="$PROJECT_DIR$/.idea/se.jbee.inject.event.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/se.jbee.inject.lang.iml" filepath="$PROJECT_DIR$/.idea/se.jbee.inject.lang.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/silk.iml" filepath="$PROJECT_DIR$/.idea/silk.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/test.integration.iml" filepath="$PROJECT_DIR$/.idea/test.integration.iml" />
     </modules>
   </component>
