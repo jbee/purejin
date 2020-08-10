@@ -4,16 +4,15 @@ import de.sormuras.bach.Bach;
 import de.sormuras.bach.Configuration;
 import de.sormuras.bach.Flag;
 import de.sormuras.bach.Project;
+import de.sormuras.bach.action.GenerateMavenPomFiles;
+import de.sormuras.bach.project.CodeUnit;
 import de.sormuras.bach.project.Feature;
 import java.lang.System.Logger.Level;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
 
 /** purejin's build program. */
 class Build {
 
-  public static void main(String... args) throws Exception {
+  public static void main(String... args) {
     var version = "19.1-ea";
 
     var silk =
@@ -54,8 +53,21 @@ class Build {
     new Bach(configuration, silk).build(bach -> {
       bach.deleteClassesDirectories();
       bach.executeDefaultBuildActions();
+      new GeneratePoms(bach).execute();
     });
 
+  }
+
+  static class GeneratePoms extends GenerateMavenPomFiles {
+
+    public GeneratePoms(Bach bach) {
+      super(bach, "    ");
+    }
+
+    @Override
+    public String computeMavenGroupId(CodeUnit unit) {
+      return "se.jbee.inject";
+    }
   }
 
 }
