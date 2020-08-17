@@ -41,7 +41,7 @@ public class Build {
                     .withLibraryRequires("org.junit.platform.console");
 
     var configuration = Configuration.ofSystem()
-            .with(Level.ALL)
+            .with(Level.INFO)
             .with(Flag.SUMMARY_LINES_UNCUT)
             .tweak(new Tweak());
 

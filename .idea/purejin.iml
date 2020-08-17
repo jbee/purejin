@@ -9,8 +9,7 @@
       <excludeFolder url="file://$MODULE_DIR$/dist" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
-    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="lib" level="project" />
+    <orderEntry type="inheritedJdk" />
   </component>
 </module>
