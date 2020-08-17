@@ -1,14 +1,14 @@
 package test.integration.event;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static test.integration.util.TestUtils.wait50;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.Scope;
@@ -170,8 +170,8 @@ public class TestNonConcurrentVoidMultiDispatchEvents {
 	}
 
 	private static void assertMessages(List<Integer> actual, int... expected) {
-		assertEquals("Number of message not same:", expected.length,
-				actual.size());
+		assertEquals(expected.length, actual.size(),
+				"Number of message not same:");
 		for (int i = 0; i < expected.length; i++)
 			assertEquals(expected[i], actual.get(i).intValue());
 	}

@@ -1,10 +1,10 @@
 package test.integration.event;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static test.integration.util.TestUtils.wait50;
 
 import java.lang.reflect.Proxy;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -90,8 +90,8 @@ public class TestEventBasics {
 	public void thatHandledInterfacesInjectProxy() {
 		Handler proxy = injector.resolve(Handler.class);
 		assertTrue(Proxy.isProxyClass(proxy.getClass()));
-		assertSame("should be 'cached and reused'",
-				injector.resolve(Handler.class), proxy);
+		assertSame(injector.resolve(Handler.class), proxy,
+				"should be 'cached and reused'");
 	}
 
 	@Test

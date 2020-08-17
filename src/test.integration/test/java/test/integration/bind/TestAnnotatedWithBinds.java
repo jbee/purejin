@@ -1,6 +1,6 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.Annotated;
 import se.jbee.inject.AnnotatedWith;
 import se.jbee.inject.AnnotatedWith.AnnotatedInstance;
@@ -17,8 +17,8 @@ import java.util.HashSet;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static se.jbee.inject.config.ProducesBy.declaredMethods;
 import static se.jbee.inject.config.SharesBy.declaredFields;
 

@@ -1,6 +1,6 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.*;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -13,7 +13,7 @@ import java.lang.reflect.Proxy;
 import java.util.EventListener;
 
 import static java.lang.reflect.Proxy.isProxyClass;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Instance.instance;

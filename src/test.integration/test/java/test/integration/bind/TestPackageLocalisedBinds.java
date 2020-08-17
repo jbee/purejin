@@ -1,6 +1,6 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.Binder.TargetedBinder;
@@ -11,7 +11,7 @@ import java.nio.LongBuffer;
 import java.text.Format;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Packages.subPackagesOf;
 

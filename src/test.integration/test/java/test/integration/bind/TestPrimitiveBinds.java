@@ -1,14 +1,13 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Name.named;
 
 /**
@@ -100,9 +99,9 @@ public class TestPrimitiveBinds {
 	 * The stated bridge class is not a part of Silk but easy to do. Still a
 	 * loot of code for all the primitives for a little benefit.
 	 */
-	@Test(expected = NoResourceForDependency.class)
+	@Test
 	public void thatPrimitiveArrayNotWorkAsWrapperArrayClasses() {
-		assertArrayEquals(new int[42], injector.resolve(int[].class));
+		assertThrows(NoResourceForDependency.class, () -> injector.resolve(int[].class));
 	}
 
 	@Test

@@ -1,6 +1,6 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Initialiser;
 import se.jbee.inject.Injector;
@@ -10,7 +10,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
 
 import java.lang.reflect.Proxy;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests demonstrates how to use {@link Initialiser}s to decorate the

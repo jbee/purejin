@@ -1,6 +1,6 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Packages;
@@ -13,7 +13,7 @@ import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.Edition;
 import se.jbee.inject.defaults.DefaultsBundle;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Packages.*;
 
 /**
@@ -58,8 +58,8 @@ public class TestEditionPackageBinds {
 						.and(packageOf(Bootstrap.class)))));
 
 		Injector context = Bootstrap.injector(env, EditionPackageBindsBundle.class);
-		assertThrows("Should have thrown exception since EditionPackageBindsModule should not have been installed",
-				NoResourceForDependency.class, () -> context.resolve(int.class));
+		assertThrows(NoResourceForDependency.class, () -> context.resolve(int.class),
+				"Should have thrown exception since EditionPackageBindsModule should not have been installed");
 
 		// an edition including the module in this test
 		env = Environment.DEFAULT.with(Edition.class, Edition.includes(

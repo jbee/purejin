@@ -1,12 +1,12 @@
 package test.integration.convert;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static se.jbee.inject.lang.Type.raw;
 
 import java.math.BigInteger;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import se.jbee.inject.Converter;
 import se.jbee.inject.Injector;

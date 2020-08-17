@@ -1,6 +1,6 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.Initialiser;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Supplier;
@@ -14,8 +14,8 @@ import se.jbee.inject.lang.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.bind.Bindings.supplyConstant;

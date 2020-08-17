@@ -1,6 +1,8 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Name;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
@@ -24,14 +26,14 @@ public class TestInjectorExceptions {
 	private final Injector injector = Bootstrap.injector(
 			TestInjectorBundle.class);
 
-	@Test(expected = NoResourceForDependency.class)
-	public void thatExceptionIsThrownWhenResolvingAnUnboundDependency() {
-		injector.resolve(String.class);
+	@Test
+	void thatExceptionIsThrownWhenResolvingAnUnboundDependency() {
+		assertThrows(NoResourceForDependency.class, () -> injector.resolve(String.class));
 	}
 
-	@Test(expected = NoResourceForDependency.class)
-	public void thatExceptionIsThrownWhenResolvingAnUnboundDependencyWithBoundRawType() {
-		injector.resolve(Name.DEFAULT, Integer.class);
+	@Test
+	void thatExceptionIsThrownWhenResolvingAnUnboundDependencyWithBoundRawType() {
+		assertThrows(NoResourceForDependency.class, () -> injector.resolve(Name.DEFAULT, Integer.class));
 	}
 
 }

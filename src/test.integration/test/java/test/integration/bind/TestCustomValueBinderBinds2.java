@@ -1,6 +1,6 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bind.BindingType;
@@ -14,7 +14,7 @@ import se.jbee.inject.defaults.DefaultValueBinders;
 import java.io.Serializable;
 import java.util.RandomAccess;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * A test that demonstrates how the

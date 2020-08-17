@@ -1,7 +1,7 @@
 open module test.integration {
 
 	requires java.logging;
-	requires junit;
+	requires org.junit.jupiter;
 
 	/* core */
 	requires transitive se.jbee.inject;

@@ -1,6 +1,6 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.*;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.binder.BinderModule;
@@ -11,8 +11,7 @@ import test.integration.util.WebMethod;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Cast.providerTypeOf;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Packages.packageAndSubPackagesOf;
@@ -182,9 +181,10 @@ public class TestMirrorAutobindBinds {
 				injector.resolve(providerTypeOf(Boolean.class)).provide());
 	}
 
-	@Test(expected = NoResourceForDependency.class)
+	@Test
 	public void thatNoMethodsAreBoundThatAreNotAssignableToSpecifiedType() {
-		injector.resolve(Character.class);
+		assertThrows(NoResourceForDependency.class,
+				() -> injector.resolve(Character.class));
 	}
 
 	@Test
@@ -192,9 +192,10 @@ public class TestMirrorAutobindBinds {
 		assertEquals(named("foobar"), injector.resolve(Name.class));
 	}
 
-	@Test(expected = NoResourceForDependency.class)
+	@Test
 	public void thatNoMethodsAreBoundThatAreNotInSpecifiedPackagesSet() {
-		injector.resolve(String.class);
+		assertThrows(NoResourceForDependency.class,
+				() -> injector.resolve(String.class));
 	}
 
 	@Test

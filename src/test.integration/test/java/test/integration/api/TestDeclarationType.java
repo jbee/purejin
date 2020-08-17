@@ -1,7 +1,7 @@
 package test.integration.api;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.jbee.inject.DeclarationType.AUTO;
 import static se.jbee.inject.DeclarationType.DEFAULT;
 import static se.jbee.inject.DeclarationType.EXPLICIT;
@@ -9,7 +9,7 @@ import static se.jbee.inject.DeclarationType.IMPLICIT;
 import static se.jbee.inject.DeclarationType.MULTI;
 import static se.jbee.inject.DeclarationType.REQUIRED;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.DeclarationType;
 
 public class TestDeclarationType {
@@ -48,7 +48,7 @@ public class TestDeclarationType {
 	public void thatRequiredIsNotReplacedByAnyOtherType() {
 		for (DeclarationType type : DeclarationType.values()) {
 			if (type != REQUIRED) {
-				assertFalse(type.name(), REQUIRED.replacedBy(type));
+				assertFalse(REQUIRED.replacedBy(type), type.name());
 			}
 		}
 	}

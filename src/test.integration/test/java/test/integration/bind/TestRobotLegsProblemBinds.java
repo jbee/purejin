@@ -1,6 +1,6 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
@@ -8,7 +8,7 @@ import se.jbee.inject.Scope;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 
-import static org.junit.Assert.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 /**
  * This tests demonstrates 2 different ways to solve the <i>Robot legs
@@ -86,7 +86,7 @@ public class TestRobotLegsProblemBinds {
 			Injector injector) {
 		Leg leftLeg = injector.resolve(left, Leg.class);
 		Leg rightLeg = injector.resolve(right, Leg.class);
-		assertNotSame("same leg", rightLeg, leftLeg);
-		assertNotSame("same foot", rightLeg.foot, leftLeg.foot);
+		assertNotSame(rightLeg, leftLeg, "same leg");
+		assertNotSame(rightLeg.foot, leftLeg.foot, "same foot");
 	}
 }

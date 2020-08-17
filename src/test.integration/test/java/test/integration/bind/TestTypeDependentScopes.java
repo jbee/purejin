@@ -1,9 +1,9 @@
 package test.integration.bind;
 
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static se.jbee.inject.Dependency.dependency;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import se.jbee.inject.Provider;
 import se.jbee.inject.Scope;

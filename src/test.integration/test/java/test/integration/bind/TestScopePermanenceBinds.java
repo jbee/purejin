@@ -1,7 +1,7 @@
 package test.integration.bind;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.*;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -10,7 +10,7 @@ import se.jbee.inject.defaults.DefaultScopes;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Cast.resourcesTypeFor;
 import static se.jbee.inject.ScopePermanence.ignore;
 
@@ -37,7 +37,7 @@ public class TestScopePermanenceBinds {
 
 	private final Map<Name, ScopePermanence> permanenceByScope = new HashMap<>();
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		for (ScopePermanence s : injector.resolve(ScopePermanence[].class))
 			permanenceByScope.put(s.scope, s);

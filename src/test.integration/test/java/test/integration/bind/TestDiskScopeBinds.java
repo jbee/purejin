@@ -1,8 +1,8 @@
 package test.integration.bind;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Disabled;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Name;
 import se.jbee.inject.Scope;
@@ -15,8 +15,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestDiskScopeBinds {
 
@@ -36,7 +36,7 @@ public class TestDiskScopeBinds {
 		}
 	}
 
-	@Before
+	@BeforeEach
 	public void cleanDir() throws IOException {
 		if (dir.exists())
 			for (File file : dir.listFiles())
@@ -46,7 +46,7 @@ public class TestDiskScopeBinds {
 	}
 
 	@Test
-	@Ignore("Underlying file handle is never closed -- stalls on Windows.")
+	@Disabled
 	public void diskScopePreservesStateOnDisk() {
 		Injector injector = Bootstrap.injector(DiskScopeBindsModule.class);
 		AtomicInteger actualCounter = injector.resolve(AtomicInteger.class);

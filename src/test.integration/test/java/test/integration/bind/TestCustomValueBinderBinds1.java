@@ -1,6 +1,6 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.*;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.bind.*;
@@ -20,8 +20,7 @@ import java.lang.reflect.Field;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.lang.Type.fieldType;
 import static se.jbee.inject.bind.BindingType.CONSTRUCTOR;
 
@@ -143,12 +142,11 @@ public class TestCustomValueBinderBinds1 {
 		}
 	}
 
-	@Test(expected = NoResourceForDependency.class)
+	@Test
 	public void thatAllConstructorParameterTypesCanBeMadeRequired() {
 		ValueBinder<?> required = new RequiredConstructorParametersBinder();
-		Injector injector = injectorWithEnv(
-				TestCustomValueBinderBinds1Module.class, required);
-		assertNull("we should not get here", injector);
+		assertThrows(NoResourceForDependency.class,
+				() -> injectorWithEnv(TestCustomValueBinderBinds1Module.class, required));
 	}
 
 	/**

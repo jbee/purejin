@@ -1,10 +1,6 @@
 package test.integration.api;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.lang.Type.classType;
 import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.lang.Type.returnType;
@@ -18,7 +14,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.lang.Type;
 
 @SuppressWarnings({ "rawtypes" })
@@ -307,9 +303,10 @@ public class TestType {
 				Integer.class).isAssignableTo(stringList));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void thatUpperBoundOfParameterizedTypesIsChecked() {
-		Type.raw(XList.class).parametized(Object.class, Object.class);
+		assertThrows(IllegalArgumentException.class,
+				() -> Type.raw(XList.class).parametized(Object.class, Object.class));
 	}
 
 	@Test
@@ -330,10 +327,11 @@ public class TestType {
 		}
 	}
 
-	@Test(expected = ClassCastException.class)
+	@Test
 	public void thatParameterizedTypeCannotBeCastToDifferentActualTypeParameterSupertype() {
-		assertNotNull(raw(List.class).parametized(String.class).castTo(
-				raw(Collection.class).parametized(Integer.class)));
+		assertThrows(ClassCastException.class,
+				() -> assertNotNull(raw(List.class).parametized(String.class).castTo(
+				raw(Collection.class).parametized(Integer.class))));
 	}
 
 	@Test

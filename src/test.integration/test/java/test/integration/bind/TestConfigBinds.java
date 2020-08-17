@@ -1,6 +1,6 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.Converter;
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
@@ -10,8 +10,7 @@ import se.jbee.inject.config.Config;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Name.named;
 
 public class TestConfigBinds {
@@ -65,9 +64,10 @@ public class TestConfigBinds {
 		assertEquals(42, beanConfig.intValue("foo"));
 	}
 
-	@Test(expected = NoSuchElementException.class)
+	@Test
 	public void unknownValueThrowsException() {
-		config.optionalValue(String.class, "unknown").get();
+		assertThrows(NoSuchElementException.class,
+				() -> config.optionalValue(String.class, "unknown").get());
 	}
 
 	@Test
