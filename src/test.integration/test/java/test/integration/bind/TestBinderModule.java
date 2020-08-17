@@ -1,6 +1,6 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.DeclarationType;
 import se.jbee.inject.bind.Binding;
 import se.jbee.inject.bind.Bindings;
@@ -10,7 +10,7 @@ import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Environment;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.DeclarationType.EXPLICIT;
 
 /**

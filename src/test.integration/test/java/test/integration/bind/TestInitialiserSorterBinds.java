@@ -1,6 +1,6 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.Initialiser;
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * A test that demonstrates how the {@link Initialiser.Sorter} can be used to

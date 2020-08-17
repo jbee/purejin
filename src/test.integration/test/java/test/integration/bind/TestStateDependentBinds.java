@@ -1,6 +1,6 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.*;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.binder.Binder.RootBinder;
@@ -11,8 +11,8 @@ import se.jbee.inject.defaults.CoreFeature;
 import se.jbee.inject.lang.Type;
 import test.integration.util.Resource;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.jbee.inject.Cast.providerTypeOf;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;

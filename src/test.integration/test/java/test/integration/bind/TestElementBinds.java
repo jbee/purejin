@@ -1,6 +1,6 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.Hint;
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.Binder.TypedElementBinder;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests that demonstrates how to overlay the default behavior of 1-dimensional

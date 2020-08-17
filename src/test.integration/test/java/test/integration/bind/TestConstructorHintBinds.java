@@ -1,6 +1,6 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.*;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -8,8 +8,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Hint.constant;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
@@ -150,12 +149,13 @@ public class TestConstructorHintBinds {
 	public void thatReoccuringTypesAreArrangedAsOccuringAfterAnother() {
 		Baz baz = injector.resolve(Baz.class);
 		assertEquals("y", baz.foo);
-		assertEquals("when x alignment after another is broken", "y", baz.bar);
+		assertEquals("y", baz.bar, "when x alignment after another is broken");
 	}
 
-	@Test(expected = InconsistentDeclaration.class)
+	@Test
 	public void thatParametersNotArrangedThrowsException() {
-		Bootstrap.injector(FaultyParameterConstructorBindsModule.class);
+		assertThrows(InconsistentDeclaration.class,
+				() -> Bootstrap.injector(FaultyParameterConstructorBindsModule.class));
 	}
 
 }

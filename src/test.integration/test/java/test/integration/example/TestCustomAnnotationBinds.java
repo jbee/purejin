@@ -2,16 +2,16 @@ package test.integration.example;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.Serializable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.ServiceLoader;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.example.app.Support;
 
@@ -125,6 +125,7 @@ public class TestCustomAnnotationBinds {
 			injector.resolve(SomeServiceImpl.class);
 			fail("Expected interface must be used");
 		} catch (IllegalAccess e) {
+			assertNotNull(e);
 		}
 	}
 

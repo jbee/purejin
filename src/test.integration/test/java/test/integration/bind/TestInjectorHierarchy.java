@@ -1,6 +1,6 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.binder.BinderModule;
@@ -10,7 +10,7 @@ import test.integration.container.Decorate;
 import java.util.HashSet;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test that demontrates how two {@link Injector} contexts can be linked

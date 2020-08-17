@@ -1,6 +1,6 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.*;
 import se.jbee.inject.UnresolvableDependency.UnstableDependency;
 import se.jbee.inject.binder.BinderModule;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Cast.listTypeOf;
 import static se.jbee.inject.Cast.providerTypeOf;
 import static se.jbee.inject.Instance.instance;

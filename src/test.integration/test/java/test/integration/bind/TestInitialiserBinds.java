@@ -1,6 +1,6 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.Env;
 import se.jbee.inject.Initialiser;
 import se.jbee.inject.Injector;
@@ -10,7 +10,7 @@ import se.jbee.inject.binder.BinderModuleWith;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Environment;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Cast.initialiserTypeOf;
 import static se.jbee.inject.lang.Type.raw;
 

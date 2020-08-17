@@ -1,6 +1,7 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import se.jbee.inject.*;
 import se.jbee.inject.UnresolvableDependency.DependencyCycle;
 import se.jbee.inject.bind.Bundle;
@@ -15,8 +16,9 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.time.Duration;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Cast.resourcesTypeFor;
 import static se.jbee.inject.Hint.relativeReferenceTo;
 import static se.jbee.inject.Name.named;
@@ -224,28 +226,31 @@ public class TestBootstrapper {
 	 * The assert itself doesn't play such huge role here. we just want to reach
 	 * this code.
 	 */
-	@Test(timeout = 100)
-	public void thatBundlesAreNotBootstrappedMultipleTimesEvenWhenTheyAreMutual() {
-		assertNotNull(Bootstrap.injector(OneMutualDependentBundle.class));
+	@Test
+	@Timeout(1)
+	void thatBundlesAreNotBootstrappedMultipleTimesEvenWhenTheyAreMutual() {
+		assertTimeout(Duration.ofMillis(100),
+				() -> Bootstrap.injector(OneMutualDependentBundle.class));
 	}
 
-	@Test(expected = InconsistentDeclaration.class)
-	public void thatNonUniqueResourcesThrowAnException() {
-		Bootstrap.injector(ClashingBindsModule.class);
+	@Test
+	void thatNonUniqueResourcesThrowAnException() {
+		assertThrows(InconsistentDeclaration.class,
+				() -> Bootstrap.injector(ClashingBindsModule.class));
 	}
 
-	@Test(expected = DependencyCycle.class, timeout = 200)
+	@Test
+	@Timeout(1)
 	public void thatDependencyCyclesAreDetected() {
 		Injector injector = Bootstrap.injector(CyclicBindsModule.class);
-		Foo foo = injector.resolve(Foo.class);
-		fail("foo should not be resolvable but was: " + foo);
+		assertThrows(DependencyCycle.class, () -> injector.resolve(Foo.class));
 	}
 
-	@Test(expected = DependencyCycle.class, timeout = 200)
+	@Test
+	@Timeout(1)
 	public void thatDependencyCyclesInCirclesAreDetected() {
 		Injector injector = Bootstrap.injector(CircularBindsModule.class);
-		A a = injector.resolve(A.class);
-		fail("A should not be resolvable but was: " + a);
+		assertThrows(DependencyCycle.class, () -> injector.resolve(A.class));
 	}
 
 	/**

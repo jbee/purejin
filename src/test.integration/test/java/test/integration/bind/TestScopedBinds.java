@@ -1,15 +1,15 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Scope;
 import se.jbee.inject.UnresolvableDependency.UnstableDependency;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 
-import static org.junit.Assert.fail;
-
-public class TestScopedBinds {
+class TestScopedBinds {
 
 	private static class Foo {
 
@@ -32,11 +32,10 @@ public class TestScopedBinds {
 		}
 	}
 
-	@Test(expected = UnstableDependency.class)
-	public void thatInjectingAnInjectionScopedInstanceIntoAppScopedInstanceThrowsAnException() {
+	@Test
+	void thatInjectingAnInjectionScopedInstanceIntoAppScopedInstanceThrowsAnException() {
 		Injector injector = Bootstrap.injector(ScopedBindsModule.class);
-		Foo foo = injector.resolve(Foo.class);
-		fail("It should not be possible to create a foo but got one: " + foo);
+		assertThrows(UnstableDependency.class, () -> injector.resolve(Foo.class));
 	}
 
 }

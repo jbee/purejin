@@ -1,8 +1,9 @@
 package test.integration.api;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static se.jbee.inject.Packages.packageOf;
 import static se.jbee.inject.lang.Type.raw;
 
@@ -14,7 +15,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.Packages;
 import se.jbee.inject.lang.Type;
 
@@ -92,14 +93,16 @@ public class TestPackages {
 		assertTrue(subs.contains(raw(DateFormatProvider.class))); // in java.text.spi
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void thatMultipleRootSubpackagesOfDifferentDepthCanNotBeCombined() {
-		Packages.subPackagesOf(List.class, DateFormatProvider.class);
+		assertThrows(IllegalArgumentException.class,
+				() -> Packages.subPackagesOf(List.class, DateFormatProvider.class));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void thatMultipleRootPackagesAndSubpackagesOfDifferentDepthCanNotBeCombined() {
-		Packages.packageAndSubPackagesOf(List.class, DateFormatProvider.class);
+		assertThrows(IllegalArgumentException.class,
+				() -> Packages.packageAndSubPackagesOf(List.class, DateFormatProvider.class));
 	}
 
 	@Test

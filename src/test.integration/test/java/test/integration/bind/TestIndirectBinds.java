@@ -1,6 +1,6 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.IllegalAccess;
@@ -10,7 +10,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
 
 import java.io.Serializable;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * This tests demonstrates how the {@link Binder#withIndirectAccess()} method
@@ -120,24 +120,27 @@ public class TestIndirectBinds {
 				ValidNestedReceiver.class).valid.abs.getClass());
 	}
 
-	@Test(expected = IllegalAccess.class)
-	public void indirectReferencedResourcesCannotBeResolvedDirectly() {
-		assertNotNull(injector.resolve(Implementation.class));
+	@Test
+	void indirectReferencedResourcesCannotBeResolvedDirectly() {
+		assertThrows(IllegalAccess.class,
+				() -> injector.resolve(Implementation.class));
 	}
 
-	@Test(expected = UnresolvableDependency.IllegalAccess.class)
-	public void indirectAutoboundResourcesCannotBeResolvedDirectly() {
-		assertNotNull(injector.resolve(Implementation2.class));
+	@Test
+	void indirectAutoboundResourcesCannotBeResolvedDirectly() {
+		assertThrows(UnresolvableDependency.IllegalAccess.class,
+				() -> injector.resolve(Implementation2.class));
 	}
 
-	@Test(expected = UnresolvableDependency.IllegalAccess.class)
-	public void indirectResourcesCannotBeInjectedDirectly() {
-		assertNotNull(injector.resolve(InvalidReceiver.class).impl);
+	@Test
+	void indirectResourcesCannotBeInjectedDirectly() {
+		assertThrows(UnresolvableDependency.IllegalAccess.class,
+				() -> injector.resolve(InvalidReceiver.class));
 	}
 
-	@Test(expected = UnresolvableDependency.IllegalAccess.class)
-	public void indirectResourcesCannotBeInjectedDirectlyInHierarchy() {
-		assertNotNull(
-				injector.resolve(InvalidNestedReceiver.class).invalid.impl);
+	@Test
+	void indirectResourcesCannotBeInjectedDirectlyInHierarchy() {
+		assertThrows(UnresolvableDependency.IllegalAccess.class,
+				() -> injector.resolve(InvalidNestedReceiver.class));
 	}
 }

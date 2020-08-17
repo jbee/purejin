@@ -1,6 +1,6 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Resource;
 import se.jbee.inject.lang.Type;
@@ -10,7 +10,7 @@ import se.jbee.inject.config.ProducesBy;
 
 import java.util.function.Function;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.lang.Type.raw;
 
 public class TestTypeVariableAutobindBinds {

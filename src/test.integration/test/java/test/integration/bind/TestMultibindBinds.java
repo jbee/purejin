@@ -1,6 +1,6 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Name;
 import se.jbee.inject.binder.BinderModule;
@@ -11,7 +11,7 @@ import se.jbee.inject.defaults.CoreFeature;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.Cast.listTypeOf;
 import static se.jbee.inject.Cast.setTypeOf;
 import static se.jbee.inject.Name.named;

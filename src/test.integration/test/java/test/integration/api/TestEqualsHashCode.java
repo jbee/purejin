@@ -2,7 +2,7 @@ package test.integration.api;
 
 import static java.lang.reflect.Modifier.isFinal;
 import static java.lang.reflect.Modifier.isPublic;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.lang.Utils.newArray;
 
 import java.lang.reflect.Constructor;
@@ -10,7 +10,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.*;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.Utils;
@@ -68,11 +68,9 @@ public class TestEqualsHashCode {
 	private static void assertValidEqualsAndHashCodeContract(Class<?> cls)
 			throws Exception {
 		Method equals = cls.getMethod("equals", Object.class);
-		assertEquals(cls.getSimpleName() + " does not implement equals", cls,
-				equals.getDeclaringClass());
+		assertEquals(cls, equals.getDeclaringClass(), cls.getSimpleName() + " does not implement equals");
 		Method hashCode = cls.getMethod("hashCode");
-		assertEquals(cls.getSimpleName() + " does not implement hashCode", cls,
-				hashCode.getDeclaringClass());
+		assertEquals(cls, hashCode.getDeclaringClass(), cls.getSimpleName() + " does not implement hashCode");
 
 		int baseA = base++;
 		Object a = newInstance(cls, baseA);
@@ -90,11 +88,11 @@ public class TestEqualsHashCode {
 		assertNotEquals(a, null);
 		assertNotEquals(b, null);
 
-		assertTrue("Value type is not final.", isFinal(cls.getModifiers()));
+		assertTrue(isFinal(cls.getModifiers()), "Value type is not final.");
 		for (Field f : cls.getDeclaredFields()) {
 			if (!f.isSynthetic()) {
-				assertTrue("Field " + f.getName() + " is not final.",
-						isFinal(f.getModifiers()));
+				assertTrue(isFinal(f.getModifiers()),
+						"Field " + f.getName() + " is not final.");
 			}
 		}
 		// while we are at it - cover toString as well

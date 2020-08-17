@@ -1,11 +1,11 @@
 package test.integration.action;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static se.jbee.inject.lang.Type.raw;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.lang.Type;
@@ -65,17 +65,17 @@ public class TestServiceInvocationBinds {
 		public <P, R> void after(Type<P> parameter, P value, Type<R> resultType,
 				R result, Long before) {
 			afterCount++;
-			assertEquals("before state passed to after", 42L,
-					before.longValue());
+			assertEquals(42L,
+					before.longValue(), "before state passed to after");
 			assertEquals(result, "Foo".hashCode());
 		}
 
 		@Override
 		public <P, R> Long before(Type<P> parameter, P value, Type<R> result) {
 			beforeCount++;
-			assertTrue("right type passed to before",
-					parameter.type().equalTo(raw(String.class)));
-			assertEquals("right value passed to before", "Foo", value);
+			assertTrue(parameter.type().equalTo(raw(String.class)),
+					"right type passed to before");
+			assertEquals("Foo", value, "right value passed to before");
 			return 42L;
 		}
 

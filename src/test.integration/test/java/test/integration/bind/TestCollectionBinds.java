@@ -1,6 +1,6 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.Cast;
 import se.jbee.inject.Injector;
 import se.jbee.inject.lang.Type;

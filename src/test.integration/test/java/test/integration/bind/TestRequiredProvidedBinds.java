@@ -1,6 +1,6 @@
 package test.integration.bind;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.bind.Module;
@@ -8,7 +8,7 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * The test shows very loose coupling using {@link BinderModule#require(Class)}
@@ -88,9 +88,10 @@ public class TestRequiredProvidedBinds {
 
 	}
 
-	@Test(expected = NoResourceForDependency.class)
+	@Test
 	public void thatNotProvidedRequiredBindThrowsException() {
-		Bootstrap.injector(RequirementModule.class);
+		assertThrows(NoResourceForDependency.class,
+				() -> Bootstrap.injector(RequirementModule.class));
 	}
 
 	@Test

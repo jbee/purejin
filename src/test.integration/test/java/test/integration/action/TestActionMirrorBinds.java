@@ -1,11 +1,11 @@
 package test.integration.action;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.action.ActionModule.actionDependency;
 import static se.jbee.inject.config.ProducesBy.declaredMethods;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.action.Action;

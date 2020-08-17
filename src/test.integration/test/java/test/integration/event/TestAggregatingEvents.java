@@ -1,17 +1,17 @@
 package test.integration.event;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.jbee.inject.Name.named;
 
 import java.util.function.BinaryOperator;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -86,7 +86,7 @@ public class TestAggregatingEvents {
 	private final Handler b = injector.resolve(named("b"), Handler.class);
 	private final Handler proxy = injector.resolve(Handler.class);
 
-	@Before
+	@BeforeEach
 	public void preconditions() {
 		assertSame(Service.class, a.getClass());
 		assertSame(Service.class, b.getClass());
@@ -95,14 +95,14 @@ public class TestAggregatingEvents {
 	}
 
 	@Test
-	@Ignore("TODO #80 // TestAggregatingEvents.staticAggregationIsPerformed()")
+	@Disabled("TODO #80 // TestAggregatingEvents.staticAggregationIsPerformed()")
 	public void staticAggregationIsPerformed() {
 		assertFalse(proxy.all());
 		assertEquals(3, proxy.sum());
 	}
 
 	@Test
-	@Ignore("TODO #80 // TestAggregatingEvents.dynamicAggregationIsPerformed()")
+	@Disabled("TODO #80 // TestAggregatingEvents.dynamicAggregationIsPerformed()")
 	public void dynamicAggregationIsPerformed() {
 		assertTrue(proxy.dynamic(Boolean::logicalOr));
 		assertEquals(5, proxy.dynamic(3, Integer::max));

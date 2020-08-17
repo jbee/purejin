@@ -38,11 +38,10 @@ public class Build {
                     .withTestModule("src/test.integration/test/java") // extra-module tests
                     .withTestModule("src/com.example.app/test/java") // silk's first client
                     // lib/
-                    .withLibraryRequires(
-                            "org.hamcrest", "org.junit.vintage.engine", "org.junit.platform.console");
+                    .withLibraryRequires("org.junit.platform.console");
 
     var configuration = Configuration.ofSystem()
-            .with(Level.INFO)
+            .with(Level.ALL)
             .with(Flag.SUMMARY_LINES_UNCUT)
             .tweak(new Tweak());
 

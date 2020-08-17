@@ -5,7 +5,7 @@ import static test.integration.util.TestUtils.assertSerializable;
 import java.io.Serializable;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.jbee.inject.*;
 import se.jbee.inject.lang.Type;
 

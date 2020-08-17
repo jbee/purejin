@@ -1,9 +1,9 @@
 package test.integration.event;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.fail;
 import static test.integration.util.TestUtils.wait20;
 import static test.integration.util.TestUtils.wait50;
 
@@ -15,8 +15,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -46,7 +46,7 @@ import se.jbee.inject.event.*;
  * events (calls) can time out. The TTL is set to just 5ms which causes every
  * second call to time out.
  */
-@Ignore
+@Disabled
 public class TestTTLExceptionHandingComputeEvents {
 
 	private interface Handler {
@@ -131,7 +131,7 @@ public class TestTTLExceptionHandingComputeEvents {
 
 	@Test
 	public void thatEventExceptionCausedByTimeoutIsThrownIfHandlerMethodNotThrowsException() {
-		assertThrowsEventExceptionCausedByTimeout(() -> handler.slowMethod());
+		assertThrowsEventExceptionCausedByTimeout(handler::slowMethod);
 	}
 
 	private void assertThrowsEventExceptionCausedByTimeout(
@@ -139,7 +139,7 @@ public class TestTTLExceptionHandingComputeEvents {
 		assertNotNull(service);
 		blockProcessorWithTask();
 		try {
-			assertFalse("should throw EventException ", f.call());
+			assertFalse(f.call(), "should throw EventException ");
 		} catch (EventException e) {
 			assertSame(TimeoutException.class, e.getCause().getClass());
 		} catch (Exception e) {
@@ -151,7 +151,7 @@ public class TestTTLExceptionHandingComputeEvents {
 		assertNotNull(service);
 		blockProcessorWithTask();
 		try {
-			assertFalse("should throw TimeoutException", f.call());
+			assertFalse(f.call(), "should throw TimeoutException");
 		} catch (Exception e) {
 			assertSame(TimeoutException.class, e.getClass());
 		}
