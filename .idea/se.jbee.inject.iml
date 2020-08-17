@@ -5,12 +5,12 @@
     <content url="file://$MODULE_DIR$/src/se.jbee.inject">
       <sourceFolder url="file://$MODULE_DIR$/src/se.jbee.inject/main/java-9" isTestSource="false" />
     </content>
-    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="se.jbee.inject.api" exported="" />
     <orderEntry type="module" module-name="se.jbee.inject.bind" exported="" />
     <orderEntry type="module" module-name="se.jbee.inject.container" exported="" />
     <orderEntry type="module" module-name="se.jbee.inject.bootstrap" exported="" />
     <orderEntry type="module" module-name="se.jbee.inject.lang" exported="" />
+    <orderEntry type="inheritedJdk" />
   </component>
 </module>

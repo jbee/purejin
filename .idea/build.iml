@@ -2,11 +2,11 @@
 <module type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
-    <content url="file://$MODULE_DIR$/.bach/src">
+    <content url="file://$MODULE_DIR$/.bach/src/build">
       <sourceFolder url="file://$MODULE_DIR$/.bach/src/build" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="inheritedJdk" />
     <orderEntry type="library" name="bach-lib" level="project" />
+    <orderEntry type="inheritedJdk" />
   </component>
 </module>
