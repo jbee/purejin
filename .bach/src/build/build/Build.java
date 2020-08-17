@@ -7,10 +7,14 @@ import de.sormuras.bach.Project;
 import de.sormuras.bach.action.GenerateMavenPomFiles;
 import de.sormuras.bach.project.CodeUnit;
 import de.sormuras.bach.project.Feature;
+import de.sormuras.bach.tool.DefaultTweak;
+import de.sormuras.bach.tool.Javac;
+import de.sormuras.bach.tool.Javadoc;
+
 import java.lang.System.Logger.Level;
 
 /** purejin's build program. */
-class Build {
+public class Build {
 
   public static void main(String... args) {
     var version = "19.1-ea";
@@ -29,19 +33,7 @@ class Build {
                     .module("src/se.jbee.inject.convert/main/java-9", 8)
                     .module("src/se.jbee.inject.event/main/java-9", 8)
                     .module("src/se.jbee.inject.lang/main/java-9", 8)
-
                     .without(Feature.CREATE_CUSTOM_RUNTIME_IMAGE)
-                    .tweakJavacCall(
-                            javac -> javac.without("-Xlint").with("-Xlint:-serial,-rawtypes,-varargs"))
-
-                    .tweakJavadocCall(
-                            javadoc -> javadoc
-                                .without("-Xdoclint")
-                                .with("-Xdoclint:-missing")
-                                .with("-group", "API", "se.jbee.inject:se.jbee.inject.api:se.jbee.inject.bind:se.jbee.inject.lang")
-                                .with("-group", "Container", "se.jbee.inject.bootstrap:se.jbee.inject.container")
-                                .with("-group", "Add-ons", "se.jbee.inject.action:se.jbee.inject.event:se.jbee.inject.convert")
-                    )
                     // test
                     .withTestModule("src/test.integration/test/java") // extra-module tests
                     .withTestModule("src/com.example.app/test/java") // silk's first client
@@ -49,13 +41,34 @@ class Build {
                     .withLibraryRequires(
                             "org.hamcrest", "org.junit.vintage.engine", "org.junit.platform.console");
 
-    var configuration = Configuration.ofSystem().with(Level.INFO).with(Flag.SUMMARY_LINES_UNCUT);
+    var configuration = Configuration.ofSystem()
+            .with(Level.INFO)
+            .with(Flag.SUMMARY_LINES_UNCUT)
+            .tweak(new Tweak());
+
     new Bach(configuration, silk).build(bach -> {
       bach.deleteClassesDirectories();
       bach.executeDefaultBuildActions();
       new GeneratePoms(bach).execute();
     });
 
+  }
+
+  static class Tweak extends DefaultTweak {
+    @Override
+    public Javac tweakJavac(Javac javac) {
+      return javac.without("-Xlint");
+    }
+
+    @Override
+    public Javadoc tweakJavadoc(Javadoc javadoc) {
+      return javadoc
+              .without("-Xdoclint")
+              .with("-Xdoclint:-missing")
+              .with("-group", "API", "se.jbee.inject:se.jbee.inject.api:se.jbee.inject.bind:se.jbee.inject.lang")
+              .with("-group", "Container", "se.jbee.inject.bootstrap:se.jbee.inject.container")
+              .with("-group", "Add-ons", "se.jbee.inject.action:se.jbee.inject.event:se.jbee.inject.convert");
+    }
   }
 
   static class GeneratePoms extends GenerateMavenPomFiles {
