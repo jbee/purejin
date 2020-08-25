@@ -12,6 +12,17 @@ Feedback    http://github.com/jbee/purejin/issues
 Contribute  http://github.com/jbee/purejin/pulls
 CI          https://github.com/jbee/purejin/actions
 JitPack     https://jitpack.io/com/github/jbee/purejin/
+--------------------------------------------------------------------------
+
+Build       https://github.com/sormuras/bach
+
+- Install latest JDK (at least 11) on your machine.
+- Execute `jshell https://sormuras.de/bach/build` in the root directory
+  of this project to compile all modules and run all tests at least once.
+- Subsequent builds may be triggered by running a platform-dependent build
+  script via `.bach/build` on Linux/Mac or `.bach\build.bat` on Windows.
+
+--------------------------------------------------------------------------
 
 License     http://www.apache.org/licenses/LICENSE-2.0
 
