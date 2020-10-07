@@ -18,7 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        java: [11, 14, 15-ea]
+        java: [11, 15, 16-ea]
     runs-on: ${{ matrix.os }}
     steps:
       - name: 'Check out sources'
