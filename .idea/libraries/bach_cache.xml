@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="bach-cache">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/.bach/cache" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/.bach/cache" recursive="false" />
+  </library>
+</component>

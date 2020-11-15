@@ -17,8 +17,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
-        java: [11, 15, 16-ea]
+        os: [ ubuntu-latest ]
+        java: [ 16-ea ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: 'Check out sources'
@@ -29,10 +29,10 @@ jobs:
           java-version: ${{ matrix.java }}
       - name: 'Emit version of JShell (trigger creation of user''s preferences directory)'
         run: jshell --version
-      - name: 'Build with Bach.java'
-        run: jshell https://sormuras.de/bach/build
+      - name: 'Build with Bach'
+        uses: sormuras/bach-build@main
       - name: 'Upload build artifact'
         uses: actions/upload-artifact@v2
         with:
           name: artifact-${{ matrix.java }}-${{ matrix.os }}
-          path: .bach/workspace/logbook.md
+          path: .bach/workspace/modules

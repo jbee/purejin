@@ -5,7 +5,7 @@
     <content url="file://$MODULE_DIR$/src/test.integration">
       <sourceFolder url="file://$MODULE_DIR$/src/test.integration/test/java" isTestSource="true" />
     </content>
-    <orderEntry type="sourceFolder" forTests="true" />
+    <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="se.jbee.inject.api" scope="TEST" />
     <orderEntry type="module" module-name="se.jbee.inject.bind" scope="TEST" />
     <orderEntry type="module" module-name="se.jbee.inject.container" scope="TEST" />
@@ -16,7 +16,7 @@
     <orderEntry type="module" module-name="com.example.app" scope="TEST" />
     <orderEntry type="module" module-name="se.jbee.inject.lang" scope="TEST" />
     <orderEntry type="module" module-name="se.jbee.inject.bootstrap" scope="TEST" />
-    <orderEntry type="library" scope="TEST" name="lib" level="project" />
+    <orderEntry type="library" scope="TEST" name="bach-libraries" level="project" />
     <orderEntry type="inheritedJdk" />
   </component>
 </module>
