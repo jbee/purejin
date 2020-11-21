@@ -10,8 +10,7 @@ import com.github.sormuras.bach.ProjectInfo.Tweak;
     library = @Library(requires = {"org.junit.platform.console"}),
     main =
         @Main(
-            release = 11,
-            moduleSourcePaths = {"src/*/main/java", "src/*/main/java-9"},
+            release = 8,
             generateApiDocumentation = true,
             tweaks = {
               @Tweak(
@@ -41,7 +40,9 @@ import com.github.sormuras.bach.ProjectInfo.Tweak;
                     "se.jbee.inject.action:se.jbee.inject.event:se.jbee.inject.convert"
                   })
             }),
-    test = @Test(moduleSourcePaths = "src/*/test/java"))
+    test = @Test(
+            tweaks = @Tweak(tool = "junit", args = {})
+    ))
 module build {
   requires com.github.sormuras.bach;
 }
