@@ -4,7 +4,7 @@
     <exclude-output />
     <content url="file://$MODULE_DIR$/se.jbee.inject.lang">
       <sourceFolder url="file://$MODULE_DIR$/se.jbee.inject.lang/main/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/se.jbee.inject.lang/main/java-9" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/se.jbee.inject.lang/main/java-module" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="inheritedJdk" />

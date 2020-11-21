@@ -3,7 +3,7 @@
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$/se.jbee.inject">
-      <sourceFolder url="file://$MODULE_DIR$/se.jbee.inject/main/java-9" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/se.jbee.inject/main/java-module" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="se.jbee.inject.api" exported="" />

@@ -5,7 +5,7 @@
     <content url="file://$MODULE_DIR$/se.jbee.inject.api">
       <sourceFolder url="file://$MODULE_DIR$/se.jbee.inject.api/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/se.jbee.inject.api/test/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/se.jbee.inject.api/main/java-9" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/se.jbee.inject.api/main/java-module" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="se.jbee.inject.lang" />

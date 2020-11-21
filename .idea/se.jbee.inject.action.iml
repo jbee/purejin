@@ -4,7 +4,7 @@
     <exclude-output />
     <content url="file://$MODULE_DIR$/se.jbee.inject.action">
       <sourceFolder url="file://$MODULE_DIR$/se.jbee.inject.action/main/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/se.jbee.inject.action/main/java-9" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/se.jbee.inject.action/main/java-module" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="se.jbee.inject.bind" />
