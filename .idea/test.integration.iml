@@ -2,8 +2,8 @@
 <module type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
-    <content url="file://$MODULE_DIR$/src/test.integration">
-      <sourceFolder url="file://$MODULE_DIR$/src/test.integration/test/java" isTestSource="true" />
+    <content url="file://$MODULE_DIR$/test.integration">
+      <sourceFolder url="file://$MODULE_DIR$/test.integration/test/java" isTestSource="true" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="se.jbee.inject.api" scope="TEST" />
