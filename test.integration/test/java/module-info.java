@@ -2,6 +2,7 @@ open module test.integration {
 
 	requires java.logging;
 	requires org.junit.jupiter;
+	requires static org.junit.platform.console; // <- launches test modules
 
 	/* core */
 	requires transitive se.jbee.inject;

@@ -1,13 +1,10 @@
 import com.github.sormuras.bach.ProjectInfo;
-import com.github.sormuras.bach.ProjectInfo.Library;
 import com.github.sormuras.bach.ProjectInfo.Main;
-import com.github.sormuras.bach.ProjectInfo.Test;
 import com.github.sormuras.bach.ProjectInfo.Tweak;
 
 @ProjectInfo(
     name = "purejin",
     version = "19.1-ea",
-    library = @Library(requires = {"org.junit.platform.console"}),
     main =
         @Main(
             release = 8,
@@ -39,10 +36,7 @@ import com.github.sormuras.bach.ProjectInfo.Tweak;
                     "Add-ons",
                     "se.jbee.inject.action:se.jbee.inject.event:se.jbee.inject.convert"
                   })
-            }),
-    test = @Test(
-            tweaks = @Tweak(tool = "junit", args = {})
-    ))
+            }))
 module build {
   requires com.github.sormuras.bach;
 }
