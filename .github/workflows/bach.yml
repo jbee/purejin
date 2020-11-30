@@ -31,6 +31,13 @@ jobs:
         run: jshell --version
       - name: 'Build with Bach'
         uses: sormuras/bach-build@main
+      - name: 'Report test summary'
+        uses: EnricoMi/publish-unit-test-result-action@v1.6
+        if: always()
+        with:
+          check_name: 'report'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          files: .bach/workspace/reports/junit-test/*/*.xml
       - name: 'Upload build artifact'
         uses: actions/upload-artifact@v2
         with:
