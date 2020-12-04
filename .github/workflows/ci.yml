@@ -48,7 +48,7 @@ jobs:
           name: ${{ github.event.repository.name }}-build-${{ env.VERSION }}
           path: .bach/workspace/modules
       - name: 'Release early-access build'
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/master'
         uses: marvinpinto/action-automatic-releases@latest
         with:
           automatic_release_tag: 'early-access'
