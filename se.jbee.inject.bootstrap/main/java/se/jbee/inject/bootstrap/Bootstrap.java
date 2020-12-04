@@ -5,31 +5,21 @@
  */
 package se.jbee.inject.bootstrap;
 
-import static se.jbee.inject.lang.Utils.arrayOf;
-
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import se.jbee.inject.*;
-import se.jbee.inject.bind.Binding;
-import se.jbee.inject.bind.Bindings;
-import se.jbee.inject.bind.Bootstrapper;
-import se.jbee.inject.bind.Bundle;
-import se.jbee.inject.bind.Bundler;
-import se.jbee.inject.bind.Modulariser;
+import se.jbee.inject.Env;
+import se.jbee.inject.InconsistentDeclaration;
+import se.jbee.inject.Injector;
 import se.jbee.inject.bind.Module;
-import se.jbee.inject.bind.Toggled;
+import se.jbee.inject.bind.*;
+import se.jbee.inject.binder.ServiceLoaderBundles;
+import se.jbee.inject.binder.ServiceLoaderEnvBundles;
 import se.jbee.inject.config.Edition;
 import se.jbee.inject.container.Container;
 import se.jbee.inject.defaults.DefaultsBundle;
 import se.jbee.inject.lang.Utils;
+
+import java.util.*;
+
+import static se.jbee.inject.lang.Utils.arrayOf;
 
 /**
  * Utility to create an {@link Injector} context from {@link Bundle}s and
@@ -38,6 +28,14 @@ import se.jbee.inject.lang.Utils;
  * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Bootstrap {
+
+	/**
+	 * @return The {@link Injector} context purely created from {@link Bundle}s
+	 * found using {@link java.util.ServiceLoader}.
+	 */
+	public static Injector injector() {
+		return injector(env(ServiceLoaderEnvBundles.class), ServiceLoaderBundles.class);
+	}
 
 	public static Env env(Class<? extends Bundle> root) {
 		return Environment.DEFAULT.complete(injector(root).asEnv());
