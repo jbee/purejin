@@ -16,11 +16,11 @@ JitPack     https://jitpack.io/com/github/jbee/purejin/
 
 Build       https://github.com/sormuras/bach
 
-- Install latest JDK (at least 11) on your machine.
-- Execute `jshell https://sormuras.de/bach/build` in the root directory
+- Install latest JDK (at least 16-ea) on your machine.
+- Execute `jshell https://bit.ly/bach-main-build` in the root directory
   of this project to compile all modules and run all tests at least once.
 - Subsequent builds may be triggered by running a platform-dependent build
-  script via `.bach/build` on Linux/Mac or `.bach\build.bat` on Windows.
+  script via `./bach build` on Linux/Mac or `bach build` on Windows.
 
 --------------------------------------------------------------------------
 

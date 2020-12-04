@@ -5,4 +5,5 @@ src/doc/
 lib/
 pom.*
 *~
+*.jar
 _site/
