@@ -3,7 +3,7 @@
 # - https://help.github.com/en/actions/language-and-framework-guides/github-actions-for-java
 # - https://github.com/sormuras/bach
 
-name: 'Bach CI'
+name: 'CI'
 
 on:
   push:
@@ -42,3 +42,25 @@ jobs:
         with:
           name: artifact-${{ matrix.java }}-${{ matrix.os }}
           path: .bach/workspace/modules
+
+  early_access:
+    name: 'JDK Early-Access'
+    needs: build
+    continue-on-error: false
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Set up version'
+        run: |
+        SHA7=$(echo "${{ github.sha }}" | cut -c1-7)
+        VERSION=8-ea+${SHA7}
+        echo "VERSION=${VERSION}" >> ${GITHUB_ENV}
+      - name: 'Release early-access build'
+        if: github.ref == 'refs/heads/main'
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          automatic_release_tag: 'early-access'
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: true
+          title: "purejin ${{ env.VERSION }}"
+          files: |
+            .bach/workspace/modules/*.jar
