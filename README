@@ -5,7 +5,7 @@ ______  __ _________   ____     |__|__| ____
 |   __/|____/ |__|    \___  >\__|  |__|___|  /
 |__|                      \/\______|       \/
 
-
+Build with Java 16, usable with Java 8+
 
 Docs        http://jbee.github.io/purejin/
 Feedback    http://github.com/jbee/purejin/issues
