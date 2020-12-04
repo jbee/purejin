@@ -42,13 +42,6 @@ jobs:
         with:
           name: artifact-${{ matrix.java }}-${{ matrix.os }}
           path: .bach/workspace/modules
-
-  early_access:
-    name: 'JDK Early-Access'
-    needs: build
-    continue-on-error: false
-    runs-on: ubuntu-latest
-    steps:
       - name: 'Set up version'
         run: |
         SHA7=$(echo "${{ github.sha }}" | cut -c1-7)
