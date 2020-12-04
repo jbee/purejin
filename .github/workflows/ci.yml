@@ -44,9 +44,9 @@ jobs:
           path: .bach/workspace/modules
       - name: 'Set up version'
         run: |
-        SHA7=$(echo "${{ github.sha }}" | cut -c1-7)
-        VERSION=8-ea+${SHA7}
-        echo "VERSION=${VERSION}" >> ${GITHUB_ENV}
+          SHA7=$(echo "${{ github.sha }}" | cut -c1-7)
+          VERSION=8-ea+${SHA7}
+          echo "VERSION=${VERSION}" >> ${GITHUB_ENV}
       - name: 'Release early-access build'
         if: github.ref == 'refs/heads/main'
         uses: marvinpinto/action-automatic-releases@latest
