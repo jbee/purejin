@@ -3,7 +3,7 @@
 # - https://help.github.com/en/actions/language-and-framework-guides/github-actions-for-java
 # - https://github.com/sormuras/bach
 
-name: 'Bach CI'
+name: 'CI'
 
 on:
   push:
@@ -29,6 +29,11 @@ jobs:
           java-version: ${{ matrix.java }}
       - name: 'Emit version of JShell (trigger creation of user''s preferences directory)'
         run: jshell --version
+      - name: 'Set up version'
+        run: |
+          SHA7=$(echo "${{ github.sha }}" | cut -c1-7)
+          VERSION=8-ea+${SHA7}
+          echo "VERSION=${VERSION}" >> ${GITHUB_ENV}
       - name: 'Build with Bach'
         uses: sormuras/bach-build@main
       - name: 'Report test summary'
@@ -40,5 +45,15 @@ jobs:
       - name: 'Upload build artifact'
         uses: actions/upload-artifact@v2
         with:
-          name: artifact-${{ matrix.java }}-${{ matrix.os }}
+          name: ${{ github.event.repository.name }}-build-${{ env.VERSION }}
           path: .bach/workspace/modules
+      - name: 'Release early-access build'
+        if: github.ref == 'refs/heads/main'
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          automatic_release_tag: 'early-access'
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: true
+          title: "purejin ${{ env.VERSION }}"
+          files: |
+            .bach/workspace/modules/*.jar
