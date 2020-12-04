@@ -33,8 +33,7 @@ public class TestServiceLoaderBootstrapBinds {
 
 	@Test
 	public void serviceLoaderCanBeUsedToDeclareModuleRoots() {
-		Env env = Bootstrap.env(ServiceLoaderEnvBundles.class);
-		Injector context = Bootstrap.injector(env, ServiceLoaderBundles.class);
+		Injector context = Bootstrap.injector();
 		assertNotNull(context);
 		assertEquals(13, context.resolve(int.class).intValue());
 		assertEquals("com.example.app.MyFirstModule",
