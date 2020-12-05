@@ -1,20 +1,18 @@
 package test.integration.api;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static se.jbee.inject.Instance.defaultInstanceOf;
-import static se.jbee.inject.Instance.instance;
-import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Type.raw;
-
-import java.util.Arrays;
-import java.util.Comparator;
-
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.*;
 import se.jbee.inject.lang.Qualifying;
 import se.jbee.inject.lang.Type;
+
+import java.util.Arrays;
+import java.util.Comparator;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static se.jbee.inject.Instance.defaultInstanceOf;
+import static se.jbee.inject.Instance.instance;
+import static se.jbee.inject.Name.named;
+import static se.jbee.inject.lang.Type.raw;
 
 public class TestMoreApplicable {
 

@@ -1,15 +1,5 @@
 package test.integration.bind;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import static se.jbee.inject.Name.DEFAULT;
-import static se.jbee.inject.lang.Type.raw;
-
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
@@ -17,6 +7,10 @@ import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static se.jbee.inject.Name.DEFAULT;
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * A test that demonstrates how {@link Bundle}s (here in form of

@@ -1,13 +1,13 @@
 package test.integration.api;
 
-import static test.integration.util.TestUtils.assertSerializable;
+import org.junit.jupiter.api.Test;
+import se.jbee.inject.*;
+import se.jbee.inject.lang.Type;
 
 import java.io.Serializable;
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
-import se.jbee.inject.*;
-import se.jbee.inject.lang.Type;
+import static test.integration.util.TestUtils.assertSerializable;
 
 /**
  * Make sure the value objects of the library are {@link Serializable}.

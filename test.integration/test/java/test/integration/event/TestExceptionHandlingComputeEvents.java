@@ -1,18 +1,15 @@
 package test.integration.event;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import org.junit.jupiter.api.Test;
+import se.jbee.inject.Injector;
+import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.event.EventModule;
 
 import java.io.IOException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.jupiter.api.Test;
-
-import se.jbee.inject.Injector;
-import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.event.EventModule;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestExceptionHandlingComputeEvents {
 

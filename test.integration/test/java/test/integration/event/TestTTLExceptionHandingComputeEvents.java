@@ -1,26 +1,16 @@
 package test.integration.event;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.fail;
-import static test.integration.util.TestUtils.wait20;
-import static test.integration.util.TestUtils.wait50;
-
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.event.*;
+
+import java.util.concurrent.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static test.integration.util.TestUtils.wait20;
+import static test.integration.util.TestUtils.wait50;
 
 /**
  * Tests to verify the correctness of the exception handling caused by timeouts

@@ -10,6 +10,7 @@ import se.jbee.inject.InconsistentDeclaration;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bind.Module;
 import se.jbee.inject.bind.*;
+import se.jbee.inject.binder.ServiceLoaderAnnotations;
 import se.jbee.inject.binder.ServiceLoaderBundles;
 import se.jbee.inject.binder.ServiceLoaderEnvBundles;
 import se.jbee.inject.config.Edition;
@@ -34,11 +35,27 @@ public final class Bootstrap {
 	 * found using {@link java.util.ServiceLoader}.
 	 */
 	public static Injector injector() {
-		return injector(env(ServiceLoaderEnvBundles.class), ServiceLoaderBundles.class);
+		return injector(env(), ServiceLoaderBundles.class);
+	}
+
+	/**
+	 * @return The {@link Env} context purely created from {@link Bundle}s found
+	 * using {@link ServiceLoader}. These need to have the {@link
+	 * se.jbee.inject.Extends} annotation referring to the {@link Env} class.
+	 */
+	public static Env env() {
+		return env(ServiceLoaderEnvBundles.class, ServiceLoaderAnnotations.class);
 	}
 
 	public static Env env(Class<? extends Bundle> root) {
 		return Environment.DEFAULT.complete(injector(root).asEnv());
+	}
+
+	@SafeVarargs
+	public static Env env(Class<? extends Bundle>... roots) {
+		return Environment.DEFAULT.complete(
+				injector(Environment.DEFAULT, Bindings.newBindings(),
+						roots).asEnv());
 	}
 
 	public static Env env(Env env, Class<? extends Bundle> root) {
@@ -207,8 +224,10 @@ public final class Bootstrap {
 				Class<? extends Bundle>... roots) {
 			Set<Class<? extends Bundle>> newlyInstalled = new LinkedHashSet<>();
 			for (Class<? extends Bundle> root : roots)
-				if (!newlyInstalled.contains(root))
+				if (!newlyInstalled.contains(root)) {
 					install(root);
+					newlyInstalled.add(root);
+				}
 			for (Class<? extends Bundle> root : roots)
 				addAllInstalledIn(root, newlyInstalled);
 			return arrayOf(newlyInstalled, Class.class);

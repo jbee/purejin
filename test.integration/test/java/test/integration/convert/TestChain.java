@@ -1,13 +1,6 @@
 package test.integration.convert;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static se.jbee.inject.lang.Type.raw;
-
-import java.math.BigInteger;
-
 import org.junit.jupiter.api.Test;
-
 import se.jbee.inject.Converter;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -15,6 +8,12 @@ import se.jbee.inject.convert.Chain;
 import se.jbee.inject.convert.ConverterModule;
 import se.jbee.inject.convert.Converts;
 import se.jbee.inject.convert.Imports;
+
+import java.math.BigInteger;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static se.jbee.inject.lang.Type.raw;
 
 public class TestChain {
 

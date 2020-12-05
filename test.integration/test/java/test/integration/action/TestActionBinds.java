@@ -1,19 +1,15 @@
 package test.integration.action;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.fail;
-import static se.jbee.inject.lang.Type.raw;
-import static se.jbee.inject.action.ActionModule.actionDependency;
-
 import org.junit.jupiter.api.Test;
-
 import se.jbee.inject.Injector;
 import se.jbee.inject.action.Action;
 import se.jbee.inject.action.ActionExecutionFailed;
 import se.jbee.inject.action.ActionModule;
 import se.jbee.inject.bootstrap.Bootstrap;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static se.jbee.inject.action.ActionModule.actionDependency;
+import static se.jbee.inject.lang.Type.raw;
 
 public class TestActionBinds {
 

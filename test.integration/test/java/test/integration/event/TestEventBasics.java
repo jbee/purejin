@@ -1,23 +1,19 @@
 package test.integration.event;
 
-import static java.util.concurrent.CompletableFuture.completedFuture;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static test.integration.util.TestUtils.wait50;
+import org.junit.jupiter.api.Test;
+import se.jbee.inject.Injector;
+import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.event.EventModule;
+import se.jbee.inject.event.UnboxingFuture;
 
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
 
-import org.junit.jupiter.api.Test;
-
-import se.jbee.inject.Injector;
-import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.event.EventModule;
-import se.jbee.inject.event.UnboxingFuture;
+import static java.util.concurrent.CompletableFuture.completedFuture;
+import static org.junit.jupiter.api.Assertions.*;
+import static test.integration.util.TestUtils.wait50;
 
 /**
  * Most basic test for the bare functionality provided by the event system.

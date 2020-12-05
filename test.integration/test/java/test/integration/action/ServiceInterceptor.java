@@ -5,8 +5,8 @@
  */
 package test.integration.action;
 
-import se.jbee.inject.lang.Type;
 import se.jbee.inject.action.Action;
+import se.jbee.inject.lang.Type;
 
 /**
  * Frames the invocation of {@link Action}s with further functionality that can

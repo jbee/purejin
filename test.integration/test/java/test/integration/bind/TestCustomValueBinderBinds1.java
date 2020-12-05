@@ -20,9 +20,10 @@ import java.lang.reflect.Field;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.junit.jupiter.api.Assertions.*;
-import static se.jbee.inject.lang.Type.fieldType;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static se.jbee.inject.bind.BindingType.CONSTRUCTOR;
+import static se.jbee.inject.lang.Type.fieldType;
 
 /**
  * Demonstrates how to use {@link ValueBinder}s to customize the and binding

@@ -1,11 +1,8 @@
 package test.integration.api;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static se.jbee.inject.Packages.packageOf;
-import static se.jbee.inject.lang.Type.raw;
+import org.junit.jupiter.api.Test;
+import se.jbee.inject.Packages;
+import se.jbee.inject.lang.Type;
 
 import java.text.Format;
 import java.text.spi.DateFormatProvider;
@@ -15,9 +12,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.junit.jupiter.api.Test;
-import se.jbee.inject.Packages;
-import se.jbee.inject.lang.Type;
+import static org.junit.jupiter.api.Assertions.*;
+import static se.jbee.inject.Packages.packageOf;
+import static se.jbee.inject.lang.Type.raw;
 
 public class TestPackages {
 

@@ -1,19 +1,19 @@
 package test.integration.api;
 
-import static java.lang.reflect.Modifier.isFinal;
-import static java.lang.reflect.Modifier.isPublic;
-import static org.junit.jupiter.api.Assertions.*;
-import static se.jbee.inject.lang.Utils.newArray;
+import org.junit.jupiter.api.Test;
+import se.jbee.inject.*;
+import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.Utils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import org.junit.jupiter.api.Test;
-import se.jbee.inject.*;
-import se.jbee.inject.lang.Type;
-import se.jbee.inject.lang.Utils;
+import static java.lang.reflect.Modifier.isFinal;
+import static java.lang.reflect.Modifier.isPublic;
+import static org.junit.jupiter.api.Assertions.*;
+import static se.jbee.inject.lang.Utils.newArray;
 
 /**
  * Check the basic {@link #equals(Object)} and {@link #hashCode()}

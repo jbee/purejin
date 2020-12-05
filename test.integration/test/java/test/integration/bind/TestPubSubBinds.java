@@ -17,8 +17,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.bind.Bindings.supplyConstant;
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * A tests the shows how {@link Initialiser}s behind {@link Binder#init(Class)}

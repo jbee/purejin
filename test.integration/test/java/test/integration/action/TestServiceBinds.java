@@ -1,19 +1,18 @@
 package test.integration.action;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static se.jbee.inject.lang.Type.raw;
-import static se.jbee.inject.action.ActionModule.actionDependency;
-
 import org.junit.jupiter.api.Test;
-
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Scope;
 import se.jbee.inject.Supplier;
-import se.jbee.inject.lang.Type;
 import se.jbee.inject.action.Action;
 import se.jbee.inject.action.ActionModule;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.lang.Type;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static se.jbee.inject.action.ActionModule.actionDependency;
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * This test shows how to build an application specific service layer on top of

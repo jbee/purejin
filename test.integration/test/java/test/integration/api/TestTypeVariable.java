@@ -1,17 +1,17 @@
 package test.integration.api;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static se.jbee.inject.lang.Type.raw;
+import org.junit.jupiter.api.Test;
+import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.TypeVariable;
 
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-import org.junit.jupiter.api.Test;
-import se.jbee.inject.lang.Type;
-import se.jbee.inject.lang.TypeVariable;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * Tests {@link TypeVariable} utility for formal correctness.
