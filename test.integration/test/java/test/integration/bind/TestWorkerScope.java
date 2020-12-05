@@ -1,23 +1,18 @@
 package test.integration.bind;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import static se.jbee.inject.Dependency.dependency;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.junit.jupiter.api.Test;
-
 import se.jbee.inject.Provider;
 import se.jbee.inject.Scope;
 import se.jbee.inject.Scope.Controller;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.SupplyFailed;
 import se.jbee.inject.scope.WorkerScope;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static se.jbee.inject.Dependency.dependency;
 
 /**
  * Tests the correctness of the {@link WorkerScope}.

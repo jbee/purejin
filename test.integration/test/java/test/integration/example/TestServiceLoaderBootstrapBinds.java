@@ -1,17 +1,17 @@
 package test.integration.example;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-import java.util.ServiceLoader;
-
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
+import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.binder.ServiceLoaderBundles;
 import se.jbee.inject.binder.ServiceLoaderEnvBundles;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bind.Bundle;
+
+import java.util.ServiceLoader;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * This test demonstrates how the {@link java.util.ServiceLoader} concept is

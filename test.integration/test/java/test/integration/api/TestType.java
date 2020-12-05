@@ -1,21 +1,14 @@
 package test.integration.api;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static se.jbee.inject.lang.Type.classType;
-import static se.jbee.inject.lang.Type.raw;
-import static se.jbee.inject.lang.Type.returnType;
+import org.junit.jupiter.api.Test;
+import se.jbee.inject.lang.Type;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.util.AbstractCollection;
-import java.util.AbstractList;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
-import org.junit.jupiter.api.Test;
-import se.jbee.inject.lang.Type;
+import static org.junit.jupiter.api.Assertions.*;
+import static se.jbee.inject.lang.Type.*;
 
 @SuppressWarnings({ "rawtypes" })
 public class TestType {

@@ -13,7 +13,8 @@ import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.Edition;
 import se.jbee.inject.defaults.DefaultsBundle;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static se.jbee.inject.Packages.*;
 
 /**

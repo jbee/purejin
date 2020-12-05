@@ -1,8 +1,8 @@
 package test.integration.api;
 
-import static java.util.stream.Collectors.toList;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static se.jbee.inject.lang.Type.raw;
+import org.junit.jupiter.api.Test;
+import se.jbee.inject.*;
+import se.jbee.inject.lang.Type;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -10,9 +10,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
-import se.jbee.inject.*;
-import se.jbee.inject.lang.Type;
+import static java.util.stream.Collectors.toList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static se.jbee.inject.lang.Type.raw;
 
 public class TestResource {
 

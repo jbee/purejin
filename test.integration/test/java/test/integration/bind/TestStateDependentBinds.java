@@ -16,10 +16,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.jbee.inject.Cast.providerTypeOf;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.config.HintsBy.noParameters;
 import static se.jbee.inject.config.NamesBy.defaultName;
 import static se.jbee.inject.config.ProducesBy.allMethods;
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * This test demonstrates how to switch between different implementations during

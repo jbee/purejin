@@ -1,19 +1,16 @@
 package test.integration.action;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import static se.jbee.inject.lang.Type.raw;
-
 import org.junit.jupiter.api.Test;
-
 import se.jbee.inject.Injector;
-import se.jbee.inject.lang.Type;
 import se.jbee.inject.UnresolvableDependency.SupplyFailed;
 import se.jbee.inject.action.*;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.Utils;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * This test show how to bring back custom behaviour before or after

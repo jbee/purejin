@@ -1,22 +1,19 @@
 package test.integration.event;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static test.integration.util.TestUtils.wait50;
+import org.junit.jupiter.api.Test;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Scope;
+import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.event.EventModule;
+import se.jbee.inject.event.EventPolicy;
+import se.jbee.inject.event.EventProcessor;
+import se.jbee.inject.event.PolicyProvider;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
-
-import se.jbee.inject.Injector;
-import se.jbee.inject.Scope;
-import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.event.PolicyProvider;
-import se.jbee.inject.event.EventModule;
-import se.jbee.inject.event.EventPolicy;
-import se.jbee.inject.event.EventProcessor;
+import static org.junit.jupiter.api.Assertions.*;
+import static test.integration.util.TestUtils.wait50;
 
 /**
  * This test illustrates the most basic scenario of a classic "event listener"

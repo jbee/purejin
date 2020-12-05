@@ -4,6 +4,13 @@ import se.jbee.inject.Extends;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bind.Bundle;
 
+/**
+ * A {@link Bundle} that installs all {@link Bundle}s provided via {@link
+ * java.util.ServiceLoader} which are not annotated with {@link Extends} or with
+ * are annotated with {@link Extends} referring to {@link Injector} type.
+ *
+ * @since 8.1
+ */
 public class ServiceLoaderBundles extends FilteredServiceLoaderBundles {
 
 	public ServiceLoaderBundles() {
@@ -11,7 +18,9 @@ public class ServiceLoaderBundles extends FilteredServiceLoaderBundles {
 	}
 
 	static boolean isTargetingInjector(Class<? extends Bundle> bundle) {
-		return !bundle.isAnnotationPresent(Extends.class)
-			|| bundle.getAnnotation(Extends.class).value() == Injector.class;
+		if (!bundle.isAnnotationPresent(Extends.class))
+			return true;
+		Class<?> target = bundle.getAnnotation(Extends.class).value();
+		return target == Injector.class;
 	}
 }

@@ -1,11 +1,11 @@
 package test.integration.api;
 
+import org.junit.jupiter.api.Test;
+import se.jbee.inject.Name;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.jbee.inject.Name.named;
-
-import org.junit.jupiter.api.Test;
-import se.jbee.inject.Name;
 
 public class TestName {
 

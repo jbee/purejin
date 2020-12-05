@@ -1,13 +1,13 @@
 package test.integration.bind;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Scope;
 import se.jbee.inject.UnresolvableDependency.UnstableDependency;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TestScopedBinds {
 

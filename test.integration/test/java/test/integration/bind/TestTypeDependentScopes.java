@@ -1,13 +1,12 @@
 package test.integration.bind;
 
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static se.jbee.inject.Dependency.dependency;
-
 import org.junit.jupiter.api.Test;
-
 import se.jbee.inject.Provider;
 import se.jbee.inject.Scope;
 import se.jbee.inject.scope.TypeDependentScope;
+
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static se.jbee.inject.Dependency.dependency;
 
 public class TestTypeDependentScopes {
 

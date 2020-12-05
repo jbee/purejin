@@ -2,12 +2,13 @@ package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
-import se.jbee.inject.lang.Type;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.lang.Type;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static se.jbee.inject.Name.named;
 
 /**

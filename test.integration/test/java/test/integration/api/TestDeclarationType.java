@@ -1,16 +1,11 @@
 package test.integration.api;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static se.jbee.inject.DeclarationType.AUTO;
-import static se.jbee.inject.DeclarationType.DEFAULT;
-import static se.jbee.inject.DeclarationType.EXPLICIT;
-import static se.jbee.inject.DeclarationType.IMPLICIT;
-import static se.jbee.inject.DeclarationType.MULTI;
-import static se.jbee.inject.DeclarationType.REQUIRED;
-
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.DeclarationType;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static se.jbee.inject.DeclarationType.*;
 
 public class TestDeclarationType {
 

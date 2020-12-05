@@ -22,8 +22,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Cast.resourcesTypeFor;
 import static se.jbee.inject.Hint.relativeReferenceTo;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.config.ConstructsBy.common;
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * The tests shows an example of cyclic depended {@link Bundle}s. It shows that

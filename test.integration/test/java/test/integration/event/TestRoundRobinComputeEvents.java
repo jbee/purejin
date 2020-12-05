@@ -1,16 +1,13 @@
 package test.integration.event;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static se.jbee.inject.Name.named;
-
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.event.EventModule;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static se.jbee.inject.Name.named;
 
 public class TestRoundRobinComputeEvents {
 

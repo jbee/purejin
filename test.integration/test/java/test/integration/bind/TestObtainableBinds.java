@@ -7,7 +7,6 @@ import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 
-
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
