@@ -2,6 +2,7 @@ package se.jbee.inject.config;
 
 import java.lang.reflect.Method;
 
+@FunctionalInterface
 public interface DynamicLinker {
 
 	/**

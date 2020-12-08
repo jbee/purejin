@@ -66,12 +66,9 @@ public final class InconsistentBinding extends InconsistentDeclaration {
 					+ linked + "\n\t" + inconsistent);
 	}
 
-	public static InconsistentBinding noTypeAnnotation(Class<?> type) {
-		int annotations = type.getAnnotations().length;
+	public static InconsistentBinding noAnnotationModule(Class<?> type) {
 		return new InconsistentBinding(
-				"Expected an annotation on type but found none "
-					+ (annotations == 0 ? "" : "that has a custom definition")
-					+ ": " + type.getName());
+				"Expected at least one annotation used on type that is bound to an annotation module declaration: " + type.getName());
 	}
 
 	public static InconsistentBinding noFunctionalInterface(Class<?> type) {

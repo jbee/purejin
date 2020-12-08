@@ -11,22 +11,27 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BinderModuleWith;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Environment;
+import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.Utils;
 
 import java.io.Serializable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.lang.reflect.Method;
 import java.util.ServiceLoader;
 import java.util.function.IntSupplier;
 import java.util.function.LongSupplier;
 
+import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.inject.lang.Type.returnType;
 
 /**
  * A test that demonstrates how a custom annotation is defined as
- * {@link ModuleWith} (here {@link ServiceAnnotation}), how it is added to the
+ * {@link ModuleWith} (here {@link ServiceAnnotationEffect}), how it is added to the
  * bootstrapping configuration and how to request its use.
  **/
 public class TestAddAnnotatedBinds {
@@ -48,10 +53,16 @@ public class TestAddAnnotatedBinds {
 		Class<?>[] value();
 	}
 
+	@Target(METHOD)
+	@Retention(RUNTIME)
+	@interface Provides {
+	}
+
+
 	/**
 	 * Applies the effects of the {@link Service} annotation.
 	 */
-	static class ServiceAnnotation extends BinderModuleWith<Class<?>> {
+	static class ServiceAnnotationEffect extends BinderModuleWith<Class<?>> {
 
 		@Override
 		protected void declare(Class<?> annotated) {
@@ -65,7 +76,7 @@ public class TestAddAnnotatedBinds {
 	 * Applies the effect of the {@link Contract} annotation which binds the
 	 * class for all named interfaces.
 	 */
-	static class ContractAnnotation extends BinderModuleWith<Class<?>> {
+	static class ContractAnnotationEffect extends BinderModuleWith<Class<?>> {
 
 		@Override
 		protected void declare(Class<?> annotated) {
@@ -81,6 +92,23 @@ public class TestAddAnnotatedBinds {
 			} else {
 				bind(api).to((Class<? extends T>) impl);
 			}
+		}
+	}
+
+	static class ProvidesAnnotationEffect extends BinderModuleWith<Method> {
+
+		@Override
+		protected void declare(Method annotated) {
+			implicit().bind(annotated.getDeclaringClass()).toConstructor();
+			bindAnnotatedMethod(annotated, returnType(annotated));
+		}
+
+		@SuppressWarnings("unchecked")
+		private <T> void bindAnnotatedMethod(Method annotated, Type<T> returnType) {
+			bind(returnType).toFactory(context -> {
+				Object instance = context.resolve(annotated.getDeclaringClass());
+				return (T) Utils.produce(annotated, instance, null, RuntimeException::new);
+			});
 		}
 	}
 
@@ -110,6 +138,12 @@ public class TestAddAnnotatedBinds {
 		}
 	}
 
+	public static class Bean {
+		@Provides
+		public long methodAnnotation() {
+			return 13L;
+		}
+	}
 
 
 	/* Assume following to be defined in same module as above but in its
@@ -126,12 +160,14 @@ public class TestAddAnnotatedBinds {
 		protected void declare() {
 			addAnnotated(SomeServiceImpl.class);
 			addAnnotated(Answer.class);
+			addAnnotated(Bean.class);
 		}
 	}
 
 	private final Env env = Environment.DEFAULT //
-			.withTypeAnnotation(Service.class, new ServiceAnnotation())
-			.withTypeAnnotation(Contract.class, new ContractAnnotation());
+			.withTypeAnnotation(Service.class, new ServiceAnnotationEffect())
+			.withTypeAnnotation(Contract.class, new ContractAnnotationEffect())
+			.withMethodAnnotation(Provides.class, new ProvidesAnnotationEffect());
 	private final Injector injector = Bootstrap.injector(env,
 			TestAddAnnotatedBindsModule.class);
 
@@ -155,5 +191,12 @@ public class TestAddAnnotatedBinds {
 		// in contrast to @Service the @Contract only binds the named interfaces, so...
 		assertThrows(UnresolvableDependency.NoResourceForDependency.class,
 				() -> injector.resolve(LongSupplier.class));
+	}
+
+	@Test
+	public void customMethodAnnotationsAddedProgrammatically() {
+		// Bean has a method annotated @Provides which returns 13L
+		// this is bound for long as an effect of the ProvidesAnnotationEffect
+		assertEquals(13, injector.resolve(long.class));
 	}
 }

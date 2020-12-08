@@ -80,12 +80,12 @@ public final class Container implements Injector, Env {
 	}
 
 	@Override
-	public <T> T property(Name name, Type<T> property, Package scope) {
+	public <T> T property(Name qualifier, Type<T> property, Package ns) {
 		try {
-			Dependency<T> global = dependency(instance(name, property));
-			if (scope == null)
+			Dependency<T> global = dependency(instance(qualifier, property));
+			if (ns == null)
 				return resolve(global);
-			return resolve(global.injectingInto(scope));
+			return resolve(global.injectingInto(ns));
 		} catch (UnresolvableDependency e) {
 			throw new InconsistentDeclaration(e);
 		}

@@ -1,34 +1,37 @@
 package se.jbee.inject.bootstrap;
 
-import static se.jbee.inject.Instance.instance;
-import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Type.raw;
+import se.jbee.inject.*;
+import se.jbee.inject.bind.InconsistentBinding;
+import se.jbee.inject.bind.ModuleWith;
+import se.jbee.inject.bind.ValueBinder;
+import se.jbee.inject.config.*;
+import se.jbee.inject.defaults.DefaultValueBinders;
+import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.Utils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import se.jbee.inject.*;
-import se.jbee.inject.config.*;
-import se.jbee.inject.defaults.DefaultValueBinders;
-import se.jbee.inject.lang.Type;
-import se.jbee.inject.lang.Utils;
-import se.jbee.inject.bind.InconsistentBinding;
-import se.jbee.inject.bind.ModuleWith;
-import se.jbee.inject.bind.ValueBinder;
+import static se.jbee.inject.Instance.instance;
+import static se.jbee.inject.Name.named;
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * The {@link Environment} is the map based implementation of an {@link Env}
  * that mainly exists to solve the hen-egg situation that originates from {@link
  * Env} at times themselves being bootstrapped on the basis of an {@link Env}.
+ * <p>
+ * It only allows to declare "global" properties using {@link #with(Type,
+ * Object)} and others.
  */
 public final class Environment implements Env {
 
 	/**
-	 * The most basic {@link Env} that is used by default to bootstrap {@link
+	 * The most basic {@link Env} that is used as default to bootstrap {@link
 	 * Injector} contexts from root {@link se.jbee.inject.bind.Bundle} (s) or
-	 * even a bootstrapped {@link Env} itself.
+	 * even a bootstrapped a name-spaced {@link Env} itself.
 	 */
 	public static final Environment DEFAULT = new Environment() //
 			.with(Edition.class, Edition.FULL) //
@@ -92,41 +95,41 @@ public final class Environment implements Env {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T property(Name name, Type<T> property, Package scope) {
+	public <T> T property(Name qualifier, Type<T> property, Package ns) {
 		if (decorated != null && !override) {
 			try {
-				return decorated.property(name, property, scope);
+				return decorated.property(qualifier, property, ns);
 			} catch (InconsistentDeclaration e) {
 				// fall through and complement...
 			}
 		}
-		Instance<T> key = instance(name, property);
+		Instance<T> key = instance(qualifier, property);
 		Object value = values.get(key);
 		if (value != null || values.containsKey(key))
 			return (T) value;
 		if (decorated != null && override)
-			return decorated.property(name, property, scope);
-		throw InconsistentBinding.undefinedEnvProperty(name, property, scope);
+			return decorated.property(qualifier, property, ns);
+		throw InconsistentBinding.undefinedEnvProperty(qualifier, property, ns);
 	}
 
-	public <T> Environment with(Class<T> property, T value) {
-		return with(raw(property), value);
+	public <T> Environment with(Class<T> globalProperty, T value) {
+		return with(raw(globalProperty), value);
 	}
 
-	public <T> Environment with(Type<T> property, T value) {
-		return with(Name.DEFAULT.toString(), property, value);
+	public <T> Environment with(Type<T> globalProperty, T value) {
+		return with(Name.DEFAULT.toString(), globalProperty, value);
 	}
 
-	public <T> Environment with(String name, Class<T> property, T value) {
-		return with(name, raw(property), value);
+	public <T> Environment with(String qualifier, Class<T> globalProperty, T value) {
+		return with(qualifier, raw(globalProperty), value);
 	}
 
-	public <T> Environment with(String name, Type<T> property, T value) {
+	public <T> Environment with(String qualifier, Type<T> globalProperty, T value) {
 		if (readonly) {
 			return new Environment(false, copyOfValues(), override, decorated) //
-					.with(name, property, value);
+					.with(qualifier, globalProperty, value);
 		}
-		values.put(instance(named(name), property), value);
+		values.put(instance(named(qualifier), globalProperty), value);
 		return this;
 	}
 

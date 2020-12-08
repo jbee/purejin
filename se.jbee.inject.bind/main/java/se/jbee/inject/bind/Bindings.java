@@ -72,7 +72,6 @@ public final class Bindings {
 	public void addAnnotated(Env env, Class<?> annotated) {
 		Annotation[] as = annotated.getAnnotations();
 		int n = 0;
-		//TODO add support for method level annotations
 		//TODO add a meta annotation to mark annotations that are expected to be defined
 		// if such an annotation is present but no effect defined it is a binding error
 		for (Annotation a : as)
@@ -84,7 +83,7 @@ public final class Bindings {
 				if (addsAnnotatedMethod(env, m, a))
 					n++;
 		if (n == 0)
-			throw InconsistentBinding.noTypeAnnotation(annotated);
+			throw InconsistentBinding.noAnnotationModule(annotated);
 		if (constructImplicit)
 			; //TODO bind annotated to constructor
 	}
@@ -92,7 +91,7 @@ public final class Bindings {
 	private boolean addsAnnotatedType(Env env, Class<?> annotated, Annotation annotation) {
 		ModuleWith<Class<?>> then = env.property(
 				named(annotation.annotationType()),
-				ModuleWith.TYPE_ANNOTATION, annotated.getPackage());
+				ModuleWith.TYPE_ANNOTATION, annotated.getPackage(), null);
 		if (then == null)
 			return false;
 		then.declare(this, env, annotated);
@@ -103,7 +102,7 @@ public final class Bindings {
 		ModuleWith<Method> then = env.property(
 				named(annotation.annotationType()),
 				ModuleWith.METHOD_ANNOTATION,
-				annotated.getDeclaringClass().getPackage());
+				annotated.getDeclaringClass().getPackage(), null);
 		if (then == null)
 			return false;
 		then.declare(this, env, annotated);
