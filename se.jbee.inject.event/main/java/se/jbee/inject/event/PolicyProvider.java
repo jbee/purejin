@@ -17,7 +17,7 @@ package se.jbee.inject.event;
  * simply bind {@link PolicyProvider} to a custom supplier having the behaviour you
  * want.
  *
- * @since 19.1
+ * @since 8.1
  */
 @FunctionalInterface
 public interface PolicyProvider {

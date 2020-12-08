@@ -29,7 +29,7 @@ import java.util.function.Supplier;
  *
  * @param <T> The type of the instance that should be obtained
  *
- * @since 19.1
+ * @since 8.1
  */
 @FunctionalInterface
 public interface Obtainable<T> {

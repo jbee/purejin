@@ -24,7 +24,7 @@ import java.util.List;
  * (utility) packages as only contract is a consistent list of
  * {@link ResourceDescriptor} is produced to build a {@link Injector}s context.
  *
- * @since 19.1
+ * @since 8.1
  *
  * @param <T> Type of instances injected.
  */

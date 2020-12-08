@@ -17,7 +17,7 @@ public class Decorate {
 	/**
 	 * Chains {@link Injector}s similar to a {@link ClassLoader} hierarchy.
 	 *
-	 * @since 19.1
+	 * @since 8.1
 	 * @param root context acting as fallback
 	 * @param branch context that is tried first when resolving dependencies
 	 * @return An {@link Injector} with both contexts where root acts as

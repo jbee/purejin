@@ -26,11 +26,11 @@ public class TestAnnotatedWithBinds {
 
 	@Target({ ElementType.TYPE, ElementType.ANNOTATION_TYPE })
 	@Retention(RetentionPolicy.RUNTIME)
-	@interface MXBean {
+	@interface Component {
 
 	}
 
-	@MXBean
+	@Component
 	interface Service {
 
 		void verify();
@@ -49,7 +49,7 @@ public class TestAnnotatedWithBinds {
 
 	}
 
-	@MXBean
+	@Component
 	public static class ServiceImpl implements Service {
 
 		final AnnotatedWith<WebService> webServices;
@@ -141,7 +141,7 @@ public class TestAnnotatedWithBinds {
 	@Test
 	public void annotatedInstancesCanBeResolvedProgrammatically() {
 		List<AnnotatedInstance<?>> annotated = injector.annotatedWith(
-				MXBean.class);
+				Component.class);
 		assertEquals(1, annotated.size());
 		assertSame(injector.resolve(Service.class),
 				annotated.get(0).instance.get());

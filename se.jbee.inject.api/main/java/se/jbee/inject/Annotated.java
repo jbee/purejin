@@ -16,7 +16,7 @@ import java.util.function.UnaryOperator;
  *
  * @author Jan Bernitt
  *
- * @since 19.1
+ * @since 8.1
  */
 @FunctionalInterface
 public interface Annotated {

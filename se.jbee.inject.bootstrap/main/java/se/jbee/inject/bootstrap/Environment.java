@@ -5,6 +5,7 @@ import static se.jbee.inject.Name.named;
 import static se.jbee.inject.lang.Type.raw;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -76,6 +77,10 @@ public final class Environment implements Env {
 		return new Environment(true, values, override, decorated);
 	}
 
+	/**
+	 * @param completed some {@link Env}
+	 * @return This {@link Env} added as a fallback to the provided {@link Env}
+	 */
 	public Environment complete(Env completed) {
 		return new Environment(readonly, values, false, completed);
 	}
@@ -137,9 +142,16 @@ public final class Environment implements Env {
 		return with(type, value);
 	}
 
-	public <A extends Annotation> Environment withAnnotation(Class<A> name,
+	public <A extends Annotation> Environment withTypeAnnotation(Class<A> name,
 			ModuleWith<Class<?>> value) {
-		return with(named(name).toString(), ModuleWith.ANNOTATION, value);
+		//TODO check target type matches
+		return with(named(name).toString(), ModuleWith.TYPE_ANNOTATION, value);
+	}
+
+	public <A extends Annotation> Environment withMethodAnnotation(Class<A> name,
+			ModuleWith<Method> value) {
+		//TODO check target type matches
+		return with(named(name).toString(), ModuleWith.METHOD_ANNOTATION, value);
 	}
 
 	@SafeVarargs

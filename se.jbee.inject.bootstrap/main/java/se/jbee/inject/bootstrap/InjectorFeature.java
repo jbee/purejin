@@ -37,9 +37,8 @@ public enum InjectorFeature implements Toggled<InjectorFeature> {
 
 		@Override
 		protected void declare() {
-			Env env = env();
 			asDefault().bind(functionTypeOf(Class[].class, Injector.class)) //
-					.to(roots -> createSubContextFromRootBundles(env, roots));
+					.to(roots -> createSubContextFromRootBundles(env(), roots));
 		}
 
 		@SuppressWarnings({"rawtypes", "unchecked"})

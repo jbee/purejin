@@ -3,6 +3,9 @@ package se.jbee.inject.binder;
 import se.jbee.inject.Scope;
 import se.jbee.inject.bind.Bind;
 
+/**
+ * @since 8.1
+ */
 public abstract class EnvModule extends BinderModule {
 
 	@Override

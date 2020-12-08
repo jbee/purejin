@@ -18,7 +18,7 @@ import se.jbee.inject.lang.Utils;
  * Picks the {@link Constructor} to use to construct objects of a given
  * {@link Class}.
  *
- * @since 19.1
+ * @since 8.1
  */
 @FunctionalInterface
 public interface ConstructsBy {

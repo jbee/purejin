@@ -14,7 +14,7 @@ import se.jbee.inject.lang.Type;
  * @param <I> Type of the input parameter
  * @param <O> Type of the output value
  *
- * @since 19.1
+ * @since 8.1
  */
 public final class ActionSite<I, O> {
 

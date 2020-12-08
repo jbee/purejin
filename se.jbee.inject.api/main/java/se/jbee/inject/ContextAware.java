@@ -20,7 +20,7 @@ package se.jbee.inject;
  * {@link Generator}. Such {@link Resource}s are not
  * {@link ContextAware} by default.
  *
- * @since 19.1
+ * @since 8.1
  *
  * @param <T> type of the instance being resolved which itself is an instance of
  *            {@link ContextAware}. This should be the same type as the class

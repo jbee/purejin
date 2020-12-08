@@ -21,7 +21,7 @@ import java.io.Serializable;
  * this {@link Scope} be created during bootstrapping when an {@link Injector}
  * context is created.
  *
- * @since 19.1
+ * @since 8.1
  */
 public final class ScopePermanence implements Serializable {
 

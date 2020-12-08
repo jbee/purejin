@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.binder;
@@ -67,8 +67,8 @@ public abstract class BinderModule extends InitializedBinder
 
 	/**
 	 * Binds a {@link ScopePermanence} with the needed {@link Scope#container}.
-	 * 
-	 * @since 19.1
+	 *
+	 * @since 8.1
 	 * @param sp instance to bind, not null
 	 */
 	protected final void bindScopePermanence(ScopePermanence sp) {
@@ -82,8 +82,8 @@ public abstract class BinderModule extends InitializedBinder
 
 	/**
 	 * Starts the binding of a {@link Scope}.
-	 * 
-	 * @since 19.1
+	 *
+	 * @since 8.1
 	 * @param scope name of the scope to create
 	 * @return fluent API to invoke one of the {@code to} methods to provide the
 	 *         {@link Scope} or the indirection creating it.

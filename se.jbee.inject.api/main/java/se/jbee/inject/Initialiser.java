@@ -33,7 +33,7 @@ import static se.jbee.inject.lang.Type.raw;
  * @param <T> type of the value initialised, all values assignable to this type
  *            will match
  *
- * @since 19.1
+ * @since 8.1
  */
 @FunctionalInterface
 public interface Initialiser<T> {
@@ -95,7 +95,7 @@ public interface Initialiser<T> {
 	 * Can be bound to implement a defined custom ordering in which
 	 * {@link Initialiser}s are applied by an {@link Injector} context.
 	 *
-	 * @since 19.1
+	 * @since 8.1
 	 */
 	@FunctionalInterface
 	interface Sorter {

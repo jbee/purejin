@@ -5,13 +5,14 @@
  */
 package se.jbee.inject.bind;
 
-import static se.jbee.inject.lang.Type.raw;
-
-import java.lang.annotation.Annotation;
-
 import se.jbee.inject.Env;
 import se.jbee.inject.Name;
 import se.jbee.inject.lang.Type;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * A {@link ModuleWith} is an extension to a usual {@link Module} that depends
@@ -31,8 +32,13 @@ import se.jbee.inject.lang.Type;
 @FunctionalInterface
 public interface ModuleWith<T> extends Module {
 
-	@SuppressWarnings({ "unchecked", "rawtypes" }) Type<ModuleWith<Class<?>>> ANNOTATION = (Type) raw(
-			ModuleWith.class).parametized(Type.CLASS);
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	Type<ModuleWith<Class<?>>> TYPE_ANNOTATION = //
+			(Type) raw(ModuleWith.class).parametized(Type.CLASS);
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	Type<ModuleWith<Method>> METHOD_ANNOTATION = //
+			(Type) raw(ModuleWith.class).parametized(Method.class);
 
 	/**
 	 * @param bindings use to declare made bound within this {@link Module}.

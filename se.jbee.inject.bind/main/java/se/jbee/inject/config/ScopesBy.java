@@ -17,7 +17,7 @@ import se.jbee.inject.lang.TypeVariable;
  * Extracts the {@link Name} of the {@link Scope} to use for instances of a
  * given type. This can be used to implement scope annotations.
  *
- * @since 19.1
+ * @since 8.1
  */
 @FunctionalInterface
 public interface ScopesBy {

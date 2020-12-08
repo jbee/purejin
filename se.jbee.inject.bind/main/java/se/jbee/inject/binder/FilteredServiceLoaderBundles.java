@@ -1,26 +1,31 @@
 package se.jbee.inject.binder;
 
-import java.util.ServiceLoader;
-import java.util.function.Predicate;
-
 import se.jbee.inject.bind.Bundle;
 
+import java.util.ServiceLoader;
+
 public abstract class FilteredServiceLoaderBundles extends BootstrapperBundle {
-
-	private final Predicate<Class<? extends Bundle>> filter;
-
-	protected FilteredServiceLoaderBundles(
-			Predicate<Class<? extends Bundle>> filter) {
-		this.filter = filter;
-	}
 
 	@Override
 	protected final void bootstrap() {
 		//TODO localise effect to package
 		for (Bundle bundle : ServiceLoader.load(Bundle.class)) {
-			if (filter.test(bundle.getClass())) {
-				install(bundle.getClass());
+			Class<? extends Bundle> bundleId = bundle.getClass();
+			if (bootstrap(bundleId)) {
+				install(bundleId);
 			}
 		}
 	}
+
+	/**
+	 * In the instance of {@link Bundle}s composition isn't as meaningful as in
+	 * most other contexts as {@link Bundle} are purely identified by {@link
+	 * Class}. This means two instances of the same {@link Bundle}
+	 * implementation with different inner state make no sense. Therefore we do
+	 * use inheritance over composition.
+	 *
+	 * @param bundle a {@link Bundle} provided by {@link ServiceLoader}
+	 * @return true, if the bundle should be installed, else false
+	 */
+	abstract boolean bootstrap(Class<? extends Bundle> bundle);
 }

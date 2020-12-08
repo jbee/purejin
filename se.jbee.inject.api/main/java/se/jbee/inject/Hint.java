@@ -20,7 +20,7 @@ import java.util.Map;
  * A {@link Hint} is a suggested reference for parameters of a
  * {@link Constructor} or {@link Method} to inject.
  *
- * @since 19.1
+ * @since 8.1
  *
  * @param <T> The {@link Type} of the argument
  */

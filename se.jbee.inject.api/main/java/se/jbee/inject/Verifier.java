@@ -3,7 +3,8 @@ package se.jbee.inject;
 /**
  * {@link Verifier}s are attached to
  */
-@FunctionalInterface public interface Verifier {
+@FunctionalInterface
+public interface Verifier {
 
 	Verifier AOK = context -> {};
 

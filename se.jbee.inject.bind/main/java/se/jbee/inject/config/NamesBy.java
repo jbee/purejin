@@ -20,7 +20,7 @@ import se.jbee.inject.Name;
 /**
  * Extracts the {@link Name} used for instance being bound.
  *
- * @since 19.1
+ * @since 8.1
  */
 @FunctionalInterface
 public interface NamesBy {

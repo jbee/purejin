@@ -16,7 +16,7 @@ import java.util.function.Function;
  * to a actual {@link Dependency} situation its {@link #generator} is used to
  * create the instance injected should it not exist already.
  *
- * @since 19.1
+ * @since 8.1
  *
  * @param <T> type of instances yielded by the {@link #generator}.
  */

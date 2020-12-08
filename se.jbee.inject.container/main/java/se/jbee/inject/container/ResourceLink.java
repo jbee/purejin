@@ -14,17 +14,17 @@ import se.jbee.inject.Supplier;
  * {@link Generator} was created. In a way this is necessary to solve a hen-egg
  * situation in the collaboration between {@link Generator} and {@link Injector}
  * context implementations.
- * 
+ *
  * It is also a bridge between the {@link Generator} on the user side and the
  * {@link Supplier} used when binding.
  *
- * @since 19.1
+ * @since 8.1
  */
 @FunctionalInterface
 public interface ResourceLink {
 
 	/**
-	 * 
+	 *
 	 * @param <T> type of the instance create.
 	 * @param injected the {@link Dependency} currently resolved/injected
 	 * @param supplier the source used to supply the returned instance

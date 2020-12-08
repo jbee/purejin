@@ -5,31 +5,21 @@
  */
 package se.jbee.inject.bind;
 
-import static se.jbee.inject.lang.Type.raw;
-import static se.jbee.inject.lang.Utils.arrayOf;
-import static se.jbee.inject.lang.Utils.isClassMonomodal;
+import se.jbee.inject.*;
+import se.jbee.inject.Annotated.Merge;
+import se.jbee.inject.lang.Type;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import se.jbee.inject.Annotated;
-import se.jbee.inject.Annotated.Merge;
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Env;
-import se.jbee.inject.Generator;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Instance;
-import se.jbee.inject.Locator;
-import se.jbee.inject.Name;
-import se.jbee.inject.Scope;
-import se.jbee.inject.ScopePermanence;
-import se.jbee.inject.Source;
-import se.jbee.inject.Supplier;
-import se.jbee.inject.lang.Type;
-import se.jbee.inject.UnresolvableDependency;
+import static se.jbee.inject.Name.named;
+import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.inject.lang.Utils.arrayOf;
+import static se.jbee.inject.lang.Utils.isClassMonomodal;
 
 /**
  * {@link Bindings} accumulate the {@link Binding} during the bootstrapping.
@@ -79,27 +69,45 @@ public final class Bindings {
 		binder.expand(env, value, binding, this);
 	}
 
-	//TODO move out of here?
 	public void addAnnotated(Env env, Class<?> annotated) {
 		Annotation[] as = annotated.getAnnotations();
-		if (as.length == 0)
-			throw InconsistentBinding.noTypeAnnotation(annotated);
 		int n = 0;
-		for (Annotation a : as) {
-			@SuppressWarnings("unchecked")
-			ModuleWith<Class<?>> then = env.property(
-					Name.named(a.annotationType()),
-					raw(ModuleWith.class).parametized(Type.CLASS),
-					annotated.getPackage());
-			//TODO add a meta annotation to mark annotations that are expected to be defined
-			// if such an annotation is present but no effect defined it is a binding error
-			if (then != null) {
-				then.declare(this, env, annotated);
+		//TODO add support for method level annotations
+		//TODO add a meta annotation to mark annotations that are expected to be defined
+		// if such an annotation is present but no effect defined it is a binding error
+		for (Annotation a : as)
+			if (addsAnnotatedType(env, annotated, a))
 				n++;
-			}
-		}
+		boolean constructImplicit = n == 0;
+		for (Method m : annotated.getMethods())
+			for (Annotation a : m.getDeclaredAnnotations())
+				if (addsAnnotatedMethod(env, m, a))
+					n++;
 		if (n == 0)
 			throw InconsistentBinding.noTypeAnnotation(annotated);
+		if (constructImplicit)
+			; //TODO bind annotated to constructor
+	}
+
+	private boolean addsAnnotatedType(Env env, Class<?> annotated, Annotation annotation) {
+		ModuleWith<Class<?>> then = env.property(
+				named(annotation.annotationType()),
+				ModuleWith.TYPE_ANNOTATION, annotated.getPackage());
+		if (then == null)
+			return false;
+		then.declare(this, env, annotated);
+		return true;
+	}
+
+	private boolean addsAnnotatedMethod(Env env, Method annotated, Annotation annotation) {
+		ModuleWith<Method> then = env.property(
+				named(annotation.annotationType()),
+				ModuleWith.METHOD_ANNOTATION,
+				annotated.getDeclaringClass().getPackage());
+		if (then == null)
+			return false;
+		then.declare(this, env, annotated);
+		return true;
 	}
 
 	public <T> void addConstant(Env env, Source source, Name name,

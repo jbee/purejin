@@ -9,13 +9,13 @@ import se.jbee.inject.ScopePermanence;
 /**
  * Listener interface invoked by the {@link Injector}. Implementations are bound
  * as part of the {@link Injector} context.
- * 
+ *
  * Keep in mind that any instance implementing {@link PostConstructObserver} is
  * created ahead of the tracking so these cannot be tracked themselves even if
  * they qualify as instances in a permanent scope
  * ({@link ScopePermanence#isPermanent()}).
- * 
- * @since 19.1
+ *
+ * @since 8.1
  */
 @FunctionalInterface
 public interface PostConstructObserver {
@@ -23,11 +23,11 @@ public interface PostConstructObserver {
 	/**
 	 * Called by an {@link Injector} context when an instance was created and
 	 * after eventual post-construct initialisation have been applied.
-	 * 
+	 *
 	 * Note that this method is only called for typical "singleton" instances of
 	 * an application with a permanent scope
 	 * ({@link ScopePermanence#isPermanent()}).
-	 * 
+	 *
 	 * @param <T> Type of the created instance
 	 * @param resource the {@link Resource} that is the source of the provided
 	 *            instance

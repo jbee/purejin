@@ -8,7 +8,7 @@ import se.jbee.inject.lang.Type;
 /**
  * Problems related to {@link Binding} and the bootstrapping process.
  *
- * @since 19.1
+ * @since 8.1
  */
 public final class InconsistentBinding extends InconsistentDeclaration {
 

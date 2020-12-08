@@ -20,7 +20,7 @@ import se.jbee.inject.lang.Type;
  *
  * This is equivalent to use: {@link Injector#annotatedWith(Class)}
  *
- * @since 19.1
+ * @since 8.1
  *
  * @param <A> {@link Annotation} type to resolve, it only exists so a full
  *            generic type can be read using reflection to extract the

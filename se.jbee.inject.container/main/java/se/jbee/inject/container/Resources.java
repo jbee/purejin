@@ -41,7 +41,7 @@ import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
  * that the context can do further processing. This backwards link is supplied
  * as the {@link ResourceLink}.
  *
- * @since 19.1
+ * @since 8.1
  */
 final class Resources {
 

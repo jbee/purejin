@@ -10,8 +10,8 @@ import se.jbee.inject.binder.BootstrapperBundle;
  * A {@link Bundle} that installs all {@link CoreFeature} features active by
  * default. This means a {@link Injector} feature is implemented by providing a
  * {@link Resource} which is bound as a usual {@link Module}.
- * 
- * @since 19.1
+ *
+ * @since 8.1
  */
 public final class DefaultsBundle extends BootstrapperBundle {
 

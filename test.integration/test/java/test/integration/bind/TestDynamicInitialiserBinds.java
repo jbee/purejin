@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * instances.
  *
  * @author jan
- * @since 19.1
+ * @since 8.1
  */
 public class TestDynamicInitialiserBinds {
 

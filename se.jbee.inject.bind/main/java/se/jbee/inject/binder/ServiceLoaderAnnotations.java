@@ -20,7 +20,7 @@ import se.jbee.inject.bind.ModuleWith;
  * implementation class with the target {@link Annotation} itself. In that case
  * that {@link Annotation} must be the only runtime annotation present.
  *
- * @since 19.1
+ * @since 8.1
  */
 public class ServiceLoaderAnnotations extends BinderModule {
 
@@ -54,6 +54,6 @@ public class ServiceLoaderAnnotations extends BinderModule {
 
 	protected final void bind(Class<? extends Annotation> name,
 			ModuleWith<Class<?>> value) {
-		bind(Name.named(name), ModuleWith.ANNOTATION).to(value);
+		bind(Name.named(name), ModuleWith.TYPE_ANNOTATION).to(value);
 	}
 }

@@ -130,8 +130,8 @@ public class TestAddAnnotatedBinds {
 	}
 
 	private final Env env = Environment.DEFAULT //
-			.withAnnotation(Service.class, new ServiceAnnotation())
-			.withAnnotation(Contract.class, new ContractAnnotation());
+			.withTypeAnnotation(Service.class, new ServiceAnnotation())
+			.withTypeAnnotation(Contract.class, new ContractAnnotation());
 	private final Injector injector = Bootstrap.injector(env,
 			TestAddAnnotatedBindsModule.class);
 

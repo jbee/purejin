@@ -1,5 +1,6 @@
 package se.jbee.inject.config;
 
+import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.lang.Type.raw;
 
 import se.jbee.inject.Dependency;
@@ -12,7 +13,7 @@ import se.jbee.inject.Name;
  * convention of the mechanism.
  *
  * @author Jan Bernitt
- * @since 19.1
+ * @since 8.1
  */
 public final class Plugins implements Extension {
 
@@ -54,7 +55,7 @@ public final class Plugins implements Extension {
 
 	public Class<?>[] forPoint(Class<?> point, String property) {
 		@SuppressWarnings("rawtypes")
-		Dependency<Class[]> plugins = Dependency.dependency(
+		Dependency<Class[]> plugins = dependency(
 				raw(Class[].class)).named(pluginPoint(point, property));
 		return context.resolve(
 				target == null ? plugins : plugins.injectingInto(target));

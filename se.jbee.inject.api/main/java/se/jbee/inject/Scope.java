@@ -160,7 +160,7 @@ public interface Scope {
 	 * in the {@link Scope} it controls so that its implementation can return
 	 * the controller implementation.
 	 *
-	 * @since 19.1
+	 * @since 8.1
 	 */
 	interface Controller {
 

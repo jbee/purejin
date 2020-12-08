@@ -27,7 +27,7 @@ import se.jbee.inject.lang.Type;
  * can be methods for different purposes. For example factory methods or methods
  * that are used in advanced abstractions like actions.
  *
- * @since 19.1
+ * @since 8.1
  */
 @FunctionalInterface
 public interface ProducesBy {
@@ -85,6 +85,10 @@ public interface ProducesBy {
 		return impl -> filter.contains(raw(impl))
 			? this.reflect(impl)
 			: __noMethods;
+	}
+
+	default ProducesBy in(Class<?> api) {
+		return select(method -> raw(method.getDeclaringClass()).isAssignableTo(raw(api)));
 	}
 
 	static Method[] allMethods(Class<?> type) {

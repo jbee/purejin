@@ -24,7 +24,7 @@ import java.util.function.BinaryOperator;
  * are no good fit for a multi-dispatch system. Fault tolerance comes from
  * redundancy (multiple handlers) and eventually retrying.
  *
- * @since 19.1
+ * @since 8.1
  */
 public final class EventPolicy implements Serializable {
 

@@ -40,7 +40,7 @@ import se.jbee.inject.Initialiser;
  * "unregistered" if they no longer are required by any other part of the
  * application.
  *
- * @since 19.1
+ * @since 8.1
  */
 public interface EventProcessor extends AutoCloseable {
 

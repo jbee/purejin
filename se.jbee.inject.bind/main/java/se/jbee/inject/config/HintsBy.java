@@ -26,7 +26,7 @@ import se.jbee.inject.lang.Type;
  * Extracts the {@link Hint} hints used to resolve the {@link Dependency}s
  * of a {@link Method} or {@link Constructor} being injected.
  *
- * @since 19.1
+ * @since 8.1
  */
 @FunctionalInterface
 public interface HintsBy {
