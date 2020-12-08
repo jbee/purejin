@@ -65,7 +65,7 @@ public final class PostConstruct {
 			if (init != null)
 				matching.put(init, r);
 		}
-		Initialiser[] unsorted = matching.keySet().toArray(Initialiser[]::new);
+		Initialiser[] unsorted = matching.keySet().toArray(new Initialiser[0]);
 		Initialiser<?>[] sorted = unsorted.length <= 1
 				? unsorted
 				: sorter.sort(actualType, unsorted);
