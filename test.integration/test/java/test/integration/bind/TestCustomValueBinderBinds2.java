@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * This might make sense in some situation but cause issues in others when there
  * cannot be multiple instances of the same type anyway for some reason.
  */
-public class TestCustomValueBinderBinds2 {
+class TestCustomValueBinderBinds2 {
 
 	public static class BanalBean implements Serializable {
 		// no state, default constructor

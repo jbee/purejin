@@ -21,10 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * This mechanism can be used to setup more complex relations between managed
  * instances.
  *
- * @author jan
  * @since 8.1
  */
-public class TestDynamicInitialiserBinds {
+class TestDynamicInitialiserBinds {
 
 	public interface MyListener {
 

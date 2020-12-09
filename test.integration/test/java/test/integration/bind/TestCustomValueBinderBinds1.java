@@ -36,10 +36,8 @@ import static se.jbee.inject.lang.Type.fieldType;
  * The {@link RequiredConstructorParametersBinder} shows how all parameters of a
  * type bound to a constructor can add bindings that make the parameter's types
  * required so that eager exception occurs if no type is known for a parameter.
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
-public class TestCustomValueBinderBinds1 {
+class TestCustomValueBinderBinds1 {
 
 	@Target({ METHOD, FIELD })
 	@Retention(RUNTIME)

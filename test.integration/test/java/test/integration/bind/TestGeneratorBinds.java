@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.Cast.resourceTypeFor;
 import static se.jbee.inject.lang.Type.raw;
 
-public class TestGeneratorBinds {
+class TestGeneratorBinds {
 
 	private static final class GeneratorBindsModule extends BinderModule
 			implements Generator<String> {

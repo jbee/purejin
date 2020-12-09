@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests demonstrates how to use {@link Initialiser}s to decorate the
  * {@link Injector} or bound instances.
  */
-public class TestInitialiserDecorationBinds {
+class TestInitialiserDecorationBinds {
 
 	interface Shape {
 

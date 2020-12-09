@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static se.jbee.inject.Cast.resourceTypeFor;
 
-public class TestMirrorBinds {
+class TestMirrorBinds {
 
 	private static class MirrorBindsModule extends BinderModule {
 

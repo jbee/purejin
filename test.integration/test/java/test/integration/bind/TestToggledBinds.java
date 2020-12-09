@@ -28,10 +28,8 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
  * In this example we use {@link Binder#multibind(Class)}s to show that just one
  * of them has been bootstrapped depending on the value we defined in the
  * toggled property before bootstrapping.
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
-public class TestToggledBinds {
+class TestToggledBinds {
 
 	private enum Machine {
 		LOCALHOST, WORKER_1

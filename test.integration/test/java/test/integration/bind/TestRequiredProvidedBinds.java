@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * very helpful to compose an application out of parts that do not yet know each
  * other.
  */
-public class TestRequiredProvidedBinds {
+class TestRequiredProvidedBinds {
 
 	interface ExampleService {
 		// a classic singleton bean

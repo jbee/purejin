@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * of their class names. One of them is a lambda which means the name starts
  * with the name of the surrounding {@link TestInitialiserSorterBinds} class.
  */
-public class TestInitialiserSorterBinds {
+class TestInitialiserSorterBinds {
 
 	public static final class Bean {
 

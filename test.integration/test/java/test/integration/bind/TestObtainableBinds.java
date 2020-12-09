@@ -17,7 +17,7 @@ import static se.jbee.inject.lang.Type.raw;
 /**
  * A test that demonstrates {@link Obtainable} wrapper usage.
  */
-public class TestObtainableBinds {
+class TestObtainableBinds {
 
 	static class Plugin {
 		final String name;

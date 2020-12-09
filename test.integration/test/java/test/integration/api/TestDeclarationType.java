@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.jbee.inject.DeclarationType.*;
 
-public class TestDeclarationType {
+class TestDeclarationType {
 
 	@Test
 	public void thatExplicitIsNotReplacedByExplicit() {

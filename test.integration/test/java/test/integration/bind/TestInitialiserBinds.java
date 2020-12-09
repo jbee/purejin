@@ -21,7 +21,7 @@ import static se.jbee.inject.lang.Type.raw;
  * hook" of course is simulated so we can test for it being invoked. In a real
  * scenario one would use {@link Runtime#addShutdownHook(Thread)}.
  */
-public class TestInitialiserBinds {
+class TestInitialiserBinds {
 
 	static final class TestInitialiserBindsModule extends BinderModule
 			implements Initialiser<Injector> {

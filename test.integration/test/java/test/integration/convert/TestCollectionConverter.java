@@ -17,7 +17,7 @@ import static se.jbee.inject.Cast.listTypeOf;
 import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.lang.Utils.arrayMap;
 
-public class TestCollectionConverter {
+class TestCollectionConverter {
 
 	public static class TestCollectionConverterModule extends ConverterModule {
 

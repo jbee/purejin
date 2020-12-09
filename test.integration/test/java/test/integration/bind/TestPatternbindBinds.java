@@ -11,8 +11,6 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BinderModuleWith;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Environment;
-import se.jbee.inject.lang.Type;
-import se.jbee.inject.lang.Utils;
 
 import java.io.Serializable;
 import java.lang.annotation.Retention;
@@ -27,14 +25,13 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.lang.Type.raw;
-import static se.jbee.inject.lang.Type.returnType;
 
 /**
  * A test that demonstrates how a custom annotation is defined as
- * {@link ModuleWith} (here {@link ServiceAnnotationEffect}), how it is added to the
+ * {@link ModuleWith} (here {@link ServiceAnnotationPattern}), how it is added to the
  * bootstrapping configuration and how to request its use.
  **/
-public class TestAddAnnotatedBinds {
+class TestPatternbindBinds {
 
 	/* Assume following to be defined in some software module... */
 
@@ -62,7 +59,7 @@ public class TestAddAnnotatedBinds {
 	/**
 	 * Applies the effects of the {@link Service} annotation.
 	 */
-	static class ServiceAnnotationEffect extends BinderModuleWith<Class<?>> {
+	static class ServiceAnnotationPattern extends BinderModuleWith<Class<?>> {
 
 		@Override
 		protected void declare(Class<?> annotated) {
@@ -76,7 +73,7 @@ public class TestAddAnnotatedBinds {
 	 * Applies the effect of the {@link Contract} annotation which binds the
 	 * class for all named interfaces.
 	 */
-	static class ContractAnnotationEffect extends BinderModuleWith<Class<?>> {
+	static class ContractAnnotationPattern extends BinderModuleWith<Class<?>> {
 
 		@Override
 		protected void declare(Class<?> annotated) {
@@ -95,20 +92,12 @@ public class TestAddAnnotatedBinds {
 		}
 	}
 
-	static class ProvidesAnnotationEffect extends BinderModuleWith<Method> {
+	static class ProvidesAnnotationPattern extends BinderModuleWith<Method> {
 
 		@Override
 		protected void declare(Method annotated) {
 			implicit().bind(annotated.getDeclaringClass()).toConstructor();
-			bindAnnotatedMethod(annotated, returnType(annotated));
-		}
-
-		@SuppressWarnings("unchecked")
-		private <T> void bindAnnotatedMethod(Method annotated, Type<T> returnType) {
-			bind(returnType).toFactory(context -> {
-				Object instance = context.resolve(annotated.getDeclaringClass());
-				return (T) Utils.produce(annotated, instance, null, RuntimeException::new);
-			});
+			autobind().producer(annotated, null);
 		}
 	}
 
@@ -158,16 +147,16 @@ public class TestAddAnnotatedBinds {
 
 		@Override
 		protected void declare() {
-			addAnnotated(SomeServiceImpl.class);
-			addAnnotated(Answer.class);
-			addAnnotated(Bean.class);
+			patternbind(SomeServiceImpl.class);
+			patternbind(Answer.class);
+			patternbind(Bean.class);
 		}
 	}
 
 	private final Env env = Environment.DEFAULT //
-			.withTypeAnnotation(Service.class, new ServiceAnnotationEffect())
-			.withTypeAnnotation(Contract.class, new ContractAnnotationEffect())
-			.withMethodAnnotation(Provides.class, new ProvidesAnnotationEffect());
+			.withTypePattern(Service.class, new ServiceAnnotationPattern())
+			.withTypePattern(Contract.class, new ContractAnnotationPattern())
+			.withMethodPattern(Provides.class, new ProvidesAnnotationPattern());
 	private final Injector injector = Bootstrap.injector(env,
 			TestAddAnnotatedBindsModule.class);
 

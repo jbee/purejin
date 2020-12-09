@@ -24,10 +24,8 @@ import static test.integration.bind.AssertInjects.assertEqualSets;
  * The example also shows how {@link Annotation}s like {@link Featured} can be
  * used to mark {@link Bundle}s or {@link Module}s as a specific
  * {@link Feature}.
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
-public class TestEditionFeatureBinds {
+class TestEditionFeatureBinds {
 
 	public enum AnnotatedFeature implements Feature<AnnotatedFeature> {
 		FOO, BAR, BAZ;

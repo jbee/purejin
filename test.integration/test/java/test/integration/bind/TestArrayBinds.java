@@ -14,7 +14,7 @@ import static test.integration.bind.AssertInjects.assertEqualSets;
  * How to inject different arrays into different instances of the same parent
  * type.
  */
-public class TestArrayBinds {
+class TestArrayBinds {
 
 	public static class Command {
 

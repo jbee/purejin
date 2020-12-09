@@ -14,7 +14,7 @@ import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.lang.Type.raw;
 
-public class TestResolveResourceBinds {
+class TestResolveResourceBinds {
 
 	private static class TestResolveResourceBindsModule extends BinderModule {
 

@@ -13,7 +13,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Name.named;
 
-public class TestConfigBinds {
+class TestConfigBinds {
 
 	public static final class Bean {
 

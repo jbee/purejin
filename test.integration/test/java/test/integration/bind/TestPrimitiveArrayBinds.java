@@ -12,10 +12,8 @@ import static se.jbee.inject.Name.named;
 
 /**
  * This test demonstrates how to add automatic primitive array support.
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
-public class TestPrimitiveArrayBinds {
+class TestPrimitiveArrayBinds {
 
 	private static class PrimitiveArrayBindsModule extends BinderModule {
 

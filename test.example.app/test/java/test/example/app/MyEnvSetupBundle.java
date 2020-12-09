@@ -1,4 +1,4 @@
-package com.example.app;
+package test.example.app;
 
 import se.jbee.inject.Env;
 import se.jbee.inject.Extends;

@@ -21,7 +21,7 @@ import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.lang.Type.raw;
 
-public class TestProviderBinds {
+class TestProviderBinds {
 
 	static final DynamicState DYNAMIC_STATE_IN_A = new DynamicState();
 	static final DynamicState DYNAMIC_STATE_IN_B = new DynamicState();

@@ -12,12 +12,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static se.jbee.inject.Name.named;
 
 /**
- * In Silk primitives and wrapper {@link Class}es are the same {@link Type}.
- *
- * @author Jan Bernitt (jan@jbee.se)
- *
+ * Primitives and wrapper {@link Class}es are the same {@link Type} as far as
+ * the {@link Injector} is concerned.
  */
-public class TestPrimitiveBinds {
+class TestPrimitiveBinds {
 
 	private static class PrimitiveBindsModule extends BinderModule {
 

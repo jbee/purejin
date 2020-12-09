@@ -9,7 +9,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestSupplierBinds {
+class TestSupplierBinds {
 
 	public static class SupplierBindsModule extends BinderModule
 			implements Supplier<String> {

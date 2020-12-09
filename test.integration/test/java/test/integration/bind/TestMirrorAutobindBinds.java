@@ -24,10 +24,8 @@ import static se.jbee.inject.lang.Type.raw;
 /**
  * This test demonstrates the use of mirrors to semi-automatically bind
  * {@link Constructor}s and/or {@link Method}s as 'providers' of an instance.
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
-public class TestMirrorAutobindBinds {
+class TestMirrorAutobindBinds {
 
 	static final StringBuffer STATE = new StringBuffer();
 

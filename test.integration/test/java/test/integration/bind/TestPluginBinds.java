@@ -32,7 +32,7 @@ import static test.integration.bind.AssertInjects.assertEqualSets;
  * contain different members depending on the actual {@link Dependency} if the
  * scope of the bind done is narrowed like in this example.
  */
-public class TestPluginBinds {
+class TestPluginBinds {
 
 	private static class TestPluginModule extends BinderModule {
 

@@ -31,7 +31,7 @@ import static test.integration.util.TestUtils.wait50;
  * which will only resolve if the main thread continues in the test method to
  * the point where it notifies the waiting worker threads.
  */
-public class TestNonConcurrentVoidMultiDispatchEvents {
+class TestNonConcurrentVoidMultiDispatchEvents {
 
 	public interface Listener {
 

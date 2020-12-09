@@ -14,7 +14,7 @@ import static se.jbee.inject.Name.named;
  * A very basic test that shows how {@link Binder#init(Class)} can be used to
  * simulate setter injection.
  */
-public class TestSetterInitialisationBinds {
+class TestSetterInitialisationBinds {
 
 	public static class Bean {
 

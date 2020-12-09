@@ -145,16 +145,16 @@ public final class Environment implements Env {
 		return with(type, value);
 	}
 
-	public <A extends Annotation> Environment withTypeAnnotation(Class<A> name,
+	public <A extends Annotation> Environment withTypePattern(Class<A> qualifier,
 			ModuleWith<Class<?>> value) {
 		//TODO check target type matches
-		return with(named(name).toString(), ModuleWith.TYPE_ANNOTATION, value);
+		return with(named(qualifier).toString(), ModuleWith.TYPE_ANNOTATION, value);
 	}
 
-	public <A extends Annotation> Environment withMethodAnnotation(Class<A> name,
+	public <A extends Annotation> Environment withMethodPattern(Class<A> qualifier,
 			ModuleWith<Method> value) {
 		//TODO check target type matches
-		return with(named(name).toString(), ModuleWith.METHOD_ANNOTATION, value);
+		return with(named(qualifier).toString(), ModuleWith.METHOD_ANNOTATION, value);
 	}
 
 	@SafeVarargs

@@ -15,10 +15,8 @@ import static se.jbee.inject.lang.Type.raw;
 /**
  * Test illustrates how to inject specific implementation for same interface
  * into the same receiver class.
- *
- * @author jan
  */
-public class TestSpecificImplementationBinds {
+class TestSpecificImplementationBinds {
 
 	interface Action {
 		String doIt();

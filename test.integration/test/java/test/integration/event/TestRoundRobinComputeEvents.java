@@ -9,7 +9,7 @@ import se.jbee.inject.event.EventModule;
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Name.named;
 
-public class TestRoundRobinComputeEvents {
+class TestRoundRobinComputeEvents {
 
 	private interface Handler {
 

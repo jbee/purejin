@@ -24,10 +24,8 @@ import static se.jbee.inject.Name.named;
  * {@link BinderModuleWith#declare(Object)} is determined by the type of the
  * generic. This has to be the same {@link Type} as the one used when declaring
  * the value using {@link Environment#with(Type, Object)}.
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
-public class TestModuleWithBinds {
+class TestModuleWithBinds {
 
 	private static class TestModuleWithBindsBundle extends BootstrapperBundle {
 

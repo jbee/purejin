@@ -17,7 +17,7 @@ import static se.jbee.inject.Cast.setTypeOf;
 import static se.jbee.inject.Name.named;
 import static test.integration.bind.AssertInjects.assertEqualSets;
 
-public class TestMultibindBinds {
+class TestMultibindBinds {
 
 	static final Name foo = named("foo");
 	static final Name bar = named("bar");

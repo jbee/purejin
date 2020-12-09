@@ -17,10 +17,8 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests that demonstrates how to overlay the default behavior of 1-dimensional
  * array types by defining the elements of them explicitly using the
  * {@link TypedElementBinder#toElements(Hint[])} methods.
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
-public class TestElementBinds {
+class TestElementBinds {
 
 	private static class ElementBindsModule extends BinderModule {
 

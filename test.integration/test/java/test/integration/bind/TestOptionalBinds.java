@@ -18,7 +18,7 @@ import static se.jbee.inject.lang.Type.raw;
  * Dependencies that are available are injected wrapped in the {@link Optional},
  * dependencies that are not available are injected as {@link Optional#empty()}.
  */
-public class TestOptionalBinds {
+class TestOptionalBinds {
 
 	static final class TestOptionalBindsModule extends BinderModule {
 

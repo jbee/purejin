@@ -25,7 +25,7 @@ import static se.jbee.inject.Name.named;
  * found but the principle of using the {@link Initialiser} to add this feature
  * stays the same.
  */
-public class TestInitialiserAnnotationBinds {
+class TestInitialiserAnnotationBinds {
 
 	static final class TestInitialiserAnnotationBindsModule extends BinderModule
 			implements Initialiser<Object> {

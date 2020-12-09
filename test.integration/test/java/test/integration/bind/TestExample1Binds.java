@@ -19,7 +19,7 @@ import static se.jbee.inject.lang.Type.raw;
 /**
  * In reply to https://groups.google.com/forum/#!topic/silk-di/JhBnvF7k6Q4
  */
-public class TestExample1Binds {
+class TestExample1Binds {
 
 	public static class MyClass {
 

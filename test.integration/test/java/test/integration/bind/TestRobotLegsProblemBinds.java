@@ -17,10 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
  * This problem is a simple example where 2 slightly different object trees
  * needs to be created. In the case of the robot each of the robots legs should
  * get its on instance of a feet.
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
-public class TestRobotLegsProblemBinds {
+class TestRobotLegsProblemBinds {
 
 	public static class Foot {
 		// the left and right foot

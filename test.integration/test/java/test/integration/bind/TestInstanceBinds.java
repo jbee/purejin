@@ -9,10 +9,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * The test demonstrates binds that are 'linked' by type.
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
-public class TestInstanceBinds {
+class TestInstanceBinds {
 
 	public static class Foo {
 

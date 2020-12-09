@@ -19,10 +19,8 @@ import static se.jbee.inject.lang.Type.raw;
  * the action concept. The benefit is that application code does not become
  * dependent on the {@link Action} abstraction that is part of the DI aspect and
  * should be transparent.
- *
- * @author jan
  */
-public class TestServiceBinds {
+class TestServiceBinds {
 
 	/**
 	 * Think of this as an application specific service interface that normally

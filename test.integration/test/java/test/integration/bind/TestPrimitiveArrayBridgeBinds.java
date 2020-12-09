@@ -14,7 +14,7 @@ import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.Name.named;
 
-public class TestPrimitiveArrayBridgeBinds {
+class TestPrimitiveArrayBridgeBinds {
 
 	private static class TestPrimitiveArrayBridgeBindsBundle
 			extends BootstrapperBundle {

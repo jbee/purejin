@@ -15,7 +15,7 @@ import java.util.function.BinaryOperator;
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Name.named;
 
-public class TestAggregatingEvents {
+class TestAggregatingEvents {
 
 	interface Handler {
 

@@ -31,7 +31,7 @@ import static se.jbee.inject.lang.Type.raw;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public class TestAutobindBinds {
+class TestAutobindBinds {
 
 	static class AutobindBindsModule extends BinderModule {
 

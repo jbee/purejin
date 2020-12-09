@@ -48,7 +48,7 @@ import static se.jbee.inject.lang.Type.raw;
  * instance resolved and subscribed is not the same instance that is resolved
  * when using the {@link Service}.
  */
-public class TestPubSubBinds {
+class TestPubSubBinds {
 
 	interface Subscriber {
 

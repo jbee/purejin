@@ -11,7 +11,7 @@ import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestExceptionHandlingComputeEvents {
+class TestExceptionHandlingComputeEvents {
 
 	public interface Handler {
 

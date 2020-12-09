@@ -22,7 +22,7 @@ import static test.integration.util.TestUtils.wait50;
  * processing restrictions that control correct processing of events with
  * regards to isolation/threading.
  */
-public class TestEventBasics {
+class TestEventBasics {
 
 	public interface Handler {
 

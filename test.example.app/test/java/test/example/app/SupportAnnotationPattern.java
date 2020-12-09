@@ -1,4 +1,4 @@
-package com.example.app;
+package test.example.app;
 
 import java.lang.annotation.Annotation;
 import java.util.ServiceLoader;
@@ -23,7 +23,7 @@ import se.jbee.inject.Extends;
  * preferred where possible.
  */
 @Extends(Support.class)
-public class SupportAnnotation extends BinderModuleWith<Class<?>> {
+public class SupportAnnotationPattern extends BinderModuleWith<Class<?>> {
 
 	@Override
 	protected void declare(Class<?> annotated) {

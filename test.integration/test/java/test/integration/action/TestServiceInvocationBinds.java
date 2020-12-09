@@ -18,7 +18,7 @@ import static se.jbee.inject.lang.Type.raw;
  * add one can build something like {@link ServiceInterceptor} specialized to
  * ones needs.
  */
-public class TestServiceInvocationBinds {
+class TestServiceInvocationBinds {
 
 	private static class ServiceInvocationBindsModule extends ActionModule {
 

@@ -22,10 +22,8 @@ import static se.jbee.inject.Packages.subPackagesOf;
  * {@link TargetedBinder#inPackageOf(Class)},
  * {@link TargetedBinder#inSubPackagesOf(Class)},
  * {@link TargetedBinder#inPackageAndSubPackagesOf(Class)}.
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
-public class TestPackageLocalisedBinds {
+class TestPackageLocalisedBinds {
 
 	private static class PackageLocalisedBindsModule extends BinderModule {
 

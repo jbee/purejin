@@ -21,7 +21,7 @@ import static se.jbee.inject.Cast.*;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.lang.Type.raw;
 
-public class TestCollectionBinds {
+class TestCollectionBinds {
 
 	private static class CollectionBindsModule extends BinderModule {
 

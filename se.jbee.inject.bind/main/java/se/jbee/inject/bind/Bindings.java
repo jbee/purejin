@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 import static se.jbee.inject.Name.named;
+import static se.jbee.inject.lang.Type.classType;
 import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.lang.Utils.arrayOf;
 import static se.jbee.inject.lang.Utils.isClassMonomodal;
@@ -62,8 +63,7 @@ public final class Bindings {
 		Package scope = binding.source.ident.getPackage();
 		@SuppressWarnings("unchecked")
 		ValueBinder<V> binder = env.property(
-				raw(ValueBinder.class).parametized(Type.classType(type)),
-				scope);
+				raw(ValueBinder.class).parametized(classType(type)), scope);
 		if (binder == null)
 			throw InconsistentBinding.undefinedValueBinderType(binding, type);
 		binder.expand(env, value, binding, this);
@@ -74,18 +74,16 @@ public final class Bindings {
 		int n = 0;
 		//TODO add a meta annotation to mark annotations that are expected to be defined
 		// if such an annotation is present but no effect defined it is a binding error
+		// should be doable by just defining a module that tries to resolve the annotations from the environment => confirm with a test
 		for (Annotation a : as)
 			if (addsAnnotatedType(env, annotated, a))
 				n++;
-		boolean constructImplicit = n == 0;
 		for (Method m : annotated.getMethods())
 			for (Annotation a : m.getDeclaredAnnotations())
 				if (addsAnnotatedMethod(env, m, a))
 					n++;
 		if (n == 0)
 			throw InconsistentBinding.noAnnotationModule(annotated);
-		if (constructImplicit)
-			; //TODO bind annotated to constructor
 	}
 
 	private boolean addsAnnotatedType(Env env, Class<?> annotated, Annotation annotation) {

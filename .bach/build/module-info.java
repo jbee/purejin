@@ -28,7 +28,17 @@ import com.github.sormuras.bach.project.ProjectInfo.Tweak;
             "-group", "Add-ons",
             "se.jbee.inject.action:se.jbee.inject.event:se.jbee.inject.convert"
           })
-    })
+    },
+    test = @ProjectInfo.Test(
+            tweaks = @Tweak(
+                    tool = "junit",
+                    args = {
+                            "--config=junit.jupiter.execution.parallel.enabled=true",
+                            "--config=junit.jupiter.execution.parallel.mode.default=concurrent"
+                    }
+            )
+    ))
+
 module build {
   requires com.github.sormuras.bach;
 }

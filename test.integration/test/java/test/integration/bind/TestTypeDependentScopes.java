@@ -8,7 +8,7 @@ import se.jbee.inject.scope.TypeDependentScope;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static se.jbee.inject.Dependency.dependency;
 
-public class TestTypeDependentScopes {
+class TestTypeDependentScopes {
 
 	static class A {
 		// just for test

@@ -27,8 +27,7 @@ import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Source.source;
 import static se.jbee.inject.Target.targeting;
 import static se.jbee.inject.config.Plugins.pluginPoint;
-import static se.jbee.inject.lang.Type.fieldType;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.inject.lang.Type.*;
 import static se.jbee.inject.lang.Utils.isClassInstantiable;
 import static se.jbee.inject.lang.Utils.newArray;
 
@@ -76,10 +75,12 @@ public class Binder {
 	 *
 	 * @param types all types to bind using annotations present on the type
 	 */
-	public void addAnnotated(Class<?>... types) {
+	public void patternbind(Class<?>... types) {
 		Bindings bindings = bindings();
-		for (Class<?> type : types)
+		for (Class<?> type : types) {
 			bindings.addAnnotated(bind().env, type);
+			implicit().bind(type).toConstructor();
+		}
 	}
 
 	/**
@@ -98,7 +99,7 @@ public class Binder {
 	}
 
 	public final <T> TypedBinder<T> autobind(Class<T> type) {
-		return autobind(Type.raw(type));
+		return autobind(raw(type));
 	}
 
 	public final <T> TypedBinder<T> autobind(Type<T> type) {
@@ -106,7 +107,7 @@ public class Binder {
 	}
 
 	public final <T> TypedBinder<T> bind(Class<T> type) {
-		return bind(Type.raw(type));
+		return bind(raw(type));
 	}
 
 	public <T> TypedBinder<T> bind(Instance<T> instance) {
@@ -118,7 +119,7 @@ public class Binder {
 	}
 
 	public final <T> TypedBinder<T> bind(Name name, Class<T> type) {
-		return bind(name, Type.raw(type));
+		return bind(name, raw(type));
 	}
 
 	public final <T> TypedBinder<T> bind(Name name, Type<T> type) {
@@ -542,7 +543,7 @@ public class Binder {
 				return; // do not try to construct the class
 			Constructor<?> target = constructsBy.reflect(service);
 			if (target != null)
-				bind(target, hints);
+				constructor(target, hints);
 		}
 
 		private boolean bindSharesIn(Class<?> impl, Object instance) {
@@ -559,21 +560,37 @@ public class Binder {
 				Hint<?>[] hints) {
 			boolean needsInstance = false;
 			for (Method producer : producesBy.reflect(impl)) {
-				Type<?> returns = Type.returnType(producer);
-				if (returns.rawType != void.class
-					&& returns.rawType != Void.class) {
-					if (hints.length == 0)
-						hints = hintsBy.reflect(producer);
-					binder.per(scopesBy.reflect(producer)) //
-							.bind(namesBy.reflect(producer), returns) //
-							.to(instance, producer, hints);
+				if (producer(producer, instance, hints))
 					needsInstance |= !isStatic(producer.getModifiers());
-				}
 			}
 			return needsInstance;
 		}
 
-		private <T> void bind(Constructor<T> target, Hint<?>... hints) {
+		/**
+		 * This method will not make sure an instance of the {@link Method}'s
+		 * declaring class is created if needed. This must be bound elsewhere.
+		 *
+		 * @param producer a method that is meant to create instances of the
+		 *                 method return type
+		 * @param instance can be null to resolve the instance from {@link
+		 *                 Injector} context later (if needed)
+		 * @param hints    optional method argument {@link Hint}s
+		 * @return true if a producer was bound, else false (this is e.g. the
+		 * case when the {@link Method} returns void)
+		 */
+		public boolean producer(Method producer, Object instance, Hint<?>... hints) {
+			Type<?> returns = returnType(producer);
+			if (returns.rawType == void.class || returns.rawType == Void.class)
+				return false;
+			if (hints.length == 0)
+				hints = hintsBy.reflect(producer);
+			binder.per(scopesBy.reflect(producer)) //
+					.bind(namesBy.reflect(producer), returns) //
+					.to(instance, producer, hints);
+			return true;
+		}
+
+		public <T> void constructor(Constructor<T> target, Hint<?>... hints) {
 			Name name = namesBy.reflect(target);
 			if (hints.length == 0)
 				hints = hintsBy.reflect(target);
@@ -583,7 +600,7 @@ public class Binder {
 				appBinder.autobind(impl).to(target, hints);
 			} else {
 				appBinder.bind(name, impl).to(target, hints);
-				for (Type<? super T> st : Type.raw(impl).supertypes())
+				for (Type<? super T> st : raw(impl).supertypes())
 					if (st.isInterface())
 						appBinder.implicit().bind(name, st).to(name, impl);
 			}
@@ -803,7 +820,7 @@ public class Binder {
 
 		public <I extends Supplier<? extends T>> void toSupplier(Function<Injector, I> factory) {
 			AtomicReference<I> cache = new AtomicReference<>();
-			toSupplier((Supplier<? extends T>) (dep, context) ->
+			toSupplier((dep, context) ->
 					cache.updateAndGet(e -> e != null ? e :
 							factory.apply(context)).supply(dep, context));
 		}

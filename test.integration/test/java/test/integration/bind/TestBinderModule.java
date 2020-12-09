@@ -17,7 +17,7 @@ import static se.jbee.inject.DeclarationType.EXPLICIT;
  * Making sure the general functions of the {@link BinderModule} work as
  * expected.
  */
-public class TestBinderModule {
+class TestBinderModule {
 
 	static class TestBinderModuleModule1 extends BinderModule {
 

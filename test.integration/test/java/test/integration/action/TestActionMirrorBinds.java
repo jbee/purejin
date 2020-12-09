@@ -18,7 +18,7 @@ import static se.jbee.inject.lang.Type.raw;
  * binding a custom {@link ProducesBy} for services using
  * {@link ActionModule#discoverActionsBy(ProducesBy)}.
  */
-public class TestActionMirrorBinds {
+class TestActionMirrorBinds {
 
 	private static class TestServiceMirrorModule extends ActionModule {
 

@@ -14,7 +14,7 @@ import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.lang.Type.raw;
 
-public class TestMoreApplicable {
+public class TestMoreQualified {
 
 	static class HigherNumberIsMoreApplicable
 			implements Qualifying<HigherNumberIsMoreApplicable> {
@@ -119,7 +119,7 @@ public class TestMoreApplicable {
 
 	@Test
 	public void thatExplicitSourceIsMoreApplicableThanAutoSource() {
-		Source source = Source.source(TestMoreApplicable.class);
+		Source source = Source.source(TestMoreQualified.class);
 		assertMoreApplicable(source.typed(DeclarationType.EXPLICIT),
 				source.typed(DeclarationType.AUTO));
 	}

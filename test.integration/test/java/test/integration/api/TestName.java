@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.jbee.inject.Name.named;
 
-public class TestName {
+class TestName {
 
 	@Test
 	public void exactSameNameShouldBeCompatible() {

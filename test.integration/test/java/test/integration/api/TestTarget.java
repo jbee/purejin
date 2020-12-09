@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Target.targeting;
 
-public class TestTarget {
+class TestTarget {
 
 	@Test
 	public void thatTargetInstancesNeedsToBeMatchedByDependencies() {

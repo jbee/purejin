@@ -6,7 +6,7 @@ import se.jbee.inject.lang.Type;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestCast {
+class TestCast {
 
 	@Test
 	public void thatReturnTypeConformsToModelledType() {

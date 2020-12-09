@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static se.jbee.inject.lang.Type.raw;
 
-public class TestChain {
+class TestChain {
 
 	@Imports({ String.class, Integer.class })
 	@Converts({ "String", "Long", "Integer" })

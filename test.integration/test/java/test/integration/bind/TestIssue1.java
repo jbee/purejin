@@ -17,10 +17,8 @@ import static test.integration.bind.AssertInjects.assertEqualSets;
 /**
  * Solution for cycle on common interface injecting other implementations into
  * one of them.
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
-public class TestIssue1 {
+class TestIssue1 {
 
 	interface A {
 

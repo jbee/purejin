@@ -24,10 +24,8 @@ import static se.jbee.inject.Dependency.dependency;
  * {@link BinderModule} class into our test object {@link Bean}.
  *
  * @see TestConstructorHintBinds
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
-public class TestDependencyHintBinds {
+class TestDependencyHintBinds {
 
 	private static class DependencyParameterBindsBundle
 			extends BootstrapperBundle {

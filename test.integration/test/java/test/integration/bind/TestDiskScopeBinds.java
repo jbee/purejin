@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class TestDiskScopeBinds {
+class TestDiskScopeBinds {
 
 	static final File dir = new File("target/scope/test");
 	static final Name myDisk = Scope.disk(dir);

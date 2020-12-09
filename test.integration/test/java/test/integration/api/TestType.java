@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.lang.Type.*;
 
 @SuppressWarnings({ "rawtypes" })
-public class TestType {
+class TestType {
 
 	private interface Baz<T> {
 		// needed to check supertypes() method

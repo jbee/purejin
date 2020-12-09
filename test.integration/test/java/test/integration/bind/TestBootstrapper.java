@@ -33,7 +33,7 @@ import static se.jbee.inject.lang.Type.raw;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public class TestBootstrapper {
+class TestBootstrapper {
 
 	/**
 	 * One of two bundles in a minimal example of mutual dependent bundles.

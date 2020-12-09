@@ -8,7 +8,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestParentTargetBinds {
+class TestParentTargetBinds {
 
 	private static class ParentTargetBindsModule extends BinderModule {
 

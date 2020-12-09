@@ -19,10 +19,8 @@ import static se.jbee.inject.lang.Type.raw;
 /**
  * A test that demonstrates how to inject a specific instance into another type
  * using the {@link ScopedBinder#injectingInto(se.jbee.inject.Instance)} method.
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
-public class TestTargetedBinds {
+class TestTargetedBinds {
 
 	/**
 	 * We use different {@link Bar} constants to check if the different

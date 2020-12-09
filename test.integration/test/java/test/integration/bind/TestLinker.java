@@ -9,7 +9,7 @@ import se.jbee.inject.defaults.DefaultScopes;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestLinker {
+class TestLinker {
 
 	static class TwiceInstalledModule extends BinderModule {
 

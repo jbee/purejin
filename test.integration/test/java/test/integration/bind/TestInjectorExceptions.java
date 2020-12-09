@@ -10,7 +10,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static se.jbee.inject.Name.named;
 
-public class TestInjectorExceptions {
+class TestInjectorExceptions {
 
 	private static class TestInjectorBundle extends BinderModule {
 

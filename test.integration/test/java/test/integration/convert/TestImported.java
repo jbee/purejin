@@ -8,10 +8,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Tests the {@link Imported} utility.
- *
- * @author Jan Bernitt
  */
-public class TestImported {
+class TestImported {
 
 	private final Imported imported = Imported.base();
 

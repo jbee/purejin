@@ -28,11 +28,8 @@ import static se.jbee.inject.lang.Type.raw;
  * the next constructor parameter. The first assignable is used.
  *
  * @see TestDependencyHintBinds
- *
- * @author Jan Bernitt (jan@jbee.se)
- *
  */
-public class TestConstructorHintBinds {
+class TestConstructorHintBinds {
 
 	public static class Foo {
 

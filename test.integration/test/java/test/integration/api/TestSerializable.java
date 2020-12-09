@@ -12,7 +12,7 @@ import static test.integration.util.TestUtils.assertSerializable;
 /**
  * Make sure the value objects of the library are {@link Serializable}.
  */
-public class TestSerializable {
+class TestSerializable {
 
 	@Test
 	public void typeIsSerializable() {

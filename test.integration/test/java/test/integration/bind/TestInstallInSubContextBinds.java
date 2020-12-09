@@ -21,7 +21,7 @@ import static se.jbee.inject.lang.Type.raw;
  * example the first level is the "foo" sub-context, the second level is the
  * "bar" sub-context defined in "foo".
  */
-public class TestInstallInSubContextBinds {
+class TestInstallInSubContextBinds {
 
 	static final class TestInstallInSubContextBindsModule extends BinderModule {
 

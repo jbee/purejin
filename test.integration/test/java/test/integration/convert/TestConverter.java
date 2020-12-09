@@ -22,7 +22,7 @@ import static se.jbee.inject.lang.Utils.arrayMap;
 /**
  * Tests the basics of {@link Converter}s.
  */
-public class TestConverter {
+class TestConverter {
 
 	public static class TestConverterModule extends ConverterModule {
 

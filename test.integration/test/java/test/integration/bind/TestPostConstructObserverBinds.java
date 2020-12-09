@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * This sort of thing can be used to later tear down such instances in reverse
  * order.
  */
-public class TestPostConstructObserverBinds {
+class TestPostConstructObserverBinds {
 
 	public static class A {
 

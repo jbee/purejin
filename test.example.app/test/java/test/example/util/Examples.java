@@ -1,4 +1,4 @@
-package com.example.util;
+package test.example.util;
 
 public @interface Examples {
 

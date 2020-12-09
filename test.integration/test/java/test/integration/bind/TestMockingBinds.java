@@ -30,7 +30,7 @@ import static se.jbee.inject.lang.Type.returnType;
  * dependencies that have not be bound explicitly. A single declaration with a
  * custom supplier is enough to achieve this.
  */
-public class TestMockingBinds {
+class TestMockingBinds {
 
 	interface Shape {
 

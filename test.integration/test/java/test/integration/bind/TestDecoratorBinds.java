@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Test the fix for issue #61, falsely detection of dependency cycle when using
  * the decorator pattern.
  */
-public class TestDecoratorBinds {
+class TestDecoratorBinds {
 
 	interface Foo {
 		// the used abstraction

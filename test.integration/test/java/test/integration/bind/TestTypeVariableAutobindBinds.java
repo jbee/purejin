@@ -13,7 +13,7 @@ import java.util.function.Function;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.lang.Type.raw;
 
-public class TestTypeVariableAutobindBinds {
+class TestTypeVariableAutobindBinds {
 
 	public static class TestTypeVariableAutobindBindsModule extends BinderModule {
 

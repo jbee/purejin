@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static se.jbee.inject.config.ProducesBy.declaredMethods;
 import static se.jbee.inject.config.SharesBy.declaredFields;
 
-public class TestAnnotatedWithBinds {
+class TestAnnotatedWithBinds {
 
 	@Target({ ElementType.TYPE, ElementType.ANNOTATION_TYPE })
 	@Retention(RetentionPolicy.RUNTIME)

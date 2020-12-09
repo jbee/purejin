@@ -14,7 +14,7 @@ import static se.jbee.inject.Name.named;
  * {@link Initialiser} and that the decorated {@link Injector} is passed to
  * {@link Supplier}s when resolving {@link Dependency}s.
  */
-public class TestInjectorDecorationBinds {
+class TestInjectorDecorationBinds {
 
 	public static class DecoratingInjector implements Injector, Initialiser<Injector> {
 

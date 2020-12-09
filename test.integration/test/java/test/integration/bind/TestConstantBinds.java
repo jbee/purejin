@@ -11,7 +11,7 @@ import se.jbee.inject.lang.Type;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.lang.Type.raw;
 
-public class TestConstantBinds {
+class TestConstantBinds {
 
 	private static class ConstantBindsModule extends BinderModule {
 

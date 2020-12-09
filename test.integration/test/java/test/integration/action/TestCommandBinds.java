@@ -24,7 +24,7 @@ import static se.jbee.inject.lang.Type.raw;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public class TestCommandBinds {
+class TestCommandBinds {
 
 	private interface Command<P> {
 

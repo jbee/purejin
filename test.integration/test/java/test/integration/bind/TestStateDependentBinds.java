@@ -26,10 +26,8 @@ import static se.jbee.inject.lang.Type.raw;
  * runtime dependent on a setting in some setting object. This example shows
  * also how to extend the {@link BinderModule} to introduce a custom utility
  * such as {@link ControllerModule#connect(Class)}
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
-public class TestStateDependentBinds {
+class TestStateDependentBinds {
 
 	interface Validator {
 

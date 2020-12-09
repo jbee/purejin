@@ -5,7 +5,6 @@ import se.jbee.inject.lang.Utils;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Member;
-import java.util.Optional;
 import java.util.function.Function;
 
 import static se.jbee.inject.Name.named;
@@ -131,6 +130,7 @@ public interface Env {
 	default <T> Verifier verifierFor(T target) {
 		if (!globalProperty(Env.GP_USE_VERIFICATION, false))
 			return Verifier.AOK;
+		@SuppressWarnings("unchecked")
 		Class<T> targetClass = (Class<T>) target.getClass();
 		Function<T, Verifier> factory = globalProperty(Cast.functionTypeOf(
 				targetClass, Verifier.class), null);

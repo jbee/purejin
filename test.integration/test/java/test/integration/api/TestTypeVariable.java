@@ -16,7 +16,7 @@ import static se.jbee.inject.lang.Type.raw;
 /**
  * Tests {@link TypeVariable} utility for formal correctness.
  */
-public class TestTypeVariable {
+class TestTypeVariable {
 
 	interface Examples<C> {
 

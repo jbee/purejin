@@ -14,7 +14,7 @@ import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.lang.Type.raw;
 
-public class TestResource {
+class TestResource {
 
 	@Test
 	public void naturalOrderIsFromMostQualifiedToLeastQualified() {

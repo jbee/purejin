@@ -13,7 +13,7 @@ import static se.jbee.inject.Name.named;
  * that are all implemented by the same class without having them linked to the
  * same instance.
  */
-public class TestExample2Binds {
+class TestExample2Binds {
 
 	interface Decoupling {
 

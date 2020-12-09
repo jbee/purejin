@@ -28,7 +28,7 @@ import static se.jbee.inject.lang.Type.raw;
  * {@link String} fields with a custom annotation referencing a certain property
  * value.
  */
-public class TestPropertyAnnotationBinds {
+class TestPropertyAnnotationBinds {
 
 	/**
 	 * A custom annotation used to mark {@link String} parameters that should be

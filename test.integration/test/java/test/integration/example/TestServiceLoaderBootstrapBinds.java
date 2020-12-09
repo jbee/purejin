@@ -29,14 +29,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * {@link ServiceLoaderBundles} when bootstrapping an {@link Injector}. This
  * gives same control as always for this feature as well.
  */
-public class TestServiceLoaderBootstrapBinds {
+class TestServiceLoaderBootstrapBinds {
 
 	@Test
-	public void serviceLoaderCanBeUsedToDeclareModuleRoots() {
+	void serviceLoaderCanBeUsedToDeclareModuleRoots() {
 		Injector context = Bootstrap.injector();
 		assertNotNull(context);
 		assertEquals(13, context.resolve(int.class).intValue());
-		assertEquals("com.example.app.MyFirstModule",
+		assertEquals("test.example.app.MyFirstModule",
 				context.resolve(String.class));
 	}
 }

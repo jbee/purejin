@@ -11,7 +11,7 @@ import se.jbee.inject.bootstrap.Environment;
 
 import static test.integration.bind.AssertInjects.assertEqualSets;
 
-public class TestMultipleChoicesBinds {
+class TestMultipleChoicesBinds {
 
 	private enum Text {
 		A, B, C, D, E

@@ -13,12 +13,10 @@ import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Test that demontrates how two {@link Injector} contexts can be linked
- * together in a {@link Injector#hierarchy(Injector, Injector)}.
- *
- * @author Jan Bernitt
+ * Test that demonstrates how two {@link Injector} contexts can be linked
+ * together in a hierarchy using the {@link Decorate} utility.
  */
-public class TestInjectorHierarchy {
+class TestInjectorHierarchy {
 
 	/**
 	 * The shared context

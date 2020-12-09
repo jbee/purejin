@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Packages.packageOf;
 import static se.jbee.inject.lang.Type.raw;
 
-public class TestPackages {
+class TestPackages {
 
 	@Test
 	public void thatLowerBoundTypeIsNotInPackageJavaLang() {

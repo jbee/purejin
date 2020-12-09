@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.action.ActionModule.actionDependency;
 import static se.jbee.inject.lang.Type.raw;
 
-public class TestActionBinds {
+class TestActionBinds {
 
 	public static class ActionBindsModule extends ActionModule {
 

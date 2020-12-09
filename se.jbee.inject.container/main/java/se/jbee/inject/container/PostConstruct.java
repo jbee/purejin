@@ -6,14 +6,10 @@ import se.jbee.inject.lang.Type;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
-import static java.util.Arrays.copyOf;
-import static se.jbee.inject.Cast.initialiserTypeOf;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.lang.Type.raw;
-import static se.jbee.inject.lang.Utils.arrayFilter;
-import static se.jbee.inject.lang.Utils.arrayMap;
 
 /**
  * A {@link PostConstruct} encapsulates the state and processing of
@@ -25,7 +21,14 @@ public final class PostConstruct {
 
 	private final Initialiser.Sorter sorter;
 	private final Resource<? extends Initialiser<?>>[] resources;
-	private final Map<Class<?>, Map<Resource<?>, Initialiser<?>>> byTargetRawType = new ConcurrentHashMap<>();
+	/**
+	 * Again we cannot use {@link java.util.concurrent.ConcurrentHashMap} as the
+	 * recursive nature of dependency resolution could lead to reverse
+	 * modification which that class does not allow so once more {@link
+	 * ConcurrentSkipListMap} to the rescue.
+	 */
+	private final Map<Class<?>, Map<Resource<?>, Initialiser<?>>> byTargetRawType = new ConcurrentSkipListMap<>(
+			(class1, class2) -> class1.getName().compareTo(class2.getName()));
 
 	public PostConstruct(Initialiser.Sorter sorter,
 			Resource<? extends Initialiser<?>>[] resources) {

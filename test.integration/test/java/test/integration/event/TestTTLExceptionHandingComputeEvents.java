@@ -37,7 +37,7 @@ import static test.integration.util.TestUtils.wait50;
  * second call to time out.
  */
 @Disabled
-public class TestTTLExceptionHandingComputeEvents {
+class TestTTLExceptionHandingComputeEvents {
 
 	private interface Handler {
 

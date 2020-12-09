@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * This tests demonstrates how the {@link Binder#withIndirectAccess()} method
  * can be used to restrict access to a implementation type to its interfaces.
  */
-public class TestIndirectBinds {
+class TestIndirectAccessOnlyBinds {
 
 	interface Abstraction {
 

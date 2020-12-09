@@ -18,10 +18,8 @@ import static se.jbee.inject.lang.Utils.newArray;
 /**
  * Check the basic {@link #equals(Object)} and {@link #hashCode()}
  * implementations of value types.
- *
- * @author jan
  */
-public class TestEqualsHashCode {
+class TestEqualsHashCode {
 
 	@Test
 	public void type() throws Exception {

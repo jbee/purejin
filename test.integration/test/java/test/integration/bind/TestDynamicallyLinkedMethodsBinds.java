@@ -35,7 +35,7 @@ import static se.jbee.inject.config.ProducesBy.allMethods;
  * matching group {@link se.jbee.inject.Name} must be bound which handles the
  * processing of member {@link Method}s for an {@link Object} instance.
  */
-public class TestDynamicallyLinkedMethodsBinds {
+class TestDynamicallyLinkedMethodsBinds {
 
 	/**
 	 * Annotations are just one way to mark methods which is chosen in one of

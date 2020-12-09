@@ -10,7 +10,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestLambdaBinds {
+class TestLambdaBinds {
 
 	static class LambdaBindsBundle extends InitializedBinder implements Bundle {
 

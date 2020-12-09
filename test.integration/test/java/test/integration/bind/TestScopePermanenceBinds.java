@@ -17,7 +17,7 @@ import static se.jbee.inject.ScopePermanence.ignore;
 /**
  * Verifies the {@link ScopePermanence} of the {@link DefaultScopes}.
  */
-public class TestScopePermanenceBinds {
+class TestScopePermanenceBinds {
 
 	static final Name requestScope = Name.named("request");
 

@@ -23,10 +23,8 @@ import static se.jbee.inject.Packages.*;
  * are located.
  *
  * @see TestEditionFeatureBinds
- *
- * @author jan
  */
-public class TestEditionPackageBinds {
+class TestEditionPackageBinds {
 
 	static final class EditionPackageBindsModule extends BinderModule {
 
