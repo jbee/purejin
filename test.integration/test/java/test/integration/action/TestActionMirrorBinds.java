@@ -16,7 +16,6 @@ import static se.jbee.inject.lang.Type.raw;
 /**
  * The tests illustrates how to change the way service methods are identified by
  * binding a custom {@link ProducesBy} for services using
- * {@link ActionModule#discoverActionsBy(ProducesBy)}.
  */
 class TestActionMirrorBinds {
 
@@ -46,7 +45,7 @@ class TestActionMirrorBinds {
 			TestServiceMirrorModule.class);
 
 	@Test
-	public void actionMirrorCanBeCustomized() {
+	void actionMirrorCanBeCustomized() {
 		Action<Void, Integer> answer = injector.resolve(
 				actionDependency(raw(Void.class), raw(Integer.class)));
 		assertEquals(42, answer.run(null).intValue());

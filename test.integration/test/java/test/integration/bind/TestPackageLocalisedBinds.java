@@ -48,47 +48,47 @@ class TestPackageLocalisedBinds {
 			PackageLocalisedBindsModule.class);
 
 	@Test
-	public void thatDepedencyWithoutTargetResolvedToGlobalBind() {
+	void thatDepedencyWithoutTargetResolvedToGlobalBind() {
 		assertEquals("default", injector.resolve(stringGlobal));
 	}
 
 	@Test
-	public void thatDependencyWithTargetResolvedToSpecificBindInThatPackage() {
+	void thatDependencyWithTargetResolvedToSpecificBindInThatPackage() {
 		Dependency<String> stringInBind = stringGlobal.injectingInto(
 				TestPackageLocalisedBinds.class);
 		assertEquals("test", injector.resolve(stringInBind));
 	}
 
 	@Test
-	public void thatDependencyWithTargetSomewhereElseResolvedToGlobalBind() {
+	void thatDependencyWithTargetSomewhereElseResolvedToGlobalBind() {
 		Dependency<String> stringSomewhereElse = stringGlobal.injectingInto(
 				java.io.Closeable.class);
 		assertEquals("default", injector.resolve(stringSomewhereElse));
 	}
 
 	@Test
-	public void thatDependencyWithTargetResolvedToRelevantSubPackagesBind() {
+	void thatDependencyWithTargetResolvedToRelevantSubPackagesBind() {
 		Dependency<String> stringInAnnotation = stringGlobal.injectingInto(
 				java.lang.annotation.Target.class);
 		assertEquals("java-lang.*", injector.resolve(stringInAnnotation));
 	}
 
 	@Test
-	public void thatDependencyWithTargetResolvedToRelevantPackageOfPackageAndSubPackagesBind() {
+	void thatDependencyWithTargetResolvedToRelevantPackageOfPackageAndSubPackagesBind() {
 		Dependency<String> stringInUtil = stringGlobal.injectingInto(
 				java.util.List.class);
 		assertEquals("java-util.*", injector.resolve(stringInUtil));
 	}
 
 	@Test
-	public void thatDependencyWithTargetResolvedToRelevantSubPackageOfPackageAndSubPackagesBind() {
+	void thatDependencyWithTargetResolvedToRelevantSubPackageOfPackageAndSubPackagesBind() {
 		Dependency<String> stringInUtil = stringGlobal.injectingInto(
 				java.util.concurrent.Callable.class);
 		assertEquals("java-util.*", injector.resolve(stringInUtil));
 	}
 
 	@Test
-	public void thatDependencyWithTargetResolvedToRelevantMultiSubPackagesBind() {
+	void thatDependencyWithTargetResolvedToRelevantMultiSubPackagesBind() {
 		Dependency<String> stringInUtil = stringGlobal.injectingInto(
 				java.text.spi.NumberFormatProvider.class);
 		assertEquals("java-nio.* & java-text.*",

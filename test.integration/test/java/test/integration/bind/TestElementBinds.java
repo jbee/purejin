@@ -38,19 +38,19 @@ class TestElementBinds {
 			ElementBindsModule.class);
 
 	@Test
-	public void thatInstancesAreBoundAsElements() {
+	void thatInstancesAreBoundAsElements() {
 		assertArrayEquals(new String[] { "foo", "bar" },
 				injector.resolve(String[].class));
 	}
 
 	@Test
-	public void thatSubtypeInstancesAreBoundAsElements() {
+	void thatSubtypeInstancesAreBoundAsElements() {
 		assertArrayEquals(new Number[] { 2, 3f },
 				injector.resolve(Number[].class));
 	}
 
 	@Test
-	public void thatTypesAreBoundAsElements() {
+	void thatTypesAreBoundAsElements() {
 		List<?>[] elems = injector.resolve(List[].class);
 		assertEquals(2, elems.length);
 		assertTrue(elems[0] instanceof ArrayList);
@@ -58,7 +58,7 @@ class TestElementBinds {
 	}
 
 	@Test
-	public void thatConstantsAreBoundAsElements() {
+	void thatConstantsAreBoundAsElements() {
 		Float[] floats = injector.resolve(Float[].class);
 		assertEquals(2f, floats[0], 0.01f);
 		assertEquals(4f, floats[1], 0.01f);
@@ -66,7 +66,7 @@ class TestElementBinds {
 	}
 
 	@Test
-	public void thatVarargsConstantsAreBoundAsElements() {
+	void thatVarargsConstantsAreBoundAsElements() {
 		assertArrayEquals(new Long[] { 1L, 2L, 3L, 4L },
 				injector.resolve(Long[].class));
 	}

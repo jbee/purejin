@@ -118,7 +118,7 @@ class TestInitialiserBinds {
 	static boolean moduleInitRan = false;
 
 	@Test
-	public void initialisersCanBeUsedToCloseAnyAutoCloseable() {
+	void initialisersCanBeUsedToCloseAnyAutoCloseable() {
 		Injector injector = Bootstrap.injector(
 				TestInitialiserBindsModule.class);
 
@@ -134,7 +134,7 @@ class TestInitialiserBinds {
 	}
 
 	@Test
-	public void initialisersCanMakeUseOfParammetersUsingArgumentedModules() {
+	void initialisersCanMakeUseOfParammetersUsingArgumentedModules() {
 		Env env = Environment.DEFAULT.with(Integer.class, 42); // setup some parameter
 		Injector injector = Bootstrap.injector(
 				env, TestInitialiserBindsModuleWith.class);

@@ -33,7 +33,7 @@ class TestGeneratorBinds {
 			GeneratorBindsModule.class);
 
 	@Test
-	public void generatorCanBePassedDirectly() {
+	void generatorCanBePassedDirectly() {
 		assertEquals("hello world", injector.resolve(String.class));
 		assertEquals("SupplierGeneratorBridge",
 				injector.resolve(resourceTypeFor(raw(

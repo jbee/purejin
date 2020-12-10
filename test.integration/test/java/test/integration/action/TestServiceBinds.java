@@ -93,7 +93,7 @@ class TestServiceBinds {
 	}
 
 	@Test
-	public void servicesAreResolvable() {
+	void servicesAreResolvable() {
 		Injector injector = Bootstrap.injector(ServiceBindsModule.class);
 		@SuppressWarnings("unchecked")
 		Service<Integer, Long> square = injector.resolve(

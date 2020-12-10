@@ -38,7 +38,7 @@ class TestScopePermanenceBinds {
 	private final Map<Name, ScopePermanence> permanenceByScope = new HashMap<>();
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		for (ScopePermanence s : injector.resolve(ScopePermanence[].class))
 			permanenceByScope.put(s.scope, s);
 		permanenceByScope.put(ignore.scope, ignore);
@@ -49,7 +49,7 @@ class TestScopePermanenceBinds {
 	}
 
 	@Test
-	public void injectionScopeIsNotConsistentInAnyOtherScope() {
+	void injectionScopeIsNotConsistentInAnyOtherScope() {
 		assertIsNotConsistentIn(Scope.injection, Scope.application);
 		assertIsNotConsistentIn(Scope.injection, Scope.dependency);
 		assertIsNotConsistentIn(Scope.injection, Scope.dependencyInstance);
@@ -61,7 +61,7 @@ class TestScopePermanenceBinds {
 	}
 
 	@Test
-	public void threadScopeIsNotConsistentInAnyOtherScopeExceptInjectionAndWorker() {
+	void threadScopeIsNotConsistentInAnyOtherScopeExceptInjectionAndWorker() {
 		assertIsNotConsistentIn(Scope.thread, Scope.application);
 		assertIsNotConsistentIn(Scope.thread, Scope.dependency);
 		assertIsNotConsistentIn(Scope.thread, Scope.dependencyInstance);
@@ -73,12 +73,12 @@ class TestScopePermanenceBinds {
 	}
 
 	@Test
-	public void workerScopeIsNotConsistentInAnyOtherScopeExceptInjection() {
+	void workerScopeIsNotConsistentInAnyOtherScopeExceptInjection() {
 		assertWorkerScopePermanence(Scope.worker);
 	}
 
 	@Test
-	public void customWorkerScopeIsAsConsistentAsWorkerGroupScope() {
+	void customWorkerScopeIsAsConsistentAsWorkerGroupScope() {
 		assertWorkerScopePermanence(requestScope);
 	}
 
@@ -95,12 +95,12 @@ class TestScopePermanenceBinds {
 	}
 
 	@Test
-	public void applicationIsConsistentInAnyOtherScope() {
+	void applicationIsConsistentInAnyOtherScope() {
 		assertPermanentScope(Scope.application);
 	}
 
 	@Test
-	public void dependencyBasedIsConsistentInAnyOtherScope() {
+	void dependencyBasedIsConsistentInAnyOtherScope() {
 		assertPermanentScope(Scope.dependency);
 		assertPermanentScope(Scope.dependencyInstance);
 		assertPermanentScope(Scope.dependencyType);
@@ -108,12 +108,12 @@ class TestScopePermanenceBinds {
 	}
 
 	@Test
-	public void ignoreIsConsistentInAnyOtherScope() {
+	void ignoreIsConsistentInAnyOtherScope() {
 		assertPermanentScope(ScopePermanence.ignore);
 	}
 
 	@Test
-	public void defaultScopePermanencesAreBoundAsDefaults() {
+	void defaultScopePermanencesAreBoundAsDefaults() {
 		for (Resource<ScopePermanence> r : injector.resolve(
 				resourcesTypeFor(ScopePermanence.class))) {
 			if (!r.signature.instance.name.equalTo(requestScope))
@@ -122,7 +122,7 @@ class TestScopePermanenceBinds {
 	}
 
 	@Test
-	public void defaultScopesAreBoundAsDefaults() {
+	void defaultScopesAreBoundAsDefaults() {
 		for (Resource<Scope> r : injector.resolve(
 				resourcesTypeFor(Scope.class))) {
 			if (!r.signature.instance.name.equalTo(requestScope))

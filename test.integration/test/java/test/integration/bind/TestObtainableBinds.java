@@ -53,33 +53,33 @@ class TestObtainableBinds {
 	private final Injector injector = Bootstrap.injector(TestObtainableBindsModule.class);
 
 	@Test
-	public void obtainsArrayElementsThatCouldBeResolved() {
+	void obtainsArrayElementsThatCouldBeResolved() {
 		Manager manager = injector.resolve(Manager.class);
 		assertEquals(asList("a", "b"), asList(manager.plugins).stream()
 				.map(p -> p.name).collect(toList()));
 	}
 
 	@Test
-	public void obtainsEmptyArray() {
+	void obtainsEmptyArray() {
 		assertArrayEquals(new Integer[0], (Integer[]) injector.resolve( //
 				raw(Obtainable.class).parametized(Integer[].class)).obtain());
 	}
 
 	@Test
-	public void obtainsInstanceThatCanBeResolved() {
+	void obtainsInstanceThatCanBeResolved() {
 		assertEquals("The name", injector.resolve( //
 				raw(Obtainable.class).parametized(String.class)).obtain());
 	}
 
 	@Test
-	public void obtainsOrElseForInstanceThatCanNotBeResolved() {
+	void obtainsOrElseForInstanceThatCanNotBeResolved() {
 		assertEquals("a default", injector.resolve(named("unbound"), //
 				raw(Obtainable.class).parametized(String.class))
 				.orElse("a default"));
 	}
 
 	@Test
-	public void obtainsOriginalExceptionWhenInstanceCanNotBeResolved() {
+	void obtainsOriginalExceptionWhenInstanceCanNotBeResolved() {
 		Obtainable<?> box = injector.resolve(
 				raw(Obtainable.class).parametized(Integer.class));
 		try {

@@ -44,7 +44,7 @@ class TestOptionalBinds {
 			TestOptionalBindsBundle.class);
 
 	@Test
-	public void optionalIsAvailableForExactType() {
+	void optionalIsAvailableForExactType() {
 		assertEquals(Optional.of(5), injector.resolve(
 				raw(Optional.class).parametized(Integer.class)));
 		assertEquals(Optional.of("foo"), injector.resolve(
@@ -52,27 +52,27 @@ class TestOptionalBinds {
 	}
 
 	@Test
-	public void optionalIsAvailableForSuperType() {
+	void optionalIsAvailableForSuperType() {
 		assertEquals(Optional.of(5), injector.resolve(
 				raw(Optional.class).parametized(Number.class)));
 
 	}
 
 	@Test
-	public void emptyOptionalReturnedOtherwise() {
+	void emptyOptionalReturnedOtherwise() {
 		assertEquals(Optional.empty(),
 				injector.resolve(raw(Optional.class).parametized(Float.class)));
 	}
 
 	@Test
-	public void optionalOfOptionalOfIsAvailableForExactType() {
+	void optionalOfOptionalOfIsAvailableForExactType() {
 		assertEquals(Optional.of(Optional.of(5)),
 				injector.resolve(raw(Optional.class).parametized(
 						raw(Optional.class).parametized(Integer.class))));
 	}
 
 	@Test
-	public void emptyOptionalOfOptionalReturnedOtherwise() {
+	void emptyOptionalOfOptionalReturnedOtherwise() {
 		assertEquals(Optional.of(Optional.empty()),
 				injector.resolve(raw(Optional.class).parametized(
 						raw(Optional.class).parametized(Float.class))));

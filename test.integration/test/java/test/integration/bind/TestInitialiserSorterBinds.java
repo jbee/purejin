@@ -77,7 +77,7 @@ class TestInitialiserSorterBinds {
 			TestInitialiserSorterBindsModule.class);
 
 	@Test
-	public void orderOfInitialisersCanBeCustomisedByDefiningSorter() {
+	void orderOfInitialisersCanBeCustomisedByDefiningSorter() {
 		assertEquals(asList("c", "b", "a"), injector.resolve(Bean.class).names);
 	}
 }

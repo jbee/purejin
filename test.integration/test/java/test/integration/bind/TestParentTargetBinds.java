@@ -61,7 +61,7 @@ class TestParentTargetBinds {
 			ParentTargetBindsModule.class);
 
 	@Test
-	public void thatBindWithParentTargetIsUsedWhenInjectionHasParent() {
+	void thatBindWithParentTargetIsUsedWhenInjectionHasParent() {
 		assertEquals("child-with-grandparent",
 				injector.resolve(Grandparent.class).parent.child.value);
 		assertEquals("child-with-parent",
@@ -73,7 +73,7 @@ class TestParentTargetBinds {
 	 * counter-check to see that the more precise bind does not apply here
 	 */
 	@Test
-	public void thatBindWithParentTargetIsNotUsedWhenInjectionHasNoParent() {
+	void thatBindWithParentTargetIsNotUsedWhenInjectionHasNoParent() {
 		assertEquals("child", injector.resolve(Child.class).value);
 		assertEquals("everywhere", injector.resolve(String.class));
 	}

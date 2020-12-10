@@ -43,7 +43,7 @@ class TestCustomAnnotationBinds {
 	 * binding would exist for the class.
 	 */
 	@Test
-	public void customAnnotationsAddedViaServiceLoader() {
+	void customAnnotationsAddedViaServiceLoader() {
 	   Injector injector = Bootstrap.injector(Bootstrap.env(),
 				TestCustomAnnotationBindsModule.class);
 		MySupportService service = injector.resolve(MySupportService.class);

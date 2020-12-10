@@ -52,7 +52,7 @@ class TestCustomValueBinderBinds2 {
 	}
 
 	@Test
-	public void configurationAllowsToAvoidedReferencesWhenPossible() {
+	void configurationAllowsToAvoidedReferencesWhenPossible() {
 		Injector injector = injectorWithEnv(
 				TestCustomValueBinderBinds2Module.class,
 				DefaultValueBinders.INSTANCE_REF_LITE);

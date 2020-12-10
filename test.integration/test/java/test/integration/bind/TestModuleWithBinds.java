@@ -3,6 +3,7 @@ package test.integration.bind;
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
+import se.jbee.inject.bind.Bindings;
 import se.jbee.inject.binder.BinderModuleWith;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -21,7 +22,7 @@ import static se.jbee.inject.Name.named;
 /**
  * This test demonstrates how to set properties in the {@link Env} using the
  * {@link Environment} utility. The value passed into
- * {@link BinderModuleWith#declare(Object)} is determined by the type of the
+ * {@link BinderModuleWith} is determined by the type of the
  * generic. This has to be the same {@link Type} as the one used when declaring
  * the value using {@link Environment#with(Type, Object)}.
  */
@@ -94,18 +95,18 @@ class TestModuleWithBinds {
 	}
 
 	@Test
-	public void thatPresetValuePassedToModule() {
+	void thatPresetValuePassedToModule() {
 		assertEquals("bar", injector.resolve("foo", String.class));
 	}
 
 	@Test
-	public void thatDifferentParametizedPresetValuesForSameGenericTypeArePosssible() {
+	void thatDifferentParametizedPresetValuesForSameGenericTypeArePosssible() {
 		assertEquals("b", injector.resolve("list", String.class));
 		assertEquals(2, injector.resolve("list", Integer.class).intValue());
 	}
 
 	@Test
-	public void envItselfCanBePassedToModule() {
+	void envItselfCanBePassedToModule() {
 		assertNotNull(Bootstrap.injector(TestModuleWithBindsModule4.class));
 	}
 }

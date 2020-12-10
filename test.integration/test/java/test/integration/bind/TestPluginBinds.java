@@ -15,7 +15,7 @@ import java.util.concurrent.Callable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static test.integration.bind.AssertInjects.assertEqualSets;
+import static test.integration.util.TestUtils.assertEqualSets;
 
 /**
  * Plug-in-binds are a convenient way to define a named set of classes. The name
@@ -24,7 +24,7 @@ import static test.integration.bind.AssertInjects.assertEqualSets;
  * states the class that should be added to a set.
  *
  * The set than can be received from the {@link Injector} using
- * {@link Dependency#pluginsFor(Class)}. This allows to easily build
+ * {@link Plugins#forPoint(Class)}. This allows to easily build
  * abstractions like actions that use this to collect the set of classes used to
  * look for action methods.
  *
@@ -70,14 +70,14 @@ class TestPluginBinds {
 	private final Plugins plugins = injector.resolve(Plugins.class);
 
 	@Test
-	public void thatJustUntargetedExtensionsAreResolvedGlobally() {
+	void thatJustUntargetedExtensionsAreResolvedGlobally() {
 		Class<?>[] classes = plugins.forPoint(Callable.class);
 		assertEquals(1, classes.length);
 		assertSame(TestExtensionAction.class, classes[0]);
 	}
 
 	@Test
-	public void thatPackageLocalExtensionsAreResolvedWithAppropiateInjection() {
+	void thatPackageLocalExtensionsAreResolvedWithAppropiateInjection() {
 		Class<?>[] classes = plugins.targeting(Module.class).forPoint(
 				Callable.class);
 		assertEqualSets(new Class<?>[] { TestExtensionAction.class,
@@ -85,7 +85,7 @@ class TestPluginBinds {
 	}
 
 	@Test
-	public void thatInstanceOfExtensionsAreResolvedWithAppropiateInjection() {
+	void thatInstanceOfExtensionsAreResolvedWithAppropiateInjection() {
 		Class<?>[] classes = plugins.targeting(String.class).forPoint(
 				Callable.class);
 		assertEqualSets(new Class<?>[] { TestExtensionAction.class,
@@ -93,7 +93,7 @@ class TestPluginBinds {
 	}
 
 	@Test
-	public void thatDuplicatesAreEliminated() {
+	void thatDuplicatesAreEliminated() {
 		Class<?>[] classes = plugins.forPoint(Long.class);
 		assertEqualSets(new Class<?>[] { Integer.class, Float.class }, classes);
 	}

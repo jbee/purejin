@@ -92,30 +92,30 @@ class TestIndirectAccessOnlyBinds {
 			TestIndirectBindsModule.class);
 
 	@Test
-	public void indirectConstantResourcesCanBeResolvedViaInterface() {
+	void indirectConstantResourcesCanBeResolvedViaInterface() {
 		assertEquals("42", injector.resolve(Serializable.class));
 	}
 
 	@Test
-	public void indirectReferencedResourcesCanBeResolvedViaInterface() {
+	void indirectReferencedResourcesCanBeResolvedViaInterface() {
 		assertSame(Implementation.class,
 				injector.resolve(Abstraction.class).getClass());
 	}
 
 	@Test
-	public void indirectAutoboundResourcesCanBeResolvedViaInterface() {
+	void indirectAutoboundResourcesCanBeResolvedViaInterface() {
 		assertSame(Implementation2.class,
 				injector.resolve(Abstraction2.class).getClass());
 	}
 
 	@Test
-	public void indirectResourcesCanBeInjectedViaInterface() {
+	void indirectResourcesCanBeInjectedViaInterface() {
 		assertSame(Implementation.class,
 				injector.resolve(ValidReceiver.class).abs.getClass());
 	}
 
 	@Test
-	public void indirectResourcesCanBeInjectedViaInterfaceInHierarchy() {
+	void indirectResourcesCanBeInjectedViaInterfaceInHierarchy() {
 		assertSame(Implementation.class, injector.resolve(
 				ValidNestedReceiver.class).valid.abs.getClass());
 	}

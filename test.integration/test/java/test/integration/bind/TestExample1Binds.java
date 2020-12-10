@@ -57,7 +57,7 @@ class TestExample1Binds {
 	}
 
 	@Test
-	public void constructorArgumentsCanBePassedToBootstrappingUsingPresets() {
+	void constructorArgumentsCanBePassedToBootstrappingUsingPresets() {
 		Properties props = new Properties();
 		props.put("x", "abc");
 		props.put("y", 12);
@@ -69,7 +69,7 @@ class TestExample1Binds {
 	}
 
 	@Test
-	public void constructorArgumentsCanBeResolvedUsingNamedInstances() {
+	void constructorArgumentsCanBeResolvedUsingNamedInstances() {
 		Injector injector = Bootstrap.injector(Example1Module2.class);
 		MyClass obj = injector.resolve(MyClass.class);
 		assertEquals(12, obj.twelve);

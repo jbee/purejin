@@ -8,6 +8,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.config.Config;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -45,38 +46,39 @@ class TestConfigBinds {
 	private final Config config = injector.resolve(Config.class);
 
 	@Test
-	public void generalConfiguration() {
+	void generalConfiguration() {
 		assertEquals("bar", config.stringValue("foo"));
 		assertEquals(13, config.intValue("foo"));
 	}
 
 	@Test
-	public void namespacedConfiguration() {
+	void namespacedConfiguration() {
 		Config beanConfig = config.of(Bean.class);
 		assertEquals("que", beanConfig.stringValue("foo"));
 		assertEquals(42, beanConfig.intValue("foo"));
 	}
 
 	@Test
-	public void namespacedConfigurationIsInjected() {
+	void namespacedConfigurationIsInjected() {
 		Config beanConfig = injector.resolve(Bean.class).config;
 		assertEquals("que", beanConfig.stringValue("foo"));
 		assertEquals(42, beanConfig.intValue("foo"));
 	}
 
 	@Test
-	public void unknownValueThrowsException() {
-		assertThrows(NoSuchElementException.class,
-				() -> config.optionalValue(String.class, "unknown").get());
+	void unknownValueThrowsException() {
+		Optional<String> unknown = config.optionalValue(String.class,
+				"unknown");
+		assertThrows(NoSuchElementException.class, unknown::get);
 	}
 
 	@Test
-	public void unknownPrimitiveReturnsZero() {
+	void unknownPrimitiveReturnsZero() {
 		assertEquals(0, config.intValue("unknown"));
 	}
 
 	@Test
-	public void convertedConfiguration() {
-		assertNotNull(config.value("uuid").as(UUID.class).get());
+	void convertedConfiguration() {
+		assertNotNull(config.value("uuid").as(UUID.class).orElse(null));
 	}
 }

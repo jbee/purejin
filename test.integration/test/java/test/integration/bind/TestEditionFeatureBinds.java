@@ -14,7 +14,7 @@ import se.jbee.inject.config.Feature;
 
 import java.lang.annotation.*;
 
-import static test.integration.bind.AssertInjects.assertEqualSets;
+import static test.integration.util.TestUtils.assertEqualSets;
 
 /**
  * A test that demonstrates how to use {@link Feature}s and {@link Edition}s to
@@ -22,7 +22,7 @@ import static test.integration.bind.AssertInjects.assertEqualSets;
  * if-statement in the binding code.
  *
  * The example also shows how {@link Annotation}s like {@link Featured} can be
- * used to mark {@link Bundle}s or {@link Module}s as a specific
+ * used to mark {@link se.jbee.inject.bind.Bundle}s or {@link Module}s as a specific
  * {@link Feature}.
  */
 class TestEditionFeatureBinds {
@@ -106,22 +106,22 @@ class TestEditionFeatureBinds {
 	}
 
 	@Test
-	public void thatJustTheFeaturedBundleIsInstalled() {
+	void thatJustTheFeaturedBundleIsInstalled() {
 		assertEditionInstalls(Edition.includes(AnnotatedFeature.FOO), 42);
 	}
 
 	@Test
-	public void thatJustTheFeaturedModuleIsInstalled() {
+	void thatJustTheFeaturedModuleIsInstalled() {
 		assertEditionInstalls(Edition.includes(AnnotatedFeature.BAR), 8);
 	}
 
 	@Test
-	public void thatJustTheFeaturedModularBundleIsInstalled() {
+	void thatJustTheFeaturedModularBundleIsInstalled() {
 		assertEditionInstalls(Edition.includes(AnnotatedFeature.BAZ), 128);
 	}
 
 	@Test
-	public void thatTheFeaturedBundlesAndModulesAreInstalled() {
+	void thatTheFeaturedBundlesAndModulesAreInstalled() {
 		assertEditionInstalls(
 				Edition.includes(AnnotatedFeature.BAR, AnnotatedFeature.BAZ), 8,
 				128);

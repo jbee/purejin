@@ -38,7 +38,7 @@ class TestChain {
 	private final Injector context = Bootstrap.injector(TestChainModule.class);
 
 	@Test
-	public void chainCanBeStartedFromAnyLinksInput() {
+	void chainCanBeStartedFromAnyLinksInput() {
 		Chain<BigInteger> chain = new Chain<>(new ExampleConverter(), context);
 		assertConverts(chain, String.class, "42", BigInteger.valueOf(42));
 		assertConverts(chain, Integer.class, 42, BigInteger.valueOf(42));

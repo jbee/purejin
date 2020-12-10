@@ -36,7 +36,7 @@ class TestExample2Binds {
 	}
 
 	@Test
-	public void thatInstancesAToDAreDifferent() {
+	void thatInstancesAToDAreDifferent() {
 		Injector injector = Bootstrap.injector(Example2Module.class);
 		Decoupling a = injector.resolve("a", Decoupling.class);
 		Decoupling b = injector.resolve("b", Decoupling.class);

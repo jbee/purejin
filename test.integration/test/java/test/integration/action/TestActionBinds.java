@@ -46,7 +46,7 @@ class TestActionBinds {
 	}
 
 	@Test
-	public void actionsDecoupleConcreteMethods() {
+	void actionsDecoupleConcreteMethods() {
 		Injector injector = Bootstrap.injector(ActionBindsModule.class);
 		Action<Integer, Integer> mul2 = injector.resolve(
 				actionDependency(raw(Integer.class), raw(Integer.class)));
@@ -60,7 +60,7 @@ class TestActionBinds {
 	}
 
 	@Test
-	public void exceptionsAreWrappedInActionMalfunction() {
+	void exceptionsAreWrappedInActionMalfunction() {
 		Injector injector = Bootstrap.injector(ActionBindsModule.class);
 		Action<Void, Void> error = injector.resolve(
 				actionDependency(raw(Void.class), raw(Void.class)));

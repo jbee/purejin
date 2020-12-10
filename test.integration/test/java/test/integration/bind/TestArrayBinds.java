@@ -8,7 +8,7 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 
 import static se.jbee.inject.Name.named;
-import static test.integration.bind.AssertInjects.assertEqualSets;
+import static test.integration.util.TestUtils.assertEqualSets;
 
 /**
  * How to inject different arrays into different instances of the same parent
@@ -38,21 +38,18 @@ class TestArrayBinds {
 
 		@Override
 		protected void declare() {
-			bind(PRE_2, Double.class).to(Double.valueOf(2.0d)); // used by both CMD_1 and CMD_2
+			bind(PRE_2, Double.class).to(2.0d); // used by both CMD_1 and CMD_2
 
 			bind(CMD_1, Command.class).toConstructor();
-			injectingInto(CMD_1, Command.class).multibind(Number.class).to(
-					Integer.valueOf(1));
+			injectingInto(CMD_1, Command.class).multibind(Number.class).to(1);
 			injectingInto(CMD_1, Command.class).multibind(Number.class).to(
 					PRE_2, Double.class);
 
 			bind(CMD_2, Command.class).toConstructor();
 			injectingInto(CMD_2, Command.class).multibind(Number.class).to(
 					PRE_2, Double.class);
-			injectingInto(CMD_2, Command.class).multibind(Number.class).to(
-					Float.valueOf(3f));
-			injectingInto(CMD_2, Command.class).multibind(Number.class).to(
-					Long.valueOf(5L));
+			injectingInto(CMD_2, Command.class).multibind(Number.class).to(3f);
+			injectingInto(CMD_2, Command.class).multibind(Number.class).to(5L);
 
 			bind(CMD_3, Command.class).toConstructor();
 			injectingInto(CMD_3, Command.class).bind(Number.class).to(1, 6d, 8);
@@ -74,7 +71,7 @@ class TestArrayBinds {
 			ArrayBindsModule.class);
 
 	@Test
-	public void thatEachCommandGetsOnlyThePreconditionsBoundToIt() {
+	void thatEachCommandGetsOnlyThePreconditionsBoundToIt() {
 		assertPreconditions(CMD_1, 1, 2.0d);
 		assertPreconditions(CMD_2, 2d, 3f, 5L);
 		assertPreconditions(CMD_3, 1, 6d, 8);

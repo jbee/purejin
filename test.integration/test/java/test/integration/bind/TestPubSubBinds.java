@@ -171,12 +171,12 @@ class TestPubSubBinds {
 	}
 
 	@Test
-	public void withEveryUpperBound() {
+	void withEveryUpperBound() {
 		assertSubscribedToPublisher(PubSubBindsModule.class);
 	}
 
 	@Test
-	public void withAllAndMultibind() {
+	void withAllAndMultibind() {
 		assertSubscribedToPublisher(PubSubBindsModule2.class);
 	}
 

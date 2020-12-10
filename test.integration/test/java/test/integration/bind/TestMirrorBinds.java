@@ -41,7 +41,7 @@ class TestMirrorBinds {
 			MirrorBindsModule.class);
 
 	@Test
-	public void annotatedScopeIsUsed() {
+	void annotatedScopeIsUsed() {
 		assertNotSame(injector.resolve(InjectionScoped.class),
 				injector.resolve(InjectionScoped.class));
 		Resource<InjectionScoped> resource = injector.resolve(

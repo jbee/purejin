@@ -59,7 +59,7 @@ class TestDependencyHintBinds {
 	}
 
 	@Test
-	public void thatDependencyParameterIsUnderstood() {
+	void thatDependencyParameterIsUnderstood() {
 		Injector resolver = Bootstrap.injector(
 				DependencyParameterBindsBundle.class);
 		Bean bean = resolver.resolve(Bean.class);

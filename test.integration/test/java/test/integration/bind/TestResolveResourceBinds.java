@@ -34,7 +34,7 @@ class TestResolveResourceBinds {
 			TestResolveResourceBindsModule.class);
 
 	@Test
-	public void thatResourceIsAvailableForEveryBoundResource() {
+	void thatResourceIsAvailableForEveryBoundResource() {
 		Resource<String> resource = injector.resolve(
 				resourceTypeFor(String.class));
 		assertNotNull(resource);
@@ -42,19 +42,19 @@ class TestResolveResourceBinds {
 	}
 
 	@Test
-	public void thatResourceArrayIsAvailableForEveryBoundResource() {
+	void thatResourceArrayIsAvailableForEveryBoundResource() {
 		Resource<String>[] resource = injector.resolve(
 				resourcesTypeFor(String.class));
 		assertEquals(4, resource.length);
 	}
 
 	@Test
-	public void thatResourceArrayIsAvailableForAllResources() {
+	void thatResourceArrayIsAvailableForAllResources() {
 		assertTrue(injector.resolve(Resource[].class).length >= 4);
 	}
 
 	@Test
-	public void thatResourceArrayFiltersByName() {
+	void thatResourceArrayFiltersByName() {
 		Dependency<? extends Resource<String>[]> dependency = dependency(
 				resourcesTypeFor(String.class)).named("special");
 		Resource<String>[] rs = injector.resolve(dependency);
@@ -64,7 +64,7 @@ class TestResolveResourceBinds {
 	}
 
 	@Test
-	public void thatGeneratorIsAvailableForEveryBoundResource() {
+	void thatGeneratorIsAvailableForEveryBoundResource() {
 		Generator<String> generator = injector.resolve(
 				generatorTypeOf(raw(String.class)));
 		assertNotNull(generator);
@@ -72,24 +72,24 @@ class TestResolveResourceBinds {
 	}
 
 	@Test
-	public void thatGeneratorArrayIsAvailableForEveryBoundResource() {
+	void thatGeneratorArrayIsAvailableForEveryBoundResource() {
 		Generator<String>[] gens = injector.resolve(
 				generatorsTypeFor(raw(String.class)));
 		assertEquals(4, gens.length);
 	}
 
 	@Test
-	public void thatGeneratorArrayIsAvailableForAllResources() {
+	void thatGeneratorArrayIsAvailableForAllResources() {
 		assertTrue(injector.resolve(Generator[].class).length >= 4);
 	}
 
 	@Test
-	public void thatInjectorIsAvailableByDefault() {
+	void thatInjectorIsAvailableByDefault() {
 		assertSame(injector, injector.resolve(Injector.class));
 	}
 
 	@Test
-	public void resolingViaResourceDoesLookupPlainTypeForPotentialMatches() {
+	void resolingViaResourceDoesLookupPlainTypeForPotentialMatches() {
 		try {
 			injector.resolve(named("x"), resourceTypeFor(String.class));
 			fail("Expected not to find a matching resource");
@@ -100,7 +100,7 @@ class TestResolveResourceBinds {
 	}
 
 	@Test
-	public void resolingViaGeneratorDoesLookupPlainTypeForPotentialMatches() {
+	void resolingViaGeneratorDoesLookupPlainTypeForPotentialMatches() {
 		try {
 			injector.resolve(named("x"), generatorTypeOf(raw(String.class)));
 			fail("Expected not to find a matching resource");

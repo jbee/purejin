@@ -47,7 +47,7 @@ class TestInitialiserGenericBinds {
 			TestInitialiserGenericBindsModule.class);
 
 	@Test
-	public void initialisersOnlyAffectExactTypeMatches() {
+	void initialisersOnlyAffectExactTypeMatches() {
 		assertEquals(new HashSet<>(asList("b", "a")),
 				new HashSet<>(context.resolve(listTypeOf(String.class))));
 		assertEquals(asList(1), context.resolve(listTypeOf(Integer.class)));

@@ -45,7 +45,7 @@ class TestEditionPackageBinds {
 	}
 
 	@Test
-	public void editionsCanBeUsedToInstallBundlesPackageDependent() {
+	void editionsCanBeUsedToInstallBundlesPackageDependent() {
 		// no edition
 		Injector injector = Bootstrap.injector(EditionPackageBindsBundle.class);
 		assertEquals(42, injector.resolve(int.class).intValue());

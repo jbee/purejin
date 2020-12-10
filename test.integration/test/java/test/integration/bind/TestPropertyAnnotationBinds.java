@@ -111,7 +111,7 @@ class TestPropertyAnnotationBinds {
 	}
 
 	@Test
-	public void customMirrorAndSupplierCanBeUsedToAddCustomAnnotation() {
+	void customMirrorAndSupplierCanBeUsedToAddCustomAnnotation() {
 		Properties properties = new Properties();
 		properties.put("foo", "property1");
 		properties.put("bar", "property2");

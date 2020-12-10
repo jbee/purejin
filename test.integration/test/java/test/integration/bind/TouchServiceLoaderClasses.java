@@ -9,7 +9,7 @@ class TouchServiceLoaderClasses {
 
 	@SuppressWarnings("unused")
 	@Test
-	public void test() {
+	void test() {
 		new ServiceLoaderAnnotations();
 		new ServiceLoaderBundles();
 		new ServiceLoaderEnvBundles();

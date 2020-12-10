@@ -72,7 +72,7 @@ class TestInitialiserAnnotationBinds {
 			TestInitialiserAnnotationBindsModule.class);
 
 	@Test
-	public void initialisiersCanBeUsedToAddAnnotationBasedInjection() {
+	void initialisiersCanBeUsedToAddAnnotationBasedInjection() {
 		SomeBean bean = injector.resolve(SomeBean.class);
 		assertEquals(42, bean.someField.intValue());
 		assertEquals("x", bean.someNamedField);

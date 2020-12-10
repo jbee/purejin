@@ -67,13 +67,19 @@ public class Binder {
 
 	/**
 	 * Adds bindings indirectly by inspecting the annotations present on the
-	 * provided types. The effect of found annotation(s) is applied as encoded
-	 * by an annotation specific {@link ModuleWith} added to the {@link Env}.
-	 * This can done either programmatically or via {@link
-	 * java.util.ServiceLoader} entry for the {@link ModuleWith} (of {@link
-	 * Class}).
+	 * provided types and their methods. An annotation can be linked to a
+	 * binding pattern described by a {@link ModuleWith} linked to a specific
+	 * annotation as part of the {@link Env}. This can done either
+	 * programmatically or via {@link java.util.ServiceLoader} entry for the
+	 * {@link ModuleWith} (of {@link Class}).
+	 * <p>
+	 * This is the most "automatic" way of binding that maybe has closes
+	 * similarity with annotation based dependency injection as found in CDI or
+	 * spring. It separates the specifics of the bind from the target. While
+	 * this is very simple to use it is also very limiting.
 	 *
-	 * @param types all types to bind using annotations present on the type
+	 * @param types all types to bind using annotations present on the type and
+	 *              their methods
 	 */
 	public void patternbind(Class<?>... types) {
 		Bindings bindings = bindings();

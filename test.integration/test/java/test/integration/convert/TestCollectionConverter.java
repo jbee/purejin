@@ -35,14 +35,14 @@ class TestCollectionConverter {
 			TestCollectionConverterModule.class);
 
 	@Test
-	public void genericArrayToCollectionConverterCanBeDefined() {
+	void genericArrayToCollectionConverterCanBeDefined() {
 		Converter<Number[], List<Number>> arr2list = context.resolve(
 				Converter.converterTypeOf(raw(Number[].class), listTypeOf(Number.class)));
 		assertEquals(asList(1, 2), arr2list.convert(new Number[] { 1, 2 }));
 	}
 
 	@Test
-	public void genericStringToArrayConverterCanBeDefined() {
+	void genericStringToArrayConverterCanBeDefined() {
 		Converter<String, Integer[]> str2intArr = context.resolve(
 				Converter.converterTypeOf(String.class, Integer[].class));
 		assertArrayEquals(new Integer[] { 42, 13 },

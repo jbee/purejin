@@ -32,7 +32,7 @@ class TestLambdaBinds {
 	}
 
 	@Test
-	public void thatLambdasCanBeUsedToDescribeModules() {
+	void thatLambdasCanBeUsedToDescribeModules() {
 		Injector injector = Bootstrap.injector(LambdaBindsModule.class);
 
 		assertEquals(1, injector.resolve(int.class).intValue());

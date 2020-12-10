@@ -106,17 +106,17 @@ class TestConstructorHintBinds {
 			ParameterConstructorBindsModule.class);
 
 	@Test
-	public void thatClassParameterIsArranged() {
+	void thatClassParameterIsArranged() {
 		assertNotNull(injector.resolve(Foo.class));
 	}
 
 	@Test
-	public void thatTypeParameterIsArranged() {
+	void thatTypeParameterIsArranged() {
 		assertNotNull(injector.resolve(Bar.class));
 	}
 
 	@Test
-	public void thatInstanceParameterIsArranged() {
+	void thatInstanceParameterIsArranged() {
 		Bar bar = injector.resolve(Bar.class);
 		assertEquals("y", bar.foo);
 	}
@@ -131,7 +131,7 @@ class TestConstructorHintBinds {
 	 * 1st argument.
 	 */
 	@Test
-	public void thatParameterAsAnotherTypeIsArranged() {
+	void thatParameterAsAnotherTypeIsArranged() {
 		Qux qux = injector.resolve(Qux.class);
 		assertEquals("y", qux.sequence);
 	}
@@ -140,20 +140,20 @@ class TestConstructorHintBinds {
 	 * @see #thatParameterAsAnotherTypeIsArranged()
 	 */
 	@Test
-	public void thatConstantParameterIsArranged() {
+	void thatConstantParameterIsArranged() {
 		Qux qux = injector.resolve(Qux.class);
 		assertEquals(1980, qux.value);
 	}
 
 	@Test
-	public void thatReoccuringTypesAreArrangedAsOccuringAfterAnother() {
+	void thatReoccuringTypesAreArrangedAsOccuringAfterAnother() {
 		Baz baz = injector.resolve(Baz.class);
 		assertEquals("y", baz.foo);
 		assertEquals("y", baz.bar, "when x alignment after another is broken");
 	}
 
 	@Test
-	public void thatParametersNotArrangedThrowsException() {
+	void thatParametersNotArrangedThrowsException() {
 		assertThrows(InconsistentDeclaration.class,
 				() -> Bootstrap.injector(FaultyParameterConstructorBindsModule.class));
 	}

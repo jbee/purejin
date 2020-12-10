@@ -40,7 +40,7 @@ class TestTypeVariableAutobindBinds {
 			TestTypeVariableAutobindBindsModule.class);
 
 	@Test
-	public void actualReturnTypeIsInjectedAsFirstArgumentIfParameterTypeMatchesTypeOfReturnType() {
+	void actualReturnTypeIsInjectedAsFirstArgumentIfParameterTypeMatchesTypeOfReturnType() {
 		@SuppressWarnings("unchecked")
 		Function<Integer, String> f = context.resolve(
 				raw(Function.class).parametized(Integer.class, String.class));

@@ -2,10 +2,8 @@ package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
-import se.jbee.inject.Supplier;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
-import se.jbee.inject.binder.Supply;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.defaults.CoreFeature;
 
@@ -16,10 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 /**
  * A test that demonstrates how to extend the DI so that e.g. a class gets its
  * class-specific- {@link Logger} injected. Have a look how
- * {@link Supply#LOGGER} is implemented.
- *
- * You can use {@link Factory}s for simpler cases or {@link Supplier}s when more
- * context information are needed to provide the instance.
+ * {@link CoreFeature#LOGGER} is implemented.
  */
 class TestLoggerBinds {
 
@@ -53,7 +48,7 @@ class TestLoggerBinds {
 	}
 
 	@Test
-	public void thatEachClassGetsTheLoggerWithItsCanonicalName() {
+	void thatEachClassGetsTheLoggerWithItsCanonicalName() {
 		Injector injector = Bootstrap.injector(LoggerBindsBundle.class);
 		Foo foo = injector.resolve(Foo.class);
 		assertSame(Logger.getLogger(Foo.class.getCanonicalName()), foo.logger);

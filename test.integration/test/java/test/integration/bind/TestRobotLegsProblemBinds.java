@@ -69,13 +69,13 @@ class TestRobotLegsProblemBinds {
 	}
 
 	@Test
-	public void thatRobotHasDifferentLegsWhenUsingInjectingIntoClause() {
+	void thatRobotHasDifferentLegsWhenUsingInjectingIntoClause() {
 		assertRobotHasDifferentLegsWithDifferentFoots(
 				Bootstrap.injector(RobotLegsProblemBindsModule.class));
 	}
 
 	@Test
-	public void thatRobotHasDifferentLegsWhenUsingTargetInstanceScopedFeets() {
+	void thatRobotHasDifferentLegsWhenUsingTargetInstanceScopedFeets() {
 		assertRobotHasDifferentLegsWithDifferentFoots(
 				Bootstrap.injector(RobotLegsProblemScopeBindsModule.class));
 	}

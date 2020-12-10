@@ -66,17 +66,17 @@ class TestInjectorDecorationBinds {
 			TestInjectorDecorationBindsModule.class);
 
 	@Test
-	public void bootstrappingReturnsDecoratedInjector() {
+	void bootstrappingReturnsDecoratedInjector() {
 		assertSame(DecoratingInjector.class, injector.getClass());
 	}
 
 	@Test
-	public void decoratedInjectorIsInjected() {
+	void decoratedInjectorIsInjected() {
 		assertNotNull(injector.resolve("constructed", Bean.class));
 	}
 
 	@Test
-	public void decoratedInjectorIsProvidedAsSupplierContext() {
+	void decoratedInjectorIsProvidedAsSupplierContext() {
 		assertNotNull(injector.resolve("supplied", Bean.class));
 	}
 }

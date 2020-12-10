@@ -42,7 +42,7 @@ class TestDecoratorBinds {
 	}
 
 	@Test
-	public void decoratorPatternCanBeUsed() {
+	void decoratorPatternCanBeUsed() {
 		Injector injector = Bootstrap.injector(DecoratorBindsModule.class);
 		assertEquals(Decorator.class, injector.resolve(Foo.class).getClass());
 	}

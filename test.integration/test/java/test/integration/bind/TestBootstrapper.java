@@ -241,14 +241,14 @@ class TestBootstrapper {
 
 	@Test
 	@Timeout(1)
-	public void thatDependencyCyclesAreDetected() {
+	void thatDependencyCyclesAreDetected() {
 		Injector injector = Bootstrap.injector(CyclicBindsModule.class);
 		assertThrows(DependencyCycle.class, () -> injector.resolve(Foo.class));
 	}
 
 	@Test
 	@Timeout(1)
-	public void thatDependencyCyclesInCirclesAreDetected() {
+	void thatDependencyCyclesInCirclesAreDetected() {
 		Injector injector = Bootstrap.injector(CircularBindsModule.class);
 		assertThrows(DependencyCycle.class, () -> injector.resolve(A.class));
 	}
@@ -260,7 +260,7 @@ class TestBootstrapper {
 	 * {@link Generator} is created for them.
 	 */
 	@Test
-	public void thatBindingsAreReplacedByMoreQualiedOnes() {
+	void thatBindingsAreReplacedByMoreQualiedOnes() {
 		Injector injector = Bootstrap.injector(ReplacingBindsModule.class);
 		assertEquals(6, injector.resolve(Number.class));
 		Resource<?>[] rs = injector.resolve(raw(Resource.class).parametized(
@@ -277,7 +277,7 @@ class TestBootstrapper {
 	}
 
 	@Test
-	public void thatEagerSingeltonsCanBeCreated() {
+	void thatEagerSingeltonsCanBeCreated() {
 		Injector injector = Bootstrap.injector(
 				EagerSingletonsBindsModule.class);
 		assertNotNull(injector);
@@ -285,7 +285,7 @@ class TestBootstrapper {
 	}
 
 	@Test
-	public void thatCustomMirrorIsUsedToPickConstructor() {
+	void thatCustomMirrorIsUsedToPickConstructor() {
 		Injector injector = Bootstrap.injector(CustomMirrorBundle.class);
 		assertEquals("will be passed to D", injector.resolve(D.class).s);
 	}

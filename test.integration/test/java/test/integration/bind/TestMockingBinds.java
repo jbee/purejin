@@ -177,7 +177,7 @@ class TestMockingBinds {
 	}
 
 	@Test
-	public void wildcardBindsDoFallBackToMostGeneralIfRequired() {
+	void wildcardBindsDoFallBackToMostGeneralIfRequired() {
 		Injector injector = Bootstrap.injector(TestMockingBindsModule.class);
 		Serializable mock = injector.resolve(Serializable.class);
 		assertTrue(isProxyClass(mock.getClass()));
@@ -185,7 +185,7 @@ class TestMockingBinds {
 	}
 
 	@Test
-	public void moreSpecificUpperBoundTypesAreMorePrecise() {
+	void moreSpecificUpperBoundTypesAreMorePrecise() {
 		Injector injector = Bootstrap.injector(TestMockingBindsModule.class);
 		MouseListener mock = injector.resolve(MouseListener.class);
 		assertTrue(isProxyClass(mock.getClass()));
@@ -193,7 +193,7 @@ class TestMockingBinds {
 	}
 
 	@Test
-	public void bindsCanBeUsedToMockReturnValuesOfMockMethods() {
+	void bindsCanBeUsedToMockReturnValuesOfMockMethods() {
 		Injector injector = Bootstrap.injector(TestMockingBindsModule.class);
 		Shape shape = injector.resolve(Shape.class);
 		Rectangle bounds = shape.getBounds();
@@ -204,7 +204,7 @@ class TestMockingBinds {
 	}
 
 	@Test
-	public void methodsOfMocksByDefaultReturnMocksIfPossible() {
+	void methodsOfMocksByDefaultReturnMocksIfPossible() {
 		Injector injector = Bootstrap.injector(TestMockingBindsModule.class);
 		Shape shape = injector.resolve(Shape.class);
 		PathIterator iter = shape.getPathIterator(null);
@@ -214,7 +214,7 @@ class TestMockingBinds {
 	}
 
 	@Test
-	public void methodOfMocksByDefaultReturnNullOtherwise() { // when no custom binding or mocking available
+	void methodOfMocksByDefaultReturnNullOtherwise() { // when no custom binding or mocking available
 		Injector injector = Bootstrap.injector(TestMockingBindsModule.class);
 		Shape shape = injector.resolve(Shape.class);
 		assertNull(shape.getBounds2D());

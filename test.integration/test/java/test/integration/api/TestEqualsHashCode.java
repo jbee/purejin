@@ -22,42 +22,42 @@ import static se.jbee.inject.lang.Utils.newArray;
 class TestEqualsHashCode {
 
 	@Test
-	public void type() throws Exception {
+	void type() throws Exception {
 		assertValidEqualsAndHashCodeContract(Type.class);
 	}
 
 	@Test
-	public void instance() throws Exception {
+	void instance() throws Exception {
 		assertValidEqualsAndHashCodeContract(Instance.class);
 	}
 
 	@Test
-	public void instances() throws Exception {
+	void instances() throws Exception {
 		assertValidEqualsAndHashCodeContract(Instances.class);
 	}
 
 	@Test
-	public void locator() throws Exception {
+	void locator() throws Exception {
 		assertValidEqualsAndHashCodeContract(Locator.class);
 	}
 
 	@Test
-	public void target() throws Exception {
+	void target() throws Exception {
 		assertValidEqualsAndHashCodeContract(Target.class);
 	}
 
 	@Test
-	public void packages() throws Exception {
+	void packages() throws Exception {
 		assertValidEqualsAndHashCodeContract(Packages.class);
 	}
 
 	@Test
-	public void name() throws Exception {
+	void name() throws Exception {
 		assertValidEqualsAndHashCodeContract(Name.class);
 	}
 
 	@Test
-	public void dependency() throws Exception {
+	void dependency() throws Exception {
 		assertValidEqualsAndHashCodeContract(Dependency.class);
 	}
 
@@ -71,9 +71,9 @@ class TestEqualsHashCode {
 		assertEquals(cls, hashCode.getDeclaringClass(), cls.getSimpleName() + " does not implement hashCode");
 
 		int baseA = base++;
-		Object a = newInstance(cls, baseA);
-		Object b = newInstance(cls, base++);
-		Object a2 = newInstance(cls, baseA);
+		final Object a = newInstance(cls, baseA);
+		final Object b = newInstance(cls, base++);
+		final Object a2 = newInstance(cls, baseA);
 		assertEquals(a, a);
 		assertEquals(a, a2);
 		assertEquals(a2, a);
@@ -96,14 +96,14 @@ class TestEqualsHashCode {
 		// while we are at it - cover toString as well
 		assertFalse(a.toString().isEmpty());
 		assertEquals(a.toString(), a2.toString());
-		assertFalse(a.toString().equals(b.toString()));
+		assertNotEquals(b.toString(), a.toString());
 	}
 
 	private static Object newInstance(Class<?> cls, int base) throws Exception {
 		if (cls == int.class || cls == Integer.class)
-			return Integer.valueOf(base);
+			return base;
 		if (cls == boolean.class || cls == Boolean.class)
-			return Boolean.valueOf(base % 2 == 1);
+			return base % 2 == 1;
 		if (cls == String.class || cls == Object.class)
 			return String.valueOf(base);
 		if (cls == Class.class)

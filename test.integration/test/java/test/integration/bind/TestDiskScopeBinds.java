@@ -37,7 +37,7 @@ class TestDiskScopeBinds {
 	}
 
 	@BeforeEach
-	public void cleanDir() throws IOException {
+	void cleanDir() throws IOException {
 		if (dir.exists())
 			for (File file : dir.listFiles())
 				if (!file.isDirectory())
@@ -47,7 +47,7 @@ class TestDiskScopeBinds {
 
 	@Test
 	@Disabled
-	public void diskScopePreservesStateOnDisk() {
+	void diskScopePreservesStateOnDisk() {
 		Injector injector = Bootstrap.injector(DiskScopeBindsModule.class);
 		AtomicInteger actualCounter = injector.resolve(AtomicInteger.class);
 		assertEquals(1, actualCounter.intValue());

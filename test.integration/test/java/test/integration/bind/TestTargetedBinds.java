@@ -94,17 +94,17 @@ class TestTargetedBinds {
 			TargetedBindsModule.class);
 
 	@Test
-	public void thatBindWithTargetIsUsedWhenInjectingIntoIt() {
+	void thatBindWithTargetIsUsedWhenInjectingIntoIt() {
 		assertSame(BAR_IN_FOO, injector.resolve(Foo.class).bar);
 	}
 
 	@Test
-	public void thatBindWithTargetIsNotUsedWhenNotInjectingIntoIt() {
+	void thatBindWithTargetIsNotUsedWhenNotInjectingIntoIt() {
 		assertSame(BAR_EVERYWHERE_ELSE, injector.resolve(Bar.class));
 	}
 
 	@Test
-	public void thatNamedTargetIsUsedWhenInjectingIntoIt() {
+	void thatNamedTargetIsUsedWhenInjectingIntoIt() {
 		Instance<Foo> specialFoo = instance(named("special"), raw(Foo.class));
 		Bar bar = injector.resolve(
 				dependency(Bar.class).injectingInto(specialFoo));
@@ -112,7 +112,7 @@ class TestTargetedBinds {
 	}
 
 	@Test
-	public void thatBindWithNamedTargetIsUsedWhenInjectingIntoIt() {
+	void thatBindWithNamedTargetIsUsedWhenInjectingIntoIt() {
 		assertSame(BAR_EVERYWHERE_ELSE,
 				injector.resolve("special", Foo.class).bar);
 		assertSame(BAR_IN_AWESOME_FOO,
@@ -120,12 +120,12 @@ class TestTargetedBinds {
 	}
 
 	@Test
-	public void thatBindWithInterfaceTargetIsUsedWhenInjectingIntoClassHavingThatInterface() {
+	void thatBindWithInterfaceTargetIsUsedWhenInjectingIntoClassHavingThatInterface() {
 		assertSame(BAR_IN_SERIALIZABLE, injector.resolve(Baz.class).bar);
 	}
 
 	@Test
-	public void thatBindWithExactClassTargetIsUsedWhenInjectingIntoClassHavingThatClassButAlsoAnInterfaceMatching() {
+	void thatBindWithExactClassTargetIsUsedWhenInjectingIntoClassHavingThatClassButAlsoAnInterfaceMatching() {
 		assertSame(BAR_IN_QUX, injector.resolve(Qux.class).bar);
 	}
 }

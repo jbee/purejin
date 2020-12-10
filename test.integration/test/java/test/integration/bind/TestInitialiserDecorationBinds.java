@@ -82,17 +82,17 @@ class TestInitialiserDecorationBinds {
 			TestInitialiserDecorationModule.class);
 
 	@Test
-	public void injectorCanBeDecoratedUsingInitialisers() {
+	void injectorCanBeDecoratedUsingInitialisers() {
 		assertSame(DelegatingInjector.class, injector.getClass());
 	}
 
 	@Test
-	public void decoratingInjectorCanResolveDependenciesUsingDelegate() {
+	void decoratingInjectorCanResolveDependenciesUsingDelegate() {
 		assertEquals(42, injector.resolve(int.class).intValue());
 	}
 
 	@Test
-	public void injectedInjectorCanBeDecoratedUsingInitialisers() {
+	void injectedInjectorCanBeDecoratedUsingInitialisers() {
 		assertSame(DelegatingInjector.class,
 				injector.resolve(Injector.class).getClass());
 		assertSame(DelegatingInjector.class,
@@ -100,7 +100,7 @@ class TestInitialiserDecorationBinds {
 	}
 
 	@Test
-	public void resolvedInstancesCanBeDocratedUsingInitialisers() {
+	void resolvedInstancesCanBeDocratedUsingInitialisers() {
 		Shape s = injector.resolve(Shape.class);
 		assertNotNull(s);
 		assertSame(s, injector.resolve(Shape.class));

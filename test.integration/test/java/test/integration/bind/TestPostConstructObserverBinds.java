@@ -72,7 +72,7 @@ class TestPostConstructObserverBinds {
 			TestPostConstructObserverBindsModule.class);
 
 	@Test
-	public void orderOfCreationCanBeRecordedUsingInjectionListeners() {
+	void orderOfCreationCanBeRecordedUsingInjectionListeners() {
 		CreationObserver creation = injector.resolve(CreationObserver.class);
 		assertEquals(0, creation.created.size());
 		A a = injector.resolve(A.class);

@@ -52,7 +52,7 @@ class TestType {
 	private List<String> aStringListField;
 
 	@Test
-	public void testToString() throws Exception {
+	void testToString() throws Exception {
 		Type<List> l = Type.raw(List.class).parametized(String.class);
 		assertEquals("java.util.List<java.lang.String>", l.toString());
 
@@ -72,7 +72,7 @@ class TestType {
 	}
 
 	@Test
-	public void testIsAssignableTo() {
+	void testIsAssignableTo() {
 		Type<Integer> integer = Type.raw(Integer.class);
 		Type<Number> number = Type.raw(Number.class);
 		assertTrue(integer.isAssignableTo(number));
@@ -80,7 +80,7 @@ class TestType {
 	}
 
 	@Test
-	public void testIsAssignableTo1Generic() {
+	void testIsAssignableTo1Generic() {
 		Type<List> listOfIntegers = Type.raw(List.class).parametized(
 				Integer.class);
 		Type<List> listOfNumbers = Type.raw(List.class).parametized(
@@ -94,7 +94,7 @@ class TestType {
 	}
 
 	@Test
-	public void testIsAssignableTo2Generics() {
+	void testIsAssignableTo2Generics() {
 		Type<List> listOfClassesOfIntegers = Type.raw(List.class).parametized(
 				Type.raw(Class.class).parametized(Integer.class));
 		Type<Class> classOfNumbers = Type.raw(Class.class).parametized(
@@ -112,7 +112,7 @@ class TestType {
 	}
 
 	@Test
-	public void testGenericArrays() {
+	void testGenericArrays() {
 		Type<Class[]> classArray = Type.raw(Class[].class).parametized(
 				String.class);
 		assertEquals("java.lang.Class<java.lang.String>",
@@ -122,7 +122,7 @@ class TestType {
 	}
 
 	@Test
-	public void testTwoDimensionalGenericArrays() {
+	void testTwoDimensionalGenericArrays() {
 		Type<Class[][]> classArray = Type.raw(Class[][].class).parametized(
 				String.class);
 		assertEquals("java.lang.Class<java.lang.String>",
@@ -132,7 +132,7 @@ class TestType {
 	}
 
 	@Test
-	public void testMultiDimensionalGenericArrays() {
+	void testMultiDimensionalGenericArrays() {
 		Type<Class[][][]> classArray = Type.raw(Class[][][].class).parametized(
 				String.class);
 		assertEquals("java.lang.Class<java.lang.String>",
@@ -142,26 +142,26 @@ class TestType {
 	}
 
 	@Test
-	public void shouldRecognize1DimensionalArrayTypes() {
+	void shouldRecognize1DimensionalArrayTypes() {
 		Type<Number[]> t = Type.raw(Number[].class);
 		assertEquals(1, t.arrayDimensions());
 	}
 
 	@Test
-	public void shouldNotRecognizeMultiDimensionalArrayTypesAsArray1D() {
+	void shouldNotRecognizeMultiDimensionalArrayTypesAsArray1D() {
 		Type<Number[][]> t = Type.raw(Number[][].class);
 		assertEquals(2, t.arrayDimensions());
 	}
 
 	@Test
-	public void testMorePreciseThan() {
+	void testMorePreciseThan() {
 		Type<Integer> integer = Type.raw(Integer.class);
 		Type<Number> number = Type.raw(Number.class);
 		assertMorePrecise(integer, number);
 	}
 
 	@Test
-	public void testMorePreciseThanUpperBound() {
+	void testMorePreciseThanUpperBound() {
 		Type<Integer> integer = Type.raw(Integer.class);
 		Type<? extends Integer> upperBoundInteger = Type.raw(
 				Integer.class).asUpperBound();
@@ -169,7 +169,7 @@ class TestType {
 	}
 
 	@Test
-	public void testMorePreciseThanIndependend() {
+	void testMorePreciseThanIndependend() {
 		Type<Integer> integer = Type.raw(Integer.class);
 		Type<String> string = Type.raw(String.class);
 		assertTrue(integer.moreQualifiedThan(string));
@@ -183,21 +183,21 @@ class TestType {
 	}
 
 	@Test
-	public void testMorePreciseThanWithGenerics() {
+	void testMorePreciseThanWithGenerics() {
 		Type<List> integer = Type.raw(List.class).parametized(Integer.class);
 		Type<List> number = Type.raw(List.class).parametized(Number.class);
 		assertMorePrecise(integer, number);
 	}
 
 	@Test
-	public void testMorePreciseThanWithGenericsAndWithout() {
+	void testMorePreciseThanWithGenericsAndWithout() {
 		Type<List> integer = Type.raw(List.class).parametized(Integer.class);
 		Type<List> wildcardList = Type.raw(List.class);
 		assertMorePrecise(integer, wildcardList);
 	}
 
 	@Test
-	public void testMorePreciseThanWithWildcardGenerics() {
+	void testMorePreciseThanWithWildcardGenerics() {
 		Type<List> integer = Type.raw(List.class).parametized(Integer.class);
 		Type<List> wildcardInteger = Type.raw(List.class).parametized(
 				Integer.class).parametizedAsUpperBounds();
@@ -205,7 +205,7 @@ class TestType {
 	}
 
 	@Test
-	public void testMorePreciseThanWithSubclassAndGenerics() {
+	void testMorePreciseThanWithSubclassAndGenerics() {
 		Type<ArrayList> arrayListOfIntegers = Type.raw(
 				ArrayList.class).parametized(Integer.class);
 		Type<List> listOfIntegers = Type.raw(List.class).parametized(
@@ -214,14 +214,14 @@ class TestType {
 	}
 
 	@Test
-	public void testArrayType() {
+	void testArrayType() {
 		Type<? extends Number> t = Type.raw(Number.class).asUpperBound();
 		assertEquals("? extends java.lang.Number[]",
 				t.addArrayDimension().toString());
 	}
 
 	@Test
-	public void thatGenericSuperInterfacesAreAvailableAsSupertype() {
+	void thatGenericSuperInterfacesAreAvailableAsSupertype() {
 		Type<? super Integer>[] intergerSupertypes = Type.raw(
 				Integer.class).supertypes();
 		assertContains(intergerSupertypes,
@@ -229,7 +229,7 @@ class TestType {
 	}
 
 	@Test
-	public void thatTypeVariableSuperInterfacesAreAvailableAsSupertype() {
+	void thatTypeVariableSuperInterfacesAreAvailableAsSupertype() {
 		Type<? super List>[] supertypes = Type.raw(List.class).parametized(
 				String.class).supertypes();
 		assertContains(supertypes,
@@ -237,7 +237,7 @@ class TestType {
 	}
 
 	@Test
-	public void thatTypeVariableSuperSuperInterfacesAreAvailableAsSupertype() {
+	void thatTypeVariableSuperSuperInterfacesAreAvailableAsSupertype() {
 		Type<? super List>[] supertypes = Type.raw(List.class).parametized(
 				String.class).supertypes();
 		assertContains(supertypes,
@@ -245,14 +245,14 @@ class TestType {
 	}
 
 	@Test
-	public void thatTypeVariableSuperInterfacesUseWildcardDefaultAsSupertype() {
+	void thatTypeVariableSuperInterfacesUseWildcardDefaultAsSupertype() {
 		Type<? super List>[] supertypes = Type.raw(List.class).supertypes();
 		assertContains(supertypes,
 				Type.raw(Collection.class).parametized(Type.WILDCARD));
 	}
 
 	@Test
-	public void thatTypeVariableSuperClassIsAvailableAsSupertype() {
+	void thatTypeVariableSuperClassIsAvailableAsSupertype() {
 		Type<? super ArrayList>[] supertypes = Type.raw(
 				ArrayList.class).parametized(String.class).supertypes();
 		assertContains(supertypes,
@@ -260,7 +260,7 @@ class TestType {
 	}
 
 	@Test
-	public void thatTypeVariableSuperSuperClassIsAvailableAsSupertype() {
+	void thatTypeVariableSuperSuperClassIsAvailableAsSupertype() {
 		Type<? super ArrayList>[] supertypes = Type.raw(
 				ArrayList.class).parametized(String.class).supertypes();
 		assertContains(supertypes,
@@ -268,7 +268,7 @@ class TestType {
 	}
 
 	@Test
-	public void thatTypeVariablesResolvedCorrectlyForSupertypes() {
+	void thatTypeVariablesResolvedCorrectlyForSupertypes() {
 		Type<Bar> type = Type.raw(Bar.class).parametized(Integer.class,
 				Float.class);
 		Type<? super Bar>[] supertypes = type.supertypes();
@@ -281,14 +281,14 @@ class TestType {
 	}
 
 	@Test
-	public void thatCompareableSupertypeOfIntegerIsCompareableInteger() {
+	void thatCompareableSupertypeOfIntegerIsCompareableInteger() {
 		assertTrue(Type.supertype(Comparable.class,
 				Type.raw(Integer.class)).equalTo(
 						Type.raw(Comparable.class).parametized(Integer.class)));
 	}
 
 	@Test
-	public void thatTypeComparisonIsDoneBasedOnTheCommonType() {
+	void thatTypeComparisonIsDoneBasedOnTheCommonType() {
 		Type<List> stringList = Type.raw(List.class).parametized(String.class);
 		assertTrue(Type.raw(XList.class).parametized(Integer.class,
 				String.class).isAssignableTo(stringList));
@@ -297,13 +297,14 @@ class TestType {
 	}
 
 	@Test
-	public void thatUpperBoundOfParameterizedTypesIsChecked() {
+	void thatUpperBoundOfParameterizedTypesIsChecked() {
+		Type<XList> listType = raw(XList.class);
 		assertThrows(IllegalArgumentException.class,
-				() -> Type.raw(XList.class).parametized(Object.class, Object.class));
+				() -> listType.parametized(Object.class, Object.class));
 	}
 
 	@Test
-	public void thatRawTypeCanBeCastToAnySupertype() {
+	void thatRawTypeCanBeCastToAnySupertype() {
 		Type<ArrayList> rawArrayList = raw(ArrayList.class);
 		assertNotNull(rawArrayList.castTo(raw(List.class)));
 		assertNotNull(rawArrayList.castTo(
@@ -313,7 +314,7 @@ class TestType {
 	}
 
 	@Test
-	public void thatUnparametizedTypeCanBeCastToAllItsSupertypes() {
+	void thatUnparametizedTypeCanBeCastToAllItsSupertypes() {
 		Type<Integer> integer = raw(Integer.class);
 		for (Type<? super Integer> supertype : integer.supertypes()) {
 			assertNotNull(integer.castTo(supertype));
@@ -321,21 +322,21 @@ class TestType {
 	}
 
 	@Test
-	public void thatParameterizedTypeCannotBeCastToDifferentActualTypeParameterSupertype() {
-		assertThrows(ClassCastException.class,
-				() -> assertNotNull(raw(List.class).parametized(String.class).castTo(
-				raw(Collection.class).parametized(Integer.class))));
+	void thatParameterizedTypeCannotBeCastToDifferentActualTypeParameterSupertype() {
+		Type<List> a = raw(List.class).parametized(String.class);
+		Type<Collection> b = raw(Collection.class).parametized(Integer.class);
+		assertThrows(ClassCastException.class, () -> a.castTo(b));
 	}
 
 	@Test
-	public void thatParameterizedTypeCanBeCastToWildcardedSupertype() {
+	void thatParameterizedTypeCanBeCastToWildcardedSupertype() {
 		assertNotNull(raw(ArrayList.class).parametized(Integer.class).castTo(
 				raw(List.class).parametized(
 						Number.class).parametizedAsUpperBounds()));
 	}
 
 	@Test
-	public void actualTypeArguments() throws Exception {
+	void actualTypeArguments() throws Exception {
 		assertEquals("{X=? extends java.io.Serializable, E=?}",
 				classType(XList.class).actualTypeArguments().toString());
 		assertEquals("{X=java.lang.String, E=java.lang.Integer}",

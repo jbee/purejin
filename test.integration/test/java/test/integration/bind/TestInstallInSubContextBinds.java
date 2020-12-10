@@ -65,13 +65,13 @@ class TestInstallInSubContextBinds {
 			TestInstallInSubContextBindsModule.class);
 
 	@Test
-	public void bindsInstalledInSubContextAreNotAccessibleInParent() {
+	void bindsInstalledInSubContextAreNotAccessibleInParent() {
 		assertThrows(UnresolvableDependency.class,
 				() -> injector.resolve(int.class));
 	}
 
 	@Test
-	public void bindsAreAvailableInTheSubContextTheyWereInstalledIn() {
+	void bindsAreAvailableInTheSubContextTheyWereInstalledIn() {
 		Injector foo = injector.subContext("foo");
 		assertNotSame(foo, injector);
 		assertEquals(42, foo.resolve(int.class).intValue());
@@ -83,7 +83,7 @@ class TestInstallInSubContextBinds {
 	}
 
 	@Test
-	public void anySubContextCanBeResolvedButItMightBeEmpty() {
+	void anySubContextCanBeResolvedButItMightBeEmpty() {
 		Injector subContext = injector.subContext("withoutIntallIn");
 		assertNotNull(subContext);
 		try {
@@ -95,7 +95,7 @@ class TestInstallInSubContextBinds {
 	}
 
 	@Test
-	public void subContextEnvironmentIsSameAsRootContexts() {
+	void subContextEnvironmentIsSameAsRootContexts() {
 		Injector foo = injector.subContext("foo");
 		assertNotSame(foo, injector);
 		assertSame(injector.resolve(DEFAULT, raw(Env.class)),

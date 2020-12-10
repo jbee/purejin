@@ -87,13 +87,13 @@ class TestToggledBinds {
 	}
 
 	@Test
-	public void thatBundleOfTheGivenConstGotBootstrappedAndOthersNot() {
+	void thatBundleOfTheGivenConstGotBootstrappedAndOthersNot() {
 		assertChoiceResolvedToValue(Machine.LOCALHOST, "on-localhost");
 		assertChoiceResolvedToValue(Machine.WORKER_1, "on-worker-1");
 	}
 
 	@Test
-	public void thatBundleOfUndefinedConstGotBootstrappedAndOthersNot() {
+	void thatBundleOfUndefinedConstGotBootstrappedAndOthersNot() {
 		assertChoiceResolvedToValue(null, "on-generic");
 	}
 

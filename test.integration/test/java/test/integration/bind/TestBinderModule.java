@@ -50,7 +50,7 @@ class TestBinderModule {
 	}
 
 	@Test
-	public void thatBindingSourceReflectsTheOrigin() {
+	void thatBindingSourceReflectsTheOrigin() {
 		Binding<?>[] bindings = Bootstrap.bindings(Environment.DEFAULT,
 				TestBinderModuleBundle.class, Bindings.newBindings());
 

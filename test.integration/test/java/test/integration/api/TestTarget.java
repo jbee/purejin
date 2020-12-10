@@ -14,7 +14,7 @@ import static se.jbee.inject.Target.targeting;
 class TestTarget {
 
 	@Test
-	public void thatTargetInstancesNeedsToBeMatchedByDependencies() {
+	void thatTargetInstancesNeedsToBeMatchedByDependencies() {
 		Target target = targeting(List.class);
 		Dependency<String> dependency = dependency(String.class);
 		assertFalse(target.isAvailableFor(dependency));

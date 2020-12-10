@@ -48,7 +48,7 @@ class TestRoundRobinComputeEvents {
 
 	@Test
 	@Disabled("TODO #80 // TestRoundRobinComputeEvents.computationUsesAllAvailableServices()")
-	public void computationUsesAllAvailableServices() {
+	void computationUsesAllAvailableServices() {
 		Handler h = injector.resolve(Handler.class);
 		Service a = injector.resolve("a", Service.class);
 		Service b = injector.resolve("b", Service.class);

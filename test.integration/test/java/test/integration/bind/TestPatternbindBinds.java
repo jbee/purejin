@@ -161,7 +161,7 @@ class TestPatternbindBinds {
 			TestAddAnnotatedBindsModule.class);
 
 	@Test
-	public void customAnnotationsAddedProgrammatically() {
+	void customAnnotationsAddedProgrammatically() {
 		SomeService service = injector.resolve(SomeService.class);
 		assertNotNull(service);
 		assertSame(SomeServiceImpl.class, service.getClass());
@@ -173,7 +173,7 @@ class TestPatternbindBinds {
 	}
 
 	@Test
-	public void customAnnotationsWithPropertiesAddedProgrammatically() {
+	void customAnnotationsWithPropertiesAddedProgrammatically() {
 		IntSupplier answer = injector.resolve(IntSupplier.class);
 		assertNotNull(answer);
 		assertEquals(42, answer.getAsInt());
@@ -183,7 +183,7 @@ class TestPatternbindBinds {
 	}
 
 	@Test
-	public void customMethodAnnotationsAddedProgrammatically() {
+	void customMethodAnnotationsAddedProgrammatically() {
 		// Bean has a method annotated @Provides which returns 13L
 		// this is bound for long as an effect of the ProvidesAnnotationEffect
 		assertEquals(13, injector.resolve(long.class));

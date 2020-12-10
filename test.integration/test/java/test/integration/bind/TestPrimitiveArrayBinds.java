@@ -51,7 +51,7 @@ class TestPrimitiveArrayBinds {
 			PrimitiveArrayBindsModule.class);
 
 	@Test
-	public void thatPrimitiveArrayIsAvailable() {
+	void thatPrimitiveArrayIsAvailable() {
 		assertArrayEquals(new int[] { 7, 42 }, injector.resolve(int[].class));
 	}
 }

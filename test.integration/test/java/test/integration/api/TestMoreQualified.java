@@ -14,7 +14,7 @@ import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.lang.Type.raw;
 
-public class TestMoreQualified {
+class TestMoreQualified {
 
 	static class HigherNumberIsMoreApplicable
 			implements Qualifying<HigherNumberIsMoreApplicable> {
@@ -37,22 +37,22 @@ public class TestMoreQualified {
 	}
 
 	@Test
-	public void thatMoreApplicabilityEvalsToTrue() {
+	void thatMoreApplicabilityEvalsToTrue() {
 		assertTrue(hip(2).moreQualifiedThan(hip(1)));
 	}
 
 	@Test
-	public void thatEqualApplicabilityEvalsToFalse() {
+	void thatEqualApplicabilityEvalsToFalse() {
 		assertFalse(hip(2).moreQualifiedThan(hip(2)));
 	}
 
 	@Test
-	public void thatLessApplicabilityEvalsToFalse() {
+	void thatLessApplicabilityEvalsToFalse() {
 		assertFalse(hip(1).moreQualifiedThan(hip(2)));
 	}
 
 	@Test
-	public void thatMoreApplicabilityComesFirstInSortOrder() {
+	void thatMoreApplicabilityComesFirstInSortOrder() {
 		HigherNumberIsMoreApplicable[] values = new HigherNumberIsMoreApplicable[] {
 				hip(1), hip(2) };
 		Arrays.sort(values, comparator(HigherNumberIsMoreApplicable.class));
@@ -60,17 +60,17 @@ public class TestMoreQualified {
 	}
 
 	@Test
-	public void thatSameTypeIsNotMoreApplicable() {
+	void thatSameTypeIsNotMoreApplicable() {
 		assertNotMoreApplicableThanItself(Type.raw(String.class));
 	}
 
 	@Test
-	public void thatSameDefaultNameIsNotMoreApplicable() {
+	void thatSameDefaultNameIsNotMoreApplicable() {
 		assertNotMoreApplicableThanItself(Name.DEFAULT);
 	}
 
 	@Test
-	public void thatUnnamedIsMoreApplicableThanNamedInstance() {
+	void thatUnnamedIsMoreApplicableThanNamedInstance() {
 		Type<Integer> type = raw(Integer.class);
 		Instance<Integer> named = instance(named("foo"), type);
 		Instance<Integer> unnamed = defaultInstanceOf(type);
@@ -78,39 +78,39 @@ public class TestMoreQualified {
 	}
 
 	@Test
-	public void thatUnnamedIsMoreApplicableThanNamed() {
+	void thatUnnamedIsMoreApplicableThanNamed() {
 		assertTrue(Name.DEFAULT.moreQualifiedThan(named("foo")));
 	}
 
 	@Test
-	public void thatNamedIsNotMoreApplicableThanUnnamed() {
+	void thatNamedIsNotMoreApplicableThanUnnamed() {
 		assertFalse(named("bar").moreQualifiedThan(Name.DEFAULT));
 	}
 
 	@Test
-	public void thatSameSpecificPackageIsNotMoreApplicable() {
+	void thatSameSpecificPackageIsNotMoreApplicable() {
 		assertNotMoreApplicableThanItself(Packages.packageOf(String.class));
 	}
 
 	@Test
-	public void thatSpecificPackageIsMoreApplicableThanGlobal() {
+	void thatSpecificPackageIsMoreApplicableThanGlobal() {
 		assertMoreApplicable(Packages.packageOf(String.class), Packages.ALL);
 	}
 
 	@Test
-	public void thatSpecificPackageIsMoreApplicableThanThatPackageWithItsSubPackages() {
+	void thatSpecificPackageIsMoreApplicableThanThatPackageWithItsSubPackages() {
 		assertMoreApplicable(Packages.packageOf(String.class),
 				Packages.packageAndSubPackagesOf(String.class));
 	}
 
 	@Test
-	public void thatSpecificPackageIsMoreApplicableThanSubPackagesUnderIt() {
+	void thatSpecificPackageIsMoreApplicableThanSubPackagesUnderIt() {
 		assertMoreApplicable(Packages.packageOf(String.class),
 				Packages.subPackagesOf(String.class));
 	}
 
 	@Test
-	public void thatApplicablityIsGivenByOrdinalStartingWithLowest() {
+	void thatApplicablityIsGivenByOrdinalStartingWithLowest() {
 		DeclarationType[] types = DeclarationType.values();
 		for (int i = 1; i < types.length; i++) {
 			assertTrue(types[i].moreQualifiedThan(types[i - 1]));
@@ -118,7 +118,7 @@ public class TestMoreQualified {
 	}
 
 	@Test
-	public void thatExplicitSourceIsMoreApplicableThanAutoSource() {
+	void thatExplicitSourceIsMoreApplicableThanAutoSource() {
 		Source source = Source.source(TestMoreQualified.class);
 		assertMoreApplicable(source.typed(DeclarationType.EXPLICIT),
 				source.typed(DeclarationType.AUTO));

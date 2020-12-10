@@ -53,7 +53,7 @@ class TestSetterInitialisationBinds {
 	}
 
 	@Test
-	public void setterInjectionCanBeSimulatedUsingInit() {
+	void setterInjectionCanBeSimulatedUsingInit() {
 		Injector injector = Bootstrap.injector(
 				SetterInitialisationBindsModule.class);
 		Bean bean = injector.resolve(Bean.class);

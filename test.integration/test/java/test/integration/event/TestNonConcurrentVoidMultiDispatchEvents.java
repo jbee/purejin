@@ -71,7 +71,7 @@ class TestNonConcurrentVoidMultiDispatchEvents {
 			synchronized (this) {
 				try {
 					wait();
-				} catch (InterruptedException e) {
+				} catch (InterruptedException ignored) {
 				}
 			}
 		}
@@ -100,7 +100,7 @@ class TestNonConcurrentVoidMultiDispatchEvents {
 			TestMultiDispatchEventsModule.class);
 
 	@Test
-	public void onlyOneThreadAtATimeCallsSameListersMethods() {
+	void onlyOneThreadAtATimeCallsSameListersMethods() {
 		Listener listener = injector.resolve(Listener.class);
 		Service a = injector.resolve(Service.class);
 		Service b = injector.resolve(Service.class);

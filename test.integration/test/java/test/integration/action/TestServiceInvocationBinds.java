@@ -91,7 +91,7 @@ class TestServiceInvocationBinds {
 			AssertInvocation.class);
 
 	@Test
-	public void thatInvocationIsInvokedBeforeAndAfterTheServiceMethodCall() {
+	void thatInvocationIsInvokedBeforeAndAfterTheServiceMethodCall() {
 		@SuppressWarnings("unchecked") Action<String, Integer> hashCode = injector.resolve(
 				raw(Action.class).parametized(String.class, Integer.class));
 		int beforeCount = inv.beforeCount;
@@ -102,7 +102,7 @@ class TestServiceInvocationBinds {
 	}
 
 	@Test
-	public void thatInvocationIsInvokedAfterExceptionInTheServiceMethodCall() {
+	void thatInvocationIsInvokedAfterExceptionInTheServiceMethodCall() {
 		@SuppressWarnings("unchecked")
 		Action<String, Void> fail = injector.resolve(
 				raw(Action.class).parametized(String.class, Void.class));
@@ -119,7 +119,7 @@ class TestServiceInvocationBinds {
 	}
 
 	@Test
-	public void thatInvocationHandlersCanBeResolvedDirectly() {
+	void thatInvocationHandlersCanBeResolvedDirectly() {
 		ServiceInterceptor<?>[] invocations = injector.resolve(
 				ServiceInterceptor[].class);
 		assertEquals(1, invocations.length);

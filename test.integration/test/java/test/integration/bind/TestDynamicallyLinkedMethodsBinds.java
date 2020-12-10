@@ -14,14 +14,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static java.util.Arrays.asList;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static java.util.Collections.singletonList;
+import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.config.ProducesBy.allMethods;
 
@@ -114,7 +115,7 @@ class TestDynamicallyLinkedMethodsBinds {
 	}
 
 	@Test
-	public void targetingViaInjectingIntoCanBeUsedToLimitTheSetOfInstancesAffectedByMarking() {
+	void injectingIntoCanBeUsedToLimitTheSetOfAffectedInstances() {
 		List<Object> acceptedInstances = new ArrayList<>();
 		List<Method> acceptedMethods = new ArrayList<>();
 		DynamicLinker verifier = (instance, marked) -> {
@@ -126,18 +127,18 @@ class TestDynamicallyLinkedMethodsBinds {
 		Bean expected = context.resolve("marked", Bean.class);
 		assertEquals("marked", expected.name);
 		assertEquals("unmarked", context.resolve("unmarked", Bean.class).name);
-		assertEquals(asList(expected), acceptedInstances);
+		assertEquals(singletonList(expected), acceptedInstances);
 		assertEquals(1, acceptedMethods.size());
 		assertEquals("myMethod", acceptedMethods.get(0).getName());
 	}
 
 	@Test
-	public void interfacesCanBeUsedToMarkSetsOfTypes() {
+	void interfacesApplyDynamicLinkingToAssignableTypes() {
 		Env env = Environment.DEFAULT.with(DynamicLinker.class, (i,m) -> {});
 		Injector context = Bootstrap.injector(env, TestMarkBindsModule.class);
-		assertEquals(true, context.resolve("marked", Bean.class).cleaned,
+		assertTrue(context.resolve("marked", Bean.class).cleaned,
 				"clean was not called for marked bean");
-		assertEquals(true, context.resolve("unmarked", Bean.class).cleaned,
+		assertTrue(context.resolve("unmarked", Bean.class).cleaned,
 				"clean was not called for unmarked bean");
 	}
 }

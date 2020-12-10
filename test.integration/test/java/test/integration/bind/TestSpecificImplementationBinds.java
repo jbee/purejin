@@ -78,7 +78,7 @@ class TestSpecificImplementationBinds {
 	}
 
 	@Test
-	public void thatImplementationIsPickedAsSpecified() {
+	void thatImplementationIsPickedAsSpecified() {
 		Injector injector = Bootstrap.injector(
 				SpecificImplementationBindsModule.class);
 

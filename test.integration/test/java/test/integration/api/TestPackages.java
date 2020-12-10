@@ -19,14 +19,14 @@ import static se.jbee.inject.lang.Type.raw;
 class TestPackages {
 
 	@Test
-	public void thatLowerBoundTypeIsNotInPackageJavaLang() {
+	void thatLowerBoundTypeIsNotInPackageJavaLang() {
 		Packages javaLang = packageOf(String.class);
 		assertFalse(javaLang.contains(Type.WILDCARD));
 		assertFalse(javaLang.contains(raw(List.class).asUpperBound()));
 	}
 
 	@Test
-	public void thatPackageAllContainsAllTypes() {
+	void thatPackageAllContainsAllTypes() {
 		Packages all = Packages.ALL;
 		assertTrue(all.contains(raw(List.class)));
 		assertTrue(all.contains(raw(AtomicBoolean.class)));
@@ -34,7 +34,7 @@ class TestPackages {
 	}
 
 	@Test
-	public void thatPackageContainsType() {
+	void thatPackageContainsType() {
 		Packages javaUtil = Packages.packageOf(String.class);
 		assertTrue(javaUtil.contains(raw(String.class)));
 		assertFalse(javaUtil.contains(raw(ConcurrentLinkedQueue.class)));
@@ -43,7 +43,7 @@ class TestPackages {
 	}
 
 	@Test
-	public void thatSubpackagesContainType() {
+	void thatSubpackagesContainType() {
 		Packages javaUtil = Packages.subPackagesOf(List.class);
 		assertFalse(javaUtil.contains(raw(List.class)));
 		assertTrue(javaUtil.contains(raw(ConcurrentLinkedQueue.class)));
@@ -52,7 +52,7 @@ class TestPackages {
 	}
 
 	@Test
-	public void thatPackgeAndSubpackagesContainType() {
+	void thatPackgeAndSubpackagesContainType() {
 		Packages javaUtil = Packages.packageAndSubPackagesOf(List.class);
 		assertTrue(javaUtil.contains(raw(List.class)));
 		assertTrue(javaUtil.contains(raw(ConcurrentLinkedQueue.class)));
@@ -61,7 +61,7 @@ class TestPackages {
 	}
 
 	@Test
-	public void thatIndividualPackagesCanBeCherryPicked() {
+	void thatIndividualPackagesCanBeCherryPicked() {
 		Packages cherries = Packages.packageOf(List.class, AtomicBoolean.class,
 				String.class);
 		assertTrue(cherries.contains(raw(List.class)));
@@ -72,7 +72,7 @@ class TestPackages {
 	}
 
 	@Test
-	public void thatMultipleRootSubpackagesOfSameDepthCanBeCombined() {
+	void thatMultipleRootSubpackagesOfSameDepthCanBeCombined() {
 		Packages subs = Packages.subPackagesOf(List.class, Format.class);
 		assertFalse(subs.contains(raw(List.class))); // in java.util
 		assertTrue(subs.contains(raw(AtomicBoolean.class))); // in java.uitl.concurrent
@@ -81,7 +81,7 @@ class TestPackages {
 	}
 
 	@Test
-	public void thatMultipleRootPackagesAndSubpackagesOfSameDepthCanBeCombined() {
+	void thatMultipleRootPackagesAndSubpackagesOfSameDepthCanBeCombined() {
 		Packages subs = Packages.packageAndSubPackagesOf(List.class,
 				Format.class);
 		assertTrue(subs.contains(raw(List.class))); // in java.util
@@ -91,19 +91,19 @@ class TestPackages {
 	}
 
 	@Test
-	public void thatMultipleRootSubpackagesOfDifferentDepthCanNotBeCombined() {
+	void thatMultipleRootSubpackagesOfDifferentDepthCanNotBeCombined() {
 		assertThrows(IllegalArgumentException.class,
 				() -> Packages.subPackagesOf(List.class, DateFormatProvider.class));
 	}
 
 	@Test
-	public void thatMultipleRootPackagesAndSubpackagesOfDifferentDepthCanNotBeCombined() {
+	void thatMultipleRootPackagesAndSubpackagesOfDifferentDepthCanNotBeCombined() {
 		assertThrows(IllegalArgumentException.class,
 				() -> Packages.packageAndSubPackagesOf(List.class, DateFormatProvider.class));
 	}
 
 	@Test
-	public void thatParentPackagesAreOfSameKindOfSet() {
+	void thatParentPackagesAreOfSameKindOfSet() {
 		assertEquals(Packages.subPackagesOf(Map.class),
 				Packages.subPackagesOf(ConcurrentMap.class).parents());
 		assertEquals(Packages.packageOf(Map.class),
@@ -114,12 +114,12 @@ class TestPackages {
 	}
 
 	@Test
-	public void thatParentOfAllPackagesIsAllPackages() {
+	void thatParentOfAllPackagesIsAllPackages() {
 		assertEquals(Packages.ALL, Packages.ALL.parents());
 	}
 
 	@Test
-	public void thatParentOfDefaultPackageIsDefaultPackage() {
+	void thatParentOfDefaultPackageIsDefaultPackage() {
 		assertEquals(Packages.DEFAULT, Packages.DEFAULT.parents());
 	}
 }

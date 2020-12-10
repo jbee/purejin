@@ -48,22 +48,22 @@ class TestAutobindBinds {
 			AutobindBindsModule.class);
 
 	@Test
-	public void thatTheAutoboundTypeItselfIsBound() {
+	void thatTheAutoboundTypeItselfIsBound() {
 		assertEquals(42, injector.resolve(Integer.class).intValue());
 	}
 
 	@Test
-	public void thatDirectSuperclassOfAutoboundTypeIsBound() {
+	void thatDirectSuperclassOfAutoboundTypeIsBound() {
 		assertEquals(42, injector.resolve(Number.class).intValue());
 	}
 
 	@Test
-	public void thatSuperinterfaceOfAutoboundTypeIsBound() {
+	void thatSuperinterfaceOfAutoboundTypeIsBound() {
 		assertEquals(42, injector.resolve(Serializable.class));
 	}
 
 	@Test
-	public void thatParametizedSuperinterfaceOfAutoboundTypeIsBound() {
+	void thatParametizedSuperinterfaceOfAutoboundTypeIsBound() {
 		assertEquals(42, injector.resolve(
 				raw(Comparable.class).parametized(Integer.class)));
 	}

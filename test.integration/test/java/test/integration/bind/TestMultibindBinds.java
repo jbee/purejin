@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.Cast.listTypeOf;
 import static se.jbee.inject.Cast.setTypeOf;
 import static se.jbee.inject.Name.named;
-import static test.integration.bind.AssertInjects.assertEqualSets;
+import static test.integration.util.TestUtils.assertEqualSets;
 
 class TestMultibindBinds {
 
@@ -63,7 +63,7 @@ class TestMultibindBinds {
 			MultibindBindsBundle.class);
 
 	@Test
-	public void thatMultipleNamedElementsCanBeBound() {
+	void thatMultipleNamedElementsCanBeBound() {
 		Integer[] foos = injector.resolve(foo, Integer[].class);
 		assertEqualSets(new Integer[] { 2, 3 }, foos);
 		Integer[] bars = injector.resolve(bar, Integer[].class);
@@ -75,7 +75,7 @@ class TestMultibindBinds {
 	}
 
 	@Test
-	public void thatMultipleBoundNamedElementsCanUsedAsList() {
+	void thatMultipleBoundNamedElementsCanUsedAsList() {
 		List<Integer> foos = injector.resolve(foo, listTypeOf(Integer.class));
 		assertEqualSets(new Integer[] { 2, 3 }, foos.toArray());
 		List<Integer> bars = injector.resolve(bar, listTypeOf(Integer.class));
@@ -83,7 +83,7 @@ class TestMultibindBinds {
 	}
 
 	@Test
-	public void thatMultipleBoundNamedElementsCanUsedAsSet() {
+	void thatMultipleBoundNamedElementsCanUsedAsSet() {
 		Set<Integer> foos = injector.resolve(foo, setTypeOf(Integer.class));
 		assertEqualSets(new Integer[] { 2, 3 }, foos.toArray());
 		Set<Integer> bars = injector.resolve(bar, setTypeOf(Integer.class));
@@ -91,7 +91,7 @@ class TestMultibindBinds {
 	}
 
 	@Test
-	public void thatMultipleToConstantsCanBeBound() {
+	void thatMultipleToConstantsCanBeBound() {
 		List<Long> longs = injector.resolve(listTypeOf(long.class));
 		assertEqualSets(new Long[] { 1L, 2L, 3L, 4L }, longs.toArray());
 		assertEquals(2, injector.resolve(Float[].class).length);

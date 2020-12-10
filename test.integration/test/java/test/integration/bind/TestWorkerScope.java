@@ -23,30 +23,30 @@ class TestWorkerScope {
 	private final Scope scope = new WorkerScope();
 
 	@Test
-	public void scopeYieldsControllerWithoutUsingTheProvider() {
+	void scopeYieldsControllerWithoutUsingTheProvider() {
 		assertNotNull(getController());
 	}
 
 	@Test
-	public void scopeCannotBeUsedBeforeItIsAllocated() {
+	void scopeCannotBeUsedBeforeItIsAllocated() {
 		assertDeallocated(1, "test");
 	}
 
 	@Test
-	public void deallocateDoesNotRequireAllocate() {
-		getController().deallocate();
+	void deallocateDoesNotRequireAllocate() {
+		assertDoesNotThrow(() -> getController().deallocate());
 	}
 
 	@Test
-	public void deallocateCanBeCalledMoreThanOnce() {
+	void deallocateCanBeCalledMoreThanOnce() {
 		Scope.Controller controller = getController();
 		controller.allocate();
 		controller.deallocate();
-		controller.deallocate();
+		assertDoesNotThrow(controller::deallocate);
 	}
 
 	@Test
-	public void onceProvidedInstancesAreCachedInScope() {
+	void onceProvidedInstancesAreCachedInScope() {
 		Scope.Controller controller = getController();
 		controller.allocate();
 		String v1 = "test";
@@ -56,7 +56,7 @@ class TestWorkerScope {
 	}
 
 	@Test
-	public void onceDeallocatedInstancesAreNoLongerReachable() {
+	void onceDeallocatedInstancesAreNoLongerReachable() {
 		Scope.Controller controller = getController();
 		controller.allocate();
 		String v1 = "test";
@@ -66,7 +66,7 @@ class TestWorkerScope {
 	}
 
 	@Test
-	public void contextCanBeTransferred() throws Exception {
+	void contextCanBeTransferred() throws Exception {
 		CompletableFuture<String> asyncResult = new CompletableFuture<>();
 		Scope.Controller controllerLevel0 = getController();
 		controllerLevel0.allocate();

@@ -99,7 +99,7 @@ class TestCustomValueBinderBinds1 {
 	}
 
 	@Test
-	public void thatBindingsCanJustBeCounted() {
+	void thatBindingsCanJustBeCounted() {
 		CountBinder count = new CountBinder();
 		CountBinder emptyCount = new CountBinder();
 		Injector injector = injectorWithEnv(
@@ -142,7 +142,7 @@ class TestCustomValueBinderBinds1 {
 	}
 
 	@Test
-	public void thatAllConstructorParameterTypesCanBeMadeRequired() {
+	void thatAllConstructorParameterTypesCanBeMadeRequired() {
 		ValueBinder<?> required = new RequiredConstructorParametersBinder();
 		assertThrows(NoResourceForDependency.class,
 				() -> injectorWithEnv(TestCustomValueBinderBinds1Module.class, required));
@@ -201,7 +201,7 @@ class TestCustomValueBinderBinds1 {
 	}
 
 	@Test
-	public void thatCustomInitialisationCanBeAdded() {
+	void thatCustomInitialisationCanBeAdded() {
 		Injector injector = injectorWithEnv(
 				TestCustomValueBinderBinds1Module.class,
 				new FieldInjectionBinder());

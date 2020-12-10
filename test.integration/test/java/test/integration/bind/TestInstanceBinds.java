@@ -31,14 +31,14 @@ class TestInstanceBinds {
 			InstanceBindsModule.class);
 
 	@Test
-	public void thatNumberDependencyIsResolvedToIntegerBoundSupplier() {
+	void thatNumberDependencyIsResolvedToIntegerBoundSupplier() {
 		Number number = injector.resolve(Number.class);
 		assertTrue(number instanceof Integer);
 		assertEquals(42, number.intValue());
 	}
 
 	@Test
-	public void thatTypeLinkedBackToItselfBecomesConstructorBinding() {
+	void thatTypeLinkedBackToItselfBecomesConstructorBinding() {
 		assertNotNull(injector.resolve(Foo.class));
 	}
 }

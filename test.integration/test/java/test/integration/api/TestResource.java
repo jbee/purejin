@@ -17,7 +17,7 @@ import static se.jbee.inject.lang.Type.raw;
 class TestResource {
 
 	@Test
-	public void naturalOrderIsFromMostQualifiedToLeastQualified() {
+	void naturalOrderIsFromMostQualifiedToLeastQualified() {
 		List<Resource<?>> resources = new ArrayList<>();
 		resources.add(createResourceOf(1, Type.WILDCARD));
 		resources.add(

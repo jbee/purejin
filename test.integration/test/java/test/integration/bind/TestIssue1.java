@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.lang.Type.raw;
-import static test.integration.bind.AssertInjects.assertEqualSets;
+import static test.integration.util.TestUtils.assertEqualSets;
 
 /**
  * Solution for cycle on common interface injecting other implementations into
@@ -87,7 +87,7 @@ class TestIssue1 {
 	}
 
 	@Test
-	public void thatBundleCanBeBootstrapped() {
+	void thatBundleCanBeBootstrapped() {
 		Injector injector = Bootstrap.injector(Bundle1.class);
 		B b = injector.resolve(B.class);
 		B leftB = injector.resolve(left, B.class);

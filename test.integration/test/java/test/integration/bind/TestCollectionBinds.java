@@ -9,14 +9,12 @@ import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.defaults.CoreFeature;
 import se.jbee.inject.lang.Type;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
+import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Cast.*;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.lang.Type.raw;
@@ -59,68 +57,102 @@ class TestCollectionBinds {
 
 	private final Injector injector = Bootstrap.injector(
 			CollectionBindsBundle.class);
-	private final AssertInjects ai = new AssertInjects(injector);
 
 	@Test
-	public void thatArrayTypeIsAvailableForAnyBoundType() {
-		ai.assertInjects(new String[] { "foobar" }, raw(String[].class));
+	void thatArrayTypeIsAvailableForAnyBoundType() {
+		assertInjects(new String[] { "foobar" }, raw(String[].class));
 	}
 
 	@Test
-	public void thatListIsAvailableForBoundType() {
-		ai.assertInjects(singletonList("foobar"), listTypeOf(String.class));
-		ai.assertInjects(asList(42, 846), listTypeOf(Integer.class));
+	void thatListIsAvailableForBoundType() {
+		assertInjects(singletonList("foobar"), listTypeOf(String.class));
+		assertInjects(asList(42, 846), listTypeOf(Integer.class));
 	}
 
 	@Test
-	public void thatSetIsAvailableForBoundType() {
-		ai.assertInjects(singleton("foobar"), setTypeOf(String.class));
-		ai.assertInjects(new TreeSet<>(asList(new Integer[] { 42, 846 })),
+	void thatSetIsAvailableForBoundType() {
+		assertInjects(singleton("foobar"), setTypeOf(String.class));
+		assertInjects(new TreeSet<>(asList(new Integer[] { 42, 846 })),
 				setTypeOf(Integer.class));
 	}
 
 	@Test
-	public void thatCollectionIsAvailable() {
+	void thatCollectionIsAvailable() {
 		Type<? extends Collection<?>> collectionType = Cast.collectionTypeOf(
 				Integer.class);
-		ai.assertInjectsItems(new Integer[] { 846, 42 }, collectionType);
+		assertInjectsItems(new Integer[] { 846, 42 }, collectionType);
 	}
 
 	@Test
-	public void thatListAsLowerBoundIsAvailable() {
+	void thatListAsLowerBoundIsAvailable() {
 		Type<? extends List<Number>> wildcardListType = listTypeOf(
 				Number.class).parametizedAsUpperBounds();
-		ai.assertInjectsItems(new Number[] { 846, 42, 42.0f },
+		assertInjectsItems(new Number[] { 846, 42, 42.0f },
 				wildcardListType);
 	}
 
 	@Test
-	public void thatSetAsLowerBoundIsAvailable() {
+	void thatSetAsLowerBoundIsAvailable() {
 		Type<? extends Set<Number>> wildcardSetType = setTypeOf(
 				Number.class).parametizedAsUpperBounds();
-		ai.assertInjectsItems(new Number[] { 846, 42, 42.0f }, wildcardSetType);
+		assertInjectsItems(new Number[] { 846, 42, 42.0f }, wildcardSetType);
 	}
 
 	@Test
-	public void thatCollectionAsLowerBoundIsAvailable() {
+	void thatCollectionAsLowerBoundIsAvailable() {
 		Type<? extends Collection<Number>> collectionType = collectionTypeOf(
 				Number.class).parametizedAsUpperBounds();
-		ai.assertInjectsItems(new Number[] { 846, 42, 42.0f }, collectionType);
+		assertInjectsItems(new Number[] { 846, 42, 42.0f }, collectionType);
 	}
 
 	@Test
-	public void thatListOfListsOfBoundTypesAreAvailable() {
-		ai.assertInjects(singletonList(singletonList("foobar")),
+	void thatListOfListsOfBoundTypesAreAvailable() {
+		assertInjects(singletonList(singletonList("foobar")),
 				listTypeOf(listTypeOf(String.class)));
 	}
 
 	@Test
-	public void thatCollectionIsAvailableWhenJustListIsInstalled() {
+	void thatCollectionIsAvailableWhenJustListIsInstalled() {
 		Injector injector = Bootstrap.injector(
 				CollectionBindsJustListBundle.class);
-		Type<? extends Collection<?>> collectionType = collectionTypeOf(
-				Integer.class);
-		new AssertInjects(injector).assertInjectsItems(
-				new Integer[] { 846, 42 }, collectionType);
+		assertInjectsItems(new Integer[] { 846, 42 },
+				injector.resolve(collectionTypeOf(Integer.class)));
 	}
+
+	@Deprecated
+	private <E> void assertInjectsItems(E[] expected,
+			Type<? extends Collection<?>> dependencyType) {
+		assertInjectsItems(asList(expected), dependencyType);
+	}
+
+	@Deprecated
+	private <E> void assertInjectsItems(Collection<E> expected,
+			Type<? extends Collection<?>> dependencyType) {
+		assertInjectsItems(expected, injector.resolve(dependencyType));
+	}
+
+	@Deprecated
+	private <T> void assertInjects(T expected,
+			Type<? extends T> dependencyType) {
+		assertEqualSets(expected, injector.resolve(dependencyType));
+	}
+
+	private static <T> void assertEqualSets(T expected, T actual) {
+		if (expected instanceof Object[]) {
+			Object[] arr = (Object[]) expected;
+			assertArrayEquals(arr, (Object[]) actual);
+		} else {
+			assertEquals(expected, actual);
+		}
+	}
+
+	private static <E> void assertInjectsItems(E[] expected, Collection<?> actual) {
+		assertInjectsItems(asList(expected), actual);
+	}
+
+	private static <E> void assertInjectsItems(Collection<E> expected,
+			Collection<?> actual) {
+		assertTrue(actual.containsAll(expected));
+	}
+
 }

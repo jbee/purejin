@@ -39,7 +39,7 @@ class TestConstantBinds {
 			InstanceBindsBundle.class);
 
 	@Test
-	public void thatInstanceInjectedBasedOnTheDependencyType() {
+	void thatInstanceInjectedBasedOnTheDependencyType() {
 		assertInjects("bar", raw(CharSequence.class));
 		assertInjects("foobar", raw(String.class));
 		assertInjects(42, raw(Integer.class));

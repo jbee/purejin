@@ -97,18 +97,18 @@ class TestProviderBinds {
 			ProviderBindsBundle.class);
 
 	@Test
-	public void providersAreAvailableForAnyBoundType() {
+	void providersAreAvailableForAnyBoundType() {
 		assertInjectsProviderFor("foobar", raw(String.class));
 		assertInjectsProviderFor(42, raw(Integer.class));
 	}
 
 	@Test
-	public void providersAreAvailableForAnyNamedBoundType() {
+	void providersAreAvailableForAnyNamedBoundType() {
 		assertInjectsProviderFor(846, raw(Integer.class), named("foo"));
 	}
 
 	@Test
-	public void providersAreAvailableForArrays() {
+	void providersAreAvailableForArrays() {
 		WorkingStateConsumer state = injector.resolve(
 				WorkingStateConsumer.class);
 		assertNotNull(state.strings);
@@ -119,25 +119,25 @@ class TestProviderBinds {
 	}
 
 	@Test
-	public void providersAreAvailableForLists() {
+	void providersAreAvailableForLists() {
 		List<String> list = asList("foobar", "special");
 		assertInjectsProviderFor(list,
 				raw(List.class).parametized(String.class));
 	}
 
 	@Test
-	public void providersAreAvailableForSets() {
+	void providersAreAvailableForSets() {
 		Set<String> set = new HashSet<>(asList("foobar", "special"));
 		assertInjectsProviderFor(set, raw(Set.class).parametized(String.class));
 	}
 
 	@Test
-	public void providersOvercomeScopingConflicts() {
+	void providersOvercomeScopingConflicts() {
 		assertNotNull(injector.resolve(WorkingStateConsumer.class));
 	}
 
 	@Test
-	public void scopingConflictsCauseException() {
+	void scopingConflictsCauseException() {
 		try {
 			injector.resolve(FaultyStateConsumer.class);
 			fail("expected " + UnstableDependency.class.getSimpleName());
@@ -150,7 +150,7 @@ class TestProviderBinds {
 	}
 
 	@Test
-	public void providersKeepHierarchySoProvidedDependencyIsResolvedAsIfResolvedDirectly() {
+	void providersKeepHierarchySoProvidedDependencyIsResolvedAsIfResolvedDirectly() {
 		WorkingStateConsumer a = injector.resolve(A);
 		assertSame(DYNAMIC_STATE_IN_A, a.state());
 		WorkingStateConsumer b = injector.resolve(B);
@@ -159,7 +159,7 @@ class TestProviderBinds {
 	}
 
 	@Test
-	public void providersCanBeCombinedWithOtherBridges() {
+	void providersCanBeCombinedWithOtherBridges() {
 		Provider<List<WorkingStateConsumer>> provider = injector.resolve(
 				providerTypeOf(listTypeOf(WorkingStateConsumer.class)));
 		assertNotNull(provider);
@@ -171,7 +171,7 @@ class TestProviderBinds {
 	}
 
 	@Test
-	public void providerCanProvidePerInjectionInstanceWithinAnPerApplicationParent() {
+	void providerCanProvidePerInjectionInstanceWithinAnPerApplicationParent() {
 		WorkingStateConsumer obj = injector.resolve(WorkingStateConsumer.class);
 		assertNotNull(obj.state()); // if expiry is a problem this will throw an exception
 	}

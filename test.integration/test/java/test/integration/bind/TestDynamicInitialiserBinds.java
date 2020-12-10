@@ -66,7 +66,7 @@ class TestDynamicInitialiserBinds {
 	}
 
 	@Test
-	public void thatDynamicInitialisationTookPlace() {
+	void thatDynamicInitialisationTookPlace() {
 		Injector injector = Bootstrap.injector(
 				DynamicInitialiserBindsModule.class);
 		assertEquals(1, injector.resolve(MyService.class).sum);

@@ -89,20 +89,20 @@ class TestRequiredProvidedBinds {
 	}
 
 	@Test
-	public void thatNotProvidedRequiredBindThrowsException() {
+	void thatNotProvidedRequiredBindThrowsException() {
 		assertThrows(NoResourceForDependency.class,
 				() -> Bootstrap.injector(RequirementModule.class));
 	}
 
 	@Test
-	public void thatRequirementIsFulfilledByProvidedBind() {
+	void thatRequirementIsFulfilledByProvidedBind() {
 		Injector injector = Bootstrap.injector(
 				RequiredProvidedBindsBundle.class);
 		assertNotNull(injector.resolve(ExampleService.class));
 	}
 
 	@Test
-	public void thatUnusedProvidedBindIsNotAddedToInjectorContext() {
+	void thatUnusedProvidedBindIsNotAddedToInjectorContext() {
 		Injector injector = Bootstrap.injector(
 				RequiredProvidedBindsBundle.class);
 		try {
@@ -116,7 +116,7 @@ class TestRequiredProvidedBinds {
 	}
 
 	@Test
-	public void thatAnExplicitBindReplacesTheProvidedImplementation() {
+	void thatAnExplicitBindReplacesTheProvidedImplementation() {
 		Injector injector = Bootstrap.injector(ExplicitBindBundle.class);
 		ExampleService s = injector.resolve(ExampleService.class);
 		assertTrue(s instanceof ExplicitExampleService);

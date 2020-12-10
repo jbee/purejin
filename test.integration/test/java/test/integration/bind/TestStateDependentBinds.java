@@ -252,14 +252,14 @@ class TestStateDependentBinds {
 	}
 
 	@Test
-	public void thatStateChangeIsResolvedToAnotherImplementation() {
+	void thatStateChangeIsResolvedToAnotherImplementation() {
 		Injector injector = Bootstrap.injector(
 				StateDependentBindsModule1.class);
 		assertStateChangeIsResolvedToAnotherImplementation(injector);
 	}
 
 	@Test
-	public void thatStateChangeIsResolvedToAnotherImplementation2() {
+	void thatStateChangeIsResolvedToAnotherImplementation2() {
 		Injector injector = Bootstrap.injector(
 				StateDependentBindsModule2.class);
 		assertStateChangeIsResolvedToAnotherImplementation(injector);
@@ -280,7 +280,7 @@ class TestStateDependentBinds {
 	}
 
 	@Test
-	public void thatStateChangeIsProvidedToAnotherImplementation() {
+	void thatStateChangeIsProvidedToAnotherImplementation() {
 		Injector injector = Bootstrap.injector(StateDependentBindsBundle.class);
 		StatefulObject config = injector.resolve(StatefulObject.class);
 		Provider<Validator> v = injector.resolve(
@@ -294,7 +294,7 @@ class TestStateDependentBinds {
 	}
 
 	@Test
-	public void thatStateChangeIsResolvedUsingNamedInstances() {
+	void thatStateChangeIsResolvedUsingNamedInstances() {
 		assertConfigNumberResolvedToStringEnding(null, "undefined");
 		assertConfigNumberResolvedToStringEnding(7, "7");
 		assertConfigNumberResolvedToStringEnding(42, "42");

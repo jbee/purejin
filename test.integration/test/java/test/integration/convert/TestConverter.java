@@ -41,7 +41,7 @@ class TestConverter {
 	}
 
 	@Test
-	public void chainsCanBeBuildByAppending() {
+	void chainsCanBeBuildByAppending() {
 		Converter<String, Long> str2long = Long::parseLong;
 		Converter<Long, Integer> long2int = Long::intValue;
 		assertEquals(Integer.valueOf(13),
@@ -49,7 +49,7 @@ class TestConverter {
 	}
 
 	@Test
-	public void chainsCanBeBuildByPrepanding() {
+	void chainsCanBeBuildByPrepanding() {
 		Converter<String, Long> str2long = Long::parseLong;
 		Converter<Long, Integer> long2int = Long::intValue;
 		assertEquals(Integer.valueOf(13),
@@ -57,7 +57,7 @@ class TestConverter {
 	}
 
 	@Test
-	public void errorsCanBeRecoveredUsingDefaultValues() {
+	void errorsCanBeRecoveredUsingDefaultValues() {
 		Converter<String, Integer> str2int = Integer::parseInt;
 		assertEquals(13, str2int.fallbackTo(13).convert("illegal").intValue());
 	}
@@ -66,7 +66,7 @@ class TestConverter {
 			TestConverterModule.class);
 
 	@Test
-	public void converterMethodsWithTypeVariableUseScopeDependencyType() {
+	void converterMethodsWithTypeVariableUseScopeDependencyType() {
 		@SuppressWarnings("rawtypes")
 		Resource<Converter<String, List>> str2ints = context.resolve(
 				resourceTypeFor(Converter.converterTypeOf(raw(String.class),
@@ -75,7 +75,7 @@ class TestConverter {
 	}
 
 	@Test
-	public void genericMethodConverters() {
+	void genericMethodConverters() {
 		Converter<String, List<Integer>> str2ints = context.resolve(
 				Converter.converterTypeOf(raw(String.class), listTypeOf(Integer.class)));
 		assertEquals(asList(42, 13), str2ints.convert("42, 13"));

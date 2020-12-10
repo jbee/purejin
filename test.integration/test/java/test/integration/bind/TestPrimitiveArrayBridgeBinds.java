@@ -59,7 +59,7 @@ class TestPrimitiveArrayBridgeBinds {
 			TestPrimitiveArrayBridgeBindsBundle.class);
 
 	@Test
-	public void primitiveArrayBridgeProvidesPrimitveInts() {
+	void primitiveArrayBridgeProvidesPrimitveInts() {
 		int[] ints = injector.resolve(int[].class);
 		assertEquals(3, ints.length);
 		Set<Integer> actual = new HashSet<>();
@@ -69,7 +69,7 @@ class TestPrimitiveArrayBridgeBinds {
 	}
 
 	@Test
-	public void primitiveArrayBridgeProvidesPrimitveLongs() {
+	void primitiveArrayBridgeProvidesPrimitveLongs() {
 		long[] longs = injector.resolve(long[].class);
 		assertEquals(3, longs.length);
 		Set<Long> actual = new HashSet<>();
@@ -79,7 +79,7 @@ class TestPrimitiveArrayBridgeBinds {
 	}
 
 	@Test
-	public void primitiveArrayBridgeProvidesPrimitveFloats() {
+	void primitiveArrayBridgeProvidesPrimitveFloats() {
 		float[] floats = injector.resolve(float[].class);
 		assertEquals(3, floats.length);
 		Set<Float> actual = new HashSet<>();
@@ -89,7 +89,7 @@ class TestPrimitiveArrayBridgeBinds {
 	}
 
 	@Test
-	public void primitiveArrayBridgeProvidesPrimitveDoubles() {
+	void primitiveArrayBridgeProvidesPrimitveDoubles() {
 		double[] doubles = injector.resolve(double[].class);
 		assertEquals(3, doubles.length);
 		Set<Double> actual = new HashSet<>();
@@ -99,7 +99,7 @@ class TestPrimitiveArrayBridgeBinds {
 	}
 
 	@Test
-	public void primitiveArrayBridgeProvidesPrimitveBooleans() {
+	void primitiveArrayBridgeProvidesPrimitveBooleans() {
 		boolean[] booleans = injector.resolve(boolean[].class);
 		// this might be surprising expectation at first,
 		// the reason only 1 value is returned is that resolving arrays

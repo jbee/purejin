@@ -56,25 +56,25 @@ class TestPrimitiveBinds {
 			PrimitiveBindsModule.class);
 
 	@Test
-	public void thatIntPrimitivesWorkAsWrapperClasses() {
+	void thatIntPrimitivesWorkAsWrapperClasses() {
 		assertEquals(42, injector.resolve(Integer.class).intValue());
 		assertEquals(42, injector.resolve(int.class).intValue());
 	}
 
 	@Test
-	public void thatLongPrimitivesWorkAsWrapperClasses() {
+	void thatLongPrimitivesWorkAsWrapperClasses() {
 		assertEquals(132L, injector.resolve(Long.class).longValue());
 		assertEquals(132L, injector.resolve(long.class).longValue());
 	}
 
 	@Test
-	public void thatBooleanPrimitivesWorkAsWrapperClasses() {
+	void thatBooleanPrimitivesWorkAsWrapperClasses() {
 		assertEquals(true, injector.resolve(Boolean.class));
 		assertEquals(true, injector.resolve(boolean.class));
 	}
 
 	@Test
-	public void thatFloatPrimitivesWorkAsWrapperClasses() {
+	void thatFloatPrimitivesWorkAsWrapperClasses() {
 		assertEquals(3.1415f, injector.resolve("pi", Float.class).floatValue(),
 				0.01f);
 		assertEquals(3.1415f, injector.resolve("pi", float.class).floatValue(),
@@ -82,7 +82,7 @@ class TestPrimitiveBinds {
 	}
 
 	@Test
-	public void thatDoublePrimitivesWorkAsWrapperClasses() {
+	void thatDoublePrimitivesWorkAsWrapperClasses() {
 		assertEquals(2.71828d, injector.resolve("e", Double.class), 0.01d);
 		assertEquals(2.71828d, injector.resolve("e", double.class), 0.01d);
 	}
@@ -99,12 +99,12 @@ class TestPrimitiveBinds {
 	 * loot of code for all the primitives for a little benefit.
 	 */
 	@Test
-	public void thatPrimitiveArrayNotWorkAsWrapperArrayClasses() {
+	void thatPrimitiveArrayNotWorkAsWrapperArrayClasses() {
 		assertThrows(NoResourceForDependency.class, () -> injector.resolve(int[].class));
 	}
 
 	@Test
-	public void thatPrimitivesWorkAsPrimitiveOrWrapperClassesWhenInjected() {
+	void thatPrimitivesWorkAsPrimitiveOrWrapperClassesWhenInjected() {
 		PrimitiveBindsBean bean = injector.resolve(PrimitiveBindsBean.class);
 		assertEquals(42, bean.i);
 		assertEquals(3.1415f, bean.f, 0.01f);

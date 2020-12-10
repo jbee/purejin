@@ -28,7 +28,7 @@ class TestSupplierBinds {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		Injector injector = Bootstrap.injector(SupplierBindsModule.class);
 		String value = injector.resolve(String.class);
 		assertEquals("foobar", value);

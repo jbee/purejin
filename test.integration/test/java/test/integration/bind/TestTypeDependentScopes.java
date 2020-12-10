@@ -19,7 +19,7 @@ class TestTypeDependentScopes {
 	}
 
 	@Test
-	public void thatDependencyTypeScopeEnsuresSingletonPerExactGenericType() {
+	void thatDependencyTypeScopeEnsuresSingletonPerExactGenericType() {
 		Scope scope = new TypeDependentScope(TypeDependentScope::typeSignature);
 		A a = new A();
 		B b = new B();

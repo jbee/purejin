@@ -5,11 +5,10 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.defaults.DefaultScopes;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TestLinker {
+class TestMultiInstall {
 
 	static class TwiceInstalledModule extends BinderModule {
 
@@ -20,11 +19,11 @@ class TestLinker {
 
 	}
 
-	private static class LinkerBundle extends BootstrapperBundle {
+	private static class TestMultiInstallBundle extends BootstrapperBundle {
 
 		@Override
 		protected void bootstrap() {
-			install(DefaultScopes.class);
+			installDefaults();
 			install(new TwiceInstalledModule());
 			install(new TwiceInstalledModule());
 		}
@@ -36,8 +35,8 @@ class TestLinker {
 	 * can be determined that installing it twice or more does not make sense.
 	 */
 	@Test
-	public void thatMonomodalModulesCanBeInstalledTwice() {
-		Injector injector = Bootstrap.injector(LinkerBundle.class);
+	void thatMonomodalModulesCanBeInstalledTwice() {
+		Injector injector = Bootstrap.injector(TestMultiInstallBundle.class);
 		assertEquals(42, injector.resolve(Integer.class).intValue());
 	}
 }

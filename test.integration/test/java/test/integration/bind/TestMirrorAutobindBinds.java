@@ -139,12 +139,12 @@ class TestMirrorAutobindBinds {
 			TestMirrorAutobindBindsModule.class);
 
 	@Test
-	public void thatInstanceFactoryMethodIsAvailable() {
+	void thatInstanceFactoryMethodIsAvailable() {
 		assertEquals(42f, injector.resolve(float.class).floatValue(), 0.01f);
 	}
 
 	@Test
-	public void thatStaticFactoryMethodIsAvailable() {
+	void thatStaticFactoryMethodIsAvailable() {
 		assertEquals(42, injector.resolve(int.class).intValue());
 	}
 
@@ -153,12 +153,12 @@ class TestMirrorAutobindBinds {
 	 * producing factory method gets 21f injected instead of 42f.
 	 */
 	@Test
-	public void thatInstanceFactoryMethodWithParametersIsAvailable() {
+	void thatInstanceFactoryMethodWithParametersIsAvailable() {
 		assertEquals(42d, injector.resolve(double.class), 0.01d);
 	}
 
 	@Test
-	public void thatStaticFactoryMethodWithParametersIsAvailable() {
+	void thatStaticFactoryMethodWithParametersIsAvailable() {
 		assertEquals(84L, injector.resolve(long.class).longValue());
 	}
 
@@ -169,40 +169,40 @@ class TestMirrorAutobindBinds {
 	 * named {@link Instance} that can be resolved.
 	 */
 	@Test
-	public void thatNamedWithAnnotationCanBeUsedToGetNamedResources() {
+	void thatNamedWithAnnotationCanBeUsedToGetNamedResources() {
 		assertEquals(42d, injector.resolve("Foo", double.class), 0.01d);
 	}
 
 	@Test
-	public void thatMethodsAreBoundThatAreAssignableToSpecifiedType() {
+	void thatMethodsAreBoundThatAreAssignableToSpecifiedType() {
 		assertEquals(true,
 				injector.resolve(providerTypeOf(Boolean.class)).provide());
 	}
 
 	@Test
-	public void thatNoMethodsAreBoundThatAreNotAssignableToSpecifiedType() {
+	void thatNoMethodsAreBoundThatAreNotAssignableToSpecifiedType() {
 		assertThrows(NoResourceForDependency.class,
 				() -> injector.resolve(Character.class));
 	}
 
 	@Test
-	public void thatMethodsAreBoundThatAreInSpecifiedPackagesSet() {
+	void thatMethodsAreBoundThatAreInSpecifiedPackagesSet() {
 		assertEquals(named("foobar"), injector.resolve(Name.class));
 	}
 
 	@Test
-	public void thatNoMethodsAreBoundThatAreNotInSpecifiedPackagesSet() {
+	void thatNoMethodsAreBoundThatAreNotInSpecifiedPackagesSet() {
 		assertThrows(NoResourceForDependency.class,
 				() -> injector.resolve(String.class));
 	}
 
 	@Test
-	public void thatMethodsAreBoundToSpecificInstance() {
+	void thatMethodsAreBoundToSpecificInstance() {
 		assertSame(STATE, injector.resolve(StringBuffer.class));
 	}
 
 	@Test
-	public void thatDeclaredScopeIsUsedForMirrorBindings() {
+	void thatDeclaredScopeIsUsedForMirrorBindings() {
 		byte first = injector.resolve(byte.class);
 		byte second = injector.resolve(byte.class);
 		assertEquals(first + 1, second);

@@ -67,20 +67,20 @@ class TestInjectorHierarchy {
 	private final Injector branched2 = Decorate.hierarchy(root, branch2);
 
 	@Test
-	public void parentContextIsAccessibleForHierarchicalInjector() {
+	void parentContextIsAccessibleForHierarchicalInjector() {
 		assertEquals(42, branched1.resolve(Integer.class).intValue());
 		assertEquals(42, branched2.resolve(Integer.class).intValue());
 	}
 
 	@Test
-	public void childContextIsAccessibleForHierarchicalInjector() {
+	void childContextIsAccessibleForHierarchicalInjector() {
 		assertEquals(42.42f, branched1.resolve(Float.class).floatValue(),
 				0.01f);
 		assertEquals(0.42f, branched2.resolve(Float.class).floatValue(), 0.01f);
 	}
 
 	@Test
-	public void mergedArrayContextIsAccessibleForHierarchicalInjector() {
+	void mergedArrayContextIsAccessibleForHierarchicalInjector() {
 		Number[] numbers = branched1.resolve(
 				Type.raw(Number[].class).asUpperBound());
 		assertEqualSets(new Number[] { 42, 13f, 42.42f }, numbers);

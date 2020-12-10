@@ -134,12 +134,12 @@ class TestAnnotatedWithBinds {
 	}
 
 	@Test
-	public void annotatedInstancesAreInjected() {
+	void annotatedInstancesAreInjected() {
 		injector.resolve(Service.class).verify();
 	}
 
 	@Test
-	public void annotatedInstancesCanBeResolvedProgrammatically() {
+	void annotatedInstancesCanBeResolvedProgrammatically() {
 		List<AnnotatedInstance<?>> annotated = injector.annotatedWith(
 				Component.class);
 		assertEquals(1, annotated.size());
@@ -149,7 +149,7 @@ class TestAnnotatedWithBinds {
 	}
 
 	@Test
-	public void annotatedInstancesCanOriginateFromMethodsAndFields() {
+	void annotatedInstancesCanOriginateFromMethodsAndFields() {
 		List<AnnotatedInstance<?>> annotated = injector.annotatedWith(
 				Marker.class);
 		assertEquals(2, annotated.size());
@@ -159,7 +159,7 @@ class TestAnnotatedWithBinds {
 	}
 
 	@Test
-	public void annotatedInstancesListIsCached() {
+	void annotatedInstancesListIsCached() {
 		assertSame(injector.annotatedWith(Marker.class),
 				injector.annotatedWith(Marker.class));
 	}
