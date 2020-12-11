@@ -15,7 +15,7 @@ import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.*;
-import static se.jbee.inject.Cast.listTypeOf;
+import static se.jbee.inject.lang.Cast.listTypeOf;
 import static se.jbee.inject.Provider.providerTypeOf;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;

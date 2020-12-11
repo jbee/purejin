@@ -10,7 +10,7 @@ import java.util.HashSet;
 
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static se.jbee.inject.Cast.listTypeOf;
+import static se.jbee.inject.lang.Cast.listTypeOf;
 
 class TestBuildUpGenericBinds {
 

@@ -13,7 +13,7 @@ import java.util.List;
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static se.jbee.inject.Cast.listTypeOf;
+import static se.jbee.inject.lang.Cast.listTypeOf;
 import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.lang.Utils.arrayMap;
 

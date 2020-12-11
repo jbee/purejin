@@ -3,7 +3,6 @@ package test.integration.bind;
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
-import se.jbee.inject.bind.Bindings;
 import se.jbee.inject.binder.BinderModuleWith;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -16,7 +15,7 @@ import java.util.Properties;
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static se.jbee.inject.Cast.listTypeOf;
+import static se.jbee.inject.lang.Cast.listTypeOf;
 import static se.jbee.inject.Name.named;
 
 /**

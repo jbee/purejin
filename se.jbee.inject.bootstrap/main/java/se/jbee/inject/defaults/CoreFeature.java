@@ -5,7 +5,7 @@
  */
 package se.jbee.inject.defaults;
 
-import static se.jbee.inject.Cast.functionTypeOf;
+import static se.jbee.inject.lang.Cast.functionTypeOf;
 import static se.jbee.inject.Resource.resourcesTypeOf;
 import static se.jbee.inject.Scope.application;
 import static se.jbee.inject.lang.Type.raw;

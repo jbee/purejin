@@ -1,7 +1,7 @@
 package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
-import se.jbee.inject.Cast;
+import se.jbee.inject.lang.Cast;
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
@@ -15,7 +15,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
-import static se.jbee.inject.Cast.*;
+import static se.jbee.inject.lang.Cast.*;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.lang.Type.raw;
 

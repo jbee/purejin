@@ -3,7 +3,7 @@
  *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject;
+package se.jbee.inject.lang;
 
 import se.jbee.inject.lang.Type;
 
@@ -15,16 +15,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 /**
- * Utility to get rid of warnings for known generic {@link Type}s.
- *
- * @see Obtainable#obtainableTypeOf(Type)
- * @see Converter#converterTypeOf(Type, Type)
- * @see Generator#generatorTypeOf(Type)
- * @see Provider#providerTypeOf(Type)
- * @see BuildUp#buildUpTypeOf(Type)
- * @see Resource#resourceTypeOf(Type)
- *
- * @author Jan Bernitt (jan@jbee.se)
+ * Utility to get rid of warnings for JRE generic {@link Type}s.
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public final class Cast {

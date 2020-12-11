@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static se.jbee.inject.Cast.listTypeOf;
-import static se.jbee.inject.Cast.setTypeOf;
+import static se.jbee.inject.lang.Cast.listTypeOf;
+import static se.jbee.inject.lang.Cast.setTypeOf;
 import static se.jbee.inject.Name.named;
 import static test.integration.util.TestUtils.assertEqualSets;
 
