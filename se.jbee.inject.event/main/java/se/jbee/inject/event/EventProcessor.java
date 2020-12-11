@@ -10,7 +10,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeoutException;
 
-import se.jbee.inject.Initialiser;
+import se.jbee.inject.BuildUp;
 
 /**
  * The {@link EventProcessor} is the unit that functionally connects the
@@ -67,7 +67,7 @@ public interface EventProcessor extends AutoCloseable {
 	 * given with an {@link Event}.
 	 *
 	 * When an event type is {@link EventModule#handle(Class)}d the registration
-	 * occurs "automatically" though {@link Initialiser}s for the event handler
+	 * occurs "automatically" though {@link BuildUp}s for the event handler
 	 * interface. For handler implementations it is sufficient to implement that
 	 * handler interface. No explicit connection needs to be bound.
 	 *

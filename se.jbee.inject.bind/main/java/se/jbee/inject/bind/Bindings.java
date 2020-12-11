@@ -6,7 +6,7 @@
 package se.jbee.inject.bind;
 
 import se.jbee.inject.*;
-import se.jbee.inject.Annotated.Merge;
+import se.jbee.inject.Annotated.Enhancer;
 import se.jbee.inject.lang.Type;
 
 import java.lang.annotation.Annotation;
@@ -48,9 +48,9 @@ public final class Bindings {
 	public <T> void add(Env env, Binding<T> complete) {
 		if (!complete.isComplete())
 			throw InconsistentBinding.addingIncomplete(complete);
-		Merge merge = env.property(Annotated.Merge.class,
+		Enhancer enhancer = env.property(Enhancer.class,
 				complete.source.ident.getPackage());
-		list.add(complete.annotatedBy(merge.apply(complete.annotations)));
+		list.add(complete.annotatedBy(enhancer.apply(complete.annotations)));
 	}
 
 	public void addExpanded(Env env, Binding<?> binding) {

@@ -49,7 +49,7 @@ public final class Environment implements Env {
 			.with(NamesBy.class, NamesBy.defaultName) //
 			.with(ScopesBy.class, ScopesBy.alwaysDefault) //
 			.with(HintsBy.class, HintsBy.noParameters) //
-			.with(Annotated.Merge.class, Annotated.NO_MERGE) //
+			.with(Annotated.Enhancer.class, Annotated.SOURCE) //
 			.with(Env.GP_USE_DEEP_REFLECTION, boolean.class, false) //
 			.with(Env.GP_DEEP_REFLECTION_PACKAGES, Packages.class, Packages.ALL) //
 			.with(Env.GP_USE_VERIFICATION, boolean.class, false) //

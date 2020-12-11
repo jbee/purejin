@@ -1,8 +1,8 @@
 package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
+import se.jbee.inject.BuildUp;
 import se.jbee.inject.Env;
-import se.jbee.inject.Initialiser;
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.Binder;
 import se.jbee.inject.binder.BinderModule;
@@ -12,30 +12,30 @@ import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.lang.Type;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static se.jbee.inject.Initialiser.initialiserTypeOf;
+import static se.jbee.inject.BuildUp.buildUpTypeOf;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
- * The tests demonstrates how the {@link Initialiser} and
+ * The tests demonstrates how the {@link BuildUp} and
  * {@link Binder#initbind()} can be used to e.g. install a "shutdown hook" that
  * would automatically close all {@link AutoCloseable}s. Here the "shutdown
  * hook" of course is simulated so we can test for it being invoked. In a real
  * scenario one would use {@link Runtime#addShutdownHook(Thread)}.
  */
-class TestInitialiserBinds {
+class TestBuildUpBinds {
 
-	static final class TestInitialiserBindsModule extends BinderModule
-			implements Initialiser<Injector> {
+	static final class TestBuildUpBindsModule extends BinderModule
+			implements BuildUp<Injector> {
 
 		@Override
 		protected void declare() {
 			initbind().to(this);
-			initbind().to(AutoCloseableInitialiser.class);
+			initbind().to(AutoCloseableBuildUp.class);
 			construct(SingletonResource.class);
 		}
 
 		@Override
-		public Injector init(Injector target, Type<?> as, Injector context) {
+		public Injector buildUp(Injector target, Type<?> as, Injector context) {
 			// just to show that one could use the module itself as well
 			// this e.g. allows to pass down and use setup data by using
 			// PresetModule's as shown with TestInitialiserBindsPresetModule
@@ -45,8 +45,8 @@ class TestInitialiserBinds {
 
 	}
 
-	static final class TestInitialiserBindsModuleWith
-			extends BinderModuleWith<Integer> implements Initialiser<Injector> {
+	static final class TestBuildUpBindsModuleWith
+			extends BinderModuleWith<Integer> implements BuildUp<Injector> {
 
 		Integer setup;
 
@@ -59,16 +59,16 @@ class TestInitialiserBinds {
 		}
 
 		@Override
-		public Injector init(Injector target, Type<?> as, Injector context) {
+		public Injector buildUp(Injector target, Type<?> as, Injector context) {
 			assertNotNull(setup);
 			// use setup to initialize something
 			return target;
 		}
 	}
 
-	public static class AutoCloseableInitialiser implements Initialiser<Injector> {
+	public static class AutoCloseableBuildUp implements BuildUp<Injector> {
 
-		public AutoCloseableInitialiser(AutoCloseable[] autoCloseables) {
+		public AutoCloseableBuildUp(AutoCloseable[] autoCloseables) {
 			// since this instance is created by the container it is also properly injected.
 			// so this can be used to receive instances that should be initialized as well
 			// in this case we just did it to show the possibility but it is not needed
@@ -81,7 +81,7 @@ class TestInitialiserBinds {
 		}
 
 		@Override
-		public Injector init(Injector target, Type<?> as, Injector context) {
+		public Injector buildUp(Injector target, Type<?> as, Injector context) {
 			// by the use of upper bound we receive all implementing classes
 			// even though they have not be bound explicitly for AutoCloseable.
 			AutoCloseable[] autoCloseables = target.resolve(
@@ -121,7 +121,7 @@ class TestInitialiserBinds {
 	@Test
 	void initialisersCanBeUsedToCloseAnyAutoCloseable() {
 		Injector injector = Bootstrap.injector(
-				TestInitialiserBindsModule.class);
+				TestBuildUpBindsModule.class);
 
 		assertNotNull(shutdownHookMock);
 		@SuppressWarnings("resource")
@@ -138,13 +138,13 @@ class TestInitialiserBinds {
 	void initialisersCanMakeUseOfParammetersUsingArgumentedModules() {
 		Env env = Environment.DEFAULT.with(Integer.class, 42); // setup some parameter
 		Injector injector = Bootstrap.injector(
-				env, TestInitialiserBindsModuleWith.class);
+				env, TestBuildUpBindsModuleWith.class);
 
 		// double check
-		Initialiser<Injector> initialiser = injector.resolve(
-				initialiserTypeOf(Injector.class));
-		assertTrue(initialiser instanceof TestInitialiserBindsModuleWith);
-		TestInitialiserBindsModuleWith module = (TestInitialiserBindsModuleWith) initialiser;
+		BuildUp<Injector> buildUp = injector.resolve(
+				buildUpTypeOf(Injector.class));
+		assertTrue(buildUp instanceof TestBuildUpBindsModuleWith);
+		TestBuildUpBindsModuleWith module = (TestBuildUpBindsModuleWith) buildUp;
 		assertNotNull(module.setup);
 		assertEquals(42, module.setup.intValue());
 	}

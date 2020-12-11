@@ -51,7 +51,7 @@ public abstract class ResourceDescriptor<T> {
 	public static Annotated annotatedOf(Supplier<?> supplier) {
 		return supplier instanceof Annotated
 			? (Annotated) supplier
-			: Annotated.WITH_NO_ANNOTATIONS;
+			: Annotated.EMPTY;
 	}
 
 	public abstract ResourceDescriptor<T> annotatedBy(Annotated annotations);

@@ -2,7 +2,7 @@ package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Dependency;
-import se.jbee.inject.Initialiser;
+import se.jbee.inject.BuildUp;
 import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.binder.BinderModule;
@@ -14,10 +14,10 @@ import java.lang.reflect.Proxy;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests demonstrates how to use {@link Initialiser}s to decorate the
+ * Tests demonstrates how to use {@link BuildUp}s to decorate the
  * {@link Injector} or bound instances.
  */
-class TestInitialiserDecorationBinds {
+class TestBuildUpDecorationBinds {
 
 	interface Shape {
 
@@ -32,8 +32,8 @@ class TestInitialiserDecorationBinds {
 		}
 	}
 
-	private static class TestInitialiserDecorationModule extends BinderModule
-			implements Initialiser<Shape> {
+	private static class TestBuildUpDecorationModule extends BinderModule
+			implements BuildUp<Shape> {
 
 		@Override
 		protected void declare() {
@@ -46,7 +46,7 @@ class TestInitialiserDecorationBinds {
 		}
 
 		@Override
-		public Shape init(Shape target, Type<?> as, Injector context) {
+		public Shape buildUp(Shape target, Type<?> as, Injector context) {
 			return (Shape) Proxy.newProxyInstance(
 					target.getClass().getClassLoader(),
 					new Class[] { Shape.class },
@@ -80,7 +80,7 @@ class TestInitialiserDecorationBinds {
 	}
 
 	private final Injector injector = Bootstrap.injector(
-			TestInitialiserDecorationModule.class);
+			TestBuildUpDecorationModule.class);
 
 	@Test
 	void injectorCanBeDecoratedUsingInitialisers() {

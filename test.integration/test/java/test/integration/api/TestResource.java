@@ -32,7 +32,7 @@ class TestResource {
 		Source source = Source.source(getClass());
 		return new Resource<>(serialID, source, ScopePermanence.ignore,
 				new Locator<>(Instance.anyOf(type)),
-				Annotated.WITH_NO_ANNOTATIONS, Verifier.AOK,
+				Annotated.EMPTY, Verifier.AOK,
 				resource -> (dep -> null));
 	}
 }

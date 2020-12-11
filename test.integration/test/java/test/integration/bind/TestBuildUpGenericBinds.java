@@ -12,7 +12,7 @@ import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.Cast.listTypeOf;
 
-class TestInitialiserGenericBinds {
+class TestBuildUpGenericBinds {
 
 	public static class StringList extends ArrayList<String> {
 	}

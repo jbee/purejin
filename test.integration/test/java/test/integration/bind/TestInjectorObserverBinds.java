@@ -5,7 +5,6 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Resource;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.container.PostConstructObserver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,14 +13,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
- * Test that demonstrates how {@link PostConstructObserver} can be bound to track
+ * Test that demonstrates how {@link Injector.Observer} can be bound to track
  * the order of instance creation during the bootstrapping of an application
  * tree here simulated by types A, B and C.
  *
  * This sort of thing can be used to later tear down such instances in reverse
  * order.
  */
-class TestPostConstructObserverBinds {
+class TestInjectorObserverBinds {
 
 	public static class A {
 
@@ -46,12 +45,12 @@ class TestPostConstructObserverBinds {
 
 	}
 
-	public static class CreationObserver implements PostConstructObserver {
+	public static class CreationObserver implements Injector.Observer {
 
 		final List<Object> created = new ArrayList<>();
 
 		@Override
-		public <T> void afterPostConstruct(Resource<T> resource, T instance) {
+		public void afterBuildUp(Resource<?> resource, Object instance) {
 			created.add(instance);
 		}
 	}
@@ -63,7 +62,7 @@ class TestPostConstructObserverBinds {
 			construct(A.class);
 			construct(B.class);
 			construct(C.class);
-			multibind(PostConstructObserver.class).to(CreationObserver.class);
+			multibind(Injector.Observer.class).to(CreationObserver.class);
 		}
 
 	}

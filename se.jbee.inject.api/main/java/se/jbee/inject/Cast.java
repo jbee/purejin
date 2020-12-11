@@ -21,7 +21,7 @@ import java.util.function.Function;
  * @see Converter#converterTypeOf(Type, Type)
  * @see Generator#generatorTypeOf(Type)
  * @see Provider#providerTypeOf(Type)
- * @see Initialiser#initialiserTypeOf(Type)
+ * @see BuildUp#buildUpTypeOf(Type)
  * @see Resource#resourceTypeOf(Type)
  *
  * @author Jan Bernitt (jan@jbee.se)

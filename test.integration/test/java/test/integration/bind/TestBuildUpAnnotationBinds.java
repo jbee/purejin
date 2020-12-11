@@ -1,7 +1,7 @@
 package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
-import se.jbee.inject.Initialiser;
+import se.jbee.inject.BuildUp;
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -14,22 +14,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.Name.named;
 
 /**
- * This test demonstrates how a {@link Initialiser} for {@link Object} can be
+ * This test demonstrates how a {@link BuildUp} for {@link Object} can be
  * used to add annotation based injection to the {@link Injector}.
  *
  * In this basic example the {@link Resource} annotation is used to mark field
  * that should be injected. The naive implementation of the annotation
- * {@link Initialiser} then iterates the {@link Field}s of the target to check
+ * {@link BuildUp} then iterates the {@link Field}s of the target to check
  * for the annotation and inject the fields resolving them from the
  * {@link Injector} context. A serious implementation obviously has to be more
  * sophisticated in how to identify and initialised fields based on annotations
- * found but the principle of using the {@link Initialiser} to add this feature
+ * found but the principle of using the {@link BuildUp} to add this feature
  * stays the same.
  */
-class TestInitialiserAnnotationBinds {
+class TestBuildUpAnnotationBinds {
 
-	static final class TestInitialiserAnnotationBindsModule extends BinderModule
-			implements Initialiser<Object> {
+	static final class TestBuildUpAnnotationBindsModule extends BinderModule
+			implements BuildUp<Object> {
 
 		@Override
 		protected void declare() {
@@ -41,7 +41,7 @@ class TestInitialiserAnnotationBinds {
 		}
 
 		@Override
-		public Object init(Object target, Type<?> as, Injector context) {
+		public Object buildUp(Object target, Type<?> as, Injector context) {
 			for (Field f : target.getClass().getDeclaredFields()) {
 				if (f.isAnnotationPresent(Resource.class)) {
 					try {
@@ -70,7 +70,7 @@ class TestInitialiserAnnotationBinds {
 	}
 
 	private final Injector injector = Bootstrap.injector(
-			TestInitialiserAnnotationBindsModule.class);
+			TestBuildUpAnnotationBindsModule.class);
 
 	@Test
 	void initialisiersCanBeUsedToAddAnnotationBasedInjection() {

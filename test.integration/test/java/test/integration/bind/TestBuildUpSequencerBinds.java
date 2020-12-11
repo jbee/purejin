@@ -1,7 +1,7 @@
 package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
-import se.jbee.inject.Initialiser;
+import se.jbee.inject.BuildUp;
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -15,22 +15,22 @@ import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * A test that demonstrates how the {@link Initialiser.Sorter} can be used to
- * order {@link Initialiser}s.
+ * A test that demonstrates how the {@link BuildUp.Sequencer} can be used to
+ * order {@link BuildUp}s.
  *
  * In this example the initialisers are sorted in reverse alphabetically order
  * of their class names. One of them is a lambda which means the name starts
- * with the name of the surrounding {@link TestInitialiserSorterBinds} class.
+ * with the name of the surrounding {@link TestBuildUpSequencerBinds} class.
  */
-class TestInitialiserSorterBinds {
+class TestBuildUpSequencerBinds {
 
 	public static final class Bean {
 
 		List<String> names = new ArrayList<>();
 	}
 
-	static final class TestInitialiserSorterBindsModule extends BinderModule
-			implements Initialiser.Sorter {
+	static final class TestInitialiserSequencerBindsModule extends BinderModule
+			implements BuildUp.Sequencer {
 
 		@Override
 		protected void declare() {
@@ -41,12 +41,12 @@ class TestInitialiserSorterBinds {
 				bean.names.add("c");
 				return bean;
 			});
-			bind(Initialiser.Sorter.class).to(this);
+			bind(BuildUp.Sequencer.class).to(this);
 		}
 
 		@Override
-		public Initialiser<?>[] sort(Class<?> actualType,
-				Initialiser<?>[] set) {
+		public BuildUp<?>[] order(Class<?> actualType,
+				BuildUp<?>[] set) {
 			Arrays.sort(set, (a, b) -> b.getClass().getSimpleName().compareTo(
 					a.getClass().getSimpleName()));
 			return set;
@@ -54,20 +54,20 @@ class TestInitialiserSorterBinds {
 
 	}
 
-	public static final class InitA implements Initialiser<Bean> {
+	public static final class InitA implements BuildUp<Bean> {
 
 		@Override
-		public Bean init(Bean bean, Type<?> as, Injector context) {
+		public Bean buildUp(Bean bean, Type<?> as, Injector context) {
 			bean.names.add("a");
 			return bean;
 		}
 
 	}
 
-	public static final class InitB implements Initialiser<Bean> {
+	public static final class InitB implements BuildUp<Bean> {
 
 		@Override
-		public Bean init(Bean bean, Type<?> as, Injector context) {
+		public Bean buildUp(Bean bean, Type<?> as, Injector context) {
 			bean.names.add("b");
 			return bean;
 		}
@@ -75,7 +75,7 @@ class TestInitialiserSorterBinds {
 	}
 
 	private final Injector injector = Bootstrap.injector(
-			TestInitialiserSorterBindsModule.class);
+			TestInitialiserSequencerBindsModule.class);
 
 	@Test
 	void orderOfInitialisersCanBeCustomisedByDefiningSorter() {

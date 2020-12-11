@@ -1,7 +1,7 @@
 package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
-import se.jbee.inject.Initialiser;
+import se.jbee.inject.BuildUp;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.bind.Bundle;
@@ -21,7 +21,7 @@ import static se.jbee.inject.bind.Bindings.supplyConstant;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
- * A tests the shows how {@link Initialiser}s behind {@link Binder#init(Class)}
+ * A tests the shows how {@link BuildUp}s behind {@link Binder#init(Class)}
  * can be used to automatically wire a pub-sub relation.
  *
  * In the test scenario there is a interface for a {@link Publisher} and a
@@ -33,7 +33,7 @@ import static se.jbee.inject.lang.Type.raw;
  * implementation.
  *
  * The important thing to understand is that wiring is done after the
- * {@link Injector} context has been created. The {@link Initialiser} resolves
+ * {@link Injector} context has been created. The {@link BuildUp} resolves
  * the target instance (here the {@link PublisherImpl}) and the arguments. In
  * one case we use {@link Binder#multibind(Class)} to explicitly bind all three
  * implementation classes to the {@link Subscriber} interface. In the other

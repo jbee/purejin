@@ -19,7 +19,7 @@ import static java.util.Arrays.copyOfRange;
  * some way of delegating actual instantiation (or supply) of generated
  * instances back to the {@link Injector} context which they are a part of so
  * that the context can do further processing. This backwards link is supplied
- * as the {@link ResourceLink}.
+ * as the {@link SupplyContext}.
  *
  * @since 8.1
  */
@@ -31,24 +31,25 @@ final class Resources {
 	private final Resource<?>[] genericResources;
 
 	/**
-	 * Creates a set of grouped {@link Resource} from
-	 * {@link ResourceDescriptor}s.
+	 * Creates a set of grouped {@link Resource} from {@link
+	 * ResourceDescriptor}s.
 	 *
-	 * @param link backlink to the internals of the {@link Injector} context
-	 *            this resources is created for which is provided by the
-	 *            {@link Injector} implementation
-	 * @param scopes function to lookup (yield) {@link Scope} by {@link Name}
-	 *            (also provided by the created {@link Injector} context)
-	 * @param descriptors the list of {@link ResourceDescriptor}s that
-	 *            {@link Resource}s are created for. Note that this list must be
-	 *            sorted already from the most qualified to the least qualified
-	 *            for each raw type. The order of the raw type groups is
-	 *            irrelevant.
+	 * @param context     backlink to the internals of the {@link Injector}
+	 *                    context this resources is created for which is
+	 *                    provided by the {@link Injector} implementation
+	 * @param scopes      function to lookup (yield) {@link Scope} by {@link
+	 *                    Name} (also provided by the created {@link Injector}
+	 *                    context)
+	 * @param descriptors the list of {@link ResourceDescriptor}s that {@link
+	 *                    Resource}s are created for. Note that this list must
+	 *                    be sorted already from the most qualified to the least
+	 *                    qualified for each raw type. The order of the raw type
+	 *                    groups is irrelevant.
 	 */
-	Resources(ResourceLink link, Function<Name, Scope> scopes,
+	Resources(SupplyContext context, Function<Name, Scope> scopes,
 			ResourceDescriptor<?>... descriptors) {
 		this.resourceCount = descriptors.length;
-		this.sortedResources = createResources(link, scopes, descriptors);
+		this.sortedResources = createResources(context, scopes, descriptors);
 		this.resourcesByType = createResourcesByRawType(sortedResources);
 		this.genericResources = selectGenericResources(resourcesByType);
 	}
@@ -106,7 +107,7 @@ final class Resources {
 		return res.isEmpty() ? null : res.toArray(new Resource[0]);
 	}
 
-	private Resource<?>[] createResources(ResourceLink link,
+	private Resource<?>[] createResources(SupplyContext context,
 			Function<Name, Scope> scopes, ResourceDescriptor<?>[] descriptors) {
 		Resource<?>[] res = new Resource<?>[descriptors.length];
 
@@ -137,7 +138,7 @@ final class Resources {
 		// create rest of resources
 		for (int i = 0; i < descriptors.length; i++)
 			if (res[i] == null)
-				res[i] = createResource(link, scopes, i, descriptors[i],
+				res[i] = createResource(context, scopes, i, descriptors[i],
 						permanenceByScope);
 		return res;
 	}
@@ -196,13 +197,13 @@ final class Resources {
 		return byRawType;
 	}
 
-	private <T> Resource<T> createResource(ResourceLink link,
+	private <T> Resource<T> createResource(SupplyContext context,
 			Function<Name, Scope> scopes, int serialID,
 			ResourceDescriptor<T> descriptor,
 			Map<Name, ScopePermanence> permanenceByScope) {
 		// NB. using the function is a way to allow both Resource and Generator implementation to be initialised with a final reference of each other
 		Function<Resource<T>, Generator<T>> generatorFactory = //
-				resource -> createGenerator(link, scopes, resource,
+				resource -> createGenerator(context, scopes, resource,
 						descriptor.supplier);
 		ScopePermanence scoping = permanenceByScope.get(descriptor.scope);
 		if (scoping == null)
@@ -223,13 +224,13 @@ final class Resources {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T> Generator<T> createGenerator(ResourceLink link,
+	private <T> Generator<T> createGenerator(SupplyContext context,
 			Function<Name, Scope> scopes, Resource<T> resource,
 			Supplier<? extends T> supplier) {
 		if (supplier.isGenerator())
 			return (Generator<T>) supplier.asGenerator();
 		Name scope = resource.permanence.scope;
-		Generator<T> inContext = dep -> link.supplyInContext(dep, supplier,
+		Generator<T> inContext = dep -> context.supplyInContext(dep, supplier,
 				resource);
 		if (Scope.class.isAssignableFrom(resource.type().rawType)
 			|| Scope.container.equalTo(scope))

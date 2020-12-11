@@ -12,12 +12,13 @@ import static se.jbee.inject.Name.named;
 
 /**
  * A test that demonstrates that the {@link Injector} can be decorated using a
- * {@link Initialiser} and that the decorated {@link Injector} is passed to
+ * {@link BuildUp} and that the decorated {@link Injector} is passed to
  * {@link Supplier}s when resolving {@link Dependency}s.
  */
 class TestInjectorDecorationBinds {
 
-	public static class DecoratingInjector implements Injector, Initialiser<Injector> {
+	public static class DecoratingInjector implements Injector,
+			BuildUp<Injector> {
 
 		private final Injector decorated;
 
@@ -32,7 +33,7 @@ class TestInjectorDecorationBinds {
 		}
 
 		@Override
-		public Injector init(Injector target, Type<?> as,
+		public Injector buildUp(Injector target, Type<?> as,
 				Injector context) {
 			//OBS: context is the undecorated Injector (there might have been other decorations applied before)
 			// use target instead!

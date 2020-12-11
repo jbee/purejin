@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import se.jbee.inject.Env;
 import se.jbee.inject.Hint;
 import se.jbee.inject.Injector;
-import se.jbee.inject.binder.Binder;
 import se.jbee.inject.binder.BinderModuleWith;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Environment;
@@ -15,7 +14,6 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiConsumer;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -25,19 +23,13 @@ import static se.jbee.inject.Name.named;
 import static se.jbee.inject.config.ProducesBy.allMethods;
 
 /**
- * This test demonstrates the basic feature of dynamically linking methods for later
- * processing.
- * <p>
- * While the {@link Binder#connect()} identifies {@link Method}s (per {@link Object} instance
- * created in a {@link Injector} context) that are "members" of a {@link
- * se.jbee.inject.Name#named(Object)} group a {@link BiConsumer} processor of
- * matching group {@link se.jbee.inject.Name} must be bound which handles the
- * processing of member {@link Method}s for an {@link Object} instance.
+ * This test demonstrates the basic feature of dynamically connection methods
+ * for different types of processing.
  */
-class TestDynamicallyLinkedMethodsBinds {
+class TestConnectMethodsBinds {
 
 	/**
-	 * Annotations are just one way to mark methods which is chosen in one of
+	 * Annotations are just one way to select methods used by
 	 * the test examples in this class
 	 */
 	@Target(METHOD)
@@ -45,7 +37,7 @@ class TestDynamicallyLinkedMethodsBinds {
 	@interface Marked {}
 
 	/**
-	 * Marking by default applies to type hierarchies so interfaces can be
+	 * Connecting by default applies to type hierarchies so interfaces can be
 	 * useful to describe the set of {@link Class}es where member {@link
 	 * Method}s potentially should be found.
 	 * <p>
@@ -81,7 +73,7 @@ class TestDynamicallyLinkedMethodsBinds {
 		}
 	}
 
-	static class TestMarkBindsModule extends BinderModuleWith<Connector> {
+	static class TestConnectMethodsBindsModule extends BinderModuleWith<Connector> {
 
 		@Override
 		protected void declare(Connector verifier) {
@@ -121,7 +113,7 @@ class TestDynamicallyLinkedMethodsBinds {
 			acceptedMethods.add(method);
 		};
 		Env env = Environment.DEFAULT.with(Connector.class, verifier);
-		Injector context = Bootstrap.injector(env, TestMarkBindsModule.class);
+		Injector context = Bootstrap.injector(env, TestConnectMethodsBindsModule.class);
 		Bean expected = context.resolve("marked", Bean.class);
 		assertEquals("marked", expected.name);
 		assertEquals("unmarked", context.resolve("unmarked", Bean.class).name);
@@ -133,7 +125,7 @@ class TestDynamicallyLinkedMethodsBinds {
 	@Test
 	void interfacesApplyDynamicLinkingToAssignableTypes() {
 		Env env = Environment.DEFAULT.with(Connector.class, (i, as, m) -> {});
-		Injector context = Bootstrap.injector(env, TestMarkBindsModule.class);
+		Injector context = Bootstrap.injector(env, TestConnectMethodsBindsModule.class);
 		assertTrue(context.resolve("marked", Bean.class).cleaned,
 				"clean was not called for marked bean");
 		assertTrue(context.resolve("unmarked", Bean.class).cleaned,

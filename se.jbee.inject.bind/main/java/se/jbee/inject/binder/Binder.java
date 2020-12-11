@@ -19,7 +19,7 @@ import java.util.function.Function;
 
 import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Arrays.stream;
-import static se.jbee.inject.Initialiser.initialiserTypeOf;
+import static se.jbee.inject.BuildUp.buildUpTypeOf;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Hint.relativeReferenceTo;
 import static se.jbee.inject.Instance.*;
@@ -151,13 +151,13 @@ public class Binder {
 	}
 
 	/**
-	 * Bind something that is an {@link Initialiser} for the {@link Injector}.
+	 * Bind something that is an {@link BuildUp} for the {@link Injector}.
 	 *
 	 * @since 8.1
 	 *
 	 * @return fluent API
 	 */
-	public final TypedBinder<Initialiser<Injector>> initbind() {
+	public final TypedBinder<BuildUp<Injector>> initbind() {
 		return initbind(Injector.class);
 	}
 
@@ -166,7 +166,7 @@ public class Binder {
 	 *
 	 * @return fluent API
 	 */
-	public final <T> TypedBinder<Initialiser<T>> initbind(Class<T> type) {
+	public final <T> TypedBinder<BuildUp<T>> initbind(Class<T> type) {
 		return initbind(raw(type));
 	}
 
@@ -175,8 +175,8 @@ public class Binder {
 	 *
 	 * @return fluent API
 	 */
-	public final <T> TypedBinder<Initialiser<T>> initbind(Type<T> type) {
-		return multibind(initialiserTypeOf(type));
+	public final <T> TypedBinder<BuildUp<T>> initbind(Type<T> type) {
+		return multibind(BuildUp.buildUpTypeOf(type));
 	}
 
 	public final <T> TypedBinder<T> multibind(Class<T> type) {

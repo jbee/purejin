@@ -6,7 +6,6 @@
 package se.jbee.inject.container;
 
 import static java.lang.System.identityHashCode;
-import static se.jbee.inject.Initialiser.initialiserTypeOf;
 import static se.jbee.inject.Resource.resourcesTypeOf;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
@@ -22,19 +21,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Env;
-import se.jbee.inject.Generator;
-import se.jbee.inject.InconsistentDeclaration;
-import se.jbee.inject.Initialiser;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Name;
-import se.jbee.inject.Resource;
-import se.jbee.inject.ResourceDescriptor;
-import se.jbee.inject.Scope;
-import se.jbee.inject.Supplier;
+import se.jbee.inject.*;
 import se.jbee.inject.lang.Type;
-import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 
 /**
@@ -44,39 +32,39 @@ import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
  * @author Jan Bernitt (jan@jbee.se)
  *
  * @see Resources for bootstrapping of the {@link Injector} context
- * @see PostConstruct for instance initialisation
+ * @see BuildUpResources for instance initialisation
  */
 public final class Container implements Injector, Env {
 
 	public static Injector injector(ResourceDescriptor<?>... descriptors) {
-		return new Container(descriptors).getDecorated();
+		return new Container(descriptors).getBuiltUp();
 	}
 
 	private final Resources resources;
-	private final PostConstruct postConstruct;
-	private final PostConstructObserver postConstructObserver;
-	private final Injector decorated;
+	private final BuildUpResources buildUpResources;
+	private final Observer observer;
+	private final Injector builtUp;
 
 	private Container(ResourceDescriptor<?>... descriptors) {
 		this.resources = new Resources(this::supplyInContext,
 				scope -> resolve(scope, Scope.class), descriptors);
-		this.postConstruct = new PostConstruct(
+		this.buildUpResources = new BuildUpResources(
 				orElse((t, arr) -> arr,
-						() -> resolve(Initialiser.Sorter.class)),
-				resolve(resourcesTypeOf(initialiserTypeOf(Type.WILDCARD))));
-		this.postConstructObserver = resolvePostConstructObserver();
-		this.decorated = postConstruct.postConstruct(this);
+						() -> resolve(BuildUp.Sequencer.class)),
+				resolve(resourcesTypeOf(BuildUp.buildUpTypeOf(Type.WILDCARD))));
+		this.observer = resolvePostConstructObserver();
+		this.builtUp = buildUpResources.buildUp(this);
 		resources.verifyIn(this);
 		resources.initEager();
 	}
 
-	private Injector getDecorated() {
-		return decorated == null ? this : decorated;
+	private Injector getBuiltUp() {
+		return builtUp == null ? this : builtUp;
 	}
 
-	private PostConstructObserver resolvePostConstructObserver() {
-		return PostConstructObserver.merge(
-				resolve(PostConstructObserver[].class));
+	private Observer resolvePostConstructObserver() {
+		return Observer.merge(
+				resolve(Observer[].class));
 	}
 
 	@Override
@@ -98,7 +86,7 @@ public final class Container implements Injector, Env {
 		final Class<T> rawType = type.rawType;
 		if (rawType == Injector.class
 			&& (dep.instance.name.isAny() || dep.instance.name.isDefault()))
-			return (T) decorated;
+			return (T) builtUp;
 		if (rawType == Env.class && dep.instance.name.equalTo(Name.AS))
 			return (T) this;
 		return resolveFromResource(dep, type, rawType);
@@ -235,21 +223,21 @@ public final class Container implements Injector, Env {
 
 	/**
 	 * Can be called by a {@link Generator} to create an instance from a
-	 * {@link Supplier} and have {@link Initialiser}s applied for it as well as
-	 * notifying {@link PostConstructObserver}s.
+	 * {@link Supplier} and have {@link BuildUp}s applied for it as well as
+	 * notifying {@link Observer}s.
 	 */
 	private <T> T supplyInContext(Dependency<? super T> injected,
 			Supplier<? extends T> supplier, Resource<T> resource) {
-		Injector context = getDecorated();
+		Injector context = getBuiltUp();
 		T instance = supplier.supply(injected, context);
 		if (instance != null
 			&& !resource.permanence.scope.equalTo(Scope.reference)) {
-			if (postConstruct != null)
-				instance = postConstruct.postConstruct(instance, injected,
+			if (buildUpResources != null)
+				instance = buildUpResources.buildUp(instance, injected,
 						context);
-			if (postConstructObserver != null
+			if (observer != null
 				&& resource.permanence.isPermanent()) {
-				postConstructObserver.afterPostConstruct(resource, instance);
+				observer.afterBuildUp(resource, instance);
 			}
 		}
 		return instance;

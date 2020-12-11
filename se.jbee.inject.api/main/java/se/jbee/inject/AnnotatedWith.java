@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.function.Supplier;
 
-import se.jbee.inject.Annotated.Merge;
+import se.jbee.inject.Annotated.Enhancer;
 import se.jbee.inject.lang.Type;
 
 /**
@@ -49,8 +49,8 @@ public interface AnnotatedWith<A extends Annotation> {
 	 *         using custom {@link se.jbee.inject.Supplier}s for these
 	 *         types (usually done by binding custom
 	 *         {@code se.jbee.inject.bind.ValueBinder}s in the {@link Env})
-	 *         or in general by using a custom {@link Annotated#NO_MERGE}
-	 *         function which is bound in the {@link Env} for the {@link Merge}
+	 *         or in general by using a custom {@link Annotated#SOURCE}
+	 *         function which is bound in the {@link Env} for the {@link Enhancer}
 	 *         property.
 	 */
 	List<AnnotatedInstance<?>> instances();

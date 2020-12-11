@@ -7,7 +7,7 @@ import se.jbee.inject.Resource;
 import se.jbee.inject.Supplier;
 
 /**
- * The {@link ResourceLink} is an abstraction to the internals of a
+ * The {@link SupplyContext} is an abstraction to the internals of a
  * {@link Injector} implementation that {@link Generator} use when they actually
  * create an instance using the {@link Supplier} which should be called with the
  * actual {@link Injector} instance which might not be known when the
@@ -21,7 +21,7 @@ import se.jbee.inject.Supplier;
  * @since 8.1
  */
 @FunctionalInterface
-public interface ResourceLink {
+public interface SupplyContext {
 
 	/**
 	 *

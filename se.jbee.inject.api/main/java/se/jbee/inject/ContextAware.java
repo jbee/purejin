@@ -11,7 +11,7 @@ package se.jbee.inject;
  * instances with modified state that reflects the adaptation to the
  * {@link Dependency} context.
  *
- * In contrast to an {@link Initialiser} the {@link ContextAware} is not called
+ * In contrast to an {@link BuildUp} the {@link ContextAware} is not called
  * on construction but each time the instance is injected (resolved) by the
  * {@link Injector}. This is limited to scoped {@link Resource}s. This are
  * {@link Resource}s that neither are in {@link Scope}
