@@ -5,38 +5,21 @@
  */
 package se.jbee.inject.defaults;
 
-import static se.jbee.inject.Instance.anyOf;
-import static se.jbee.inject.lang.Type.raw;
-import static se.jbee.inject.lang.Utils.instantiate;
-import static se.jbee.inject.lang.Utils.isClassBanal;
-import static se.jbee.inject.lang.Utils.isClassInstantiable;
-import static se.jbee.inject.bind.BindingType.CONSTRUCTOR;
-import static se.jbee.inject.bind.BindingType.FIELD;
-import static se.jbee.inject.bind.BindingType.METHOD;
-import static se.jbee.inject.bind.BindingType.PREDEFINED;
-import static se.jbee.inject.bind.BindingType.REFERENCE;
-import static se.jbee.inject.bind.Bindings.supplyConstant;
-import static se.jbee.inject.bind.Bindings.supplyScopedConstant;
-import static se.jbee.inject.binder.Supply.byAccess;
-import static se.jbee.inject.binder.Supply.byNew;
-import static se.jbee.inject.binder.Supply.byParametrizedInstanceReference;
-import static se.jbee.inject.binder.Supply.byProducer;
+import se.jbee.inject.*;
+import se.jbee.inject.bind.*;
+import se.jbee.inject.binder.*;
+import se.jbee.inject.config.ConstructsBy;
+import se.jbee.inject.lang.Type;
 
 import java.lang.reflect.Constructor;
 
-import se.jbee.inject.*;
-import se.jbee.inject.bind.Binding;
-import se.jbee.inject.bind.BindingType;
-import se.jbee.inject.bind.Bindings;
-import se.jbee.inject.bind.InconsistentBinding;
-import se.jbee.inject.bind.ValueBinder;
-import se.jbee.inject.binder.Constant;
-import se.jbee.inject.binder.New;
-import se.jbee.inject.binder.Produces;
-import se.jbee.inject.binder.Shares;
-import se.jbee.inject.binder.Supply;
-import se.jbee.inject.config.ConstructsBy;
-import se.jbee.inject.lang.Type;
+import static se.jbee.inject.Instance.anyOf;
+import static se.jbee.inject.bind.BindingType.*;
+import static se.jbee.inject.bind.Bindings.supplyConstant;
+import static se.jbee.inject.bind.Bindings.supplyScopedConstant;
+import static se.jbee.inject.binder.Supply.*;
+import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.inject.lang.Utils.*;
 
 /**
  * Utility with default {@link ValueBinder}s.
@@ -193,8 +176,7 @@ public final class DefaultValueBinders {
 						//TODO shouldn't this use New instead?
 				return;
 			}
-			if (srcType.isAssignableTo(raw(Supplier.class))
-				&& !item.type().isAssignableTo(raw(Supplier.class))) {
+			if (isCompatibleSupplier(item.type(), srcType)) {
 				@SuppressWarnings("unchecked")
 				Class<? extends Supplier<? extends T>> supplier = (Class<? extends Supplier<? extends T>>) srcType.rawType;
 				target.addExpanded(env, item.complete(REFERENCE,
@@ -214,6 +196,16 @@ public final class DefaultValueBinders {
 			if (type.isInterface())
 				throw InconsistentBinding.loop(item, src, bound);
 			bindToMirrorConstructor(env, type.rawType, item, target);
+		}
+
+		private <T> boolean isCompatibleSupplier(Type<T> requiredType,
+				Type<?> providedType) {
+			if (!providedType.isAssignableTo(raw(Supplier.class)))
+				return false;
+			if (requiredType.isAssignableTo(raw(Supplier.class)))
+				return false;
+			return Type.supertype(Supplier.class, (Type) providedType) //
+					.parameter(0).isAssignableTo(requiredType);
 		}
 
 	}

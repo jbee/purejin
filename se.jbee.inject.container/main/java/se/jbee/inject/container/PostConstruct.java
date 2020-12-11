@@ -41,7 +41,7 @@ public final class PostConstruct {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> T postConstruct(T instance, Dependency<?> injected,
+	public <T> T postConstruct(T instance, Dependency<?super T> injected,
 			Injector context) {
 		if (resources.length == 0)
 			return instance;
@@ -79,15 +79,17 @@ public final class PostConstruct {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <T> T applyPostConstruct(T instance, Dependency<?> injected,
+	private static <T> T applyPostConstruct(T instance, Dependency<? super T> injected,
 			Injector context, Map<Resource<?>, Initialiser<?>> inits) {
-		if (inits != null && !inits.isEmpty())
+		if (inits != null && !inits.isEmpty()) {
+			Type<? super T> type = injected.type();
 			for (Map.Entry<Resource<?>, Initialiser<?>> init : inits.entrySet()) {
 				Target target = init.getKey().signature.target;
 				if (target.isAvailableFor(injected))
 					instance = (T) ((Initialiser<? super T>) init.getValue()) //
-						.init(instance, context);
+							.init(instance, type, context);
 			}
+		}
 		return instance;
 	}
 
@@ -105,13 +107,13 @@ public final class PostConstruct {
 		if (!provided.isAssignableTo(required))
 			return null;
 		I init = resource.generate();
-		if (!matchesInitFilter(init, context.instance, actualType))
+		if (!matchesInitFilter(init, actualType))
 			return null;
 		return (Initialiser<? super T>) init;
 	}
 
 	private static <T, I extends Initialiser<?>> boolean matchesInitFilter(
-			I init, Instance<?> contract, Class<T> actualType) {
+			I init, Class<T> actualType) {
 		if (init.isFiltered())
 			return init.asFilter().test(actualType);
 		return true;

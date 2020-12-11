@@ -8,10 +8,13 @@ import se.jbee.inject.Supplier;
 import se.jbee.inject.action.Action;
 import se.jbee.inject.action.ActionModule;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.config.ProducesBy;
 import se.jbee.inject.lang.Type;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static se.jbee.inject.action.ActionModule.actionDependency;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static se.jbee.inject.action.Action.actionTypeOf;
+import static se.jbee.inject.config.ProducesBy.allMethods;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
@@ -48,7 +51,7 @@ class TestServiceBinds {
 				Injector context) {
 			Type<? super Service<?, ?>> type = dep.type();
 			return newService(context.resolve(
-					actionDependency(type.parameter(0), type.parameter(1))));
+					actionTypeOf(type.parameter(0), type.parameter(1))));
 		}
 
 		private static <I, O> Service<I, O> newService(Action<I, O> action) {
@@ -77,7 +80,8 @@ class TestServiceBinds {
 
 		@Override
 		protected void declare() {
-			bindActionsIn(MathService.class);
+			construct(MathService.class);
+			connect(allMethods).in(MathService.class).asAction();
 			per(Scope.dependencyType)
 					.starbind(Service.class) //
 					.toSupplier(new ServiceSupplier());
@@ -98,6 +102,7 @@ class TestServiceBinds {
 		@SuppressWarnings("unchecked")
 		Service<Integer, Long> square = injector.resolve(
 				raw(Service.class).parametized(Integer.class, Long.class));
+		assertNotNull(injector.resolve(MathService.class));
 		assertEquals(4L, square.calc(2).longValue());
 	}
 

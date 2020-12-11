@@ -97,7 +97,7 @@ class TestPatternbindBinds {
 		@Override
 		protected void declare(Method annotated) {
 			implicit().bind(annotated.getDeclaringClass()).toConstructor();
-			autobind().producer(annotated, null);
+			autobind().asProducer(annotated, null);
 		}
 	}
 

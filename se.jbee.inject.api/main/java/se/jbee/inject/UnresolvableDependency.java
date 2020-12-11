@@ -12,6 +12,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A {@link Dependency} that should be resolved during the injection or
@@ -120,7 +121,9 @@ public abstract class UnresolvableDependency extends RuntimeException {
 
 		public NoMethodForDependency(Type<?> returnType,
 				Type<?>[] parameterTypes, Throwable cause) {
-			super(returnType + ":" + Arrays.toString(parameterTypes), cause);
+			super("No method for signature: " + returnType + " <any>(" + Arrays.stream(
+					parameterTypes).map(Object::toString).collect(
+					Collectors.joining(",")) + ")", cause);
 		}
 	}
 

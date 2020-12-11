@@ -5,6 +5,7 @@ import se.jbee.inject.Initialiser;
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.lang.Type;
 import test.integration.util.Resource;
 
 import java.lang.reflect.Field;
@@ -40,7 +41,7 @@ class TestInitialiserAnnotationBinds {
 		}
 
 		@Override
-		public Object init(Object target, Injector context) {
+		public Object init(Object target, Type<?> as, Injector context) {
 			for (Field f : target.getClass().getDeclaredFields()) {
 				if (f.isAnnotationPresent(Resource.class)) {
 					try {

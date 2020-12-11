@@ -25,15 +25,15 @@ class TestInitialiserGenericBinds {
 
 		@Override
 		protected void declare() {
-			initbind(listTypeOf(String.class)).to((target, context) -> {
+			initbind(listTypeOf(String.class)).to((target, as, context) -> {
 				target.add("a");
 				return target;
 			});
-			initbind(listTypeOf(Integer.class)).to((target, context) -> {
+			initbind(listTypeOf(Integer.class)).to((target, as, context) -> {
 				target.add(1);
 				return target;
 			});
-			initbind(StringList.class).to((target, context) -> {
+			initbind(StringList.class).to((target, as, context) -> {
 				target.add("b");
 				return target;
 			});

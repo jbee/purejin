@@ -2,14 +2,12 @@ package test.integration.action;
 
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
-import se.jbee.inject.UnresolvableDependency.SupplyFailed;
 import se.jbee.inject.action.*;
-import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.lang.Type;
-import se.jbee.inject.lang.Utils;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static se.jbee.inject.config.ProducesBy.allMethods;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
@@ -20,25 +18,15 @@ import static se.jbee.inject.lang.Type.raw;
  */
 class TestServiceInvocationBinds {
 
-	private static class ServiceInvocationBindsModule extends ActionModule {
+	static class ServiceInvocationBindsModule extends ActionModule {
 
 		@Override
 		protected void declare() {
-			bindActionsIn(ServiceInvocationBindsService.class);
+			construct(ServiceInvocationBindsService.class);
+			connect(allMethods).in(ServiceInvocationBindsService.class).asAction();
 			plug(AssertInvocation.class).into(ServiceInterceptor.class);
 			bind(Executor.class).to(InstrumentedExecutor.class);
 		}
-
-	}
-
-	private static class ServiceInvocationBindsBundle
-			extends BootstrapperBundle {
-
-		@Override
-		protected void bootstrap() {
-			install(ServiceInvocationBindsModule.class);
-		}
-
 	}
 
 	public static class ServiceInvocationBindsService {
@@ -80,13 +68,13 @@ class TestServiceInvocationBinds {
 		public <P, R> void afterException(Type<P> parameter, P value,
 				Type<R> result, Exception e, Long before) {
 			afterExceptionCount++;
-			assertTrue(e instanceof IllegalStateException);
+			assertTrue(e instanceof IllegalStateException, "was: " + e.toString());
 		}
 
 	}
 
 	private final Injector injector = Bootstrap.injector(
-			ServiceInvocationBindsBundle.class);
+			ServiceInvocationBindsModule.class);
 	private final AssertInvocation inv = injector.resolve(
 			AssertInvocation.class);
 
@@ -94,6 +82,7 @@ class TestServiceInvocationBinds {
 	void thatInvocationIsInvokedBeforeAndAfterTheServiceMethodCall() {
 		@SuppressWarnings("unchecked") Action<String, Integer> hashCode = injector.resolve(
 				raw(Action.class).parametized(String.class, Integer.class));
+		assertNotNull(injector.resolve(ServiceInvocationBindsService.class));
 		int beforeCount = inv.beforeCount;
 		int afterCount = inv.afterCount;
 		assertEquals("Foo".hashCode(), hashCode.run("Foo").intValue());
@@ -106,6 +95,7 @@ class TestServiceInvocationBinds {
 		@SuppressWarnings("unchecked")
 		Action<String, Void> fail = injector.resolve(
 				raw(Action.class).parametized(String.class, Void.class));
+		assertNotNull(injector.resolve(ServiceInvocationBindsService.class));
 		int afterExceptionCount = inv.afterExceptionCount;
 		try {
 			fail.run("Foo");
@@ -122,6 +112,7 @@ class TestServiceInvocationBinds {
 	void thatInvocationHandlersCanBeResolvedDirectly() {
 		ServiceInterceptor<?>[] invocations = injector.resolve(
 				ServiceInterceptor[].class);
+		assertNotNull(injector.resolve(ServiceInvocationBindsService.class));
 		assertEquals(1, invocations.length);
 		assertEquals(invocations[0].getClass(), AssertInvocation.class);
 	}
@@ -137,25 +128,10 @@ class TestServiceInvocationBinds {
 		@Override
 		public <I, O> O run(ActionSite<I, O> site, Object[] args, I value)
 				throws ActionExecutionFailed {
-			Object[] state = before(site.output, site.input, value);
-			O res;
-			try {
-				res = site.output.rawType.cast(
-						Utils.produce(site.action, site.owner, args, //
-								e -> SupplyFailed.valueOf(e, site.action)));
-			} catch (SupplyFailed e) {
-				Exception ex = e;
-				if (e.getCause() instanceof Exception) {
-					ex = (Exception) e.getCause();
-				}
-				afterException(site.output, site.input, value, ex, state);
-				throw new ActionExecutionFailed(
-						site.action.getDeclaringClass().getSimpleName() + "#"
-							+ site.action.getName() + " failed: "
-							+ ex.getMessage(),
-						ex);
-			}
-			after(site.output, site.input, value, res, state);
+			Object[] state = before(site.out, site.in, value);
+			O res = site.call(args,
+					ex -> afterException(site.out, site.in, value, ex, state));
+			after(site.out, site.in, value, res, state);
 			return res;
 		}
 

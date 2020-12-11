@@ -7,6 +7,7 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.lang.Type;
 
 import java.lang.reflect.Proxy;
 
@@ -36,7 +37,7 @@ class TestInitialiserDecorationBinds {
 
 		@Override
 		protected void declare() {
-			initbind().to((injector, __) -> new DelegatingInjector(injector));
+			initbind().to((injector, as, __) -> new DelegatingInjector(injector));
 			bind(int.class).to(42);
 			bind(Foo.class).toConstructor();
 
@@ -45,7 +46,7 @@ class TestInitialiserDecorationBinds {
 		}
 
 		@Override
-		public Shape init(Shape target, Injector context) {
+		public Shape init(Shape target, Type<?> as, Injector context) {
 			return (Shape) Proxy.newProxyInstance(
 					target.getClass().getClassLoader(),
 					new Class[] { Shape.class },

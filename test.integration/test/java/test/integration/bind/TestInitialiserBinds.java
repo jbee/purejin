@@ -9,6 +9,7 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BinderModuleWith;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Environment;
+import se.jbee.inject.lang.Type;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Cast.initialiserTypeOf;
@@ -34,7 +35,7 @@ class TestInitialiserBinds {
 		}
 
 		@Override
-		public Injector init(Injector target, Injector context) {
+		public Injector init(Injector target, Type<?> as, Injector context) {
 			// just to show that one could use the module itself as well
 			// this e.g. allows to pass down and use setup data by using
 			// PresetModule's as shown with TestInitialiserBindsPresetModule
@@ -58,7 +59,7 @@ class TestInitialiserBinds {
 		}
 
 		@Override
-		public Injector init(Injector target, Injector context) {
+		public Injector init(Injector target, Type<?> as, Injector context) {
 			assertNotNull(setup);
 			// use setup to initialize something
 			return target;
@@ -80,7 +81,7 @@ class TestInitialiserBinds {
 		}
 
 		@Override
-		public Injector init(Injector target, Injector context) {
+		public Injector init(Injector target, Type<?> as, Injector context) {
 			// by the use of upper bound we receive all implementing classes
 			// even though they have not be bound explicitly for AutoCloseable.
 			AutoCloseable[] autoCloseables = target.resolve(

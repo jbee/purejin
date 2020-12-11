@@ -5,6 +5,8 @@
  */
 package se.jbee.inject;
 
+import se.jbee.inject.lang.Type;
+
 import java.lang.annotation.Annotation;
 import java.util.function.Predicate;
 
@@ -17,7 +19,7 @@ import static se.jbee.inject.lang.Type.raw;
  *
  * {@link Initialiser}s are matched based on the actual type of the target
  * argument. If target can be assigned to the {@link Initialiser}'s target type
- * the {@link Initialiser#init(Object, Injector)} is called.
+ * the {@link Initialiser#init(Object, Type, Injector)} is called.
  *
  * {@link Initialiser}s allow to run initialisation code once and build more
  * powerful mechanisms on top of it.
@@ -37,27 +39,33 @@ import static se.jbee.inject.lang.Type.raw;
  */
 @FunctionalInterface
 public interface Initialiser<T> {
+	//TODO rename: maybe some reference to Scope as this occurs when things are added to a scope
 
 	/**
 	 * Is called when the target instance is created within the {@link Injector}
 	 * context. For {@link Injector} itself as target this is called as soon as
-	 * its state has been initialised. It can be used to decorate the
-	 * {@link Injector} or any other target instance created within a context.
+	 * its state has been initialised. It can be used to decorate the {@link
+	 * Injector} or any other target instance created within a context.
 	 *
-	 * @param target the newly created instance to initialise. For
-	 *            {@link Initialiser} of the {@link Injector} this is always the
-	 *            decorated {@link Injector} in case decoration was done by
-	 *            other {@link Initialiser}s.
+	 * @param target  the newly created instance to initialise. For {@link
+	 *                Initialiser} of the {@link Injector} this is always the
+	 *                decorated {@link Injector} in case decoration was done by
+	 *                other {@link Initialiser}s.
+	 * @param as      the type as which the target instance is used (injected).
+	 *                While this is the actual instance type of a supertype of
+	 *                it this is not necessarily a supertype of the {@link
+	 *                Initialiser}s supertype of the actual type of the target
+	 *                so it cannot use the type parameter {@code T}.
 	 * @param context use to resolve instances that require further
-	 *            initialisation setup. For {@link Initialiser} of the
-	 *            {@link Injector} this is always the underlying
-	 *            {@link Injector} that isn't decorated in case decoration was
-	 *            done before by another {@link Initialiser}.
+	 *                initialisation setup. For {@link Initialiser} of the
+	 *                {@link Injector} this is always the underlying {@link
+	 *                Injector} that isn't decorated in case decoration was done
+	 *                before by another {@link Initialiser}.
 	 * @return the initialised instance; usually this is still the target
-	 *         instance. When using proxy or decorator pattern this would be the
-	 *         proxy or decorator instance.
+	 * instance. When using proxy or decorator pattern this would be the proxy
+	 * or decorator instance.
 	 */
-	T init(T target, Injector context);
+	T init(T target, Type<?> as, Injector context);
 
 	/**
 	 * Mostly defined to capture the contract by convention that when a {@link

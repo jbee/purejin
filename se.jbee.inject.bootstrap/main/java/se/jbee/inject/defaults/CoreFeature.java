@@ -23,7 +23,7 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Supply;
 import se.jbee.inject.config.Extension;
 import se.jbee.inject.config.Plugins;
-import se.jbee.inject.container.Lazy;
+import se.jbee.inject.lang.Lazy;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.Utils;
 
@@ -183,7 +183,7 @@ public enum CoreFeature implements Toggled<CoreFeature> {
 			asDefault() //
 					.per(Scope.dependency) //
 					.starbind(Optional.class) //
-					.toSupplier((dep, context) -> optional(dep, context));
+					.toSupplier(this::optional);
 		}
 
 		@SuppressWarnings("unchecked")
@@ -241,7 +241,7 @@ public enum CoreFeature implements Toggled<CoreFeature> {
 			asDefault() //
 					.per(Scope.dependency) //
 					.starbind(Obtainable.class) //
-					.toSupplier((dep, context) -> obtain(dep, context));
+					.toSupplier(this::obtain);
 		}
 
 		@SuppressWarnings("unchecked")

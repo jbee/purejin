@@ -8,19 +8,17 @@ import se.jbee.inject.binder.Binder;
 import se.jbee.inject.binder.BinderModuleWith;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Environment;
-import se.jbee.inject.config.DynamicLinker;
+import se.jbee.inject.config.Connector;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Name.named;
@@ -30,7 +28,7 @@ import static se.jbee.inject.config.ProducesBy.allMethods;
  * This test demonstrates the basic feature of dynamically linking methods for later
  * processing.
  * <p>
- * While the {@link Binder#link()} identifies {@link Method}s (per {@link Object} instance
+ * While the {@link Binder#connect()} identifies {@link Method}s (per {@link Object} instance
  * created in a {@link Injector} context) that are "members" of a {@link
  * se.jbee.inject.Name#named(Object)} group a {@link BiConsumer} processor of
  * matching group {@link se.jbee.inject.Name} must be bound which handles the
@@ -83,30 +81,30 @@ class TestDynamicallyLinkedMethodsBinds {
 		}
 	}
 
-	static class TestMarkBindsModule extends BinderModuleWith<DynamicLinker> {
+	static class TestMarkBindsModule extends BinderModuleWith<Connector> {
 
 		@Override
-		protected void declare(DynamicLinker verifier) {
+		protected void declare(Connector verifier) {
 			// the marking as "my-linker"
 			injectingInto(named("marked"), Bean.class) //
-					.link(allMethods.annotatedWith(Marked.class)) //
+					.connect(allMethods.annotatedWith(Marked.class)) //
 					.in(Bean.class) //
-					.with("my-linker");
+					.to("my-linker");
 
 			// 2 named instances, one should match for marking, other should not
 			bind(named("marked"), Bean.class).toConstructor(Hint.constant("marked"));
 			bind(named("unmarked"), Bean.class).toConstructor(Hint.constant("unmarked"));
 
 			// whom to call with marked methods of: my-linker
-			bind("my-linker", DynamicLinker.class).to(verifier);
+			bind("my-linker", Connector.class).to(verifier);
 
 			//-----------------[2nd group]-----------------------
-			link(Cleaned.class).with("my-cleaned");
+			connect(Cleaned.class).to("my-cleaned");
 
-			bind("my-cleaned", DynamicLinker.class).to((instance, marked) -> {
+			bind("my-cleaned", Connector.class).to((instance, as, method) -> {
 				// in this example: directly call the method to verify it got passed
 				try {
-					marked.invoke(instance);
+					method.invoke(instance);
 				} catch (Exception e) {
 					fail(e);
 				}
@@ -118,11 +116,11 @@ class TestDynamicallyLinkedMethodsBinds {
 	void injectingIntoCanBeUsedToLimitTheSetOfAffectedInstances() {
 		List<Object> acceptedInstances = new ArrayList<>();
 		List<Method> acceptedMethods = new ArrayList<>();
-		DynamicLinker verifier = (instance, marked) -> {
+		Connector verifier = (instance, as, method) -> {
 			acceptedInstances.add(instance);
-			acceptedMethods.add(marked);
+			acceptedMethods.add(method);
 		};
-		Env env = Environment.DEFAULT.with(DynamicLinker.class, verifier);
+		Env env = Environment.DEFAULT.with(Connector.class, verifier);
 		Injector context = Bootstrap.injector(env, TestMarkBindsModule.class);
 		Bean expected = context.resolve("marked", Bean.class);
 		assertEquals("marked", expected.name);
@@ -134,7 +132,7 @@ class TestDynamicallyLinkedMethodsBinds {
 
 	@Test
 	void interfacesApplyDynamicLinkingToAssignableTypes() {
-		Env env = Environment.DEFAULT.with(DynamicLinker.class, (i,m) -> {});
+		Env env = Environment.DEFAULT.with(Connector.class, (i, as, m) -> {});
 		Injector context = Bootstrap.injector(env, TestMarkBindsModule.class);
 		assertTrue(context.resolve("marked", Bean.class).cleaned,
 				"clean was not called for marked bean");

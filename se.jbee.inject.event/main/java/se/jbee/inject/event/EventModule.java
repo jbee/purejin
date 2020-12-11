@@ -38,7 +38,7 @@ public abstract class EventModule extends BinderModule {
 		if (!handlerType.isInterface())
 			throw new IllegalArgumentException(
 					"Event type has to be an interface but was: " + handlerType);
-		initbind(handlerType).to((listener, injector) -> {
+		initbind(handlerType).to((listener, as, injector) -> {
 			injector.resolve(EventProcessor.class).register(handlerType, listener);
 			return listener;
 		});

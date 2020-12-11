@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import se.jbee.inject.*;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.lang.Type;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -31,7 +32,8 @@ class TestInjectorDecorationBinds {
 		}
 
 		@Override
-		public Injector init(Injector target, Injector context) {
+		public Injector init(Injector target, Type<?> as,
+				Injector context) {
 			//OBS: context is the undecorated Injector (there might have been other decorations applied before)
 			// use target instead!
 			return new DecoratingInjector(target);

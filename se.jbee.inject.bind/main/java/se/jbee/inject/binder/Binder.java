@@ -40,6 +40,8 @@ import static se.jbee.inject.lang.Utils.newArray;
 @SuppressWarnings({ "squid:S1448", "squid:S1200", "ClassReferencesSubclass" })
 public class Binder {
 
+	public static final String ACTION_CONNECTOR = "actions";
+
 	public static RootBinder create(Bind bind) {
 		return new RootBinder(bind);
 	}
@@ -210,16 +212,16 @@ public class Binder {
 	 *
 	 * @since 8.1
 	 */
-	public LinkBinder link() {
-		return new LinkBinder(this, env().property(ProducesBy.class, bind.source.pkg()));
+	public ConnectBinder connect() {
+		return new ConnectBinder(this, env().property(ProducesBy.class, bind.source.pkg()));
 	}
 
-	public LinkBinder link(ProducesBy linksBy) {
-		return new LinkBinder(this, linksBy);
+	public ConnectBinder connect(ProducesBy linksBy) {
+		return new ConnectBinder(this, linksBy);
 	}
 
-	public <T> LinkTargetBinder<T> link(Class<T> api) {
-		return new LinkTargetBinder<>(this, ProducesBy.declaredMethods.in(api), raw(api));
+	public <T> ConnectTargetBinder<T> connect(Class<T> api) {
+		return new ConnectTargetBinder<>(this, ProducesBy.declaredMethods.in(api), raw(api));
 	}
 
 	protected Binder on(Bind bind) {
@@ -310,7 +312,7 @@ public class Binder {
 
 		public <C> void forEach(Type<? extends C[]> dependencies,
 				BiConsumer<T, C> initialiser) {
-			binder.initbind().to((impl, injector) -> {
+			binder.initbind().to((impl, as, injector) -> {
 				T obj = injector.resolve(target);
 				C[] args = injector.resolve(
 						dependency(dependencies).injectingInto(target));
@@ -332,7 +334,7 @@ public class Binder {
 
 		public <C> void by(Instance<? extends C> dependency,
 				BiConsumer<T, C> initialiser) {
-			binder.initbind().to((impl, injector) -> {
+			binder.initbind().to((impl, as, injector) -> {
 				T obj = injector.resolve(target);
 				C arg = injector.resolve(
 						dependency(dependency).injectingInto(target));
@@ -375,81 +377,87 @@ public class Binder {
 	}
 
 	/**
-	 * Marking is the dynamic process of identifying methods in target types
-	 * that should be subject to a {@link DynamicLinker} referenced by name.
+	 * Connecting is the dynamic process of identifying methods in target types
+	 * that should be subject to a {@link Connector} referenced by name.
 	 *
-	 * The {@link DynamicLinker} is expected to be bound explicitly elsewhere.
+	 * The {@link Connector} is expected to be bound explicitly elsewhere.
 	 *
 	 * @since 8.1
 	 */
-	public static class LinkBinder {
+	public static class ConnectBinder {
 
 		private final Binder binder;
-		private final ProducesBy linksBy;
+		private final ProducesBy connectsBy;
 
-		protected LinkBinder(Binder binder, ProducesBy linksBy) {
+		protected ConnectBinder(Binder binder, ProducesBy connectsBy) {
 			this.binder = binder;
-			this.linksBy = linksBy;
+			this.connectsBy = connectsBy;
 		}
 
 		/**
 		 * @see #in(Type)
 		 */
-		public <T> LinkTargetBinder<T> in(Class<T> target) {
+		public <T> ConnectTargetBinder<T> in(Class<T> target) {
 			return in(raw(target));
 		}
 
 		/**
-		 * Linking is applied to all subtypes of the provided target type.
+		 * Connecting is applied to all subtypes of the provided target type.
 		 *
-		 * @param target can be understood as the scope in which linking applies
+		 * @param target can be understood as the scope in which connecting applies
 		 *               to identified methods.
 		 * @param <T>    target bean type or interface implemented by targets
 		 * @return binder for fluent API
 		 */
-		public <T> LinkTargetBinder<T> in(Type<T> target) {
-			return new LinkTargetBinder<>(binder, linksBy, target);
+		public <T> ConnectTargetBinder<T> in(Type<T> target) {
+			return new ConnectTargetBinder<>(binder, connectsBy, target);
 		}
 	}
 
 	/**
 	 * @param <T> type of the class(es) (includes subtypes) that are subject to
-	 *            linking
+	 *            connecting
 	 * @since 8.1
 	 */
-	public static class LinkTargetBinder<T> {
+	public static class ConnectTargetBinder<T> {
 
 		private final Binder binder;
-		private final ProducesBy linksBy;
+		private final ProducesBy connectsBy;
 		private final Type<T> target;
 
-		public LinkTargetBinder(Binder binder, ProducesBy linksBy,
+		public ConnectTargetBinder(Binder binder, ProducesBy connectsBy,
 				Type<T> target) {
 			this.binder = binder;
-			this.linksBy = linksBy;
+			this.connectsBy = connectsBy;
 			this.target = target;
 		}
 
-		public LinkTargetBinder<T> with(String linker) {
-			return with(named(linker));
+		public ConnectTargetBinder<T> asAction() {
+			return to(ACTION_CONNECTOR);
 		}
 
-		public LinkTargetBinder<T> with(Class<?> linker) {
-			return with(named(linker));
+		public ConnectTargetBinder<T> to(String connectorName) {
+			return to(named(connectorName));
 		}
 
-		public LinkTargetBinder<T> with(Name linker) {
+		public ConnectTargetBinder<T> to(Class<?> connectorName) {
+			return to(named(connectorName));
+		}
+
+		public ConnectTargetBinder<T> to(Name connectorName) {
 			binder.initbind(target) //
-					.to((instance, context) -> init(instance, context, linker));
-			return this; // for multiple as
+					.to((instance, as, context) ->
+							init(connectorName, instance, as, context));
+			return this; // for multiple to
 		}
 
-		private T init(T instance, Injector context, Name linker) {
-			Method[] linked = linksBy.reflect(instance.getClass());
-			if (linked != null && linked.length > 0) {
-				DynamicLinker dynLinker = context.resolve(linker, DynamicLinker.class);
-				for (Method m : linked)
-					dynLinker.link(instance, m);
+		private T init(Name connectorName, T instance, Type<?> as,
+				Injector context) {
+			Method[] connected = connectsBy.reflect(instance.getClass());
+			if (connected != null && connected.length > 0) {
+				Connector connector = context.resolve(connectorName, Connector.class);
+				for (Method m : connected)
+					connector.connect(instance, as, m);
 			}
 			return instance;
 		}
@@ -549,7 +557,7 @@ public class Binder {
 				return; // do not try to construct the class
 			Constructor<?> target = constructsBy.reflect(service);
 			if (target != null)
-				constructor(target, hints);
+				asConstructor(target, hints);
 		}
 
 		private boolean bindSharesIn(Class<?> impl, Object instance) {
@@ -566,7 +574,7 @@ public class Binder {
 				Hint<?>[] hints) {
 			boolean needsInstance = false;
 			for (Method producer : producesBy.reflect(impl)) {
-				if (producer(producer, instance, hints))
+				if (asProducer(producer, instance, hints))
 					needsInstance |= !isStatic(producer.getModifiers());
 			}
 			return needsInstance;
@@ -576,27 +584,27 @@ public class Binder {
 		 * This method will not make sure an instance of the {@link Method}'s
 		 * declaring class is created if needed. This must be bound elsewhere.
 		 *
-		 * @param producer a method that is meant to create instances of the
+		 * @param target a method that is meant to create instances of the
 		 *                 method return type
 		 * @param instance can be null to resolve the instance from {@link
 		 *                 Injector} context later (if needed)
 		 * @param hints    optional method argument {@link Hint}s
-		 * @return true if a producer was bound, else false (this is e.g. the
+		 * @return true if a target was bound, else false (this is e.g. the
 		 * case when the {@link Method} returns void)
 		 */
-		public boolean producer(Method producer, Object instance, Hint<?>... hints) {
-			Type<?> returns = returnType(producer);
+		public boolean asProducer(Method target, Object instance, Hint<?>... hints) {
+			Type<?> returns = returnType(target);
 			if (returns.rawType == void.class || returns.rawType == Void.class)
 				return false;
 			if (hints.length == 0)
-				hints = hintsBy.reflect(producer);
-			binder.per(scopesBy.reflect(producer)) //
-					.bind(namesBy.reflect(producer), returns) //
-					.to(instance, producer, hints);
+				hints = hintsBy.reflect(target);
+			binder.per(scopesBy.reflect(target)) //
+					.bind(namesBy.reflect(target), returns) //
+					.to(instance, target, hints);
 			return true;
 		}
 
-		public <T> void constructor(Constructor<T> target, Hint<?>... hints) {
+		public <T> void asConstructor(Constructor<T> target, Hint<?>... hints) {
 			Name name = namesBy.reflect(target);
 			if (hints.length == 0)
 				hints = hintsBy.reflect(target);

@@ -1,35 +1,15 @@
 package se.jbee.inject.container;
 
-import static java.util.Arrays.copyOfRange;
+import se.jbee.inject.*;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import se.jbee.inject.lang.Lazy;
+import se.jbee.inject.lang.Type;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
-import se.jbee.inject.ContextAware;
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Generator;
-import se.jbee.inject.InconsistentDeclaration;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Locator;
-import se.jbee.inject.Name;
-import se.jbee.inject.Provider;
-import se.jbee.inject.Resource;
-import se.jbee.inject.ResourceDescriptor;
-import se.jbee.inject.Scope;
-import se.jbee.inject.ScopePermanence;
-import se.jbee.inject.Supplier;
-import se.jbee.inject.lang.Type;
-import se.jbee.inject.UnresolvableDependency;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import static java.util.Arrays.copyOfRange;
 
 /**
  * A set of {@link Resources} encapsulates the state and bootstrapping of
@@ -47,7 +27,7 @@ final class Resources {
 
 	private final int resourceCount;
 	private final Map<Class<?>, Resource<?>[]> resourcesByType;
-	private final Resource<?>[] resources;
+	private final Resource<?>[] sortedResources;
 	private final Resource<?>[] genericResources;
 
 	/**
@@ -68,8 +48,8 @@ final class Resources {
 	Resources(ResourceLink link, Function<Name, Scope> scopes,
 			ResourceDescriptor<?>... descriptors) {
 		this.resourceCount = descriptors.length;
-		this.resources = createResources(link, scopes, descriptors);
-		this.resourcesByType = createResourcesByRawType(resources);
+		this.sortedResources = createResources(link, scopes, descriptors);
+		this.resourcesByType = createResourcesByRawType(sortedResources);
 		this.genericResources = selectGenericResources(resourcesByType);
 	}
 
@@ -109,7 +89,7 @@ final class Resources {
 	}
 
 	public void initEager() {
-		for (Resource<?> eager : resources)
+		for (Resource<?> eager : sortedResources)
 			eager.init();
 	}
 
@@ -262,7 +242,7 @@ final class Resources {
 	}
 
 	public void verifyIn(Injector context) {
-		for (Resource<?> r : resources)
+		for (Resource<?> r : sortedResources)
 			r.verifier.verifyIn(context);
 	}
 
@@ -347,10 +327,10 @@ final class Resources {
 		private final Lazy<Scope> scope = new Lazy<>();
 		private final Resource<T> resource;
 		private final int resources;
-		private final Provider<Scope> scopeProvider;
+		private final java.util.function.Supplier<Scope> scopeProvider;
 
 		LazyScopedGenerator(Generator<T> inContext, Resource<T> resource,
-				int resources, Provider<Scope> scope) {
+				int resources, java.util.function.Supplier<Scope> scope) {
 			this.resource = resource;
 			this.inContext = inContext;
 			this.resources = resources;
@@ -364,19 +344,21 @@ final class Resources {
 					resource.signature, resource.permanence);
 			/*
 			 * This cache makes sure that within one thread even if the provider
-			 * (lambda below) is called multiple times (which can occur because
+			 * (createInScope) is called multiple times (which can occur because
 			 * methods like {@code updateAndGet} on atomics have a loop) will
-			 * always yield the same instance. Different invocation of this
-			 * method (yield) however can lead to multiple calls to the
-			 * supplier.
+			 * always yield the same instance. Different invocation of this outer
+			 * method (generate) however can lead to multiple calls to the
+			 * Generator.
 			 */
-			AtomicReference<T> instanceCache = new AtomicReference<>();
-			T res = scope.get(scopeProvider).provide(resource.serialID,
-					resources, injected,
-					() -> instanceCache.updateAndGet(
-							instance -> instance != null
-								? instance
-								: inContext.generate(injected)));
+			Object[] cache = new Object[1];
+			@SuppressWarnings("unchecked")
+			Provider<T> createInScope = () -> {
+				if (cache[0] == null)
+					cache[0] = inContext.generate(injected);
+				return (T) cache[0];
+			};
+			T res = scope.get(scopeProvider) //
+					.provide(resource.serialID,	resources, injected, createInScope);
 			if (res instanceof ContextAware) {
 				@SuppressWarnings("unchecked")
 				ContextAware<T> contextAware = (ContextAware<T>) res;

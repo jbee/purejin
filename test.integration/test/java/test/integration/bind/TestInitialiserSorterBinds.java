@@ -5,6 +5,7 @@ import se.jbee.inject.Initialiser;
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.lang.Type;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +37,7 @@ class TestInitialiserSorterBinds {
 			bind(Bean.class).toConstructor();
 			initbind(Bean.class).to(InitA.class);
 			initbind(Bean.class).to(InitB.class);
-			initbind(Bean.class).to((bean, context) -> {
+			initbind(Bean.class).to((bean, as, context) -> {
 				bean.names.add("c");
 				return bean;
 			});
@@ -56,7 +57,7 @@ class TestInitialiserSorterBinds {
 	public static final class InitA implements Initialiser<Bean> {
 
 		@Override
-		public Bean init(Bean bean, Injector context) {
+		public Bean init(Bean bean, Type<?> as, Injector context) {
 			bean.names.add("a");
 			return bean;
 		}
@@ -66,7 +67,7 @@ class TestInitialiserSorterBinds {
 	public static final class InitB implements Initialiser<Bean> {
 
 		@Override
-		public Bean init(Bean bean, Injector context) {
+		public Bean init(Bean bean, Type<?> as, Injector context) {
 			bean.names.add("b");
 			return bean;
 		}

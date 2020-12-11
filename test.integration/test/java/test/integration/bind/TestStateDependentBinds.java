@@ -25,11 +25,11 @@ import static se.jbee.inject.lang.Type.raw;
  * This test demonstrates how to switch between different implementations during
  * runtime dependent on a setting in some setting object. This example shows
  * also how to extend the {@link BinderModule} to introduce a custom utility
- * such as {@link ControllerModule#connect(Class)}
+ * such as {@link RouterModule#connect(Class)}
  */
 class TestStateDependentBinds {
 
-	interface Validator {
+	@FunctionalInterface interface Validator {
 
 		boolean valid(String input);
 	}
@@ -89,23 +89,23 @@ class TestStateDependentBinds {
 
 	/* Module and Bundle code to setup scenario */
 
-	public static abstract class ControllerModule extends BinderModule {
+	public static abstract class RouterModule extends BinderModule {
 
-		public <T, C> ControllerBinder<T> connect(Class<T> type) {
-			return connect(raw(type));
+		public <T, C> RouterBinder<T> route(Class<T> type) {
+			return route(raw(type));
 		}
 
-		public <T, C> ControllerBinder<T> connect(Type<T> type) {
-			return new ControllerBinder<>(root, type);
+		public <T, C> RouterBinder<T> route(Type<T> type) {
+			return new RouterBinder<>(root, type);
 		}
 	}
 
-	public static class ControllerBinder<T> {
+	public static class RouterBinder<T> {
 
 		private final RootBinder binder;
 		private final Type<T> type;
 
-		ControllerBinder(RootBinder binder, Type<T> type) {
+		RouterBinder(RootBinder binder, Type<T> type) {
 			this.binder = new RootBinder(binder.bind().next());
 			this.type = type;
 		}
@@ -199,11 +199,11 @@ class TestStateDependentBinds {
 	 *
 	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	private static class StateDependentBindsModule2 extends ControllerModule {
+	private static class StateDependentBindsModule2 extends RouterModule {
 
 		@Override
 		protected void declare() {
-			connect(Validator.class).via(ValidationStrength.class);
+			route(Validator.class).via(ValidationStrength.class);
 
 			bind(named(ValidationStrength.PERMISSIVE), Validator.class).to(
 					Permissive.class);
@@ -220,11 +220,11 @@ class TestStateDependentBinds {
 
 	}
 
-	private static class StateDependentBindsModule3 extends ControllerModule {
+	private static class StateDependentBindsModule3 extends RouterModule {
 
 		@Override
 		protected void declare() {
-			connect(String.class).via(Integer.class);
+			route(String.class).via(Integer.class);
 
 			bind(named(42), String.class).to("Now it is 42");
 			bind(named(7), String.class).to("Now it is 7");

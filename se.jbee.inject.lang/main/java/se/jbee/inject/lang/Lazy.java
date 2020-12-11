@@ -1,13 +1,12 @@
-package se.jbee.inject.container;
+package se.jbee.inject.lang;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-
-import se.jbee.inject.Provider;
+import java.util.function.Supplier;
 
 /**
  * The {@link Lazy} utility class is used for fields that are initialised by a
- * {@link Provider} function that should only run once in case it will be
+ * {@link Supplier} function that should only run once in case it will be
  * initialising the value.
  *
  * It should not be run at all if the value is uninitialised or another thread
@@ -23,10 +22,10 @@ public final class Lazy<V> extends AtomicReference<V> {
 
 	private final AtomicBoolean initialised = new AtomicBoolean();
 
-	public V get(Provider<V> initialValue) {
+	public V get(Supplier<V> initialValue) {
 		V value;
 		if (initialised.compareAndSet(false, true)) {
-			value = initialValue.provide();
+			value = initialValue.get();
 			set(value);
 		} else {
 			// another thread is about to initialise it
