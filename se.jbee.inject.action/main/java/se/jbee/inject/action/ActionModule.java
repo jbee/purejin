@@ -5,11 +5,15 @@
  */
 package se.jbee.inject.action;
 
-import se.jbee.inject.*;
+import se.jbee.inject.Dependency;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Scope;
+import se.jbee.inject.Supplier;
 import se.jbee.inject.UnresolvableDependency.NoMethodForDependency;
 import se.jbee.inject.bind.Module;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.config.Connector;
+import se.jbee.inject.config.ProducesBy;
 import se.jbee.inject.lang.Type;
 
 import java.lang.reflect.Method;
@@ -21,14 +25,18 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static se.jbee.inject.lang.Type.*;
+import static se.jbee.inject.lang.Type.actualReturnType;
 
 /**
- * When binding {@link Action}s this {@link Module} can be extended.
+ * Base {@link Module} that needs to be extended and installed at least once to
+ * add the general setup for {@link Action}s.
+ * <p>
+ * To add {@link Method}s as {@link Action}s use {@link #connect(ProducesBy)}
+ * and {@link ConnectTargetBinder#asAction()} as in this example:
  *
- * It provides procedure-related bind methods.
- *
- * @author Jan Bernitt (jan@jbee.se)
+ * <pre>
+ * connect(ProducesBy.allMethods).in(MyService.class).asAction();
+ * </pre>
  */
 public abstract class ActionModule extends BinderModule {
 
@@ -47,14 +55,10 @@ public abstract class ActionModule extends BinderModule {
 					.to(ActionSupplier.class);
 			asDefault().per(Scope.application) //
 					.bind(Executor.class) //
-					.to(new DirectExecutor());
+					.to(this::run);
 		}
-	}
 
-	static final class DirectExecutor implements Executor {
-
-		@Override
-		public <A, B> B run(ActionSite<A, B> site, Object[] args, A value) {
+		<A, B> B run(ActionSite<A, B> site, Object[] args, A value) {
 			return site.call(args, null);
 		}
 	}
@@ -72,14 +76,12 @@ public abstract class ActionModule extends BinderModule {
 		 */
 		private final Map<String, Action<?, ?>> actionsBySignature = new ConcurrentHashMap<>();
 
-		private final Env env;
 		private final Injector injector;
 		private final Executor executor;
 		private final AtomicInteger connectedCount = new AtomicInteger();
 
 		public ActionSupplier(Injector injector) {
 			this.injector = injector;
-			this.env = injector.resolve(Env.class);
 			this.executor = injector.resolve(Executor.class);
 		}
 
@@ -151,10 +153,11 @@ public abstract class ActionModule extends BinderModule {
 
 		@Override
 		public B run(A input) throws ActionExecutionFailed {
-			List<ActionSite<A, B>> sites = this.sites.get();
-			if (sites.size() == 1)
-				return executor.run(sites.get(0), sites.get(0).args(context, input), input);
-			for (ActionSite<A,B> site : sites)
+			List<ActionSite<A, B>> activeSites = this.sites.get();
+			if (activeSites.size() == 1)
+				return executor.run(activeSites.get(0),
+						activeSites.get(0).args(context, input), input);
+			for (ActionSite<A, B> site : activeSites)
 				executor.run(site, site.args(context, input), input);
 			return null;
 		}

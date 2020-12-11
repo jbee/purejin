@@ -40,6 +40,8 @@ import static se.jbee.inject.lang.Type.raw;
 @FunctionalInterface
 public interface Initialiser<T> {
 
+	//TODO rename: maybe some reference to Scope as this occurs when things are added to a scope
+	// BuildUp + TearDown
 
 	static <T> Type<Initialiser<T>> initialiserTypeOf(Class<T> initialisedType) {
 		return initialiserTypeOf(raw(initialisedType));
@@ -49,7 +51,6 @@ public interface Initialiser<T> {
 	static <T> Type<Initialiser<T>> initialiserTypeOf(Type<T> initialisedType) {
 		return (Type) raw(Initialiser.class).parametized(initialisedType);
 	}
-	//TODO rename: maybe some reference to Scope as this occurs when things are added to a scope
 
 	/**
 	 * Is called when the target instance is created within the {@link Injector}
