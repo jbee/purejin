@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import se.jbee.inject.convert.Imported;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests the {@link Imported} utility.
@@ -107,11 +107,8 @@ class TestImported {
 	}
 
 	private void assertError(String input, String expectedError) {
-		try {
-			imported.resolve(input);
-			fail("Expected error for input: " + input);
-		} catch (IllegalArgumentException e) {
-			assertEquals(expectedError, e.getMessage());
-		}
+		Exception ex = assertThrows(IllegalArgumentException.class,
+				() -> imported.resolve(input));
+		assertEquals(expectedError, ex.getMessage());
 	}
 }

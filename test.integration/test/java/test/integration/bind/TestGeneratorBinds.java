@@ -9,7 +9,7 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static se.jbee.inject.Cast.resourceTypeFor;
+import static se.jbee.inject.Resource.resourceTypeOf;
 import static se.jbee.inject.lang.Type.raw;
 
 class TestGeneratorBinds {
@@ -36,7 +36,7 @@ class TestGeneratorBinds {
 	void generatorCanBePassedDirectly() {
 		assertEquals("hello world", injector.resolve(String.class));
 		assertEquals("SupplierGeneratorBridge",
-				injector.resolve(resourceTypeFor(raw(
+				injector.resolve(resourceTypeOf(raw(
 						String.class))).generator.getClass().getSimpleName());
 	}
 

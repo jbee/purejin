@@ -1,43 +1,53 @@
 package se.jbee.inject.convert;
 
-import static se.jbee.inject.Instance.defaultInstanceOf;
-
-import java.util.Deque;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
-
 import se.jbee.inject.Converter;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.lang.Type;
 
-public final class Chain<B> {
+import java.util.Deque;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map;
+
+import static se.jbee.inject.Instance.defaultInstanceOf;
+import static se.jbee.inject.lang.Type.raw;
+
+/**
+ * A {@link ConvertTo} groups {@link Converter}s that all convert to the same
+ * output type from different input types.
+ * <p>
+ * It makes use of {@link Converter} chains to allow for as many input types
+ * based on the know type conversions.
+ *
+ * @param <B> output type of the conversion
+ */
+public final class ConvertTo<B> {
 
 	static final class Link<A, B> {
 		final Type<A> in;
 		final Type<B> out;
-		final Converter<A, B> converter;
+		final Converter<A, B> by;
 
-		Link(Type<A> in, Type<B> out, Converter<A, B> converter) {
+		Link(Type<A> in, Type<B> out, Converter<A, B> by) {
 			this.in = in;
 			this.out = out;
-			this.converter = converter;
+			this.by = by;
 		}
 	}
 
-	private final Type<B> outputType;
-	private final Map<Type<?>, Converter<?, B>> headsByInputType = new LinkedHashMap<>();
+	private final Type<B> out;
+	private final Map<Type<?>, Converter<?, B>> ins = new LinkedHashMap<>();
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Chain(Converter<?, B> tail, Injector context) {
+	public ConvertTo(Converter<?, B> tail, Injector context) {
 		Class<? extends Converter> tailType = tail.getClass();
 		Type<? extends Converter> converterType = Type.supertype(
-				Converter.class, Type.raw(tailType));
+				Converter.class, raw(tailType));
 		Type<?> directInputType = converterType.parameter(0);
-		this.outputType = (Type) converterType.parameter(1);
-		headsByInputType.put(directInputType, tail);
+		this.out = (Type) converterType.parameter(1);
+		ins.put(directInputType, tail);
 		initAnnotatedChains(tailType, directInputType, context);
 	}
 
@@ -57,13 +67,13 @@ public final class Chain<B> {
 				Deque<Link<?, ?>> converterChain = converterChain(chain,
 						directInputType, context);
 				Link<?, ?> tail = converterChain.pollLast();
-				Converter<?, B> chainBuilder = headsByInputType.get(
+				Converter<?, B> chainBuilder = ins.get(
 						directInputType);
 				while (tail != null) {
 					@SuppressWarnings("rawtypes")
-					Converter converter = tail.converter;
-					chainBuilder = chainBuilder.after(converter);
-					headsByInputType.put(tail.in, chainBuilder);
+					Converter converter = tail.by;
+					chainBuilder = chainBuilder.upon(converter);
+					ins.put(tail.in, chainBuilder);
 					tail = converterChain.pollLast();
 				}
 			}
@@ -107,20 +117,20 @@ public final class Chain<B> {
 		return chainInstances;
 	}
 
-	public <A> Converter<A, B> forInput(Type<A> type) {
+	public <A> Converter<A, B> from(Type<A> in) {
 		@SuppressWarnings("unchecked")
-		Converter<A, B> res = (Converter<A, B>) headsByInputType.get(type);
+		Converter<A, B> res = (Converter<A, B>) ins.get(in);
 		if (res == null)
 			throw new UnsupportedOperationException(
-					"Conversion from " + type + "not available");
+					"Conversion from " + in + "not available");
 		return res;
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder str = new StringBuilder();
-		for (Type<?> in : headsByInputType.keySet()) {
-			str.append(in).append(" => ").append(outputType).append('\n');
+		for (Type<?> in : ins.keySet()) {
+			str.append(in).append(" => ").append(out).append('\n');
 		}
 		return str.toString();
 	}

@@ -13,7 +13,7 @@ import test.integration.util.Resource;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static se.jbee.inject.Cast.providerTypeOf;
+import static se.jbee.inject.Provider.providerTypeOf;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.config.HintsBy.noParameters;

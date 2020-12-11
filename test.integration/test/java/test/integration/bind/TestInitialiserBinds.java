@@ -12,7 +12,7 @@ import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.lang.Type;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static se.jbee.inject.Cast.initialiserTypeOf;
+import static se.jbee.inject.Initialiser.initialiserTypeOf;
 import static se.jbee.inject.lang.Type.raw;
 
 /**

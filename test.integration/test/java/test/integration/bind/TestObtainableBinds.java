@@ -12,7 +12,7 @@ import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.inject.Obtainable.obtainableTypeOf;
 
 /**
  * A test that demonstrates {@link Obtainable} wrapper usage.
@@ -62,26 +62,24 @@ class TestObtainableBinds {
 	@Test
 	void obtainsEmptyArray() {
 		assertArrayEquals(new Integer[0], (Integer[]) injector.resolve( //
-				raw(Obtainable.class).parametized(Integer[].class)).obtain());
+				obtainableTypeOf(Integer[].class)).obtain());
 	}
 
 	@Test
 	void obtainsInstanceThatCanBeResolved() {
 		assertEquals("The name", injector.resolve( //
-				raw(Obtainable.class).parametized(String.class)).obtain());
+				obtainableTypeOf(String.class)).obtain());
 	}
 
 	@Test
 	void obtainsOrElseForInstanceThatCanNotBeResolved() {
 		assertEquals("a default", injector.resolve(named("unbound"), //
-				raw(Obtainable.class).parametized(String.class))
-				.orElse("a default"));
+				obtainableTypeOf(String.class)).orElse("a default"));
 	}
 
 	@Test
 	void obtainsOriginalExceptionWhenInstanceCanNotBeResolved() {
-		Obtainable<?> box = injector.resolve(
-				raw(Obtainable.class).parametized(Integer.class));
+		Obtainable<?> box = injector.resolve(obtainableTypeOf(Integer.class));
 		try {
 			box.orElseThrow();
 		} catch (UnresolvableDependency e) {

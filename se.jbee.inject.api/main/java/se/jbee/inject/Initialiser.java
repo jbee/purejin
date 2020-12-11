@@ -39,6 +39,16 @@ import static se.jbee.inject.lang.Type.raw;
  */
 @FunctionalInterface
 public interface Initialiser<T> {
+
+
+	static <T> Type<Initialiser<T>> initialiserTypeOf(Class<T> initialisedType) {
+		return initialiserTypeOf(raw(initialisedType));
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	static <T> Type<Initialiser<T>> initialiserTypeOf(Type<T> initialisedType) {
+		return (Type) raw(Initialiser.class).parametized(initialisedType);
+	}
 	//TODO rename: maybe some reference to Scope as this occurs when things are added to a scope
 
 	/**

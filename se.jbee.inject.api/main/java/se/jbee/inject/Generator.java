@@ -5,6 +5,10 @@
  */
 package se.jbee.inject;
 
+import se.jbee.inject.lang.Type;
+
+import static se.jbee.inject.lang.Type.raw;
+
 /**
  * A {@link Generator} creates the instance(s) for the generator's
  * {@link Resource}.
@@ -19,6 +23,16 @@ package se.jbee.inject;
  */
 @FunctionalInterface
 public interface Generator<T> {
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	static <T> Type<Generator<T>> generatorTypeOf(Type<T> providedType) {
+		return (Type) raw(Generator.class).parametized(providedType);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	static <T> Type<Generator<T>[]> generatorsTypeOf(Type<T> generatedType) {
+		return (Type) raw(Generator[].class).parametized(generatedType);
+	}
 
 	/**
 	 * Yields the instance that satisfies the given {@link Dependency}.

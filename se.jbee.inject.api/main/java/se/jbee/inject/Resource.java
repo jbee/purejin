@@ -10,6 +10,8 @@ import se.jbee.inject.lang.Type;
 
 import java.util.function.Function;
 
+import static se.jbee.inject.lang.Type.raw;
+
 /**
  * A {@link Resource} describes a injection situation or scenario through its
  * {@link #signature} and {@link #permanence}. If the {@link Resource} applies
@@ -22,6 +24,24 @@ import java.util.function.Function;
  */
 public final class Resource<T> implements Comparable<Resource<?>>,
 		Qualifying<Resource<?>>, Generator<T> {
+
+	public static <T> Type<Resource<T>> resourceTypeOf(Class<T> type) {
+		return resourceTypeOf(raw(type));
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static <T> Type<Resource<T>> resourceTypeOf(Type<T> type) {
+		return (Type) raw(Resource.class).parametized(type);
+	}
+
+	public static <T> Type<Resource<T>[]> resourcesTypeOf(Class<T> type) {
+		return resourcesTypeOf(raw(type));
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static <T> Type<Resource<T>[]> resourcesTypeOf(Type<T> type) {
+		return (Type) raw(Resource[].class).parametized(type);
+	}
 
 	public final Generator<T> generator;
 

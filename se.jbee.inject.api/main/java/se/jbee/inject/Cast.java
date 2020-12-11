@@ -17,7 +17,12 @@ import java.util.function.Function;
 /**
  * Utility to get rid of warnings for known generic {@link Type}s.
  *
+ * @see Obtainable#obtainableTypeOf(Type)
  * @see Converter#converterTypeOf(Type, Type)
+ * @see Generator#generatorTypeOf(Type)
+ * @see Provider#providerTypeOf(Type)
+ * @see Initialiser#initialiserTypeOf(Type)
+ * @see Resource#resourceTypeOf(Type)
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
@@ -52,49 +57,6 @@ public final class Cast {
 	public static <T> Type<Collection<T>> collectionTypeOf(
 			Type<T> elementType) {
 		return (Type) raw(Collection.class).parametized(elementType);
-	}
-
-	public static <T> Type<Provider<T>> providerTypeOf(Class<T> providedType) {
-		return providerTypeOf(raw(providedType));
-	}
-
-	public static <T> Type<Provider<T>> providerTypeOf(Type<T> providedType) {
-		return (Type) raw(Provider.class).parametized(providedType);
-	}
-
-	public static <T> Type<Generator<T>> generatorTypeOf(Type<T> providedType) {
-		return (Type) raw(Generator.class).parametized(providedType);
-	}
-
-	public static <T> Type<Generator<T>[]> generatorsTypeFor(
-			Type<T> generatedType) {
-		return (Type) raw(Generator[].class).parametized(generatedType);
-	}
-
-	public static <T> Type<Resource<T>> resourceTypeFor(Class<T> type) {
-		return resourceTypeFor(raw(type));
-	}
-
-	public static <T> Type<Resource<T>> resourceTypeFor(Type<T> type) {
-		return (Type) raw(Resource.class).parametized(type);
-	}
-
-	public static <T> Type<Resource<T>[]> resourcesTypeFor(Class<T> type) {
-		return resourcesTypeFor(raw(type));
-	}
-
-	public static <T> Type<Resource<T>[]> resourcesTypeFor(Type<T> type) {
-		return (Type) raw(Resource[].class).parametized(type);
-	}
-
-	public static <T> Type<Initialiser<T>> initialiserTypeOf(
-			Class<T> initialisedType) {
-		return (Type) raw(Initialiser.class).parametized(initialisedType);
-	}
-
-	public static <T> Type<Initialiser<T>> initialiserTypeOf(
-			Type<T> initialisedType) {
-		return (Type) raw(Initialiser.class).parametized(initialisedType);
 	}
 
 	public static <A, B> Type<Function<A,B>> functionTypeOf(Class<A> a, Class<B> b) {

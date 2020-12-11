@@ -6,7 +6,7 @@
 package se.jbee.inject.defaults;
 
 import static se.jbee.inject.Cast.functionTypeOf;
-import static se.jbee.inject.Cast.resourcesTypeFor;
+import static se.jbee.inject.Resource.resourcesTypeOf;
 import static se.jbee.inject.Scope.application;
 import static se.jbee.inject.lang.Type.raw;
 
@@ -269,7 +269,7 @@ public enum CoreFeature implements Toggled<CoreFeature> {
 			@SuppressWarnings("unchecked")
 			private T resolve() {
 				Resource<E>[] resources = context.resolve(
-						dep.typed(resourcesTypeFor(dep.type())));
+						dep.typed(resourcesTypeOf(dep.type())));
 				List<E> elements = new ArrayList<>();
 				for (Resource<E> r : resources) {
 					try {

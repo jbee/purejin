@@ -12,7 +12,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static se.jbee.inject.Cast.providerTypeOf;
+import static se.jbee.inject.Provider.providerTypeOf;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Packages.packageAndSubPackagesOf;
 import static se.jbee.inject.config.HintsBy.noParameters;

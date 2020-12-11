@@ -19,7 +19,7 @@ import java.util.function.Function;
 
 import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Arrays.stream;
-import static se.jbee.inject.Cast.initialiserTypeOf;
+import static se.jbee.inject.Initialiser.initialiserTypeOf;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Hint.relativeReferenceTo;
 import static se.jbee.inject.Instance.*;

@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static se.jbee.inject.Cast.resourcesTypeFor;
+import static se.jbee.inject.Resource.resourcesTypeOf;
 import static se.jbee.inject.Hint.relativeReferenceTo;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.config.ConstructsBy.common;
@@ -268,11 +268,11 @@ class TestBootstrapper {
 		//TODO can this be limited to cases with a certain Scope so that container can be excluded?
 		assertEquals(4, rs.length);
 		Resource<Number>[] forNumber = injector.resolve(
-				resourcesTypeFor(Number.class));
+				Resource.resourcesTypeOf(Number.class));
 		assertEquals(1, forNumber.length);
 		@SuppressWarnings("rawtypes")
 		Resource<Comparable>[] forCompareable = injector.resolve(
-				resourcesTypeFor(Comparable.class));
+				Resource.resourcesTypeOf(Comparable.class));
 		assertEquals(3, forCompareable.length);
 	}
 

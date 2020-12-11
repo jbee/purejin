@@ -6,8 +6,8 @@
 package se.jbee.inject.container;
 
 import static java.lang.System.identityHashCode;
-import static se.jbee.inject.Cast.initialiserTypeOf;
-import static se.jbee.inject.Cast.resourcesTypeFor;
+import static se.jbee.inject.Initialiser.initialiserTypeOf;
+import static se.jbee.inject.Resource.resourcesTypeOf;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.lang.Type.raw;
@@ -63,7 +63,7 @@ public final class Container implements Injector, Env {
 		this.postConstruct = new PostConstruct(
 				orElse((t, arr) -> arr,
 						() -> resolve(Initialiser.Sorter.class)),
-				resolve(resourcesTypeFor(initialiserTypeOf(Type.WILDCARD))));
+				resolve(resourcesTypeOf(initialiserTypeOf(Type.WILDCARD))));
 		this.postConstructObserver = resolvePostConstructObserver();
 		this.decorated = postConstruct.postConstruct(this);
 		resources.verifyIn(this);

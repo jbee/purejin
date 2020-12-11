@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static se.jbee.inject.Cast.resourcesTypeFor;
+import static se.jbee.inject.Resource.resourcesTypeOf;
 import static se.jbee.inject.ScopePermanence.ignore;
 
 /**
@@ -115,7 +115,7 @@ class TestScopePermanenceBinds {
 	@Test
 	void defaultScopePermanencesAreBoundAsDefaults() {
 		for (Resource<ScopePermanence> r : injector.resolve(
-				resourcesTypeFor(ScopePermanence.class))) {
+				Resource.resourcesTypeOf(ScopePermanence.class))) {
 			if (!r.signature.instance.name.equalTo(requestScope))
 				assertEquals(DeclarationType.DEFAULT, r.source.declarationType);
 		}
@@ -124,7 +124,7 @@ class TestScopePermanenceBinds {
 	@Test
 	void defaultScopesAreBoundAsDefaults() {
 		for (Resource<Scope> r : injector.resolve(
-				resourcesTypeFor(Scope.class))) {
+				Resource.resourcesTypeOf(Scope.class))) {
 			if (!r.signature.instance.name.equalTo(requestScope))
 				assertEquals(DeclarationType.DEFAULT, r.source.declarationType);
 		}

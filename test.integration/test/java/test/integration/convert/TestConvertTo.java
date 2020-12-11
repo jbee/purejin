@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import se.jbee.inject.Converter;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.convert.Chain;
+import se.jbee.inject.convert.ConvertTo;
 import se.jbee.inject.convert.ConverterModule;
 import se.jbee.inject.convert.Converts;
 import se.jbee.inject.convert.Imports;
@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static se.jbee.inject.lang.Type.raw;
 
-class TestChain {
+class TestConvertTo {
 
 	@Imports({ String.class, Integer.class })
 	@Converts({ "String", "Long", "Integer" })
@@ -39,16 +39,16 @@ class TestChain {
 
 	@Test
 	void chainCanBeStartedFromAnyLinksInput() {
-		Chain<BigInteger> chain = new Chain<>(new ExampleConverter(), context);
-		assertConverts(chain, String.class, "42", BigInteger.valueOf(42));
-		assertConverts(chain, Integer.class, 42, BigInteger.valueOf(42));
-		assertConverts(chain, Long.class, 42L, BigInteger.valueOf(42));
+		ConvertTo<BigInteger> toBigInteger = new ConvertTo<>(new ExampleConverter(), context);
+		assertConverts(toBigInteger, String.class, "42", BigInteger.valueOf(42));
+		assertConverts(toBigInteger, Integer.class, 42, BigInteger.valueOf(42));
+		assertConverts(toBigInteger, Long.class, 42L, BigInteger.valueOf(42));
 	}
 
-	private static <I, O> void assertConverts(Chain<O> chain, Class<I> type,
-			I input, O expected) {
-		Converter<I, O> str2bigInt = chain.forInput(raw(type));
-		assertNotNull(str2bigInt);
-		assertEquals(expected, str2bigInt.convert(input));
+	private static <A, B> void assertConverts(ConvertTo<B> convertTo, Class<A> type,
+			A input, B expected) {
+		Converter<A, B> a2b = convertTo.from(raw(type));
+		assertNotNull(a2b);
+		assertEquals(expected, a2b.convert(input));
 	}
 }

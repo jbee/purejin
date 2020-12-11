@@ -13,6 +13,15 @@ import se.jbee.inject.lang.Type;
 @FunctionalInterface
 public interface Converter<A, B> {
 
+	static <A, B> Type<Converter<A, B>> converterTypeOf(Class<A> a, Class<B> b) {
+		return converterTypeOf(Type.raw(a), Type.raw(b));
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	static <A, B> Type<Converter<A, B>> converterTypeOf(Type<A> a, Type<B> b) {
+		return (Type) Type.raw(Converter.class).parametized(a, b);
+	}
+
 	/**
 	 * Converts input to the corresponding value of the output type of this
 	 * {@link Converter}.
@@ -24,15 +33,15 @@ public interface Converter<A, B> {
 	 */
 	B convert(A input);
 
-	default <T> Converter<A, T> before(Converter<B, T> next) {
-		return next.after(this);
+	default <T> Converter<A, T> then(Converter<B, T> next) {
+		return next.upon(this);
 	}
 
-	default <T> Converter<T, B> after(Converter<T, A> prev) {
+	default <T> Converter<T, B> upon(Converter<T, A> prev) {
 		return in -> convert(prev.convert(in));
 	}
 
-	default Converter<A, B> fallbackTo(B constant) {
+	default Converter<A, B> orElse(B constant) {
 		return in -> {
 			try {
 				B res = convert(in);
@@ -41,15 +50,6 @@ public interface Converter<A, B> {
 				return constant;
 			}
 		};
-	}
-
-	static <A, B> Type<Converter<A, B>> converterTypeOf(Class<A> a, Class<B> b) {
-		return converterTypeOf(Type.raw(a), Type.raw(b));
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	static <A, B> Type<Converter<A, B>> converterTypeOf(Type<A> a, Type<B> b) {
-		return (Type) Type.raw(Converter.class).parametized(a, b);
 	}
 
 }

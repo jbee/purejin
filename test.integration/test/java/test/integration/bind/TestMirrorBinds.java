@@ -1,10 +1,7 @@
 package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
-import se.jbee.inject.Env;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Resource;
-import se.jbee.inject.Scope;
+import se.jbee.inject.*;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Environment;
@@ -13,7 +10,7 @@ import test.integration.util.Scoped;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static se.jbee.inject.Cast.resourceTypeFor;
+import static se.jbee.inject.Resource.resourceTypeOf;
 
 class TestMirrorBinds {
 
@@ -45,7 +42,7 @@ class TestMirrorBinds {
 		assertNotSame(injector.resolve(InjectionScoped.class),
 				injector.resolve(InjectionScoped.class));
 		Resource<InjectionScoped> resource = injector.resolve(
-				resourceTypeFor(InjectionScoped.class));
+				Resource.resourceTypeOf(InjectionScoped.class));
 		assertEquals(Scope.injection, resource.permanence.scope);
 	}
 }

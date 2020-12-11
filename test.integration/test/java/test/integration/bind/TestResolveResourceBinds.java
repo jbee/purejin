@@ -9,7 +9,6 @@ import se.jbee.inject.bootstrap.Bootstrap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static se.jbee.inject.Cast.*;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.lang.Type.raw;
@@ -36,7 +35,7 @@ class TestResolveResourceBinds {
 	@Test
 	void thatResourceIsAvailableForEveryBoundResource() {
 		Resource<String> resource = injector.resolve(
-				resourceTypeFor(String.class));
+				Resource.resourceTypeOf(String.class));
 		assertNotNull(resource);
 		assertEquals("foobar", resource.generate(dependency(String.class)));
 	}
@@ -44,7 +43,7 @@ class TestResolveResourceBinds {
 	@Test
 	void thatResourceArrayIsAvailableForEveryBoundResource() {
 		Resource<String>[] resource = injector.resolve(
-				resourcesTypeFor(String.class));
+				Resource.resourcesTypeOf(String.class));
 		assertEquals(4, resource.length);
 	}
 
@@ -56,7 +55,7 @@ class TestResolveResourceBinds {
 	@Test
 	void thatResourceArrayFiltersByName() {
 		Dependency<? extends Resource<String>[]> dependency = dependency(
-				resourcesTypeFor(String.class)).named("special");
+				Resource.resourcesTypeOf(String.class)).named("special");
 		Resource<String>[] rs = injector.resolve(dependency);
 		assertEquals(2, rs.length);
 		assertEquals("special-list", rs[0].generate(dependency(String.class)));
@@ -66,7 +65,7 @@ class TestResolveResourceBinds {
 	@Test
 	void thatGeneratorIsAvailableForEveryBoundResource() {
 		Generator<String> generator = injector.resolve(
-				generatorTypeOf(raw(String.class)));
+				Generator.generatorTypeOf(raw(String.class)));
 		assertNotNull(generator);
 		assertEquals("foobar", generator.generate(dependency(String.class)));
 	}
@@ -74,7 +73,7 @@ class TestResolveResourceBinds {
 	@Test
 	void thatGeneratorArrayIsAvailableForEveryBoundResource() {
 		Generator<String>[] gens = injector.resolve(
-				generatorsTypeFor(raw(String.class)));
+				Generator.generatorsTypeOf(raw(String.class)));
 		assertEquals(4, gens.length);
 	}
 
@@ -91,7 +90,7 @@ class TestResolveResourceBinds {
 	@Test
 	void resolingViaResourceDoesLookupPlainTypeForPotentialMatches() {
 		try {
-			injector.resolve(named("x"), resourceTypeFor(String.class));
+			injector.resolve(named("x"), Resource.resourceTypeOf(String.class));
 			fail("Expected not to find a matching resource");
 		} catch (NoResourceForDependency e) {
 			assertFalse(e.getMessage().contains(": none"));
@@ -102,7 +101,7 @@ class TestResolveResourceBinds {
 	@Test
 	void resolingViaGeneratorDoesLookupPlainTypeForPotentialMatches() {
 		try {
-			injector.resolve(named("x"), generatorTypeOf(raw(String.class)));
+			injector.resolve(named("x"), Generator.generatorTypeOf(raw(String.class)));
 			fail("Expected not to find a matching resource");
 		} catch (NoResourceForDependency e) {
 			assertFalse(e.getMessage().contains(": none"));

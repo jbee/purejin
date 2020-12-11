@@ -5,7 +5,7 @@
  */
 package se.jbee.inject;
 
-import static se.jbee.inject.Cast.resourceTypeFor;
+import static se.jbee.inject.Resource.resourceTypeOf;
 
 /**
  * Similar to a call-site each {@linkplain InjectionSite} represents the
@@ -65,7 +65,7 @@ public final class InjectionSite {
 			} else { // relative ref
 				Instance<?> ref = hint.relativeRef;
 				Dependency<? extends Resource<?>> resourceDep = site.typed(
-						resourceTypeFor(ref.type)).named(ref.name);
+						resourceTypeOf(ref.type)).named(ref.name);
 				Resource<?> resource = injector.resolve(resourceDep);
 				if (resource.permanence.isPermanent()) {
 					//TODO and not has type variable involved
