@@ -9,7 +9,7 @@ import se.jbee.inject.bind.Toggled;
 import se.jbee.inject.binder.Binder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
-import se.jbee.inject.binder.TogglerBundle;
+import se.jbee.inject.binder.BundleFor;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Environment;
 
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 /**
  * The test demonstrates how to use {@link Toggled} and the
- * {@link TogglerBundle} to allow different bootstrapping depended on a toggle
+ * {@link BundleFor} to allow different bootstrapping depended on a toggle
  * property set in the {@link Env}.
  *
  * This technique should avoid if-statements in the {@link Bundle}s and
@@ -49,7 +49,7 @@ class TestToggledBinds {
 	 * value has been defined in the {@link Env} so that it is actually
 	 * <code>null</code>.
 	 */
-	private static class MachineBundle extends TogglerBundle<Machine> {
+	private static class MachineBundle extends BundleFor<Machine> {
 
 		@Override
 		protected void bootstrap() {

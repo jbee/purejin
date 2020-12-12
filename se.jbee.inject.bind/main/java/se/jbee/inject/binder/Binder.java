@@ -19,7 +19,6 @@ import java.util.function.Function;
 
 import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Arrays.stream;
-import static se.jbee.inject.BuildUp.buildUpTypeOf;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Hint.relativeReferenceTo;
 import static se.jbee.inject.Instance.*;
@@ -41,6 +40,7 @@ import static se.jbee.inject.lang.Utils.newArray;
 public class Binder {
 
 	public static final String ACTION_CONNECTOR = "actions";
+	public static final String SCHEDULER_CONNECTOR = "scheduler";
 
 	public static RootBinder create(Bind bind) {
 		return new RootBinder(bind);

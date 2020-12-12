@@ -41,13 +41,13 @@ import static se.jbee.inject.lang.Type.raw;
 @FunctionalInterface
 public interface BuildUp<T> { // BuildUp + TearDown
 
-	static <T> Type<BuildUp<T>> buildUpTypeOf(Class<T> initialisedType) {
-		return buildUpTypeOf(raw(initialisedType));
+	static <T> Type<BuildUp<T>> buildUpTypeOf(Class<T> targetType) {
+		return buildUpTypeOf(raw(targetType));
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	static <T> Type<BuildUp<T>> buildUpTypeOf(Type<T> initialisedType) {
-		return (Type) raw(BuildUp.class).parametized(initialisedType);
+	static <T> Type<BuildUp<T>> buildUpTypeOf(Type<T> targetType) {
+		return (Type) raw(BuildUp.class).parametized(targetType);
 	}
 
 	/**

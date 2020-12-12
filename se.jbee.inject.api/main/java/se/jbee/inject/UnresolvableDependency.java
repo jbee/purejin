@@ -91,7 +91,7 @@ public abstract class UnresolvableDependency extends RuntimeException {
 		public NoResourceForDependency(Collection<Type<?>> types,
 				List<?> dropped) {
 			super("No resource for type(s)\n\trequired: " + types
-				+ "\n\tdropped bindings:\n" + dropped);
+				+ (dropped.isEmpty() ? "" : "\n\tdropped bindings:\n" + dropped));
 		}
 	}
 
