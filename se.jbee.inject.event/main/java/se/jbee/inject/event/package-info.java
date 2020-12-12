@@ -14,6 +14,6 @@
  * Any bound and created instance that implements a registered event handler
  * interface will asynchronously receive any message send. Either make sure the
  * instance is injected during bootstrapping of the application or bind the
- * instance in an {@link se.jbee.inject.ScopePermanence#eager()} scope.
+ * instance in an {@link se.jbee.inject.ScopeLifeCycle#eager()} scope.
  */
 package se.jbee.inject.event;

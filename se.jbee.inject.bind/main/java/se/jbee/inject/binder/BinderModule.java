@@ -5,16 +5,16 @@
  */
 package se.jbee.inject.binder;
 
-import static se.jbee.inject.Scope.container;
-
 import se.jbee.inject.Env;
 import se.jbee.inject.Name;
 import se.jbee.inject.Scope;
-import se.jbee.inject.ScopePermanence;
+import se.jbee.inject.ScopeLifeCycle;
 import se.jbee.inject.bind.Bindings;
 import se.jbee.inject.bind.Bootstrapper;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.bind.Module;
+
+import static se.jbee.inject.Scope.container;
 
 /**
  * The default utility {@link Module} almost always used.
@@ -66,18 +66,17 @@ public abstract class BinderModule extends InitializedBinder
 	}
 
 	/**
-	 * Binds a {@link ScopePermanence} with the needed {@link Scope#container}.
+	 * Binds a {@link ScopeLifeCycle} with the needed {@link Scope#container}.
 	 *
 	 * @since 8.1
 	 * @param sp instance to bind, not null
 	 */
-	protected final void bindScopePermanence(ScopePermanence sp) {
-		bindScopePermanence(sp.scope).to(sp);
+	protected final void bindScopeLifeCycle(ScopeLifeCycle sp) {
+		bindScopeLifeCycle(sp.scope).to(sp);
 	}
 
-	protected final TypedBinder<ScopePermanence> bindScopePermanence(
-			Name scope) {
-		return per(container).bind(scope, ScopePermanence.class);
+	protected final TypedBinder<ScopeLifeCycle> bindScopeLifeCycle(Name scope) {
+		return per(container).bind(scope, ScopeLifeCycle.class);
 	}
 
 	/**

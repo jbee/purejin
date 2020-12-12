@@ -65,14 +65,14 @@ class TestSerializable {
 
 	@Test
 	void scopePermanenceIsSerializable() {
-		assertSerializable(ScopePermanence.ignore);
-		assertSerializable(ScopePermanence.singleton.derive(Scope.application));
+		assertSerializable(ScopeLifeCycle.ignore);
+		assertSerializable(ScopeLifeCycle.singleton.derive(Scope.application));
 	}
 
 	@Test
 	void injectionIsSerializable() {
 		assertSerializable(new Injection(Instance.anyOf(String.class),
-				Locator.locator(String.class), ScopePermanence.ignore));
+				Locator.locator(String.class), ScopeLifeCycle.ignore));
 	}
 
 	@Test

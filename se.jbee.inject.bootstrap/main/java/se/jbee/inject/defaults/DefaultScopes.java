@@ -2,8 +2,8 @@ package se.jbee.inject.defaults;
 
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Scope.container;
-import static se.jbee.inject.ScopePermanence.singleton;
-import static se.jbee.inject.ScopePermanence.unstable;
+import static se.jbee.inject.ScopeLifeCycle.singleton;
+import static se.jbee.inject.ScopeLifeCycle.unstable;
 import static se.jbee.inject.scope.DiskScope.SYNC_INTERVAL;
 import static se.jbee.inject.scope.DiskScope.SYNC_INTERVAL_DEFAULT_DURATION;
 
@@ -15,7 +15,7 @@ import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Name;
 import se.jbee.inject.Scope;
-import se.jbee.inject.ScopePermanence;
+import se.jbee.inject.ScopeLifeCycle;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bind.Bind;
@@ -30,7 +30,7 @@ import se.jbee.inject.scope.WorkerScope;
 /**
  * Binds implementations for the standard {@link Scope}s declared as
  * {@link Name} in the {@link Scope} class.
- * 
+ *
  * This includes {@link DiskScope}s that use their root folder as part of the
  * {@link Scope}'s {@link Name}.
  */
@@ -44,21 +44,21 @@ public final class DefaultScopes extends BinderModule
 
 	@Override
 	protected void declare() {
-		bindScopePermanence(ScopePermanence.reference);
-		bindScopePermanence(ScopePermanence.container);
-		bindScopePermanence(singleton.derive(Scope.jvm));
-		bindScopePermanence(singleton.derive(Scope.application));
-		bindScopePermanence(singleton.derive(Scope.dependency));
-		bindScopePermanence(singleton.derive(Scope.dependencyType));
-		bindScopePermanence(singleton.derive(Scope.dependencyInstance));
-		bindScopePermanence(singleton.derive(Scope.targetInstance));
-		bindScopePermanence(unstable.derive(Scope.thread) //
+		bindScopeLifeCycle(ScopeLifeCycle.reference);
+		bindScopeLifeCycle(ScopeLifeCycle.container);
+		bindScopeLifeCycle(singleton.derive(Scope.jvm));
+		bindScopeLifeCycle(singleton.derive(Scope.application));
+		bindScopeLifeCycle(singleton.derive(Scope.dependency));
+		bindScopeLifeCycle(singleton.derive(Scope.dependencyType));
+		bindScopeLifeCycle(singleton.derive(Scope.dependencyInstance));
+		bindScopeLifeCycle(singleton.derive(Scope.targetInstance));
+		bindScopeLifeCycle(unstable.derive(Scope.thread) //
 				.canBeInjectedInto(Scope.thread)//
 				.canBeInjectedInto(Scope.worker) //
 				.canBeInjectedInto(Scope.injection)); //
-		bindScopePermanence(unstable.derive(Scope.injection) //
+		bindScopeLifeCycle(unstable.derive(Scope.injection) //
 				.canBeInjectedInto(Scope.injection));
-		bindScopePermanence(unstable.derive(Scope.worker) //
+		bindScopeLifeCycle(unstable.derive(Scope.worker) //
 				.canBeInjectedInto(Scope.worker) //
 				.canBeInjectedInto(Scope.injection)); //
 

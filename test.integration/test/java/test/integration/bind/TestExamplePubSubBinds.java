@@ -48,8 +48,9 @@ import static se.jbee.inject.lang.Type.raw;
  * instance resolved and subscribed is not the same instance that is resolved
  * when using the {@link Service}.
  */
-class TestPubSubBinds {
+class TestExamplePubSubBinds {
 
+	@FunctionalInterface
 	interface Subscriber {
 
 		void onEvent();
@@ -57,7 +58,7 @@ class TestPubSubBinds {
 
 	interface Publisher {
 
-		public void publish();
+		void publish();
 
 		void subscribe(Subscriber sub);
 	}
@@ -73,7 +74,7 @@ class TestPubSubBinds {
 
 		@Override
 		public void publish() {
-			subs.forEach(sub -> sub.onEvent());
+			subs.forEach(Subscriber::onEvent);
 		}
 	}
 
@@ -111,7 +112,7 @@ class TestPubSubBinds {
 		}
 	}
 
-	private static class PubSubBindsModule extends BinderModule {
+	private static class TestExamplePubSubBindsModule1 extends BinderModule {
 
 		/**
 		 * Any of the below could have been in another module
@@ -134,14 +135,13 @@ class TestPubSubBinds {
 			init(PublisherImpl.class).forAny(Subscriber.class,
 					Publisher::subscribe);
 		}
-
 	}
 
 	/**
 	 * An alternative way is to use {@link #multibind(Class)} and
 	 * {@link InitBinder#forEach(Type, java.util.function.BiConsumer)}.
 	 */
-	private static class PubSubBindsModule2 extends BinderModule {
+	private static class TestExamplePubSubBindsModule2 extends BinderModule {
 
 		/**
 		 * Any of the below could have been in another module
@@ -171,22 +171,22 @@ class TestPubSubBinds {
 	}
 
 	@Test
-	void withEveryUpperBound() {
-		assertSubscribedToPublisher(PubSubBindsModule.class);
+	void withMultibindAndForAny() {
+		assertSubscribedToPublisher(TestExamplePubSubBindsModule1.class);
 	}
 
 	@Test
-	void withAllAndMultibind() {
-		assertSubscribedToPublisher(PubSubBindsModule2.class);
+	void withMultibindAndForEach() {
+		assertSubscribedToPublisher(TestExamplePubSubBindsModule2.class);
 	}
 
 	private static void assertSubscribedToPublisher(
 			Class<? extends Bundle> bundle) {
-		Injector injector = Bootstrap.injector(bundle);
-		Publisher pub = injector.resolve(Publisher.class);
-		SomeService sub = injector.resolve(SomeService.class);
-		AnotherService sub2 = injector.resolve(AnotherService.class);
-		PredefinedService sub3 = (PredefinedService) injector.resolve("pre",
+		Injector context = Bootstrap.injector(bundle);
+		Publisher pub = context.resolve(Publisher.class);
+		SomeService sub = context.resolve(SomeService.class);
+		AnotherService sub2 = context.resolve(AnotherService.class);
+		PredefinedService sub3 = (PredefinedService) context.resolve("pre",
 				Service.class);
 
 		assertFalse(sub.event);

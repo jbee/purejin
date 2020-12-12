@@ -5,56 +5,58 @@
  */
 package se.jbee.inject;
 
-import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Utils.arrayAppend;
-import static se.jbee.inject.lang.Utils.arrayContains;
-import static se.jbee.inject.lang.Utils.arrayEquals;
-
 import java.io.Serializable;
 
+import static se.jbee.inject.Name.named;
+import static se.jbee.inject.lang.Utils.*;
+
 /**
- * A {@link ScopePermanence} is a description for the life-cycle relations
+ * A {@link ScopeLifeCycle} is a description for the life-cycle relations
  * between one {@link Scope} and other {@link Scope}s which determines which
  * {@link Scope}s are valid to nest within each other and which are not.
  *
- * The {@link #scope} can also be made {@link #eager()} to have instances within
+ * The referenced {@link #scope} can also be made {@link #eager()} to have instances within
  * this {@link Scope} be created during bootstrapping when an {@link Injector}
- * context is created.
+ * context is created. By default {@link ScopeLifeCycle} are {@link #lazy()}.
  *
  * @since 8.1
  */
-public final class ScopePermanence implements Serializable {
+public final class ScopeLifeCycle implements Serializable {
 
-	public static final ScopePermanence ignore = scopePermanence(
+	public static final ScopeLifeCycle ignore = scopeLifeCycle(
 			named("@ignore")).permanent();
-	public static final ScopePermanence reference = scopePermanence(
+	public static final ScopeLifeCycle reference = scopeLifeCycle(
 			Scope.reference).permanent();
 
-	public static final ScopePermanence singleton = scopePermanence(
+	public static final ScopeLifeCycle singleton = scopeLifeCycle(
 			named("@singleton")).permanent();
 
-	public static final ScopePermanence container = singleton.derive(
+	public static final ScopeLifeCycle container = singleton.derive(
 			Scope.container);
 
-	public static final ScopePermanence unstable = scopePermanence(
+	public static final ScopeLifeCycle unstable = scopeLifeCycle(
 			named("@unstable"));
 
-	public static final ScopePermanence disk = scopePermanence(named("@disk"));
+	public static final ScopeLifeCycle disk = scopeLifeCycle(named("@disk"));
 
-	@SafeVarargs
-	public static ScopePermanence scopePermanence(Name scope,
-			Name... stableInScopes) {
-		return new ScopePermanence(scope, stableInScopes, false, false, null);
+	public static ScopeLifeCycle scopeLifeCycle(Name scope,
+			Name... consistentInScopes) {
+		return new ScopeLifeCycle(scope, consistentInScopes, false, false,
+				null);
 	}
 
+	/**
+	 * {@link Name} reference to the {@link Scope} this {@link ScopeLifeCycle}
+	 * describes
+	 */
 	public final Name scope;
 	private final Name[] consistentInScopes;
 	private final boolean permanent;
 	private final boolean eager;
-	private final ScopePermanence group;
+	private final ScopeLifeCycle group;
 
-	private ScopePermanence(Name scope, Name[] consistentInScopes,
-			boolean permanent, boolean eager, ScopePermanence group) {
+	private ScopeLifeCycle(Name scope, Name[] consistentInScopes,
+			boolean permanent, boolean eager, ScopeLifeCycle group) {
 		this.scope = scope;
 		this.permanent = permanent;
 		this.consistentInScopes = consistentInScopes;
@@ -62,13 +64,13 @@ public final class ScopePermanence implements Serializable {
 		this.group = group;
 	}
 
-	public ScopePermanence permanent() {
-		return new ScopePermanence(scope, consistentInScopes, true, eager,
+	public ScopeLifeCycle permanent() {
+		return new ScopeLifeCycle(scope, consistentInScopes, true, eager,
 				group);
 	}
 
 	/**
-	 * Declares this {@link ScopePermanence} as being stable in the given
+	 * Declares this {@link ScopeLifeCycle} as being stable in the given
 	 * parent.
 	 *
 	 * Declares the given parent {@link Scope} at least as stable as this scope.
@@ -78,38 +80,38 @@ public final class ScopePermanence implements Serializable {
 	 * @param parent another {@link Scope} type
 	 * @return this for chaining
 	 */
-	public ScopePermanence canBeInjectedInto(Name parent) {
-		return new ScopePermanence(scope,
+	public ScopeLifeCycle canBeInjectedInto(Name parent) {
+		return new ScopeLifeCycle(scope,
 				arrayAppend(consistentInScopes, parent), permanent, eager,
 				group);
 	}
 
-	private ScopePermanence groupedAs(ScopePermanence group) {
+	private ScopeLifeCycle groupedAs(ScopeLifeCycle group) {
 		if (!group.isGroup())
 			throw new IllegalArgumentException(
 					"Scoping is not a group: " + group);
-		return new ScopePermanence(scope, group.consistentInScopes,
+		return new ScopeLifeCycle(scope, group.consistentInScopes,
 				group.permanent, group.eager, group);
 	}
 
-	public ScopePermanence derive(Name scope) {
-		return scopePermanence(scope).groupedAs(this);
+	public ScopeLifeCycle derive(Name scope) {
+		return scopeLifeCycle(scope).groupedAs(this);
 	}
 
-	public ScopePermanence eager() {
+	public ScopeLifeCycle eager() {
 		if (!isPermanent())
 			throw new IllegalStateException(
 					"Must be permanent to become eager but was " + this);
-		return new ScopePermanence(scope, consistentInScopes, true, true,
+		return new ScopeLifeCycle(scope, consistentInScopes, true, true,
 				group);
 	}
 
-	public ScopePermanence lazy() {
-		return new ScopePermanence(scope, consistentInScopes, permanent, false,
+	public ScopeLifeCycle lazy() {
+		return new ScopeLifeCycle(scope, consistentInScopes, permanent, false,
 				group);
 	}
 
-	public boolean equalTo(ScopePermanence other) {
+	public boolean equalTo(ScopeLifeCycle other) {
 		return scope.equalTo(other.scope) && permanent == other.permanent //
 			&& eager == other.eager //
 			&& arrayEquals(consistentInScopes, other.consistentInScopes,
@@ -126,8 +128,8 @@ public final class ScopePermanence implements Serializable {
 		return scope.value.startsWith("@");
 	}
 
-	public boolean isConsistentIn(ScopePermanence other) {
-		return isPermanent() || other.isIgnore() || isIgnore()
+	public boolean isConsistentIn(ScopeLifeCycle other) {
+		return isPermanent() || other.isIgnored() || isIgnored()
 			|| arrayContains(consistentInScopes, s -> s.equalTo(other.scope))
 			|| other.group != null && arrayContains(consistentInScopes,
 					s -> s.equalTo(other.group.scope))
@@ -136,12 +138,12 @@ public final class ScopePermanence implements Serializable {
 
 	@Override
 	public String toString() {
-		return isIgnore() ? "*" : scope.toString() + (eager ? "!" : "");
+		return isIgnored() ? "*" : scope.toString() + (eager ? "!" : "");
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		return obj instanceof ScopePermanence && equalTo((ScopePermanence) obj);
+		return obj instanceof ScopeLifeCycle && equalTo((ScopeLifeCycle) obj);
 	}
 
 	@Override
@@ -149,14 +151,15 @@ public final class ScopePermanence implements Serializable {
 		return scope.hashCode();
 	}
 
-	public boolean isIgnore() {
+	public boolean isIgnored() {
 		return this == ignore;
 	}
 
 	/**
-	 * @return when {@code true} instances with this {@link ScopePermanence} are
-	 *         stable, that means once created, they exist throughout the
-	 *         life-span of the application (the {@link Injector} context).
+	 * @return when {@code true} instances with this {@link ScopeLifeCycle}
+	 * exist throughout the life-span of the application (the {@link Injector}
+	 * context) wherefore there cannot be issues of stale state with instances
+	 * in this scope.
 	 */
 	public boolean isPermanent() {
 		return permanent;

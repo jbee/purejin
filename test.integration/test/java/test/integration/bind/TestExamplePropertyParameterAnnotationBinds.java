@@ -113,7 +113,8 @@ class TestExamplePropertyParameterAnnotationBinds {
 		final String property1;
 		final String property2;
 
-		public ExampleBean(@Property("foo") String property1,
+		public ExampleBean(
+				@Property("foo") String property1,
 				@Property("bar") String property2) {
 			this.property1 = property1;
 			this.property2 = property2;

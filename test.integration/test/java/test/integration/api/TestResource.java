@@ -30,7 +30,7 @@ class TestResource {
 
 	private Resource<?> createResourceOf(int serialID, Type<?> type) {
 		Source source = Source.source(getClass());
-		return new Resource<>(serialID, source, ScopePermanence.ignore,
+		return new Resource<>(serialID, source, ScopeLifeCycle.ignore,
 				new Locator<>(Instance.anyOf(type)),
 				Annotated.EMPTY, Verifier.AOK,
 				resource -> (dep -> null));

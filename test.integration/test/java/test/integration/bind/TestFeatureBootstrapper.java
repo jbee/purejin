@@ -19,7 +19,6 @@ import java.lang.annotation.Target;
 import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static se.jbee.inject.Resource.resourcesTypeOf;
 import static se.jbee.inject.Hint.relativeReferenceTo;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.config.ConstructsBy.common;
@@ -31,7 +30,7 @@ import static se.jbee.inject.lang.Type.raw;
  * valid to make cyclic references or install the {@link Bundle}s multiple
  * times.
  */
-class TestInternalsBootstrapper {
+class TestFeatureBootstrapper {
 
 	/**
 	 * One of two bundles in a minimal example of mutual dependent bundles.
@@ -45,7 +44,6 @@ class TestInternalsBootstrapper {
 		protected void bootstrap() {
 			install(OtherMutualDependentBundle.class);
 		}
-
 	}
 
 	private static class OtherMutualDependentBundle extends BootstrapperBundle {
@@ -54,7 +52,6 @@ class TestInternalsBootstrapper {
 		protected void bootstrap() {
 			install(OneMutualDependentBundle.class);
 		}
-
 	}
 
 	/**
@@ -69,7 +66,6 @@ class TestInternalsBootstrapper {
 			bind(Integer.class).to(42);
 			bind(Integer.class).to(8);
 		}
-
 	}
 
 	private static class ReplacingBindsModule extends BinderModule {
@@ -83,7 +79,6 @@ class TestInternalsBootstrapper {
 			autobind(Double.class).to(42d);
 			bind(Number.class).to(6);
 		}
-
 	}
 
 	@SuppressWarnings("unused")
@@ -144,17 +139,16 @@ class TestInternalsBootstrapper {
 			bind(B.class).toConstructor(relativeReferenceTo(C.class));
 			bind(C.class).toConstructor(relativeReferenceTo(A.class));
 		}
-
 	}
 
 	private static class EagerSingletonsBindsModule extends BinderModule
 			implements Supplier<String> {
 
-		static int eagers = 0;
+		static int eagerCount = 0;
 
 		@Override
 		protected void declare() {
-			bindScopePermanence(ScopePermanence.singleton.derive(
+			bindScopeLifeCycle(ScopeLifeCycle.singleton.derive(
 					Scope.application).eager());
 			bind(named("eager"), String.class).toSupplier(this);
 			per(Scope.injection).bind(named("lazy"), String.class).toSupplier(
@@ -164,21 +158,21 @@ class TestInternalsBootstrapper {
 		@Override
 		public String supply(Dependency<? super String> dep, Injector context) {
 			if (!dep.instance.name.equalTo(named("lazy"))) {
-				eagers++;
+				eagerCount++;
 				return "eager";
 			}
 			fail("since it is lazy it should not be called");
 			return "fail";
 		}
-
 	}
 
-	private static class CustomMirrorBundle extends BootstrapperBundle {
+	private static class CustomConstructorSelectionStrategyBundle
+			extends BootstrapperBundle {
 
 		@Override
 		protected void bootstrap() {
 			install(DefaultScopes.class);
-			install(CustomMirrorModule.class);
+			install(CustomConstructorSelectionStrategyModule.class);
 		}
 	}
 
@@ -188,7 +182,8 @@ class TestInternalsBootstrapper {
 
 	}
 
-	private static class CustomMirrorModule extends BinderModule {
+	private static class CustomConstructorSelectionStrategyModule
+			extends BinderModule {
 
 		@Override
 		protected Env configure(Env env) {
@@ -226,29 +221,29 @@ class TestInternalsBootstrapper {
 	 */
 	@Test
 	@Timeout(1)
-	void thatBundlesAreNotBootstrappedMultipleTimesEvenWhenTheyAreMutual() {
+	void bundlesAreNotBootstrappedMultipleTimesEvenWhenTheyAreMutual() {
 		assertTimeout(Duration.ofMillis(100),
 				() -> Bootstrap.injector(OneMutualDependentBundle.class));
 	}
 
 	@Test
-	void thatNonUniqueResourcesThrowAnException() {
+	void nonUniqueResourcesThrowAnException() {
 		assertThrows(InconsistentDeclaration.class,
 				() -> Bootstrap.injector(ClashingBindsModule.class));
 	}
 
 	@Test
 	@Timeout(1)
-	void thatDependencyCyclesAreDetected() {
-		Injector injector = Bootstrap.injector(CyclicBindsModule.class);
-		assertThrows(DependencyCycle.class, () -> injector.resolve(Foo.class));
+	void dependencyCyclesAreDetected() {
+		Injector context = Bootstrap.injector(CyclicBindsModule.class);
+		assertThrows(DependencyCycle.class, () -> context.resolve(Foo.class));
 	}
 
 	@Test
 	@Timeout(1)
-	void thatDependencyCyclesInCirclesAreDetected() {
-		Injector injector = Bootstrap.injector(CircularBindsModule.class);
-		assertThrows(DependencyCycle.class, () -> injector.resolve(A.class));
+	void dependencyCyclesInCirclesAreDetected() {
+		Injector context = Bootstrap.injector(CircularBindsModule.class);
+		assertThrows(DependencyCycle.class, () -> context.resolve(A.class));
 	}
 
 	/**
@@ -258,33 +253,30 @@ class TestInternalsBootstrapper {
 	 * {@link Generator} is created for them.
 	 */
 	@Test
-	void thatBindingsAreReplacedByMoreQualiedOnes() {
-		Injector injector = Bootstrap.injector(ReplacingBindsModule.class);
-		assertEquals(6, injector.resolve(Number.class));
-		Resource<?>[] rs = injector.resolve(raw(Resource.class).parametized(
+	void bindingsAreReplacedByMoreQualifiedOnes() {
+		Injector context = Bootstrap.injector(ReplacingBindsModule.class);
+		assertEquals(6, context.resolve(Number.class));
+		Resource<?>[] rs = context.resolve(raw(Resource.class).parametized(
 				Number.class).parametizedAsUpperBounds().addArrayDimension());
 		//TODO can this be limited to cases with a certain Scope so that container can be excluded?
 		assertEquals(4, rs.length);
-		Resource<Number>[] forNumber = injector.resolve(
-				Resource.resourcesTypeOf(Number.class));
-		assertEquals(1, forNumber.length);
-		@SuppressWarnings("rawtypes")
-		Resource<Comparable>[] forCompareable = injector.resolve(
-				Resource.resourcesTypeOf(Comparable.class));
-		assertEquals(3, forCompareable.length);
+		assertEquals(1,
+				context.resolve(Resource.resourcesTypeOf(Number.class)).length);
+		assertEquals(3, context.resolve(
+				Resource.resourcesTypeOf(Comparable.class)).length);
 	}
 
 	@Test
-	void thatEagerSingeltonsCanBeCreated() {
+	void eagerSingletonsAreCreated() {
+		Injector context = Bootstrap.injector(EagerSingletonsBindsModule.class);
+		assertNotNull(context);
+		assertEquals(1, EagerSingletonsBindsModule.eagerCount);
+	}
+
+	@Test
+	void customConstructorSelectionStrategyIsUsedToPickConstructor() {
 		Injector injector = Bootstrap.injector(
-				EagerSingletonsBindsModule.class);
-		assertNotNull(injector);
-		assertEquals(1, EagerSingletonsBindsModule.eagers);
-	}
-
-	@Test
-	void thatCustomMirrorIsUsedToPickConstructor() {
-		Injector injector = Bootstrap.injector(CustomMirrorBundle.class);
+				CustomConstructorSelectionStrategyBundle.class);
 		assertEquals("will be passed to D", injector.resolve(D.class).s);
 	}
 

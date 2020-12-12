@@ -13,7 +13,7 @@ import static se.jbee.inject.lang.Type.raw;
  * A {@link Generator} creates the instance(s) for the generator's
  * {@link Resource}.
  *
- * When binding directly to a {@link Generator} any {@link ScopePermanence} will be
+ * When binding directly to a {@link Generator} any {@link ScopeLifeCycle} will be
  * ineffective since the supplied {@link Generator} will directly be asked to
  * {@link #generate(Dependency)} the instance for the dependency. This can be used
  * to implement instance management different to the one provided by

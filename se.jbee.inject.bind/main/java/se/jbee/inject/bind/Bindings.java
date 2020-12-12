@@ -152,14 +152,14 @@ public final class Bindings {
 	/**
 	 * In contrast to {@link #supplyConstant(Object)} which does supply the
 	 * constant as {@link Generator} and thereby does not support custom
-	 * {@link ScopePermanence} or {@link Scope}s this way of supplying the
+	 * {@link ScopeLifeCycle} or {@link Scope}s this way of supplying the
 	 * constant will treat the constant as bean, that is like any "dynamically"
 	 * supplied value.
 	 *
 	 * @param <T> type of the constant
-	 * @param constant a bean that requires {@link ScopePermanence} effects.
+	 * @param constant a bean that requires {@link ScopeLifeCycle} effects.
 	 * @return A {@link Supplier} that supplies the given constant with
-	 *         {@link ScopePermanence} effects.
+	 *         {@link ScopeLifeCycle} effects.
 	 */
 	public static <T> Supplier<T> supplyScopedConstant(T constant) {
 		return (dep, context) -> constant;
@@ -167,7 +167,7 @@ public final class Bindings {
 
 	/**
 	 * Since the {@link Supplier} also implements {@link Generator} it is used
-	 * directly without any {@link ScopePermanence} effects. Effectively a
+	 * directly without any {@link ScopeLifeCycle} effects. Effectively a
 	 * constant always has the {@link Scope#container}.
 	 *
 	 * The implementation also implements {@link #equals(Object)} and

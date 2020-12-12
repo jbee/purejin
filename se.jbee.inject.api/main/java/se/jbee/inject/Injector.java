@@ -101,7 +101,7 @@ public interface Injector {
 	 * Keep in mind that any instance implementing {@link Observer} is created
 	 * ahead of the tracking so these cannot be tracked themselves even if they
 	 * qualify as instances in a permanent scope ({@link
-	 * ScopePermanence#isPermanent()}).
+	 * ScopeLifeCycle#isPermanent()}).
 	 *
 	 * @since 8.1
 	 */
@@ -114,7 +114,7 @@ public interface Injector {
 		 * <p>
 		 * Note that this method is only called for typical "singleton"
 		 * instances of an application with a permanent scope ({@link
-		 * ScopePermanence#isPermanent()}).
+		 * ScopeLifeCycle#isPermanent()}).
 		 *
 		 * @param resource the {@link Resource} that is the source of the
 		 *                 provided instance

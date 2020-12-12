@@ -11,41 +11,45 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static se.jbee.inject.Resource.resourcesTypeOf;
-import static se.jbee.inject.ScopePermanence.ignore;
+import static se.jbee.inject.ScopeLifeCycle.ignore;
 
 /**
- * Verifies the {@link ScopePermanence} of the {@link DefaultScopes}.
+ * Verifies the {@link ScopeLifeCycle} of the {@link DefaultScopes}.
+ *
+ * BTW both {@link Scope}s and {@link ScopeLifeCycle}s are managed instances
+ * that can be resolved in the {@link Injector} context.
+ *
+ * {@link Scope} implementation may also have dependencies.
  */
-class TestScopePermanenceBinds {
+class TestFeatureScopeLifeCycleBinds {
 
 	static final Name requestScope = Name.named("request");
 
-	static final class TestScopePermanenceBindsModule extends BinderModule {
+	static final class TestFeatureScopeLifeCycleBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			bindScopePermanence(requestScope).toFactory(
+			bindScopeLifeCycle(requestScope).toFactory(
 					context -> context.resolve(Scope.worker,
-							ScopePermanence.class).derive(requestScope));
+							ScopeLifeCycle.class).derive(requestScope));
 		}
 
 	}
 
-	private final Injector injector = Bootstrap.injector(
-			TestScopePermanenceBindsModule.class);
+	private final Injector context = Bootstrap.injector(
+			TestFeatureScopeLifeCycleBindsModule.class);
 
-	private final Map<Name, ScopePermanence> permanenceByScope = new HashMap<>();
+	private final Map<Name, ScopeLifeCycle> lifeCycleByScope = new HashMap<>();
 
 	@BeforeEach
 	void setup() {
-		for (ScopePermanence s : injector.resolve(ScopePermanence[].class))
-			permanenceByScope.put(s.scope, s);
-		permanenceByScope.put(ignore.scope, ignore);
+		for (ScopeLifeCycle s : context.resolve(ScopeLifeCycle[].class))
+			lifeCycleByScope.put(s.scope, s);
+		lifeCycleByScope.put(ignore.scope, ignore);
 	}
 
-	private ScopePermanence getPermanence(Name scope) {
-		return permanenceByScope.get(scope);
+	private ScopeLifeCycle getLifeCycle(Name scope) {
+		return lifeCycleByScope.get(scope);
 	}
 
 	@Test
@@ -109,13 +113,13 @@ class TestScopePermanenceBinds {
 
 	@Test
 	void ignoreIsConsistentInAnyOtherScope() {
-		assertPermanentScope(ScopePermanence.ignore);
+		assertPermanentScope(ScopeLifeCycle.ignore);
 	}
 
 	@Test
-	void defaultScopePermanencesAreBoundAsDefaults() {
-		for (Resource<ScopePermanence> r : injector.resolve(
-				Resource.resourcesTypeOf(ScopePermanence.class))) {
+	void defaultScopeLifeCyclesAreBoundAsDefaults() {
+		for (Resource<ScopeLifeCycle> r : context.resolve(
+				Resource.resourcesTypeOf(ScopeLifeCycle.class))) {
 			if (!r.signature.instance.name.equalTo(requestScope))
 				assertEquals(DeclarationType.DEFAULT, r.source.declarationType);
 		}
@@ -123,7 +127,7 @@ class TestScopePermanenceBinds {
 
 	@Test
 	void defaultScopesAreBoundAsDefaults() {
-		for (Resource<Scope> r : injector.resolve(
+		for (Resource<Scope> r : context.resolve(
 				Resource.resourcesTypeOf(Scope.class))) {
 			if (!r.signature.instance.name.equalTo(requestScope))
 				assertEquals(DeclarationType.DEFAULT, r.source.declarationType);
@@ -131,20 +135,20 @@ class TestScopePermanenceBinds {
 	}
 
 	private void assertIsConsistentIn(Name leftScope, Name rightScope) {
-		assertTrue(getPermanence(leftScope).isConsistentIn(
-				getPermanence(rightScope)));
+		assertTrue(getLifeCycle(leftScope) //
+				.isConsistentIn(getLifeCycle(rightScope)));
 	}
 
 	private void assertIsNotConsistentIn(Name leftScope, Name rightScope) {
-		assertFalse(getPermanence(leftScope).isConsistentIn(
-				getPermanence(rightScope)));
+		assertFalse(getLifeCycle(leftScope) //
+				.isConsistentIn(getLifeCycle(rightScope)));
 	}
 
 	private void assertPermanentScope(Name scope) {
-		assertPermanentScope(getPermanence(scope));
+		assertPermanentScope(getLifeCycle(scope));
 	}
 
-	private void assertPermanentScope(ScopePermanence tested) {
+	private void assertPermanentScope(ScopeLifeCycle tested) {
 		assertTrue(tested.isPermanent());
 		assertTrue(tested.isConsistentIn(tested));
 		Name scope = tested.scope;

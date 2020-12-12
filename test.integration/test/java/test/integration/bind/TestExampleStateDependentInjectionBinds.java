@@ -13,21 +13,40 @@ import test.integration.util.Resource;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static se.jbee.inject.Provider.providerTypeOf;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
+import static se.jbee.inject.Provider.providerTypeOf;
 import static se.jbee.inject.config.HintsBy.noParameters;
 import static se.jbee.inject.config.NamesBy.defaultName;
 import static se.jbee.inject.config.ProducesBy.allMethods;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
- * This test demonstrates how to switch between different implementations during
- * runtime dependent on a setting in some setting object. This example shows
- * also how to extend the {@link BinderModule} to introduce a custom utility
- * such as {@link RouterModule#connect(Class)}
+ * The {@link Injector} context is "immutable" once it is created. This refer to
+ * the {@link se.jbee.inject.Resource}s it has to generate instances. Within the
+ * {@link Scope}s generated instances "accumulate" as they get resolved.
+ * <p>
+ * In such an "non-dynamic" concept it might appear that it is hard to do
+ * dynamic injection. This is not the case. The core idea is that a {@link
+ * Supplier} can use any information available in an {@link Injector} context to
+ * decide what value it should return. If a {@link Scope} is chosen like {@link
+ * Scope#injection} that resolves the returned result each time it is requested
+ * the decision can be made dynamic.
+ * <p>
+ * In this test this it is shown how to make the value injected dependent on the
+ * state of another object.
+ * <p>
+ * This is a more advanced example that introduces a new type of {@link
+ * se.jbee.inject.bind.Module}, the {@link RouterModule}, which adds a new
+ * fluent API to make this type of state dependent wiring less repetitive and
+ * easier to read and write.
+ * <p>
+ * In the first scenario we have a {@link Validator} abstraction and with a
+ * {@link Strict} and a {@link Permissive} implementation. A {@link
+ * ValidationStrength} in another bean is used as the state or setting that
+ * controls what actual {@link Validator} should be used (injected).
  */
-class TestStateDependentBinds {
+class TestExampleStateDependentInjectionBinds {
 
 	@FunctionalInterface interface Validator {
 
@@ -118,7 +137,6 @@ class TestStateDependentBinds {
 			binder.per(Scope.injection).bind(type).toSupplier(
 					stateDependent(type, Dependency.dependency(state)));
 		}
-
 	}
 
 	/**
@@ -126,8 +144,6 @@ class TestStateDependentBinds {
 	 * current {@link ValidationStrength} value. This can be understand as a
 	 * dynamic <i>name</i> switch so that a call is resolved to different named
 	 * instances.
-	 *
-	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	public static final class StateDependentSupplier<T, S>
 			implements Supplier<T> {
@@ -165,7 +181,7 @@ class TestStateDependentBinds {
 	 * This module demonstrates state dependent binds on a low level using
 	 * general binds.
 	 */
-	private static class StateDependentBindsModule1 extends BinderModule {
+	private static class Solution1 extends BinderModule {
 
 		@Override
 		protected void declare() {
@@ -173,10 +189,10 @@ class TestStateDependentBinds {
 					stateDependent(Type.raw(Validator.class),
 							dependency(ValidationStrength.class)));
 
-			bind(named(ValidationStrength.PERMISSIVE), Validator.class).to(
-					Permissive.class);
-			bind(named(ValidationStrength.STRICT), Validator.class).to(
-					Strict.class);
+			bind(named(ValidationStrength.PERMISSIVE), Validator.class) //
+					.to(Permissive.class);
+			bind(named(ValidationStrength.STRICT), Validator.class) //
+					.to(Strict.class);
 			bind(named((Object) null), Validator.class).to(Permissive.class);
 
 			// the below is just *a* example - it is just important to provide the 'value' per injection
@@ -193,22 +209,20 @@ class TestStateDependentBinds {
 	}
 
 	/**
-	 * The same as above using {@link #connect(Class)}s. The important
-	 * difference is that it is not required to manually bind to a
+	 * The same as {@link Solution1} using {@link #connect(Class)}s. The
+	 * important difference is that it is not required to manually bind to a
 	 * {@link ValidationStrength} value.
-	 *
-	 * @author Jan Bernitt (jan@jbee.se)
 	 */
-	private static class StateDependentBindsModule2 extends RouterModule {
+	private static class Solution2 extends RouterModule {
 
 		@Override
 		protected void declare() {
 			route(Validator.class).via(ValidationStrength.class);
 
-			bind(named(ValidationStrength.PERMISSIVE), Validator.class).to(
-					Permissive.class);
-			bind(named(ValidationStrength.STRICT), Validator.class).to(
-					Strict.class);
+			bind(named(ValidationStrength.PERMISSIVE), Validator.class) //
+					.to(Permissive.class);
+			bind(named(ValidationStrength.STRICT), Validator.class) //
+					.to(Strict.class);
 			bind(named((Object) null), Validator.class).to(Permissive.class);
 
 			// the below is just *a* example - it is just important to provide the 'value' per injection
@@ -220,7 +234,11 @@ class TestStateDependentBinds {
 
 	}
 
-	private static class StateDependentBindsModule3 extends RouterModule {
+	/**
+	 * Same as {@link Solution2} but instead of an {@link Enum} the state is a
+	 * {@link Integer} number.
+	 */
+	private static class Solution3 extends RouterModule {
 
 		@Override
 		protected void declare() {
@@ -241,49 +259,50 @@ class TestStateDependentBinds {
 
 	}
 
-	private static class StateDependentBindsBundle extends BootstrapperBundle {
+	private static class Solution1Bundle extends BootstrapperBundle {
 
 		@Override
 		protected void bootstrap() {
-			install(StateDependentBindsModule1.class);
+			install(Solution1.class);
 			install(CoreFeature.PROVIDER);
 		}
-
 	}
 
 	@Test
 	void thatStateChangeIsResolvedToAnotherImplementation() {
-		Injector injector = Bootstrap.injector(
-				StateDependentBindsModule1.class);
-		assertStateChangeIsResolvedToAnotherImplementation(injector);
+		Injector context = Bootstrap.injector(Solution1.class);
+		assertStateChangeIsResolvedToAnotherImplementation(context);
 	}
 
 	@Test
 	void thatStateChangeIsResolvedToAnotherImplementation2() {
-		Injector injector = Bootstrap.injector(
-				StateDependentBindsModule2.class);
-		assertStateChangeIsResolvedToAnotherImplementation(injector);
+		Injector context = Bootstrap.injector(Solution2.class);
+		assertStateChangeIsResolvedToAnotherImplementation(context);
 	}
 
 	private static void assertStateChangeIsResolvedToAnotherImplementation(
-			Injector injector) {
-		StatefulObject config = injector.resolve(StatefulObject.class);
-		Validator v = injector.resolve(Validator.class);
+			Injector context) {
+		StatefulObject config = context.resolve(StatefulObject.class);
+		Validator v = context.resolve(Validator.class);
 		String input = "input";
 		assertTrue(v.valid(input)); // default was PERMISSIVE
 		config.setValidationStrength(ValidationStrength.STRICT);
-		v = injector.resolve(Validator.class);
+		v = context.resolve(Validator.class);
 		assertFalse(v.valid(input)); // STRICT
 		config.setValidationStrength(ValidationStrength.PERMISSIVE);
-		v = injector.resolve(Validator.class);
+		v = context.resolve(Validator.class);
 		assertTrue(v.valid(input)); // PERMISSIVE
 	}
 
+	/**
+	 * When using a {@link Provider} we do not need to resolve the {@link
+	 * Validator} each time a state change occurs.
+	 */
 	@Test
-	void thatStateChangeIsProvidedToAnotherImplementation() {
-		Injector injector = Bootstrap.injector(StateDependentBindsBundle.class);
-		StatefulObject config = injector.resolve(StatefulObject.class);
-		Provider<Validator> v = injector.resolve(
+	void stateChangeIsVisibleThroughProviderIndirection() {
+		Injector context = Bootstrap.injector(Solution1Bundle.class);
+		StatefulObject config = context.resolve(StatefulObject.class);
+		Provider<Validator> v = context.resolve(
 				providerTypeOf(Validator.class));
 		String input = "input";
 		assertTrue(v.provide().valid(input));
@@ -294,7 +313,7 @@ class TestStateDependentBinds {
 	}
 
 	@Test
-	void thatStateChangeIsResolvedUsingNamedInstances() {
+	void stateChangeIsResolvedUsingNamedInstances() {
 		assertConfigNumberResolvedToStringEnding(null, "undefined");
 		assertConfigNumberResolvedToStringEnding(7, "7");
 		assertConfigNumberResolvedToStringEnding(42, "42");
@@ -303,11 +322,10 @@ class TestStateDependentBinds {
 
 	private static void assertConfigNumberResolvedToStringEnding(
 			Integer actualValue, String ending) {
-		Injector injector = Bootstrap.injector(
-				StateDependentBindsModule3.class);
-		StatefulObject state = injector.resolve(StatefulObject.class);
+		Injector context = Bootstrap.injector(Solution3.class);
+		StatefulObject state = context.resolve(StatefulObject.class);
 		state.setNumber(actualValue);
-		String v = injector.resolve(String.class);
+		String v = context.resolve(String.class);
 		assertTrue(v.endsWith(ending));
 	}
 }

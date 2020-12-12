@@ -8,7 +8,11 @@ import se.jbee.inject.scope.TypeDependentScope;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static se.jbee.inject.Dependency.dependency;
 
-class TestTypeDependentScopes {
+/**
+ * A basic test verifying the {@link TypeDependentScope} implementation behaves
+ * as expected.
+ */
+class TestFeatureTypeDependentScopes {
 
 	static class A {
 		// just for test
@@ -19,7 +23,7 @@ class TestTypeDependentScopes {
 	}
 
 	@Test
-	void thatDependencyTypeScopeEnsuresSingletonPerExactGenericType() {
+	void dependencyTypeScopeEnsuresSingletonPerExactGenericType() {
 		Scope scope = new TypeDependentScope(TypeDependentScope::typeSignature);
 		A a = new A();
 		B b = new B();

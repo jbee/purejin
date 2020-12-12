@@ -60,7 +60,7 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 	 * The information on this {@link Scope} behaviour in relation to other
 	 * {@link Scope}s.
 	 */
-	public final ScopePermanence permanence;
+	public final ScopeLifeCycle permanence;
 
 	/**
 	 * The serial ID of this {@link Resource}. It is unique within the same
@@ -83,7 +83,7 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 	 */
 	public final Verifier verifier;
 
-	public Resource(int serialID, Source source, ScopePermanence permanence,
+	public Resource(int serialID, Source source, ScopeLifeCycle permanence,
 			Locator<T> signature, Annotated annotations, Verifier verifier,
 			Function<Resource<T>, Generator<T>> generator) {
 		this.signature = signature;
@@ -97,7 +97,7 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 	}
 
 	private Resource( int serialID,  Source source,
-			ScopePermanence permanence, Locator<T> signature, Annotated annotations,
+			ScopeLifeCycle permanence, Locator<T> signature, Annotated annotations,
 			Verifier verifier, Generator<T> generator) {
 		this.generator = generator;
 		this.signature = signature;

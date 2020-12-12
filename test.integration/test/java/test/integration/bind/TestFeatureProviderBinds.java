@@ -15,13 +15,39 @@ import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.*;
-import static se.jbee.inject.lang.Cast.listTypeOf;
-import static se.jbee.inject.Provider.providerTypeOf;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
+import static se.jbee.inject.Provider.providerTypeOf;
+import static se.jbee.inject.lang.Cast.listTypeOf;
 import static se.jbee.inject.lang.Type.raw;
 
-class TestProviderBinds {
+/**
+ * {@link Provider}s are a common concept in dependency injection used to inject
+ * instances with an unstable {@link Scope} into those with a more stable {@link
+ * Scope} without running the risk of accessing stale state.
+ * <p>
+ * This is simply done by not injecting the unstable type directly into the more
+ * stable one but by wrapping it into the {@link Provider} indirection. To
+ * access the current valid value when needed {@link Provider#provide()} is
+ * called right before the value is needed.
+ * <p>
+ * In most dependency injection frameworks and libraries the burden to use
+ * {@link Provider}s where needed lies upon the user and mistakes simply
+ * manifest inconsistent runtime behaviour and the underlying scoping issue has
+ * to be identified by the user.
+ * <p>
+ * To lift this burden purejin has the concept of {@link ScopeLifeCycle}s where
+ * {@link Scope}s declare their stability or consistency in relation to each
+ * other. This is done as part of the {@link se.jbee.inject.defaults.DefaultScopes}
+ * but users can define their own scopes or redefine existing ones with
+ * different {@link ScopeLifeCycle}. The {@link Injector} uses the {@link
+ * ScopeLifeCycle} information to detect faulty relations at injection.
+ * <p>
+ * The {@link Provider} can then be used to overcome the limitations and allow
+ * injecting unstable dependencies into stable ones. By default this feature
+ * is not installed. To enable it install {@link CoreFeature#PROVIDER}.
+ */
+class TestFeatureProviderBinds {
 
 	static final DynamicState DYNAMIC_STATE_IN_A = new DynamicState();
 	static final DynamicState DYNAMIC_STATE_IN_B = new DynamicState();
@@ -31,7 +57,7 @@ class TestProviderBinds {
 	static final Instance<WorkingStateConsumer> B = instance(named("B"),
 			raw(WorkingStateConsumer.class));
 
-	private static class ProviderBindsModule extends BinderModule {
+	private static class TestFeatureProviderBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
@@ -53,12 +79,12 @@ class TestProviderBinds {
 
 	}
 
-	private static class ProviderBindsBundle extends BootstrapperBundle {
+	private static class TestFeatureProviderBindsBundle extends BootstrapperBundle {
 
 		@Override
 		protected void bootstrap() {
 			installAll(CoreFeature.class);
-			install(ProviderBindsModule.class);
+			install(TestFeatureProviderBindsModule.class);
 		}
 
 	}
@@ -93,8 +119,8 @@ class TestProviderBinds {
 		}
 	}
 
-	private final Injector injector = Bootstrap.injector(
-			ProviderBindsBundle.class);
+	private final Injector context = Bootstrap.injector(
+			TestFeatureProviderBindsBundle.class);
 
 	@Test
 	void providersAreAvailableForAnyBoundType() {
@@ -109,7 +135,7 @@ class TestProviderBinds {
 
 	@Test
 	void providersAreAvailableForArrays() {
-		WorkingStateConsumer state = injector.resolve(
+		WorkingStateConsumer state = context.resolve(
 				WorkingStateConsumer.class);
 		assertNotNull(state.strings);
 		String[] strings = state.strings.provide();
@@ -133,34 +159,31 @@ class TestProviderBinds {
 
 	@Test
 	void providersOvercomeScopingConflicts() {
-		assertNotNull(injector.resolve(WorkingStateConsumer.class));
+		assertNotNull(context.resolve(WorkingStateConsumer.class));
 	}
 
 	@Test
 	void scopingConflictsCauseException() {
-		try {
-			injector.resolve(FaultyStateConsumer.class);
-			fail("expected " + UnstableDependency.class.getSimpleName());
-		} catch (UnstableDependency e) {
-			assertEquals("Unstable dependency injection" +
-							"\n" + "\t  of: test.integration.bind.TestProviderBinds.DynamicState  in * into * => *  scoped injection" +
-							"\n" + "\tinto: test.integration.bind.TestProviderBinds.FaultyStateConsumer  in * into * => *  scoped application",
-					e.getMessage());
-		}
+		Exception ex = assertThrows(UnstableDependency.class,
+				() -> context.resolve(FaultyStateConsumer.class));
+		assertEquals("Unstable dependency injection" +
+						"\n" + "\t  of: test.integration.bind.TestFeatureProviderBinds.DynamicState  in * into * => *  scoped injection" +
+						"\n" + "\tinto: test.integration.bind.TestFeatureProviderBinds.FaultyStateConsumer  in * into * => *  scoped application",
+				ex.getMessage());
 	}
 
 	@Test
 	void providersKeepHierarchySoProvidedDependencyIsResolvedAsIfResolvedDirectly() {
-		WorkingStateConsumer a = injector.resolve(A);
+		WorkingStateConsumer a = context.resolve(A);
 		assertSame(DYNAMIC_STATE_IN_A, a.state());
-		WorkingStateConsumer b = injector.resolve(B);
+		WorkingStateConsumer b = context.resolve(B);
 		assertNotSame(a, b);
 		assertSame(DYNAMIC_STATE_IN_B, b.state());
 	}
 
 	@Test
 	void providersCanBeCombinedWithOtherBridges() {
-		Provider<List<WorkingStateConsumer>> provider = injector.resolve(
+		Provider<List<WorkingStateConsumer>> provider = context.resolve(
 				providerTypeOf(listTypeOf(WorkingStateConsumer.class)));
 		assertNotNull(provider);
 		List<WorkingStateConsumer> consumers = provider.provide();
@@ -172,7 +195,7 @@ class TestProviderBinds {
 
 	@Test
 	void providerCanProvidePerInjectionInstanceWithinAnPerApplicationParent() {
-		WorkingStateConsumer obj = injector.resolve(WorkingStateConsumer.class);
+		WorkingStateConsumer obj = context.resolve(WorkingStateConsumer.class);
 		assertNotNull(obj.state()); // if expiry is a problem this will throw an exception
 	}
 
@@ -183,7 +206,7 @@ class TestProviderBinds {
 
 	private <T> void assertInjectsProviderFor(T expected,
 			Type<? extends T> dependencyType, Name name) {
-		Provider<?> provider = injector.resolve(name,
+		Provider<?> provider = context.resolve(name,
 				providerTypeOf(dependencyType));
 		assertEquals(expected, provider.provide());
 	}

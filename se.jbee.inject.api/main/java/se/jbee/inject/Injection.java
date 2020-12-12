@@ -1,6 +1,6 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject;
@@ -16,10 +16,10 @@ public final class Injection implements Serializable {
 
 	public final Instance<?> dependency;
 	public final Locator<?> target;
-	public final ScopePermanence permanence;
+	public final ScopeLifeCycle permanence;
 
 	public Injection(Instance<?> dependency, Locator<?> target,
-			ScopePermanence permanence) {
+			ScopeLifeCycle permanence) {
 		this.dependency = dependency;
 		this.target = target;
 		this.permanence = permanence;
@@ -46,6 +46,6 @@ public final class Injection implements Serializable {
 	}
 
 	public Injection ignoredScoping() {
-		return new Injection(dependency, target, ScopePermanence.ignore);
+		return new Injection(dependency, target, ScopeLifeCycle.ignore);
 	}
 }

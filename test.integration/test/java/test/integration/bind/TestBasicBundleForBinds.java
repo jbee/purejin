@@ -16,32 +16,31 @@ import se.jbee.inject.bootstrap.Environment;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 /**
- * The test demonstrates how to use {@link Toggled} and the
- * {@link BundleFor} to allow different bootstrapping depended on a toggle
- * property set in the {@link Env}.
- *
- * This technique should avoid if-statements in the {@link Bundle}s and
- * {@link Module}s itself to get manageable and predictable sets of
- * configurations that can be composed easily using arguments to the
- * bootstrapping process itself.
- *
+ * The test demonstrates how to use {@link Toggled} and the {@link BundleFor} to
+ * allow different bootstrapping depended on a toggle property set in the {@link
+ * Env}.
+ * <p>
+ * This technique avoids using if-statements in the {@link Bundle}s and {@link
+ * Module}s itself to get manageable and predictable sets of configurations that
+ * can be composed easily using arguments to the bootstrapping process itself.
+ * <p>
  * In this example we use {@link Binder#multibind(Class)}s to show that just one
- * of them has been bootstrapped depending on the value we defined in the
- * toggled property before bootstrapping.
+ * of the bundles has been installed depending on the value we defined {@link
+ * Env} for the {@link Machine} which is our toggle property.
  */
-class TestToggledBinds {
+class TestBasicBundleForBinds {
 
 	private enum Machine {
 		LOCALHOST, WORKER_1
 	}
 
-	private static class ModularBindsBundle extends BootstrapperBundle {
+	private static class TestBasicBundleForBindsBundle
+			extends BootstrapperBundle {
 
 		@Override
 		protected void bootstrap() {
 			install(MachineBundle.class, Machine.class);
 		}
-
 	}
 
 	/**
@@ -87,21 +86,22 @@ class TestToggledBinds {
 	}
 
 	@Test
-	void thatBundleOfTheGivenConstGotBootstrappedAndOthersNot() {
+	void bundleOfTheGivenConstGotBootstrappedAndOthersNot() {
 		assertChoiceResolvedToValue(Machine.LOCALHOST, "on-localhost");
 		assertChoiceResolvedToValue(Machine.WORKER_1, "on-worker-1");
 	}
 
 	@Test
-	void thatBundleOfUndefinedConstGotBootstrappedAndOthersNot() {
+	void bundleOfUndefinedConstGotBootstrappedAndOthersNot() {
 		assertChoiceResolvedToValue(null, "on-generic");
 	}
 
 	private static void assertChoiceResolvedToValue(Machine actualChoice,
-			String expected) {
+			String expectedValue) {
 		Env env = Environment.DEFAULT.withToggled(Machine.class, actualChoice);
-		Injector injector = Bootstrap.injector(env, ModularBindsBundle.class);
-		assertArrayEquals(new String[] { expected },
-				injector.resolve(String[].class));
+		Injector context = Bootstrap.injector(env,
+				TestBasicBundleForBindsBundle.class);
+		assertArrayEquals(new String[] { expectedValue },
+				context.resolve(String[].class));
 	}
 }

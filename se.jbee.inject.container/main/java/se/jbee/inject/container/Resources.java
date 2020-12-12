@@ -111,26 +111,26 @@ final class Resources {
 			Function<Name, Scope> scopes, ResourceDescriptor<?>[] descriptors) {
 		Resource<?>[] res = new Resource<?>[descriptors.length];
 
-		Map<Name, Resource<ScopePermanence>> permanenceResourceByScope = new HashMap<>();
-		Map<Name, ScopePermanence> permanenceByScope = new HashMap<>();
+		Map<Name, Resource<ScopeLifeCycle>> permanenceResourceByScope = new HashMap<>();
+		Map<Name, ScopeLifeCycle> permanenceByScope = new HashMap<>();
 		Injector bootstrappingContext = createBootstrappingContext(
 				permanenceResourceByScope, permanenceByScope);
 		// create ScopePermanence resources
 		for (int i = 0; i < descriptors.length; i++) {
 			ResourceDescriptor<?> descriptor = descriptors[i];
-			if (descriptor.signature.type().rawType == ScopePermanence.class) {
+			if (descriptor.signature.type().rawType == ScopeLifeCycle.class) {
 				Resource<?> r = createScopePermanenceResource(i, descriptor,
 						bootstrappingContext);
 				res[i] = r;
 				@SuppressWarnings("unchecked")
-				Resource<ScopePermanence> r2 = (Resource<ScopePermanence>) r;
+				Resource<ScopeLifeCycle> r2 = (Resource<ScopeLifeCycle>) r;
 				permanenceResourceByScope.put(r.signature.instance.name, r2);
 			}
 		}
 		// make sure all ScopePermanence are known
-		for (Entry<Name, Resource<ScopePermanence>> e : permanenceResourceByScope.entrySet()) {
+		for (Entry<Name, Resource<ScopeLifeCycle>> e : permanenceResourceByScope.entrySet()) {
 			if (!permanenceByScope.containsKey(e.getKey())) {
-				Resource<ScopePermanence> val = e.getValue();
+				Resource<ScopeLifeCycle> val = e.getValue();
 				permanenceByScope.put(e.getKey(),
 						val.generate(val.signature.toDependency()));
 			}
@@ -144,8 +144,8 @@ final class Resources {
 	}
 
 	private static Injector createBootstrappingContext(
-			Map<Name, Resource<ScopePermanence>> permanenceResourceByScope,
-			Map<Name, ScopePermanence> permanenceByScope) {
+			Map<Name, Resource<ScopeLifeCycle>> permanenceResourceByScope,
+			Map<Name, ScopeLifeCycle> permanenceByScope) {
 		return new Injector() {
 
 			@SuppressWarnings({ "unchecked", "ChainOfInstanceofChecks" })
@@ -155,11 +155,11 @@ final class Resources {
 				Class<E> rawType = dep.type().rawType;
 				if (rawType == Injector.class)
 					return (E) this;
-				if (rawType == ScopePermanence.class) {
+				if (rawType == ScopeLifeCycle.class) {
 					Name scope = dep.instance.name;
 					if (!permanenceResourceByScope.containsKey(scope))
 						throw noResourceFor(dep);
-					Dependency<ScopePermanence> scopeDep = (Dependency<ScopePermanence>) dep;
+					Dependency<ScopeLifeCycle> scopeDep = (Dependency<ScopeLifeCycle>) dep;
 					return (E) permanenceByScope.computeIfAbsent(scope,
 							name -> permanenceResourceByScope.get(
 									name).generator.generate(scopeDep));
@@ -200,12 +200,12 @@ final class Resources {
 	private <T> Resource<T> createResource(SupplyContext context,
 			Function<Name, Scope> scopes, int serialID,
 			ResourceDescriptor<T> descriptor,
-			Map<Name, ScopePermanence> permanenceByScope) {
+			Map<Name, ScopeLifeCycle> permanenceByScope) {
 		// NB. using the function is a way to allow both Resource and Generator implementation to be initialised with a final reference of each other
 		Function<Resource<T>, Generator<T>> generatorFactory = //
 				resource -> createGenerator(context, scopes, resource,
 						descriptor.supplier);
-		ScopePermanence scoping = permanenceByScope.get(descriptor.scope);
+		ScopeLifeCycle scoping = permanenceByScope.get(descriptor.scope);
 		if (scoping == null)
 			throw new InconsistentDeclaration("Scope `" + descriptor.scope
 				+ "` is used but not defined for: " + descriptor);
@@ -217,7 +217,7 @@ final class Resources {
 	private static <T> Resource<T> createScopePermanenceResource(int serialID,
 			ResourceDescriptor<T> descriptor, Injector bootstrappingContext) {
 		return new Resource<>(serialID, descriptor.source,
-				ScopePermanence.container, descriptor.signature,
+				ScopeLifeCycle.container, descriptor.signature,
 				descriptor.annotations, descriptor.verifier,
 					resource -> (dependency ->	descriptor.supplier
 							.supply(dependency, bootstrappingContext)));
@@ -312,7 +312,7 @@ final class Resources {
 				throws UnresolvableDependency {
 			dep.ensureNoIllegalDirectAccessOf(resource.signature);
 			return inContext.generate(dep.injectingInto(resource.signature,
-					ScopePermanence.ignore));
+					ScopeLifeCycle.ignore));
 		}
 	}
 

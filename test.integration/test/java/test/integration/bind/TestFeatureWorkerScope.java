@@ -17,7 +17,7 @@ import static se.jbee.inject.Dependency.dependency;
 /**
  * Tests the correctness of the {@link WorkerScope}.
  */
-class TestWorkerScope {
+class TestFeatureWorkerScope {
 
 	private final int generators = 3;
 	private final Scope scope = new WorkerScope();
