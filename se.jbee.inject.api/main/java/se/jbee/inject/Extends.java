@@ -36,7 +36,7 @@ import java.util.ServiceLoader;
  * {@link Extends#value()}.
  * <p>
  *
- * @since 19.1
+ * @since 8.1
  */
 @Retention(RUNTIME)
 @Target(TYPE)

@@ -3,7 +3,8 @@ package se.jbee.inject;
 /**
  * {@link Verifier}s are attached to
  */
-@FunctionalInterface public interface Verifier {
+@FunctionalInterface
+public interface Verifier {
 
 	Verifier AOK = context -> {};
 
@@ -11,7 +12,7 @@ package se.jbee.inject;
 	 * Called by the {@link Injector} at the end of bootstrapping process for
 	 * each {@link Resource} that became part of the container context. This
 	 * occurs after the {@link Injector} itself has been initialised by {@link
-	 * Initialiser}s but before eager scoped instances are created.
+	 * BuildUp}s but before eager scoped instances are created.
 	 *
 	 * @param context the container to use to verify the conditions captured by
 	 *                this {@link Verifier}.

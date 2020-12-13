@@ -16,6 +16,7 @@ import se.jbee.inject.UnresolvableDependency;
 public final class WorkerScope implements Scope {
 
 	//TODO cleanup that checks if thread is alive => general feature to allow hook in for cleanup without needed to explicitly work with scheduler
+	// also to cleanup on JVM shutdown
 
 	private static final class WorkerState {
 		final AtomicReferenceArray<Object> instances;

@@ -27,7 +27,7 @@ import se.jbee.inject.lang.Type;
  * field. Also this makes sure the constant of the field value is assignable to
  * the bound type.
  *
- * @since 19.1
+ * @since 8.1
  */
 @FunctionalInterface
 public interface SharesBy {

@@ -29,11 +29,11 @@
  * {@link se.jbee.inject.bind.Toggled} {@link java.lang.Enum}s can be used to
  * implement feature toggles where a {@link se.jbee.inject.bind.Bundle} is only
  * installed if the {@link java.lang.Enum} constant associated with the {@link
- * se.jbee.inject.bind.Bundle} is {@link se.jbee.inject.Env#toggled(Class, Enum,
- * Package)}. Besides being useful as feature switch this also allows to hide
- * actual {@link se.jbee.inject.bind.Bundle} implementation classes and make
- * them accessible through a {@link java.lang.Enum} and its constants. This is
- * the equivalent of an interface for {@link se.jbee.inject.bind.Bundle}
+ * se.jbee.inject.bind.Bundle} is {@link se.jbee.inject.Env#toggled(java.lang.Class,
+ * java.lang.Enum)}. Besides being useful as feature switch this also allows to
+ * hide actual {@link se.jbee.inject.bind.Bundle} implementation classes and
+ * make them accessible through a {@link java.lang.Enum} and its constants. This
+ * is the equivalent of an interface for {@link se.jbee.inject.bind.Bundle}
  * classes.
  * </p>
  *

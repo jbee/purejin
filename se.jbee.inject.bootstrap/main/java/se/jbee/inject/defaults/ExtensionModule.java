@@ -21,7 +21,7 @@ import se.jbee.inject.config.Extension;
  * The created instance is an effective singleton per type, so there will be one
  * instance for each {@link Extension} implementation class.
  *
- * @since 19.1
+ * @since 8.1
  */
 // intentionally made default visible to not be confused with a module that is useful as a base class for user modules
 class ExtensionModule extends BinderModule {

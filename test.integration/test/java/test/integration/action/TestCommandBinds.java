@@ -8,9 +8,12 @@ import se.jbee.inject.Supplier;
 import se.jbee.inject.action.Action;
 import se.jbee.inject.action.ActionModule;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.config.ProducesBy;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static se.jbee.inject.action.ActionModule.actionDependency;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static se.jbee.inject.action.Action.actionTypeOf;
+import static se.jbee.inject.config.ProducesBy.allMethods;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
@@ -24,7 +27,7 @@ import static se.jbee.inject.lang.Type.raw;
  *
  * @author Jan Bernitt (jan@jbee.se)
  */
-public class TestCommandBinds {
+class TestCommandBinds {
 
 	private interface Command<P> {
 
@@ -36,7 +39,7 @@ public class TestCommandBinds {
 		@Override
 		public Command<?> supply(Dependency<? super Command<?>> dep,
 				Injector context) {
-			return newCommand(context.resolve(actionDependency(
+			return newCommand(context.resolve(actionTypeOf(
 					dep.type().parameter(0), raw(Long.class))));
 		}
 
@@ -64,7 +67,8 @@ public class TestCommandBinds {
 
 		@Override
 		protected void declare() {
-			bindActionsIn(MathService.class);
+			construct(MathService.class);
+			connect(allMethods).in(MathService.class).asAction();
 			per(Scope.dependencyType) //
 					.starbind(Command.class) //
 					.toSupplier(new CommandSupplier());
@@ -80,11 +84,12 @@ public class TestCommandBinds {
 	}
 
 	@Test
-	public void thatServiceCanBeResolvedWhenHavingJustOneGeneric() {
+	void serviceCanBeResolvedWhenHavingJustOneGeneric() {
 		Injector injector = Bootstrap.injector(CommandBindsModule.class);
 		@SuppressWarnings("unchecked")
 		Command<Integer> square = injector.resolve(
 				raw(Command.class).parametized(Integer.class));
+		assertNotNull(injector.resolve(MathService.class));
 		assertEquals(9L, square.calc(3).longValue());
 	}
 }

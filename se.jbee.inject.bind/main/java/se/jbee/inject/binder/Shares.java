@@ -14,7 +14,7 @@ import se.jbee.inject.lang.Typed;
  * the {@link Supplier} supplying is asked to supply the value.
  *
  * @author Jan Bernitt
- * @since 19.1
+ * @since 8.1
  *
  * @param <T> type of the constant shared
  */

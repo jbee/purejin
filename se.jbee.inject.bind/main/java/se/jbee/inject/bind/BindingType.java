@@ -11,7 +11,7 @@ import se.jbee.inject.Supplier;
  * What is supplying instances for a {@link Binding}?
  *
  * As we cannot look into the implementation of a {@link Supplier} this type
- * groups concrete ways to supply instances.
+ * groups ways to supply instances.
  */
 public enum BindingType {
 
@@ -52,8 +52,8 @@ public enum BindingType {
 	FIELD,
 
 	/**
-	 * The binding is an incomplete. A value was provided that should be
-	 * expanded into a complete {@link Binding}.
+	 * The binding is an incomplete value that should be expanded into a
+	 * complete {@link Binding}.
 	 */
 	VALUE,
 }

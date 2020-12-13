@@ -9,30 +9,26 @@ import se.jbee.inject.*;
 import se.jbee.inject.bind.*;
 import se.jbee.inject.config.*;
 import se.jbee.inject.lang.Type;
-import se.jbee.inject.lang.Utils;
 
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Arrays.stream;
-import static se.jbee.inject.Cast.initialiserTypeOf;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Hint.relativeReferenceTo;
 import static se.jbee.inject.Instance.*;
+import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Source.source;
 import static se.jbee.inject.Target.targeting;
-import static se.jbee.inject.lang.Type.fieldType;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.inject.config.Plugins.pluginPoint;
+import static se.jbee.inject.lang.Type.*;
 import static se.jbee.inject.lang.Utils.isClassInstantiable;
 import static se.jbee.inject.lang.Utils.newArray;
-import static se.jbee.inject.config.Plugins.pluginPoint;
 
 /**
  * The default implementation of a fluent binder interface that provides a lot
@@ -42,6 +38,9 @@ import static se.jbee.inject.config.Plugins.pluginPoint;
  */
 @SuppressWarnings({ "squid:S1448", "squid:S1200", "ClassReferencesSubclass" })
 public class Binder {
+
+	public static final String ACTION_CONNECTOR = "actions";
+	public static final String SCHEDULER_CONNECTOR = "scheduler";
 
 	public static RootBinder create(Bind bind) {
 		return new RootBinder(bind);
@@ -68,17 +67,34 @@ public class Binder {
 		return bind().bindings;
 	}
 
-	//TODO make this into a Module subclass
-	public void addAnnotated(Class<?>... types) {
+	/**
+	 * Adds bindings indirectly by inspecting the annotations present on the
+	 * provided types and their methods. An annotation can be linked to a
+	 * binding pattern described by a {@link ModuleWith} linked to a specific
+	 * annotation as part of the {@link Env}. This can done either
+	 * programmatically or via {@link java.util.ServiceLoader} entry for the
+	 * {@link ModuleWith} (of {@link Class}).
+	 * <p>
+	 * This is the most "automatic" way of binding that maybe has closes
+	 * similarity with annotation based dependency injection as found in CDI or
+	 * spring. It separates the specifics of the bind from the target. While
+	 * this is very simple to use it is also very limiting.
+	 *
+	 * @param types all types to bind using annotations present on the type and
+	 *              their methods
+	 */
+	public void patternbind(Class<?>... types) {
 		Bindings bindings = bindings();
-		for (Class<?> type : types)
+		for (Class<?> type : types) {
 			bindings.addAnnotated(bind().env, type);
+			implicit().bind(type).toConstructor();
+		}
 	}
 
 	/**
 	 * Allows access only via interface.
 	 *
-	 * @since 19.1
+	 * @since 8.1
 	 *
 	 * @return fluent API
 	 */
@@ -90,101 +106,122 @@ public class Binder {
 		return new TypedElementBinder<>(bind(), defaultInstanceOf(raw(type)));
 	}
 
-	public <T> TypedBinder<T> autobind(Class<T> type) {
-		return autobind(Type.raw(type));
+	public final <T> TypedBinder<T> autobind(Class<T> type) {
+		return autobind(raw(type));
 	}
 
-	public <T> TypedBinder<T> autobind(Type<T> type) {
+	public final <T> TypedBinder<T> autobind(Type<T> type) {
 		return on(bind().asAuto()).bind(type);
 	}
 
-	public <T> TypedBinder<T> bind(Class<T> type) {
-		return bind(Type.raw(type));
+	public final <T> TypedBinder<T> bind(Class<T> type) {
+		return bind(raw(type));
 	}
 
 	public <T> TypedBinder<T> bind(Instance<T> instance) {
 		return new TypedBinder<>(bind(), instance);
 	}
 
-	public <T> TypedBinder<T> bind(Name name, Class<T> type) {
-		return bind(name, Type.raw(type));
+	public final <T> TypedBinder<T> bind(String name, Class<T> type) {
+		return bind(named(name), type);
 	}
 
-	public <T> TypedBinder<T> bind(Name name, Type<T> type) {
+	public final <T> TypedBinder<T> bind(Name name, Class<T> type) {
+		return bind(name, raw(type));
+	}
+
+	public final <T> TypedBinder<T> bind(Name name, Type<T> type) {
 		return bind(instance(name, type));
 	}
 
-	public <T> TypedBinder<T> bind(Type<T> type) {
+	public final <T> TypedBinder<T> bind(Type<T> type) {
 		return bind(defaultInstanceOf(type));
 	}
 
-	public void construct(Class<?> type) {
+	public final void construct(Class<?> type) {
 		construct((defaultInstanceOf(raw(type))));
 	}
 
-	public void construct(Instance<?> instance) {
+	public final void construct(Instance<?> instance) {
 		bind(instance).toConstructor();
 	}
 
-	public void construct(Name name, Class<?> type) {
+	public final void construct(Name name, Class<?> type) {
 		construct(instance(name, raw(type)));
 	}
 
 	/**
-	 * Bind something that is an {@link Initialiser} for the {@link Injector}.
+	 * Bind something that is an {@link BuildUp} for the {@link Injector}.
 	 *
-	 * @since 19.1
+	 * @since 8.1
 	 *
 	 * @return fluent API
 	 */
-	public TypedBinder<Initialiser<Injector>> initbind() {
+	public final TypedBinder<BuildUp<Injector>> initbind() {
 		return initbind(Injector.class);
 	}
 
 	/**
-	 * @since 19.1
+	 * @since 8.1
 	 *
 	 * @return fluent API
 	 */
-	public <T> TypedBinder<Initialiser<T>> initbind(Class<T> type) {
+	public final <T> TypedBinder<BuildUp<T>> initbind(Class<T> type) {
 		return initbind(raw(type));
 	}
 
 	/**
-	 * @since 19.1
+	 * @since 8.1
 	 *
 	 * @return fluent API
 	 */
-	public <T> TypedBinder<Initialiser<T>> initbind(Type<T> type) {
-		return multibind(initialiserTypeOf(type));
+	public final <T> TypedBinder<BuildUp<T>> initbind(Type<T> type) {
+		return multibind(BuildUp.buildUpTypeOf(type));
 	}
 
-	public <T> TypedBinder<T> multibind(Class<T> type) {
+	public final <T> TypedBinder<T> multibind(Class<T> type) {
 		return multibind(raw(type));
 	}
 
-	public <T> TypedBinder<T> multibind(Instance<T> instance) {
+	public final <T> TypedBinder<T> multibind(Instance<T> instance) {
 		return on(bind().asMulti()).bind(instance);
 	}
 
-	public <T> TypedBinder<T> multibind(Name name, Class<T> type) {
+	public final <T> TypedBinder<T> multibind(Name name, Class<T> type) {
 		return multibind(instance(name, raw(type)));
 	}
 
-	public <T> TypedBinder<T> multibind(Name name, Type<T> type) {
+	public final <T> TypedBinder<T> multibind(Name name, Type<T> type) {
 		return multibind(instance(name, type));
 	}
 
-	public <T> TypedBinder<T> multibind(Type<T> type) {
+	public final <T> TypedBinder<T> multibind(Type<T> type) {
 		return multibind(defaultInstanceOf(type));
 	}
 
-	public <T> TypedBinder<T> starbind(Class<T> type) {
+	public final <T> TypedBinder<T> starbind(Class<T> type) {
 		return bind(anyOf(raw(type)));
 	}
 
 	public <T> PluginBinder<T> plug(Class<T> plugin) {
 		return new PluginBinder<>(on(bind()), plugin);
+	}
+
+	/**
+	 * Mark methods as members of a named group.
+	 *
+	 * @since 8.1
+	 */
+	public ConnectBinder connect() {
+		return new ConnectBinder(this, env().property(ProducesBy.class, bind.source.pkg()));
+	}
+
+	public ConnectBinder connect(ProducesBy linksBy) {
+		return new ConnectBinder(this, linksBy);
+	}
+
+	public <T> ConnectTargetBinder<T> connect(Class<T> api) {
+		return new ConnectTargetBinder<>(this, ProducesBy.declaredMethods.in(api), raw(api));
 	}
 
 	protected Binder on(Bind bind) {
@@ -201,7 +238,7 @@ public class Binder {
 
 	/**
 	 * @see #installIn(String, Class...)
-	 * @since 19.1
+	 * @since 8.1
 	 */
 	@SafeVarargs
 	public final void installIn(Class<?> subContext,
@@ -219,7 +256,7 @@ public class Binder {
 	 * @param lazyInstalled the {@link Bundle} to install in the sub-context
 	 *            lazy {@link Injector}
 	 *
-	 * @since 19.1
+	 * @since 8.1
 	 */
 	@SafeVarargs
 	public final void installIn(String subContext,
@@ -234,7 +271,7 @@ public class Binder {
 	 *
 	 * @param target the type whose instances should be initialised by calling
 	 *            some method
-	 * @since 19.1
+	 * @since 8.1
 	 */
 	public <T> InitBinder<T> init(Class<T> target) {
 		return init(Name.DEFAULT, raw(target));
@@ -255,7 +292,7 @@ public class Binder {
 	 *
 	 * @param <T> type of the instances that should be initialised
 	 *
-	 * @since 19.1
+	 * @since 8.1
 	 */
 	public static class InitBinder<T> {
 
@@ -275,7 +312,7 @@ public class Binder {
 
 		public <C> void forEach(Type<? extends C[]> dependencies,
 				BiConsumer<T, C> initialiser) {
-			binder.initbind().to((impl, injector) -> {
+			binder.initbind().to((impl, as, injector) -> {
 				T obj = injector.resolve(target);
 				C[] args = injector.resolve(
 						dependency(dependencies).injectingInto(target));
@@ -297,7 +334,7 @@ public class Binder {
 
 		public <C> void by(Instance<? extends C> dependency,
 				BiConsumer<T, C> initialiser) {
-			binder.initbind().to((impl, injector) -> {
+			binder.initbind().to((impl, as, injector) -> {
 				T obj = injector.resolve(target);
 				C arg = injector.resolve(
 						dependency(dependency).injectingInto(target));
@@ -340,11 +377,98 @@ public class Binder {
 	}
 
 	/**
+	 * Connecting is the dynamic process of identifying methods in target types
+	 * that should be subject to a {@link Connector} referenced by name.
+	 *
+	 * The {@link Connector} is expected to be bound explicitly elsewhere.
+	 *
+	 * @since 8.1
+	 */
+	public static class ConnectBinder {
+
+		private final Binder binder;
+		private final ProducesBy connectsBy;
+
+		protected ConnectBinder(Binder binder, ProducesBy connectsBy) {
+			this.binder = binder;
+			this.connectsBy = connectsBy;
+		}
+
+		/**
+		 * @see #in(Type)
+		 */
+		public <T> ConnectTargetBinder<T> in(Class<T> target) {
+			return in(raw(target));
+		}
+
+		/**
+		 * Connecting is applied to all subtypes of the provided target type.
+		 *
+		 * @param target can be understood as the scope in which connecting applies
+		 *               to identified methods.
+		 * @param <T>    target bean type or interface implemented by targets
+		 * @return binder for fluent API
+		 */
+		public <T> ConnectTargetBinder<T> in(Type<T> target) {
+			return new ConnectTargetBinder<>(binder, connectsBy, target);
+		}
+	}
+
+	/**
+	 * @param <T> type of the class(es) (includes subtypes) that are subject to
+	 *            connecting
+	 * @since 8.1
+	 */
+	public static class ConnectTargetBinder<T> {
+
+		private final Binder binder;
+		private final ProducesBy connectsBy;
+		private final Type<T> target;
+
+		public ConnectTargetBinder(Binder binder, ProducesBy connectsBy,
+				Type<T> target) {
+			this.binder = binder;
+			this.connectsBy = connectsBy;
+			this.target = target;
+		}
+
+		public ConnectTargetBinder<T> asAction() {
+			return to(ACTION_CONNECTOR);
+		}
+
+		public ConnectTargetBinder<T> to(String connectorName) {
+			return to(named(connectorName));
+		}
+
+		public ConnectTargetBinder<T> to(Class<?> connectorName) {
+			return to(named(connectorName));
+		}
+
+		public ConnectTargetBinder<T> to(Name connectorName) {
+			binder.initbind(target) //
+					.to((instance, as, context) ->
+							init(connectorName, instance, as, context));
+			return this; // for multiple to
+		}
+
+		private T init(Name connectorName, T instance, Type<?> as,
+				Injector context) {
+			Method[] connected = connectsBy.reflect(instance.getClass());
+			if (connected != null && connected.length > 0) {
+				Connector connector = context.resolve(connectorName, Connector.class);
+				for (Method m : connected)
+					connector.connect(instance, as, m);
+			}
+			return instance;
+		}
+	}
+
+	/**
 	 * The {@link AutoBinder} makes use of mirrors to select and bind
 	 * constructors for beans and methods as factories and {@link Name} these
 	 * instances as well as provide {@link Hint}s.
 	 *
-	 * @since 19.1
+	 * @since 8.1
 	 */
 	public static class AutoBinder {
 
@@ -433,7 +557,7 @@ public class Binder {
 				return; // do not try to construct the class
 			Constructor<?> target = constructsBy.reflect(service);
 			if (target != null)
-				bind(target, hints);
+				asConstructor(target, hints);
 		}
 
 		private boolean bindSharesIn(Class<?> impl, Object instance) {
@@ -450,21 +574,37 @@ public class Binder {
 				Hint<?>[] hints) {
 			boolean needsInstance = false;
 			for (Method producer : producesBy.reflect(impl)) {
-				Type<?> returns = Type.returnType(producer);
-				if (returns.rawType != void.class
-					&& returns.rawType != Void.class) {
-					if (hints.length == 0)
-						hints = hintsBy.reflect(producer);
-					binder.per(scopesBy.reflect(producer)) //
-							.bind(namesBy.reflect(producer), returns) //
-							.to(instance, producer, hints);
+				if (asProducer(producer, instance, hints))
 					needsInstance |= !isStatic(producer.getModifiers());
-				}
 			}
 			return needsInstance;
 		}
 
-		private <T> void bind(Constructor<T> target, Hint<?>... hints) {
+		/**
+		 * This method will not make sure an instance of the {@link Method}'s
+		 * declaring class is created if needed. This must be bound elsewhere.
+		 *
+		 * @param target a method that is meant to create instances of the
+		 *                 method return type
+		 * @param instance can be null to resolve the instance from {@link
+		 *                 Injector} context later (if needed)
+		 * @param hints    optional method argument {@link Hint}s
+		 * @return true if a target was bound, else false (this is e.g. the
+		 * case when the {@link Method} returns void)
+		 */
+		public boolean asProducer(Method target, Object instance, Hint<?>... hints) {
+			Type<?> returns = returnType(target);
+			if (returns.rawType == void.class || returns.rawType == Void.class)
+				return false;
+			if (hints.length == 0)
+				hints = hintsBy.reflect(target);
+			binder.per(scopesBy.reflect(target)) //
+					.bind(namesBy.reflect(target), returns) //
+					.to(instance, target, hints);
+			return true;
+		}
+
+		public <T> void asConstructor(Constructor<T> target, Hint<?>... hints) {
 			Name name = namesBy.reflect(target);
 			if (hints.length == 0)
 				hints = hintsBy.reflect(target);
@@ -474,7 +614,7 @@ public class Binder {
 				appBinder.autobind(impl).to(target, hints);
 			} else {
 				appBinder.bind(name, impl).to(target, hints);
-				for (Type<? super T> st : Type.raw(impl).supertypes())
+				for (Type<? super T> st : raw(impl).supertypes())
 					if (st.isInterface())
 						appBinder.implicit().bind(name, st).to(name, impl);
 			}
@@ -533,7 +673,7 @@ public class Binder {
 		/**
 		 * Root for container "global" configuration.
 		 *
-		 * @since 19.1
+		 * @since 8.1
 		 */
 		public TargetedBinder config() {
 			return injectingInto(Config.class);
@@ -542,7 +682,7 @@ public class Binder {
 		/**
 		 * Root for target type specific configuration.
 		 *
-		 * @since 19.1
+		 * @since 8.1
 		 */
 		public TargetedBinder config(Class<?> ns) {
 			return config().within(ns);
@@ -551,7 +691,7 @@ public class Binder {
 		/**
 		 * Root for {@link Instance} specific configuration.
 		 *
-		 * @since 19.1
+		 * @since 8.1
 		 */
 		public TargetedBinder config(Instance<?> ns) {
 			return config().within(ns);
@@ -580,7 +720,7 @@ public class Binder {
 		/**
 		 * Bind {@link Method}s and {@link Constructor}s based on mirrors.
 		 *
-		 * @since 19.1
+		 * @since 8.1
 		 */
 		public AutoBinder autobind() {
 			return new AutoBinder(root, bind().scope);
@@ -694,7 +834,7 @@ public class Binder {
 
 		public <I extends Supplier<? extends T>> void toSupplier(Function<Injector, I> factory) {
 			AtomicReference<I> cache = new AtomicReference<>();
-			toSupplier((Supplier<? extends T>) (dep, context) ->
+			toSupplier((dep, context) ->
 					cache.updateAndGet(e -> e != null ? e :
 							factory.apply(context)).supply(dep, context));
 		}
@@ -706,7 +846,7 @@ public class Binder {
 		 * This is used when a full {@link Supplier} contract is not needed to
 		 * save stating the not needed {@link Dependency} argument.
 		 *
-		 * @since 19.1
+		 * @since 8.1
 		 */
 		public void toFactory(Function<Injector, T> factory) {
 			toSupplier((dep, context) -> factory.apply(context));
@@ -722,14 +862,14 @@ public class Binder {
 		 * instead or create a {@link Generator} bridge that does not implement
 		 * {@link Generator} itself.
 		 *
-		 * @since 19.1
+		 * @since 8.1
 		 */
 		public void toGenerator(Generator<? extends T> generator) {
 			toSupplier(new SupplierGeneratorBridge<>(generator));
 		}
 
 		/**
-		 * @since 19.1
+		 * @since 8.1
 		 */
 		public void to(java.util.function.Supplier<? extends T> method) {
 			toSupplier((Dependency<? super T> d, Injector i) -> method.get());
@@ -745,7 +885,7 @@ public class Binder {
 		 * the initialisation that occurs for instances created by the
 		 * container.
 		 *
-		 * @since 19.1
+		 * @since 8.1
 		 *
 		 * @param constant a "bean" instance
 		 */

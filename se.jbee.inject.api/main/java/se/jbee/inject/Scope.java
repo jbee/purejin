@@ -7,49 +7,52 @@ package se.jbee.inject;
 
 import se.jbee.inject.lang.Type;
 
-import static se.jbee.inject.Name.named;
-
 import java.io.File;
 
+import static se.jbee.inject.Name.named;
+
 /**
- * A {@linkplain Scope} describes a particular lifecycle.
- *
- * The {@linkplain Scope} itself acts as the source of instances. Each
- * {@link Injector} has a single instance of each {@linkplain Scope} used.
- *
- * All {@link Scope} instances themselves are container instances in the
- * {@link #container} scope which is a special "singleton" scope used during
- * bootstrapping of the {@link Injector} context.
- *
- * @author Jan Bernitt (jan@jbee.se)
+ * A {@linkplain Scope} implements a particular life-cycle behaviour.
+ * <p>
+ * The {@linkplain Scope} itself acts as a repository of instances. Each {@link
+ * Injector} has a single instance of each {@linkplain Scope} used.
+ * <p>
+ * All {@link Scope} instances themselves are bound as container instances in
+ * the {@link #container} scope which is a special "singleton" scope reserved
+ * for constants that belong to the {@link Injector} context itself.
+ * <p>
+ * To set a {@link Scope}s implementation bind a named instance.
  */
 @FunctionalInterface
 public interface Scope {
 
 	/**
-	 * @param serialID ID number of this {@link Resource} with the
-	 *            {@link Injector} context
-	 * @param resources the total number of {@link Resource}s in the
-	 *            {@link Injector} context
-	 * @param dep currently served {@link Dependency}
-	 * @param provider constructor function yielding new instances if needed.
-	 *            All {@link Scope}s have to make sure they only ever call
-	 *            {@link Provider#provide()} once and only if it is actually
-	 *            required and yields the instance used.
+	 * @param serialID  ID number of this {@link Resource} with the {@link
+	 *                  Injector} context
+	 * @param resources the total number of {@link Resource}s in the {@link
+	 *                  Injector} context. This is given to allow optimized
+	 *                  organization of instances within the registry
+	 *                  implementation of a {@link Scope}.
+	 * @param dep       currently served {@link Dependency}
+	 * @param provider  constructor function yielding new instances if needed.
+	 *                  All {@link Scope}s have to make sure they only ever call
+	 *                  {@link Provider#provide()} once and only if it is
+	 *                  actually required and yields the instance used.
 	 * @return Existing instances are returned, non-existing are received from
-	 *         the given {@link Provider} and added to this {@link Scope} data
-	 *         structure (forever if it is an application wide singleton or
-	 *         shorter depending on the {@link Scope}).
-	 *
-	 *         The information from the {@link Dependency} and {@link Resource}
-	 *         can be used to lookup existing instances.
+	 * the given {@link Provider} and added to this {@link Scope} data structure
+	 * (forever if it is an application wide singleton or shorter depending on
+	 * the {@link Scope}).
+	 * <p>
+	 * The information from the {@link Dependency} and {@link Resource} can be
+	 * used to lookup existing instances.
 	 */
 	<T> T provide(int serialID, int resources, Dependency<? super T> dep,
 			Provider<T> provider) throws UnresolvableDependency;
 
 	/**
-	 * A virtual scope used by the scope configuration {@code ScopedBy } to indicate that no
-	 * particular scope should be used. This falls back on {@link #application}.
+	 * A virtual scope used by the scope configuration {@code ScopedBy } to
+	 * indicate that no particular scope should be used. This falls back on
+	 * {@link #application}.
 	 */
 	Name auto = named("@auto");
 
@@ -102,30 +105,74 @@ public interface Scope {
 	/**
 	 * Is a family of temporary scopes that are explicitly linked and unlinked
 	 * with a thread for a period of time. This is usually used for worker
-	 * threads that a linked to a fresh scope for each work item. In contrast to
-	 * a {@link #thread} scope the worker scope resets when it is unlinked and
-	 * linked again for the same {@link Thread}.
-	 *
+	 * threads that are linked to a fresh scope for each work item. In contrast
+	 * to a {@link #thread} scope the worker scope resets when it is unlinked
+	 * and linked again for the same {@link Thread}.
+	 * <p>
 	 * A typical example of a worker scope is a 'per-request' scope in a HTTP
 	 * server.
 	 */
 	Name worker = named("@worker");
 
+	/**
+	 * A scope that stores one instance per exact dependency. That means it
+	 * considers the {@link Instance} and the {@link Injection} hierarchy of the
+	 * {@link Dependency}. An dependency with the same {@link Name} and {@link
+	 * Type} within different "parent" or "grandparent" will correspond to a
+	 * different instance in this scope.
+	 * <p>
+	 * This is like a {@code Map<Dependency<?>, Object>} where the key is the
+	 * resolved {@link Dependency}.
+	 */
 	Name dependency = named("dependency");
 
+	/**
+	 * A scope that stores one instance per exact {@link Type} that is
+	 * resolved/injected. None of the other data attached to the injected {@link
+	 * Dependency} is considered.
+	 * <p>
+	 * This is like a {@code Map<Type<?>, Object>} where the key {@link Type}
+	 * depends on the resolved {@link Dependency#type()}.
+	 */
 	Name dependencyType = named("dependency-type");
 
+	/**
+	 * A scope that stores one instance per exact {@link Name} and {@link Type}
+	 * that is resolved or injected.
+	 * <p>
+	 * This is like a {@code Map<Instance<?>, Object>} where the key {@link
+	 * Instance} depends on the resolved {@link Dependency#instance}.
+	 */
 	Name dependencyInstance = named("dependency-instance");
 
+	/**
+	 * A scope that stores one instance per exact injection target instance
+	 * (that means {@link Name} and {@link Type} of the instance receiving the
+	 * resolved {@link Dependency} are considered).
+	 * <p>
+	 * A classic example would be injection of a "per-class" logger. The
+	 * resolved dependency is of the logger type but we want a logger that is
+	 * specific to the instance that receives the logger.
+	 */
 	Name targetInstance = named("target-instance");
 
+	/**
+	 * Returns the name of a disk scope with the given directory as its root.
+	 *
+	 * @param dir the root directory of the disk scope
+	 * @return the name to use when binding the {@link Scope} (and {@link
+	 * ScopeLifeCycle}).
+	 */
 	static Name disk(File dir) {
 		return Name.named("disk:" + dir.getAbsolutePath());
 	}
 
 	/**
-	 * Often called the 'default' or 'prototype'-scope. Asks the
-	 * {@link Provider} once per injection.
+	 * Often called the 'default' or 'prototype'-scope. Asks the {@link
+	 * Provider} once per injection. In other words it is a stateless scope that
+	 * acts as if there wasn't a concept of scopes and the {@link Provider}
+	 * (which represents the underlying {@link Supplier}) would be asked
+	 * directly.
 	 */
 	Scope INJECTION = Scope::injection;
 
@@ -160,7 +207,7 @@ public interface Scope {
 	 * in the {@link Scope} it controls so that its implementation can return
 	 * the controller implementation.
 	 *
-	 * @since 19.1
+	 * @since 8.1
 	 */
 	interface Controller {
 
@@ -201,6 +248,11 @@ public interface Scope {
 		 */
 		void deallocate();
 
+		/**
+		 * @param scope a "worker" type scope name
+		 * @return the {@link Instance} to bind to when binding the {@link
+		 * Controller} for the provided scope
+		 */
 		static Instance<Controller> forScope(Name scope) {
 			return Instance.instance(scope, Type.raw(Controller.class));
 		}

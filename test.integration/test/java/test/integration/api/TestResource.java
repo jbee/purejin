@@ -14,10 +14,10 @@ import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.lang.Type.raw;
 
-public class TestResource {
+class TestResource {
 
 	@Test
-	public void naturalOrderIsFromMostQualifiedToLeastQualified() {
+	void naturalOrderIsFromMostQualifiedToLeastQualified() {
 		List<Resource<?>> resources = new ArrayList<>();
 		resources.add(createResourceOf(1, Type.WILDCARD));
 		resources.add(
@@ -30,9 +30,9 @@ public class TestResource {
 
 	private Resource<?> createResourceOf(int serialID, Type<?> type) {
 		Source source = Source.source(getClass());
-		return new Resource<>(serialID, source, ScopePermanence.ignore,
+		return new Resource<>(serialID, source, ScopeLifeCycle.ignore,
 				new Locator<>(Instance.anyOf(type)),
-				Annotated.WITH_NO_ANNOTATIONS, Verifier.AOK,
+				Annotated.EMPTY, Verifier.AOK,
 				resource -> (dep -> null));
 	}
 }

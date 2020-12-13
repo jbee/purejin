@@ -11,5 +11,5 @@ open module test.integration {
 	requires se.jbee.inject.action;
 	requires se.jbee.inject.event;
 
-	requires com.example.app; // <- module under test
+	requires test.example.app; // <- module under test
 }

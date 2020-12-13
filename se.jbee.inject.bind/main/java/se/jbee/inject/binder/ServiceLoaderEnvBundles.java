@@ -13,11 +13,8 @@ import se.jbee.inject.bind.Bundle;
  */
 public class ServiceLoaderEnvBundles extends FilteredServiceLoaderBundles {
 
-	public ServiceLoaderEnvBundles() {
-		super(ServiceLoaderEnvBundles::isTargetingEnv);
-	}
-
-	static boolean isTargetingEnv(Class<? extends Bundle> bundle) {
+	@Override
+	boolean bootstrap(Class<? extends Bundle> bundle) {
 		if (!bundle.isAnnotationPresent(Extends.class))
 			return false;
 		Class<?> target = bundle.getAnnotation(Extends.class).value();

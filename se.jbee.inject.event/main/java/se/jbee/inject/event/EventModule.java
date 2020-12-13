@@ -15,7 +15,7 @@ import se.jbee.inject.binder.BinderModule;
  * Base {@link Module} for modules that want to make known a handler to the
  * event system using {@link #handle(Class)}.
  *
- * @since 19.1
+ * @since 8.1
  */
 public abstract class EventModule extends BinderModule {
 
@@ -38,7 +38,7 @@ public abstract class EventModule extends BinderModule {
 		if (!handlerType.isInterface())
 			throw new IllegalArgumentException(
 					"Event type has to be an interface but was: " + handlerType);
-		initbind(handlerType).to((listener, injector) -> {
+		initbind(handlerType).to((listener, as, injector) -> {
 			injector.resolve(EventProcessor.class).register(handlerType, listener);
 			return listener;
 		});

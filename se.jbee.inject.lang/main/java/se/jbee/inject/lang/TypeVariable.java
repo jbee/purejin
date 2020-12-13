@@ -15,7 +15,7 @@ import java.util.function.UnaryOperator;
  * {@link java.lang.reflect.TypeVariable}s.
  *
  * @author Jan Bernitt
- * @since 19.1
+ * @since 8.1
  */
 public final class TypeVariable {
 

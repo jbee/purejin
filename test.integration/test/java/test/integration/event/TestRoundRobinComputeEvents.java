@@ -9,7 +9,7 @@ import se.jbee.inject.event.EventModule;
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Name.named;
 
-public class TestRoundRobinComputeEvents {
+class TestRoundRobinComputeEvents {
 
 	private interface Handler {
 
@@ -48,7 +48,7 @@ public class TestRoundRobinComputeEvents {
 
 	@Test
 	@Disabled("TODO #80 // TestRoundRobinComputeEvents.computationUsesAllAvailableServices()")
-	public void computationUsesAllAvailableServices() {
+	void computationUsesAllAvailableServices() {
 		Handler h = injector.resolve(Handler.class);
 		Service a = injector.resolve("a", Service.class);
 		Service b = injector.resolve("b", Service.class);

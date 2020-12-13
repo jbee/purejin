@@ -22,7 +22,7 @@ import se.jbee.inject.Instance;
  * hierarchy to effectively name-space configuration values to avoid name
  * collisions.
  *
- * @since 19.1
+ * @since 8.1
  */
 public class Config implements ContextAware<Config>, Extension {
 
@@ -48,7 +48,7 @@ public class Config implements ContextAware<Config>, Extension {
 	@Override
 	public Config inContext(Dependency<? super Config> context) {
 		if (context.isUntargeted())
-			return this;
+			return ns == null ? this : new Config(this.context, null);
 		Instance<?> target = context.target();
 		if (target.name.isAny())
 			return of(target.type.rawType);

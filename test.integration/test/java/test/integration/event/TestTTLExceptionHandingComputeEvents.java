@@ -37,7 +37,7 @@ import static test.integration.util.TestUtils.wait50;
  * second call to time out.
  */
 @Disabled
-public class TestTTLExceptionHandingComputeEvents {
+class TestTTLExceptionHandingComputeEvents {
 
 	private interface Handler {
 
@@ -84,7 +84,7 @@ public class TestTTLExceptionHandingComputeEvents {
 			handle(Handler.class);
 			construct(SlowService.class);
 			injectingInto(EventProcessor.class).bind(ExecutorService.class).to(
-					() -> Executors.newSingleThreadExecutor());
+					Executors::newSingleThreadExecutor);
 			bind(PolicyProvider.class).to(event -> EventPolicy.DEFAULT.withTTL(5));
 		}
 	}
@@ -95,32 +95,32 @@ public class TestTTLExceptionHandingComputeEvents {
 	private final SlowService service = injector.resolve(SlowService.class);
 
 	@Test
-	public void thatTimeoutExceptionIsThrownIfHandlerMethodThrowsSuperclassException() {
+	void thatTimeoutExceptionIsThrownIfHandlerMethodThrowsSuperclassException() {
 		assertThrowsTimeoutException(
 				() -> handler.slowMethodThatThrowsException());
 	}
 
 	@Test
-	public void thatTimeoutExceptionIsThrownIfHandlerMethodThrowsTimeoutException() {
+	void thatTimeoutExceptionIsThrownIfHandlerMethodThrowsTimeoutException() {
 		assertThrowsTimeoutException(
-				() -> handler.slowMethodThatThrowsTineoutException());
+				handler::slowMethodThatThrowsTineoutException);
 	}
 
 	@Test
-	public void thatTimeoutExceptionIsThrownIfFutureGetWithTimeoutIsUsed() {
+	void thatTimeoutExceptionIsThrownIfFutureGetWithTimeoutIsUsed() {
 		assertThrowsTimeoutException(
 				() -> handler.slowMethodReturnsFuture().get(5,
 						TimeUnit.MICROSECONDS));
 	}
 
 	@Test
-	public void thatEventExceptionCausedByTimeoutIsThrownIfFutureGet() {
+	void thatEventExceptionCausedByTimeoutIsThrownIfFutureGet() {
 		assertThrowsEventExceptionCausedByTimeout(
 				() -> handler.slowMethodReturnsFuture().get());
 	}
 
 	@Test
-	public void thatEventExceptionCausedByTimeoutIsThrownIfHandlerMethodNotThrowsException() {
+	void thatEventExceptionCausedByTimeoutIsThrownIfHandlerMethodNotThrowsException() {
 		assertThrowsEventExceptionCausedByTimeout(handler::slowMethod);
 	}
 

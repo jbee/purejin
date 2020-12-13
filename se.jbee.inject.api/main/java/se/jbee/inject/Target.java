@@ -8,12 +8,10 @@ package se.jbee.inject;
 import se.jbee.inject.lang.Qualifying;
 import se.jbee.inject.lang.Type;
 
-import static se.jbee.inject.Packages.packageAndSubPackagesOf;
-import static se.jbee.inject.Packages.packageOf;
-import static se.jbee.inject.Packages.subPackagesOf;
-import static se.jbee.inject.lang.Type.raw;
-
 import java.io.Serializable;
+
+import static se.jbee.inject.Packages.*;
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * Describes where a {@link Locator} is available for injection.
@@ -59,7 +57,7 @@ public final class Target
 	}
 
 	/**
-	 * @since 19.1
+	 * @since 8.1
 	 *
 	 * @return Same as this {@link Target} but also {@link #indirect}
 	 */
@@ -93,8 +91,17 @@ public final class Target
 		return injectingInto(raw(type));
 	}
 
+	/**
+	 * @return true if this {@link Target} matches any and all {@link
+	 * Dependency}s, in other words it does not filter at all
+	 * @since 8.1
+	 */
+	public boolean isAny() {
+		return equalTo(ANY);
+	}
+
 	public boolean isAvailableFor(Dependency<?> dep) {
-		return isAccessibleFor(dep) && isCompatibleWith(dep);
+		return isAny() || isAccessibleFor(dep) && isCompatibleWith(dep);
 	}
 
 	/**
@@ -137,7 +144,7 @@ public final class Target
 	}
 
 	public boolean isAccessibleFor(Dependency<?> dependency) {
-		return packages.contains(dependency.target().type());
+		return this == ANY || packages.contains(dependency.target().type());
 	}
 
 	@Override

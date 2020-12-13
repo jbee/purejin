@@ -1,35 +1,15 @@
 package se.jbee.inject.container;
 
-import static java.util.Arrays.copyOfRange;
+import se.jbee.inject.*;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import se.jbee.inject.lang.Lazy;
+import se.jbee.inject.lang.Type;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
-import se.jbee.inject.ContextAware;
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Generator;
-import se.jbee.inject.InconsistentDeclaration;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Locator;
-import se.jbee.inject.Name;
-import se.jbee.inject.Provider;
-import se.jbee.inject.Resource;
-import se.jbee.inject.ResourceDescriptor;
-import se.jbee.inject.Scope;
-import se.jbee.inject.ScopePermanence;
-import se.jbee.inject.Supplier;
-import se.jbee.inject.lang.Type;
-import se.jbee.inject.UnresolvableDependency;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import static java.util.Arrays.copyOfRange;
 
 /**
  * A set of {@link Resources} encapsulates the state and bootstrapping of
@@ -39,37 +19,38 @@ import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
  * some way of delegating actual instantiation (or supply) of generated
  * instances back to the {@link Injector} context which they are a part of so
  * that the context can do further processing. This backwards link is supplied
- * as the {@link ResourceLink}.
+ * as the {@link SupplyContext}.
  *
- * @since 19.1
+ * @since 8.1
  */
 final class Resources {
 
 	private final int resourceCount;
 	private final Map<Class<?>, Resource<?>[]> resourcesByType;
-	private final Resource<?>[] resources;
+	private final Resource<?>[] sortedResources;
 	private final Resource<?>[] genericResources;
 
 	/**
-	 * Creates a set of grouped {@link Resource} from
-	 * {@link ResourceDescriptor}s.
+	 * Creates a set of grouped {@link Resource} from {@link
+	 * ResourceDescriptor}s.
 	 *
-	 * @param link backlink to the internals of the {@link Injector} context
-	 *            this resources is created for which is provided by the
-	 *            {@link Injector} implementation
-	 * @param scopes function to lookup (yield) {@link Scope} by {@link Name}
-	 *            (also provided by the created {@link Injector} context)
-	 * @param descriptors the list of {@link ResourceDescriptor}s that
-	 *            {@link Resource}s are created for. Note that this list must be
-	 *            sorted already from the most qualified to the least qualified
-	 *            for each raw type. The order of the raw type groups is
-	 *            irrelevant.
+	 * @param context     backlink to the internals of the {@link Injector}
+	 *                    context this resources is created for which is
+	 *                    provided by the {@link Injector} implementation
+	 * @param scopes      function to lookup (yield) {@link Scope} by {@link
+	 *                    Name} (also provided by the created {@link Injector}
+	 *                    context)
+	 * @param descriptors the list of {@link ResourceDescriptor}s that {@link
+	 *                    Resource}s are created for. Note that this list must
+	 *                    be sorted already from the most qualified to the least
+	 *                    qualified for each raw type. The order of the raw type
+	 *                    groups is irrelevant.
 	 */
-	Resources(ResourceLink link, Function<Name, Scope> scopes,
+	Resources(SupplyContext context, Function<Name, Scope> scopes,
 			ResourceDescriptor<?>... descriptors) {
 		this.resourceCount = descriptors.length;
-		this.resources = createResources(link, scopes, descriptors);
-		this.resourcesByType = createResourcesByRawType(resources);
+		this.sortedResources = createResources(context, scopes, descriptors);
+		this.resourcesByType = createResourcesByRawType(sortedResources);
 		this.genericResources = selectGenericResources(resourcesByType);
 	}
 
@@ -103,13 +84,13 @@ final class Resources {
 			b.append(r.type().simpleName()).append(' ');
 			b.append(r.instance.name).append(' ');
 			b.append(r.target).append(' ');
-			b.append(rx.permanence).append(' ');
+			b.append(rx.lifeCycle).append(' ');
 			b.append(rx.source).append('\n');
 		}
 	}
 
 	public void initEager() {
-		for (Resource<?> eager : resources)
+		for (Resource<?> eager : sortedResources)
 			eager.init();
 	}
 
@@ -126,45 +107,45 @@ final class Resources {
 		return res.isEmpty() ? null : res.toArray(new Resource[0]);
 	}
 
-	private Resource<?>[] createResources(ResourceLink link,
+	private Resource<?>[] createResources(SupplyContext context,
 			Function<Name, Scope> scopes, ResourceDescriptor<?>[] descriptors) {
 		Resource<?>[] res = new Resource<?>[descriptors.length];
 
-		Map<Name, Resource<ScopePermanence>> permanenceResourceByScope = new HashMap<>();
-		Map<Name, ScopePermanence> permanenceByScope = new HashMap<>();
+		Map<Name, Resource<ScopeLifeCycle>> lifeCycleResourceByScope = new HashMap<>();
+		Map<Name, ScopeLifeCycle> lifeCycleByScope = new HashMap<>();
 		Injector bootstrappingContext = createBootstrappingContext(
-				permanenceResourceByScope, permanenceByScope);
-		// create ScopePermanence resources
+				lifeCycleResourceByScope, lifeCycleByScope);
+		// create ScopeLifeCycle resources
 		for (int i = 0; i < descriptors.length; i++) {
 			ResourceDescriptor<?> descriptor = descriptors[i];
-			if (descriptor.signature.type().rawType == ScopePermanence.class) {
-				Resource<?> r = createScopePermanenceResource(i, descriptor,
+			if (descriptor.signature.type().rawType == ScopeLifeCycle.class) {
+				Resource<?> r = createLifeCycleResource(i, descriptor,
 						bootstrappingContext);
 				res[i] = r;
 				@SuppressWarnings("unchecked")
-				Resource<ScopePermanence> r2 = (Resource<ScopePermanence>) r;
-				permanenceResourceByScope.put(r.signature.instance.name, r2);
+				Resource<ScopeLifeCycle> r2 = (Resource<ScopeLifeCycle>) r;
+				lifeCycleResourceByScope.put(r.signature.instance.name, r2);
 			}
 		}
-		// make sure all ScopePermanence are known
-		for (Entry<Name, Resource<ScopePermanence>> e : permanenceResourceByScope.entrySet()) {
-			if (!permanenceByScope.containsKey(e.getKey())) {
-				Resource<ScopePermanence> val = e.getValue();
-				permanenceByScope.put(e.getKey(),
+		// make sure all required ScopeLifeCycle are known
+		for (Entry<Name, Resource<ScopeLifeCycle>> e : lifeCycleResourceByScope.entrySet()) {
+			if (!lifeCycleByScope.containsKey(e.getKey())) {
+				Resource<ScopeLifeCycle> val = e.getValue();
+				lifeCycleByScope.put(e.getKey(),
 						val.generate(val.signature.toDependency()));
 			}
 		}
 		// create rest of resources
 		for (int i = 0; i < descriptors.length; i++)
 			if (res[i] == null)
-				res[i] = createResource(link, scopes, i, descriptors[i],
-						permanenceByScope);
+				res[i] = createResource(context, scopes, i, descriptors[i],
+						lifeCycleByScope);
 		return res;
 	}
 
 	private static Injector createBootstrappingContext(
-			Map<Name, Resource<ScopePermanence>> permanenceResourceByScope,
-			Map<Name, ScopePermanence> permanenceByScope) {
+			Map<Name, Resource<ScopeLifeCycle>> lifeCycleResourceByScope,
+			Map<Name, ScopeLifeCycle> lifeCycleByScope) {
 		return new Injector() {
 
 			@SuppressWarnings({ "unchecked", "ChainOfInstanceofChecks" })
@@ -174,13 +155,13 @@ final class Resources {
 				Class<E> rawType = dep.type().rawType;
 				if (rawType == Injector.class)
 					return (E) this;
-				if (rawType == ScopePermanence.class) {
+				if (rawType == ScopeLifeCycle.class) {
 					Name scope = dep.instance.name;
-					if (!permanenceResourceByScope.containsKey(scope))
+					if (!lifeCycleResourceByScope.containsKey(scope))
 						throw noResourceFor(dep);
-					Dependency<ScopePermanence> scopeDep = (Dependency<ScopePermanence>) dep;
-					return (E) permanenceByScope.computeIfAbsent(scope,
-							name -> permanenceResourceByScope.get(
+					Dependency<ScopeLifeCycle> scopeDep = (Dependency<ScopeLifeCycle>) dep;
+					return (E) lifeCycleByScope.computeIfAbsent(scope,
+							name -> lifeCycleResourceByScope.get(
 									name).generator.generate(scopeDep));
 				}
 				throw noResourceFor(dep);
@@ -188,7 +169,7 @@ final class Resources {
 
 			private NoResourceForDependency noResourceFor(Dependency<?> dep) {
 				return new NoResourceForDependency("During bootstrapping only ",
-						dep, permanenceResourceByScope.values().toArray(
+						dep, lifeCycleResourceByScope.values().toArray(
 								new Resource[0]));
 			}
 		};
@@ -216,15 +197,15 @@ final class Resources {
 		return byRawType;
 	}
 
-	private <T> Resource<T> createResource(ResourceLink link,
+	private <T> Resource<T> createResource(SupplyContext context,
 			Function<Name, Scope> scopes, int serialID,
 			ResourceDescriptor<T> descriptor,
-			Map<Name, ScopePermanence> permanenceByScope) {
+			Map<Name, ScopeLifeCycle> lifeCycleByScope) {
 		// NB. using the function is a way to allow both Resource and Generator implementation to be initialised with a final reference of each other
 		Function<Resource<T>, Generator<T>> generatorFactory = //
-				resource -> createGenerator(link, scopes, resource,
+				resource -> createGenerator(context, scopes, resource,
 						descriptor.supplier);
-		ScopePermanence scoping = permanenceByScope.get(descriptor.scope);
+		ScopeLifeCycle scoping = lifeCycleByScope.get(descriptor.scope);
 		if (scoping == null)
 			throw new InconsistentDeclaration("Scope `" + descriptor.scope
 				+ "` is used but not defined for: " + descriptor);
@@ -233,23 +214,23 @@ final class Resources {
 				descriptor.verifier, generatorFactory);
 	}
 
-	private static <T> Resource<T> createScopePermanenceResource(int serialID,
+	private static <T> Resource<T> createLifeCycleResource(int serialID,
 			ResourceDescriptor<T> descriptor, Injector bootstrappingContext) {
 		return new Resource<>(serialID, descriptor.source,
-				ScopePermanence.container, descriptor.signature,
+				ScopeLifeCycle.container, descriptor.signature,
 				descriptor.annotations, descriptor.verifier,
 					resource -> (dependency ->	descriptor.supplier
 							.supply(dependency, bootstrappingContext)));
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T> Generator<T> createGenerator(ResourceLink link,
+	private <T> Generator<T> createGenerator(SupplyContext context,
 			Function<Name, Scope> scopes, Resource<T> resource,
 			Supplier<? extends T> supplier) {
 		if (supplier.isGenerator())
 			return (Generator<T>) supplier.asGenerator();
-		Name scope = resource.permanence.scope;
-		Generator<T> inContext = dep -> link.supplyInContext(dep, supplier,
+		Name scope = resource.lifeCycle.scope;
+		Generator<T> inContext = dep -> context.supplyInContext(dep, supplier,
 				resource);
 		if (Scope.class.isAssignableFrom(resource.type().rawType)
 			|| Scope.container.equalTo(scope))
@@ -258,11 +239,11 @@ final class Resources {
 			return new ReferenceGenerator<>(inContext, resource);
 		// default is a scoped generator...
 		return new LazyScopedGenerator<>(inContext, resource, resourceCount,
-				() -> scopes.apply(resource.permanence.scope));
+				() -> scopes.apply(resource.lifeCycle.scope));
 	}
 
 	public void verifyIn(Injector context) {
-		for (Resource<?> r : resources)
+		for (Resource<?> r : sortedResources)
 			r.verifier.verifyIn(context);
 	}
 
@@ -306,7 +287,7 @@ final class Resources {
 
 		private T provide(Dependency<? super T> dep) {
 			return inContext.generate(
-					dep.injectingInto(resource.signature, resource.permanence));
+					dep.injectingInto(resource.signature, resource.lifeCycle));
 		}
 	}
 
@@ -331,7 +312,7 @@ final class Resources {
 				throws UnresolvableDependency {
 			dep.ensureNoIllegalDirectAccessOf(resource.signature);
 			return inContext.generate(dep.injectingInto(resource.signature,
-					ScopePermanence.ignore));
+					ScopeLifeCycle.ignore));
 		}
 	}
 
@@ -347,10 +328,10 @@ final class Resources {
 		private final Lazy<Scope> scope = new Lazy<>();
 		private final Resource<T> resource;
 		private final int resources;
-		private final Provider<Scope> scopeProvider;
+		private final java.util.function.Supplier<Scope> scopeProvider;
 
 		LazyScopedGenerator(Generator<T> inContext, Resource<T> resource,
-				int resources, Provider<Scope> scope) {
+				int resources, java.util.function.Supplier<Scope> scope) {
 			this.resource = resource;
 			this.inContext = inContext;
 			this.resources = resources;
@@ -361,22 +342,24 @@ final class Resources {
 		public T generate(Dependency<? super T> dep) {
 			dep.ensureNoIllegalDirectAccessOf(resource.signature);
 			final Dependency<? super T> injected = dep.injectingInto(
-					resource.signature, resource.permanence);
+					resource.signature, resource.lifeCycle);
 			/*
 			 * This cache makes sure that within one thread even if the provider
-			 * (lambda below) is called multiple times (which can occur because
+			 * (createInScope) is called multiple times (which can occur because
 			 * methods like {@code updateAndGet} on atomics have a loop) will
-			 * always yield the same instance. Different invocation of this
-			 * method (yield) however can lead to multiple calls to the
-			 * supplier.
+			 * always yield the same instance. Different invocation of this outer
+			 * method (generate) however can lead to multiple calls to the
+			 * Generator.
 			 */
-			AtomicReference<T> instanceCache = new AtomicReference<>();
-			T res = scope.get(scopeProvider).provide(resource.serialID,
-					resources, injected,
-					() -> instanceCache.updateAndGet(
-							instance -> instance != null
-								? instance
-								: inContext.generate(injected)));
+			Object[] cache = new Object[1];
+			@SuppressWarnings("unchecked")
+			Provider<T> createInScope = () -> {
+				if (cache[0] == null)
+					cache[0] = inContext.generate(injected);
+				return (T) cache[0];
+			};
+			T res = scope.get(scopeProvider) //
+					.provide(resource.serialID,	resources, injected, createInScope);
 			if (res instanceof ContextAware) {
 				@SuppressWarnings("unchecked")
 				ContextAware<T> contextAware = (ContextAware<T>) res;

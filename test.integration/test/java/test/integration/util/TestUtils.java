@@ -1,7 +1,10 @@
 package test.integration.util;
 
 import java.io.*;
+import java.util.HashSet;
+import java.util.Set;
 
+import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -52,5 +55,14 @@ public final class TestUtils {
 		ByteArrayInputStream bais = new ByteArrayInputStream(b);
 		ObjectInputStream ois = new ObjectInputStream(bais);
 		return (Serializable) ois.readObject();
+	}
+
+	public static <E> void assertEqualSets(E[] expected, E[] actual) {
+		assertEquals(expected.length, actual.length);
+		assertEquals(set(expected), set(actual));
+	}
+
+	private static <E> Set<E> set(E[] expected) {
+		return new HashSet<>(asList(expected));
 	}
 }

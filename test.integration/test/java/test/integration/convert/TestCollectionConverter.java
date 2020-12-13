@@ -13,11 +13,11 @@ import java.util.List;
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static se.jbee.inject.Cast.listTypeOf;
+import static se.jbee.inject.lang.Cast.listTypeOf;
 import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.lang.Utils.arrayMap;
 
-public class TestCollectionConverter {
+class TestCollectionConverter {
 
 	public static class TestCollectionConverterModule extends ConverterModule {
 
@@ -35,14 +35,14 @@ public class TestCollectionConverter {
 			TestCollectionConverterModule.class);
 
 	@Test
-	public void genericArrayToCollectionConverterCanBeDefined() {
+	void genericArrayToCollectionConverterCanBeDefined() {
 		Converter<Number[], List<Number>> arr2list = context.resolve(
 				Converter.converterTypeOf(raw(Number[].class), listTypeOf(Number.class)));
 		assertEquals(asList(1, 2), arr2list.convert(new Number[] { 1, 2 }));
 	}
 
 	@Test
-	public void genericStringToArrayConverterCanBeDefined() {
+	void genericStringToArrayConverterCanBeDefined() {
 		Converter<String, Integer[]> str2intArr = context.resolve(
 				Converter.converterTypeOf(String.class, Integer[].class));
 		assertArrayEquals(new Integer[] { 42, 13 },

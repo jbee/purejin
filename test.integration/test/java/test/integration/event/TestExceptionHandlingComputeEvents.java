@@ -11,7 +11,7 @@ import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestExceptionHandlingComputeEvents {
+class TestExceptionHandlingComputeEvents {
 
 	public interface Handler {
 
@@ -64,28 +64,28 @@ public class TestExceptionHandlingComputeEvents {
 	private final Handler handler = injector.resolve(Handler.class);
 
 	@Test
-	public void thatUncheckedExceptionIsKept() {
+	void thatUncheckedExceptionIsKept() {
 		assertNotNull(service);
 		assertException(IllegalArgumentException.class, "original",
-				() -> handler.throwsUncheckedException());
+				handler::throwsUncheckedException);
 	}
 
 	@Test
-	public void thatCheckedExceptionIsKeptIfHandlerMethodSignatureAllowsIt() {
+	void thatCheckedExceptionIsKeptIfHandlerMethodSignatureAllowsIt() {
 		assertException(IOException.class, "original",
-				() -> handler.throwsCheckedException());
+				handler::throwsCheckedException);
 	}
 
 	@Test
-	public void thatTimeoutIsKeptIfHandlerMethodSignatureAllowsIt() {
+	void thatTimeoutIsKeptIfHandlerMethodSignatureAllowsIt() {
 		assertException(TimeoutException.class, "original",
-				() -> handler.throwsTimeoutException());
+				handler::throwsTimeoutException);
 	}
 
 	@Test
-	public void thatTimeoutIsKeptIfHandlerMethodSignatureAllowsItMoreGeneralException() {
+	void thatTimeoutIsKeptIfHandlerMethodSignatureAllowsItMoreGeneralException() {
 		assertException(TimeoutException.class, "original",
-				() -> handler.throwsTimeoutException2());
+				handler::throwsTimeoutException2);
 	}
 
 	private static void assertException(Class<? extends Exception> type,

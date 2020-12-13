@@ -11,7 +11,7 @@ import se.jbee.inject.lang.Utils;
  * instance per type is created using the type's
  * {@link Utils#commonConstructor(Class)}.
  *
- * @since 19.1
+ * @since 8.1
  */
 public interface Extension {
 	// marker

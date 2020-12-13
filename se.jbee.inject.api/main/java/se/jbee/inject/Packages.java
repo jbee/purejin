@@ -165,7 +165,7 @@ public final class Packages
 	}
 
 	public boolean includesAll() {
-		return roots.length == 0 && includingSubpackages;
+		return this == ALL || roots.length == 0 && includingSubpackages;
 	}
 
 	@Override

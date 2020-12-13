@@ -11,10 +11,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Target.targeting;
 
-public class TestTarget {
+class TestTarget {
 
 	@Test
-	public void thatTargetInstancesNeedsToBeMatchedByDependencies() {
+	void thatTargetInstancesNeedsToBeMatchedByDependencies() {
 		Target target = targeting(List.class);
 		Dependency<String> dependency = dependency(String.class);
 		assertFalse(target.isAvailableFor(dependency));

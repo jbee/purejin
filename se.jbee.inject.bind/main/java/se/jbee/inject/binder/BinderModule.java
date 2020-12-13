@@ -1,20 +1,20 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.binder;
 
-import static se.jbee.inject.Scope.container;
-
 import se.jbee.inject.Env;
 import se.jbee.inject.Name;
 import se.jbee.inject.Scope;
-import se.jbee.inject.ScopePermanence;
+import se.jbee.inject.ScopeLifeCycle;
 import se.jbee.inject.bind.Bindings;
 import se.jbee.inject.bind.Bootstrapper;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.bind.Module;
+
+import static se.jbee.inject.Scope.container;
 
 /**
  * The default utility {@link Module} almost always used.
@@ -66,24 +66,23 @@ public abstract class BinderModule extends InitializedBinder
 	}
 
 	/**
-	 * Binds a {@link ScopePermanence} with the needed {@link Scope#container}.
-	 * 
-	 * @since 19.1
-	 * @param sp instance to bind, not null
+	 * Binds a {@link ScopeLifeCycle} with the needed {@link Scope#container}.
+	 *
+	 * @since 8.1
+	 * @param lifeCycle the instance to bind, not null
 	 */
-	protected final void bindScopePermanence(ScopePermanence sp) {
-		bindScopePermanence(sp.scope).to(sp);
+	protected final void bindLifeCycle(ScopeLifeCycle lifeCycle) {
+		bindLifeCycle(lifeCycle.scope).to(lifeCycle);
 	}
 
-	protected final TypedBinder<ScopePermanence> bindScopePermanence(
-			Name scope) {
-		return per(container).bind(scope, ScopePermanence.class);
+	protected final TypedBinder<ScopeLifeCycle> bindLifeCycle(Name scope) {
+		return per(container).bind(scope, ScopeLifeCycle.class);
 	}
 
 	/**
 	 * Starts the binding of a {@link Scope}.
-	 * 
-	 * @since 19.1
+	 *
+	 * @since 8.1
 	 * @param scope name of the scope to create
 	 * @return fluent API to invoke one of the {@code to} methods to provide the
 	 *         {@link Scope} or the indirection creating it.

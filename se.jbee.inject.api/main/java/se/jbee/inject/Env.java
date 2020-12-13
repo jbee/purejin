@@ -1,5 +1,6 @@
 package se.jbee.inject;
 
+import se.jbee.inject.lang.Cast;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.Utils;
 
@@ -10,6 +11,23 @@ import java.util.function.Function;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.lang.Type.raw;
 
+/**
+ * An {@link Env} is a like a key-value property map where the keys are {@link
+ * Type}s and the values instances of the key type.
+ * <p>
+ * To distinguish multiple values of the same {@link Type} a {@link Name}
+ * qualifier is added.
+ * <p>
+ * To avoid collisions between qualified properties as used within different
+ * software modules that do not know about each other {@link Packages} are used
+ * as namespaces.
+ * <p>
+ * Properties that are considered namespace specific are resolved providing that
+ * {@link Package} namespace based on the {@link Class} that uses the property.
+ * <p>
+ * Properties that are considered "globally" used do not use a particular {@link
+ * Package} as namespace which makes them "global".
+ */
 @FunctionalInterface
 public interface Env {
 
@@ -33,21 +51,29 @@ public interface Env {
 	 */
 	String GP_USE_VERIFICATION = "verify";
 
-	<T> T property(Name name, Type<T> property, Package scope)
+	<T> T property(Name qualifier, Type<T> property, Package ns)
 			throws InconsistentDeclaration;
 
-	default <T> T property(Class<T> property, Package scope)
+	default <T> T property(Class<T> property, Package ns)
 			throws InconsistentDeclaration {
-		return property(Name.DEFAULT, raw(property), scope);
+		return property(Name.DEFAULT, raw(property), ns);
 	}
 
-	default <T> T property(Type<T> property, Package scope)
+	default <T> T property(Type<T> property, Package ns)
 			throws InconsistentDeclaration {
-		return property(Name.DEFAULT, property, scope);
+		return property(Name.DEFAULT, property, ns);
+	}
+
+	default <T> T property(Name qualifier, Type<T> property, Package ns, T defaultValue) {
+		try {
+			return property(qualifier, property, ns);
+		} catch (InconsistentDeclaration e) {
+			return defaultValue;
+		}
 	}
 
 	/*
-	 * Global Properties (properties in the "global" scope)
+	 * Global Properties (properties in the "global" space)
 	 *
 	 * This simply means if they are defined they will have the same value
 	 * independent of where they are resolved.
@@ -57,20 +83,20 @@ public interface Env {
 		return globalProperty(Name.DEFAULT.value, property, defaultValue);
 	}
 
-	default boolean globalProperty(String name, boolean defaultValue) {
-		return globalProperty(name, raw(boolean.class), defaultValue);
+	default boolean globalProperty(String qualifier, boolean defaultValue) {
+		return globalProperty(qualifier, raw(boolean.class), defaultValue);
 	}
 
-	default <T> T globalProperty(String name, Type<T> property, T defaultValue) {
+	default <T> T globalProperty(String qualifier, Type<T> property, T defaultValue) {
 		try {
-			return globalProperty(name, property);
+			return globalProperty(qualifier, property);
 		} catch (InconsistentDeclaration e) {
 			return defaultValue;
 		}
 	}
 
-	default <T> T globalProperty(String name, Type<T> property) {
-		return property(named(name), property, null);
+	default <T> T globalProperty(String qualifier, Type<T> property) {
+		return property(named(qualifier), property, null);
 	}
 
 	default <T> T globalProperty(Type<T> property) {
@@ -105,6 +131,7 @@ public interface Env {
 	default <T> Verifier verifierFor(T target) {
 		if (!globalProperty(Env.GP_USE_VERIFICATION, false))
 			return Verifier.AOK;
+		@SuppressWarnings("unchecked")
 		Class<T> targetClass = (Class<T>) target.getClass();
 		Function<T, Verifier> factory = globalProperty(Cast.functionTypeOf(
 				targetClass, Verifier.class), null);

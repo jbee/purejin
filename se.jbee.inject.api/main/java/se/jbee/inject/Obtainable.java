@@ -1,7 +1,11 @@
 package se.jbee.inject;
 
+import se.jbee.inject.lang.Type;
+
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * A {@link java.util.Optional} like type that is "wrapped" around the type that
@@ -29,10 +33,19 @@ import java.util.function.Supplier;
  *
  * @param <T> The type of the instance that should be obtained
  *
- * @since 19.1
+ * @since 8.1
  */
 @FunctionalInterface
 public interface Obtainable<T> {
+
+	static <T> Type<Obtainable<T>> obtainableTypeOf(Class<T> obtained) {
+		return obtainableTypeOf(raw(obtained));
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	static <T> Type<Obtainable<T>> obtainableTypeOf(Type<T> obtained) {
+		return (Type) raw(Obtainable.class).parametized(obtained);
+	}
 
 	/**
 	 * Resolves the instance of the obtained type or {@code null}  (non array

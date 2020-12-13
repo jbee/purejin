@@ -5,6 +5,10 @@
  */
 package se.jbee.inject;
 
+import se.jbee.inject.lang.Type;
+
+import static se.jbee.inject.lang.Type.raw;
+
 /**
  * A indirection that resolves the instance lazily when {@link #provide()} is
  * invoked. This is mainly used to allow the injection and usage of instances
@@ -20,6 +24,15 @@ package se.jbee.inject;
  */
 @FunctionalInterface
 public interface Provider<T> {
+
+	static <T> Type<Provider<T>> providerTypeOf(Class<T> providedType) {
+		return providerTypeOf(raw(providedType));
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	static <T> Type<Provider<T>> providerTypeOf(Type<T> providedType) {
+		return (Type) raw(Provider.class).parametized(providedType);
+	}
 
 	/**
 	 * @return The lazily resolved instance. Implementations should make sure

@@ -15,7 +15,7 @@ import java.util.function.BinaryOperator;
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Name.named;
 
-public class TestAggregatingEvents {
+class TestAggregatingEvents {
 
 	interface Handler {
 
@@ -82,7 +82,7 @@ public class TestAggregatingEvents {
 	private final Handler proxy = injector.resolve(Handler.class);
 
 	@BeforeEach
-	public void preconditions() {
+	void preconditions() {
 		assertSame(Service.class, a.getClass());
 		assertSame(Service.class, b.getClass());
 		assertNotSame(a, b);
@@ -91,14 +91,14 @@ public class TestAggregatingEvents {
 
 	@Test
 	@Disabled("TODO #80 // TestAggregatingEvents.staticAggregationIsPerformed()")
-	public void staticAggregationIsPerformed() {
+	void staticAggregationIsPerformed() {
 		assertFalse(proxy.all());
 		assertEquals(3, proxy.sum());
 	}
 
 	@Test
 	@Disabled("TODO #80 // TestAggregatingEvents.dynamicAggregationIsPerformed()")
-	public void dynamicAggregationIsPerformed() {
+	void dynamicAggregationIsPerformed() {
 		assertTrue(proxy.dynamic(Boolean::logicalOr));
 		assertEquals(5, proxy.dynamic(3, Integer::max));
 	}

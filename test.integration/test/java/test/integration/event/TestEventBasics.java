@@ -22,7 +22,7 @@ import static test.integration.util.TestUtils.wait50;
  * processing restrictions that control correct processing of events with
  * regards to isolation/threading.
  */
-public class TestEventBasics {
+class TestEventBasics {
 
 	public interface Handler {
 
@@ -68,7 +68,7 @@ public class TestEventBasics {
 			TestEventsModule.class);
 
 	@Test
-	public void thatNonReturnDispatchIsNonBlockingForTheCaller() {
+	void thatNonReturnDispatchIsNonBlockingForTheCaller() {
 		Handler proxy = injector.resolve(Handler.class);
 		Service service = injector.resolve(Service.class);
 		assertEquals(0, service.messages.size());
@@ -83,7 +83,7 @@ public class TestEventBasics {
 	}
 
 	@Test
-	public void thatHandledInterfacesInjectProxy() {
+	void thatHandledInterfacesInjectProxy() {
 		Handler proxy = injector.resolve(Handler.class);
 		assertTrue(Proxy.isProxyClass(proxy.getClass()));
 		assertSame(injector.resolve(Handler.class), proxy,
@@ -91,7 +91,7 @@ public class TestEventBasics {
 	}
 
 	@Test
-	public void thatComputationDispatchWorks() {
+	void thatComputationDispatchWorks() {
 		Handler proxy = injector.resolve(Handler.class);
 		Service service = injector.resolve(Service.class); // need to exist
 		assertNotNull(service);
@@ -101,7 +101,7 @@ public class TestEventBasics {
 	}
 
 	@Test
-	public void thatEventualComputationDispatchWorks() {
+	void thatEventualComputationDispatchWorks() {
 		Handler proxy = injector.resolve(Handler.class);
 		Service service = injector.resolve(Service.class); // need to exist
 		assertNotNull(service);

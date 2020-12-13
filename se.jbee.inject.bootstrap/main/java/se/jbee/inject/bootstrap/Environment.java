@@ -1,33 +1,37 @@
 package se.jbee.inject.bootstrap;
 
-import static se.jbee.inject.Instance.instance;
-import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Type.raw;
-
-import java.lang.annotation.Annotation;
-import java.util.HashMap;
-import java.util.Map.Entry;
-
 import se.jbee.inject.*;
+import se.jbee.inject.bind.InconsistentBinding;
+import se.jbee.inject.bind.ModuleWith;
+import se.jbee.inject.bind.ValueBinder;
 import se.jbee.inject.config.*;
 import se.jbee.inject.defaults.DefaultValueBinders;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.Utils;
-import se.jbee.inject.bind.InconsistentBinding;
-import se.jbee.inject.bind.ModuleWith;
-import se.jbee.inject.bind.ValueBinder;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map.Entry;
+
+import static se.jbee.inject.Instance.instance;
+import static se.jbee.inject.Name.named;
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * The {@link Environment} is the map based implementation of an {@link Env}
  * that mainly exists to solve the hen-egg situation that originates from {@link
  * Env} at times themselves being bootstrapped on the basis of an {@link Env}.
+ * <p>
+ * It only allows to declare "global" properties using {@link #with(Type,
+ * Object)} and others.
  */
 public final class Environment implements Env {
 
 	/**
-	 * The most basic {@link Env} that is used by default to bootstrap {@link
+	 * The most basic {@link Env} that is used as default to bootstrap {@link
 	 * Injector} contexts from root {@link se.jbee.inject.bind.Bundle} (s) or
-	 * even a bootstrapped {@link Env} itself.
+	 * even a bootstrapped a name-spaced {@link Env} itself.
 	 */
 	public static final Environment DEFAULT = new Environment() //
 			.with(Edition.class, Edition.FULL) //
@@ -45,7 +49,7 @@ public final class Environment implements Env {
 			.with(NamesBy.class, NamesBy.defaultName) //
 			.with(ScopesBy.class, ScopesBy.alwaysDefault) //
 			.with(HintsBy.class, HintsBy.noParameters) //
-			.with(Annotated.Merge.class, Annotated.NO_MERGE) //
+			.with(Annotated.Enhancer.class, Annotated.SOURCE) //
 			.with(Env.GP_USE_DEEP_REFLECTION, boolean.class, false) //
 			.with(Env.GP_DEEP_REFLECTION_PACKAGES, Packages.class, Packages.ALL) //
 			.with(Env.GP_USE_VERIFICATION, boolean.class, false) //
@@ -76,6 +80,10 @@ public final class Environment implements Env {
 		return new Environment(true, values, override, decorated);
 	}
 
+	/**
+	 * @param completed some {@link Env}
+	 * @return This {@link Env} added as a fallback to the provided {@link Env}
+	 */
 	public Environment complete(Env completed) {
 		return new Environment(readonly, values, false, completed);
 	}
@@ -87,41 +95,41 @@ public final class Environment implements Env {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T property(Name name, Type<T> property, Package scope) {
+	public <T> T property(Name qualifier, Type<T> property, Package ns) {
 		if (decorated != null && !override) {
 			try {
-				return decorated.property(name, property, scope);
+				return decorated.property(qualifier, property, ns);
 			} catch (InconsistentDeclaration e) {
 				// fall through and complement...
 			}
 		}
-		Instance<T> key = instance(name, property);
+		Instance<T> key = instance(qualifier, property);
 		Object value = values.get(key);
 		if (value != null || values.containsKey(key))
 			return (T) value;
 		if (decorated != null && override)
-			return decorated.property(name, property, scope);
-		throw InconsistentBinding.undefinedEnvProperty(name, property, scope);
+			return decorated.property(qualifier, property, ns);
+		throw InconsistentBinding.undefinedEnvProperty(qualifier, property, ns);
 	}
 
-	public <T> Environment with(Class<T> property, T value) {
-		return with(raw(property), value);
+	public <T> Environment with(Class<T> globalProperty, T value) {
+		return with(raw(globalProperty), value);
 	}
 
-	public <T> Environment with(Type<T> property, T value) {
-		return with(Name.DEFAULT.toString(), property, value);
+	public <T> Environment with(Type<T> globalProperty, T value) {
+		return with(Name.DEFAULT.toString(), globalProperty, value);
 	}
 
-	public <T> Environment with(String name, Class<T> property, T value) {
-		return with(name, raw(property), value);
+	public <T> Environment with(String qualifier, Class<T> globalProperty, T value) {
+		return with(qualifier, raw(globalProperty), value);
 	}
 
-	public <T> Environment with(String name, Type<T> property, T value) {
+	public <T> Environment with(String qualifier, Type<T> globalProperty, T value) {
 		if (readonly) {
 			return new Environment(false, copyOfValues(), override, decorated) //
-					.with(name, property, value);
+					.with(qualifier, globalProperty, value);
 		}
-		values.put(instance(named(name), property), value);
+		values.put(instance(named(qualifier), globalProperty), value);
 		return this;
 	}
 
@@ -137,9 +145,16 @@ public final class Environment implements Env {
 		return with(type, value);
 	}
 
-	public <A extends Annotation> Environment withAnnotation(Class<A> name,
+	public <A extends Annotation> Environment withTypePattern(Class<A> qualifier,
 			ModuleWith<Class<?>> value) {
-		return with(named(name).toString(), ModuleWith.ANNOTATION, value);
+		//TODO check target type matches
+		return with(named(qualifier).toString(), ModuleWith.TYPE_ANNOTATION, value);
+	}
+
+	public <A extends Annotation> Environment withMethodPattern(Class<A> qualifier,
+			ModuleWith<Method> value) {
+		//TODO check target type matches
+		return with(named(qualifier).toString(), ModuleWith.METHOD_ANNOTATION, value);
 	}
 
 	@SafeVarargs

@@ -10,18 +10,38 @@ import se.jbee.inject.lang.Type;
 
 import java.util.function.Function;
 
+import static se.jbee.inject.lang.Type.raw;
+
 /**
  * A {@link Resource} describes a injection situation or scenario through its
- * {@link #signature} and {@link #permanence}. If the {@link Resource} applies
+ * {@link #signature} and {@link #lifeCycle}. If the {@link Resource} applies
  * to a actual {@link Dependency} situation its {@link #generator} is used to
  * create the instance injected should it not exist already.
  *
- * @since 19.1
+ * @since 8.1
  *
  * @param <T> type of instances yielded by the {@link #generator}.
  */
 public final class Resource<T> implements Comparable<Resource<?>>,
 		Qualifying<Resource<?>>, Generator<T> {
+
+	public static <T> Type<Resource<T>> resourceTypeOf(Class<T> type) {
+		return resourceTypeOf(raw(type));
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static <T> Type<Resource<T>> resourceTypeOf(Type<T> type) {
+		return (Type) raw(Resource.class).parametized(type);
+	}
+
+	public static <T> Type<Resource<T>[]> resourcesTypeOf(Class<T> type) {
+		return resourcesTypeOf(raw(type));
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static <T> Type<Resource<T>[]> resourcesTypeOf(Type<T> type) {
+		return (Type) raw(Resource[].class).parametized(type);
+	}
 
 	public final Generator<T> generator;
 
@@ -40,7 +60,7 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 	 * The information on this {@link Scope} behaviour in relation to other
 	 * {@link Scope}s.
 	 */
-	public final ScopePermanence permanence;
+	public final ScopeLifeCycle lifeCycle;
 
 	/**
 	 * The serial ID of this {@link Resource}. It is unique within the same
@@ -63,12 +83,12 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 	 */
 	public final Verifier verifier;
 
-	public Resource(int serialID, Source source, ScopePermanence permanence,
+	public Resource(int serialID, Source source, ScopeLifeCycle lifeCycle,
 			Locator<T> signature, Annotated annotations, Verifier verifier,
 			Function<Resource<T>, Generator<T>> generator) {
 		this.signature = signature;
 		this.source = source;
-		this.permanence = permanence;
+		this.lifeCycle = lifeCycle;
 		this.serialID = serialID;
 		this.annotations = annotations;
 		this.verifier = verifier;
@@ -77,12 +97,12 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 	}
 
 	private Resource( int serialID,  Source source,
-			ScopePermanence permanence, Locator<T> signature, Annotated annotations,
+			ScopeLifeCycle lifeCycle, Locator<T> signature, Annotated annotations,
 			Verifier verifier, Generator<T> generator) {
 		this.generator = generator;
 		this.signature = signature;
 		this.source = source;
-		this.permanence = permanence;
+		this.lifeCycle = lifeCycle;
 		this.serialID = serialID;
 		this.annotations = annotations;
 		this.verifier = verifier;
@@ -101,12 +121,12 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 	 * Called during bootstrapping to initialise eager {@link Resource}s.
 	 */
 	public void init() {
-		if (permanence.isEager())
+		if (lifeCycle.isEager())
 			generate();
 	}
 
 	public Resource<T> withGenerator(Generator<T> generator) {
-		return new Resource<>(serialID, source, permanence, signature,
+		return new Resource<>(serialID, source, lifeCycle, signature,
 				annotations, verifier, generator);
 	}
 
@@ -117,7 +137,7 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 	@Override
 	public String toString() {
 		return "#" + serialID + " " + signature + " " + source + " "
-			+ permanence;
+			+ lifeCycle;
 	}
 
 	@Override

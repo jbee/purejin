@@ -23,8 +23,8 @@ import java.util.*;
 import static se.jbee.inject.lang.Utils.arrayOf;
 
 /**
- * Utility to create an {@link Injector} context from {@link Bundle}s and
- * {@link Module}s.
+ * Utility to create an {@link Injector} or {@link Env} context from {@link
+ * Bundle}s and {@link Module}s.
  *
  * @author Jan Bernitt (jan@jbee.se)
  */

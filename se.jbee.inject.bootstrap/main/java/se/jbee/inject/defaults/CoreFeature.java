@@ -5,16 +5,6 @@
  */
 package se.jbee.inject.defaults;
 
-import static se.jbee.inject.Cast.functionTypeOf;
-import static se.jbee.inject.Cast.resourcesTypeFor;
-import static se.jbee.inject.Scope.application;
-import static se.jbee.inject.lang.Type.raw;
-
-import java.lang.reflect.Array;
-import java.util.*;
-import java.util.function.Function;
-import java.util.logging.Logger;
-
 import se.jbee.inject.*;
 import se.jbee.inject.bind.Bootstrapper;
 import se.jbee.inject.bind.Bundle;
@@ -23,9 +13,19 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Supply;
 import se.jbee.inject.config.Extension;
 import se.jbee.inject.config.Plugins;
-import se.jbee.inject.container.Lazy;
+import se.jbee.inject.lang.Lazy;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.Utils;
+
+import java.lang.reflect.Array;
+import java.util.*;
+import java.util.function.Function;
+import java.util.logging.Logger;
+
+import static se.jbee.inject.Resource.resourcesTypeOf;
+import static se.jbee.inject.Scope.application;
+import static se.jbee.inject.lang.Cast.functionTypeOf;
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * Installs all the build-in functionality by using the core API.
@@ -183,7 +183,7 @@ public enum CoreFeature implements Toggled<CoreFeature> {
 			asDefault() //
 					.per(Scope.dependency) //
 					.starbind(Optional.class) //
-					.toSupplier((dep, context) -> optional(dep, context));
+					.toSupplier(this::optional);
 		}
 
 		@SuppressWarnings("unchecked")
@@ -241,7 +241,7 @@ public enum CoreFeature implements Toggled<CoreFeature> {
 			asDefault() //
 					.per(Scope.dependency) //
 					.starbind(Obtainable.class) //
-					.toSupplier((dep, context) -> obtain(dep, context));
+					.toSupplier(this::obtain);
 		}
 
 		@SuppressWarnings("unchecked")
@@ -269,7 +269,7 @@ public enum CoreFeature implements Toggled<CoreFeature> {
 			@SuppressWarnings("unchecked")
 			private T resolve() {
 				Resource<E>[] resources = context.resolve(
-						dep.typed(resourcesTypeFor(dep.type())));
+						dep.typed(resourcesTypeOf(dep.type())));
 				List<E> elements = new ArrayList<>();
 				for (Resource<E> r : resources) {
 					try {
@@ -387,5 +387,4 @@ public enum CoreFeature implements Toggled<CoreFeature> {
 			return copyToPrimitiveArray(wrappers, new boolean[wrappers.length]);
 		}
 	}
-
 }

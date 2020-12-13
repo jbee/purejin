@@ -6,21 +6,9 @@
 package se.jbee.inject.lang;
 
 import java.io.Serializable;
-import java.lang.reflect.Executable;
-import java.lang.reflect.Field;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.TypeVariable;
-import java.lang.reflect.WildcardType;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.lang.reflect.*;
+import java.util.*;
 
 /**
  * A generic version of {@link Class} like {@link java.lang.reflect.Type} but
@@ -68,12 +56,34 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 		return type(field.getGenericType());
 	}
 
+	public static Type<?> actualFieldType(Field member, Type<?> genericDeclaringClass) {
+		return type(member.getGenericType(), actualTypeArguments(genericDeclaringClass));
+	}
+
+	/**
+	 * Returns the generic {@link Method} return {@link Type} with any {@link
+	 * Class} level type parameter replaced with its lower bound, so {@code ?}
+	 * for an unbound type parameter or {@code Serializable} for {@code ?
+	 * extends Serializable}.
+	 *
+	 * @param method any {@link Method}
+	 * @return The fully generic return {@link Type} (filling class level type
+	 * parameters with lower bounds)
+	 */
 	public static Type<?> returnType(Method method) {
 		return type(method.getGenericReturnType());
 	}
 
+	public static Type<?> actualReturnType(Method member, Type<?> genericDeclaringClass) {
+		return type(member.getGenericReturnType(), actualTypeArguments(genericDeclaringClass));
+	}
+
 	public static Type<?> parameterType(java.lang.reflect.Parameter param) {
 		return type(param.getParameterizedType());
+	}
+
+	public static Type<?> actualParameterType(java.lang.reflect.Parameter param, Type<?> genericDeclaringClass) {
+		return type(param.getParameterizedType(), actualTypeArguments(genericDeclaringClass));
 	}
 
 	public static Type<?>[] parameterTypes(Executable methodOrConstructor) {
@@ -494,6 +504,8 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 			Type<? extends S> type) {
 		if (supertype.getTypeParameters().length == 0)
 			return raw(supertype); // just for better performance
+		if (supertype == type.rawType)
+			return raw(supertype);
 		@SuppressWarnings("unchecked")
 		Type<? extends S> res = (Type<? extends S>) Utils.arrayFindFirst(
 				type.supertypes(), s -> s.rawType == supertype);

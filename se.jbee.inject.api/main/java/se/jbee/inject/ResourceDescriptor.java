@@ -24,7 +24,7 @@ import java.util.List;
  * (utility) packages as only contract is a consistent list of
  * {@link ResourceDescriptor} is produced to build a {@link Injector}s context.
  *
- * @since 19.1
+ * @since 8.1
  *
  * @param <T> Type of instances injected.
  */
@@ -51,7 +51,7 @@ public abstract class ResourceDescriptor<T> {
 	public static Annotated annotatedOf(Supplier<?> supplier) {
 		return supplier instanceof Annotated
 			? (Annotated) supplier
-			: Annotated.WITH_NO_ANNOTATIONS;
+			: Annotated.EMPTY;
 	}
 
 	public abstract ResourceDescriptor<T> annotatedBy(Annotated annotations);

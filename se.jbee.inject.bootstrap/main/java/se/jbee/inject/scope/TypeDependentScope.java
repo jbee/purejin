@@ -17,19 +17,19 @@ import se.jbee.inject.UnresolvableDependency;
  * {@link #typeSignature(Dependency)} or the
  * {@link #instanceSignature(Dependency)} but it can also include the injection
  * hierarchy as used by {@link #hierarchicalInstanceSignature(Dependency)}.
- * 
+ *
  * One use case are {@link #JVM} singletons. As the scope is kept in a normal
  * constant that is shared within the JVM this effectively shares the map's
  * instances within the same JVM.
- * 
- * @since 19.1
+ *
+ * @since 8.1
  */
 public final class TypeDependentScope implements Scope {
 
 	/**
 	 * Effectively gives a JVM singleton per {@link Instance}.
-	 * 
-	 * @since 19.1
+	 *
+	 * @since 8.1
 	 */
 	public static final Scope JVM = new TypeDependentScope(
 			TypeDependentScope::instanceSignature);

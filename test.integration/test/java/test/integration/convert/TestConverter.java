@@ -13,8 +13,8 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static se.jbee.inject.Cast.listTypeOf;
-import static se.jbee.inject.Cast.resourceTypeFor;
+import static se.jbee.inject.lang.Cast.listTypeOf;
+import static se.jbee.inject.Resource.resourceTypeOf;
 import static se.jbee.inject.lang.Type.classType;
 import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.lang.Utils.arrayMap;
@@ -22,7 +22,7 @@ import static se.jbee.inject.lang.Utils.arrayMap;
 /**
  * Tests the basics of {@link Converter}s.
  */
-public class TestConverter {
+class TestConverter {
 
 	public static class TestConverterModule extends ConverterModule {
 
@@ -41,41 +41,41 @@ public class TestConverter {
 	}
 
 	@Test
-	public void chainsCanBeBuildByAppending() {
+	void chainsCanBeBuildByAppending() {
 		Converter<String, Long> str2long = Long::parseLong;
 		Converter<Long, Integer> long2int = Long::intValue;
 		assertEquals(Integer.valueOf(13),
-				str2long.before(long2int).convert("13"));
+				str2long.then(long2int).convert("13"));
 	}
 
 	@Test
-	public void chainsCanBeBuildByPrepanding() {
+	void chainsCanBeBuildByPrepanding() {
 		Converter<String, Long> str2long = Long::parseLong;
 		Converter<Long, Integer> long2int = Long::intValue;
 		assertEquals(Integer.valueOf(13),
-				long2int.after(str2long).convert("13"));
+				long2int.upon(str2long).convert("13"));
 	}
 
 	@Test
-	public void errorsCanBeRecoveredUsingDefaultValues() {
+	void errorsCanBeRecoveredUsingDefaultValues() {
 		Converter<String, Integer> str2int = Integer::parseInt;
-		assertEquals(13, str2int.fallbackTo(13).convert("illegal").intValue());
+		assertEquals(13, str2int.orElse(13).convert("illegal").intValue());
 	}
 
 	private final Injector context = Bootstrap.injector(
 			TestConverterModule.class);
 
 	@Test
-	public void converterMethodsWithTypeVariableUseScopeDependencyType() {
+	void converterMethodsWithTypeVariableUseScopeDependencyType() {
 		@SuppressWarnings("rawtypes")
 		Resource<Converter<String, List>> str2ints = context.resolve(
-				resourceTypeFor(Converter.converterTypeOf(raw(String.class),
+				resourceTypeOf(Converter.converterTypeOf(raw(String.class),
 						classType(List.class))));
-		assertEquals(Scope.dependencyType, str2ints.permanence.scope);
+		assertEquals(Scope.dependencyType, str2ints.lifeCycle.scope);
 	}
 
 	@Test
-	public void genericMethodConverters() {
+	void genericMethodConverters() {
 		Converter<String, List<Integer>> str2ints = context.resolve(
 				Converter.converterTypeOf(raw(String.class), listTypeOf(Integer.class)));
 		assertEquals(asList(42, 13), str2ints.convert("42, 13"));

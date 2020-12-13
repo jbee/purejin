@@ -32,7 +32,7 @@ import se.jbee.inject.UnresolvableDependency;
  * This implementation is not heavily optimised. It does the job and illustrates
  * the principle.
  *
- * @since 19.1
+ * @since 8.1
  */
 public final class DiskScope implements Scope, Closeable {
 
@@ -58,14 +58,14 @@ public final class DiskScope implements Scope, Closeable {
 	/**
 	 * NB. {@link ConcurrentHashMap} does not allow updates while updating.
 	 */
-	private final Map<String, DiskEntry> loaded = new ConcurrentSkipListMap<>();
-	private final File dir;
-	private final Function<Dependency<?>, String> filenames;
+	private final Map<String, DiskEntry> entriesByName = new ConcurrentSkipListMap<>();
+	private final File rootDir;
+	private final Function<Dependency<?>, String> dep2name;
 
 	public DiskScope(long syncInterval, ScheduledExecutorService executor,
-			File dir, Function<Dependency<?>, String> filenames) {
-		this.dir = dir;
-		this.filenames = filenames;
+			File rootDir, Function<Dependency<?>, String> dep2name) {
+		this.rootDir = rootDir;
+		this.dep2name = dep2name;
 		if (syncInterval > 0) {
 			executor.scheduleAtFixedRate(this::syncToDisk, syncInterval,
 					syncInterval, TimeUnit.MILLISECONDS);
@@ -80,13 +80,13 @@ public final class DiskScope implements Scope, Closeable {
 		if (!dep.type().isAssignableTo(raw(Serializable.class)))
 			throw new UnresolvableDependency.SupplyFailed(
 					"Any disk type has to be serializable", null);
-		return (T) loaded.compute(filenames.apply(dep),
+		return (T) entriesByName.compute(dep2name.apply(dep),
 				(key, value) -> loadFromFile(key, value, provider)).obj;
 	}
 
 	private <T> DiskEntry loadFromFile(String filename, DiskEntry value,
 			Provider<T> provider) {
-		File file = new File(dir,
+		File file = new File(rootDir,
 				filename.replace('.', '_').replaceAll("[*@]", "_") + ".bin");
 		final long lastModified = file.lastModified();
 		if (value != null && value.asOfLastModified == lastModified)
@@ -109,7 +109,7 @@ public final class DiskScope implements Scope, Closeable {
 	}
 
 	private boolean dirReady() {
-		return dir.exists() || dir.mkdirs();
+		return rootDir.exists() || rootDir.mkdirs();
 	}
 
 	private static void syncToDisk(DiskEntry entry) {
@@ -135,7 +135,7 @@ public final class DiskScope implements Scope, Closeable {
 	private void syncToDisk() {
 		if (!dirReady())
 			return;
-		for (DiskEntry e : loaded.values())
+		for (DiskEntry e : entriesByName.values())
 			syncToDisk(e);
 	}
 }

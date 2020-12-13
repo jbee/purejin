@@ -12,6 +12,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A {@link Dependency} that should be resolved during the injection or
@@ -67,8 +68,8 @@ public abstract class UnresolvableDependency extends RuntimeException {
 
 		public UnstableDependency(Injection parent, Injection injection) {
 			super("Unstable dependency injection" +
-					"\n\t  of: " + injection.target + " scoped " + injection.permanence +
-					"\n\tinto: " + parent.target + " scoped " + parent.permanence);
+					"\n\t  of: " + injection.target + " scoped " + injection.lifeCycle +
+					"\n\tinto: " + parent.target + " scoped " + parent.lifeCycle);
 		}
 
 	}
@@ -90,7 +91,7 @@ public abstract class UnresolvableDependency extends RuntimeException {
 		public NoResourceForDependency(Collection<Type<?>> types,
 				List<?> dropped) {
 			super("No resource for type(s)\n\trequired: " + types
-				+ "\n\tdropped bindings:\n" + dropped);
+				+ (dropped.isEmpty() ? "" : "\n\tdropped bindings:\n" + dropped));
 		}
 	}
 
@@ -120,7 +121,9 @@ public abstract class UnresolvableDependency extends RuntimeException {
 
 		public NoMethodForDependency(Type<?> returnType,
 				Type<?>[] parameterTypes, Throwable cause) {
-			super(returnType + ":" + Arrays.toString(parameterTypes), cause);
+			super("No method for signature: " + returnType + " <any>(" + Arrays.stream(
+					parameterTypes).map(Object::toString).collect(
+					Collectors.joining(",")) + ")", cause);
 		}
 	}
 

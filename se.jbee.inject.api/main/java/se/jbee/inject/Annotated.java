@@ -10,13 +10,11 @@ import java.util.function.UnaryOperator;
 /**
  * Can be implemented by {@link Supplier}s to communicate the annotations
  * present on the underlying source used to supply instances.
- *
+ * <p>
  * For example a {@link Method}, {@link Constructor} or {@link Field} but also
  * any form of user defined source.
  *
- * @author Jan Bernitt
- *
- * @since 19.1
+ * @since 8.1
  */
 @FunctionalInterface
 public interface Annotated {
@@ -27,12 +25,20 @@ public interface Annotated {
 	AnnotatedElement element();
 
 	@FunctionalInterface
-	interface Merge extends UnaryOperator<Annotated> {
+	interface Enhancer extends UnaryOperator<Annotated> {
 	}
 
-	Merge NO_MERGE = a -> a;
+	/**
+	 * Keeps the annotation as presented by the source. This is how the {@link
+	 * Supplier} presented it from the underlying {@link
+	 * java.lang.reflect.Member} or {@link Class}.
+	 */
+	Enhancer SOURCE = a -> a;
 
-	Annotated WITH_NO_ANNOTATIONS = () -> new AnnotatedElement() {
+	/**
+	 * NULL object that represents no {@link Annotation}s present.
+	 */
+	Annotated EMPTY = () -> new AnnotatedElement() {
 
 		@Override
 		public <T extends Annotation> T getAnnotation(Class<T> type) {

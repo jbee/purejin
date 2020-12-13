@@ -5,31 +5,22 @@
  */
 package se.jbee.inject.bind;
 
-import static se.jbee.inject.lang.Type.raw;
-import static se.jbee.inject.lang.Utils.arrayOf;
-import static se.jbee.inject.lang.Utils.isClassMonomodal;
+import se.jbee.inject.*;
+import se.jbee.inject.Annotated.Enhancer;
+import se.jbee.inject.lang.Type;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import se.jbee.inject.Annotated;
-import se.jbee.inject.Annotated.Merge;
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Env;
-import se.jbee.inject.Generator;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Instance;
-import se.jbee.inject.Locator;
-import se.jbee.inject.Name;
-import se.jbee.inject.Scope;
-import se.jbee.inject.ScopePermanence;
-import se.jbee.inject.Source;
-import se.jbee.inject.Supplier;
-import se.jbee.inject.lang.Type;
-import se.jbee.inject.UnresolvableDependency;
+import static se.jbee.inject.Name.named;
+import static se.jbee.inject.lang.Type.classType;
+import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.inject.lang.Utils.arrayOf;
+import static se.jbee.inject.lang.Utils.isClassMonomodal;
 
 /**
  * {@link Bindings} accumulate the {@link Binding} during the bootstrapping.
@@ -57,9 +48,9 @@ public final class Bindings {
 	public <T> void add(Env env, Binding<T> complete) {
 		if (!complete.isComplete())
 			throw InconsistentBinding.addingIncomplete(complete);
-		Merge merge = env.property(Annotated.Merge.class,
+		Enhancer enhancer = env.property(Enhancer.class,
 				complete.source.ident.getPackage());
-		list.add(complete.annotatedBy(merge.apply(complete.annotations)));
+		list.add(complete.annotatedBy(enhancer.apply(complete.annotations)));
 	}
 
 	public void addExpanded(Env env, Binding<?> binding) {
@@ -72,34 +63,48 @@ public final class Bindings {
 		Package scope = binding.source.ident.getPackage();
 		@SuppressWarnings("unchecked")
 		ValueBinder<V> binder = env.property(
-				raw(ValueBinder.class).parametized(Type.classType(type)),
-				scope);
+				raw(ValueBinder.class).parametized(classType(type)), scope);
 		if (binder == null)
 			throw InconsistentBinding.undefinedValueBinderType(binding, type);
 		binder.expand(env, value, binding, this);
 	}
 
-	//TODO move out of here?
 	public void addAnnotated(Env env, Class<?> annotated) {
 		Annotation[] as = annotated.getAnnotations();
-		if (as.length == 0)
-			throw InconsistentBinding.noTypeAnnotation(annotated);
 		int n = 0;
-		for (Annotation a : as) {
-			@SuppressWarnings("unchecked")
-			ModuleWith<Class<?>> then = env.property(
-					Name.named(a.annotationType()),
-					raw(ModuleWith.class).parametized(Type.CLASS),
-					annotated.getPackage());
-			//TODO add a meta annotation to mark annotations that are expected to be defined
-			// if such an annotation is present but no effect defined it is a binding error
-			if (then != null) {
-				then.declare(this, env, annotated);
+		//TODO add a meta annotation to mark annotations that are expected to be defined
+		// if such an annotation is present but no effect defined it is a binding error
+		// should be doable by just defining a module that tries to resolve the annotations from the environment => confirm with a test
+		for (Annotation a : as)
+			if (addsAnnotatedType(env, annotated, a))
 				n++;
-			}
-		}
+		for (Method m : annotated.getMethods())
+			for (Annotation a : m.getDeclaredAnnotations())
+				if (addsAnnotatedMethod(env, m, a))
+					n++;
 		if (n == 0)
-			throw InconsistentBinding.noTypeAnnotation(annotated);
+			throw InconsistentBinding.noAnnotationModule(annotated);
+	}
+
+	private boolean addsAnnotatedType(Env env, Class<?> annotated, Annotation annotation) {
+		ModuleWith<Class<?>> then = env.property(
+				named(annotation.annotationType()),
+				ModuleWith.TYPE_ANNOTATION, annotated.getPackage(), null);
+		if (then == null)
+			return false;
+		then.declare(this, env, annotated);
+		return true;
+	}
+
+	private boolean addsAnnotatedMethod(Env env, Method annotated, Annotation annotation) {
+		ModuleWith<Method> then = env.property(
+				named(annotation.annotationType()),
+				ModuleWith.METHOD_ANNOTATION,
+				annotated.getDeclaringClass().getPackage(), null);
+		if (then == null)
+			return false;
+		then.declare(this, env, annotated);
+		return true;
 	}
 
 	public <T> void addConstant(Env env, Source source, Name name,
@@ -147,14 +152,14 @@ public final class Bindings {
 	/**
 	 * In contrast to {@link #supplyConstant(Object)} which does supply the
 	 * constant as {@link Generator} and thereby does not support custom
-	 * {@link ScopePermanence} or {@link Scope}s this way of supplying the
+	 * {@link ScopeLifeCycle} or {@link Scope}s this way of supplying the
 	 * constant will treat the constant as bean, that is like any "dynamically"
 	 * supplied value.
 	 *
 	 * @param <T> type of the constant
-	 * @param constant a bean that requires {@link ScopePermanence} effects.
+	 * @param constant a bean that requires {@link ScopeLifeCycle} effects.
 	 * @return A {@link Supplier} that supplies the given constant with
-	 *         {@link ScopePermanence} effects.
+	 *         {@link ScopeLifeCycle} effects.
 	 */
 	public static <T> Supplier<T> supplyScopedConstant(T constant) {
 		return (dep, context) -> constant;
@@ -162,7 +167,7 @@ public final class Bindings {
 
 	/**
 	 * Since the {@link Supplier} also implements {@link Generator} it is used
-	 * directly without any {@link ScopePermanence} effects. Effectively a
+	 * directly without any {@link ScopeLifeCycle} effects. Effectively a
 	 * constant always has the {@link Scope#container}.
 	 *
 	 * The implementation also implements {@link #equals(Object)} and

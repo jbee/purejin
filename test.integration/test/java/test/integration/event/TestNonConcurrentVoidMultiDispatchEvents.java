@@ -31,7 +31,7 @@ import static test.integration.util.TestUtils.wait50;
  * which will only resolve if the main thread continues in the test method to
  * the point where it notifies the waiting worker threads.
  */
-public class TestNonConcurrentVoidMultiDispatchEvents {
+class TestNonConcurrentVoidMultiDispatchEvents {
 
 	public interface Listener {
 
@@ -71,7 +71,7 @@ public class TestNonConcurrentVoidMultiDispatchEvents {
 			synchronized (this) {
 				try {
 					wait();
-				} catch (InterruptedException e) {
+				} catch (InterruptedException ignored) {
 				}
 			}
 		}
@@ -100,7 +100,7 @@ public class TestNonConcurrentVoidMultiDispatchEvents {
 			TestMultiDispatchEventsModule.class);
 
 	@Test
-	public void onlyOneThreadAtATimeCallsSameListersMethods() {
+	void onlyOneThreadAtATimeCallsSameListersMethods() {
 		Listener listener = injector.resolve(Listener.class);
 		Service a = injector.resolve(Service.class);
 		Service b = injector.resolve(Service.class);

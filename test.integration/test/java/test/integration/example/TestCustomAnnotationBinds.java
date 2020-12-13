@@ -1,6 +1,6 @@
 package test.integration.example;
 
-import com.example.app.Support;
+import test.example.app.Support;
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bind.ModuleWith;
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * has the drawback that the class implementing the annotation effect cannot
  * have constructor arguments.
  */
-public class TestCustomAnnotationBinds {
+class TestCustomAnnotationBinds {
 
 	// annotation and its effect is defined in the com.example.app test dependency
 
@@ -31,7 +31,7 @@ public class TestCustomAnnotationBinds {
 
 		@Override
 		protected void declare() {
-			addAnnotated(MySupportService.class);
+			patternbind(MySupportService.class);
 		}
 	}
 
@@ -43,7 +43,7 @@ public class TestCustomAnnotationBinds {
 	 * binding would exist for the class.
 	 */
 	@Test
-	public void customAnnotationsAddedViaServiceLoader() {
+	void customAnnotationsAddedViaServiceLoader() {
 	   Injector injector = Bootstrap.injector(Bootstrap.env(),
 				TestCustomAnnotationBindsModule.class);
 		MySupportService service = injector.resolve(MySupportService.class);

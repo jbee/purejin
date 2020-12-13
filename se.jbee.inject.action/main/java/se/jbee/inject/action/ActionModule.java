@@ -5,63 +5,40 @@
  */
 package se.jbee.inject.action;
 
-import static java.util.Arrays.asList;
-import static se.jbee.inject.Dependency.dependency;
-import static se.jbee.inject.Instance.instance;
-import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Type.parameterTypes;
-import static se.jbee.inject.lang.Type.raw;
-import static se.jbee.inject.lang.Type.returnType;
-import static se.jbee.inject.lang.Utils.arrayFindFirst;
-import static se.jbee.inject.config.ProducesBy.allMethods;
-
-import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import se.jbee.inject.*;
+import se.jbee.inject.Dependency;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Scope;
+import se.jbee.inject.Supplier;
 import se.jbee.inject.UnresolvableDependency.NoMethodForDependency;
-import se.jbee.inject.lang.Type;
-import se.jbee.inject.UnresolvableDependency.SupplyFailed;
-import se.jbee.inject.lang.Utils;
 import se.jbee.inject.bind.Module;
 import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.config.Plugins;
+import se.jbee.inject.config.Connector;
 import se.jbee.inject.config.ProducesBy;
+import se.jbee.inject.lang.Type;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static se.jbee.inject.lang.Type.actualReturnType;
 
 /**
- * When binding {@link Action}s this {@link Module} can be extended.
+ * Base {@link Module} that needs to be extended and installed at least once to
+ * add the general setup for {@link Action}s.
+ * <p>
+ * To add {@link Method}s as {@link Action}s use {@link #connect(ProducesBy)}
+ * and {@link ConnectTargetBinder#asAction()} as in this example:
  *
- * It provides procedure-related bind methods.
- *
- * @author Jan Bernitt (jan@jbee.se)
+ * <pre>
+ * connect(ProducesBy.allMethods).in(MyService.class).asAction();
+ * </pre>
  */
 public abstract class ActionModule extends BinderModule {
-
-	/**
-	 * The {@link ProducesBy} picks the {@link Method}s that are used to
-	 * implement {@link Action}s. This abstraction allows to customise what
-	 * methods are bound as {@link Action}s. The
-	 * {@link ProducesBy#reflect(Class)} should return all methods in the
-	 * given {@link Class} that should be used to implement an {@link Action}.
-	 */
-	static final Instance<ProducesBy> ACTION_MIRROR = instance(
-			named(Action.class), raw(ProducesBy.class));
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static <I, O> Dependency<Action<I, O>> actionDependency(
-			Type<I> input, Type<O> output) {
-		Type type = raw(Action.class).parametized(input, output);
-		return dependency(type);
-	}
-
-	protected final void bindActionsIn(Class<?> impl) {
-		plug(impl).into(Action.class);
-	}
-
-	protected final void discoverActionsBy(ProducesBy mirror) {
-		bind(ACTION_MIRROR).to(mirror);
-	}
 
 	protected ActionModule() {
 		super(ActionBaseModule.class);
@@ -71,62 +48,49 @@ public abstract class ActionModule extends BinderModule {
 
 		@Override
 		public void declare() {
-			asDefault().per(Scope.dependencyType).starbind(
-					Action.class).toSupplier(ActionSupplier::new);
-			asDefault().per(Scope.application).bind(ACTION_MIRROR).to(
-					allMethods);
-			asDefault().per(Scope.application).bind(Executor.class).to(
-					new DirectExecutor());
+			construct(ActionSupplier.class);
+			asDefault().per(Scope.dependencyType) //
+					.starbind(Action.class).toSupplier(ActionSupplier.class);
+			asDefault().bind(ACTION_CONNECTOR, Connector.class) //
+					.to(ActionSupplier.class);
+			asDefault().per(Scope.application) //
+					.bind(Executor.class) //
+					.to(this::run);
 		}
 
-	}
-
-	static final class DirectExecutor implements Executor {
-
-		@Override
-		public <I, O> O run(ActionSite<I, O> site, Object[] args, I value) {
-			try {
-				return site.output.rawType.cast(
-						Utils.produce(site.action, site.owner, args,
-								e -> SupplyFailed.valueOf(e, site.action)));
-			} catch (SupplyFailed e) {
-				Exception ex = e;
-				if (e.getCause() instanceof Exception) {
-					ex = (Exception) e.getCause();
-				}
-				throw new ActionExecutionFailed(
-						"Exception on invocation of the action", ex);
-			}
+		<A, B> B run(ActionSite<A, B> site, Object[] args, A value) {
+			return site.call(args, null);
 		}
 	}
 
-	public static final class ActionSupplier implements Supplier<Action<?, ?>> {
+	public static final class ActionSupplier implements Supplier<Action<?, ?>>,
+			Connector {
 
 		/**
 		 * A list of discovered methods for each implementation class.
 		 */
-		private final Map<Class<?>, Method[]> cachedMethods = new ConcurrentHashMap<>();
+		private final Map<Type<?>, Set<ActionSite.ActionTarget>> methodsByReturnType = new ConcurrentHashMap<>();
 		/**
 		 * All already created {@link Action}s identified by a unique function
 		 * signature.
 		 */
-		private final Map<String, Action<?, ?>> cachedActions = new ConcurrentHashMap<>();
+		private final Map<String, Action<?, ?>> actionsBySignature = new ConcurrentHashMap<>();
 
-		private final Env env;
 		private final Injector injector;
-		private final ProducesBy actionMirror;
 		private final Executor executor;
-		private final Class<?>[] implementationClasses;
+		private final AtomicInteger connectedCount = new AtomicInteger();
 
 		public ActionSupplier(Injector injector) {
 			this.injector = injector;
-			this.env = injector.resolve(Env.class);
 			this.executor = injector.resolve(Executor.class);
-			this.implementationClasses = injector.resolve(
-					Plugins.class).forPoint(Action.class);
-			this.actionMirror = injector.resolve(
-					dependency(ACTION_MIRROR).injectingInto(
-							ActionSupplier.class));
+		}
+
+		@Override
+		public void connect(Object instance, Type<?> as, Method connected) {
+			methodsByReturnType.computeIfAbsent(actualReturnType(connected, as),
+					key -> ConcurrentHashMap.newKeySet()).add(
+					new ActionSite.ActionTarget(instance, as, connected));
+			connectedCount.incrementAndGet();
 		}
 
 		@Override
@@ -137,79 +101,65 @@ public abstract class ActionModule extends BinderModule {
 		}
 
 		@SuppressWarnings("unchecked")
-		private <I, O> Action<I, O> provide(Type<I> input, Type<O> output) {
-			final String key = input + "->" + output; // haskell like function signature
-			return (Action<I, O>) cachedActions.computeIfAbsent(key,
-					k -> newAction(input, output));
+		private <A, B> Action<A, B> provide(Type<A> in, Type<B> out) {
+			return (Action<A, B>) actionsBySignature.computeIfAbsent(
+					getSignature(in, out), key -> newAction(in, out));
 		}
 
-		private <I, O> Action<?, ?> newAction(Type<I> input, Type<O> output) {
-			Method method = resolveAction(input, output);
-			Object impl = injector.resolve(method.getDeclaringClass());
-			env.accessible(method);
-			return new ExecutorRunAction<>(injector, executor,
-					new ActionSite<>(impl, method, input, output));
+		private <A, B> String getSignature(Type<A> in, Type<B> out) {
+			return in + "->" + out;
 		}
 
-		private <I, O> Method resolveAction(Type<I> input, Type<O> output) {
-			for (Class<?> impl : implementationClasses) {
-				Method action = arrayFindFirst(actionsIn(impl),
-						a -> isActionForTypes(a, input, output));
-				if (action != null)
-					return action;
+		private <A, B> Action<?, ?> newAction(Type<A> in, Type<B> out) {
+			AtomicReference<List<ActionSite<A,B>>> cache = new AtomicReference<>();
+			AtomicInteger cachedAtConnectionCount = new AtomicInteger();
+			return new LazyAction<>(injector, executor, () -> {
+				if (cachedAtConnectionCount.get() < connectedCount.get()) {
+					cache.set(null);
+					cachedAtConnectionCount.set(connectedCount.get());
+				}
+				return cache.updateAndGet(list -> list != null ? list : resolveActions(in, out));
+			});
+		}
+
+		private <A, B> List<ActionSite<A,B>> resolveActions(Type<A> in, Type<B> out) {
+			Set<ActionSite.ActionTarget> targets = methodsByReturnType.get(out);
+			if (targets == null)
+				throw new NoMethodForDependency(out, in);
+			List<ActionSite<A,B>> matching = new ArrayList<>(1);
+			for (ActionSite.ActionTarget candidate : targets) {
+				if (candidate.isApplicableFor(in, out))
+					matching.add(new ActionSite<>(candidate, in, out, injector));
 			}
-			throw new NoMethodForDependency(output, input);
+			if (matching.isEmpty())
+				throw new NoMethodForDependency(out, in);
+			return matching;
 		}
 
-		private static <I, O> boolean isActionForTypes(Method candidate,
-				Type<I> input, Type<O> output) {
-			return returnType(candidate).equalTo(output)
-				&& (input.equalTo(Type.VOID)
-					&& candidate.getParameterCount() == 0 // no input => no params
-					|| arrayFindFirst(parameterTypes(candidate),
-							t -> t.equalTo(input)) != null);
-		}
-
-		private Method[] actionsIn(Class<?> impl) {
-			return cachedMethods.computeIfAbsent(impl,
-					k -> actionMirror.reflect(impl));
-		}
 	}
 
-	private static final class ExecutorRunAction<I, O> implements Action<I, O> {
+	private static final class LazyAction<A, B> implements Action<A, B> {
 
-		private final Injector injector;
+		private final Injector context;
 		private final Executor executor;
+		private final java.util.function.Supplier<List<ActionSite<A, B>>> sites;
 
-		private final ActionSite<I, O> site;
-		private final InjectionSite injection;
-		private final int inputIndex;
-
-		ExecutorRunAction(Injector injector, Executor executor,
-				ActionSite<I, O> site) {
-			this.injector = injector;
+		LazyAction(Injector context, Executor executor,
+				java.util.function.Supplier<List<ActionSite<A, B>>> sites) {
+			this.context = context;
 			this.executor = executor;
-			this.site = site;
-			Type<?>[] types = parameterTypes(site.action);
-			this.injection = new InjectionSite(injector,
-					dependency(site.output).injectingInto(
-							site.action.getDeclaringClass()),
-					Hint.match(types, Hint.constantNull(site.input)));
-			this.inputIndex = asList(types).indexOf(site.input);
+			this.sites = sites;
 		}
 
 		@Override
-		public O run(I input) throws ActionExecutionFailed {
-			Object[] args;
-			try {
-				args = injection.args(injector);
-			} catch (UnresolvableDependency e) {
-				throw new ActionExecutionFailed(
-						"Failed to provide all implicit arguments", e);
-			}
-			if (inputIndex >= 0)
-				args[inputIndex] = input;
-			return executor.run(site, args, input);
+		public B run(A input) throws ActionExecutionFailed {
+			List<ActionSite<A, B>> activeSites = this.sites.get();
+			if (activeSites.size() == 1)
+				return executor.run(activeSites.get(0),
+						activeSites.get(0).args(context, input), input);
+			for (ActionSite<A, B> site : activeSites)
+				executor.run(site, site.args(context, input), input);
+			return null;
 		}
 	}
 }
