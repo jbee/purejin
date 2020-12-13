@@ -17,7 +17,7 @@ import static se.jbee.inject.lang.Type.raw;
 
 /**
  * The tests demonstrates how the {@link BuildUp} and
- * {@link Binder#initbind()} can be used to e.g. install a "shutdown hook" that
+ * {@link Binder#upbind()} can be used to e.g. install a "shutdown hook" that
  * would automatically close all {@link AutoCloseable}s. Here the "shutdown
  * hook" of course is simulated so we can test for it being invoked. In a real
  * scenario one would use {@link Runtime#addShutdownHook(Thread)}.
@@ -29,8 +29,8 @@ class TestExampleBuildUpAutoCloseableBinds {
 
 		@Override
 		protected void declare() {
-			initbind().to(this);
-			initbind().to(AutoCloseableBuildUp.class);
+			upbind().to(this);
+			upbind().to(AutoCloseableBuildUp.class);
 			construct(SingletonResource.class);
 		}
 
@@ -53,7 +53,7 @@ class TestExampleBuildUpAutoCloseableBinds {
 		@Override
 		protected void declare(Integer setup) {
 			//... some binds
-			initbind().to(this);
+			upbind().to(this);
 
 			this.setup = setup;
 		}

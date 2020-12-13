@@ -26,6 +26,10 @@ public interface Action<A, B> {
 		return (Type) raw(Action.class).parametized(in, out);
 	}
 
+	static <A, B> Type<Action<A, B>> actionTypeOf(Class<A> in, Class<B> out) {
+		return actionTypeOf(raw(in), raw(out));
+	}
+
 	/**
 	 * Runs the action to compute the output from the input. This typically does
 	 * not change any inner state but it might in rare cases be part of an

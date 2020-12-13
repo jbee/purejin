@@ -37,12 +37,12 @@ class TestExampleBuildUpProxyDecorationBinds {
 
 		@Override
 		protected void declare() {
-			initbind().to((injector, as, __) -> new DelegatingInjector(injector));
+			upbind().to((injector, as, __) -> new DelegatingInjector(injector));
 			bind(int.class).to(42);
 			bind(Foo.class).toConstructor();
 
 			bind(Shape.class).to(() -> new Area()); // OBS: A constant would not work as it is resolved using a shortcut
-			initbind(Shape.class).to(this);
+			upbind(Shape.class).to(this);
 		}
 
 		@Override

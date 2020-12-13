@@ -35,9 +35,9 @@ class TestFeatureBuildUpSequencerBinds {
 		@Override
 		protected void declare() {
 			bind(Bean.class).toConstructor();
-			initbind(Bean.class).to(InitA.class);
-			initbind(Bean.class).to(InitB.class);
-			initbind(Bean.class).to((bean, as, context) -> {
+			upbind(Bean.class).to(InitA.class);
+			upbind(Bean.class).to(InitB.class);
+			upbind(Bean.class).to((bean, as, context) -> {
 				bean.names.add("c");
 				return bean;
 			});

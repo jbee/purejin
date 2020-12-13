@@ -33,13 +33,18 @@ import static se.jbee.inject.lang.Utils.newArray;
 /**
  * The default implementation of a fluent binder interface that provides a lot
  * of utility methods to improve readability and keep binding compact.
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
 @SuppressWarnings({ "squid:S1448", "squid:S1200", "ClassReferencesSubclass" })
 public class Binder {
 
+	/**
+	 * Name of the {@link Connector} used for action feature.
+	 */
 	public static final String ACTION_CONNECTOR = "actions";
+
+	/**
+	 * Name of the {@link Connector} used for the scheduler feature.
+	 */
 	public static final String SCHEDULER_CONNECTOR = "scheduler";
 
 	public static RootBinder create(Bind bind) {
@@ -55,8 +60,8 @@ public class Binder {
 	}
 
 	public Bind bind() {
-		return bind; // !ATTENTION! This method might be overridden to update
-					// Bind properties - do not access field directly
+		return bind; // !OBS! This method might be overridden to update
+					// Bind properties - do not access the field directly
 	}
 
 	protected final Env env() {
@@ -92,32 +97,97 @@ public class Binder {
 	}
 
 	/**
-	 * Allows access only via interface.
+	 * All bindings made with the returned {@link Binder} will only allow access
+	 * (injection/resolving) when it is done via an interface type.
 	 *
-	 * @since 8.1
-	 *
-	 * @return fluent API
+	 * @return immutable fluent API
 	 */
 	public Binder withIndirectAccess() {
 		return with(bind().target.indirect());
 	}
 
+	/**
+	 * Explicitly binds an array type to a specific list of elements.
+	 *
+	 * Note that this method is only used in case an array type should be bound explicitly.
+	 * To make several independent bindings that can be injected as array, set or list
+	 * use {@link #multibind(Name, Type)}s.
+	 *
+	 * @see #multibind(Name, Type)
+	 *
+	 * @param type the array type that is used elsewhere (the API or "interface")
+	 * @param <E> the type of the bound array elements
+	 * @return immutable fluent API for array element bindings
+	 */
 	public <E> TypedElementBinder<E> arraybind(Class<E[]> type) {
 		return new TypedElementBinder<>(bind(), defaultInstanceOf(raw(type)));
 	}
 
+	/**
+	 * Same as {@link #autobind(Type)} where type was wrapped in {@link
+	 * Type#raw(Class)}.
+	 *
+	 * @see #autobind(Type)
+	 */
 	public final <T> TypedBinder<T> autobind(Class<T> type) {
 		return autobind(raw(type));
 	}
 
+	/**
+	 * Binds the exact provided type and adds references from all types it
+	 * implements to the provided type. For example auto-binding {@link Integer}
+	 * adds references that bind {@link Number} to {@link Integer}, {@link
+	 * java.io.Serializable} to {@link Integer} and so forth for all types it
+	 * does implement.
+	 * <p>
+	 * Should these automatically created reference clash with another explicit
+	 * bindings, for example {@link Number} was bound to some other value
+	 * provider, the explicit binding takes precedence. Also several auto-bound
+	 * bindings from the same type to different implementors do not clash and
+	 * are removed because they are ambiguous. So usually using {@code autobind}
+	 * does not create issues with clashing bindings.
+	 *
+	 * @param type usually an implementation type implementing multiple
+	 *             contracts
+	 * @param <T>  type that should be bound to all the types it implements
+	 * @return immutable binder API
+	 */
 	public final <T> TypedBinder<T> autobind(Type<T> type) {
 		return on(bind().asAuto()).bind(type);
 	}
 
+	/**
+	 * Bind an instance with default {@link Name} (unnamed instance).
+	 *
+	 * @param type the type that is used elsewhere (the API or interface)
+	 * @param <T> raw type reference to the bound type
+	 * @return immutable fluent API
+	 */
 	public final <T> TypedBinder<T> bind(Class<T> type) {
 		return bind(raw(type));
 	}
 
+	/**
+	 * Bind an instance with default {@link Name} (unnamed instance).
+	 *
+	 * @param type the type that is used elsewhere (the API or interface)
+	 * @param <T>  type reference to the bound fully generic {@link Type}
+	 * @return immutable fluent API
+	 */
+	public final <T> TypedBinder<T> bind(Type<T> type) {
+		return bind(defaultInstanceOf(type));
+	}
+
+	/**
+	 * Same as {@link #bind(Name, Type)} just that both arguments are provided
+	 * in form of an {@link Instance}.
+	 *
+	 * @see #bind(Name, Type)
+	 *
+	 * @param instance the name and type the bound instance should be known as
+	 * @param <T>      type reference to the bound fully generic {@link Type}
+	 * @return immutable fluent API
+	 */
 	public <T> TypedBinder<T> bind(Instance<T> instance) {
 		return new TypedBinder<>(bind(), instance);
 	}
@@ -134,48 +204,67 @@ public class Binder {
 		return bind(instance(name, type));
 	}
 
-	public final <T> TypedBinder<T> bind(Type<T> type) {
-		return bind(defaultInstanceOf(type));
-	}
-
+	/**
+	 * Construct an instance of the provided type with default name (unnamed).
+	 *
+	 * Just a short from of {@code bind(type).toConstructor()}.
+	 *
+	 * @param type both the implementation type and the type the created
+	 *             instance(s) should be known as
+	 */
 	public final void construct(Class<?> type) {
 		construct((defaultInstanceOf(raw(type))));
 	}
 
+	/**
+	 * Construct a named instance of the provided type.
+	 *
+	 * Just a short from of {@code bind(instance).toConstructor()}.
+	 *
+	 * @param instance both the implementation type and the name and type the
+	 *                 created instance(s) should be known as
+	 */
 	public final void construct(Instance<?> instance) {
 		bind(instance).toConstructor();
 	}
 
+	/**
+	 * Construct a named instance of the provided type.
+	 *
+	 * Just a short from of {@code bind(name, type).toConstructor()}.
+	 *
+	 * @param name the name the created instance(s) should be known as
+	 * @param type both the implementation type and the type the created
+	 *             instance(s) should be known as
+	 */
 	public final void construct(Name name, Class<?> type) {
 		construct(instance(name, raw(type)));
 	}
 
 	/**
-	 * Bind something that is an {@link BuildUp} for the {@link Injector}.
+	 * Bind a {@link BuildUp} for the {@link Injector} itself.
 	 *
-	 * @since 8.1
-	 *
-	 * @return fluent API
+	 * @return immutable fluent API
 	 */
-	public final TypedBinder<BuildUp<Injector>> initbind() {
-		return initbind(Injector.class);
+	public final TypedBinder<BuildUp<Injector>> upbind() {
+		return upbind(Injector.class);
 	}
 
 	/**
-	 * @since 8.1
+	 * Bind a {@link BuildUp} that affects all types assignable to provided type.
 	 *
-	 * @return fluent API
+	 * @return immutable fluent API
 	 */
-	public final <T> TypedBinder<BuildUp<T>> initbind(Class<T> type) {
-		return initbind(raw(type));
+	public final <T> TypedBinder<BuildUp<T>> upbind(Class<T> type) {
+		return upbind(raw(type));
 	}
 
 	/**
-	 * @since 8.1
+	 * Bind a {@link BuildUp} that affects all types assignable to provided type.
 	 *
-	 * @return fluent API
+	 * @return immutable fluent API
 	 */
-	public final <T> TypedBinder<BuildUp<T>> initbind(Type<T> type) {
+	public final <T> TypedBinder<BuildUp<T>> upbind(Type<T> type) {
 		return multibind(BuildUp.buildUpTypeOf(type));
 	}
 
@@ -282,16 +371,15 @@ public class Binder {
 	}
 
 	/**
-	 * Small utility to make initialisation calls that depend on instances
-	 * managed by the {@link Injector} easier.
-	 *
+	 * Small utility to make initialise instances where the initialisation is
+	 * depend on instances managed by the {@link Injector} easier.
+	 * <p>
 	 * The basic principle is that the {@link #target} {@link Instance} is
 	 * initialised on the basis of some other dependency instance that is
-	 * resolved during initialisation phase and provided to the
-	 * {@link BiConsumer} function.
+	 * resolved during initialisation phase and provided to the {@link
+	 * BiConsumer} function.
 	 *
-	 * @param <T> type of the instances that should be initialised
-	 *
+	 * @param <T> type of the instances that should be build-up
 	 * @since 8.1
 	 */
 	public static class InitBinder<T> {
@@ -305,40 +393,40 @@ public class Binder {
 		}
 
 		public <C> void forAny(Class<? extends C> dependency,
-				BiConsumer<T, C> initialiser) {
+				BiConsumer<T, C> initFunction) {
 			forEach(raw(dependency).addArrayDimension().asUpperBound(),
-					initialiser);
+					initFunction);
 		}
 
 		public <C> void forEach(Type<? extends C[]> dependencies,
-				BiConsumer<T, C> initialiser) {
-			binder.initbind().to((impl, as, injector) -> {
+				BiConsumer<T, C> initFunction) {
+			binder.upbind().to((impl, as, injector) -> {
 				T obj = injector.resolve(target);
 				C[] args = injector.resolve(
 						dependency(dependencies).injectingInto(target));
 				for (C arg : args)
-					initialiser.accept(obj, arg);
+					initFunction.accept(obj, arg);
 				return impl;
 			});
 		}
 
 		public <C> void by(Class<? extends C> dependency,
-				BiConsumer<T, C> initialiser) {
-			by(defaultInstanceOf(raw(dependency)), initialiser);
+				BiConsumer<T, C> initFunction) {
+			by(defaultInstanceOf(raw(dependency)), initFunction);
 		}
 
 		public <C> void by(Name depName, Class<? extends C> depType,
-				BiConsumer<T, C> initialiser) {
-			by(Instance.instance(depName, raw(depType)), initialiser);
+				BiConsumer<T, C> initFunction) {
+			by(Instance.instance(depName, raw(depType)), initFunction);
 		}
 
 		public <C> void by(Instance<? extends C> dependency,
-				BiConsumer<T, C> initialiser) {
-			binder.initbind().to((impl, as, injector) -> {
+				BiConsumer<T, C> initFunction) {
+			binder.upbind().to((impl, as, injector) -> {
 				T obj = injector.resolve(target);
 				C arg = injector.resolve(
 						dependency(dependency).injectingInto(target));
-				initialiser.accept(obj, arg);
+				initFunction.accept(obj, arg);
 				return impl;
 			});
 		}
@@ -445,7 +533,7 @@ public class Binder {
 		}
 
 		public ConnectTargetBinder<T> to(Name connectorName) {
-			binder.initbind(target) //
+			binder.upbind(target) //
 					.to((instance, as, context) ->
 							init(connectorName, instance, as, context));
 			return this; // for multiple to

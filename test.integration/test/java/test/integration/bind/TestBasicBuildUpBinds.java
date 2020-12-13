@@ -54,10 +54,10 @@ class TestBasicBuildUpBinds {
 
 		@Override
 		protected void declare() {
-			initbind(MyListener.class).to(
+			upbind(MyListener.class).to(
 					(BuildUp<MyListener>) (l, as, injector) -> l.inc(1));
 			injectingInto(MyServiceExtension.class) //
-					.initbind(MyListener.class) //
+					.upbind(MyListener.class) //
 					.to((BuildUp<MyListener>) (l, as, injector) -> l.inc(2));
 			construct(MyService.class);
 			construct(MyOtherService.class);
