@@ -53,7 +53,7 @@ class TestFeatureBuildUpInjectorBinds {
 
 		@Override
 		protected void declare() {
-			initbind().to(DecoratingInjector.class);
+			upbind().to(DecoratingInjector.class);
 			bind(named("supplied"), Bean.class).toSupplier(this::supply);
 			bind(named("constructed"), Bean.class).toConstructor();
 		}

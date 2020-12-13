@@ -6,7 +6,9 @@ import se.jbee.inject.Name;
 import se.jbee.inject.action.Action;
 import se.jbee.inject.action.ActionExecutionFailed;
 import se.jbee.inject.action.ActionModule;
+import se.jbee.inject.binder.Binder;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.config.ProducesBy;
 
 import java.util.UUID;
 
@@ -17,9 +19,48 @@ import static se.jbee.inject.action.Action.actionTypeOf;
 import static se.jbee.inject.config.ProducesBy.allMethods;
 import static se.jbee.inject.lang.Type.raw;
 
-class TestActionBinds {
+/**
+ * Tests the {@link Action} implementation.
+ * <p>
+ * {@link Action}s are a decoupling concept where input-output processing
+ * operations are uniquely identified by their fully generic input and output
+ * {@link se.jbee.inject.lang.Type}.
+ * <p>
+ * The service bean actually implementing a particular {@link Action} as {@link
+ * java.lang.reflect.Method} is unknown and unimportant to service users.
+ * <p>
+ * They access the service {@link Action} they need by resolving the {@link
+ * Action} that does the transformation they need. For this concept to scale it
+ * is essential that business level actions are modelled with an individual
+ * input properties type per business operation. These are simple records of all
+ * input values necessary to perform the operation. The actual {@link
+ * java.lang.reflect.Method} implementing the {@link Action} is identified by
+ * having matching input and output types. They can also have further method
+ * parameters, like other services or configurations, which the {@link Injector}
+ * resolves and injects when the {@link Action} is called.
+ * <p>
+ * To add {@link java.lang.reflect.Method}s to the set of methods that should be
+ * considered as {@link Action}s these are added using the {@link
+ * se.jbee.inject.binder.Binder#connect(ProducesBy)} method with {@link
+ * Binder.ConnectTargetBinder#asAction()}. This adds the selected methods to the
+ * pool of action implementations as the implementing instance is constructed.
+ * <p>
+ * Method with a non {@link Void} (or {@code void}) return type should only have
+ * 1 implementation which computes the result.
+ * <p>
+ * Methods with return type {@link Void} (or {@code void}) can have many
+ * implementations which all are called similar to a multi-dispatch.
+ * <p>
+ * Note that in this feature test {@link Action}s are used with simple value
+ * types as input and output types as this is enough to verify their behaviour
+ * but in an actual application the input type (or indeed output type) of an
+ * action method must use a type of type combination that makes it unique which
+ * is easiest done by creating a operation specific input parameter type, like a
+ * {@code RegisterUserParameters} type.
+ */
+class TestFeatureActionBinds {
 
-	public static class ActionBindsModule extends ActionModule {
+	public static class TestFeatureActionBindsModule extends ActionModule {
 
 		@Override
 		protected void declare() {
@@ -34,7 +75,6 @@ class TestActionBinds {
 			connectAll.in(HandlerService.class).asAction();
 			connectAll.in(GenericService.class).asAction();
 		}
-
 	}
 
 	public static class MyService {
@@ -82,17 +122,18 @@ class TestActionBinds {
 		}
 	}
 
-	private final Injector context = Bootstrap.injector(ActionBindsModule.class);
+	private final Injector context = Bootstrap.injector(
+			TestFeatureActionBindsModule.class);
 
 	@Test
 	void actionsDecoupleConcreteMethods() {
 		Action<Integer, Integer> mul2 = context.resolve(
-				actionTypeOf(raw(Integer.class), raw(Integer.class)));
+				actionTypeOf(Integer.class, Integer.class));
 		assertNotNull(mul2);
 		ensureBeansExist();
 		assertEquals(9, mul2.run(3).intValue());
 		Action<Number, Integer> negate = context.resolve(
-				actionTypeOf(raw(Number.class), raw(Integer.class)));
+				actionTypeOf(Number.class, Integer.class));
 		assertNotNull(mul2);
 		assertEquals(-3, negate.run(3).intValue());
 		assertEquals(11, mul2.run(4).intValue());
@@ -100,30 +141,28 @@ class TestActionBinds {
 	}
 
 	@Test
-	void exceptionsAreWrappedInActionMalfunction() {
+	void exceptionsAreWrappedInActionExecutionFailed() {
 		Action<Void, Void> error = context.resolve(
-				actionTypeOf(raw(Void.class), raw(Void.class)));
+				actionTypeOf(void.class, void.class));
 		ensureBeansExist();
-		try {
-			error.run(null);
-			fail("Expected an exception...");
-		} catch (ActionExecutionFailed e) {
-			assertSame(IllegalStateException.class, e.getCause().getClass());
-		}
+		Exception ex = assertThrows(ActionExecutionFailed.class,
+				() -> error.run(null));
+		assertSame(IllegalStateException.class, ex.getCause().getClass());
 	}
 
 	/**
-	 * Because of its scope the {@link HandlerService} there is one instance per
-	 * name used. When only a is resolved (and connected) running the action
-	 * calls only one instance. After b is resolved (and connected) running the
-	 * action increments two times as there are now two instances. Thereby this
-	 * test shows that further targets are added to an already resolved {@link
-	 * Action} instance when they become known due to connection occurring.
+	 * Because of its scope used for the {@link HandlerService} there is one
+	 * instance per name used. When only "a" is resolved (and connected) running
+	 * the action calls only one instance. After "b" is resolved (and connected)
+	 * running the action increments two times as there are now two instances.
+	 * Thereby this test shows that further targets are added to an already
+	 * resolved {@link Action} instance when they become known due to connection
+	 * occurring.
 	 */
 	@Test
 	void actionsDynamicallyAddTargets() {
 		Action<String, Void> handler = context.resolve(
-				actionTypeOf(raw(String.class), raw(void.class)));
+				actionTypeOf(String.class, void.class));
 		assertNotNull(handler);
 		HandlerService a = context.resolve("a", HandlerService.class);
 		handler.run("a");
@@ -138,7 +177,7 @@ class TestActionBinds {
 	@Test
 	void actionsSubstituteTypeLevelTypeParametersInArgumentTypes() {
 		Action<UUID, String> printer = context.resolve(
-				actionTypeOf(raw(UUID.class), raw(String.class)));
+				actionTypeOf(UUID.class, String.class));
 		assertNotNull(printer);
 		createGenericServiceUUID();
 		UUID expected = UUID.randomUUID();
@@ -148,7 +187,7 @@ class TestActionBinds {
 	@Test
 	void actionsSubstituteTypeLevelTypeParametersInReturnTypes() {
 		Action<String, UUID> parser = context.resolve(
-				actionTypeOf(raw(String.class), raw(UUID.class)));
+				actionTypeOf(String.class, UUID.class));
 		assertNotNull(parser);
 		createGenericServiceUUID();
 		UUID expected = UUID.randomUUID();

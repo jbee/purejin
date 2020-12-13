@@ -37,7 +37,7 @@ class TestExampleBuildUpAnnotationGuidedInjectionBinds {
 			bind(String.class).to("y");
 			bind(named("x"), String.class).to("x");
 			construct(SomeBean.class);
-			initbind(Object.class).to(this);
+			upbind(Object.class).to(this);
 		}
 
 		@Override
