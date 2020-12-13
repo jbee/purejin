@@ -231,12 +231,12 @@ public final class Container implements Injector, Env {
 		Injector context = getBuiltUp();
 		T instance = supplier.supply(injected, context);
 		if (instance != null
-			&& !resource.permanence.scope.equalTo(Scope.reference)) {
+			&& !resource.lifeCycle.scope.equalTo(Scope.reference)) {
 			if (buildUpResources != null)
 				instance = buildUpResources.buildUp(instance, injected,
 						context);
 			if (observer != null
-				&& resource.permanence.isPermanent()) {
+				&& resource.lifeCycle.isPermanent()) {
 				observer.afterBuildUp(resource, instance);
 			}
 		}

@@ -9,20 +9,22 @@ import java.io.Serializable;
 
 /**
  * Describes a "stack-frame" or "layer" within the injection process.
- *
- * @author Jan Bernitt (jan@jbee.se)
+ * <p>
+ * For example, when resolving instance A which causes resolving instance B the
+ * resolution or injection of A becomes the first frame, the injection of B the
+ * second and so forth.
  */
 public final class Injection implements Serializable {
 
 	public final Instance<?> dependency;
 	public final Locator<?> target;
-	public final ScopeLifeCycle permanence;
+	public final ScopeLifeCycle lifeCycle;
 
 	public Injection(Instance<?> dependency, Locator<?> target,
-			ScopeLifeCycle permanence) {
+			ScopeLifeCycle lifeCycle) {
 		this.dependency = dependency;
 		this.target = target;
-		this.permanence = permanence;
+		this.lifeCycle = lifeCycle;
 	}
 
 	@Override

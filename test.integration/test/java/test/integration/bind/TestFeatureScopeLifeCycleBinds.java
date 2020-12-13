@@ -29,7 +29,7 @@ class TestFeatureScopeLifeCycleBinds {
 
 		@Override
 		protected void declare() {
-			bindScopeLifeCycle(requestScope).toFactory(
+			bindLifeCycle(requestScope).toFactory(
 					context -> context.resolve(Scope.worker,
 							ScopeLifeCycle.class).derive(requestScope));
 		}
@@ -78,15 +78,15 @@ class TestFeatureScopeLifeCycleBinds {
 
 	@Test
 	void workerScopeIsNotConsistentInAnyOtherScopeExceptInjection() {
-		assertWorkerScopePermanence(Scope.worker);
+		assertWorkerScopeLifeCycle(Scope.worker);
 	}
 
 	@Test
 	void customWorkerScopeIsAsConsistentAsWorkerGroupScope() {
-		assertWorkerScopePermanence(requestScope);
+		assertWorkerScopeLifeCycle(requestScope);
 	}
 
-	private void assertWorkerScopePermanence(Name worker) {
+	private void assertWorkerScopeLifeCycle(Name worker) {
 		assertIsNotConsistentIn(worker, Scope.application);
 		assertIsNotConsistentIn(worker, Scope.dependency);
 		assertIsNotConsistentIn(worker, Scope.dependencyInstance);

@@ -11,32 +11,67 @@ import static se.jbee.inject.Name.named;
 import static se.jbee.inject.lang.Utils.*;
 
 /**
- * A {@link ScopeLifeCycle} is a description for the life-cycle relations
- * between one {@link Scope} and other {@link Scope}s which determines which
- * {@link Scope}s are valid to nest within each other and which are not.
+ * A {@link ScopeLifeCycle} is an immutable description for the life-cycle
+ * relations between one {@link Scope} and other {@link Scope}s which determines
+ * which {@link Scope}s are valid to nest within each other and which are not.
+ * <p>
+ * The referenced {@link #scope} can also be made {@link #eager()} to have
+ * instances within this {@link Scope} be created during bootstrapping when an
+ * {@link Injector} context is created. By default {@link ScopeLifeCycle} are
+ * {@link #lazy()}.
  *
- * The referenced {@link #scope} can also be made {@link #eager()} to have instances within
- * this {@link Scope} be created during bootstrapping when an {@link Injector}
- * context is created. By default {@link ScopeLifeCycle} are {@link #lazy()}.
+ * To set the used {@link ScopeLifeCycle} bind a named instance.
  *
  * @since 8.1
  */
 public final class ScopeLifeCycle implements Serializable {
 
+	/**
+	 * Refers to a "virtual" scope where any life-cycle considerations are
+	 * turned off. There is no corresponding {@link Scope} as instances are not
+	 * bound with this {@link ScopeLifeCycle}. It is only used during processing
+	 * to disable evaluation.
+	 */
 	public static final ScopeLifeCycle ignore = scopeLifeCycle(
 			named("@ignore")).permanent();
+
+	/**
+	 * See {@link Scope#reference}
+	 */
 	public static final ScopeLifeCycle reference = scopeLifeCycle(
 			Scope.reference).permanent();
 
+	/**
+	 * The group of singleton scopes are all scopes that are {@link
+	 * #permanent()}. This is used to derive singleton scopes so they all
+	 * "inherit" the configuration and play nice with each other.
+	 */
 	public static final ScopeLifeCycle singleton = scopeLifeCycle(
 			named("@singleton")).permanent();
 
+	/**
+	 * See {@link Scope#container}
+	 */
 	public static final ScopeLifeCycle container = singleton.derive(
 			Scope.container);
 
+	/**
+	 * Is the group of scopes that generally are not stable. That means
+	 * instances within this scope can become stale or invalid for some reason
+	 * while they are referenced in the application.
+	 * <p>
+	 * Classic examples are instances that reflect resources that are outside of
+	 * the control of the program or JVM, like hardware resources.
+	 * <p>
+	 * Other members of this group are unstable by choice like the {@link
+	 * Scope#injection}.
+	 */
 	public static final ScopeLifeCycle unstable = scopeLifeCycle(
 			named("@unstable"));
 
+	/**
+	 * A group of scopes whose instances reflect persistent storage on disk.
+	 */
 	public static final ScopeLifeCycle disk = scopeLifeCycle(named("@disk"));
 
 	public static ScopeLifeCycle scopeLifeCycle(Name scope,
@@ -70,15 +105,15 @@ public final class ScopeLifeCycle implements Serializable {
 	}
 
 	/**
-	 * Declares this {@link ScopeLifeCycle} as being stable in the given
-	 * parent.
-	 *
+	 * Declares this {@link ScopeLifeCycle} as being stable and consistent when
+	 * used within the given parent.
+	 * <p>
 	 * Declares the given parent {@link Scope} at least as stable as this scope.
 	 * This means this {@link Scope} can be injected into the given parent
 	 * {@link Scope} without wrapping it in a {@link Provider} or alike.
 	 *
 	 * @param parent another {@link Scope} type
-	 * @return this for chaining
+	 * @return a new instance with the parent added
 	 */
 	public ScopeLifeCycle canBeInjectedInto(Name parent) {
 		return new ScopeLifeCycle(scope,
@@ -89,7 +124,7 @@ public final class ScopeLifeCycle implements Serializable {
 	private ScopeLifeCycle groupedAs(ScopeLifeCycle group) {
 		if (!group.isGroup())
 			throw new IllegalArgumentException(
-					"Scoping is not a group: " + group);
+					ScopeLifeCycle.class.getSimpleName() + " is not a group: " + group);
 		return new ScopeLifeCycle(scope, group.consistentInScopes,
 				group.permanent, group.eager, group);
 	}
@@ -102,13 +137,21 @@ public final class ScopeLifeCycle implements Serializable {
 		if (!isPermanent())
 			throw new IllegalStateException(
 					"Must be permanent to become eager but was " + this);
-		return new ScopeLifeCycle(scope, consistentInScopes, true, true,
-				group);
+		return eager
+			   ? this
+			   : new ScopeLifeCycle(scope, consistentInScopes, true, true,
+					   group);
 	}
 
+	/**
+	 * @return a new {@link ScopeLifeCycle} similar to this except not being
+	 * {@link #isEager()}
+	 */
 	public ScopeLifeCycle lazy() {
-		return new ScopeLifeCycle(scope, consistentInScopes, permanent, false,
-				group);
+		return !eager
+			   ? this
+			   : new ScopeLifeCycle(scope, consistentInScopes, permanent, false,
+					   group);
 	}
 
 	public boolean equalTo(ScopeLifeCycle other) {
@@ -122,6 +165,10 @@ public final class ScopeLifeCycle implements Serializable {
 
 	public boolean isEager() {
 		return eager;
+	}
+
+	public boolean isLazy() {
+		return !isEager();
 	}
 
 	public boolean isGroup() {

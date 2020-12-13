@@ -69,13 +69,13 @@ public abstract class BinderModule extends InitializedBinder
 	 * Binds a {@link ScopeLifeCycle} with the needed {@link Scope#container}.
 	 *
 	 * @since 8.1
-	 * @param sp instance to bind, not null
+	 * @param lifeCycle the instance to bind, not null
 	 */
-	protected final void bindScopeLifeCycle(ScopeLifeCycle sp) {
-		bindScopeLifeCycle(sp.scope).to(sp);
+	protected final void bindLifeCycle(ScopeLifeCycle lifeCycle) {
+		bindLifeCycle(lifeCycle.scope).to(lifeCycle);
 	}
 
-	protected final TypedBinder<ScopeLifeCycle> bindScopeLifeCycle(Name scope) {
+	protected final TypedBinder<ScopeLifeCycle> bindLifeCycle(Name scope) {
 		return per(container).bind(scope, ScopeLifeCycle.class);
 	}
 

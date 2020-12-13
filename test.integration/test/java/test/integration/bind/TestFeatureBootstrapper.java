@@ -148,7 +148,7 @@ class TestFeatureBootstrapper {
 
 		@Override
 		protected void declare() {
-			bindScopeLifeCycle(ScopeLifeCycle.singleton.derive(
+			bindLifeCycle(ScopeLifeCycle.singleton.derive(
 					Scope.application).eager());
 			bind(named("eager"), String.class).toSupplier(this);
 			per(Scope.injection).bind(named("lazy"), String.class).toSupplier(

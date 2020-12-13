@@ -171,9 +171,9 @@ public final class Dependency<T>
 	}
 
 	public Dependency<T> injectingInto(Locator<?> target,
-			ScopeLifeCycle permanence)
+			ScopeLifeCycle lifeCycle)
 			throws DependencyCycle, UnstableDependency {
-		Injection injection = new Injection(instance, target, permanence);
+		Injection injection = new Injection(instance, target, lifeCycle);
 		if (hierarchy.length == 0)
 			return new Dependency<>(instance, injection);
 		ensureStableScopeNesting(injection);
@@ -196,7 +196,7 @@ public final class Dependency<T>
 	private void ensureStableScopeNesting(Injection injection)
 			throws UnstableDependency {
 		Injection unstable = arrayFindFirst(hierarchy,
-				e -> !injection.permanence.isConsistentIn(e.permanence));
+				e -> !injection.lifeCycle.isConsistentIn(e.lifeCycle));
 		if (unstable != null)
 			throw new UnstableDependency(unstable, injection);
 	}

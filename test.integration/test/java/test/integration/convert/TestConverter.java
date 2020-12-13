@@ -71,7 +71,7 @@ class TestConverter {
 		Resource<Converter<String, List>> str2ints = context.resolve(
 				resourceTypeOf(Converter.converterTypeOf(raw(String.class),
 						classType(List.class))));
-		assertEquals(Scope.dependencyType, str2ints.permanence.scope);
+		assertEquals(Scope.dependencyType, str2ints.lifeCycle.scope);
 	}
 
 	@Test

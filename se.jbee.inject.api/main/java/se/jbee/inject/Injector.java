@@ -132,7 +132,7 @@ public interface Injector {
 		default Observer inScope(Name scope) {
 			Observer self = this;
 			return (resource, instance) -> {
-				if (resource.permanence.scope.equalTo(scope))
+				if (resource.lifeCycle.scope.equalTo(scope))
 					self.afterBuildUp(resource, instance);
 			};
 		}

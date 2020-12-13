@@ -54,6 +54,6 @@ class TestExampleAnnotatedScopeBinds {
 				injector.resolve(InjectionScoped.class));
 		Resource<InjectionScoped> resource = injector.resolve(
 				Resource.resourceTypeOf(InjectionScoped.class));
-		assertEquals(Scope.injection, resource.permanence.scope);
+		assertEquals(Scope.injection, resource.lifeCycle.scope);
 	}
 }

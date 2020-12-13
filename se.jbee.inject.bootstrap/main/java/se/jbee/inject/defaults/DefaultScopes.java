@@ -44,21 +44,21 @@ public final class DefaultScopes extends BinderModule
 
 	@Override
 	protected void declare() {
-		bindScopeLifeCycle(ScopeLifeCycle.reference);
-		bindScopeLifeCycle(ScopeLifeCycle.container);
-		bindScopeLifeCycle(singleton.derive(Scope.jvm));
-		bindScopeLifeCycle(singleton.derive(Scope.application));
-		bindScopeLifeCycle(singleton.derive(Scope.dependency));
-		bindScopeLifeCycle(singleton.derive(Scope.dependencyType));
-		bindScopeLifeCycle(singleton.derive(Scope.dependencyInstance));
-		bindScopeLifeCycle(singleton.derive(Scope.targetInstance));
-		bindScopeLifeCycle(unstable.derive(Scope.thread) //
+		bindLifeCycle(ScopeLifeCycle.reference);
+		bindLifeCycle(ScopeLifeCycle.container);
+		bindLifeCycle(singleton.derive(Scope.jvm));
+		bindLifeCycle(singleton.derive(Scope.application));
+		bindLifeCycle(singleton.derive(Scope.dependency));
+		bindLifeCycle(singleton.derive(Scope.dependencyType));
+		bindLifeCycle(singleton.derive(Scope.dependencyInstance));
+		bindLifeCycle(singleton.derive(Scope.targetInstance));
+		bindLifeCycle(unstable.derive(Scope.thread) //
 				.canBeInjectedInto(Scope.thread)//
 				.canBeInjectedInto(Scope.worker) //
 				.canBeInjectedInto(Scope.injection)); //
-		bindScopeLifeCycle(unstable.derive(Scope.injection) //
+		bindLifeCycle(unstable.derive(Scope.injection) //
 				.canBeInjectedInto(Scope.injection));
-		bindScopeLifeCycle(unstable.derive(Scope.worker) //
+		bindLifeCycle(unstable.derive(Scope.worker) //
 				.canBeInjectedInto(Scope.worker) //
 				.canBeInjectedInto(Scope.injection)); //
 

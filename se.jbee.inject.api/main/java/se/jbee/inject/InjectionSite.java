@@ -67,7 +67,7 @@ public final class InjectionSite {
 				Dependency<? extends Resource<?>> resourceDep = site.typed(
 						resourceTypeOf(ref.type)).named(ref.name);
 				Resource<?> resource = injector.resolve(resourceDep);
-				if (resource.permanence.isPermanent()) {
+				if (resource.lifeCycle.isPermanent()) {
 					//TODO and not has type variable involved
 					preResolvedArgs[i] = generate(resource,
 							site.instanced(hint.relativeRef));
