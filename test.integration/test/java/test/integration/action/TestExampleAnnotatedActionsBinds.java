@@ -1,11 +1,15 @@
 package test.integration.action;
 
 import org.junit.jupiter.api.Test;
+import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency.NoMethodForDependency;
 import se.jbee.inject.action.Action;
 import se.jbee.inject.action.ActionModule;
+import se.jbee.inject.binder.Binder;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.Environment;
+import se.jbee.inject.config.ProducesBy;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -29,7 +33,7 @@ class TestExampleAnnotatedActionsBinds {
 
 	}
 
-	private static class TestExampleAnnotatedActionsBindsModule
+	private static class TestExampleAnnotatedActionsBindsModule1
 			extends ActionModule {
 
 		@Override
@@ -38,7 +42,22 @@ class TestExampleAnnotatedActionsBinds {
 			connect(declaredMethods.annotatedWith(Marker.class)) //
 					.in(Bean.class).asAction();
 		}
+	}
 
+	/**
+	 * This is an alternative solution where the {@link se.jbee.inject.config.ProducesBy}
+	 * is not provided as an explicit argument to {@link
+	 * se.jbee.inject.binder.Binder#connect(ProducesBy)} but resolved from the
+	 * {@link se.jbee.inject.Env} when calling {@link Binder#connect()}.
+	 */
+	private static class TestExampleAnnotatedActionsBindsModule2
+			extends ActionModule {
+
+		@Override
+		protected void declare() {
+			construct(Bean.class);
+			connect().in(Bean.class).asAction();
+		}
 	}
 
 	public static class Bean {
@@ -57,19 +76,42 @@ class TestExampleAnnotatedActionsBinds {
 		}
 	}
 
-	private final Injector context = Bootstrap.injector(
-			TestExampleAnnotatedActionsBindsModule.class);
+	@Test
+	void annotatedMethodIsBoundAsActionWithLocalSelectorWithLocalSelector() {
+		annotatedMethodIsBoundAsAction(Bootstrap.injector(
+				TestExampleAnnotatedActionsBindsModule1.class));
+	}
 
 	@Test
-	void annotatedMethodIsBoundAsAction() {
+	void notAnnotatedMethodIsNotBoundAsActionWithLocalSelector() {
+		notAnnotatedMethodIsNotBoundAsAction(Bootstrap.injector(
+				TestExampleAnnotatedActionsBindsModule1.class));
+	}
+
+	@Test
+	void annotatedMethodIsBoundAsActionWithGlobalSelector() {
+		Env env = Environment.DEFAULT.with(Binder.CONNECT_QUALIFIER,
+				ProducesBy.class, declaredMethods.annotatedWith(Marker.class));
+		annotatedMethodIsBoundAsAction(Bootstrap.injector(env,
+				TestExampleAnnotatedActionsBindsModule2.class));
+	}
+
+	@Test
+	void notAnnotatedMethodIsNotBoundAsActionWithGlobalSelector() {
+		Env env = Environment.DEFAULT.with(Binder.CONNECT_QUALIFIER,
+				ProducesBy.class, declaredMethods.annotatedWith(Marker.class));
+		notAnnotatedMethodIsNotBoundAsAction(Bootstrap.injector(env,
+				TestExampleAnnotatedActionsBindsModule2.class));
+	}
+
+	private void annotatedMethodIsBoundAsAction(Injector context) {
 		Action<Void, Integer> answer = context.resolve(
 				actionTypeOf(Void.class, Integer.class));
 		assertNotNull(context.resolve(Bean.class)); // force creation of Bean
 		assertEquals(42, answer.run(null).intValue());
 	}
 
-	@Test
-	void notAnnotatedMethodIsNotBoundAsAction() {
+	private void notAnnotatedMethodIsNotBoundAsAction(Injector context) {
 		Action<Void, Float> answer = context.resolve(
 				actionTypeOf(Void.class, float.class));
 		assertNotNull(context.resolve(Bean.class)); // force creation of Bean
