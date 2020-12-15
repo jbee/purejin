@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import se.jbee.inject.*;
 import se.jbee.inject.UnresolvableDependency.UnstableDependency;
 import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.binder.BootstrapperBundle;
+import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.defaults.CoreFeature;
 import se.jbee.inject.lang.Type;
@@ -57,6 +57,7 @@ class TestFeatureProviderBinds {
 	static final Instance<WorkingStateConsumer> B = instance(named("B"),
 			raw(WorkingStateConsumer.class));
 
+	@Installs(features = CoreFeature.class)
 	private static class TestFeatureProviderBindsModule extends BinderModule {
 
 		@Override
@@ -75,16 +76,6 @@ class TestFeatureProviderBinds {
 			injectingInto(B).bind(DynamicState.class).to(DYNAMIC_STATE_IN_B);
 			construct(A);
 			construct(B);
-		}
-
-	}
-
-	private static class TestFeatureProviderBindsBundle extends BootstrapperBundle {
-
-		@Override
-		protected void bootstrap() {
-			installAll(CoreFeature.class);
-			install(TestFeatureProviderBindsModule.class);
 		}
 
 	}
@@ -120,7 +111,7 @@ class TestFeatureProviderBinds {
 	}
 
 	private final Injector context = Bootstrap.injector(
-			TestFeatureProviderBindsBundle.class);
+			TestFeatureProviderBindsModule.class);
 
 	@Test
 	void providersAreAvailableForAnyBoundType() {

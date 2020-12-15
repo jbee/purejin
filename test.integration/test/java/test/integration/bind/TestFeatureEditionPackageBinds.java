@@ -7,7 +7,6 @@ import se.jbee.inject.Packages;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.Edition;
@@ -26,7 +25,7 @@ import static se.jbee.inject.Packages.*;
  */
 class TestFeatureEditionPackageBinds {
 
-	static final class TestFeatureEditionPackageBindsModule
+	private static final class TestFeatureEditionPackageBindsModule
 			extends BinderModule {
 
 		@Override
@@ -35,20 +34,11 @@ class TestFeatureEditionPackageBinds {
 		}
 	}
 
-	static final class TestFeatureEditionPackageBindsBundle
-			extends BootstrapperBundle {
-
-		@Override
-		protected void bootstrap() {
-			install(TestFeatureEditionPackageBindsModule.class);
-		}
-	}
-
 	@Test
 	void editionsCanBeUsedToInstallBundlesPackageDependent() {
 		// no edition
 		Injector injector = Bootstrap.injector(
-				TestFeatureEditionPackageBindsBundle.class);
+				TestFeatureEditionPackageBindsModule.class);
 		assertEquals(42, injector.resolve(int.class).intValue());
 
 		// an edition without the module in this test
@@ -57,7 +47,7 @@ class TestFeatureEditionPackageBinds {
 						.and(packageOf(DefaultsBundle.class)
 						.and(packageOf(Bootstrap.class)))));
 
-		Injector context = Bootstrap.injector(env, TestFeatureEditionPackageBindsBundle.class);
+		Injector context = Bootstrap.injector(env, TestFeatureEditionPackageBindsModule.class);
 		assertThrows(NoResourceForDependency.class, () -> context.resolve(int.class),
 				"Should have thrown exception since EditionPackageBindsModule should not have been installed");
 
@@ -66,7 +56,7 @@ class TestFeatureEditionPackageBinds {
 				packageAndSubPackagesOf(TestFeatureEditionPackageBinds.class) //
 						.and(packageOf(DefaultsBundle.class))
 						.and(packageOf(Bootstrap.class))));
-		injector = Bootstrap.injector(env, TestFeatureEditionPackageBindsBundle.class);
+		injector = Bootstrap.injector(env, TestFeatureEditionPackageBindsModule.class);
 		assertEquals(42, injector.resolve(int.class).intValue());
 	}
 }

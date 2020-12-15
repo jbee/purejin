@@ -36,6 +36,10 @@ class TestBasicMultibindBinds {
 	static final Name foo = named("foo");
 	static final Name bar = named("bar");
 
+	/**
+	 * Just split to show that usually multiple {@code multibind}s are made in
+	 * different {@link se.jbee.inject.bind.Module}s.
+	 */
 	private static class TestBasicMultibindBindsModule1 extends BinderModule {
 
 		@Override
@@ -47,9 +51,12 @@ class TestBasicMultibindBinds {
 			bind(Float.class).to(2f, 3f);
 			bind(Double.class).to(5d, 6d, 7d);
 		}
-
 	}
 
+	/**
+	 * Just split to show that usually multiple {@code multibind}s are made in
+	 * different {@link se.jbee.inject.bind.Module}s.
+	 */
 	private static class TestBasicMultibindBindsModule2 extends BinderModule {
 
 		@Override
@@ -58,7 +65,6 @@ class TestBasicMultibindBinds {
 			multibind(foo, Integer.class).to(3);
 			multibind(bar, Integer.class).to(5);
 		}
-
 	}
 
 	private static class TestBasicMultibindBindsBundle extends BootstrapperBundle {
@@ -70,7 +76,6 @@ class TestBasicMultibindBinds {
 			install(CoreFeature.SET);
 			install(CoreFeature.LIST);
 		}
-
 	}
 
 	private final Injector context = Bootstrap.injector(
