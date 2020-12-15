@@ -3,7 +3,7 @@ package test.integration.bind;
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.binder.BootstrapperBundle;
+import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.defaults.CoreFeature;
 
@@ -24,16 +24,7 @@ import static se.jbee.inject.Name.named;
  */
 class TestBasicPrimitiveArrayBridgeBinds {
 
-	private static class TestBasicCustomPrimitiveArrayBindsBundle
-			extends BootstrapperBundle {
-
-		@Override
-		protected void bootstrap() {
-			install(CoreFeature.PRIMITIVE_ARRAYS);
-			install(TestBasicCustomPrimitiveArrayBindsModule.class);
-		}
-	}
-
+	@Installs(features = CoreFeature.class, selection = "PRIMITIVE_ARRAYS")
 	private static class TestBasicCustomPrimitiveArrayBindsModule
 			extends BinderModule {
 
@@ -62,7 +53,7 @@ class TestBasicPrimitiveArrayBridgeBinds {
 	}
 
 	private final Injector context = Bootstrap.injector(
-			TestBasicCustomPrimitiveArrayBindsBundle.class);
+			TestBasicCustomPrimitiveArrayBindsModule.class);
 
 	@Test
 	void primitiveArrayBridgeProvidesPrimitiveIntArray() {

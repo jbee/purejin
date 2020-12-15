@@ -30,6 +30,7 @@ public abstract class BinderModuleWith<T> extends InitializedBinder
 	public final void bootstrap(Bootstrapper bootstrap) {
 		bootstrap.installDefaults();
 		bootstrap.install(this);
+		installAnnotated(getClass(), bootstrap);
 	}
 
 	@Override
