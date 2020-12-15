@@ -5,16 +5,13 @@
  */
 package se.jbee.inject.binder;
 
-import se.jbee.inject.Env;
-import se.jbee.inject.Name;
-import se.jbee.inject.Scope;
-import se.jbee.inject.ScopeLifeCycle;
-import se.jbee.inject.bind.Bindings;
-import se.jbee.inject.bind.Bootstrapper;
-import se.jbee.inject.bind.Bundle;
+import se.jbee.inject.*;
 import se.jbee.inject.bind.Module;
+import se.jbee.inject.bind.*;
+import se.jbee.inject.lang.Utils;
 
 import static se.jbee.inject.Scope.container;
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * The default utility {@link Module} almost always used.
@@ -44,6 +41,7 @@ public abstract class BinderModule extends InitializedBinder
 		if (basis != null)
 			bootstrap.install(basis);
 		bootstrap.install(this);
+		installAnnotated(getClass(), bootstrap);
 	}
 
 	@Override

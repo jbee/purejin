@@ -5,7 +5,7 @@ import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.binder.BootstrapperBundle;
+import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.defaults.CoreFeature;
 
@@ -27,25 +27,15 @@ import static se.jbee.inject.Dependency.dependency;
  */
 class TestExampleDependencyAsHintBinds {
 
-	private static class TestExampleDependencyAsHintBindsBundle
-			extends BootstrapperBundle {
-
-		@Override
-		protected void bootstrap() {
-			install(CoreFeature.LOGGER);
-			install(TestExampleDependencyAsHintBindsModule.class);
-		}
-
-	}
-
-	private static class TestExampleDependencyAsHintBindsModule extends BinderModule {
+	@Installs(features = CoreFeature.class, selection = "LOGGER")
+	private static class TestExampleDependencyAsHintBindsModule
+			extends BinderModule {
 
 		@Override
 		protected void declare() {
 			bind(Bean.class).toConstructor(
 					dependency(Logger.class).injectingInto(BinderModule.class).asHint());
 		}
-
 	}
 
 	public static class Bean {
@@ -61,7 +51,7 @@ class TestExampleDependencyAsHintBinds {
 	@Test
 	void dependencyHintAffectsInjection() {
 		Injector resolver = Bootstrap.injector(
-				TestExampleDependencyAsHintBindsBundle.class);
+				TestExampleDependencyAsHintBindsModule.class);
 		Bean bean = resolver.resolve(Bean.class);
 		Logger expected = Logger.getLogger(
 				BinderModule.class.getCanonicalName());
