@@ -64,6 +64,14 @@ public interface Env {
 		return property(Name.DEFAULT, property, ns);
 	}
 
+	default <T> T property(String qualifier, Class<T> property, Package ns) {
+		return property(named(qualifier), raw(property), ns);
+	}
+
+	default <T> T property(String qualifier, Class<T> property, Package ns, T defaultValue) {
+		return property(named(qualifier), raw(property), ns, defaultValue);
+	}
+
 	default <T> T property(Name qualifier, Type<T> property, Package ns, T defaultValue) {
 		try {
 			return property(qualifier, property, ns);

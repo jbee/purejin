@@ -47,6 +47,12 @@ public class Binder {
 	 */
 	public static final String SCHEDULER_CONNECTOR = "scheduler";
 
+	/**
+	 * The qualifier {@link Name} used in the {@link Env} for the {@link
+	 * ProducesBy} value that is used by the {@link #connect()} method.
+	 */
+	public static final String CONNECT_QUALIFIER = "connect";
+
 	public static RootBinder create(Bind bind) {
 		return new RootBinder(bind);
 	}
@@ -302,7 +308,10 @@ public class Binder {
 	 * @since 8.1
 	 */
 	public ConnectBinder connect() {
-		return new ConnectBinder(this, env().property(ProducesBy.class, bind.source.pkg()));
+		Package pkg = bind.source.pkg();
+		return new ConnectBinder(this,
+				env().property(CONNECT_QUALIFIER, ProducesBy.class, pkg,
+						env().property(ProducesBy.class, pkg)));
 	}
 
 	public ConnectBinder connect(ProducesBy linksBy) {
