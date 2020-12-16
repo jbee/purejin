@@ -1,10 +1,9 @@
 package se.jbee.inject.bootstrap;
 
 import se.jbee.inject.*;
-import se.jbee.inject.bind.InconsistentBinding;
-import se.jbee.inject.bind.ModuleWith;
-import se.jbee.inject.bind.ValueBinder;
+import se.jbee.inject.bind.*;
 import se.jbee.inject.config.*;
+import se.jbee.inject.defaults.DefaultBindingConsolidation;
 import se.jbee.inject.defaults.DefaultValueBinders;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.Utils;
@@ -50,9 +49,10 @@ public final class Environment implements Env {
 			.with(ScopesBy.class, ScopesBy.alwaysDefault) //
 			.with(HintsBy.class, HintsBy.noParameters) //
 			.with(Annotated.Enhancer.class, Annotated.SOURCE) //
-			.with(Env.GP_USE_DEEP_REFLECTION, boolean.class, false) //
+			.with(BindingConsolidation.class, DefaultBindingConsolidation::consolidate) //
+			.with(Env.GP_USE_DEEP_REFLECTION, false) //
 			.with(Env.GP_DEEP_REFLECTION_PACKAGES, Packages.class, Packages.ALL) //
-			.with(Env.GP_USE_VERIFICATION, boolean.class, false) //
+			.with(Env.GP_USE_VERIFICATION,false) //
 			.readonly();
 
 	public static Environment override(Env overridden) {
@@ -110,6 +110,10 @@ public final class Environment implements Env {
 		if (decorated != null && override)
 			return decorated.property(qualifier, property, ns);
 		throw InconsistentBinding.undefinedEnvProperty(qualifier, property, ns);
+	}
+
+	public Environment with(String qualifier, boolean value) {
+		return with(qualifier, boolean.class, value);
 	}
 
 	public <T> Environment with(Class<T> globalProperty, T value) {

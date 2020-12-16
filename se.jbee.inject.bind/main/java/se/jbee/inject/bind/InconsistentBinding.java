@@ -42,7 +42,7 @@ public final class InconsistentBinding extends InconsistentDeclaration {
 	public static InconsistentBinding undefinedEnvProperty(Name name,
 			Type<?> property, Package scope) {
 		return new InconsistentBinding(
-				"Attempt to resolve environment property failed, no value was bound to "
+				"Missing environment property: "
 					+ name + " of type " + property + " in " + scope);
 	}
 

@@ -85,7 +85,9 @@ public final class Bootstrap {
 	public static Injector injector(Env env, Bindings bindings,
 			Module[] modules) {
 		return Container.injector(
-				Binding.disambiguate(bindings.declaredFrom(env, modules)));
+				env.globalProperty(BindingConsolidation.class) //
+						.consolidate(env,
+								(bindings.declaredFrom(env, modules))));
 	}
 
 	public static Modulariser modulariser(Env env) {
@@ -94,12 +96,6 @@ public final class Bootstrap {
 
 	public static Bundler bundler(Env env) {
 		return new BuiltinBootstrapper(env);
-	}
-
-	public static Binding<?>[] bindings(Env env, Class<? extends Bundle> root,
-			Bindings bindings) {
-		return Binding.disambiguate(bindings//
-				.declaredFrom(env, modulariser(env).modularise(root)));
 	}
 
 	private Bootstrap() {
