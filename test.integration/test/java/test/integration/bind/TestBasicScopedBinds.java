@@ -45,8 +45,8 @@ class TestBasicScopedBinds {
 	void injectingAnInjectionScopedInstanceIntoAppScopedInstanceThrowsAnException() {
 		Exception ex = assertThrows(UnstableDependency.class, () -> context.resolve(Foo.class));
 		assertEquals("Unstable dependency injection\n"
-				+ "\t  of: test.integration.bind.TestBasicScopedBinds.Bar  in * into * => *  scoped injection\n"
-				+ "\tinto: test.integration.bind.TestBasicScopedBinds.Foo  in * into * => *  scoped application",
+				+ "\t  of: test.integration.bind.TestBasicScopedBinds.Bar  scoped injection\n"
+				+ "\tinto: test.integration.bind.TestBasicScopedBinds.Foo  scoped application",
 				ex.getMessage());
 	}
 }

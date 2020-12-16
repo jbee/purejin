@@ -8,6 +8,7 @@ import se.jbee.inject.Supplier;
 import se.jbee.inject.bind.Bootstrapper;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.defaults.DefaultFeature;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static se.jbee.inject.Name.named;
@@ -17,7 +18,7 @@ import static se.jbee.inject.lang.Type.raw;
  * This test demonstrates how to add user defined primitive array support.
  * <p>
  * The default way however to enable primitive array support is to install
- * {@link se.jbee.inject.defaults.CoreFeature#PRIMITIVE_ARRAYS} which by default
+ * {@link DefaultFeature#PRIMITIVE_ARRAYS} which by default
  * is not installed as part of the {@link Bootstrapper#installDefaults()} as
  * it is shown in {@link TestBasicPrimitiveArrayBridgeBinds}.
  *

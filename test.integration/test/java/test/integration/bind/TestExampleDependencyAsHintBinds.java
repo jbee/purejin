@@ -7,7 +7,7 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.defaults.CoreFeature;
+import se.jbee.inject.defaults.DefaultFeature;
 
 import java.util.logging.Logger;
 
@@ -27,7 +27,7 @@ import static se.jbee.inject.Dependency.dependency;
  */
 class TestExampleDependencyAsHintBinds {
 
-	@Installs(features = CoreFeature.class, selection = "LOGGER")
+	@Installs(features = DefaultFeature.class, selection = "LOGGER")
 	private static class TestExampleDependencyAsHintBindsModule
 			extends BinderModule {
 

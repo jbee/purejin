@@ -5,7 +5,7 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.defaults.CoreFeature;
+import se.jbee.inject.defaults.DefaultFeature;
 import se.jbee.inject.lang.Cast;
 import se.jbee.inject.lang.Type;
 
@@ -40,7 +40,7 @@ class TestBasicCollectionBinds {
 
 		@Override
 		protected void bootstrap() {
-			installAll(CoreFeature.class);
+			installAll(DefaultFeature.class);
 			install(TestBasicCollectionBindsModule.class);
 		}
 	}
@@ -49,7 +49,7 @@ class TestBasicCollectionBinds {
 
 		@Override
 		protected void bootstrap() {
-			install(CoreFeature.LIST, CoreFeature.COLLECTION);
+			install(DefaultFeature.LIST, DefaultFeature.COLLECTION);
 			install(TestBasicCollectionBindsModule.class);
 		}
 	}

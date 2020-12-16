@@ -7,7 +7,7 @@ import se.jbee.inject.binder.Binder.RootBinder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.defaults.CoreFeature;
+import se.jbee.inject.defaults.DefaultFeature;
 import se.jbee.inject.lang.Type;
 import test.integration.util.Resource;
 
@@ -264,7 +264,7 @@ class TestExampleStateDependentInjectionBinds {
 		@Override
 		protected void bootstrap() {
 			install(Solution1.class);
-			install(CoreFeature.PROVIDER);
+			install(DefaultFeature.PROVIDER);
 		}
 	}
 

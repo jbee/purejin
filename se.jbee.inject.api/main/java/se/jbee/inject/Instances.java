@@ -70,7 +70,7 @@ public final class Instances implements Qualifying<Instances>,
 		StringBuilder b = new StringBuilder();
 		for (int i = 0; i < hierarchy.length; i++) {
 			if (i > 0)
-				b.append(" => ");
+				b.append(" within ");
 			b.append(hierarchy[i]);
 		}
 		return b.toString();

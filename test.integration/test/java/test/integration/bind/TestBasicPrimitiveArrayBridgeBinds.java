@@ -5,7 +5,7 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.defaults.CoreFeature;
+import se.jbee.inject.defaults.DefaultFeature;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.Name.named;
 
 /**
- * The test demonstrates the {@link CoreFeature#PRIMITIVE_ARRAYS} that installs
+ * The test demonstrates the {@link DefaultFeature#PRIMITIVE_ARRAYS} that installs
  * a bridge between wrapper arrays and their primitive counterparts so that
  * values of wrappers (and their 1-dimensional array types) can be resolved as
  * primitive arrays as well.
@@ -24,7 +24,7 @@ import static se.jbee.inject.Name.named;
  */
 class TestBasicPrimitiveArrayBridgeBinds {
 
-	@Installs(features = CoreFeature.class, selection = "PRIMITIVE_ARRAYS")
+	@Installs(features = DefaultFeature.class, selection = "PRIMITIVE_ARRAYS")
 	private static class TestBasicCustomPrimitiveArrayBindsModule
 			extends BinderModule {
 

@@ -42,6 +42,7 @@ public interface NamesBy {
 		};
 	}
 
+	@Deprecated // ask for mapper: annotation => name
 	default NamesBy unlessAnnotatedWith(Class<? extends Annotation> naming) {
 		if (naming == null)
 			return this;

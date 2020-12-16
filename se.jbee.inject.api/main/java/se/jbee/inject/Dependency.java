@@ -82,7 +82,7 @@ public final class Dependency<T>
 		StringBuilder b = new StringBuilder();
 		b.append(instance);
 		for (int i = hierarchy.length - 1; i >= 0; i--)
-			b.append(" :: ").append(hierarchy[i].target);
+			b.append(" <= ").append(hierarchy[i].target);
 		return b.toString();
 	}
 
@@ -134,7 +134,11 @@ public final class Dependency<T>
 	public Instance<?> target(int level) {
 		return level >= hierarchy.length
 			? Instance.ANY
-			: hierarchy[hierarchy.length - 1 - level].target.instance;
+			: injection(level).target.instance;
+	}
+
+	public Injection injection(int level) {
+		return hierarchy[hierarchy.length - 1 - level];
 	}
 
 	public int injectionDepth() {

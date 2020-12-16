@@ -5,6 +5,7 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.defaults.DefaultFeature;
 import se.jbee.inject.lang.Type;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -84,7 +85,7 @@ class TestBasicPrimitiveValueBinds {
 
 	/**
 	 * To allow such a automatic conversion a bridge can be installed using
-	 * {@link se.jbee.inject.defaults.CoreFeature#PRIMITIVE_ARRAYS}. By default
+	 * {@link DefaultFeature#PRIMITIVE_ARRAYS}. By default
 	 * however this is not installed so the below call fails.
 	 */
 	@Test
