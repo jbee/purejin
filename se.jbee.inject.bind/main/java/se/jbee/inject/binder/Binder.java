@@ -911,8 +911,8 @@ public class Binder {
 		}
 
 		protected final void expand(Object value) {
-			declareBindingsIn(bind().asType(locator, BindingType.VALUE, null),
-					value);
+			declareBindingsIn(bind() //
+					.asType(locator, BindingType.VALUE, null), value);
 		}
 
 		protected final void expand(BindingType type,
@@ -1011,14 +1011,14 @@ public class Binder {
 		}
 
 		public void toConstructor() {
-			to(env(ConstructsBy.class).reflect(locator.type().rawType));
+			toConstructor(locator.type().rawType);
 		}
 
-		public void toConstructor(Class<? extends T> impl,
-				Hint<?>... hints) {
+		@SuppressWarnings("unchecked")
+		public void toConstructor(Class<? extends T> impl, Hint<?>... hints) {
 			if (!isClassInstantiable(impl))
 				throw InconsistentDeclaration.notConstructable(impl);
-			to(env(ConstructsBy.class).reflect(impl), hints);
+			to((Constructor<? extends T>) env(ConstructsBy.class).reflect(impl, hints), hints);
 		}
 
 		public void toConstructor(Hint<?>... hints) {

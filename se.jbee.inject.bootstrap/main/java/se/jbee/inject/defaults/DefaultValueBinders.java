@@ -194,10 +194,11 @@ public final class DefaultValueBinders {
 				return;
 			}
 			if (type.isInterface())
-				throw InconsistentBinding.loop(item, src, bound);
-			bindToMirrorConstructor(env, type.rawType, item, target);
+				throw InconsistentBinding.referenceLoop(item, src, bound);
+			bindToConstructsBy(env, type.rawType, item, target);
 		}
 
+		@SuppressWarnings({"unchecked", "rawtypes"})
 		private <T> boolean isCompatibleSupplier(Type<T> requiredType,
 				Type<?> providedType) {
 			if (!providedType.isAssignableTo(raw(Supplier.class)))
@@ -218,13 +219,13 @@ public final class DefaultValueBinders {
 					new Locator<>(src).indirect(item.signature.target.indirect),
 					BindingType.CONSTRUCTOR, null, item.scope,
 					item.source.typed(DeclarationType.IMPLICIT));
-			bindToMirrorConstructor(env, impl, binding, target);
+			bindToConstructsBy(env, impl, binding, target);
 		}
 	}
 
-	static <T> void bindToMirrorConstructor(Env env, Class<? extends T> src,
+	static <T> void bindToConstructsBy(Env env, Class<? extends T> src,
 			Binding<T> item, Bindings target) {
-		Constructor<? extends T> c = env.property(ConstructsBy.class,
+		Constructor<?> c = env.property(ConstructsBy.class,
 				item.source.pkg()).reflect(src);
 		if (c != null)
 			target.addExpanded(env, item, New.newInstance(c));

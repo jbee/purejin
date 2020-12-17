@@ -59,7 +59,7 @@ public final class InconsistentBinding extends InconsistentDeclaration {
 					+ b);
 	}
 
-	public static InconsistentBinding loop(Binding<?> inconsistent,
+	public static InconsistentBinding referenceLoop(Binding<?> inconsistent,
 			Instance<?> linked, Instance<?> bound) {
 		return new InconsistentBinding(
 				"Detected a self-referential binding: \n\t" + bound + " => "

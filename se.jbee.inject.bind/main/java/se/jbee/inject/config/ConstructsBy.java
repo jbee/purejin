@@ -10,6 +10,7 @@ import static se.jbee.inject.lang.Utils.arrayFindFirst;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 
+import se.jbee.inject.Hint;
 import se.jbee.inject.Packages;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.Utils;
@@ -30,38 +31,22 @@ public interface ConstructsBy {
 	 *
 	 *         Returns {@code null} when no suitable constructor was found.
 	 */
-	<T> Constructor<T> reflect(Class<T> type);
+	Constructor<?> reflect(Class<?> type, Hint... hints);
 
 	/**
 	 * Default value and starting point for custom {@link ConstructsBy}.
 	 */
-	ConstructsBy common = Utils::commonConstructorOrNull;
+	ConstructsBy common = (type, hints) -> Utils.commonConstructorOrNull(type);
 
 	default ConstructsBy in(Packages filter) {
-		ConstructsBy self = this;
-		return new ConstructsBy() {
-
-			@Override
-			public <T> Constructor<T> reflect(Class<T> type) {
-				return filter.contains(Type.raw(type))
-					? self.reflect(type)
-					: null;
-			}
-		};
+		return (type, hints) -> filter.contains(Type.raw(type)) ? reflect(type) : null;
 	}
 
 	default ConstructsBy annotatedWith(Class<? extends Annotation> marker) {
-		ConstructsBy self = this;
-		return new ConstructsBy() {
-
-			@Override
-			public <T> Constructor<T> reflect(Class<T> type) {
-				@SuppressWarnings("unchecked")
-				Constructor<T>[] cs = (Constructor<T>[]) type.getDeclaredConstructors();
-				Constructor<T> marked = arrayFindFirst(cs,
-						c -> c.isAnnotationPresent(marker));
-				return marked != null ? marked : self.reflect(type);
-			}
+		return (type, hints) -> {
+			Constructor<?> marked = arrayFindFirst(type.getDeclaredConstructors(),
+					c -> c.isAnnotationPresent(marker));
+			return marked != null ? marked : reflect(type);
 		};
 	}
 }

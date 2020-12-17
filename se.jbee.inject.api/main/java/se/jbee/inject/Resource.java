@@ -10,6 +10,7 @@ import se.jbee.inject.lang.Type;
 
 import java.util.function.Function;
 
+import static se.jbee.inject.DeclarationType.IMPLICIT;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
@@ -153,18 +154,25 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 
 	@Override
 	public int compareTo(Resource<?> other) {
-		Locator<?> l1 = signature;
-		Locator<?> l2 = other.signature;
-		Class<?> c1 = l1.type().rawType;
-		Class<?> c2 = l2.type().rawType;
-		if (c1 != c2) {
-			if (c1.isAssignableFrom(c2))
+		Locator<?> a = signature;
+		Locator<?> b = other.signature;
+		Class<?> aRaw = a.type().rawType;
+		Class<?> bRaw = b.type().rawType;
+		// first of all we must sort by raw type
+		if (aRaw != bRaw) {
+			if (aRaw.isAssignableFrom(bRaw))
 				return 1;
-			if (c2.isAssignableFrom(c1))
+			if (bRaw.isAssignableFrom(aRaw))
 				return -1;
-			return c1.getName().compareTo(c2.getName());
+			return aRaw.getName().compareTo(bRaw.getName());
 		}
-		return Qualifying.compare(l1, l2);
+		// secondly any implicit bind is always after any other type of bind
+		if (source.declarationType == IMPLICIT && other.source.declarationType != IMPLICIT)
+			return 1;
+		if (source.declarationType != IMPLICIT && other.source.declarationType == IMPLICIT)
+			return -1;
+		// for same type and non implicit (or both implicit) binds compare their Locator
+		return Qualifying.compare(a, b);
 	}
 
 	@Override

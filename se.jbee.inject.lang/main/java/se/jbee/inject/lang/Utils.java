@@ -277,7 +277,7 @@ public final class Utils {
 	}
 
 	public static boolean isClassInstantiable(Class<?> cls) {
-		return !isClassVirtual(cls) && cls.getTypeParameters().length == 0;
+		return !isClassVirtual(cls);
 	}
 
 	/**
