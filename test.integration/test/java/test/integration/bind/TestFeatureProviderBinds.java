@@ -158,8 +158,8 @@ class TestFeatureProviderBinds {
 		Exception ex = assertThrows(UnstableDependency.class,
 				() -> context.resolve(FaultyStateConsumer.class));
 		assertEquals("Unstable dependency injection" +
-						"\n" + "\t  of: test.integration.bind.TestFeatureProviderBinds.DynamicState  scoped injection" +
-						"\n" + "\tinto: test.integration.bind.TestFeatureProviderBinds.FaultyStateConsumer  scoped application",
+						"\n" + "\t  of: test.integration.bind.TestFeatureProviderBinds.DynamicState scoped injection" +
+						"\n" + "\tinto: test.integration.bind.TestFeatureProviderBinds.FaultyStateConsumer scoped application",
 				ex.getMessage());
 	}
 

@@ -143,10 +143,15 @@ public final class Hint<T> implements Typed<T> {
 
 	/**
 	 * @return a more qualified {@link Hint} if the provided type is more
-	 * qualified
+	 * qualified which changes the references but does not change {@link #asType}
+	 * in case that was intentionally set to a supertype.
+	 *
+	 * At the point this method is called the {@link #asType} already had its
+	 * effect but we still want to preserve the information for debugging so
+	 * we do not get confused.
 	 */
 	private Hint<?> parameterized(Type<?> type) {
-		return type.moreQualifiedThan(asType) ? typed(type) : this;
+		return type.moreQualifiedThan(asType) ? typed(type).asType(asType) : this;
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})

@@ -84,7 +84,7 @@ public final class Instance<T> implements Typed<T>, Qualifying<Instance<?>>,
 
 	@Override
 	public String toString() {
-		return type.toString() + (name.isAny() ? "" : " " + name);
+		return type.toString() + (name.isDefault() ? "" : " " + name);
 	}
 
 	public boolean isAny() {

@@ -93,8 +93,7 @@ public enum DefaultFeature implements Toggled<DefaultFeature> {
 	OBTAINABLE(true),
 
 	/**
-	 * Adds: injection {@link Type}, {@link Instance}, {@link
-	 * Name} and {@link Dependency}.
+	 * Adds: injection {@link Type}, {@link Name} and {@link Dependency}.
 	 */
 	SELF(true)
 	;
@@ -348,9 +347,6 @@ public enum DefaultFeature implements Toggled<DefaultFeature> {
 					.starbind(Name.class) //
 					.toSupplier(SelfModule::supplyName);
 			asDefault().per(Scope.dependency) //
-					.starbind(Instance.class) //
-					.toSupplier(SelfModule::supplyInstance);
-			asDefault().per(Scope.dependency) //
 					.starbind(Dependency.class) //
 					.toSupplier(SelfModule::supplyDependency);
 		}
@@ -366,11 +362,6 @@ public enum DefaultFeature implements Toggled<DefaultFeature> {
 			return injected.dependency.name.isAny()
 				   ? injected.target.instance.name
 				   : injected.dependency.name;
-		}
-
-		private static Instance<?> supplyInstance(
-				Dependency<? super Instance<?>> dep, Injector context) {
-			return dep.injection(findTypeInjectionFrame(dep)).dependency;
 		}
 
 		private static Dependency<?> supplyDependency(

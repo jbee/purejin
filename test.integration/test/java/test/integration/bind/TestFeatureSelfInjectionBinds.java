@@ -20,8 +20,8 @@ import static se.jbee.inject.lang.Type.raw;
 
 /**
  * Test the feature {@link se.jbee.inject.defaults.DefaultFeature#SELF} which
- * allows to inject the {@link Name} or {@link Type} or {@link Instance} that
- * the created instance represents within the {@link Injector} context.
+ * allows to inject the {@link Name} or {@link Type} that the created instance
+ * represents within the {@link Injector} context.
  * <p>
  * This allows to get hold of the instance's {@link Name} and full generic
  * {@link Type}.
@@ -30,8 +30,7 @@ import static se.jbee.inject.lang.Type.raw;
  * creation of an instance.
  * <p>
  * All this information can be extracted from the {@link Dependency} itself that
- * resolves the {@link Name}, {@link Type}, {@link Instance} or {@link
- * Dependency} value.
+ * resolves the {@link Name}, {@link Type} or {@link Dependency} value.
  * <p>
  * Without question this feature is most useful in building more powerful
  * features on top of others. Within actual application code this might appear
@@ -45,15 +44,12 @@ class TestFeatureSelfInjectionBinds {
 
 		final Name actualName;
 		final Type<? extends Foo<T>> actualType;
-		final Instance<? extends Foo<T>> actualInstance;
 		final Dependency<? extends Foo<T>> actualDependency;
 
 		public Foo(Type<? extends Foo<T>> actualType, Name actualName,
-				Instance<? extends Foo<T>> actualInstance,
 				Dependency<? extends Foo<T>> actualDependency) {
 			this.actualType = actualType;
 			this.actualName = actualName;
-			this.actualInstance = actualInstance;
 			this.actualDependency = actualDependency;
 		}
 	}
@@ -64,9 +60,8 @@ class TestFeatureSelfInjectionBinds {
 
 		public SuperFoo(Foo<String> innerFoo, Name actualName,
 				Type<? extends SuperFoo<T>> actualType,
-				Instance<? extends SuperFoo<T>> actualInstance,
-				Dependency<? extends SuperFoo<T>> actualDependency) {
-			super(actualType, actualName, actualInstance, actualDependency);
+				Dependency<SuperFoo<T>> actualDependency) {
+			super(actualType, actualName, actualDependency);
 			this.innerFoo = innerFoo;
 		}
 	}
@@ -87,9 +82,9 @@ class TestFeatureSelfInjectionBinds {
 		final Foo<?> genericFoo;
 
 		public Que(Foo<?> genericFoo, Type<Que> actualType,
-				Name actualName, Instance<Que> actualInstance,
+				Name actualName,
 				Dependency<Que> actualDependency) {
-			super(actualType, actualName, actualInstance, actualDependency);
+			super(actualType, actualName, actualDependency);
 			this.genericFoo = genericFoo;
 		}
 	}
@@ -214,17 +209,29 @@ class TestFeatureSelfInjectionBinds {
 
 	@Test
 	void actualDependencyFromAdHoc() {
+		@SuppressWarnings("rawtypes")
 		Type<Foo> type = raw(Foo.class).parametized(String.class);
-		assertSimilar(dependency(
-				type.asUpperBound().parametized(Type.WILDCARD)).injectingInto(
-				anyOf(raw(Foo.class))), context.resolve(type).actualDependency);
+		assertSimilar(
+				dependency(type.asUpperBound().parametized(Type.WILDCARD)) //
+				.injectingInto(anyOf(raw(Foo.class))), //
+				context.resolve(type).actualDependency);
 	}
 
 	@Test
 	void actualDependencyFromParameterNestedFlatWildcardTypeWithHintOverload() {
 		Que que = context.resolve("x", Que.class);
-		assertSimilar(dependency(Que.class).injectingInto(
-				instance(named("x"), raw(Que.class))), que.actualDependency);
+		assertSimilar(dependency(Que.class) //
+				.injectingInto(instance(named("x"), raw(Que.class))), //
+				que.actualDependency);
+	}
+
+	@Test
+	void actualDependencyFromParameterNestedDeep() {
+		Bar bar = context.resolve(Bar.class);
+		assertSimilar(dependency(Type.classType(SuperFoo.class)) //
+						.injectingInto(Bar.class) //
+						.injectingInto(anyOf(SuperFoo.class)), //
+				bar.superFoo.actualDependency);
 	}
 
 	/**
