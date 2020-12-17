@@ -40,7 +40,7 @@ class ExtensionModule extends BinderModule {
 	private static <T> T extension(ConstructsBy constructsBy, Dependency<?> dep,
 			Injector context) {
 		Constructor<T> ext = (Constructor<T>) constructsBy.reflect(
-				dep.type().rawType);
+				dep.type().rawType.getDeclaredConstructors());
 		context.resolve(Env.class).accessible(ext);
 		return Supply.byNew(newInstance(ext)) //
 				.supply((Dependency<? super T>) dep, context);

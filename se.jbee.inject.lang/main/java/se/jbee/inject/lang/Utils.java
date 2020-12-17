@@ -5,28 +5,18 @@
  */
 package se.jbee.inject.lang;
 
-import static java.lang.System.arraycopy;
-import static java.lang.reflect.Array.newInstance;
-import static java.lang.reflect.Modifier.isAbstract;
-import static java.lang.reflect.Modifier.isPrivate;
-import static java.lang.reflect.Modifier.isProtected;
-import static java.lang.reflect.Modifier.isPublic;
-import static java.util.Arrays.copyOf;
-import static se.jbee.inject.lang.Type.raw;
-
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.Collection;
-import java.util.NoSuchElementException;
 import java.util.function.*;
+
+import static java.lang.System.arraycopy;
+import static java.lang.reflect.Array.newInstance;
+import static java.lang.reflect.Modifier.*;
+import static java.util.Arrays.copyOf;
+import static se.jbee.inject.lang.Type.*;
 
 /**
  * Language level utility methods for the library.
@@ -51,15 +41,32 @@ public final class Utils {
 
 	/* Arrays */
 
+	/**
+	 * This implementation assumes that the array passed is usually short (< 20)
+	 * and that usually the filter does accept all elements it is the case for
+	 * example with lists of {@link Member}s and filters on those.
+	 *
+	 * @param arr    an array or null
+	 * @param accept a {@link Predicate} that returns true for those elements
+	 *               that should stay
+	 * @param <A>    array element type
+	 * @return the filtered array, the same instance if all elements get
+	 * accepted, or a new instance of some get filtered out
+	 */
 	public static <A> A[] arrayFilter(A[] arr, Predicate<A> accept) {
 		if (arr == null || arr.length == 0)
 			return arr;
-		A[] accepted = newArray(arr, arr.length);
+		int[] acceptedIndex = new int[arr.length];
 		int j = 0;
-		for (A a : arr)
-			if (accept.test(a))
-				accepted[j++] = a;
-		return j == arr.length ? arr : copyOf(accepted, j);
+		for (int i = 0; i < arr.length; i++)
+			if (accept.test(arr[i]))
+				acceptedIndex[j++] = i;
+		if (j == arr.length)
+			return arr;
+		A[] accepted = newArray(arr, j);
+		for (int i = 0; i < j; i++)
+			accepted[i] = arr[acceptedIndex[i]];
+		return accepted;
 	}
 
 	public static <A> A[] arrayAppend(A[] arr, A e) {
@@ -337,48 +344,26 @@ public final class Utils {
 		return a; // same
 	}
 
-	/**
-	 * Returns the constructor with most visible visibility and longest argument
-	 * list. Self-referencing constructors are ignored.
-	 *
-	 * @param <T> type that should be constructed/instantiated
-	 * @param type constructed type
-	 * @return The highest visibility constructor with the most parameters that
-	 *         does not have the declaring class itself as parameter type (some
-	 *         compiler seam to generate such a synthetic constructor)
-	 * @throws NoSuchElementException in case the type is not constructable (has
-	 *             no constructors at all)
-	 */
-	public static <T> Constructor<T> commonConstructor(Class<T> type) {
-		@SuppressWarnings("unchecked")
-		Constructor<T>[] cs = (Constructor<T>[]) type.getDeclaredConstructors();
-		if (cs.length == 0)
-			throw new NoSuchElementException("Type does not declare any constructors: " + type);
-		if (cs.length == 1)
-			return cs[0];
-		Constructor<T> mostParamsConstructor = null;
-		for (Constructor<T> c : cs)
-			mostParamsConstructor = commonConstructor(type,
-					mostParamsConstructor, c);
-		if (mostParamsConstructor == null)
-			throw new NoSuchElementException("Type does not declare any constructors: " + type);
-		return mostParamsConstructor;
+	public static int mostVisibleMostParametersToLeastVisibleLeastParameters(
+			Constructor<?> a, Constructor<?> b) {
+		return a.equals(b) ? 0 : moreVisibleMoreParameters(a, b) == b ? 1 : -1;
 	}
 
-	private static <T> Constructor<T> commonConstructor(Class<T> type,
-			Constructor<T> a, Constructor<T> b) {
-		return !arrayContains(b.getParameterTypes(), type, Class::equals) // avoid self referencing constructors (synthetic) as they cause endless loop
-			&& (a == null //
-				|| (moreVisible(b, a) == b && (moreVisible(a, b) == b
-					|| b.getParameterCount() > a.getParameterCount()))) ? b : a;
+	public static Constructor<?> moreVisibleMoreParameters(Constructor<?> a,
+			Constructor<?> b) {
+		if (a == null)
+			return b;
+		if (moreVisible(a, b) == b)
+			return b;
+		if (moreVisible(b, a) == a)
+			return a;
+		return b.getParameterCount() > a.getParameterCount() ? b : a;
 	}
 
-	public static <T> Constructor<T> commonConstructorOrNull(Class<T> type) {
-		try {
-			return commonConstructor(type);
-		} catch (NoSuchElementException e) {
-			return null;
-		}
+	public static <T> boolean isRecursiveTypeParameterPresent(Constructor<T> c) {
+		Class<T> t = c.getDeclaringClass();
+		return arrayContains(c.getParameterTypes(), t, Class::equals) // first check raw types
+				&& arrayContains(parameterTypes(c), classType(t), Type::equalTo); // then check full generic Type as it is much more work
 	}
 
 	public static <T> Constructor<T> noArgsConstructor(Class<T> type) {

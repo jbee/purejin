@@ -42,7 +42,7 @@ public final class Environment implements Env {
 			.withBinder(DefaultValueBinders.INSTANCE_REF) //
 			.withBinder(DefaultValueBinders.PARAMETRIZED_REF) //
 			.withBinder(DefaultValueBinders.ARRAY) //
-			.with(ConstructsBy.class, ConstructsBy.common) //
+			.with(ConstructsBy.class, ConstructsBy.OPTIMISTIC) //
 			.with(SharesBy.class, SharesBy.noFields) //
 			.with(ProducesBy.class, ProducesBy.noMethods) //
 			.with(NamesBy.class, NamesBy.defaultName) //

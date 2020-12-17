@@ -7,6 +7,7 @@ import se.jbee.inject.UnresolvableDependency.DependencyCycle;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
+import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.ConstructsBy;
@@ -21,7 +22,7 @@ import java.time.Duration;
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Hint.relativeReferenceTo;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.config.ConstructsBy.common;
+import static se.jbee.inject.config.ConstructsBy.OPTIMISTIC;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
@@ -166,22 +167,13 @@ class TestFeatureBootstrapper {
 		}
 	}
 
-	private static class CustomConstructorSelectionStrategyBundle
-			extends BootstrapperBundle {
-
-		@Override
-		protected void bootstrap() {
-			install(DefaultScopes.class);
-			install(CustomConstructorSelectionStrategyModule.class);
-		}
-	}
-
 	@Target(ElementType.CONSTRUCTOR)
 	@Retention(RetentionPolicy.RUNTIME)
 	@interface ConstructFrom {
 
 	}
 
+	@Installs(bundles = DefaultScopes.class)
 	private static class CustomConstructorSelectionStrategyModule
 			extends BinderModule {
 
@@ -189,7 +181,7 @@ class TestFeatureBootstrapper {
 		protected Env configure(Env env) {
 			return Environment.override(env) //
 					.with(ConstructsBy.class,
-							common.annotatedWith(ConstructFrom.class));
+							OPTIMISTIC.annotatedWith(ConstructFrom.class));
 		}
 
 		@Override
@@ -210,7 +202,7 @@ class TestFeatureBootstrapper {
 
 		}
 
-		public D() {
+		public D(Integer a, Double b) {
 			this("would be picked normally");
 		}
 	}
@@ -276,7 +268,7 @@ class TestFeatureBootstrapper {
 	@Test
 	void customConstructorSelectionStrategyIsUsedToPickConstructor() {
 		Injector injector = Bootstrap.injector(
-				CustomConstructorSelectionStrategyBundle.class);
+				CustomConstructorSelectionStrategyModule.class);
 		assertEquals("will be passed to D", injector.resolve(D.class).s);
 	}
 

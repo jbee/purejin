@@ -652,7 +652,8 @@ public class Binder {
 			boolean needsInstance2 = bindSharesIn(service, instance);
 			if (!needsInstance1 && !needsInstance2)
 				return; // do not try to construct the class
-			Constructor<?> target = constructsBy.reflect(service);
+			Constructor<?> target = constructsBy
+					.reflect(service.getDeclaredConstructors(), hints);
 			if (target != null)
 				asConstructor(target, hints);
 		}
@@ -1018,7 +1019,8 @@ public class Binder {
 		public void toConstructor(Class<? extends T> impl, Hint<?>... hints) {
 			if (!isClassInstantiable(impl))
 				throw InconsistentDeclaration.notConstructable(impl);
-			to((Constructor<? extends T>) env(ConstructsBy.class).reflect(impl, hints), hints);
+			to((Constructor<? extends T>) env(ConstructsBy.class)
+					.reflect(impl.getDeclaredConstructors(), hints), hints);
 		}
 
 		public void toConstructor(Hint<?>... hints) {

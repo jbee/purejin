@@ -226,7 +226,7 @@ public final class DefaultValueBinders {
 	static <T> void bindToConstructsBy(Env env, Class<? extends T> src,
 			Binding<T> item, Bindings target) {
 		Constructor<?> c = env.property(ConstructsBy.class,
-				item.source.pkg()).reflect(src);
+				item.source.pkg()).reflect(src.getDeclaredConstructors());
 		if (c != null)
 			target.addExpanded(env, item, New.newInstance(c));
 	}
