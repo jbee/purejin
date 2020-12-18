@@ -9,7 +9,6 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 
 import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static se.jbee.inject.Instance.anyOf;
 
 /**
  * This tests demonstrates 2 different ways to solve the somewhat famous "Robot

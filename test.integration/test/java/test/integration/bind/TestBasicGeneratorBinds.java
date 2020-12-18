@@ -8,8 +8,6 @@ import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 
-import java.lang.reflect.InvocationTargetException;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.Resource.resourceTypeOf;
 import static se.jbee.inject.lang.Type.raw;
