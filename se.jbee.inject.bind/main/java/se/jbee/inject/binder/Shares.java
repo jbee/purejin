@@ -1,13 +1,13 @@
 package se.jbee.inject.binder;
 
-import static java.lang.reflect.Modifier.isStatic;
-import static se.jbee.inject.lang.Type.fieldType;
-
-import java.lang.reflect.Field;
-
 import se.jbee.inject.Supplier;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.Typed;
+
+import java.lang.reflect.Field;
+
+import static java.lang.reflect.Modifier.isStatic;
+import static se.jbee.inject.lang.Type.fieldType;
 
 /**
  * Shares a value that is extracted from a field. The field is read each time

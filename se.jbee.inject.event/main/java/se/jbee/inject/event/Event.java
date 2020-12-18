@@ -5,12 +5,12 @@
  */
 package se.jbee.inject.event;
 
-import static java.lang.System.currentTimeMillis;
+import se.jbee.inject.lang.Type;
 
 import java.lang.reflect.Method;
 import java.util.function.BinaryOperator;
 
-import se.jbee.inject.lang.Type;
+import static java.lang.System.currentTimeMillis;
 
 /**
  * The message describing the handler interface method invocation as data.

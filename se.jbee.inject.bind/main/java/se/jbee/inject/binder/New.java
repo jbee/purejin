@@ -5,12 +5,12 @@
  */
 package se.jbee.inject.binder;
 
-import java.lang.reflect.Constructor;
-
 import se.jbee.inject.Hint;
+import se.jbee.inject.bind.ValueBinder;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.Typed;
-import se.jbee.inject.bind.ValueBinder;
+
+import java.lang.reflect.Constructor;
 
 /**
  * A {@link New} is the {@link ValueBinder} expansion wrapper for {@link Constructor}

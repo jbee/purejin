@@ -9,10 +9,10 @@ import se.jbee.inject.lang.Qualifying;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.Typed;
 
+import java.io.Serializable;
+
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.lang.Type.raw;
-
-import java.io.Serializable;
 
 /**
  * Describes WHAT (type-wise) can be injected and WHERE it can be injected.

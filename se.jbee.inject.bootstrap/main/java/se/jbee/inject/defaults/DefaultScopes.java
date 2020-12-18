@@ -1,31 +1,21 @@
 package se.jbee.inject.defaults;
 
+import se.jbee.inject.*;
+import se.jbee.inject.bind.Bind;
+import se.jbee.inject.binder.BinderModule;
+import se.jbee.inject.config.Config;
+import se.jbee.inject.scope.*;
+
+import java.io.File;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Scope.container;
 import static se.jbee.inject.ScopeLifeCycle.singleton;
 import static se.jbee.inject.ScopeLifeCycle.unstable;
 import static se.jbee.inject.scope.DiskScope.SYNC_INTERVAL;
 import static se.jbee.inject.scope.DiskScope.SYNC_INTERVAL_DEFAULT_DURATION;
-
-import java.io.File;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Name;
-import se.jbee.inject.Scope;
-import se.jbee.inject.ScopeLifeCycle;
-import se.jbee.inject.Supplier;
-import se.jbee.inject.UnresolvableDependency;
-import se.jbee.inject.bind.Bind;
-import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.config.Config;
-import se.jbee.inject.scope.ApplicationScope;
-import se.jbee.inject.scope.DiskScope;
-import se.jbee.inject.scope.ThreadScope;
-import se.jbee.inject.scope.TypeDependentScope;
-import se.jbee.inject.scope.WorkerScope;
 
 /**
  * Binds implementations for the standard {@link Scope}s declared as

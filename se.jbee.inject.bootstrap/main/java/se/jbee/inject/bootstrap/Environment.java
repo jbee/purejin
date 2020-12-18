@@ -1,7 +1,10 @@
 package se.jbee.inject.bootstrap;
 
 import se.jbee.inject.*;
-import se.jbee.inject.bind.*;
+import se.jbee.inject.bind.BindingConsolidation;
+import se.jbee.inject.bind.InconsistentBinding;
+import se.jbee.inject.bind.ModuleWith;
+import se.jbee.inject.bind.ValueBinder;
 import se.jbee.inject.config.*;
 import se.jbee.inject.defaults.DefaultBindingConsolidation;
 import se.jbee.inject.defaults.DefaultValueBinders;
@@ -45,9 +48,9 @@ public final class Environment implements Env {
 			.with(ConstructsBy.class, ConstructsBy.OPTIMISTIC) //
 			.with(SharesBy.class, SharesBy.noFields) //
 			.with(ProducesBy.class, ProducesBy.noMethods) //
-			.with(NamesBy.class, NamesBy.defaultName) //
-			.with(ScopesBy.class, ScopesBy.alwaysDefault) //
-			.with(HintsBy.class, HintsBy.noParameters) //
+			.with(NamesBy.class, obj -> Name.DEFAULT) //
+			.with(ScopesBy.class, ScopesBy.AUTO) //
+			.with(HintsBy.class, param -> null) //
 			.with(Annotated.Enhancer.class, Annotated.SOURCE) //
 			.with(BindingConsolidation.class, DefaultBindingConsolidation::consolidate) //
 			.with(Env.GP_USE_DEEP_REFLECTION, false) //
@@ -138,7 +141,7 @@ public final class Environment implements Env {
 	}
 
 	public <T> Environment withBinder(Class<? extends ValueBinder<T>> value) {
-		return withBinder(Utils.instantiate(value, this::accessible,
+		return withBinder(Utils.construct(value, this::accessible,
 				e -> new InconsistentDeclaration("Failed to create ValueBinder of type: " + value, e)));
 	}
 

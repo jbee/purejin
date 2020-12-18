@@ -1,17 +1,15 @@
 package se.jbee.inject.config;
 
-import static se.jbee.inject.InconsistentDeclaration.annotationLacksProperty;
-import static se.jbee.inject.lang.Utils.annotatedName;
-import static se.jbee.inject.lang.Utils.annotation;
-import static se.jbee.inject.lang.Utils.annotationPropertyByType;
+import se.jbee.inject.Name;
+import se.jbee.inject.Scope;
+import se.jbee.inject.lang.TypeVariable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.Method;
+import java.util.function.Function;
 
-import se.jbee.inject.Name;
-import se.jbee.inject.Scope;
-import se.jbee.inject.lang.TypeVariable;
+import static se.jbee.inject.Name.named;
 
 /**
  * Extracts the {@link Name} of the {@link Scope} to use for instances of a
@@ -22,31 +20,38 @@ import se.jbee.inject.lang.TypeVariable;
 @FunctionalInterface
 public interface ScopesBy {
 
-	Name reflect(GenericDeclaration type);
+	ScopesBy AUTO = target -> Scope.auto;
 
-	ScopesBy alwaysDefault = target -> Scope.auto;
-
-	ScopesBy type = target -> {
+	ScopesBy RETURN_TYPE = target -> {
 		if (target instanceof Method) {
 			Method m = (Method) target;
 			return TypeVariable.typeVariables(
 					m.getGenericReturnType()).isEmpty()
-						? Scope.application
-						: Scope.dependencyType;
+					? Scope.application
+					: Scope.dependencyType;
 		}
 		return Scope.application;
 	};
 
-	default ScopesBy unlessAnnotatedWith(Class<? extends Annotation> naming) {
-		if (naming == null)
-			return this;
-		Method nameProperty = annotationPropertyByType(String.class, naming);
-		if (nameProperty == null)
-			throw annotationLacksProperty(String.class, naming);
-		return type -> {
-			String name = annotatedName(nameProperty, annotation(naming, type));
-			return name == null ? this.reflect(type) : Name.named(name);
+	Name reflect(GenericDeclaration type);
+
+	default ScopesBy orElse(Name name) {
+		return obj -> {
+			Name n = reflect(obj);
+			return n != null ? n : name;
 		};
 	}
 
+	default ScopesBy orElse(ScopesBy whenNull) {
+		return obj -> {
+			Name n = reflect(obj);
+			return n != null ? n : whenNull.reflect(obj);
+		};
+	}
+
+	static <T extends Annotation> ScopesBy annotatedWith(Class<T> annotation, Function<T, String> property) {
+		return obj -> obj.isAnnotationPresent(annotation) //
+				? named(property.apply(obj.getAnnotation(annotation)))
+				: null;
+	}
 }

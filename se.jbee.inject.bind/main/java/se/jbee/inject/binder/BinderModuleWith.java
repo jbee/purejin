@@ -5,14 +5,14 @@
  */
 package se.jbee.inject.binder;
 
-import java.lang.annotation.Annotation;
-
 import se.jbee.inject.Env;
-import se.jbee.inject.lang.Type;
 import se.jbee.inject.bind.Bindings;
 import se.jbee.inject.bind.Bootstrapper;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.bind.ModuleWith;
+import se.jbee.inject.lang.Type;
+
+import java.lang.annotation.Annotation;
 
 /**
  * The default utility {@link ModuleWith}.

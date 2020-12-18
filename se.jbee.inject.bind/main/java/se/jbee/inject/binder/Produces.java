@@ -5,15 +5,15 @@
  */
 package se.jbee.inject.binder;
 
-import static java.lang.reflect.Modifier.isStatic;
-import static se.jbee.inject.lang.Type.parameterType;
+import se.jbee.inject.Hint;
+import se.jbee.inject.bind.ValueBinder;
+import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.Typed;
 
 import java.lang.reflect.Method;
 
-import se.jbee.inject.Hint;
-import se.jbee.inject.lang.Type;
-import se.jbee.inject.lang.Typed;
-import se.jbee.inject.bind.ValueBinder;
+import static java.lang.reflect.Modifier.isStatic;
+import static se.jbee.inject.lang.Type.parameterType;
 
 /**
  * A {@link Produces} is the {@link ValueBinder} expansion wrapper for a method

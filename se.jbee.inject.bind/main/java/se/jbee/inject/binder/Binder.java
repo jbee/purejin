@@ -22,12 +22,13 @@ import static java.util.Arrays.stream;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Hint.relativeReferenceTo;
 import static se.jbee.inject.Instance.*;
+import static se.jbee.inject.Name.DEFAULT;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Source.source;
 import static se.jbee.inject.Target.targeting;
 import static se.jbee.inject.config.Plugins.pluginPoint;
 import static se.jbee.inject.lang.Type.*;
-import static se.jbee.inject.lang.Utils.isClassInstantiable;
+import static se.jbee.inject.lang.Utils.isClassConstructable;
 import static se.jbee.inject.lang.Utils.newArray;
 
 /**
@@ -458,7 +459,7 @@ public class Binder {
 		public void into(Class<?> pluginPoint, String property) {
 			binder.multibind(pluginPoint(pluginPoint, property),
 					Class.class).to(plugin);
-			if (isClassInstantiable(plugin))
+			if (isClassConstructable(plugin))
 				binder.implicit().construct(plugin);
 			// we allow both collections of classes that have a common
 			// super-type or collections that don't
@@ -574,7 +575,7 @@ public class Binder {
 		private final ConstructsBy constructsBy;
 		private final ProducesBy producesBy;
 		private final NamesBy namesBy;
-		private final ScopesBy scopesBy; //TODO use it
+		private final ScopesBy scopesBy;
 		private final HintsBy hintsBy;
 
 		protected AutoBinder(RootBinder binder, Name scope) {
@@ -585,7 +586,7 @@ public class Binder {
 			this.sharesBy = env.property(SharesBy.class, where);
 			this.constructsBy = env.property(ConstructsBy.class, where);
 			this.producesBy = env.property(ProducesBy.class, where);
-			this.namesBy = env.property(NamesBy.class, where);
+			this.namesBy = env.property(NamesBy.class, where).orElse(DEFAULT);
 			this.hintsBy = env.property(HintsBy.class, where);
 			this.scopesBy = scope.equalTo(Scope.mirror)
 				? env.property(ScopesBy.class, where)
@@ -621,7 +622,7 @@ public class Binder {
 
 		public AutoBinder nameBy(NamesBy mirror) {
 			return new AutoBinder(binder, sharesBy, constructsBy, producesBy,
-					mirror, scopesBy, hintsBy);
+					mirror.orElse(DEFAULT), scopesBy, hintsBy);
 		}
 
 		public AutoBinder scopeBy(ScopesBy mirror) {
@@ -634,28 +635,34 @@ public class Binder {
 					namesBy, scopesBy, mirror);
 		}
 
-		public void in(Class<?> service) {
-			in(service, Hint.none());
+		public void in(Class<?> impl) {
+			in(impl, Hint.none());
 		}
 
-		public void in(Object service, Hint<?>... hints) {
-			in(service.getClass(), service, hints);
+		public void in(Class<?> impl, Class<?>... more) {
+			in(impl);
+			for (Class<?> i : more)
+				in(i);
 		}
 
-		public void in(Class<?> service, Hint<?>... hints) {
-			in(service, null, hints);
+		public void in(Object impl, Hint<?>... hints) {
+			in(impl.getClass(), impl, hints);
 		}
 
-		private void in(Class<?> service, Object instance,
+		public void in(Class<?> impl, Hint<?>... hints) {
+			in(impl, null, hints);
+		}
+
+		private void in(Class<?> impl, Object instance,
 				Hint<?>... hints) {
-			boolean needsInstance1 = bindProducesIn(service, instance, hints);
-			boolean needsInstance2 = bindSharesIn(service, instance);
+			boolean needsInstance1 = bindProducesIn(impl, instance, hints);
+			boolean needsInstance2 = bindSharesIn(impl, instance);
 			if (!needsInstance1 && !needsInstance2)
 				return; // do not try to construct the class
 			Constructor<?> target = constructsBy
-					.reflect(service.getDeclaredConstructors(), hints);
+					.reflect(impl.getDeclaredConstructors(), hints);
 			if (target != null)
-				asConstructor(target, hints);
+				asConstructor(Scope.auto, target, hints);
 		}
 
 		private boolean bindSharesIn(Class<?> impl, Object instance) {
@@ -695,35 +702,34 @@ public class Binder {
 			if (returns.rawType == void.class || returns.rawType == Void.class)
 				return false;
 			if (hints.length == 0)
-				hints = hintsBy.reflect(target);
-			binder.per(scopesBy.reflect(target)) //
+				hints = hintsBy.applyTo(target);
+			Name scope = scopesBy.reflect(target);
+			binder.per(scope == null ? Scope.auto : scope) //
 					.bind(namesBy.reflect(target), returns) //
 					.to(instance, target, hints);
 			return true;
 		}
 
 		public <T> void asConstructor(Constructor<T> target, Hint<?>... hints) {
+			asConstructor(scopesBy.reflect(target), target, hints);
+		}
+
+		public <T> void asConstructor(Name scope, Constructor<T> target, Hint<?>... hints) {
 			if (target == null)
 				throw InconsistentBinding.generic("Provided Constructor was null");
 			Name name = namesBy.reflect(target);
 			if (hints.length == 0)
-				hints = hintsBy.reflect(target);
+				hints = hintsBy.applyTo(target);
 			Class<T> impl = target.getDeclaringClass();
-			Binder appBinder = binder.per(Scope.application).implicit();
+			Binder scopedBinder = binder.per(scope != null ? scope : Scope.auto).implicit();
 			if (name.isDefault()) {
-				appBinder.autobind(impl).to(target, hints);
+				scopedBinder.autobind(impl).to(target, hints);
 			} else {
-				appBinder.bind(name, impl).to(target, hints);
+				scopedBinder.bind(name, impl).to(target, hints);
 				for (Type<? super T> st : raw(impl).supertypes())
 					if (st.isInterface())
-						appBinder.implicit().bind(name, st).to(name, impl);
+						scopedBinder.implicit().bind(name, st).to(name, impl);
 			}
-		}
-
-		public void in(Class<?> impl, Class<?>... more) {
-			in(impl);
-			for (Class<?> i : more)
-				in(i);
 		}
 	}
 
@@ -900,14 +906,14 @@ public class Binder {
 			if (target == null)
 				throw InconsistentBinding.generic("Provided constructor was null");
 			if (hints.length == 0)
-				hints = env(HintsBy.class).reflect(target);
+				hints = env(HintsBy.class).applyTo(target);
 			expand(New.newInstance(target, hints));
 		}
 
 		protected final void to(Object owner, Method target,
 				Hint<?>... hints) {
 			if (hints.length == 0)
-				hints = env(HintsBy.class).reflect(target);
+				hints = env(HintsBy.class).applyTo(target);
 			expand(Produces.produces(owner, target, hints));
 		}
 
@@ -1037,7 +1043,7 @@ public class Binder {
 
 		@SuppressWarnings("unchecked")
 		public void toConstructor(Class<? extends T> impl, Hint<?>... hints) {
-			if (!isClassInstantiable(impl))
+			if (!isClassConstructable(impl))
 				throw InconsistentDeclaration.notConstructable(impl);
 			Constructor<? extends T> target = (Constructor<? extends T>)
 					env(ConstructsBy.class) //

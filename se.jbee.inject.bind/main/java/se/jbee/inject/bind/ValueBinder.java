@@ -5,13 +5,13 @@
  */
 package se.jbee.inject.bind;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-
 import se.jbee.inject.Env;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Locator;
 import se.jbee.inject.Supplier;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 
 /**
  * A {@linkplain ValueBinder} is a pure function that transforms a source value

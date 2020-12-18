@@ -7,13 +7,13 @@ package se.jbee.inject;
 
 import se.jbee.inject.lang.Qualifying;
 
-import static java.util.Arrays.asList;
-import static se.jbee.inject.lang.Utils.arrayCompare;
-import static se.jbee.inject.lang.Utils.arrayPrepend;
-
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
+
+import static java.util.Arrays.asList;
+import static se.jbee.inject.lang.Utils.arrayCompare;
+import static se.jbee.inject.lang.Utils.arrayPrepend;
 
 /**
  * A hierarchy of {@link Instance}s.

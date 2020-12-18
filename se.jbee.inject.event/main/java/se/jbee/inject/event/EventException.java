@@ -6,11 +6,7 @@
 package se.jbee.inject.event;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 
 /**
  * Is thrown by the event interface proxy for calls that should return a value

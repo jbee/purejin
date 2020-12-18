@@ -10,6 +10,7 @@ import se.jbee.inject.bind.*;
 import se.jbee.inject.binder.*;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.Utils;
 
 import java.lang.reflect.Constructor;
 
@@ -171,7 +172,7 @@ public final class DefaultValueBinders {
 			Type<?> srcType = src.type();
 			if (avoidReferences && isClassBanal(srcType.rawType)) {
 				target.addExpanded(env, item,
-						new Constant<>(instantiate(srcType.rawType, env::accessible,
+						new Constant<>(Utils.construct(srcType.rawType, env::accessible,
 								RuntimeException::new)).manual());
 						//TODO shouldn't this use New instead?
 				return;
@@ -214,7 +215,7 @@ public final class DefaultValueBinders {
 	static <T> void implicitlyBindToConstructor(Env env, Instance<T> src,
 			Binding<?> item, Bindings target) {
 		Class<T> impl = src.type().rawType;
-		if (isClassInstantiable(impl)) {
+		if (isClassConstructable(impl)) {
 			Binding<T> binding = Binding.binding(
 					new Locator<>(src).indirect(item.signature.target.indirect),
 					BindingType.CONSTRUCTOR, null, item.scope,

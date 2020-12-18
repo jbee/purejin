@@ -5,11 +5,11 @@
  */
 package se.jbee.inject.event;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import se.jbee.inject.bind.Module;
 import se.jbee.inject.binder.BinderModule;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Base {@link Module} for modules that want to make known a handler to the

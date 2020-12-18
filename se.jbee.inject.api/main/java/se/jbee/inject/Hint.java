@@ -10,8 +10,8 @@ import se.jbee.inject.lang.Typed;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Map;
 
 import static se.jbee.inject.Instance.anyOf;
@@ -33,6 +33,13 @@ public final class Hint<T> implements Typed<T> {
 
 	public static Hint<?>[] none() {
 		return NO_PARAMS;
+	}
+
+	public static Hint<?>[] signature(Class<?> ... parameterTypes) {
+		if (parameterTypes.length == 0)
+			return none();
+		return Arrays.stream(parameterTypes).map(
+				Hint::relativeReferenceTo).toArray(Hint[]::new);
 	}
 
 	public static <T> Hint<T> relativeReferenceTo(Class<T> target) {

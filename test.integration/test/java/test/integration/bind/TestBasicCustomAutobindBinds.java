@@ -6,6 +6,8 @@ import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.binder.Binder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.config.HintsBy;
+import se.jbee.inject.config.NamesBy;
 import test.integration.util.Resource;
 import test.integration.util.WebMethod;
 
@@ -16,8 +18,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Packages.packageAndSubPackagesOf;
 import static se.jbee.inject.Provider.providerTypeOf;
-import static se.jbee.inject.config.HintsBy.noParameters;
-import static se.jbee.inject.config.NamesBy.defaultName;
 import static se.jbee.inject.config.ProducesBy.allMethods;
 import static se.jbee.inject.config.ProducesBy.declaredMethods;
 import static se.jbee.inject.lang.Type.raw;
@@ -42,8 +42,9 @@ class TestBasicCustomAutobindBinds {
 					.in(this);
 			autobind() //
 					.produceBy(allMethods.annotatedWith(WebMethod.class)) //
-					.nameBy(defaultName.unlessAnnotatedWith(Resource.class)) //
-					.hintBy(noParameters.unlessAnnotatedWith(Resource.class)) //
+					.nameBy(NamesBy.annotatedWith(Resource.class, Resource::value)) //
+					.hintBy(HintsBy.instanceReference( //
+							NamesBy.annotatedWith(Resource.class, Resource::value))) //
 					.in(Implementor1.class);
 			autobind() //
 					.produceBy(allMethods.returnTypeAssignableTo(

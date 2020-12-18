@@ -5,8 +5,8 @@
  */
 package se.jbee.inject.bind;
 
-import se.jbee.inject.*;
 import se.jbee.inject.Annotated.Enhancer;
+import se.jbee.inject.*;
 import se.jbee.inject.lang.Type;
 
 import java.lang.annotation.Annotation;
@@ -20,7 +20,7 @@ import static se.jbee.inject.Name.named;
 import static se.jbee.inject.lang.Type.classType;
 import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.lang.Utils.arrayOf;
-import static se.jbee.inject.lang.Utils.isClassMonomodal;
+import static se.jbee.inject.lang.Utils.isClassConceptStateless;
 
 /**
  * {@link Bindings} accumulate the {@link Binding} during the bootstrapping.
@@ -136,7 +136,7 @@ public final class Bindings {
 		for (Module m : modules) {
 			Class<? extends Module> ns = m.getClass();
 			final boolean hasBeenDeclared = declared.contains(ns);
-			if (hasBeenDeclared && !isClassMonomodal(ns))
+			if (hasBeenDeclared && !isClassConceptStateless(ns))
 				multimodals.add(ns);
 			if (!hasBeenDeclared || multimodals.contains(ns)) {
 				m.declare(this, env);

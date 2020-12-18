@@ -7,7 +7,20 @@ package se.jbee.inject;
 
 /**
  * A {@link Supplier} is a source or factory for specific instances within the
- * given {@link Injector} context.
+ * given {@link Injector} context. It can be understood as the "backend"
+ * abstraction that actually does the work within the internals of the {@link
+ * Injector} implementation.
+ * <p>
+ * The {@link Supplier} declared in binding phase is later used in the form of
+ * the {@link Provider} passed to the {@link Scope#provide(int, int, Dependency,
+ * Provider)} method. Therefore using a {@link Supplier} creates instances
+ * within a {@link Scope}.
+ * <p>
+ * This is in contrast to the {@link Generator} abstraction that is the
+ * "frontend" or user facing abstraction to create or yield instances. Normally
+ * a {@link Generator} is just a facade to reach down to the {@link Supplier}
+ * backing it but it can also be an implementation that is not backed by a
+ * {@link Supplier} which then means it also does not apply any {@link Scope}ing.
  *
  * @param <T> The type of the instance being resolved
  */
@@ -62,7 +75,7 @@ public interface Supplier<T> {
 	 * used each time an instance is needed.
 	 */
 	static <T> Supplier<T> nonScopedBy(Generator<T> generator) {
-		/**
+		/*
 		 * This cannot be changed to a lambda since we need a type that actually
 		 * implements both {@link Supplier} and {@link Generator}. This way the
 		 * {@link Generator} is picked directly by the {@link Injector}.

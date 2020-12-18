@@ -1,15 +1,15 @@
 package se.jbee.inject.defaults;
 
-import static se.jbee.inject.binder.New.newInstance;
-import static se.jbee.inject.lang.Type.raw;
-
-import java.lang.reflect.Constructor;
-
 import se.jbee.inject.*;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Supply;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.config.Extension;
+
+import java.lang.reflect.Constructor;
+
+import static se.jbee.inject.binder.New.newInstance;
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * Provides a {@link Supplier} that can resolve all types extending an

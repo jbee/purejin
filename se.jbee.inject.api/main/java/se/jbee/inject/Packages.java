@@ -8,16 +8,12 @@ package se.jbee.inject;
 import se.jbee.inject.lang.Qualifying;
 import se.jbee.inject.lang.Type;
 
-import static java.util.Arrays.asList;
-import static se.jbee.inject.lang.Utils.arrayCompare;
-import static se.jbee.inject.lang.Utils.arrayContains;
-import static se.jbee.inject.lang.Utils.arrayMap;
-import static se.jbee.inject.lang.Utils.seqCount;
-import static se.jbee.inject.lang.Utils.seqRegionEquals;
-
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
+
+import static java.util.Arrays.asList;
+import static se.jbee.inject.lang.Utils.*;
 
 /**
  * A set of {@link Package}s described one or more root packages (on the same

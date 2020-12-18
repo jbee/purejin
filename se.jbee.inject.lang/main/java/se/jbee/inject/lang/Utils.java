@@ -5,9 +5,6 @@
  */
 package se.jbee.inject.lang;
 
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Target;
 import java.lang.reflect.*;
 import java.util.Collection;
 import java.util.function.*;
@@ -204,52 +201,6 @@ public final class Utils {
 		return list.toArray(newArray(type, list.size()));
 	}
 
-	/* Annotations */
-
-	public static Method annotationPropertyByType(Class<?> type,
-			Class<? extends Annotation> annotation) {
-		return arrayFindFirst(annotation.getDeclaredMethods(),
-				m -> m.getReturnType() == type);
-	}
-
-	public static String annotatedName(Method nameProperty, Annotation obj) {
-		if (obj == null)
-			return null;
-		try {
-			String name = (String) nameProperty.invoke(obj);
-			if (!name.isEmpty() && !name.equals(nameProperty.getDefaultValue()))
-				return name;
-		} catch (Exception e) {
-			// fall through
-		}
-		return null;
-	}
-
-	@SuppressWarnings("LoopConditionNotUpdatedInsideLoop")
-	public static <A extends Annotation> A annotation(Class<A> type,
-			AnnotatedElement obj) {
-		A res = obj.getAnnotation(type);
-		if (res != null)
-			return res;
-		if (!isAllowedOnAnnotations(type))
-			return null;
-		do {
-			for (Annotation a : obj.getAnnotations()) {
-				res = annotation(type, a.annotationType());
-				if (res != null)
-					return res;
-			}
-		} while (obj instanceof Class && obj != Object.class);
-		return null;
-	}
-
-	public static boolean isAllowedOnAnnotations(
-			Class<? extends Annotation> type) {
-		return type.isAnnotationPresent(Target.class)
-			&& arrayContains(type.getAnnotation(Target.class).value(),
-					e -> e == ElementType.ANNOTATION_TYPE);
-	}
-
 	/* Classes / Types */
 
 	/**
@@ -275,7 +226,7 @@ public final class Utils {
 	 *         Note that this method just covers JRE types.
 	 */
 	@SuppressWarnings({ "squid:S1067", "squid:S1541" })
-	public static boolean isClassVirtual(Class<?> cls) {
+	private static boolean isClassNotConstructable(Class<?> cls) {
 		return cls == null || cls.isInterface() || cls.isEnum()
 			|| cls.isAnnotation() || cls.isAnonymousClass() || cls.isPrimitive()
 			|| cls.isArray() || isAbstract(cls.getModifiers())
@@ -283,20 +234,18 @@ public final class Utils {
 			|| cls == Boolean.class || cls == Void.class || cls == Class.class;
 	}
 
-	public static boolean isClassInstantiable(Class<?> cls) {
-		return !isClassVirtual(cls);
+	public static boolean isClassConstructable(Class<?> cls) {
+		return !isClassNotConstructable(cls);
 	}
 
 	/**
 	 * @param cls Any {@link Class} object, not null
-	 * @return A {@link Class} is monomodal if it there is just a single
+	 * @return A {@link Class} concept is stateless if it there is just a single
 	 *         possible initial state. All newly created instances can just have
 	 *         this similar initial state but due to internal state they could
 	 *         (not necessarily must) develop (behave) different later on.
-	 *
-	 *         The opposite of monomodal is multimodal.
 	 */
-	public static boolean isClassMonomodal(Class<?> cls) {
+	public static boolean isClassConceptStateless(Class<?> cls) {
 		if (cls.isInterface())
 			return false;
 		if (cls == Object.class)
@@ -307,7 +256,7 @@ public final class Utils {
 		for (Constructor<?> c : cls.getDeclaredConstructors())
 			// maybe arguments are passed to super-type so we check it too
 			if (c.getParameterCount() > 0)
-				return isClassMonomodal(cls.getSuperclass());
+				return isClassConceptStateless(cls.getSuperclass());
 		return true;
 	}
 
@@ -321,7 +270,7 @@ public final class Utils {
 			&& !cls.isEnum() && !cls.isAnnotation() && !cls.isArray()
 			&& cls.getDeclaredConstructors().length == 1
 			&& cls.getDeclaredConstructors()[0].getParameterCount() == 0
-			&& isClassMonomodal(cls);
+			&& isClassConceptStateless(cls);
 	}
 
 	/* Members */
@@ -421,6 +370,13 @@ public final class Utils {
 		}
 	}
 
+	public static <T> T construct(Class<T> type, Consumer<Constructor<T>> init,
+			Function<Exception, ? extends RuntimeException> exceptionTransformer) {
+		Constructor<T> target = noArgsConstructor(type);
+		init.accept(target);
+		return construct(target, new Object[0], exceptionTransformer);
+	}
+
 	public static Object produce(Method target, Object owner, Object[] args,
 			Function<Exception, ? extends RuntimeException> exceptionTransformer) {
 		try {
@@ -439,7 +395,8 @@ public final class Utils {
 		}
 	}
 
-	private static Function<Exception, ? extends RuntimeException> wrap(Function<Exception, ? extends RuntimeException> exceptionTransformer) {
+	private static Function<Exception, ? extends RuntimeException> wrap(
+			Function<Exception, ? extends RuntimeException> exceptionTransformer) {
 		return e -> {
 			if (e instanceof IllegalAccessException) {
 				IllegalAccessException extended = new IllegalAccessException(
@@ -450,13 +407,5 @@ public final class Utils {
 			}
 			return exceptionTransformer.apply(e);
 		};
-	}
-
-	public static <T> T instantiate(Class<T> type,
-			Consumer<Constructor> init,
-			Function<Exception, ? extends RuntimeException> exceptionTransformer) {
-		Constructor<T> target = noArgsConstructor(type);
-		init.accept(target);
-		return construct(target, new Object[0], exceptionTransformer);
 	}
 }

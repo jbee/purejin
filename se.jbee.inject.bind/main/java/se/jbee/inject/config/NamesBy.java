@@ -5,54 +5,70 @@
  */
 package se.jbee.inject.config;
 
-import static se.jbee.inject.InconsistentDeclaration.annotationLacksProperty;
-import static se.jbee.inject.lang.Utils.annotatedName;
-import static se.jbee.inject.lang.Utils.annotation;
-import static se.jbee.inject.lang.Utils.annotationPropertyByType;
+import se.jbee.inject.Name;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Member;
-import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.function.Function;
 
-import se.jbee.inject.Name;
+import static se.jbee.inject.Name.named;
 
 /**
- * Extracts the {@link Name} used for instance being bound.
+ * A strategy to extract the {@link Name} used for instance from either the
+ * {@link AccessibleObject}.
  *
  * @since 8.1
  */
 @FunctionalInterface
 public interface NamesBy {
 
+	NamesBy DECLARED_NAME = obj ->  {
+		if (obj instanceof Member) return named(((Member) obj).getName());
+		if (obj instanceof Class) return named(((Class<?>) obj).getSimpleName());
+		if (obj instanceof Parameter) //
+			return ((Parameter) obj).isNamePresent() //
+					? named(((Parameter) obj).getName())
+					: null;
+		return null;
+	};
+
 	/**
 	 * @return The {@link Name} of the instance provided by the given object.
-	 *         Use {@link Name#DEFAULT} for no specific name.
+	 * When composing null can be returned to indicate that no decision has been
+	 * made. If the overall {@link NamesBy} returns null {@link Name#DEFAULT} is
+	 * used.
 	 */
-	Name reflect(AccessibleObject obj);
+	Name reflect(AnnotatedElement obj);
 
-	NamesBy defaultName = obj -> Name.DEFAULT;
-
-	static NamesBy memberNameOr(NamesBy fallback) {
+	default NamesBy orElse(Name name) {
 		return obj -> {
-			if (obj instanceof Member) {
-				return Name.named(((Member) obj).getName());
-			}
-			return fallback.reflect(obj);
+			Name n = reflect(obj);
+			return n != null ? n : name;
 		};
 	}
 
-	@Deprecated // ask for mapper: annotation => name
-	default NamesBy unlessAnnotatedWith(Class<? extends Annotation> naming) {
-		if (naming == null)
-			return this;
-		Method nameProperty = annotationPropertyByType(String.class, naming);
-		if (nameProperty == null)
-			throw annotationLacksProperty(String.class, naming);
+	default NamesBy orElse(NamesBy whenNull) {
 		return obj -> {
-			String name = annotatedName(nameProperty, annotation(naming, obj));
-			return name == null ? this.reflect(obj) : Name.named(name);
+			Name n = reflect(obj);
+			return n != null ? n : whenNull.reflect(obj);
 		};
 	}
 
+	static <T extends Annotation> NamesBy annotatedWith(Class<T> annotation,
+			Function<T, String> property) {
+		return annotatedWith(annotation, property, false);
+	}
+
+	static <T extends Annotation> NamesBy annotatedWith(Class<T> annotation,
+			Function<T, String> property, boolean absoluteName) {
+		return obj -> {
+			if (!obj.isAnnotationPresent(annotation))
+				return null;
+			String name = property.apply(obj.getAnnotation(annotation));
+			return absoluteName ? named(annotation).concat(name) : named(name);
+		};
+	}
 }

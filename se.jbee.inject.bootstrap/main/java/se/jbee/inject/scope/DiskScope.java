@@ -1,8 +1,9 @@
 package se.jbee.inject.scope;
 
-import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import static se.jbee.inject.lang.Type.raw;
+import se.jbee.inject.Dependency;
+import se.jbee.inject.Provider;
+import se.jbee.inject.Scope;
+import se.jbee.inject.UnresolvableDependency;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -14,10 +15,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Provider;
-import se.jbee.inject.Scope;
-import se.jbee.inject.UnresolvableDependency;
+import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * The {@link DiskScope} is a {@link Scope} that persists objects on disk.

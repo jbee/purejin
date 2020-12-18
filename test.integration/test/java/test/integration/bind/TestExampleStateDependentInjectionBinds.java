@@ -7,6 +7,8 @@ import se.jbee.inject.binder.Binder.RootBinder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.config.HintsBy;
+import se.jbee.inject.config.NamesBy;
 import se.jbee.inject.defaults.DefaultFeature;
 import se.jbee.inject.lang.Type;
 import test.integration.util.Resource;
@@ -16,8 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Provider.providerTypeOf;
-import static se.jbee.inject.config.HintsBy.noParameters;
-import static se.jbee.inject.config.NamesBy.defaultName;
 import static se.jbee.inject.config.ProducesBy.allMethods;
 import static se.jbee.inject.lang.Type.raw;
 
@@ -48,7 +48,8 @@ import static se.jbee.inject.lang.Type.raw;
  */
 class TestExampleStateDependentInjectionBinds {
 
-	@FunctionalInterface interface Validator {
+	@FunctionalInterface
+	interface Validator {
 
 		boolean valid(String input);
 	}
@@ -63,7 +64,6 @@ class TestExampleStateDependentInjectionBinds {
 		public boolean valid(String input) {
 			return true; // just for testing
 		}
-
 	}
 
 	public static class Strict implements Validator {
@@ -72,7 +72,6 @@ class TestExampleStateDependentInjectionBinds {
 		public boolean valid(String input) {
 			return false; // just for testing
 		}
-
 	}
 
 	public static class StatefulObject {
@@ -103,7 +102,6 @@ class TestExampleStateDependentInjectionBinds {
 		public void setNumber(Integer number) {
 			this.number = number;
 		}
-
 	}
 
 	/* Module and Bundle code to setup scenario */
@@ -252,8 +250,9 @@ class TestExampleStateDependentInjectionBinds {
 			per(Scope.injection).autobind() //
 					.produceBy(
 							allMethods.returnTypeAssignableTo(raw(int.class))) //
-					.nameBy(defaultName.unlessAnnotatedWith(Resource.class)) //
-					.hintBy(noParameters.unlessAnnotatedWith(Resource.class)) //
+					.nameBy(NamesBy.annotatedWith(Resource.class, Resource::value)) //
+					.hintBy(HintsBy.instanceReference( //
+							NamesBy.annotatedWith(Resource.class, Resource::value))) //
 					.in(StatefulObject.class);
 		}
 
@@ -326,6 +325,7 @@ class TestExampleStateDependentInjectionBinds {
 		StatefulObject state = context.resolve(StatefulObject.class);
 		state.setNumber(actualValue);
 		String v = context.resolve(String.class);
-		assertTrue(v.endsWith(ending));
+		assertTrue(v.endsWith(ending),
+				"assumed to end with " + ending + " but was " + v);
 	}
 }

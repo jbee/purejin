@@ -149,7 +149,7 @@ public final class Bootstrap {
 		private <T> T createBundle(Class<T> bundle) {
 			// OBS: Here we do not use the env but always make the bundles accessible
 			// as this is kind of designed into the concept
-			return Utils.instantiate(bundle, Utils::accessible,
+			return Utils.construct(bundle, Utils::accessible,
 					e -> new InconsistentDeclaration("Failed to create bundle: " + bundle, e));
 		}
 
