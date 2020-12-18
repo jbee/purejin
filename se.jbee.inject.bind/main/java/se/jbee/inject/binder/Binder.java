@@ -959,15 +959,30 @@ public class Binder {
 		 * bypasses {@link Scope} effects. The provided {@link Generator} is
 		 * directly called to generate the instance each time it should be
 		 * injected.
-		 *
+		 * <p>
 		 * If a {@link Scope} should apply use {@link #toSupplier(Supplier)}
 		 * instead or create a {@link Generator} bridge that does not implement
 		 * {@link Generator} itself.
 		 *
+		 * @param generator used to create instances directly (with no {@link
+		 *                  Scope} around it)
 		 * @since 8.1
 		 */
 		public void toGenerator(Generator<? extends T> generator) {
-			toSupplier(new SupplierGeneratorBridge<>(generator));
+			toSupplier(Supplier.nonScopedBy(generator));
+		}
+
+		/**
+		 * In contrast to {@link #toGenerator(Generator)} this is just an
+		 * ordinary adapter between {@link Generator} and {@link Supplier}. The
+		 * provided {@link Generator} becomes usable as {@link Supplier}
+		 * internally with all normal {@link Scope}ing effects occuring.
+		 *
+		 * @param generator used to create instances with a {@link Scope}
+		 * @since 8.1
+		 */
+		public void toScopedGenerator(Generator<? extends  T> generator) {
+			toSupplier((dep, context) -> generator.generate(dep));
 		}
 
 		/**
@@ -1004,8 +1019,9 @@ public class Binder {
 		}
 
 		public final void to(T constant1, T constant2, T constant3) {
-			onMulti().toConstant(constant1).toConstant(constant2).toConstant(
-					constant3);
+			onMulti().toConstant(constant1) //
+					.toConstant(constant2) //
+					.toConstant(constant3);
 		}
 
 		@SafeVarargs
@@ -1131,33 +1147,5 @@ public class Binder {
 			System.arraycopy(elements, 0, res, 0, res.length);
 			return (E[]) res;
 		}
-	}
-
-	/**
-	 * This cannot be changed to a lambda since we need a type that actually
-	 * implements both {@link Supplier} and {@link Generator}. This way the
-	 * {@link Generator} is picked directly by the {@link Injector}.
-	 */
-	private static final class SupplierGeneratorBridge<T>
-			implements Supplier<T>, Generator<T> {
-
-		private final Generator<T> generator;
-
-		SupplierGeneratorBridge(Generator<T> generator) {
-			this.generator = generator;
-		}
-
-		@Override
-		public T generate(Dependency<? super T> dep)
-				throws UnresolvableDependency {
-			return generator.generate(dep);
-		}
-
-		@Override
-		public T supply(Dependency<? super T> dep, Injector context)
-				throws UnresolvableDependency {
-			return generate(dep);
-		}
-
 	}
 }

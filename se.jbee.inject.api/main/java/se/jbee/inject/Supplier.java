@@ -10,7 +10,6 @@ package se.jbee.inject;
  * given {@link Injector} context.
  *
  * @param <T> The type of the instance being resolved
- * @author Jan Bernitt (jan@jbee.se)
  */
 @FunctionalInterface
 public interface Supplier<T> {
@@ -37,12 +36,61 @@ public interface Supplier<T> {
 	}
 
 	/**
-	 * @return This {@link Supplier} as {@link Generator}
+	 * Note that this method should only be called after making sure using
+	 * {@link #isGenerator()} that this {@link Supplier} is indeed a {@link
+	 * Generator} too.
 	 *
+	 * @return This {@link Supplier} as {@link Generator} as created by {@link
+	 * #nonScopedBy(Generator)}.
 	 * @see #isGenerator()
 	 */
+	@SuppressWarnings("unchecked")
 	default Generator<T> asGenerator() {
 		return (Generator<T>) this;
 	}
 
+	/**
+	 * Wraps a {@link Generator} as {@link Supplier} so that scoping is bypassed
+	 * and the {@link Generator} is asked directly to create instances.
+	 *
+	 * @param generator the generator used to directly create instances
+	 * @param <T>       type of instance(s) created by the {@link Generator} and
+	 *                  the {@link Supplier}
+	 * @return The {@link Generator} wrapped into a {@link Supplier} in a way so
+	 * it is unwrapped later on used {@link #asGenerator()}. This means no
+	 * scoping effects occur as the provided {@link Generator} will directly be
+	 * used each time an instance is needed.
+	 */
+	static <T> Supplier<T> nonScopedBy(Generator<T> generator) {
+		/**
+		 * This cannot be changed to a lambda since we need a type that actually
+		 * implements both {@link Supplier} and {@link Generator}. This way the
+		 * {@link Generator} is picked directly by the {@link Injector}.
+		 */
+		final class NonScopedGenerator<E>
+				implements Supplier<E>, Generator<E> {
+
+			private final Generator<E> generator;
+
+			NonScopedGenerator(Generator<E> generator) {
+				this.generator = generator;
+			}
+
+			@Override
+			public E generate(Dependency<? super E> dep) {
+				return generator.generate(dep);
+			}
+
+			@Override
+			public E supply(Dependency<? super E> dep, Injector context) {
+				return generate(dep);
+			}
+
+			@Override
+			public String toString() {
+				return "by "+ generator.toString();
+			}
+		}
+		return new NonScopedGenerator<>(generator);
+	}
 }
