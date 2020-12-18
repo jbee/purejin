@@ -14,6 +14,7 @@ import java.lang.reflect.Method;
 
 import static java.lang.reflect.Modifier.isStatic;
 import static se.jbee.inject.lang.Type.parameterType;
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * A {@link Produces} is the {@link ValueBinder} expansion wrapper for a method
@@ -45,7 +46,7 @@ public final class Produces<T> implements Typed<T> {
 		this.isInstanceMethod = !isStatic(target.getModifiers());
 		Type.returnType(target).toSupertype(returns); // make sure types are compatible
 		if (owner != null
-			&& !owner.getClass().isAssignableFrom(target.getDeclaringClass())) {
+			&& !raw(owner.getClass()).isAssignableTo(raw(target.getDeclaringClass()))) {
 			throw new IllegalArgumentException(
 					"Owner of type " + owner.getClass()
 						+ " does not declare the target method: " + target);

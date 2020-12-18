@@ -47,7 +47,7 @@ public final class Environment implements Env {
 			.withBinder(DefaultValueBinders.ARRAY) //
 			.with(ConstructsBy.class, ConstructsBy.OPTIMISTIC) //
 			.with(SharesBy.class, SharesBy.noFields) //
-			.with(ProducesBy.class, ProducesBy.noMethods) //
+			.with(ProducesBy.class, impl -> null) //
 			.with(NamesBy.class, obj -> Name.DEFAULT) //
 			.with(ScopesBy.class, ScopesBy.AUTO) //
 			.with(HintsBy.class, param -> null) //

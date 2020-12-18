@@ -18,7 +18,7 @@ import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.action.Action.actionTypeOf;
-import static se.jbee.inject.config.ProducesBy.declaredMethods;
+import static se.jbee.inject.config.ProducesBy.OPTIMISTIC;
 
 /**
  * The simple example that shows how {@link java.lang.reflect.Method}s used as
@@ -39,7 +39,7 @@ class TestExampleAnnotatedActionsBinds {
 		@Override
 		protected void declare() {
 			construct(Bean.class);
-			connect(declaredMethods.annotatedWith(Marker.class)) //
+			connect(OPTIMISTIC.annotatedWith(Marker.class)) //
 					.in(Bean.class).asAction();
 		}
 	}
@@ -91,7 +91,7 @@ class TestExampleAnnotatedActionsBinds {
 	@Test
 	void annotatedMethodIsBoundAsActionWithGlobalSelector() {
 		Env env = Environment.DEFAULT.with(Binder.CONNECT_QUALIFIER,
-				ProducesBy.class, declaredMethods.annotatedWith(Marker.class));
+				ProducesBy.class, OPTIMISTIC.annotatedWith(Marker.class));
 		annotatedMethodIsBoundAsAction(Bootstrap.injector(env,
 				TestExampleAnnotatedActionsBindsModule2.class));
 	}
@@ -99,7 +99,7 @@ class TestExampleAnnotatedActionsBinds {
 	@Test
 	void notAnnotatedMethodIsNotBoundAsActionWithGlobalSelector() {
 		Env env = Environment.DEFAULT.with(Binder.CONNECT_QUALIFIER,
-				ProducesBy.class, declaredMethods.annotatedWith(Marker.class));
+				ProducesBy.class, OPTIMISTIC.annotatedWith(Marker.class));
 		notAnnotatedMethodIsNotBoundAsAction(Bootstrap.injector(env,
 				TestExampleAnnotatedActionsBindsModule2.class));
 	}

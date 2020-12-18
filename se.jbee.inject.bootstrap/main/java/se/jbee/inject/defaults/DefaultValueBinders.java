@@ -47,7 +47,7 @@ public final class DefaultValueBinders {
 
 	/**
 	 * This {@link ValueBinder} adds bindings to super-types for
-	 * {@link Binding}s declared with {@link DeclarationType#AUTO} or
+	 * {@link Binding}s declared with {@link DeclarationType#SUPER} or
 	 * {@link DeclarationType#PROVIDED}.
 	 */
 	static final class SuperTypesBinder implements ValueBinder<Binding<?>> {
@@ -57,7 +57,7 @@ public final class DefaultValueBinders {
 				Bindings target) {
 			target.add(env, item);
 			DeclarationType declarationType = item.source.declarationType;
-			if (declarationType != DeclarationType.AUTO
+			if (declarationType != DeclarationType.SUPER
 				&& declarationType != DeclarationType.PROVIDED)
 				return;
 			for (Type<? super T> supertype : item.type().supertypes())

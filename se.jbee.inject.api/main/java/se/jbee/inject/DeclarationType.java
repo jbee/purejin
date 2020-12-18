@@ -50,11 +50,11 @@ public enum DeclarationType implements Qualifying<DeclarationType> {
 	PROVIDED,
 
 	/**
-	 * A auto-bind has been used. That is binding a class or instance to the
+	 * A super-bind has been used. That is binding a class or instance to the
 	 * exact type as {@link #EXPLICIT} and to all its super-classes and
 	 * -interfaces as a AUTO bound bind.
 	 */
-	AUTO,
+	SUPER,
 
 	/**
 	 * A bind that is meant to co-exist with others that might have the same
@@ -100,7 +100,7 @@ public enum DeclarationType implements Qualifying<DeclarationType> {
 	 *         false
 	 */
 	public boolean droppedWith(DeclarationType other) {
-		return this == other && (this == AUTO || this == PROVIDED);
+		return this == other && (this == SUPER || this == PROVIDED);
 	}
 
 }

@@ -8,6 +8,7 @@ import se.jbee.inject.binder.BinderModuleWith;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.Connector;
+import se.jbee.inject.config.ProducesBy;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -20,7 +21,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.config.ProducesBy.allMethods;
 
 /**
  * This test demonstrates the basic feature of dynamically connection methods
@@ -81,7 +81,7 @@ class TestFeatureConnectorBinds {
 		protected void declare(Connector verifier) {
 			// the marking as "my-linker"
 			injectingInto(named("marked"), Bean.class) //
-					.connect(allMethods.annotatedWith(Marked.class)) //
+					.connect(ProducesBy.OPTIMISTIC.annotatedWith(Marked.class)) //
 					.in(Bean.class) //
 					.to("my-linker");
 

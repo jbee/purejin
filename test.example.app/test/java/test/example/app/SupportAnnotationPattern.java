@@ -27,6 +27,6 @@ public class SupportAnnotationPattern extends BinderModuleWith<Class<?>> {
 
 	@Override
 	protected void declare(Class<?> annotated) {
-		per(Scope.application).autobind(annotated).toConstructor();
+		per(Scope.application).superbind(annotated).toConstructor();
 	}
 }

@@ -6,7 +6,10 @@
 package se.jbee.inject.lang;
 
 import java.lang.reflect.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.function.*;
 
 import static java.lang.System.arraycopy;
@@ -37,6 +40,20 @@ public final class Utils {
 	}
 
 	/* Arrays */
+
+	public static <T> T[] arrayConcat(T[] a, T[] b) {
+		if (a == null)
+			return b;
+		if (b == null)
+			return a;
+		if (a.length == 0)
+			return b;
+		if (b.length == 0)
+			return a;
+		T[] both = Arrays.copyOf(a, a.length + b.length);
+		System.arraycopy(b, 0, both, a.length, b.length);
+		return both;
+	}
 
 	/**
 	 * This implementation assumes that the array passed is usually short (< 20)
@@ -201,6 +218,24 @@ public final class Utils {
 		return list.toArray(newArray(type, list.size()));
 	}
 
+	public static <A, B> List<B> arrayFilter(Class<A> root, Class<?> top,
+			Function<Class<?>, B[]> map2elems, Predicate<B> filter) {
+		List<B> res = new ArrayList<>();
+		arrayFilter(root, top, map2elems, filter, res);
+		return res;
+	}
+
+	public static <A, B> void arrayFilter(Class<A> root, Class<?> top,
+			Function<Class<?>, B[]> map2elems, Predicate<B> filter,
+			List<B> acc) {
+		if (root == null || root == top)
+			return;
+		for (B e : map2elems.apply(root))
+			if (filter == null || filter.test(e))
+				acc.add(e);
+		arrayFilter(root.getSuperclass(), top, map2elems, filter, acc);
+	}
+
 	/* Classes / Types */
 
 	/**
@@ -327,7 +362,7 @@ public final class Utils {
 		}
 	}
 
-	/* Sequences */
+	/* Char Sequences */
 
 	public static boolean seqRegionEquals(CharSequence s1, CharSequence s2,
 			int length) {

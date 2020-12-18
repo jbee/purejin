@@ -5,19 +5,19 @@
  */
 package se.jbee.inject.config;
 
+import se.jbee.inject.Hint;
 import se.jbee.inject.Packages;
 import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.Utils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.TypeVariable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.function.Function;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 
-import static java.util.Arrays.asList;
 import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.lang.Type.returnType;
 import static se.jbee.inject.lang.Utils.arrayFilter;
@@ -32,17 +32,47 @@ import static se.jbee.inject.lang.Utils.arrayFilter;
 @FunctionalInterface
 public interface ProducesBy {
 
-	Method[] __noMethods = new Method[0];
+	ProducesBy OPTIMISTIC = declaredMethods(m -> !m.isSynthetic(), true);
 
 	/**
 	 * @return The {@link Method}s that should be used in the context this
-	 *         {@link ProducesBy} is used.
+	 * {@link ProducesBy} is used. Return {@code null} when no decision has been
+	 * made. Returns empty array when the decision is to not use any producer
+	 * methods.
 	 */
 	Method[] reflect(Class<?> impl);
 
-	ProducesBy noMethods = impl -> __noMethods;
-	ProducesBy declaredMethods = ((ProducesBy) Class::getDeclaredMethods).ignoreSynthetic();
-	ProducesBy allMethods = ((ProducesBy) ProducesBy::allMethods).ignoreSynthetic();
+	static ProducesBy declaredMethods(boolean recursive) {
+		return declaredMethods(null, recursive);
+	}
+
+	static ProducesBy declaredMethods(Predicate<Method> filter, boolean recursive) {
+		return methods(Class::getDeclaredMethods, filter, recursive);
+	}
+
+	static ProducesBy methods(Function<Class<?>, Method[]> selection,
+			Predicate<Method> filter, boolean recursive) {
+		return impl -> arrayFilter(impl,
+				recursive ? Object.class : impl.getSuperclass(), selection,
+				filter).toArray(Method[]::new);
+	}
+
+	static ProducesBy methods(Function<Class<?>, Method[]> selection,
+			Predicate<Method> filter, Class<?> top) {
+		return impl -> arrayFilter(impl, top, selection, filter)
+				.toArray(Method[]::new);
+	}
+
+	default ProducesBy orElse(ProducesBy whenNull) {
+		return impl -> {
+			Method[] res = reflect(impl);
+			return res != null ? res : whenNull.reflect(impl);
+		};
+	}
+
+	default ProducesBy and(ProducesBy other) {
+		return impl -> Utils.arrayConcat(reflect(impl), other.reflect(impl));
+	}
 
 	default ProducesBy ignoreStatic() {
 		return withModifier(((IntPredicate) Modifier::isStatic).negate());
@@ -62,7 +92,11 @@ public interface ProducesBy {
 	}
 
 	default ProducesBy select(Predicate<Method> filter) {
-		return impl -> arrayFilter(this.reflect(impl), filter);
+		return impl -> arrayFilter(reflect(impl), filter);
+	}
+
+	default ProducesBy selectBy(Hint<?>... hints) {
+		return select(method -> Hint.matches(method, hints));
 	}
 
 	default ProducesBy returnTypeAssignableTo(Type<?> supertype) {
@@ -83,20 +117,11 @@ public interface ProducesBy {
 
 	default ProducesBy in(Packages filter) {
 		return impl -> filter.contains(raw(impl))
-			? this.reflect(impl)
-			: __noMethods;
+			? reflect(impl)
+			: null;
 	}
 
 	default ProducesBy in(Class<?> api) {
 		return select(method -> raw(method.getDeclaringClass()).isAssignableTo(raw(api)));
-	}
-
-	static Method[] allMethods(Class<?> type) {
-		List<Method> all = new ArrayList<>();
-		while (type != Object.class && type != null) {
-			all.addAll(asList(type.getDeclaredMethods()));
-			type = type.getSuperclass();
-		}
-		return all.toArray(__noMethods);
 	}
 }

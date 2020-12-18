@@ -121,7 +121,7 @@ class TestMoreQualified {
 	void thatExplicitSourceIsMoreApplicableThanAutoSource() {
 		Source source = Source.source(TestMoreQualified.class);
 		assertMoreApplicable(source.typed(DeclarationType.EXPLICIT),
-				source.typed(DeclarationType.AUTO));
+				source.typed(DeclarationType.SUPER));
 	}
 
 	private static <T extends Qualifying<? super T>> void assertMoreApplicable(

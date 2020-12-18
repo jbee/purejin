@@ -131,13 +131,13 @@ public class Binder {
 	}
 
 	/**
-	 * Same as {@link #autobind(Type)} where type was wrapped in {@link
+	 * Same as {@link #superbind(Type)} where type was wrapped in {@link
 	 * Type#raw(Class)}.
 	 *
-	 * @see #autobind(Type)
+	 * @see #superbind(Type)
 	 */
-	public final <T> TypedBinder<T> autobind(Class<T> type) {
-		return autobind(raw(type));
+	public final <T> TypedBinder<T> superbind(Class<T> type) {
+		return superbind(raw(type));
 	}
 
 	/**
@@ -159,8 +159,8 @@ public class Binder {
 	 * @param <T>  type that should be bound to all the types it implements
 	 * @return immutable binder API
 	 */
-	public final <T> TypedBinder<T> autobind(Type<T> type) {
-		return on(bind().asAuto()).bind(type);
+	public final <T> TypedBinder<T> superbind(Type<T> type) {
+		return on(bind().asSuper()).bind(type);
 	}
 
 	/**
@@ -320,7 +320,8 @@ public class Binder {
 	}
 
 	public <T> ConnectTargetBinder<T> connect(Class<T> api) {
-		return new ConnectTargetBinder<>(this, ProducesBy.declaredMethods.in(api), raw(api));
+		return new ConnectTargetBinder<>(this,
+				ProducesBy.OPTIMISTIC.in(api), raw(api));
 	}
 
 	protected Binder on(Bind bind) {
@@ -580,7 +581,7 @@ public class Binder {
 
 		protected AutoBinder(RootBinder binder, Name scope) {
 			Bind bind = binder.bind();
-			this.binder = binder.on(bind.asAuto()).on(bind.next());
+			this.binder = binder.on(bind.asSuper()).on(bind.next());
 			Env env = bind.env;
 			Package where = bind.source.pkg();
 			this.sharesBy = env.property(SharesBy.class, where);
@@ -645,24 +646,24 @@ public class Binder {
 				in(i);
 		}
 
-		public void in(Object impl, Hint<?>... hints) {
-			in(impl.getClass(), impl, hints);
+		public void in(Object impl, Hint<?>... construction) {
+			in(impl.getClass(), impl, construction);
 		}
 
-		public void in(Class<?> impl, Hint<?>... hints) {
-			in(impl, null, hints);
+		public void in(Class<?> impl, Hint<?>... construction) {
+			in(impl, null, construction);
 		}
 
 		private void in(Class<?> impl, Object instance,
-				Hint<?>... hints) {
-			boolean needsInstance1 = bindProducesIn(impl, instance, hints);
+				Hint<?>... construction) {
+			boolean needsInstance1 = bindProducesIn(impl, instance);
 			boolean needsInstance2 = bindSharesIn(impl, instance);
 			if (!needsInstance1 && !needsInstance2)
 				return; // do not try to construct the class
 			Constructor<?> target = constructsBy
-					.reflect(impl.getDeclaredConstructors(), hints);
+					.reflect(impl.getDeclaredConstructors(), construction);
 			if (target != null)
-				asConstructor(Scope.auto, target, hints);
+				asConstructor(Scope.auto, target, construction);
 		}
 
 		private boolean bindSharesIn(Class<?> impl, Object instance) {
@@ -675,11 +676,13 @@ public class Binder {
 			return needsInstance;
 		}
 
-		private boolean bindProducesIn(Class<?> impl, Object instance,
-				Hint<?>[] hints) {
+		private boolean bindProducesIn(Class<?> impl, Object instance) {
+			Method[] producers = producesBy.reflect(impl);
+			if (producers == null)
+				return false;
 			boolean needsInstance = false;
-			for (Method producer : producesBy.reflect(impl)) {
-				if (asProducer(producer, instance, hints))
+			for (Method producer : producers) {
+				if (asProducer(producer, instance, Hint.none()))
 					needsInstance |= !isStatic(producer.getModifiers());
 			}
 			return needsInstance;
@@ -701,7 +704,7 @@ public class Binder {
 			Type<?> returns = returnType(target);
 			if (returns.rawType == void.class || returns.rawType == Void.class)
 				return false;
-			if (hints.length == 0)
+			if (hints == null || hints.length == 0)
 				hints = hintsBy.applyTo(target);
 			Name scope = scopesBy.reflect(target);
 			binder.per(scope == null ? Scope.auto : scope) //
@@ -723,7 +726,7 @@ public class Binder {
 			Class<T> impl = target.getDeclaringClass();
 			Binder scopedBinder = binder.per(scope != null ? scope : Scope.auto).implicit();
 			if (name.isDefault()) {
-				scopedBinder.autobind(impl).to(target, hints);
+				scopedBinder.superbind(impl).to(target, hints);
 			} else {
 				scopedBinder.bind(name, impl).to(target, hints);
 				for (Type<? super T> st : raw(impl).supertypes())
@@ -982,7 +985,7 @@ public class Binder {
 		 * In contrast to {@link #toGenerator(Generator)} this is just an
 		 * ordinary adapter between {@link Generator} and {@link Supplier}. The
 		 * provided {@link Generator} becomes usable as {@link Supplier}
-		 * internally with all normal {@link Scope}ing effects occuring.
+		 * internally with all normal {@link Scope}ing effects occurring.
 		 *
 		 * @param generator used to create instances with a {@link Scope}
 		 * @since 8.1
@@ -1115,9 +1118,6 @@ public class Binder {
 	 * This kind of bindings actually re-map the []-type so that the automatic
 	 * behavior of returning all known instances of the element type will no
 	 * longer be used whenever the bind made applies.
-	 *
-	 * @author Jan Bernitt (jan@jbee.se)
-	 *
 	 */
 	public static class TypedElementBinder<E> extends TypedBinder<E[]> {
 

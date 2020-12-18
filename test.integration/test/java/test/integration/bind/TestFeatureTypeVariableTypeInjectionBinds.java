@@ -11,6 +11,7 @@ import se.jbee.inject.lang.Type;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static se.jbee.inject.config.ProducesBy.declaredMethods;
 import static se.jbee.inject.lang.Cast.functionTypeOf;
 
 /**
@@ -29,7 +30,7 @@ class TestFeatureTypeVariableTypeInjectionBinds {
 
 		@Override
 		protected void declare() {
-			autobind().produceBy(ProducesBy.declaredMethods).in(this);
+			autobind().produceBy(declaredMethods(false)).in(this);
 		}
 
 		/**

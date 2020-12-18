@@ -16,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Scope.dependencyInstance;
 import static se.jbee.inject.Scope.dependencyType;
 import static se.jbee.inject.action.Action.actionTypeOf;
-import static se.jbee.inject.config.ProducesBy.allMethods;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
@@ -69,7 +68,7 @@ class TestFeatureActionBinds {
 			per(dependencyInstance).bind(Name.ANY, HandlerService.class).toConstructor();
 			per(dependencyType).bind(GenericService.class).toConstructor();
 
-			ConnectBinder connectAll = connect(allMethods);
+			ConnectBinder connectAll = connect(ProducesBy.OPTIMISTIC);
 			connectAll.in(MyService.class).asAction();
 			connectAll.in(MyOtherService.class).asAction();
 			connectAll.in(HandlerService.class).asAction();

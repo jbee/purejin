@@ -75,9 +75,9 @@ class TestFeatureBootstrapper {
 		protected void declare() {
 			asDefault().bind(Number.class).to(7);
 			asDefault().bind(Integer.class).to(11);
-			autobind(Integer.class).to(2);
-			autobind(Float.class).to(4f);
-			autobind(Double.class).to(42d);
+			superbind(Integer.class).to(2);
+			superbind(Float.class).to(4f);
+			superbind(Double.class).to(42d);
 			bind(Number.class).to(6);
 		}
 	}
@@ -239,7 +239,7 @@ class TestFeatureBootstrapper {
 	}
 
 	/**
-	 * In the example {@link Number} is {@link DeclarationType#AUTO} bound for
+	 * In the example {@link Number} is {@link DeclarationType#SUPER} bound for
 	 * {@link Integer} and {@link Float} but an {@link DeclarationType#EXPLICIT}
 	 * bind done overrides these automatic binds. They are removed and no
 	 * {@link Generator} is created for them.

@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Provider.providerTypeOf;
-import static se.jbee.inject.config.ProducesBy.allMethods;
+import static se.jbee.inject.config.ProducesBy.OPTIMISTIC;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
@@ -195,7 +195,7 @@ class TestExampleStateDependentInjectionBinds {
 
 			// the below is just *a* example - it is just important to provide the 'value' per injection
 			per(Scope.injection).autobind() //
-					.produceBy(allMethods.returnTypeAssignableTo(
+					.produceBy(OPTIMISTIC.returnTypeAssignableTo(
 							raw(ValidationStrength.class))) //
 					.in(StatefulObject.class);
 		}
@@ -225,7 +225,7 @@ class TestExampleStateDependentInjectionBinds {
 
 			// the below is just *a* example - it is just important to provide the 'value' per injection
 			per(Scope.injection).autobind() //
-					.produceBy(allMethods.returnTypeAssignableTo(
+					.produceBy(OPTIMISTIC.returnTypeAssignableTo(
 							raw(ValidationStrength.class))) //
 					.in(StatefulObject.class);
 		}
@@ -249,7 +249,7 @@ class TestExampleStateDependentInjectionBinds {
 			// the below is just *a* example - it is just important to provide the 'value' per injection
 			per(Scope.injection).autobind() //
 					.produceBy(
-							allMethods.returnTypeAssignableTo(raw(int.class))) //
+							OPTIMISTIC.returnTypeAssignableTo(raw(int.class))) //
 					.nameBy(NamesBy.annotatedWith(Resource.class, Resource::value)) //
 					.hintBy(HintsBy.instanceReference( //
 							NamesBy.annotatedWith(Resource.class, Resource::value))) //

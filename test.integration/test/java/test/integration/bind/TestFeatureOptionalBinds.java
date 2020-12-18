@@ -25,7 +25,7 @@ class TestFeatureOptionalBinds {
 
 		@Override
 		protected void declare() {
-			autobind(int.class).to(5);
+			superbind(int.class).to(5);
 			bind(String.class).to("foo");
 		}
 

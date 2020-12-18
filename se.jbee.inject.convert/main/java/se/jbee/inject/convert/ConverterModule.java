@@ -31,7 +31,7 @@ public abstract class ConverterModule extends BinderModule {
 	private static final Type<Converter> ANY_CONVERTER_TYPE = classType(
 			Converter.class);
 
-	private static final ProducesBy PRODUCES_BY = ProducesBy.declaredMethods //
+	private static final ProducesBy PRODUCES_BY = ProducesBy.OPTIMISTIC //
 			.returnTypeAssignableTo(ANY_CONVERTER_TYPE);
 	private static final SharesBy SHARES_BY = SharesBy.declaredFields //
 			.typeAssignableTo(ANY_CONVERTER_TYPE);

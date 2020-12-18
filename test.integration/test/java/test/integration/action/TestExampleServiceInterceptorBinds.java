@@ -4,12 +4,12 @@ import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.action.*;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.config.ProducesBy;
 import se.jbee.inject.lang.Type;
 
 import java.util.function.BiFunction;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static se.jbee.inject.config.ProducesBy.allMethods;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
@@ -60,7 +60,7 @@ class TestExampleServiceInterceptorBinds {
 		@Override
 		protected void declare() {
 			construct(TheService.class);
-			connect(allMethods).in(TheService.class).asAction();
+			connect(ProducesBy.OPTIMISTIC).in(TheService.class).asAction();
 			// register the interceptor
 			plug(AssertInvocationInterceptor.class) //
 					.into(ServiceInterceptor.class);
