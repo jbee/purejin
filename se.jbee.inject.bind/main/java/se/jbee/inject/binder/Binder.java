@@ -703,6 +703,8 @@ public class Binder {
 		}
 
 		public <T> void asConstructor(Constructor<T> target, Hint<?>... hints) {
+			if (target == null)
+				throw InconsistentBinding.generic("Provided Constructor was null");
 			Name name = namesBy.reflect(target);
 			if (hints.length == 0)
 				hints = hintsBy.reflect(target);
@@ -895,6 +897,8 @@ public class Binder {
 		}
 
 		public void to(Constructor<? extends T> target, Hint<?>... hints) {
+			if (target == null)
+				throw InconsistentBinding.generic("Provided constructor was null");
 			if (hints.length == 0)
 				hints = env(HintsBy.class).reflect(target);
 			expand(New.newInstance(target, hints));
@@ -1019,8 +1023,13 @@ public class Binder {
 		public void toConstructor(Class<? extends T> impl, Hint<?>... hints) {
 			if (!isClassInstantiable(impl))
 				throw InconsistentDeclaration.notConstructable(impl);
-			to((Constructor<? extends T>) env(ConstructsBy.class)
-					.reflect(impl.getDeclaredConstructors(), hints), hints);
+			Constructor<? extends T> target = (Constructor<? extends T>)
+					env(ConstructsBy.class) //
+						.reflect(impl.getDeclaredConstructors(), hints);
+			if (target == null)
+				throw InconsistentBinding.generic(
+						"No usable Constructor for type: " + impl);
+			to(target, hints);
 		}
 
 		public void toConstructor(Hint<?>... hints) {

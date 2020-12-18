@@ -9,11 +9,14 @@ import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.Typed;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.Map;
 
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Instance.instance;
+import static se.jbee.inject.lang.Type.parameterTypes;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
@@ -81,6 +84,27 @@ public final class Hint<T> implements Typed<T> {
 
 	public static <T> Hint<T> constantNull(Type<T> asType) {
 		return new Hint<>(asType, null, null, null);
+	}
+
+	public static boolean matches(Executable member, Hint<?>[] hints) {
+		if (hints.length == 0)
+			return true;
+		Type<?>[] types = parameterTypes(member);
+		for (Hint<?> hint : hints) {
+			boolean matched = false;
+			int i = 0;
+			while (!matched && i < types.length) {
+				Type<?> type = types[i];
+				if (type != null && hint.asType.isAssignableTo(type)) {
+					types[i] = null;
+					matched = true;
+				}
+				i++;
+			}
+			if (!matched)
+				return false;
+		}
+		return true;
 	}
 
 	public static Hint<?>[] match(Type<?>[] types, Hint<?>... hints) {

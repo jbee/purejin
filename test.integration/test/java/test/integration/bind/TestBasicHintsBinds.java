@@ -10,6 +10,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
+import java.math.BigInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Hint.constant;
@@ -71,6 +72,11 @@ class TestBasicHintsBinds {
 			this.value = value;
 			this.sequence = sequence;
 		}
+
+		public Qux(BigInteger value, String sequence, Double number) {
+			this.value = value;
+			this.sequence = sequence + "meh";
+		}
 	}
 
 	private static class ParameterConstructorBindsModule extends BinderModule {
@@ -102,22 +108,22 @@ class TestBasicHintsBinds {
 
 	}
 
-	private final Injector injector = Bootstrap.injector(
+	private final Injector context = Bootstrap.injector(
 			ParameterConstructorBindsModule.class);
 
 	@Test
 	void classParameterIsArranged() {
-		assertNotNull(injector.resolve(Foo.class));
+		assertNotNull(context.resolve(Foo.class));
 	}
 
 	@Test
 	void typeParameterIsArranged() {
-		assertNotNull(injector.resolve(Bar.class));
+		assertNotNull(context.resolve(Bar.class));
 	}
 
 	@Test
 	void instanceParameterIsArranged() {
-		Bar bar = injector.resolve(Bar.class);
+		Bar bar = context.resolve(Bar.class);
 		assertEquals("y", bar.foo);
 	}
 
@@ -132,7 +138,7 @@ class TestBasicHintsBinds {
 	 */
 	@Test
 	void parameterAsAnotherTypeIsArranged() {
-		Qux qux = injector.resolve(Qux.class);
+		Qux qux = context.resolve(Qux.class);
 		assertEquals("y", qux.sequence);
 	}
 
@@ -141,13 +147,13 @@ class TestBasicHintsBinds {
 	 */
 	@Test
 	void constantParameterIsArranged() {
-		Qux qux = injector.resolve(Qux.class);
+		Qux qux = context.resolve(Qux.class);
 		assertEquals(1980, qux.value);
 	}
 
 	@Test
 	void reoccurringTypesAreArrangedAsOccurringAfterAnother() {
-		Baz baz = injector.resolve(Baz.class);
+		Baz baz = context.resolve(Baz.class);
 		assertEquals("y", baz.foo);
 		assertEquals("y", baz.bar, "when x alignment after another is broken");
 	}
