@@ -13,8 +13,6 @@ import java.io.Serializable;
 /**
  * A {@link Name} is used as discriminator in cases where multiple
  * {@link Instance}s are bound for the same {@link Type}.
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Name
 		implements Qualifying<Name>, Serializable, Comparable<Name> {

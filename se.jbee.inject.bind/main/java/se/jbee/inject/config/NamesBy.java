@@ -25,6 +25,12 @@ import static se.jbee.inject.Name.named;
 @FunctionalInterface
 public interface NamesBy {
 
+	/**
+	 * Uses the name as declared in the Java source code. This is the {@link
+	 * Member#getName()}, the {@link Class#getSimpleName()} or the {@link
+	 * Parameter#getName()}. {@link Parameter} only use the name if {@link
+	 * Parameter#isNamePresent()}.
+	 */
 	NamesBy DECLARED_NAME = obj ->  {
 		if (obj instanceof Member) return named(((Member) obj).getName());
 		if (obj instanceof Class) return named(((Class<?>) obj).getSimpleName());

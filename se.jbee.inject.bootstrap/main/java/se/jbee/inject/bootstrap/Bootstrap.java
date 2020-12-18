@@ -260,6 +260,5 @@ public final class Bootstrap {
 				if (!accu.contains(c))
 					addAllInstalledIn(c, accu);
 		}
-
 	}
 }
