@@ -1,3 +1,4 @@
+import com.github.sormuras.bach.project.Feature;
 import com.github.sormuras.bach.project.ProjectInfo;
 import com.github.sormuras.bach.project.ProjectInfo.Tweak;
 
@@ -5,6 +6,10 @@ import com.github.sormuras.bach.project.ProjectInfo.Tweak;
         name = "purejin",
         version = "8-ea",
         compileModulesForJavaRelease = 8,
+        features = {
+                Feature.GENERATE_API_DOCUMENTATION,
+                Feature.INCLUDE_SOURCES_IN_MODULAR_JAR
+        },
         tweaks = {
                 @Tweak(tool = "javac", with = {"-encoding", "UTF-8", "-g", "-parameters"}),
                 @Tweak(tool = "javadoc",
