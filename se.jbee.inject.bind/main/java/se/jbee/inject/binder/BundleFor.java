@@ -6,11 +6,11 @@
 package se.jbee.inject.binder;
 
 import se.jbee.inject.bind.Bootstrapper;
-import se.jbee.inject.lang.Type;
+import se.jbee.inject.bind.Bootstrapper.ToggledBootstrapper;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.bind.InconsistentBinding;
 import se.jbee.inject.bind.Toggled;
-import se.jbee.inject.bind.Bootstrapper.ToggledBootstrapper;
+import se.jbee.inject.lang.Type;
 
 /**
  * The default utility base class for {@link Toggled}s.

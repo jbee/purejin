@@ -1,11 +1,11 @@
 package se.jbee.inject.config;
 
-import static se.jbee.inject.Dependency.dependency;
-import static se.jbee.inject.lang.Type.raw;
-
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Name;
+
+import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * {@link Plugins} are an {@link Extension} that makes resolving plugged

@@ -5,26 +5,31 @@
  */
 package se.jbee.inject.config;
 
-import static se.jbee.inject.InconsistentDeclaration.annotationLacksProperty;
-import static se.jbee.inject.Instance.instance;
-import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Type.parameterTypes;
-import static se.jbee.inject.lang.Utils.annotationPropertyByType;
-import static se.jbee.inject.lang.Utils.arrayFindFirst;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Executable;
-import java.lang.reflect.Method;
-
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Hint;
+import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.inject.lang.Type;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+
+import static se.jbee.inject.Instance.instance;
+import static se.jbee.inject.lang.Type.parameterType;
+
 /**
- * Extracts the {@link Hint} hints used to resolve the {@link Dependency}s
- * of a {@link Method} or {@link Constructor} being injected.
+ * Extracts the {@link Hint} used to resolve the {@link Dependency}s for a
+ * {@link Method} or {@link Constructor} {@link Parameter}.
+ * <p>
+ * The binder API uses {@link #applyTo(Executable)} to resolve the {@link Hint}s
+ * for all {@link Parameter}s. By convention this uses a {@link
+ * Hint#relativeReferenceTo(Type)} for those {@link Parameter}s where the {@link
+ * HintsBy} strategy did return {@code null}. If {@code null} was returned for
+ * all {@link Parameter}s no {@link Hint}s will be used.
+ *
+ * @see NamesBy
  *
  * @since 8.1
  */
@@ -32,53 +37,54 @@ import se.jbee.inject.lang.Type;
 public interface HintsBy {
 
 	/**
-	 * @return The {@link Hint} hints for the construction/invocation of
-	 *         the given object. This is either a
-	 *         {@link java.lang.reflect.Constructor} or a
-	 *         {@link java.lang.reflect.Method} Use a zero length array if there
-	 *         are no hits.
+	 * @return The {@link Hint} for the given {@link Parameter}.
 	 */
-	Hint<?>[] reflect(Executable obj);
-
-	HintsBy noParameters = obj -> Hint.none();
+	Hint<?> reflect(Parameter param);
 
 	/**
-	 * A {@link HintsBy} that allows to specify the
-	 * {@link Annotation} which is used to indicate the instance {@link Name} of
-	 * a method parameter.
+	 * Used by the binder API to resolve {@link Hint}s for an {@link
+	 * Executable}.
+	 *
+	 * @param obj the {@link Method} or {@link Constructor} to hint for
+	 * @return the {@link Hint}s to use, zero length array for no hints
 	 */
-	default HintsBy unlessAnnotatedWith(
-			Class<? extends Annotation> naming) {
-		if (naming == null)
-			return this;
-		Method nameProperty = annotationPropertyByType(String.class, naming);
-		if (nameProperty == null)
-			throw annotationLacksProperty(String.class, naming);
-		return obj -> {
-			Annotation[][] ais = obj.getParameterAnnotations();
-			Type<?>[] tis = parameterTypes(obj);
-			Hint<?>[] res = new Hint[tis.length];
-			int named = 0;
-			for (int i = 0; i < res.length; i++) {
-				res[i] = Hint.relativeReferenceTo(tis[i]); // default
-				Annotation instance = arrayFindFirst(ais[i],
-						a -> naming == a.annotationType());
-				if (instance != null) {
-					//TODO nicer exception handling for invoke (same in other mirrors)
-					try {
-						String name = (String) nameProperty.invoke(instance);
-						if (!name.isEmpty()
-							&& !name.equals(nameProperty.getDefaultValue())) {
-							res[i] = instance(named(name), tis[i]).asHint();
-							named++;
-						}
-					} catch (Exception e) {
-						// gobble
-					}
-				}
+	default Hint<?>[] applyTo(Executable obj) {
+		if (obj.getParameterCount() == 0)
+			return Hint.none();
+		Hint<?>[] hints = new Hint[obj.getParameterCount()];
+		int hinted = 0;
+		int i = 0;
+		for (Parameter p : obj.getParameters()) {
+			Hint<?> hint = reflect(p);
+			if (hint == null) {
+				// prevent misunderstanding a later given hint for another parameter
+				hint = Hint.relativeReferenceTo(parameterType(p));
+			} else {
+				hinted++;
 			}
-			return named == 0 ? this.reflect(obj) : res;
+			hints[i++] = hint;
+		}
+		return hinted > 0 ? hints : Hint.none();
+	}
 
+	default HintsBy orElse(HintsBy whenNull) {
+		return param -> {
+			Hint<?> hint = reflect(param);
+			return hint != null ? hint : whenNull.reflect(param);
+		};
+	}
+
+	/**
+	 * Returns a strategy that return {@link Hint#relativeReferenceTo(Instance)}
+	 * in case the provided {@link NamesBy} strategy does return a {@link
+	 * Name}.
+	 */
+	static HintsBy instanceReference(NamesBy namesBy) {
+		return param -> {
+			Name name = namesBy.reflect(param);
+			return name != null
+					? Hint.relativeReferenceTo(instance(name, parameterType(param)))
+					: null;
 		};
 	}
 }

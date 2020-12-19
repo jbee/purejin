@@ -10,6 +10,7 @@ import se.jbee.inject.bind.*;
 import se.jbee.inject.binder.*;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.Utils;
 
 import java.lang.reflect.Constructor;
 
@@ -46,7 +47,7 @@ public final class DefaultValueBinders {
 
 	/**
 	 * This {@link ValueBinder} adds bindings to super-types for
-	 * {@link Binding}s declared with {@link DeclarationType#AUTO} or
+	 * {@link Binding}s declared with {@link DeclarationType#SUPER} or
 	 * {@link DeclarationType#PROVIDED}.
 	 */
 	static final class SuperTypesBinder implements ValueBinder<Binding<?>> {
@@ -56,7 +57,7 @@ public final class DefaultValueBinders {
 				Bindings target) {
 			target.add(env, item);
 			DeclarationType declarationType = item.source.declarationType;
-			if (declarationType != DeclarationType.AUTO
+			if (declarationType != DeclarationType.SUPER
 				&& declarationType != DeclarationType.PROVIDED)
 				return;
 			for (Type<? super T> supertype : item.type().supertypes())
@@ -171,7 +172,7 @@ public final class DefaultValueBinders {
 			Type<?> srcType = src.type();
 			if (avoidReferences && isClassBanal(srcType.rawType)) {
 				target.addExpanded(env, item,
-						new Constant<>(instantiate(srcType.rawType, env::accessible,
+						new Constant<>(Utils.construct(srcType.rawType, env::accessible,
 								RuntimeException::new)).manual());
 						//TODO shouldn't this use New instead?
 				return;
@@ -194,10 +195,11 @@ public final class DefaultValueBinders {
 				return;
 			}
 			if (type.isInterface())
-				throw InconsistentBinding.loop(item, src, bound);
-			bindToMirrorConstructor(env, type.rawType, item, target);
+				throw InconsistentBinding.referenceLoop(item, src, bound);
+			bindToConstructsBy(env, type.rawType, item, target);
 		}
 
+		@SuppressWarnings({"unchecked", "rawtypes"})
 		private <T> boolean isCompatibleSupplier(Type<T> requiredType,
 				Type<?> providedType) {
 			if (!providedType.isAssignableTo(raw(Supplier.class)))
@@ -213,19 +215,19 @@ public final class DefaultValueBinders {
 	static <T> void implicitlyBindToConstructor(Env env, Instance<T> src,
 			Binding<?> item, Bindings target) {
 		Class<T> impl = src.type().rawType;
-		if (isClassInstantiable(impl)) {
+		if (isClassConstructable(impl)) {
 			Binding<T> binding = Binding.binding(
 					new Locator<>(src).indirect(item.signature.target.indirect),
 					BindingType.CONSTRUCTOR, null, item.scope,
 					item.source.typed(DeclarationType.IMPLICIT));
-			bindToMirrorConstructor(env, impl, binding, target);
+			bindToConstructsBy(env, impl, binding, target);
 		}
 	}
 
-	static <T> void bindToMirrorConstructor(Env env, Class<? extends T> src,
+	static <T> void bindToConstructsBy(Env env, Class<? extends T> src,
 			Binding<T> item, Bindings target) {
-		Constructor<? extends T> c = env.property(ConstructsBy.class,
-				item.source.pkg()).reflect(src);
+		Constructor<?> c = env.property(ConstructsBy.class,
+				item.source.pkg()).reflect(src.getDeclaredConstructors());
 		if (c != null)
 			target.addExpanded(env, item, New.newInstance(c));
 	}

@@ -5,15 +5,9 @@
  */
 package se.jbee.inject.container;
 
-import static java.lang.System.identityHashCode;
-import static se.jbee.inject.Resource.resourcesTypeOf;
-import static se.jbee.inject.Dependency.dependency;
-import static se.jbee.inject.Instance.instance;
-import static se.jbee.inject.lang.Type.raw;
-import static se.jbee.inject.lang.Utils.arrayFilter;
-import static se.jbee.inject.lang.Utils.arrayFindFirst;
-import static se.jbee.inject.lang.Utils.arrayOf;
-import static se.jbee.inject.lang.Utils.orElse;
+import se.jbee.inject.*;
+import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import se.jbee.inject.lang.Type;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -21,9 +15,12 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import se.jbee.inject.*;
-import se.jbee.inject.lang.Type;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import static java.lang.System.identityHashCode;
+import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Instance.instance;
+import static se.jbee.inject.Resource.resourcesTypeOf;
+import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.inject.lang.Utils.*;
 
 /**
  * The default {@link Injector} implementation that is based on

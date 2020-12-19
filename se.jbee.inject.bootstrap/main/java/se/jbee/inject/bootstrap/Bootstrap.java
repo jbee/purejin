@@ -85,7 +85,9 @@ public final class Bootstrap {
 	public static Injector injector(Env env, Bindings bindings,
 			Module[] modules) {
 		return Container.injector(
-				Binding.disambiguate(bindings.declaredFrom(env, modules)));
+				env.globalProperty(BindingConsolidation.class) //
+						.consolidate(env,
+								(bindings.declaredFrom(env, modules))));
 	}
 
 	public static Modulariser modulariser(Env env) {
@@ -94,12 +96,6 @@ public final class Bootstrap {
 
 	public static Bundler bundler(Env env) {
 		return new BuiltinBootstrapper(env);
-	}
-
-	public static Binding<?>[] bindings(Env env, Class<? extends Bundle> root,
-			Bindings bindings) {
-		return Binding.disambiguate(bindings//
-				.declaredFrom(env, modulariser(env).modularise(root)));
 	}
 
 	private Bootstrap() {
@@ -153,7 +149,7 @@ public final class Bootstrap {
 		private <T> T createBundle(Class<T> bundle) {
 			// OBS: Here we do not use the env but always make the bundles accessible
 			// as this is kind of designed into the concept
-			return Utils.instantiate(bundle, Utils::accessible,
+			return Utils.construct(bundle, Utils::accessible,
 					e -> new InconsistentDeclaration("Failed to create bundle: " + bundle, e));
 		}
 
@@ -264,6 +260,5 @@ public final class Bootstrap {
 				if (!accu.contains(c))
 					addAllInstalledIn(c, accu);
 		}
-
 	}
 }

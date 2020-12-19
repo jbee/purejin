@@ -8,8 +8,6 @@ import se.jbee.inject.config.ScopesBy;
 import se.jbee.inject.config.SharesBy;
 import se.jbee.inject.lang.Type;
 
-import static se.jbee.inject.config.NamesBy.defaultName;
-import static se.jbee.inject.config.NamesBy.memberNameOr;
 import static se.jbee.inject.lang.Type.classType;
 
 /**
@@ -33,10 +31,9 @@ public abstract class ConverterModule extends BinderModule {
 	private static final Type<Converter> ANY_CONVERTER_TYPE = classType(
 			Converter.class);
 
-	private static final NamesBy NAME_BY = memberNameOr(defaultName);
-	private static final ProducesBy PRODUCES_BY = ProducesBy.declaredMethods //
+	private static final ProducesBy PRODUCES_BY = ProducesBy.OPTIMISTIC //
 			.returnTypeAssignableTo(ANY_CONVERTER_TYPE);
-	private static final SharesBy SHARES_BY = SharesBy.declaredFields //
+	private static final SharesBy SHARES_BY = SharesBy.declaredFields(false) //
 			.typeAssignableTo(ANY_CONVERTER_TYPE);
 
 	@Override
@@ -46,8 +43,8 @@ public abstract class ConverterModule extends BinderModule {
 
 	protected final AutoBinder autobindConverters() {
 		return autobind() //
-				.nameBy(NAME_BY) //
-				.scopeBy(ScopesBy.type) //
+				.nameBy(NamesBy.DECLARED_NAME) //
+				.scopeBy(ScopesBy.RETURN_TYPE) //
 				.shareBy(SHARES_BY) //
 				.produceBy(PRODUCES_BY);
 	}

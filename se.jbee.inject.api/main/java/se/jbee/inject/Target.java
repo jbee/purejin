@@ -149,9 +149,18 @@ public final class Target
 
 	@Override
 	public String toString() {
-		String symbolic = instance.isAny() ? "*" : instance.toString();
-		return (indirect ? "!" : "") + " in " + packages + " into "
-				+ parents + " => " + symbolic + " ";
+		StringBuilder str = new StringBuilder();
+		if (indirect)
+			str.append("!");
+		if (!packages.includesAll())
+			str.append(" in package " + packages);
+		if (!parents.isAny() || !instance.isAny()) {
+			str.append(" when injecting ");
+			str.append(instance.isAny() ? "*" : instance.toString());
+			if (!parents.isAny())
+				str.append( " into " + parents);
+		}
+		return str.toString();
 	}
 
 	public Target inPackageAndSubPackagesOf(Class<?> type) {

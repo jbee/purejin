@@ -1,5 +1,9 @@
 package se.jbee.inject.config;
 
+import se.jbee.inject.*;
+
+import java.util.Optional;
+
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static se.jbee.inject.Dependency.dependency;
@@ -8,14 +12,6 @@ import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.lang.Utils.orElse;
-
-import java.util.Optional;
-
-import se.jbee.inject.ContextAware;
-import se.jbee.inject.Converter;
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Instance;
 
 /**
  * A {@link Config} is an {@link Extension} that uses the {@link Dependency}

@@ -1,19 +1,11 @@
 /*
  *  Copyright (c) 2012-2019, Jan Bernitt
- *	
+ *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
 package se.jbee.inject.bind;
 
-import se.jbee.inject.DeclarationType;
-import se.jbee.inject.Env;
-import se.jbee.inject.Instance;
-import se.jbee.inject.Locator;
-import se.jbee.inject.Name;
-import se.jbee.inject.Scope;
-import se.jbee.inject.Source;
-import se.jbee.inject.Supplier;
-import se.jbee.inject.Target;
+import se.jbee.inject.*;
 import se.jbee.inject.config.ScopesBy;
 
 /**
@@ -45,8 +37,8 @@ public final class Bind {
 		return as(DeclarationType.MULTI);
 	}
 
-	public Bind asAuto() {
-		return as(DeclarationType.AUTO);
+	public Bind asSuper() {
+		return as(DeclarationType.SUPER);
 	}
 
 	public Bind asImplicit() {
@@ -102,10 +94,9 @@ public final class Bind {
 	}
 
 	private <T> Name effectiveScope(Locator<T> locator) {
-		Name effectiveScope = scope.equalTo(Scope.mirror)
-			? env.property(ScopesBy.class, source.pkg()).reflect(
-					locator.type().rawType)
-			: scope;
+		Name effectiveScope = scope.equalTo(Scope.mirror) //
+				? env.property(ScopesBy.class, source.pkg()).reflect(locator.type().rawType)
+				: scope;
 		return effectiveScope.equalTo(Scope.auto)
 			? Scope.application
 			: effectiveScope;

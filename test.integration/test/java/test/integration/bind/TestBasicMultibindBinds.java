@@ -6,7 +6,7 @@ import se.jbee.inject.Name;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.defaults.CoreFeature;
+import se.jbee.inject.defaults.DefaultFeature;
 import se.jbee.inject.lang.Type;
 
 import java.util.List;
@@ -73,8 +73,8 @@ class TestBasicMultibindBinds {
 		protected void bootstrap() {
 			install(TestBasicMultibindBindsModule1.class);
 			install(TestBasicMultibindBindsModule2.class);
-			install(CoreFeature.SET);
-			install(CoreFeature.LIST);
+			install(DefaultFeature.SET);
+			install(DefaultFeature.LIST);
 		}
 	}
 

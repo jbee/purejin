@@ -1,10 +1,12 @@
 package se.jbee.inject.bootstrap;
 
 import se.jbee.inject.*;
+import se.jbee.inject.bind.BindingConsolidation;
 import se.jbee.inject.bind.InconsistentBinding;
 import se.jbee.inject.bind.ModuleWith;
 import se.jbee.inject.bind.ValueBinder;
 import se.jbee.inject.config.*;
+import se.jbee.inject.defaults.DefaultBindingConsolidation;
 import se.jbee.inject.defaults.DefaultValueBinders;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.Utils;
@@ -43,16 +45,17 @@ public final class Environment implements Env {
 			.withBinder(DefaultValueBinders.INSTANCE_REF) //
 			.withBinder(DefaultValueBinders.PARAMETRIZED_REF) //
 			.withBinder(DefaultValueBinders.ARRAY) //
-			.with(ConstructsBy.class, ConstructsBy.common) //
-			.with(SharesBy.class, SharesBy.noFields) //
-			.with(ProducesBy.class, ProducesBy.noMethods) //
-			.with(NamesBy.class, NamesBy.defaultName) //
-			.with(ScopesBy.class, ScopesBy.alwaysDefault) //
-			.with(HintsBy.class, HintsBy.noParameters) //
+			.with(ConstructsBy.class, ConstructsBy.OPTIMISTIC) //
+			.with(SharesBy.class, impl -> null) //
+			.with(ProducesBy.class, impl -> null) //
+			.with(NamesBy.class, obj -> Name.DEFAULT) //
+			.with(ScopesBy.class, ScopesBy.AUTO) //
+			.with(HintsBy.class, param -> null) //
 			.with(Annotated.Enhancer.class, Annotated.SOURCE) //
-			.with(Env.GP_USE_DEEP_REFLECTION, boolean.class, false) //
+			.with(BindingConsolidation.class, DefaultBindingConsolidation::consolidate) //
+			.with(Env.GP_USE_DEEP_REFLECTION, false) //
 			.with(Env.GP_DEEP_REFLECTION_PACKAGES, Packages.class, Packages.ALL) //
-			.with(Env.GP_USE_VERIFICATION, boolean.class, false) //
+			.with(Env.GP_USE_VERIFICATION,false) //
 			.readonly();
 
 	public static Environment override(Env overridden) {
@@ -112,6 +115,10 @@ public final class Environment implements Env {
 		throw InconsistentBinding.undefinedEnvProperty(qualifier, property, ns);
 	}
 
+	public Environment with(String qualifier, boolean value) {
+		return with(qualifier, boolean.class, value);
+	}
+
 	public <T> Environment with(Class<T> globalProperty, T value) {
 		return with(raw(globalProperty), value);
 	}
@@ -134,7 +141,7 @@ public final class Environment implements Env {
 	}
 
 	public <T> Environment withBinder(Class<? extends ValueBinder<T>> value) {
-		return withBinder(Utils.instantiate(value, this::accessible,
+		return withBinder(Utils.construct(value, this::accessible,
 				e -> new InconsistentDeclaration("Failed to create ValueBinder of type: " + value, e)));
 	}
 

@@ -5,22 +5,23 @@
  */
 package se.jbee.inject.config;
 
-import static java.util.Arrays.asList;
-import static se.jbee.inject.lang.Type.raw;
-import static se.jbee.inject.lang.Type.returnType;
-import static se.jbee.inject.lang.Utils.arrayFilter;
+import se.jbee.inject.Hint;
+import se.jbee.inject.Packages;
+import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.Utils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.TypeVariable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.function.Function;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
-import se.jbee.inject.Packages;
-import se.jbee.inject.lang.Type;
+import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.inject.lang.Type.returnType;
+import static se.jbee.inject.lang.Utils.arrayFilter;
 
 /**
  * Extracts the relevant {@link Method}s for a given target {@link Class}. These
@@ -32,17 +33,52 @@ import se.jbee.inject.lang.Type;
 @FunctionalInterface
 public interface ProducesBy {
 
-	Method[] __noMethods = new Method[0];
+	/**
+	 * The default pool of methods contains all non synthetic {@link Method}
+	 * including all inherited ones except for those declared (and not
+	 * overridden) in {@link Object}.
+	 */
+	ProducesBy OPTIMISTIC = declaredMethods(m -> !m.isSynthetic(), true);
 
 	/**
 	 * @return The {@link Method}s that should be used in the context this
-	 *         {@link ProducesBy} is used.
+	 * {@link ProducesBy} is used. Return {@code null} when no decision has been
+	 * made. Returns empty array when the decision is to not use any producer
+	 * methods.
 	 */
 	Method[] reflect(Class<?> impl);
 
-	ProducesBy noMethods = impl -> __noMethods;
-	ProducesBy declaredMethods = ((ProducesBy) Class::getDeclaredMethods).ignoreSynthetic();
-	ProducesBy allMethods = ((ProducesBy) ProducesBy::allMethods).ignoreSynthetic();
+	static ProducesBy declaredMethods(boolean includeInherited) {
+		return declaredMethods(null, includeInherited);
+	}
+
+	static ProducesBy declaredMethods(Predicate<Method> filter,
+			boolean includeInherited) {
+		return methods(Class::getDeclaredMethods, filter, includeInherited);
+	}
+
+	static ProducesBy methods(Function<Class<?>, Method[]> pool,
+			Predicate<Method> filter, boolean includeInherited) {
+		return methods(pool, filter,
+				impl -> includeInherited ? Object.class : impl.getSuperclass());
+	}
+
+	static ProducesBy methods(Function<Class<?>, Method[]> pool,
+			Predicate<Method> filter, UnaryOperator<Class<?>> end) {
+		return impl -> arrayFilter(impl, end.apply(impl), pool, filter)
+				.toArray(new Method[0]);
+	}
+
+	default ProducesBy orElse(ProducesBy whenNull) {
+		return impl -> {
+			Method[] res = reflect(impl);
+			return res != null ? res : whenNull.reflect(impl);
+		};
+	}
+
+	default ProducesBy or(ProducesBy other) {
+		return impl -> Utils.arrayConcat(reflect(impl), other.reflect(impl));
+	}
 
 	default ProducesBy ignoreStatic() {
 		return withModifier(((IntPredicate) Modifier::isStatic).negate());
@@ -62,7 +98,15 @@ public interface ProducesBy {
 	}
 
 	default ProducesBy select(Predicate<Method> filter) {
-		return impl -> arrayFilter(this.reflect(impl), filter);
+		return impl -> arrayFilter(reflect(impl), filter);
+	}
+
+	default ProducesBy selectStrictBy(Hint<?>... hints) {
+		return select(method -> Hint.matchesInOrder(method, hints));
+	}
+
+	default ProducesBy selectBy(Hint<?>... hints) {
+		return select(method -> Hint.matchesInRandomOrder(method, hints));
 	}
 
 	default ProducesBy returnTypeAssignableTo(Type<?> supertype) {
@@ -83,20 +127,12 @@ public interface ProducesBy {
 
 	default ProducesBy in(Packages filter) {
 		return impl -> filter.contains(raw(impl))
-			? this.reflect(impl)
-			: __noMethods;
+			? reflect(impl)
+			: null;
 	}
 
 	default ProducesBy in(Class<?> api) {
-		return select(method -> raw(method.getDeclaringClass()).isAssignableTo(raw(api)));
-	}
-
-	static Method[] allMethods(Class<?> type) {
-		List<Method> all = new ArrayList<>();
-		while (type != Object.class && type != null) {
-			all.addAll(asList(type.getDeclaredMethods()));
-			type = type.getSuperclass();
-		}
-		return all.toArray(__noMethods);
+		return select(method -> raw(method.getDeclaringClass()) //
+				.isAssignableTo(raw(api)));
 	}
 }

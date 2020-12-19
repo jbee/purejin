@@ -1,11 +1,11 @@
 package test.integration.example;
 
-import test.example.app.Support;
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bind.ModuleWith;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
+import test.example.app.Support;
 
 import java.util.ServiceLoader;
 

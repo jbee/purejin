@@ -1,11 +1,11 @@
 package test.example.app;
 
-import java.lang.annotation.Annotation;
-import java.util.ServiceLoader;
-
+import se.jbee.inject.Extends;
 import se.jbee.inject.Scope;
 import se.jbee.inject.binder.BinderModuleWith;
-import se.jbee.inject.Extends;
+
+import java.lang.annotation.Annotation;
+import java.util.ServiceLoader;
 
 /**
  * This is bound to the annotation
@@ -27,6 +27,6 @@ public class SupportAnnotationPattern extends BinderModuleWith<Class<?>> {
 
 	@Override
 	protected void declare(Class<?> annotated) {
-		per(Scope.application).autobind(annotated).toConstructor();
+		per(Scope.application).superbind(annotated).toConstructor();
 	}
 }

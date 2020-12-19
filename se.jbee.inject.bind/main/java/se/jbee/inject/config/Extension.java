@@ -9,7 +9,7 @@ import se.jbee.inject.lang.Utils;
  *
  * This means the marked type does not need to be bound explicitly. A singleton
  * instance per type is created using the type's
- * {@link Utils#commonConstructor(Class)}.
+ * {@link Utils#mostVisibleMostParametersConstructor(Class)}.
  *
  * @since 8.1
  */

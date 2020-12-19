@@ -1,10 +1,6 @@
 package se.jbee.inject.scope;
 
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Provider;
-import se.jbee.inject.Resource;
-import se.jbee.inject.Scope;
-import se.jbee.inject.UnresolvableDependency;
+import se.jbee.inject.*;
 
 /**
  * Asks the {@link Provider} once per thread per {@link Resource} which is

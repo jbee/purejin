@@ -1,14 +1,14 @@
 package se.jbee.inject.lang;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonMap;
-
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.WildcardType;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.UnaryOperator;
+
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonMap;
 
 /**
  * A utility to help extract actual {@link Type} of

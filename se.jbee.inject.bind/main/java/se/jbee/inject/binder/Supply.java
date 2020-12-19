@@ -117,7 +117,7 @@ public final class Supply {
 	}
 
 	public static <T> Supplier<T> byNew(New<T> instantiation) {
-		return new Instantiation<>(instantiation.target, Hint.match(
+		return new Construct<>(instantiation.target, Hint.match(
 				parameterTypes(instantiation.target), instantiation.hints));
 	}
 
@@ -160,8 +160,6 @@ public final class Supply {
 	/**
 	 * A {@link Supplier} uses multiple different separate suppliers to provide
 	 * the elements of a array of the supplied type.
-	 *
-	 * @author Jan Bernitt (jan@jbee.se)
 	 */
 	private static final class PredefinedArraySupplier<E>
 			extends WithArgs<E[]> {
@@ -212,12 +210,12 @@ public final class Supply {
 
 	}
 
-	private static final class Instantiation<T> extends WithArgs<T>
+	private static final class Construct<T> extends WithArgs<T>
 			implements Annotated {
 
 		private final Constructor<T> target;
 
-		Instantiation(Constructor<T> target, Hint<?>[] args) {
+		Construct(Constructor<T> target, Hint<?>[] args) {
 			super(args);
 			this.target = target;
 		}

@@ -5,11 +5,11 @@
  */
 package se.jbee.inject.config;
 
-import java.lang.annotation.Annotation;
-import java.util.EnumSet;
-
 import se.jbee.inject.Packages;
 import se.jbee.inject.lang.Type;
+
+import java.lang.annotation.Annotation;
+import java.util.EnumSet;
 
 /**
  * An {@link Edition} decides which features are contained in a specific setup.

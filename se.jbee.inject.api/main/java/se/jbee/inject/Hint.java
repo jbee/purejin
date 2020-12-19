@@ -8,13 +8,16 @@ package se.jbee.inject;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.Typed;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Map;
+
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Instance.instance;
+import static se.jbee.inject.lang.Type.parameterTypes;
 import static se.jbee.inject.lang.Type.raw;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.util.Map;
 
 /**
  * A {@link Hint} is a suggested reference for parameters of a
@@ -30,6 +33,13 @@ public final class Hint<T> implements Typed<T> {
 
 	public static Hint<?>[] none() {
 		return NO_PARAMS;
+	}
+
+	public static Hint<?>[] signature(Class<?> ... parameterTypes) {
+		if (parameterTypes.length == 0)
+			return none();
+		return Arrays.stream(parameterTypes).map(
+				Hint::relativeReferenceTo).toArray(Hint[]::new);
 	}
 
 	public static <T> Hint<T> relativeReferenceTo(Class<T> target) {
@@ -83,6 +93,41 @@ public final class Hint<T> implements Typed<T> {
 		return new Hint<>(asType, null, null, null);
 	}
 
+	public static boolean matchesInOrder(Executable member, Hint<?>[] hints) {
+		if (hints.length == 0)
+			return true;
+		Type<?>[] types = parameterTypes(member);
+		int i = 0;
+		for (Hint<?> hint : hints) {
+			while (i < types.length && !hint.asType.isAssignableTo(types[i]))
+				i++;
+			if (i >= types.length)
+				return false;
+		}
+		return true;
+	}
+
+	public static boolean matchesInRandomOrder(Executable member, Hint<?>[] hints) {
+		if (hints.length == 0)
+			return true;
+		Type<?>[] types = parameterTypes(member);
+		for (Hint<?> hint : hints) {
+			boolean matched = false;
+			int i = 0;
+			while (!matched && i < types.length) {
+				Type<?> type = types[i];
+				if (type != null && hint.asType.isAssignableTo(type)) {
+					types[i] = null; // nark as handled by removing it
+					matched = true;
+				}
+				i++;
+			}
+			if (!matched)
+				return false;
+		}
+		return true;
+	}
+
 	public static Hint<?>[] match(Type<?>[] types, Hint<?>... hints) {
 		if (types.length == 0)
 			return NO_PARAMS;
@@ -91,7 +136,7 @@ public final class Hint<T> implements Typed<T> {
 			int i = indexForType(types, hint, args);
 			if (i < 0)
 				throw InconsistentDeclaration.incomprehensibleHint(hint);
-			args[i] = hint;
+			args[i] = hint.parameterized(types[i]);
 		}
 		for (int i = 0; i < args.length; i++)
 			if (args[i] == null)
@@ -101,9 +146,21 @@ public final class Hint<T> implements Typed<T> {
 
 	private static int indexForType(Type<?>[] types, Hint<?> hint,
 			Hint<?>[] args) {
+		Type<?> target = hint.type();
+		// 1. lowest index with exact type match, or else
 		for (int i = 0; i < types.length; i++)
-			if (args[i] == null && hint.type().isAssignableTo(types[i]))
+			if (args[i] == null && target.equalTo(types[i]))
 				return i;
+		// 2. lowest index with same raw type and assignable, or else
+		for (int i = 0; i < types.length; i++)
+			if (args[i] == null && target.rawType == types[i].rawType //
+					&& target.isAssignableTo(types[i]))
+				return i;
+		// 3. lowest index with assignable type, or else
+		for (int i = 0; i < types.length; i++)
+			if (args[i] == null && target.isAssignableTo(types[i]))
+				return i;
+		// 4. not found
 		return -1;
 	}
 
@@ -129,25 +186,42 @@ public final class Hint<T> implements Typed<T> {
 		return relativeRef == null && absoluteRef == null;
 	}
 
+	/**
+	 * @return a more qualified {@link Hint} if the provided type is more
+	 * qualified which changes the references but does not change {@link #asType}
+	 * in case that was intentionally set to a supertype.
+	 *
+	 * At the point this method is called the {@link #asType} already had its
+	 * effect but we still want to preserve the information for debugging so
+	 * we do not get confused.
+	 */
+	private Hint<?> parameterized(Type<?> type) {
+		return type.moreQualifiedThan(asType) ? typed(type).asType(asType) : this;
+	}
+
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public <S> Hint<S> asType(Type<S> supertype) {
-		return typed(supertype);
+		asType.toSupertype(supertype); // throws if this is not legal
+		return new Hint<>((Type) supertype, value, relativeRef, absoluteRef);
 	}
 
 	public <S> Hint<S> asType(Class<S> supertype) {
-		return typed(raw(supertype));
+		return asType(raw(supertype));
 	}
 
 	/**
 	 * @param type The new type of this {@link Hint}
-	 * @throws ClassCastException In case the given type is incompatible with
-	 *             the previous one.
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public <E> Hint<E> typed(Type<E> type) {
-		asType.toSupertype(type);
-		return new Hint<>(type, (E) value, (Instance<E>) relativeRef,
-				(Dependency<E>) absoluteRef);
+		Instance<? extends E> newRelRef = relativeRef == null
+				? null
+				: relativeRef.typed(type);
+		Dependency<? extends E> newAbsRef = absoluteRef == null
+				? null
+				: absoluteRef.typed(type);
+		return new Hint<>(type, (E) value, newRelRef, newAbsRef);
 	}
 
 	@Override

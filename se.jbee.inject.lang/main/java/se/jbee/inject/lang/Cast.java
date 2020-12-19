@@ -5,14 +5,12 @@
  */
 package se.jbee.inject.lang;
 
-import se.jbee.inject.lang.Type;
-
-import static se.jbee.inject.lang.Type.raw;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
+
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * Utility to get rid of warnings for JRE generic {@link Type}s.

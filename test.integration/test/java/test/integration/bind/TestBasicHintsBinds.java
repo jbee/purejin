@@ -10,6 +10,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
+import java.math.BigInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Hint.constant;
@@ -71,6 +72,11 @@ class TestBasicHintsBinds {
 			this.value = value;
 			this.sequence = sequence;
 		}
+
+		public Qux(BigInteger value, String sequence, Double number) {
+			this.value = value;
+			this.sequence = sequence + "meh";
+		}
 	}
 
 	private static class ParameterConstructorBindsModule extends BinderModule {
@@ -102,22 +108,22 @@ class TestBasicHintsBinds {
 
 	}
 
-	private final Injector injector = Bootstrap.injector(
+	private final Injector context = Bootstrap.injector(
 			ParameterConstructorBindsModule.class);
 
 	@Test
-	void thatClassParameterIsArranged() {
-		assertNotNull(injector.resolve(Foo.class));
+	void classParameterIsArranged() {
+		assertNotNull(context.resolve(Foo.class));
 	}
 
 	@Test
-	void thatTypeParameterIsArranged() {
-		assertNotNull(injector.resolve(Bar.class));
+	void typeParameterIsArranged() {
+		assertNotNull(context.resolve(Bar.class));
 	}
 
 	@Test
-	void thatInstanceParameterIsArranged() {
-		Bar bar = injector.resolve(Bar.class);
+	void instanceParameterIsArranged() {
+		Bar bar = context.resolve(Bar.class);
 		assertEquals("y", bar.foo);
 	}
 
@@ -131,29 +137,29 @@ class TestBasicHintsBinds {
 	 * 1st argument.
 	 */
 	@Test
-	void thatParameterAsAnotherTypeIsArranged() {
-		Qux qux = injector.resolve(Qux.class);
+	void parameterAsAnotherTypeIsArranged() {
+		Qux qux = context.resolve(Qux.class);
 		assertEquals("y", qux.sequence);
 	}
 
 	/**
-	 * @see #thatParameterAsAnotherTypeIsArranged()
+	 * @see #parameterAsAnotherTypeIsArranged()
 	 */
 	@Test
-	void thatConstantParameterIsArranged() {
-		Qux qux = injector.resolve(Qux.class);
+	void constantParameterIsArranged() {
+		Qux qux = context.resolve(Qux.class);
 		assertEquals(1980, qux.value);
 	}
 
 	@Test
-	void thatReoccuringTypesAreArrangedAsOccuringAfterAnother() {
-		Baz baz = injector.resolve(Baz.class);
+	void reoccurringTypesAreArrangedAsOccurringAfterAnother() {
+		Baz baz = context.resolve(Baz.class);
 		assertEquals("y", baz.foo);
 		assertEquals("y", baz.bar, "when x alignment after another is broken");
 	}
 
 	@Test
-	void thatParametersNotArrangedThrowsException() {
+	void parametersNotArrangedThrowsException() {
 		assertThrows(InconsistentDeclaration.class,
 				() -> Bootstrap.injector(FaultyParameterConstructorBindsModule.class));
 	}

@@ -6,21 +6,17 @@ import se.jbee.inject.binder.BinderModuleWith;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.HintsBy;
+import se.jbee.inject.config.NamesBy;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.lang.reflect.Executable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Type.parameterType;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
@@ -62,29 +58,8 @@ class TestExamplePropertyParameterAnnotationBinds {
 		 */
 		@Override
 		protected Env configure(Env env) {
-			return Environment.override(env).with(HintsBy.class, this::hints);
-		}
-
-		/**
-		 * The custom {@link HintsBy} implementation checks the the {@link
-		 * Property} annotation; if present, a {@link Instance} hint is added to
-		 * the constructor arguments linking the parameter to a named {@link
-		 * String}. The name of that {@link String} is derived from the
-		 * annotation value. The added {@link PropertySupplier} will be called
-		 * when resolving the namespaced {@link String}. It extracts the
-		 * property from the name and resolves it from the properties.
-		 */
-		private Hint<?>[] hints(Executable obj) {
-			List<Hint<?>> hints = new ArrayList<>();
-			for (java.lang.reflect.Parameter param : obj.getParameters()) {
-				if (param.isAnnotationPresent(Property.class)) {
-					Name name = named(Property.class).concat(
-							param.getAnnotation(Property.class).value());
-					Instance<?> hint = instance(name, parameterType(param));
-					hints.add(hint.asHint());
-				}
-			}
-			return hints.isEmpty() ? Hint.none() : hints.toArray(new Hint[0]);
+			return Environment.override(env).with(HintsBy.class, HintsBy.instanceReference(
+					NamesBy.annotatedWith(Property.class, Property::value, true)));
 		}
 
 		@Override
@@ -95,7 +70,6 @@ class TestExamplePropertyParameterAnnotationBinds {
 			// just to test
 			bind(ExampleBean.class).toConstructor();
 		}
-
 	}
 
 	static final class PropertySupplier implements Supplier<String> {

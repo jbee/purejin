@@ -22,12 +22,13 @@ import static java.util.Arrays.stream;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Hint.relativeReferenceTo;
 import static se.jbee.inject.Instance.*;
+import static se.jbee.inject.Name.DEFAULT;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Source.source;
 import static se.jbee.inject.Target.targeting;
 import static se.jbee.inject.config.Plugins.pluginPoint;
 import static se.jbee.inject.lang.Type.*;
-import static se.jbee.inject.lang.Utils.isClassInstantiable;
+import static se.jbee.inject.lang.Utils.isClassConstructable;
 import static se.jbee.inject.lang.Utils.newArray;
 
 /**
@@ -130,13 +131,13 @@ public class Binder {
 	}
 
 	/**
-	 * Same as {@link #autobind(Type)} where type was wrapped in {@link
+	 * Same as {@link #superbind(Type)} where type was wrapped in {@link
 	 * Type#raw(Class)}.
 	 *
-	 * @see #autobind(Type)
+	 * @see #superbind(Type)
 	 */
-	public final <T> TypedBinder<T> autobind(Class<T> type) {
-		return autobind(raw(type));
+	public final <T> TypedBinder<T> superbind(Class<T> type) {
+		return superbind(raw(type));
 	}
 
 	/**
@@ -158,8 +159,8 @@ public class Binder {
 	 * @param <T>  type that should be bound to all the types it implements
 	 * @return immutable binder API
 	 */
-	public final <T> TypedBinder<T> autobind(Type<T> type) {
-		return on(bind().asAuto()).bind(type);
+	public final <T> TypedBinder<T> superbind(Type<T> type) {
+		return on(bind().asSuper()).bind(type);
 	}
 
 	/**
@@ -319,7 +320,8 @@ public class Binder {
 	}
 
 	public <T> ConnectTargetBinder<T> connect(Class<T> api) {
-		return new ConnectTargetBinder<>(this, ProducesBy.declaredMethods.in(api), raw(api));
+		return new ConnectTargetBinder<>(this,
+				ProducesBy.OPTIMISTIC.in(api), raw(api));
 	}
 
 	protected Binder on(Bind bind) {
@@ -458,7 +460,7 @@ public class Binder {
 		public void into(Class<?> pluginPoint, String property) {
 			binder.multibind(pluginPoint(pluginPoint, property),
 					Class.class).to(plugin);
-			if (isClassInstantiable(plugin))
+			if (isClassConstructable(plugin))
 				binder.implicit().construct(plugin);
 			// we allow both collections of classes that have a common
 			// super-type or collections that don't
@@ -574,18 +576,18 @@ public class Binder {
 		private final ConstructsBy constructsBy;
 		private final ProducesBy producesBy;
 		private final NamesBy namesBy;
-		private final ScopesBy scopesBy; //TODO use it
+		private final ScopesBy scopesBy;
 		private final HintsBy hintsBy;
 
 		protected AutoBinder(RootBinder binder, Name scope) {
 			Bind bind = binder.bind();
-			this.binder = binder.on(bind.asAuto()).on(bind.next());
+			this.binder = binder.on(bind.asSuper()).on(bind.next());
 			Env env = bind.env;
 			Package where = bind.source.pkg();
 			this.sharesBy = env.property(SharesBy.class, where);
 			this.constructsBy = env.property(ConstructsBy.class, where);
 			this.producesBy = env.property(ProducesBy.class, where);
-			this.namesBy = env.property(NamesBy.class, where);
+			this.namesBy = env.property(NamesBy.class, where).orElse(DEFAULT);
 			this.hintsBy = env.property(HintsBy.class, where);
 			this.scopesBy = scope.equalTo(Scope.mirror)
 				? env.property(ScopesBy.class, where)
@@ -621,7 +623,7 @@ public class Binder {
 
 		public AutoBinder nameBy(NamesBy mirror) {
 			return new AutoBinder(binder, sharesBy, constructsBy, producesBy,
-					mirror, scopesBy, hintsBy);
+					mirror.orElse(DEFAULT), scopesBy, hintsBy);
 		}
 
 		public AutoBinder scopeBy(ScopesBy mirror) {
@@ -634,32 +636,42 @@ public class Binder {
 					namesBy, scopesBy, mirror);
 		}
 
-		public void in(Class<?> service) {
-			in(service, Hint.none());
+		public void in(Class<?> impl) {
+			in(impl, Hint.none());
 		}
 
-		public void in(Object service, Hint<?>... hints) {
-			in(service.getClass(), service, hints);
+		public void in(Class<?> impl, Class<?>... more) {
+			in(impl);
+			for (Class<?> i : more)
+				in(i);
 		}
 
-		public void in(Class<?> service, Hint<?>... hints) {
-			in(service, null, hints);
+		public void in(Object impl, Hint<?>... construction) {
+			in(impl.getClass(), impl, construction);
 		}
 
-		private void in(Class<?> service, Object instance,
-				Hint<?>... hints) {
-			boolean needsInstance1 = bindProducesIn(service, instance, hints);
-			boolean needsInstance2 = bindSharesIn(service, instance);
+		public void in(Class<?> impl, Hint<?>... construction) {
+			in(impl, null, construction);
+		}
+
+		private void in(Class<?> impl, Object instance,
+				Hint<?>... construction) {
+			boolean needsInstance1 = bindProducesIn(impl, instance);
+			boolean needsInstance2 = bindSharesIn(impl, instance);
 			if (!needsInstance1 && !needsInstance2)
 				return; // do not try to construct the class
-			Constructor<?> target = constructsBy.reflect(service);
+			Constructor<?> target = constructsBy
+					.reflect(impl.getDeclaredConstructors(), construction);
 			if (target != null)
-				asConstructor(target, hints);
+				asConstructor(Scope.auto, target, construction);
 		}
 
 		private boolean bindSharesIn(Class<?> impl, Object instance) {
+			Field[] constants = sharesBy.reflect(impl);
+			if (constants == null || constants.length == 0)
+				return false;
 			boolean needsInstance = false;
-			for (Field constant : sharesBy.reflect(impl)) {
+			for (Field constant : constants) {
 				binder.per(Scope.container).bind(namesBy.reflect(constant),
 						fieldType(constant)).to(instance, constant);
 				needsInstance |= !isStatic(constant.getModifiers());
@@ -667,11 +679,13 @@ public class Binder {
 			return needsInstance;
 		}
 
-		private boolean bindProducesIn(Class<?> impl, Object instance,
-				Hint<?>[] hints) {
+		private boolean bindProducesIn(Class<?> impl, Object instance) {
+			Method[] producers = producesBy.reflect(impl);
+			if (producers == null)
+				return false;
 			boolean needsInstance = false;
-			for (Method producer : producesBy.reflect(impl)) {
-				if (asProducer(producer, instance, hints))
+			for (Method producer : producers) {
+				if (asProducer(producer, instance, Hint.none()))
 					needsInstance |= !isStatic(producer.getModifiers());
 			}
 			return needsInstance;
@@ -693,34 +707,35 @@ public class Binder {
 			Type<?> returns = returnType(target);
 			if (returns.rawType == void.class || returns.rawType == Void.class)
 				return false;
-			if (hints.length == 0)
-				hints = hintsBy.reflect(target);
-			binder.per(scopesBy.reflect(target)) //
+			if (hints == null || hints.length == 0)
+				hints = hintsBy.applyTo(target);
+			Name scope = scopesBy.reflect(target);
+			binder.per(scope == null ? Scope.auto : scope) //
 					.bind(namesBy.reflect(target), returns) //
 					.to(instance, target, hints);
 			return true;
 		}
 
 		public <T> void asConstructor(Constructor<T> target, Hint<?>... hints) {
-			Name name = namesBy.reflect(target);
-			if (hints.length == 0)
-				hints = hintsBy.reflect(target);
-			Class<T> impl = target.getDeclaringClass();
-			Binder appBinder = binder.per(Scope.application).implicit();
-			if (name.isDefault()) {
-				appBinder.autobind(impl).to(target, hints);
-			} else {
-				appBinder.bind(name, impl).to(target, hints);
-				for (Type<? super T> st : raw(impl).supertypes())
-					if (st.isInterface())
-						appBinder.implicit().bind(name, st).to(name, impl);
-			}
+			asConstructor(scopesBy.reflect(target), target, hints);
 		}
 
-		public void in(Class<?> impl, Class<?>... more) {
-			in(impl);
-			for (Class<?> i : more)
-				in(i);
+		public <T> void asConstructor(Name scope, Constructor<T> target, Hint<?>... hints) {
+			if (target == null)
+				throw InconsistentBinding.generic("Provided Constructor was null");
+			Name name = namesBy.reflect(target);
+			if (hints.length == 0)
+				hints = hintsBy.applyTo(target);
+			Class<T> impl = target.getDeclaringClass();
+			Binder scopedBinder = binder.per(scope != null ? scope : Scope.auto).implicit();
+			if (name.isDefault()) {
+				scopedBinder.superbind(impl).to(target, hints);
+			} else {
+				scopedBinder.bind(name, impl).to(target, hints);
+				for (Type<? super T> st : raw(impl).supertypes())
+					if (st.isInterface())
+						scopedBinder.implicit().bind(name, st).to(name, impl);
+			}
 		}
 	}
 
@@ -894,15 +909,17 @@ public class Binder {
 		}
 
 		public void to(Constructor<? extends T> target, Hint<?>... hints) {
+			if (target == null)
+				throw InconsistentBinding.generic("Provided constructor was null");
 			if (hints.length == 0)
-				hints = env(HintsBy.class).reflect(target);
+				hints = env(HintsBy.class).applyTo(target);
 			expand(New.newInstance(target, hints));
 		}
 
 		protected final void to(Object owner, Method target,
 				Hint<?>... hints) {
 			if (hints.length == 0)
-				hints = env(HintsBy.class).reflect(target);
+				hints = env(HintsBy.class).applyTo(target);
 			expand(Produces.produces(owner, target, hints));
 		}
 
@@ -911,8 +928,8 @@ public class Binder {
 		}
 
 		protected final void expand(Object value) {
-			declareBindingsIn(bind().asType(locator, BindingType.VALUE, null),
-					value);
+			declareBindingsIn(bind() //
+					.asType(locator, BindingType.VALUE, null), value);
 		}
 
 		protected final void expand(BindingType type,
@@ -954,15 +971,30 @@ public class Binder {
 		 * bypasses {@link Scope} effects. The provided {@link Generator} is
 		 * directly called to generate the instance each time it should be
 		 * injected.
-		 *
+		 * <p>
 		 * If a {@link Scope} should apply use {@link #toSupplier(Supplier)}
 		 * instead or create a {@link Generator} bridge that does not implement
 		 * {@link Generator} itself.
 		 *
+		 * @param generator used to create instances directly (with no {@link
+		 *                  Scope} around it)
 		 * @since 8.1
 		 */
 		public void toGenerator(Generator<? extends T> generator) {
-			toSupplier(new SupplierGeneratorBridge<>(generator));
+			toSupplier(Supplier.nonScopedBy(generator));
+		}
+
+		/**
+		 * In contrast to {@link #toGenerator(Generator)} this is just an
+		 * ordinary adapter between {@link Generator} and {@link Supplier}. The
+		 * provided {@link Generator} becomes usable as {@link Supplier}
+		 * internally with all normal {@link Scope}ing effects occurring.
+		 *
+		 * @param generator used to create instances with a {@link Scope}
+		 * @since 8.1
+		 */
+		public void toScopedGenerator(Generator<? extends  T> generator) {
+			toSupplier((dep, context) -> generator.generate(dep));
 		}
 
 		/**
@@ -999,8 +1031,9 @@ public class Binder {
 		}
 
 		public final void to(T constant1, T constant2, T constant3) {
-			onMulti().toConstant(constant1).toConstant(constant2).toConstant(
-					constant3);
+			onMulti().toConstant(constant1) //
+					.toConstant(constant2) //
+					.toConstant(constant3);
 		}
 
 		@SafeVarargs
@@ -1011,14 +1044,20 @@ public class Binder {
 		}
 
 		public void toConstructor() {
-			to(env(ConstructsBy.class).reflect(locator.type().rawType));
+			toConstructor(locator.type().rawType);
 		}
 
-		public void toConstructor(Class<? extends T> impl,
-				Hint<?>... hints) {
-			if (!isClassInstantiable(impl))
+		@SuppressWarnings("unchecked")
+		public void toConstructor(Class<? extends T> impl, Hint<?>... hints) {
+			if (!isClassConstructable(impl))
 				throw InconsistentDeclaration.notConstructable(impl);
-			to(env(ConstructsBy.class).reflect(impl), hints);
+			Constructor<? extends T> target = (Constructor<? extends T>)
+					env(ConstructsBy.class) //
+						.reflect(impl.getDeclaredConstructors(), hints);
+			if (target == null)
+				throw InconsistentBinding.generic(
+						"No usable Constructor for type: " + impl);
+			to(target, hints);
 		}
 
 		public void toConstructor(Hint<?>... hints) {
@@ -1082,9 +1121,6 @@ public class Binder {
 	 * This kind of bindings actually re-map the []-type so that the automatic
 	 * behavior of returning all known instances of the element type will no
 	 * longer be used whenever the bind made applies.
-	 *
-	 * @author Jan Bernitt (jan@jbee.se)
-	 *
 	 */
 	public static class TypedElementBinder<E> extends TypedBinder<E[]> {
 
@@ -1120,33 +1156,5 @@ public class Binder {
 			System.arraycopy(elements, 0, res, 0, res.length);
 			return (E[]) res;
 		}
-	}
-
-	/**
-	 * This cannot be changed to a lambda since we need a type that actually
-	 * implements both {@link Supplier} and {@link Generator}. This way the
-	 * {@link Generator} is picked directly by the {@link Injector}.
-	 */
-	private static final class SupplierGeneratorBridge<T>
-			implements Supplier<T>, Generator<T> {
-
-		private final Generator<T> generator;
-
-		SupplierGeneratorBridge(Generator<T> generator) {
-			this.generator = generator;
-		}
-
-		@Override
-		public T generate(Dependency<? super T> dep)
-				throws UnresolvableDependency {
-			return generator.generate(dep);
-		}
-
-		@Override
-		public T supply(Dependency<? super T> dep, Injector context)
-				throws UnresolvableDependency {
-			return generate(dep);
-		}
-
 	}
 }

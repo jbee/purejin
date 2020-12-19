@@ -9,14 +9,14 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.List;
 
+import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
- * The tests demonstrates the meaning of a {@link Binder#autobind(Class)} call.
+ * The tests demonstrates the meaning of a {@link Binder#superbind(Class)} call.
  * That will create multiple binds, one each for the type and all its
  * super-classes and -interfaces. All of them are bound to the same to-clause,
  * hence share the same {@link Supplier} (in the end all to-clauses become one).
@@ -28,44 +28,39 @@ import static se.jbee.inject.lang.Type.raw;
  * setup. But in some cases an instance should serve as many different
  * interfaces all implemented by it (e.g. a class implementing a couple of
  * single service interfaces).
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
-class TestBasicAutobindBinds {
+class TestBasicSuperbindBinds {
 
-	static class TestBasicAutobindBindsModule extends BinderModule {
+	static class TestBasicSuperbindBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			autobind(Integer.class).to(42);
-			autobind(raw(List.class).parametized(String.class)).to(
-					Arrays.asList(new String[] {}));
+			superbind(Integer.class).to(42);
+			superbind(raw(List.class).parametized(String.class)).to(emptyList());
 		}
-
 	}
 
 	private final Injector injector = Bootstrap.injector(
-			TestBasicAutobindBindsModule.class);
+			TestBasicSuperbindBindsModule.class);
 
 	@Test
-	void thatTheAutoboundTypeItselfIsBound() {
+	void superbindTypeItselfIsBound() {
 		assertEquals(42, injector.resolve(Integer.class).intValue());
 	}
 
 	@Test
-	void thatDirectSuperclassOfAutoboundTypeIsBound() {
+	void directSuperclassOfSuperbindTypeIsBound() {
 		assertEquals(42, injector.resolve(Number.class).intValue());
 	}
 
 	@Test
-	void thatSuperinterfaceOfAutoboundTypeIsBound() {
+	void superInterfaceOfSuperbindTypeIsBound() {
 		assertEquals(42, injector.resolve(Serializable.class));
 	}
 
 	@Test
-	void thatParametizedSuperinterfaceOfAutoboundTypeIsBound() {
+	void parametrizedSuperInterfaceOfSuperbindTypeIsBound() {
 		assertEquals(42, injector.resolve(
 				raw(Comparable.class).parametized(Integer.class)));
 	}
-
 }

@@ -30,7 +30,7 @@ import static se.jbee.inject.lang.Type.raw;
 /**
  * Installs all the build-in functionality by using the core API.
  */
-public enum CoreFeature implements Toggled<CoreFeature> {
+public enum DefaultFeature implements Toggled<DefaultFeature> {
 	/**
 	 * Adds: {@link Provider}s can be injected for all bound types.
 	 */
@@ -90,19 +90,23 @@ public enum CoreFeature implements Toggled<CoreFeature> {
 	/**
 	 * Adds: {@link Obtainable}s
 	 */
-	OBTAINABLE(true)
+	OBTAINABLE(true),
 
+	/**
+	 * Adds: injection {@link Type}, {@link Name} and {@link Dependency}.
+	 */
+	SELF(true)
 	;
 
 	public final boolean installedByDefault;
 
-	CoreFeature(boolean installedByDefault) {
+	DefaultFeature(boolean installedByDefault) {
 		this.installedByDefault = installedByDefault;
 	}
 
 	@Override
 	public void bootstrap(
-			Bootstrapper.ToggledBootstrapper<CoreFeature> bootstrapper) {
+			Bootstrapper.ToggledBootstrapper<DefaultFeature> bootstrapper) {
 		bootstrapper.install(ListBridgeModule.class, LIST);
 		bootstrapper.install(SetBridgeModule.class, SET);
 		bootstrapper.install(CollectionBridgeModule.class, COLLECTION);
@@ -116,6 +120,7 @@ public enum CoreFeature implements Toggled<CoreFeature> {
 		bootstrapper.install(PrimitiveArraysModule.class, PRIMITIVE_ARRAYS);
 		bootstrapper.install(AnnotatedWithModule.class, ANNOTATED_WITH);
 		bootstrapper.install(ObtainableModule.class, OBTAINABLE);
+		bootstrapper.install(SelfModule.class, SELF);
 	}
 
 	private static class LoggerModule extends BinderModule {
@@ -329,7 +334,52 @@ public enum CoreFeature implements Toggled<CoreFeature> {
 		protected void declare() {
 			asDefault().bind(Env.class).to(env());
 		}
+	}
 
+	private static final class SelfModule extends BinderModule {
+
+		@Override
+		protected void declare() {
+			asDefault().per(Scope.dependency) //
+					.starbind(Type.class) //
+					.toSupplier(SelfModule::supplyType);
+			asDefault().per(Scope.dependency) //
+					.starbind(Name.class) //
+					.toSupplier(SelfModule::supplyName);
+			asDefault().per(Scope.dependency) //
+					.starbind(Dependency.class) //
+					.toSupplier(SelfModule::supplyDependency);
+		}
+
+		private static Type<?> supplyType(Dependency<? super Type<?>> dep,
+				Injector context) {
+			return dep.injection(findTypeInjectionFrame(dep)).dependency.type;
+		}
+
+		private static Name supplyName(Dependency<? super Name> dep,
+				Injector context) {
+			Injection injected = dep.injection(1);
+			return injected.dependency.name.isAny()
+				   ? injected.target.instance.name
+				   : injected.dependency.name;
+		}
+
+		private static Dependency<?> supplyDependency(
+				Dependency<? super Dependency<?>> dep, Injector context) {
+			return dep.onTypeParameter().uninject();
+		}
+
+		private static int findTypeInjectionFrame(Dependency<?> dep) {
+			Type<?> target = dep.injection(1).dependency.type;
+			if (!target.isRawType())
+				return 1;
+			for (int frame = 2; frame < dep.injectionDepth(); frame++) {
+				Type<?> candidate = dep.injection(frame).dependency.type;
+				if (candidate.rawType == target.rawType && !candidate.isRawType())
+					return frame;
+			}
+			return 1;
+		}
 	}
 
 	private static final class PrimitiveArraysModule extends BinderModule {

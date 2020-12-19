@@ -41,7 +41,7 @@ public final class Source
 	@Override
 	public String toString() {
 		return ident.getSimpleName() + "#" + declarationNo
-			+ declarationType.name().charAt(0);
+			+ ":" + declarationType.name().charAt(0);
 	}
 
 	@Override

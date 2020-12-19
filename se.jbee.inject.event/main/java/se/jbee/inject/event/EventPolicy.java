@@ -5,13 +5,13 @@
  */
 package se.jbee.inject.event;
 
-import static java.lang.Math.max;
-
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BinaryOperator;
+
+import static java.lang.Math.max;
 
 /**
  * A {@link EventPolicy} controls how the {@link Event}s are processed by a

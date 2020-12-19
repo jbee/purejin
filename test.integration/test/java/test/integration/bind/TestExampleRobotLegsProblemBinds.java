@@ -90,9 +90,9 @@ class TestExampleRobotLegsProblemBinds {
 
 		@Override
 		protected void declare() {
-			per(Scope.targetInstance).construct(Foot.class);
 			bind(left, Leg.class).toConstructor();
 			bind(right, Leg.class).toConstructor();
+			per(Scope.targetInstance).construct(Foot.class);
 		}
 	}
 
@@ -109,9 +109,9 @@ class TestExampleRobotLegsProblemBinds {
 	}
 
 	private static void assertRobotHasDifferentLegsWithDifferentFeet(
-			Injector injector) {
-		Leg leftLeg = injector.resolve(left, Leg.class);
-		Leg rightLeg = injector.resolve(right, Leg.class);
+			Injector context) {
+		Leg leftLeg = context.resolve(left, Leg.class);
+		Leg rightLeg = context.resolve(right, Leg.class);
 		assertNotSame(rightLeg, leftLeg, "same leg");
 		assertNotSame(rightLeg.foot, leftLeg.foot, "same foot");
 	}

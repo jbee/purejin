@@ -5,9 +5,7 @@
  */
 package se.jbee.inject.event;
 
-import static java.lang.reflect.Proxy.newProxyInstance;
-import static se.jbee.inject.lang.Type.returnType;
-import static se.jbee.inject.event.EventException.unwrapGet;
+import se.jbee.inject.lang.Type;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -15,17 +13,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BinaryOperator;
 
-import se.jbee.inject.lang.Type;
+import static java.lang.reflect.Proxy.newProxyInstance;
+import static se.jbee.inject.event.EventException.unwrapGet;
+import static se.jbee.inject.lang.Type.returnType;
 
 /**
  * Default implementation of the {@link EventProcessor} supporting all

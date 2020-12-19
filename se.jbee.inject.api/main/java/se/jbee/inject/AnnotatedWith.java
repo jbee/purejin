@@ -1,5 +1,8 @@
 package se.jbee.inject;
 
+import se.jbee.inject.Annotated.Enhancer;
+import se.jbee.inject.lang.Type;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
@@ -7,9 +10,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.function.Supplier;
-
-import se.jbee.inject.Annotated.Enhancer;
-import se.jbee.inject.lang.Type;
 
 /**
  * Allows to resolve bound instances annotated with a certain {@link Annotation}

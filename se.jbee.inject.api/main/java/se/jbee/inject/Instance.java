@@ -9,9 +9,9 @@ import se.jbee.inject.lang.Qualifying;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.Typed;
 
-import static se.jbee.inject.lang.Type.raw;
-
 import java.io.Serializable;
+
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * Used to tell that we don#t want just one singleton at a time but multiple
@@ -84,7 +84,7 @@ public final class Instance<T> implements Typed<T>, Qualifying<Instance<?>>,
 
 	@Override
 	public String toString() {
-		return type.toString() + " " + name;
+		return type.toString() + (name.isDefault() ? "" : " " + name);
 	}
 
 	public boolean isAny() {

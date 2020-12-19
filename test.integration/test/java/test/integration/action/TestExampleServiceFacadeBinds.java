@@ -7,12 +7,12 @@ import se.jbee.inject.Scope;
 import se.jbee.inject.action.Action;
 import se.jbee.inject.action.ActionModule;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.config.ProducesBy;
 import se.jbee.inject.lang.Type;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static se.jbee.inject.action.Action.actionTypeOf;
-import static se.jbee.inject.config.ProducesBy.allMethods;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
@@ -49,7 +49,7 @@ class TestExampleServiceFacadeBinds {
 		protected void declare() {
 			construct(MathService.class);
 			construct(MathDependentService.class);
-			connect(allMethods).in(MathService.class).asAction();
+			connect(ProducesBy.OPTIMISTIC).in(MathService.class).asAction();
 			per(Scope.dependencyType)
 					.starbind(Service.class) //
 					.toSupplier(ServiceModule::supply);

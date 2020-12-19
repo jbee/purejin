@@ -1,15 +1,11 @@
 package se.jbee.inject.scope;
 
+import se.jbee.inject.*;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Function;
-
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Instance;
-import se.jbee.inject.Provider;
-import se.jbee.inject.Scope;
-import se.jbee.inject.UnresolvableDependency;
 
 /**
  * A {@link Scope} that maintains a map of instances where the key is derived

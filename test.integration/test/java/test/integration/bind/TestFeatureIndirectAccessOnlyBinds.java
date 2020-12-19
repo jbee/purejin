@@ -78,7 +78,7 @@ class TestFeatureIndirectAccessOnlyBinds {
 			withIndirectAccess().bind(Serializable.class).to("42");
 			withIndirectAccess().bind(Abstraction.class).to(
 					Implementation.class);
-			withIndirectAccess().autobind(
+			withIndirectAccess().superbind(
 					Implementation2.class).toConstructor();
 			construct(ValidReceiver.class);
 			construct(InvalidReceiver.class);

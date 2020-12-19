@@ -7,11 +7,11 @@ import se.jbee.inject.Scope;
 import se.jbee.inject.action.Action;
 import se.jbee.inject.action.ActionModule;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.config.ProducesBy;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static se.jbee.inject.action.Action.actionTypeOf;
-import static se.jbee.inject.config.ProducesBy.allMethods;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
@@ -30,6 +30,7 @@ import static se.jbee.inject.lang.Type.raw;
  */
 class TestExampleCommandFacadeBinds {
 
+	@FunctionalInterface
 	private interface Command<P> {
 
 		long calc(P param);
@@ -40,7 +41,7 @@ class TestExampleCommandFacadeBinds {
 		@Override
 		protected void declare() {
 			construct(MathService.class);
-			connect(allMethods).in(MathService.class).asAction();
+			connect(ProducesBy.OPTIMISTIC).in(MathService.class).asAction();
 			per(Scope.dependencyType) //
 					.starbind(Command.class) //
 					.toSupplier(CommandModule::supply);

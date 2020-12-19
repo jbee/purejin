@@ -2,8 +2,9 @@ package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.DeclarationType;
+import se.jbee.inject.Env;
+import se.jbee.inject.Injector;
 import se.jbee.inject.bind.Binding;
-import se.jbee.inject.bind.Bindings;
 import se.jbee.inject.bind.Module;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
@@ -28,7 +29,6 @@ class TestBasicMultiModuleSetupBinds {
 			bind(String.class).to("2");
 			bind(Float.class).to(3.0f);
 		}
-
 	}
 
 	static class TestBasicMultiModuleSetupBindsModule2 extends BinderModule {
@@ -37,7 +37,6 @@ class TestBasicMultiModuleSetupBinds {
 		protected void declare() {
 			bind(Double.class).to(2.0);
 		}
-
 	}
 
 	static class TestBasicMultiModuleSetupBindsBundle
@@ -48,14 +47,14 @@ class TestBasicMultiModuleSetupBinds {
 			install(TestBasicMultiModuleSetupBindsModule1.class);
 			install(TestBasicMultiModuleSetupBindsModule2.class);
 		}
-
 	}
 
 	@Test
-	void thatBindingSourceReflectsTheOrigin() {
-		Binding<?>[] bindings = Bootstrap.bindings(Environment.DEFAULT,
-				TestBasicMultiModuleSetupBindsBundle.class,
-				Bindings.newBindings());
+	void bindingSourceReflectsTheOrigin() {
+		Injector context = Bootstrap.injector(Environment.DEFAULT //
+						.with(Env.GP_BIND_BINDINGS, true),
+				TestBasicMultiModuleSetupBindsBundle.class);
+		Binding<?>[] bindings = context.resolve(Binding[].class);
 
 		assertBinding(TestBasicMultiModuleSetupBindsModule1.class, 1, EXPLICIT,
 				forType(Integer.class, bindings));

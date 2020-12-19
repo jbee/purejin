@@ -6,7 +6,7 @@ import se.jbee.inject.UnresolvableDependency.UnstableDependency;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.defaults.CoreFeature;
+import se.jbee.inject.defaults.DefaultFeature;
 import se.jbee.inject.lang.Type;
 
 import java.util.HashSet;
@@ -45,7 +45,7 @@ import static se.jbee.inject.lang.Type.raw;
  * <p>
  * The {@link Provider} can then be used to overcome the limitations and allow
  * injecting unstable dependencies into stable ones. By default this feature
- * is not installed. To enable it install {@link CoreFeature#PROVIDER}.
+ * is not installed. To enable it install {@link DefaultFeature#PROVIDER}.
  */
 class TestFeatureProviderBinds {
 
@@ -57,7 +57,7 @@ class TestFeatureProviderBinds {
 	static final Instance<WorkingStateConsumer> B = instance(named("B"),
 			raw(WorkingStateConsumer.class));
 
-	@Installs(features = CoreFeature.class)
+	@Installs(features = DefaultFeature.class)
 	private static class TestFeatureProviderBindsModule extends BinderModule {
 
 		@Override
@@ -158,8 +158,8 @@ class TestFeatureProviderBinds {
 		Exception ex = assertThrows(UnstableDependency.class,
 				() -> context.resolve(FaultyStateConsumer.class));
 		assertEquals("Unstable dependency injection" +
-						"\n" + "\t  of: test.integration.bind.TestFeatureProviderBinds.DynamicState  in * into * => *  scoped injection" +
-						"\n" + "\tinto: test.integration.bind.TestFeatureProviderBinds.FaultyStateConsumer  in * into * => *  scoped application",
+						"\n" + "\t  of: test.integration.bind.TestFeatureProviderBinds.DynamicState scoped injection" +
+						"\n" + "\tinto: test.integration.bind.TestFeatureProviderBinds.FaultyStateConsumer scoped application",
 				ex.getMessage());
 	}
 

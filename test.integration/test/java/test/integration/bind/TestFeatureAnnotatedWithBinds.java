@@ -9,6 +9,7 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Environment;
+import se.jbee.inject.config.SharesBy;
 
 import java.lang.annotation.*;
 import java.lang.reflect.AnnotatedElement;
@@ -19,8 +20,7 @@ import java.util.List;
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static se.jbee.inject.config.ProducesBy.declaredMethods;
-import static se.jbee.inject.config.SharesBy.declaredFields;
+import static se.jbee.inject.config.ProducesBy.OPTIMISTIC;
 
 class TestFeatureAnnotatedWithBinds {
 
@@ -87,8 +87,8 @@ class TestFeatureAnnotatedWithBinds {
 			bind(Bean.class).toConstructor();
 			bind(Service.class).to(ServiceImpl.class);
 			autobind() //
-					.produceBy(declaredMethods.annotatedWith(Marker.class)) //
-					.shareBy(declaredFields.annotatedWith(Marker.class)) //
+					.produceBy(OPTIMISTIC.annotatedWith(Marker.class)) //
+					.shareBy(SharesBy.OPTIMISTIC.annotatedWith(Marker.class)) //
 					.in(this);
 		}
 

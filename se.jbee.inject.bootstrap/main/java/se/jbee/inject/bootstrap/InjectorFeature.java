@@ -1,6 +1,7 @@
 package se.jbee.inject.bootstrap;
 
-import se.jbee.inject.*;
+import se.jbee.inject.Env;
+import se.jbee.inject.Injector;
 import se.jbee.inject.bind.Bindings;
 import se.jbee.inject.bind.Bootstrapper;
 import se.jbee.inject.bind.Bundle;

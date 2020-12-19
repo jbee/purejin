@@ -44,7 +44,7 @@ public final class Injection implements Serializable {
 
 	@Override
 	public String toString() {
-		return dependency + " for " + target + " ?";
+		return dependency + " from " + target;
 	}
 
 	public Injection ignoredScoping() {

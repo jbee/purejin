@@ -5,12 +5,12 @@
  */
 package se.jbee.inject.event;
 
+import se.jbee.inject.BuildUp;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeoutException;
-
-import se.jbee.inject.BuildUp;
 
 /**
  * The {@link EventProcessor} is the unit that functionally connects the

@@ -42,7 +42,7 @@ public final class InconsistentBinding extends InconsistentDeclaration {
 	public static InconsistentBinding undefinedEnvProperty(Name name,
 			Type<?> property, Package scope) {
 		return new InconsistentBinding(
-				"Attempt to resolve environment property failed, no value was bound to "
+				"Missing environment property: "
 					+ name + " of type " + property + " in " + scope);
 	}
 
@@ -59,7 +59,7 @@ public final class InconsistentBinding extends InconsistentDeclaration {
 					+ b);
 	}
 
-	public static InconsistentBinding loop(Binding<?> inconsistent,
+	public static InconsistentBinding referenceLoop(Binding<?> inconsistent,
 			Instance<?> linked, Instance<?> bound) {
 		return new InconsistentBinding(
 				"Detected a self-referential binding: \n\t" + bound + " => "

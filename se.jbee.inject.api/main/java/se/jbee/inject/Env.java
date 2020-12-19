@@ -51,6 +51,8 @@ public interface Env {
 	 */
 	String GP_USE_VERIFICATION = "verify";
 
+	String GP_BIND_BINDINGS = "self-bind";
+
 	<T> T property(Name qualifier, Type<T> property, Package ns)
 			throws InconsistentDeclaration;
 

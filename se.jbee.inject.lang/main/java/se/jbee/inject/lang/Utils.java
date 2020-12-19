@@ -5,28 +5,18 @@
  */
 package se.jbee.inject.lang;
 
+import java.lang.reflect.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.*;
+
 import static java.lang.System.arraycopy;
 import static java.lang.reflect.Array.newInstance;
-import static java.lang.reflect.Modifier.isAbstract;
-import static java.lang.reflect.Modifier.isPrivate;
-import static java.lang.reflect.Modifier.isProtected;
-import static java.lang.reflect.Modifier.isPublic;
+import static java.lang.reflect.Modifier.*;
 import static java.util.Arrays.copyOf;
-import static se.jbee.inject.lang.Type.raw;
-
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Target;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.Collection;
-import java.util.NoSuchElementException;
-import java.util.function.*;
+import static se.jbee.inject.lang.Type.*;
 
 /**
  * Language level utility methods for the library.
@@ -51,15 +41,46 @@ public final class Utils {
 
 	/* Arrays */
 
+	public static <T> T[] arrayConcat(T[] a, T[] b) {
+		if (a == null)
+			return b;
+		if (b == null)
+			return a;
+		if (a.length == 0)
+			return b;
+		if (b.length == 0)
+			return a;
+		T[] both = Arrays.copyOf(a, a.length + b.length);
+		System.arraycopy(b, 0, both, a.length, b.length);
+		return both;
+	}
+
+	/**
+	 * This implementation assumes that the array passed is usually short (< 20)
+	 * and that usually the filter does accept all elements it is the case for
+	 * example with lists of {@link Member}s and filters on those.
+	 *
+	 * @param arr    an array or null
+	 * @param accept a {@link Predicate} that returns true for those elements
+	 *               that should stay
+	 * @param <A>    array element type
+	 * @return the filtered array, the same instance if all elements get
+	 * accepted, or a new instance of some get filtered out
+	 */
 	public static <A> A[] arrayFilter(A[] arr, Predicate<A> accept) {
 		if (arr == null || arr.length == 0)
 			return arr;
-		A[] accepted = newArray(arr, arr.length);
+		int[] acceptedIndex = new int[arr.length];
 		int j = 0;
-		for (A a : arr)
-			if (accept.test(a))
-				accepted[j++] = a;
-		return j == arr.length ? arr : copyOf(accepted, j);
+		for (int i = 0; i < arr.length; i++)
+			if (accept.test(arr[i]))
+				acceptedIndex[j++] = i;
+		if (j == arr.length)
+			return arr;
+		A[] accepted = newArray(arr, j);
+		for (int i = 0; i < j; i++)
+			accepted[i] = arr[acceptedIndex[i]];
+		return accepted;
 	}
 
 	public static <A> A[] arrayAppend(A[] arr, A e) {
@@ -197,50 +218,22 @@ public final class Utils {
 		return list.toArray(newArray(type, list.size()));
 	}
 
-	/* Annotations */
-
-	public static Method annotationPropertyByType(Class<?> type,
-			Class<? extends Annotation> annotation) {
-		return arrayFindFirst(annotation.getDeclaredMethods(),
-				m -> m.getReturnType() == type);
+	public static <A, B> List<B> arrayFilter(Class<A> root, Class<?> top,
+			Function<Class<?>, B[]> map2elems, Predicate<B> filter) {
+		List<B> res = new ArrayList<>();
+		arrayFilter(root, top, map2elems, filter, res);
+		return res;
 	}
 
-	public static String annotatedName(Method nameProperty, Annotation obj) {
-		if (obj == null)
-			return null;
-		try {
-			String name = (String) nameProperty.invoke(obj);
-			if (!name.isEmpty() && !name.equals(nameProperty.getDefaultValue()))
-				return name;
-		} catch (Exception e) {
-			// fall through
-		}
-		return null;
-	}
-
-	@SuppressWarnings("LoopConditionNotUpdatedInsideLoop")
-	public static <A extends Annotation> A annotation(Class<A> type,
-			AnnotatedElement obj) {
-		A res = obj.getAnnotation(type);
-		if (res != null)
-			return res;
-		if (!isAllowedOnAnnotations(type))
-			return null;
-		do {
-			for (Annotation a : obj.getAnnotations()) {
-				res = annotation(type, a.annotationType());
-				if (res != null)
-					return res;
-			}
-		} while (obj instanceof Class && obj != Object.class);
-		return null;
-	}
-
-	public static boolean isAllowedOnAnnotations(
-			Class<? extends Annotation> type) {
-		return type.isAnnotationPresent(Target.class)
-			&& arrayContains(type.getAnnotation(Target.class).value(),
-					e -> e == ElementType.ANNOTATION_TYPE);
+	public static <A, B> void arrayFilter(Class<A> root, Class<?> end,
+			Function<Class<?>, B[]> map2elems, Predicate<B> filter,
+			List<B> acc) {
+		if (root == null || root == end)
+			return;
+		for (B e : map2elems.apply(root))
+			if (filter == null || filter.test(e))
+				acc.add(e);
+		arrayFilter(root.getSuperclass(), end, map2elems, filter, acc);
 	}
 
 	/* Classes / Types */
@@ -268,7 +261,7 @@ public final class Utils {
 	 *         Note that this method just covers JRE types.
 	 */
 	@SuppressWarnings({ "squid:S1067", "squid:S1541" })
-	public static boolean isClassVirtual(Class<?> cls) {
+	private static boolean isClassNotConstructable(Class<?> cls) {
 		return cls == null || cls.isInterface() || cls.isEnum()
 			|| cls.isAnnotation() || cls.isAnonymousClass() || cls.isPrimitive()
 			|| cls.isArray() || isAbstract(cls.getModifiers())
@@ -276,20 +269,18 @@ public final class Utils {
 			|| cls == Boolean.class || cls == Void.class || cls == Class.class;
 	}
 
-	public static boolean isClassInstantiable(Class<?> cls) {
-		return !isClassVirtual(cls) && cls.getTypeParameters().length == 0;
+	public static boolean isClassConstructable(Class<?> cls) {
+		return !isClassNotConstructable(cls);
 	}
 
 	/**
 	 * @param cls Any {@link Class} object, not null
-	 * @return A {@link Class} is monomodal if it there is just a single
+	 * @return A {@link Class} concept is stateless if it there is just a single
 	 *         possible initial state. All newly created instances can just have
 	 *         this similar initial state but due to internal state they could
 	 *         (not necessarily must) develop (behave) different later on.
-	 *
-	 *         The opposite of monomodal is multimodal.
 	 */
-	public static boolean isClassMonomodal(Class<?> cls) {
+	public static boolean isClassConceptStateless(Class<?> cls) {
 		if (cls.isInterface())
 			return false;
 		if (cls == Object.class)
@@ -300,7 +291,7 @@ public final class Utils {
 		for (Constructor<?> c : cls.getDeclaredConstructors())
 			// maybe arguments are passed to super-type so we check it too
 			if (c.getParameterCount() > 0)
-				return isClassMonomodal(cls.getSuperclass());
+				return isClassConceptStateless(cls.getSuperclass());
 		return true;
 	}
 
@@ -314,7 +305,7 @@ public final class Utils {
 			&& !cls.isEnum() && !cls.isAnnotation() && !cls.isArray()
 			&& cls.getDeclaredConstructors().length == 1
 			&& cls.getDeclaredConstructors()[0].getParameterCount() == 0
-			&& isClassMonomodal(cls);
+			&& isClassConceptStateless(cls);
 	}
 
 	/* Members */
@@ -337,48 +328,26 @@ public final class Utils {
 		return a; // same
 	}
 
-	/**
-	 * Returns the constructor with most visible visibility and longest argument
-	 * list. Self-referencing constructors are ignored.
-	 *
-	 * @param <T> type that should be constructed/instantiated
-	 * @param type constructed type
-	 * @return The highest visibility constructor with the most parameters that
-	 *         does not have the declaring class itself as parameter type (some
-	 *         compiler seam to generate such a synthetic constructor)
-	 * @throws NoSuchElementException in case the type is not constructable (has
-	 *             no constructors at all)
-	 */
-	public static <T> Constructor<T> commonConstructor(Class<T> type) {
-		@SuppressWarnings("unchecked")
-		Constructor<T>[] cs = (Constructor<T>[]) type.getDeclaredConstructors();
-		if (cs.length == 0)
-			throw new NoSuchElementException("Type does not declare any constructors: " + type);
-		if (cs.length == 1)
-			return cs[0];
-		Constructor<T> mostParamsConstructor = null;
-		for (Constructor<T> c : cs)
-			mostParamsConstructor = commonConstructor(type,
-					mostParamsConstructor, c);
-		if (mostParamsConstructor == null)
-			throw new NoSuchElementException("Type does not declare any constructors: " + type);
-		return mostParamsConstructor;
+	public static int mostVisibleMostParametersToLeastVisibleLeastParameters(
+			Constructor<?> a, Constructor<?> b) {
+		return a.equals(b) ? 0 : moreVisibleMoreParameters(a, b) == b ? 1 : -1;
 	}
 
-	private static <T> Constructor<T> commonConstructor(Class<T> type,
-			Constructor<T> a, Constructor<T> b) {
-		return !arrayContains(b.getParameterTypes(), type, Class::equals) // avoid self referencing constructors (synthetic) as they cause endless loop
-			&& (a == null //
-				|| (moreVisible(b, a) == b && (moreVisible(a, b) == b
-					|| b.getParameterCount() > a.getParameterCount()))) ? b : a;
+	public static Constructor<?> moreVisibleMoreParameters(Constructor<?> a,
+			Constructor<?> b) {
+		if (a == null)
+			return b;
+		if (moreVisible(a, b) == b)
+			return b;
+		if (moreVisible(b, a) == a)
+			return a;
+		return b.getParameterCount() > a.getParameterCount() ? b : a;
 	}
 
-	public static <T> Constructor<T> commonConstructorOrNull(Class<T> type) {
-		try {
-			return commonConstructor(type);
-		} catch (NoSuchElementException e) {
-			return null;
-		}
+	public static <T> boolean isRecursiveTypeParameterPresent(Constructor<T> c) {
+		Class<T> t = c.getDeclaringClass();
+		return arrayContains(c.getParameterTypes(), t, Class::equals) // first check raw types
+				&& arrayContains(parameterTypes(c), classType(t), Type::equalTo); // then check full generic Type as it is much more work
 	}
 
 	public static <T> Constructor<T> noArgsConstructor(Class<T> type) {
@@ -393,7 +362,7 @@ public final class Utils {
 		}
 	}
 
-	/* Sequences */
+	/* Char Sequences */
 
 	public static boolean seqRegionEquals(CharSequence s1, CharSequence s2,
 			int length) {
@@ -436,6 +405,13 @@ public final class Utils {
 		}
 	}
 
+	public static <T> T construct(Class<T> type, Consumer<Constructor<T>> init,
+			Function<Exception, ? extends RuntimeException> exceptionTransformer) {
+		Constructor<T> target = noArgsConstructor(type);
+		init.accept(target);
+		return construct(target, new Object[0], exceptionTransformer);
+	}
+
 	public static Object produce(Method target, Object owner, Object[] args,
 			Function<Exception, ? extends RuntimeException> exceptionTransformer) {
 		try {
@@ -454,7 +430,8 @@ public final class Utils {
 		}
 	}
 
-	private static Function<Exception, ? extends RuntimeException> wrap(Function<Exception, ? extends RuntimeException> exceptionTransformer) {
+	private static Function<Exception, ? extends RuntimeException> wrap(
+			Function<Exception, ? extends RuntimeException> exceptionTransformer) {
 		return e -> {
 			if (e instanceof IllegalAccessException) {
 				IllegalAccessException extended = new IllegalAccessException(
@@ -465,13 +442,5 @@ public final class Utils {
 			}
 			return exceptionTransformer.apply(e);
 		};
-	}
-
-	public static <T> T instantiate(Class<T> type,
-			Consumer<Constructor> init,
-			Function<Exception, ? extends RuntimeException> exceptionTransformer) {
-		Constructor<T> target = noArgsConstructor(type);
-		init.accept(target);
-		return construct(target, new Object[0], exceptionTransformer);
 	}
 }

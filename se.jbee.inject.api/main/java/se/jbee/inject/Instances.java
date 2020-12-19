@@ -7,13 +7,13 @@ package se.jbee.inject;
 
 import se.jbee.inject.lang.Qualifying;
 
-import static java.util.Arrays.asList;
-import static se.jbee.inject.lang.Utils.arrayCompare;
-import static se.jbee.inject.lang.Utils.arrayPrepend;
-
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
+
+import static java.util.Arrays.asList;
+import static se.jbee.inject.lang.Utils.arrayCompare;
+import static se.jbee.inject.lang.Utils.arrayPrepend;
 
 /**
  * A hierarchy of {@link Instance}s.
@@ -70,7 +70,7 @@ public final class Instances implements Qualifying<Instances>,
 		StringBuilder b = new StringBuilder();
 		for (int i = 0; i < hierarchy.length; i++) {
 			if (i > 0)
-				b.append(" => ");
+				b.append(" within ");
 			b.append(hierarchy[i]);
 		}
 		return b.toString();

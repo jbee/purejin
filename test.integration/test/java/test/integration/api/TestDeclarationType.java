@@ -29,12 +29,12 @@ class TestDeclarationType {
 	void thatImplicitDefaultAutoReplacedByMulti() {
 		assertTrue(IMPLICIT.replacedBy(MULTI));
 		assertTrue(DEFAULT.replacedBy(MULTI));
-		assertTrue(AUTO.replacedBy(MULTI));
+		assertTrue(SUPER.replacedBy(MULTI));
 	}
 
 	@Test
 	void thatDefaultReplacedByAutoMultiOrExplicit() {
-		assertTrue(DEFAULT.replacedBy(AUTO));
+		assertTrue(DEFAULT.replacedBy(SUPER));
 		assertTrue(DEFAULT.replacedBy(MULTI));
 		assertTrue(DEFAULT.replacedBy(EXPLICIT));
 	}
@@ -60,7 +60,7 @@ class TestDeclarationType {
 
 	@Test
 	void thatAutoNotClashesWithAuto() {
-		assertFalse(AUTO.clashesWith(AUTO));
+		assertFalse(SUPER.clashesWith(SUPER));
 	}
 
 	@Test

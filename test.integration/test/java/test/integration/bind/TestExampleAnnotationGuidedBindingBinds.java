@@ -76,7 +76,7 @@ class TestExampleAnnotationGuidedBindingBinds {
 		protected void declare(Class<?> annotated) {
 			per(Scope.application)
 					.withIndirectAccess() // withIndirectAccess just used as an example (not needed)
-					.autobind(annotated).toConstructor();
+					.superbind(annotated).toConstructor();
 		}
 	}
 
