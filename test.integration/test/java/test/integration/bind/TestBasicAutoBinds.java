@@ -10,11 +10,10 @@ import se.jbee.inject.config.ProducesBy;
 import se.jbee.inject.config.SharesBy;
 
 import java.lang.reflect.Modifier;
-import java.util.HashSet;
 
-import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.lang.Type.raw;
+import static test.integration.util.TestUtils.assertEqualSets;
 
 /**
  * A test that shows usage of {@link Binder.ScopedBinder#autobind()}.
@@ -138,8 +137,8 @@ class TestBasicAutoBinds {
 	@Test
 	void methodSelectionWithOr() {
 		assertTrue(context.resolve(boolean.class), "wrong boolean method bound");
-		assertEquals(new HashSet<>(asList(2, 3, 12)),
-				new HashSet<>(asList(context.resolve(Integer[].class))));
+		assertEqualSets(new Integer[] { 2, 3, 12 },
+				context.resolve(Integer[].class));
 		assertThrows(UnresolvableDependency.class,
 				() -> context.resolve(double.class), "should not be bound");
 		assertThrows(UnresolvableDependency.class,

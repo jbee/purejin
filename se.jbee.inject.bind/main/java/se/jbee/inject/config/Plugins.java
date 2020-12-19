@@ -1,8 +1,6 @@
 package se.jbee.inject.config;
 
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Name;
+import se.jbee.inject.*;
 
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.lang.Type.raw;
@@ -12,10 +10,9 @@ import static se.jbee.inject.lang.Type.raw;
  * {@link Class}es for specific plugin points more convenient and formalise the
  * convention of the mechanism.
  *
- * @author Jan Bernitt
  * @since 8.1
  */
-public final class Plugins implements Extension {
+public final class Plugins implements ContextAware<Plugins>, Extension {
 
 	/**
 	 * The {@link Name} of the plugin-point.
@@ -45,6 +42,13 @@ public final class Plugins implements Extension {
 		this.target = target;
 	}
 
+	@Override
+	public Plugins inContext(Dependency<? super Plugins> context) {
+		if (context.isUntargeted())
+			return target == null ? this : targeting(null);
+		return targeting(context.target().type.rawType);
+	}
+
 	public Plugins targeting(Class<?> target) {
 		return new Plugins(context, target);
 	}
@@ -59,5 +63,9 @@ public final class Plugins implements Extension {
 				raw(Class[].class)).named(pluginPoint(point, property));
 		return context.resolve(
 				target == null ? plugins : plugins.injectingInto(target));
+	}
+
+	public Class<?> getTarget() {
+		return target;
 	}
 }

@@ -13,8 +13,7 @@ import se.jbee.inject.config.Plugins;
 import java.io.Serializable;
 import java.util.concurrent.Callable;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.*;
 import static test.integration.util.TestUtils.assertEqualSets;
 
 /**
@@ -49,8 +48,15 @@ class TestBasicPluginBinds {
 
 			// testing elimination of duplicates
 			plug(Integer.class).into(Long.class);
-			plug(Integer.class).into(Long.class); // 2x
+			plug(Integer.class).into(Long.class); // 2nd time
 			plug(Float.class).into(Long.class);
+
+			// testing ContextAware
+			construct(ContextAwarePlugins.class);
+			// just so we have a value as well
+			injectingInto(ContextAwarePlugins.class)
+					.plug(String.class)
+					.into(CharSequence.class);
 		}
 	}
 
@@ -64,6 +70,15 @@ class TestBasicPluginBinds {
 
 	private static class ExtensionInstanceOfAction {
 		// just to see that it is resolved as action class
+	}
+
+	public static class ContextAwarePlugins {
+
+		final Plugins plugins;
+
+		public ContextAwarePlugins(Plugins plugins) {
+			this.plugins = plugins;
+		}
 	}
 
 	private final Injector context = Bootstrap.injector(
@@ -98,5 +113,15 @@ class TestBasicPluginBinds {
 	void duplicatesAreEliminated() {
 		Class<?>[] classes = plugins.forPoint(Long.class);
 		assertEqualSets(new Class<?>[] { Integer.class, Float.class }, classes);
+	}
+
+	@Test
+	void pluginsAreInjectedContextAware() {
+		ContextAwarePlugins bean = context.resolve(ContextAwarePlugins.class);
+		assertNotNull(bean);
+		assertNotNull(bean.plugins);
+		assertEquals(ContextAwarePlugins.class, bean.plugins.getTarget());
+		assertEqualSets(new Class<?>[] { String.class },
+				bean.plugins.forPoint(CharSequence.class));
 	}
 }
