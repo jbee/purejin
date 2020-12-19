@@ -17,6 +17,7 @@ import java.lang.reflect.TypeVariable;
 import java.util.function.Function;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
 import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.lang.Type.returnType;
@@ -32,6 +33,11 @@ import static se.jbee.inject.lang.Utils.arrayFilter;
 @FunctionalInterface
 public interface ProducesBy {
 
+	/**
+	 * The default pool of methods contains all non synthetic {@link Method}
+	 * including all inherited ones except for those declared (and not
+	 * overridden) in {@link Object}.
+	 */
 	ProducesBy OPTIMISTIC = declaredMethods(m -> !m.isSynthetic(), true);
 
 	/**
@@ -42,25 +48,25 @@ public interface ProducesBy {
 	 */
 	Method[] reflect(Class<?> impl);
 
-	static ProducesBy declaredMethods(boolean recursive) {
-		return declaredMethods(null, recursive);
+	static ProducesBy declaredMethods(boolean includeInherited) {
+		return declaredMethods(null, includeInherited);
 	}
 
-	static ProducesBy declaredMethods(Predicate<Method> filter, boolean recursive) {
-		return methods(Class::getDeclaredMethods, filter, recursive);
+	static ProducesBy declaredMethods(Predicate<Method> filter,
+			boolean includeInherited) {
+		return methods(Class::getDeclaredMethods, filter, includeInherited);
 	}
 
-	static ProducesBy methods(Function<Class<?>, Method[]> selection,
-			Predicate<Method> filter, boolean recursive) {
-		return impl -> arrayFilter(impl,
-				recursive ? Object.class : impl.getSuperclass(), selection,
-				filter).toArray(Method[]::new);
+	static ProducesBy methods(Function<Class<?>, Method[]> pool,
+			Predicate<Method> filter, boolean includeInherited) {
+		return methods(pool, filter,
+				impl -> includeInherited ? Object.class : impl.getSuperclass());
 	}
 
-	static ProducesBy methods(Function<Class<?>, Method[]> selection,
-			Predicate<Method> filter, Class<?> top) {
-		return impl -> arrayFilter(impl, top, selection, filter)
-				.toArray(Method[]::new);
+	static ProducesBy methods(Function<Class<?>, Method[]> pool,
+			Predicate<Method> filter, UnaryOperator<Class<?>> end) {
+		return impl -> arrayFilter(impl, end.apply(impl), pool, filter)
+				.toArray(new Method[0]);
 	}
 
 	default ProducesBy orElse(ProducesBy whenNull) {
@@ -70,7 +76,7 @@ public interface ProducesBy {
 		};
 	}
 
-	default ProducesBy and(ProducesBy other) {
+	default ProducesBy or(ProducesBy other) {
 		return impl -> Utils.arrayConcat(reflect(impl), other.reflect(impl));
 	}
 
@@ -95,8 +101,12 @@ public interface ProducesBy {
 		return impl -> arrayFilter(reflect(impl), filter);
 	}
 
+	default ProducesBy selectStrictBy(Hint<?>... hints) {
+		return select(method -> Hint.matchesInOrder(method, hints));
+	}
+
 	default ProducesBy selectBy(Hint<?>... hints) {
-		return select(method -> Hint.matches(method, hints));
+		return select(method -> Hint.matchesInRandomOrder(method, hints));
 	}
 
 	default ProducesBy returnTypeAssignableTo(Type<?> supertype) {
@@ -122,6 +132,7 @@ public interface ProducesBy {
 	}
 
 	default ProducesBy in(Class<?> api) {
-		return select(method -> raw(method.getDeclaringClass()).isAssignableTo(raw(api)));
+		return select(method -> raw(method.getDeclaringClass()) //
+				.isAssignableTo(raw(api)));
 	}
 }

@@ -93,7 +93,21 @@ public final class Hint<T> implements Typed<T> {
 		return new Hint<>(asType, null, null, null);
 	}
 
-	public static boolean matches(Executable member, Hint<?>[] hints) {
+	public static boolean matchesInOrder(Executable member, Hint<?>[] hints) {
+		if (hints.length == 0)
+			return true;
+		Type<?>[] types = parameterTypes(member);
+		int i = 0;
+		for (Hint<?> hint : hints) {
+			while (i < types.length && !hint.asType.isAssignableTo(types[i]))
+				i++;
+			if (i >= types.length)
+				return false;
+		}
+		return true;
+	}
+
+	public static boolean matchesInRandomOrder(Executable member, Hint<?>[] hints) {
 		if (hints.length == 0)
 			return true;
 		Type<?>[] types = parameterTypes(member);
@@ -103,7 +117,7 @@ public final class Hint<T> implements Typed<T> {
 			while (!matched && i < types.length) {
 				Type<?> type = types[i];
 				if (type != null && hint.asType.isAssignableTo(type)) {
-					types[i] = null;
+					types[i] = null; // nark as handled by removing it
 					matched = true;
 				}
 				i++;

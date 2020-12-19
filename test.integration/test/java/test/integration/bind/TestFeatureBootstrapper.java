@@ -178,7 +178,7 @@ class TestFeatureBootstrapper {
 			extends BinderModule {
 
 		@Override
-		protected Env configure(Env env) {
+		public Env configure(Env env) {
 			return Environment.override(env) //
 					.with(ConstructsBy.class,
 							OPTIMISTIC.annotatedWith(ConstructFrom.class));

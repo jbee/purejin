@@ -54,7 +54,7 @@ public interface ConstructsBy {
 	 */
 	ConstructsBy OPTIMISTIC = FIRST
 			.ignore(Utils::isRecursiveTypeParameterPresent) // ignore looping ones
-			.select(Hint::matches) // ignore those that don't match provided Hints
+			.select(Hint::matchesInRandomOrder) // ignore those that don't match provided Hints
 			.sortedBy(Utils::mostVisibleMostParametersToLeastVisibleLeastParameters);
 
 	default ConstructsBy sortedBy(Comparator<Constructor<?>> cmp) {

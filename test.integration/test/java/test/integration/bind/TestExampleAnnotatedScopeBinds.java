@@ -28,7 +28,7 @@ class TestExampleAnnotatedScopeBinds {
 	private static class TestExampleAnnotatedScopeBindsModule extends BinderModule {
 
 		@Override
-		protected Env configure(Env env) {
+		public Env configure(Env env) {
 			return Environment.override(env) //
 					.with(ScopesBy.class, //
 							ScopesBy.annotatedWith(Scoped.class, Scoped::value));

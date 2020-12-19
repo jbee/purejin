@@ -53,7 +53,14 @@ public abstract class BinderModule extends InitializedBinder
 		declare();
 	}
 
-	protected Env configure(Env env) {
+	/**
+	 * Override this to customise the {@link Env} used within this {@link
+	 * BinderModule}.
+	 *
+	 * @param env The "global" {@link Env}
+	 * @return the adjusted {@link Env} for this {@link BinderModule}
+	 */
+	public Env configure(Env env) {
 		return env;
 	}
 

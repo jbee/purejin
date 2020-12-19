@@ -2,17 +2,17 @@ package se.jbee.inject.config;
 
 import se.jbee.inject.Packages;
 import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.Utils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.TypeVariable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.function.Function;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
-import static java.util.Arrays.asList;
 import static se.jbee.inject.lang.Type.fieldType;
 import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.lang.Utils.arrayFilter;
@@ -32,17 +32,44 @@ import static se.jbee.inject.lang.Utils.arrayFilter;
 @FunctionalInterface
 public interface SharesBy {
 
-	Field[] __noFields = new Field[0];
+	SharesBy OPTIMISTIC = declaredFields(f -> !f.isSynthetic(), true);
 
 	/**
-	 * @return The {@link Field}s that should be used in the context this
-	 *         {@link SharesBy} is used.
+	 * @return The {@link Field}s that should be used in the context this {@link
+	 * SharesBy} is used. Return {@code null} when no decision has been made.
+	 * Returns empty array when the decision is to not share any fields.
 	 */
 	Field[] reflect(Class<?> impl);
 
-	SharesBy noFields = impl -> __noFields;
-	SharesBy declaredFields = ((SharesBy) Class::getDeclaredFields).ignoreSynthetic();
-	SharesBy allFields = ((SharesBy) SharesBy::allFields).ignoreSynthetic();
+	static SharesBy declaredFields(boolean includeInherited) {
+		return declaredFields(null, includeInherited);
+	}
+	static SharesBy declaredFields(Predicate<Field> filter, boolean includeInherited) {
+		return fields(Class::getDeclaredFields, filter, includeInherited);
+	}
+
+	static SharesBy fields(Function<Class<?>, Field[]> pool,
+			Predicate<Field> filter, boolean includeInherited) {
+		return fields(pool, filter,
+				impl -> includeInherited ? Object.class : impl.getSuperclass());
+	}
+
+	static SharesBy fields(Function<Class<?>, Field[]> pool,
+			Predicate<Field> filter, UnaryOperator<Class<?>> end) {
+		return impl -> arrayFilter(impl, end.apply(impl), pool, filter)
+				.toArray(new Field[0]);
+	}
+
+	default SharesBy orElse(SharesBy whenNull) {
+		return impl -> {
+			Field[] res = reflect(impl);
+			return res != null ? res : whenNull.reflect(impl);
+		};
+	}
+
+	default SharesBy or(SharesBy other) {
+		return impl -> Utils.arrayConcat(reflect(impl), other.reflect(impl));
+	}
 
 	default SharesBy ignoreStatic() {
 		return withModifier(((IntPredicate) Modifier::isStatic).negate());
@@ -84,15 +111,6 @@ public interface SharesBy {
 	default SharesBy in(Packages filter) {
 		return impl -> filter.contains(raw(impl))
 			? this.reflect(impl)
-			: __noFields;
-	}
-
-	static Field[] allFields(Class<?> type) {
-		List<Field> all = new ArrayList<>();
-		while (type != Object.class && type != null) {
-			all.addAll(asList(type.getDeclaredFields()));
-			type = type.getSuperclass();
-		}
-		return all.toArray(__noFields);
+			: null;
 	}
 }

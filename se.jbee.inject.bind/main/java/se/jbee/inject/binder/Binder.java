@@ -667,8 +667,11 @@ public class Binder {
 		}
 
 		private boolean bindSharesIn(Class<?> impl, Object instance) {
+			Field[] constants = sharesBy.reflect(impl);
+			if (constants == null || constants.length == 0)
+				return false;
 			boolean needsInstance = false;
-			for (Field constant : sharesBy.reflect(impl)) {
+			for (Field constant : constants) {
 				binder.per(Scope.container).bind(namesBy.reflect(constant),
 						fieldType(constant)).to(instance, constant);
 				needsInstance |= !isStatic(constant.getModifiers());

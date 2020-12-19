@@ -225,15 +225,15 @@ public final class Utils {
 		return res;
 	}
 
-	public static <A, B> void arrayFilter(Class<A> root, Class<?> top,
+	public static <A, B> void arrayFilter(Class<A> root, Class<?> end,
 			Function<Class<?>, B[]> map2elems, Predicate<B> filter,
 			List<B> acc) {
-		if (root == null || root == top)
+		if (root == null || root == end)
 			return;
 		for (B e : map2elems.apply(root))
 			if (filter == null || filter.test(e))
 				acc.add(e);
-		arrayFilter(root.getSuperclass(), top, map2elems, filter, acc);
+		arrayFilter(root.getSuperclass(), end, map2elems, filter, acc);
 	}
 
 	/* Classes / Types */
