@@ -4,8 +4,8 @@ import se.jbee.inject.Hint;
 import se.jbee.inject.InjectionSite;
 import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency;
+import se.jbee.inject.lang.Reflect;
 import se.jbee.inject.lang.Type;
-import se.jbee.inject.lang.Utils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -69,7 +69,8 @@ public final class ActionSite<A, B> {
 	public B call(Object[] args, Consumer<Exception> errorHandler) throws ActionExecutionFailed {
 		try {
 			Method action = target.action;
-			return out.rawType.cast(Utils.produce(action, target.instance, args,
+			return out.rawType.cast(
+					Reflect.produce(action, target.instance, args,
 					e -> UnresolvableDependency.SupplyFailed.valueOf(e, action)));
 		} catch (UnresolvableDependency.SupplyFailed e) {
 			Exception ex = e;

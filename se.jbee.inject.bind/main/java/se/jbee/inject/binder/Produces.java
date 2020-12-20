@@ -66,6 +66,13 @@ public final class Produces<T> implements Typed<T> {
 		return (Produces<E>) this;
 	}
 
+	/**
+	 * If a {@link Method} has a {@link Type} parameter as its first parameter
+	 * we assume it is meant to be the actual type.
+	 *
+	 * @return true if the target {@link Method} has a matching {@link Type}
+	 * parameter as it first parameter, otherwise false
+	 */
 	public boolean requestsActualType() {
 		if (target.getParameterCount() == 0)
 			return false;

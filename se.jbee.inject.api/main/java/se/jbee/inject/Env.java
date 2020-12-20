@@ -1,8 +1,8 @@
 package se.jbee.inject;
 
 import se.jbee.inject.lang.Cast;
+import se.jbee.inject.lang.Reflect;
 import se.jbee.inject.lang.Type;
-import se.jbee.inject.lang.Utils;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Member;
@@ -134,7 +134,7 @@ public interface Env {
 			Packages where = globalProperty(Env.GP_DEEP_REFLECTION_PACKAGES,
 					raw(Packages.class));
 			if (where.contains(target.getDeclaringClass()))
-				Utils.accessible(target);
+				Reflect.accessible(target);
 		}
 	}
 

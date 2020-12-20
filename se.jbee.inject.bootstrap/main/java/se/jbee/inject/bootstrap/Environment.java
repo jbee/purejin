@@ -8,8 +8,8 @@ import se.jbee.inject.bind.ValueBinder;
 import se.jbee.inject.config.*;
 import se.jbee.inject.defaults.DefaultBindingConsolidation;
 import se.jbee.inject.defaults.DefaultValueBinders;
+import se.jbee.inject.lang.Reflect;
 import se.jbee.inject.lang.Type;
-import se.jbee.inject.lang.Utils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -141,7 +141,7 @@ public final class Environment implements Env {
 	}
 
 	public <T> Environment withBinder(Class<? extends ValueBinder<T>> value) {
-		return withBinder(Utils.construct(value, this::accessible,
+		return withBinder(Reflect.construct(value, this::accessible,
 				e -> new InconsistentDeclaration("Failed to create ValueBinder of type: " + value, e)));
 	}
 
