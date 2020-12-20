@@ -7,6 +7,7 @@ package se.jbee.inject.binder;
 
 import se.jbee.inject.*;
 import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import se.jbee.inject.lang.Reflect;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.TypeVariable;
 import se.jbee.inject.lang.Utils;
@@ -116,9 +117,9 @@ public final class Supply {
 				Hint.match(parameterTypes(producer.target), producer.hints), null);
 	}
 
-	public static <T> Supplier<T> byNew(New<T> instantiation) {
-		return new Construct<>(instantiation.target, Hint.match(
-				parameterTypes(instantiation.target), instantiation.hints));
+	public static <T> Supplier<T> byNew(New<T> constructor) {
+		return new Construct<>(constructor.target, Hint.match(
+				parameterTypes(constructor.target), constructor.hints));
 	}
 
 	public static <T> Supplier<T> byAccess(Shares<T> constant) {
@@ -199,7 +200,7 @@ public final class Supply {
 		@Override
 		public T supply(Dependency<? super T> dep, Injector context)
 				throws UnresolvableDependency {
-			return (T) Utils.share(field.target, field.owner,
+			return (T) Reflect.share(field.target, field.owner,
 					e -> UnresolvableDependency.SupplyFailed.valueOf(e, field.target));
 		}
 
@@ -227,7 +228,7 @@ public final class Supply {
 
 		@Override
 		protected T invoke(Object[] args, Injector context) {
-			return Utils.construct(target, args,
+			return Reflect.construct(target, args,
 					e -> UnresolvableDependency.SupplyFailed.valueOf(e, target));
 		}
 
@@ -266,7 +267,7 @@ public final class Supply {
 		protected T invoke(Object[] args, Injector context) {
 			if (producer.isInstanceMethod && owner == null)
 				owner = context.resolve(producer.target.getDeclaringClass());
-			return returns.cast(Utils.produce(producer.target, owner, args,
+			return returns.cast(Reflect.produce(producer.target, owner, args,
 					e -> UnresolvableDependency.SupplyFailed.valueOf(e, producer.target)));
 		}
 
@@ -280,8 +281,8 @@ public final class Supply {
 							e -> e.getValue().apply(dep.type())));
 			java.lang.reflect.Parameter[] params = producer.target.getParameters();
 			for (int i = 0; i < actualTypeHints.length; i++) {
-				actualTypeHints[i] = actualTypeHints[i].withActualType(
-						params[i], actualTypes);
+				actualTypeHints[i] = actualTypeHints[i] //
+						.withActualType(params[i], actualTypes);
 			}
 			return actualTypeHints;
 		}

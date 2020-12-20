@@ -16,7 +16,7 @@ import se.jbee.inject.binder.ServiceLoaderEnvBundles;
 import se.jbee.inject.config.Edition;
 import se.jbee.inject.container.Container;
 import se.jbee.inject.defaults.DefaultsBundle;
-import se.jbee.inject.lang.Utils;
+import se.jbee.inject.lang.Reflect;
 
 import java.util.*;
 
@@ -149,7 +149,7 @@ public final class Bootstrap {
 		private <T> T createBundle(Class<T> bundle) {
 			// OBS: Here we do not use the env but always make the bundles accessible
 			// as this is kind of designed into the concept
-			return Utils.construct(bundle, Utils::accessible,
+			return Reflect.construct(bundle, Reflect::accessible,
 					e -> new InconsistentDeclaration("Failed to create bundle: " + bundle, e));
 		}
 

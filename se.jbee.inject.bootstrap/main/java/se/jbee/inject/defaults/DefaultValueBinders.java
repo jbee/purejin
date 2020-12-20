@@ -9,8 +9,8 @@ import se.jbee.inject.*;
 import se.jbee.inject.bind.*;
 import se.jbee.inject.binder.*;
 import se.jbee.inject.config.ConstructsBy;
+import se.jbee.inject.lang.Reflect;
 import se.jbee.inject.lang.Type;
-import se.jbee.inject.lang.Utils;
 
 import java.lang.reflect.Constructor;
 
@@ -172,7 +172,7 @@ public final class DefaultValueBinders {
 			Type<?> srcType = src.type();
 			if (avoidReferences && isClassBanal(srcType.rawType)) {
 				target.addExpanded(env, item,
-						new Constant<>(Utils.construct(srcType.rawType, env::accessible,
+						new Constant<>(Reflect.construct(srcType.rawType, env::accessible,
 								RuntimeException::new)).manual());
 						//TODO shouldn't this use New instead?
 				return;

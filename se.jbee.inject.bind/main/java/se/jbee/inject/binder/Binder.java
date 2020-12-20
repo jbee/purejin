@@ -6,6 +6,7 @@
 package se.jbee.inject.binder;
 
 import se.jbee.inject.*;
+import se.jbee.inject.Supplier;
 import se.jbee.inject.bind.*;
 import se.jbee.inject.config.*;
 import se.jbee.inject.lang.Type;
@@ -14,8 +15,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
+import java.util.function.*;
 
 import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Arrays.stream;
@@ -253,7 +253,7 @@ public class Binder {
 	 *
 	 * @return immutable fluent API
 	 */
-	public final TypedBinder<BuildUp<Injector>> upbind() {
+	public final UpbindBinder<Injector> upbind() {
 		return upbind(Injector.class);
 	}
 
@@ -262,7 +262,7 @@ public class Binder {
 	 *
 	 * @return immutable fluent API
 	 */
-	public final <T> TypedBinder<BuildUp<T>> upbind(Class<T> type) {
+	public final <T> UpbindBinder<T> upbind(Class<T> type) {
 		return upbind(raw(type));
 	}
 
@@ -271,8 +271,8 @@ public class Binder {
 	 *
 	 * @return immutable fluent API
 	 */
-	public final <T> TypedBinder<BuildUp<T>> upbind(Type<T> type) {
-		return multibind(BuildUp.buildUpTypeOf(type));
+	public final <T> UpbindBinder<T> upbind(Type<T> type) {
+		return multibind(BuildUp.buildUpTypeOf(type)).wrapAs(UpbindBinder::new);
 	}
 
 	public final <T> TypedBinder<T> multibind(Class<T> type) {
@@ -382,13 +382,42 @@ public class Binder {
 	}
 
 	/**
-	 * Small utility to make initialise instances where the initialisation is
-	 * depend on instances managed by the {@link Injector} easier.
+	 * Small utility to <b>lazily</b> run an initialisation function for the
+	 * target instances of the bound {@link BuildUp}.
+	 *
+	 * @param <T> type of the instances being {@link BuildUp}
+	 * @since 8.1
+	 */
+	public static class UpbindBinder<T> extends TypedBinder<BuildUp<T>> {
+
+		UpbindBinder(Bind bind, Locator<BuildUp<T>> locator) {
+			super(bind, locator);
+		}
+
+		public final void run(Consumer<T> function) {
+			to((target, as, context) -> {
+				function.accept(target);
+				return target;
+			});
+		}
+
+		public final void run(UnaryOperator<T> function) {
+			to(((target, as, context) -> function.apply(target)));
+		}
+	}
+
+	/**
+	 * Small utility to <b>eagerly</b> run an initialisation function for a
+	 * group instances managed by the {@link Injector}.
 	 * <p>
 	 * The basic principle is that the {@link #target} {@link Instance} is
 	 * initialised on the basis of some other dependency instance that is
 	 * resolved during initialisation phase and provided to the {@link
-	 * BiConsumer} function.
+	 * BiConsumer} function. This can be one or many of such instances.
+	 * <p>
+	 * In contrast to a plain {@link BuildUp} that runs <b>lazily</b> when an
+	 * instance of the matching type is constructed this initialisation is
+	 * performed directly after the {@link Injector} context is created.
 	 *
 	 * @param <T> type of the instances that should be build-up
 	 * @since 8.1
@@ -891,9 +920,13 @@ public class Binder {
 			this(bind.next(), new Locator<>(instance, bind.target));
 		}
 
-		TypedBinder(Bind bind, Locator<T> locator) {
+		protected TypedBinder(Bind bind, Locator<T> locator) {
 			this.bind = bind;
 			this.locator = locator;
+		}
+
+		protected <B> B wrapAs(BiFunction<Bind, Locator<T>, B> wrap) {
+			return wrap.apply(bind, locator);
 		}
 
 		private Env env() {
