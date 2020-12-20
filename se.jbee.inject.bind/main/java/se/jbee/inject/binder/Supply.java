@@ -129,7 +129,7 @@ public final class Supply {
 	/**
 	 * This effectively avoid redoing {@link Resource} resolution for each
 	 * invocation. Instead the {@link Resource} is resolved once and
-	 * continiously used from there on to {@link Resource#generate(Dependency)}
+	 * continuously used from there on to {@link Resource#generate(Dependency)}
 	 * the values.
 	 */
 	public static <T> Provider<T> byLazyProvider(Dependency<T> dep,

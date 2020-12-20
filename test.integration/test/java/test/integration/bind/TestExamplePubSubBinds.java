@@ -47,6 +47,8 @@ import static se.jbee.inject.lang.Type.raw;
  * very same instance of the 3 {@link Service} implementations. Otherwise the
  * instance resolved and subscribed is not the same instance that is resolved
  * when using the {@link Service}.
+ *
+ * @see TestExamplePostConstructBinds
  */
 class TestExamplePubSubBinds {
 
