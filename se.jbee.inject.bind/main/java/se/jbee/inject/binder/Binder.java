@@ -404,11 +404,37 @@ public class Binder {
 		public final void run(UnaryOperator<T> function) {
 			to(((target, as, context) -> function.apply(target)));
 		}
+
+		public <R> void by(Instance<? extends R> related,
+				BiConsumer<T, R> initFunction) {
+			to((target, as, context) -> {
+				initFunction.accept(target,
+						context.resolve(dependency(related).injectingInto(as)));
+				return target;
+			});
+		}
+
+		public final <R> void forEach(Class<? extends R> related,
+				BiConsumer<T, R> initFunction) {
+			forEach(raw(related), initFunction);
+		}
+
+		public <R> void forEach(Type<? extends R> related,
+				BiConsumer<T, R> initFunction) {
+			Dependency<? extends R[]> dep = dependency(
+					related.addArrayDimension().asUpperBound());
+			to((target, as, context) -> {
+				for (R arg : context.resolve(dep.injectingInto(as)))
+					initFunction.accept(target, arg);
+				return target;
+			});
+		}
 	}
 
 	/**
 	 * Small utility to <b>eagerly</b> run an initialisation function for a
-	 * group instances managed by the {@link Injector}.
+	 * group instances managed by the {@link Injector} at the end of the
+	 * bootstrapping process.
 	 * <p>
 	 * The basic principle is that the {@link #target} {@link Instance} is
 	 * initialised on the basis of some other dependency instance that is
@@ -419,7 +445,8 @@ public class Binder {
 	 * instance of the matching type is constructed this initialisation is
 	 * performed directly after the {@link Injector} context is created.
 	 *
-	 * @param <T> type of the instances that should be build-up
+	 * @param <T> type of the instances that should be setup during
+	 *            bootstrapping
 	 * @since 8.1
 	 */
 	public static class BootBinder<T> {
@@ -432,40 +459,40 @@ public class Binder {
 			this.target = target;
 		}
 
-		public <C> void forAny(Class<? extends C> dependency,
-				BiConsumer<T, C> initFunction) {
-			forEach(raw(dependency).addArrayDimension().asUpperBound(),
-					initFunction);
+		public final <R> void forEach(Class<? extends R> related,
+				BiConsumer<T, R> initFunction) {
+			forEach(raw(related), initFunction);
 		}
 
-		public <C> void forEach(Type<? extends C[]> dependencies,
-				BiConsumer<T, C> initFunction) {
-			binder.upbind().to((impl, as, injector) -> {
-				T obj = injector.resolve(target);
-				C[] args = injector.resolve(
-						dependency(dependencies).injectingInto(target));
-				for (C arg : args)
+		public <R> void forEach(Type<? extends R> related,
+				BiConsumer<T, R> initFunction) {
+			Dependency<? extends R[]> dep = dependency(
+					related.addArrayDimension().asUpperBound()) //
+					.injectingInto(target);
+			binder.upbind().to((impl, as, context) -> {
+				T obj = context.resolve(target);
+				for (R arg : context.resolve(dep))
 					initFunction.accept(obj, arg);
 				return impl;
 			});
 		}
 
-		public <C> void by(Class<? extends C> dependency,
-				BiConsumer<T, C> initFunction) {
-			by(defaultInstanceOf(raw(dependency)), initFunction);
+		public final <R> void by(Class<? extends R> related,
+				BiConsumer<T, R> initFunction) {
+			by(defaultInstanceOf(raw(related)), initFunction);
 		}
 
-		public <C> void by(Name depName, Class<? extends C> depType,
-				BiConsumer<T, C> initFunction) {
-			by(Instance.instance(depName, raw(depType)), initFunction);
+		public final <R> void by(Name relatedName,
+				Class<? extends R> relatedType, BiConsumer<T, R> initFunction) {
+			by(Instance.instance(relatedName, raw(relatedType)), initFunction);
 		}
 
-		public <C> void by(Instance<? extends C> dependency,
-				BiConsumer<T, C> initFunction) {
-			binder.upbind().to((impl, as, injector) -> {
-				T obj = injector.resolve(target);
-				C arg = injector.resolve(
-						dependency(dependency).injectingInto(target));
+		public <R> void by(Instance<? extends R> related,
+				BiConsumer<T, R> initFunction) {
+			binder.upbind().to((impl, as, context) -> {
+				T obj = context.resolve(target);
+				R arg = context.resolve(
+						dependency(related).injectingInto(as));
 				initFunction.accept(obj, arg);
 				return impl;
 			});

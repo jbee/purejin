@@ -2,51 +2,46 @@ package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.BuildUp;
+import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
-import se.jbee.inject.Supplier;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.binder.Binder;
-import se.jbee.inject.binder.Binder.BootBinder;
 import se.jbee.inject.binder.BinderModule;
+import se.jbee.inject.binder.BinderModuleWith;
+import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.lang.Type;
+import se.jbee.inject.bootstrap.Environment;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.bind.Bindings.supplyConstant;
-import static se.jbee.inject.lang.Type.raw;
 
 /**
- * A tests the shows how {@link BuildUp}s behind {@link Binder#boot(Class)}
- * can be used to automatically wire a pub-sub relation.
- *
+ * A tests the shows how {@link BuildUp}s behind {@link Binder#boot(Class)} can
+ * be used to automatically wire a pub-sub relation.
+ * <p>
  * In the test scenario there is a interface for a {@link Publisher} and a
- * {@link Subscriber} and 3 {@link Service}s that all also implement
- * {@link Subscriber}. Goal is to have them all
- * {@link Publisher#subscribe(Subscriber)} to the {@link PublisherImpl}
- * implementation. This works both for {@link Publisher#subscribe(Subscriber)}
- * being defined in the interface or only in the {@link PublisherImpl}
- * implementation.
- *
- * The important thing to understand is that wiring is done after the
- * {@link Injector} context has been created. The {@link BuildUp} resolves
- * the target instance (here the {@link PublisherImpl}) and the arguments. In
- * one case we use {@link Binder#multibind(Class)} to explicitly bind all three
- * implementation classes to the {@link Subscriber} interface. In the other
- * example we rely on implicit reference bindings being made. For example
- * {@code SomeService.class} is linked to the same constant supplied when bound
- * to {@link Service}.
- * {@link BootBinder#forAny(Class, java.util.function.BiConsumer)} fetches all
- * bound instances that do implement the target type (here {@link Subscriber}).
- *
- * In both examples it is important to end up with reference bindings to the
- * very same instance of the 3 {@link Service} implementations. Otherwise the
- * instance resolved and subscribed is not the same instance that is resolved
- * when using the {@link Service}.
+ * {@link Subscriber} and 3 {@link Service}s that all also implement {@link
+ * Subscriber}. Goal is to have them all {@link Publisher#subscribe(Subscriber)}
+ * to the {@link PublisherImpl} implementation. This works both for {@link
+ * Publisher#subscribe(Subscriber)} being defined in the interface or only in
+ * the {@link PublisherImpl} implementation.
+ * <p>
+ * This example uses {@link Binder#multibind(Class)} to make each of the
+ * implementations a {@link Subscriber} that is known within the {@link
+ * Injector} context. Another option would be to use {@link
+ * Binder#superbind(Class)} to simply bind an implementation to all its
+ * supertypes including its interfaces.
+ * <p>
+ * With all {@link Subscriber}s available as {@link Subscriber[]} the
+ * initialisation can be done in two ways. Eager wiring at the end of
+ * bootstrapping the {@link Injector} is done using {@link Binder#boot(Class)}
+ * (see {@link EagerSolution}). Lazy wiring at the point where the {@link
+ * Publisher} is created/resolved is done using {@link Binder#upbind(Class)}
+ * (see {@link LazySolution}).
  *
  * @see TestExamplePostConstructBinds
  */
@@ -67,7 +62,7 @@ class TestExamplePubSubBinds {
 
 	public static class PublisherImpl implements Publisher {
 
-		private final List<Subscriber> subs = new ArrayList<>();
+		final List<Subscriber> subs = new ArrayList<>();
 
 		@Override
 		public void subscribe(Subscriber sub) {
@@ -85,118 +80,108 @@ class TestExamplePubSubBinds {
 
 	public static class SomeService implements Service, Subscriber {
 
-		boolean event;
+		int events;
 
 		@Override
 		public void onEvent() {
-			event = true;
+			events++;
 		}
 
 	}
 
 	public static class AnotherService implements Service, Subscriber {
 
-		boolean event;
+		int events;
 
 		@Override
 		public void onEvent() {
-			event = true;
+			events++;
 		}
 	}
 
 	public static class PredefinedService implements Service, Subscriber {
 
-		boolean event;
+		int events;
 
 		@Override
 		public void onEvent() {
-			event = true;
+			events++;
 		}
 	}
 
-	private static class TestExamplePubSubBindsModule1 extends BinderModule {
+	private static class CommonPartOfSolution
+			extends BinderModuleWith<Publisher> {
 
-		/**
-		 * Any of the below could have been in another module
-		 */
 		@Override
-		protected void declare() {
-			// a constant
-			bind(Service.class).to(new SomeService());
-
-			// a reference and implicit constructor
+		protected void declare(Publisher value) {
+			bind(named("some"), Service.class).to(SomeService.class);
 			bind(named("ref"), Service.class).to(AnotherService.class);
+			bind(named("pre"), Service.class).to(PredefinedService.class);
 
-			// a predefined (unknown constant) with aid of explicit multibind to Subscriber
-			Supplier<PredefinedService> predefined = supplyConstant(
-					new PredefinedService());
-			bind(named("pre"), Service.class).toSupplier(predefined);
-			multibind(Subscriber.class).toSupplier(predefined);
-
-			bind(Publisher.class).to(PublisherImpl.class);
-			boot(PublisherImpl.class).forAny(Subscriber.class,
-					Publisher::subscribe);
-		}
-	}
-
-	/**
-	 * An alternative way is to use {@link #multibind(Class)} and
-	 * {@link BootBinder#forEach(Type, java.util.function.BiConsumer)}.
-	 */
-	private static class TestExamplePubSubBindsModule2 extends BinderModule {
-
-		/**
-		 * Any of the below could have been in another module
-		 */
-		@Override
-		protected void declare() {
-			// a constant
-			bind(SomeService.class).to(new SomeService());
-			bind(Service.class).to(SomeService.class);
 			multibind(Subscriber.class).to(SomeService.class);
-
-			// a reference and implicit constructor
-			bind(named("ref"), Service.class).to(AnotherService.class);
 			multibind(Subscriber.class).to(AnotherService.class);
+			multibind(Subscriber.class).to(PredefinedService.class);
 
-			// a predefined (unknown constant) with aid of explicit multibind to Subscriber
-			Supplier<PredefinedService> predefined = supplyConstant(
-					new PredefinedService());
-			bind(named("pre"), Service.class).toSupplier(predefined);
-			multibind(Subscriber.class).toSupplier(predefined);
-
-			bind(Publisher.class).to(PublisherImpl.class);
-			boot(PublisherImpl.class).forEach(raw(Subscriber[].class),
-					Publisher::subscribe);
+			// since we are using a constant but we want it to be affected by
+			// BuildUp we bind it as a scoped constant
+			// the reason for using a constant is just so we can verify in the
+			// test that in eager case the subscription is created with the
+			// context whereas in lazy case on resolving the publisher
+			bind(Publisher.class).toScoped(value);
 		}
+	}
 
+	@Installs(bundles = CommonPartOfSolution.class)
+	private static class EagerSolution extends BinderModule {
+
+		@Override
+		protected void declare() {
+			boot(Publisher.class) //
+					.forEach(Subscriber.class, Publisher::subscribe);
+		}
+	}
+
+	@Installs(bundles = CommonPartOfSolution.class)
+	private static class LazySolution extends BinderModule {
+
+		@Override
+		protected void declare() {
+			upbind(Publisher.class) //
+					.forEach(Subscriber.class, Publisher::subscribe);
+		}
 	}
 
 	@Test
-	void withMultibindAndForAny() {
-		assertSubscribedToPublisher(TestExamplePubSubBindsModule1.class);
+	void eagerlyEstablishPubSubRelationOnEndOfBootstrapping() {
+		assertSubscribedToPublisher(EagerSolution.class, 3);
 	}
 
 	@Test
-	void withMultibindAndForEach() {
-		assertSubscribedToPublisher(TestExamplePubSubBindsModule2.class);
+	void lazilyEstablishPubSubRelation() {
+		assertSubscribedToPublisher(LazySolution.class, 0);
 	}
 
 	private static void assertSubscribedToPublisher(
-			Class<? extends Bundle> bundle) {
-		Injector context = Bootstrap.injector(bundle);
-		Publisher pub = context.resolve(Publisher.class);
-		SomeService sub = context.resolve(SomeService.class);
-		AnotherService sub2 = context.resolve(AnotherService.class);
-		PredefinedService sub3 = (PredefinedService) context.resolve("pre",
-				Service.class);
+			Class<? extends Bundle> bundle, int initiallyExpectedSubscribers) {
+		PublisherImpl pub = new PublisherImpl();
+		Env env = Environment.DEFAULT.with(Publisher.class, pub);
+		Injector context = Bootstrap.injector(env, bundle);
+		// at this point the context is created by not necessarily any instances
+		// this is where the difference between eager and lazy shows
+		assertEquals(initiallyExpectedSubscribers, pub.subs.size());
+		assertSame(pub, context.resolve(PublisherImpl.class));
+		assertEquals(3, pub.subs.size(), "lazy did not cause subscription");
 
-		assertFalse(sub.event);
-		assertFalse(sub2.event);
-		assertFalse(sub3.event);
+		SomeService sub1 = context.resolve(SomeService.class);
+		AnotherService sub2 = context.resolve(AnotherService.class);
+		PredefinedService sub3 = context.resolve(PredefinedService.class);
+
+		assertEquals(0, sub1.events);
+		assertEquals(0, sub2.events);
+		assertEquals(0, sub3.events);
 		pub.publish();
-		assertTrue(sub.event);
-		assertTrue(sub2.event);
-		assertTrue(sub3.event);
+		assertEquals(1, sub1.events);
+		assertEquals(1, sub2.events);
+		assertEquals(1, sub3.events);
 	}
 }
