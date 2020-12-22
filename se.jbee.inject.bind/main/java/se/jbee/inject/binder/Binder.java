@@ -373,12 +373,12 @@ public class Binder {
 	 *            some method
 	 * @since 8.1
 	 */
-	public <T> InitBinder<T> init(Class<T> target) {
-		return init(Name.DEFAULT, raw(target));
+	public <T> BootBinder<T> boot(Class<T> target) {
+		return boot(Name.DEFAULT, raw(target));
 	}
 
-	public <T> InitBinder<T> init(Name name, Type<T> target) {
-		return new InitBinder<>(on(bind()), instance(name, target));
+	public <T> BootBinder<T> boot(Name name, Type<T> target) {
+		return new BootBinder<>(on(bind()), instance(name, target));
 	}
 
 	/**
@@ -422,12 +422,12 @@ public class Binder {
 	 * @param <T> type of the instances that should be build-up
 	 * @since 8.1
 	 */
-	public static class InitBinder<T> {
+	public static class BootBinder<T> {
 
 		private final Binder binder;
 		private final Instance<T> target;
 
-		protected InitBinder(Binder binder, Instance<T> target) {
+		protected BootBinder(Binder binder, Instance<T> target) {
 			this.binder = binder;
 			this.target = target;
 		}

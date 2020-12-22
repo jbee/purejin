@@ -6,7 +6,7 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Supplier;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.binder.Binder;
-import se.jbee.inject.binder.Binder.InitBinder;
+import se.jbee.inject.binder.Binder.BootBinder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.lang.Type;
@@ -21,7 +21,7 @@ import static se.jbee.inject.bind.Bindings.supplyConstant;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
- * A tests the shows how {@link BuildUp}s behind {@link Binder#init(Class)}
+ * A tests the shows how {@link BuildUp}s behind {@link Binder#boot(Class)}
  * can be used to automatically wire a pub-sub relation.
  *
  * In the test scenario there is a interface for a {@link Publisher} and a
@@ -40,7 +40,7 @@ import static se.jbee.inject.lang.Type.raw;
  * example we rely on implicit reference bindings being made. For example
  * {@code SomeService.class} is linked to the same constant supplied when bound
  * to {@link Service}.
- * {@link InitBinder#forAny(Class, java.util.function.BiConsumer)} fetches all
+ * {@link BootBinder#forAny(Class, java.util.function.BiConsumer)} fetches all
  * bound instances that do implement the target type (here {@link Subscriber}).
  *
  * In both examples it is important to end up with reference bindings to the
@@ -134,14 +134,14 @@ class TestExamplePubSubBinds {
 			multibind(Subscriber.class).toSupplier(predefined);
 
 			bind(Publisher.class).to(PublisherImpl.class);
-			init(PublisherImpl.class).forAny(Subscriber.class,
+			boot(PublisherImpl.class).forAny(Subscriber.class,
 					Publisher::subscribe);
 		}
 	}
 
 	/**
 	 * An alternative way is to use {@link #multibind(Class)} and
-	 * {@link InitBinder#forEach(Type, java.util.function.BiConsumer)}.
+	 * {@link BootBinder#forEach(Type, java.util.function.BiConsumer)}.
 	 */
 	private static class TestExamplePubSubBindsModule2 extends BinderModule {
 
@@ -166,7 +166,7 @@ class TestExamplePubSubBinds {
 			multibind(Subscriber.class).toSupplier(predefined);
 
 			bind(Publisher.class).to(PublisherImpl.class);
-			init(PublisherImpl.class).forEach(raw(Subscriber[].class),
+			boot(PublisherImpl.class).forEach(raw(Subscriber[].class),
 					Publisher::subscribe);
 		}
 
