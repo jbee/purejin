@@ -8,13 +8,10 @@ package se.jbee.inject.binder;
 import se.jbee.inject.Hint;
 import se.jbee.inject.bind.ValueBinder;
 import se.jbee.inject.lang.Type;
-import se.jbee.inject.lang.Typed;
 
 import java.lang.reflect.Method;
 
-import static java.lang.reflect.Modifier.isStatic;
 import static se.jbee.inject.lang.Type.parameterType;
-import static se.jbee.inject.lang.Type.raw;
 
 /**
  * A {@link Produces} is the {@link ValueBinder} expansion wrapper for a method
@@ -23,40 +20,37 @@ import static se.jbee.inject.lang.Type.raw;
  *
  * @param <T> type of the value yield by the factory method
  */
-public final class Produces<T> implements Typed<T> {
+public final class Produces<T> extends ReflectiveRef<Method, T> {
 
-	public static Produces<?> produces(Object owner, Method target,
-			Hint<?>... hints) {
-		return new Produces<>(owner, target, hints);
+	public static <T> Produces<? extends T> produces(Type<T> expectedType,
+			Object owner, Method target, Hint<?>... args) {
+		@SuppressWarnings("unchecked")
+		Type<? extends T> actualType = (Type<? extends T>) actualType(owner, target);
+		checkBasicCompatibility(Type.returnType(target), actualType, target);
+		return new Produces<>(expectedType, actualType, owner, target, args);
 	}
 
-	public final Object owner;
-	public final Method target;
-	public final Type<T> returns;
-	public final Hint<?>[] hints;
-	public final boolean isInstanceMethod;
-	public final boolean hasTypeVariables;
-
-	@SuppressWarnings("unchecked")
-	private Produces(Object owner, Method target, Hint<?>[] hints) {
-		this.returns = (Type<T>) Type.returnType(target);
-		this.target = target;
-		this.hints = hints;
-		this.owner = owner;
-		this.isInstanceMethod = !isStatic(target.getModifiers());
-		Type.returnType(target).toSupertype(returns); // make sure types are compatible
-		if (owner != null
-			&& !raw(owner.getClass()).isAssignableTo(raw(target.getDeclaringClass()))) {
-			throw new IllegalArgumentException(
-					"Owner of type " + owner.getClass()
-						+ " does not declare the target method: " + target);
-		}
-		this.hasTypeVariables = target.getTypeParameters().length > 0;
+	public static <T> Produces<?> produces(Object owner, Method target,
+			Hint<?>... args) {
+		@SuppressWarnings("unchecked")
+		Type<T> actualType = (Type<T>) actualType(owner, target);
+		checkBasicCompatibility(Type.returnType(target), actualType, target);
+		return new Produces<>(actualType, actualType, owner, target, args);
 	}
 
-	@Override
-	public Type<T> type() {
-		return returns;
+	private Produces(Type<? super T> expectedType, Type<T> actualType, Object owner, Method target, Hint<?>[] hints) {
+		super(expectedType, owner, target, hints, actualType);
+	}
+
+	private static Type<?> actualType(Object owner, Method target) {
+		return requiresActualReturnType(target, Method::getReturnType,
+				Method::getAnnotatedReturnType) //
+				? Type.actualReturnType(target,	actualDeclaringType(owner, target)) //
+				: Type.returnType(target);
+	}
+
+	public boolean declaresTypeParameters() {
+		return target.getTypeParameters().length > 0;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -79,6 +73,6 @@ public final class Produces<T> implements Typed<T> {
 		Type<?> parameterType = parameterType(target.getParameters()[0]);
 		if (parameterType.rawType != Type.class)
 			return false;
-		return parameterType.parameter(0).equalTo(returns);
+		return parameterType.parameter(0).equalTo(type());
 	}
 }

@@ -37,27 +37,46 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 			base = base.getComponentType();
 		}
 		if (base != type) {
-			Type<?> genericBase = withWildcardTypeParameters(base);
+			Type<?> genericBase = raw(base).varTypeParametersAsWildcards();
 			return new Type<>(type, genericBase.params);
 		}
-		return withWildcardTypeParameters(type);
+		return raw(type).varTypeParametersAsWildcards();
 	}
 
-	private static <T> Type<T> withWildcardTypeParameters(Class<T> type) {
-		Type<T> res = raw(type);
-		TypeVariable<?>[] typeParameters = type.getTypeParameters();
-		if (typeParameters.length > 0) {
-			return res.parametized(wildcards(typeParameters));
-		}
-		return res;
+	public static int typeVariableComparator(TypeVariable<?> a, TypeVariable<?> b) {
+		int res = a.getName().compareTo(b.getName());
+		if (res != 0)
+			return res;
+		if (a.getGenericDeclaration().equals(b.getGenericDeclaration()))
+			return 0;
+		return Integer.compare(a.getGenericDeclaration().hashCode(), b.getGenericDeclaration().hashCode());
 	}
 
-	public static Type<?> fieldType(Field field) {
-		return type(field.getGenericType());
+	private Type<T> varTypeParametersAsWildcards() {
+		TypeVariable<?>[] vars = rawType.getTypeParameters();
+		return vars.length == 0
+				? this
+				: parametized(actualTypes(vars, emptyTypeArguments()));
 	}
 
 	public static Type<?> actualFieldType(Field member, Type<?> genericDeclaringClass) {
-		return type(member.getGenericType(), actualTypeArguments(genericDeclaringClass));
+		return genericType(member.getGenericType(), actualTypeArguments(genericDeclaringClass));
+	}
+
+	public static Type<?> actualReturnType(Method member, Type<?> genericDeclaringClass) {
+		return genericType(member.getGenericReturnType(), actualTypeArguments(genericDeclaringClass));
+	}
+
+	public static Type<?> actualReturnType(Constructor<?> member, Type<?> genericDeclaringClass) {
+		return genericType(member.getAnnotatedReturnType().getType(), actualTypeArguments(genericDeclaringClass));
+	}
+
+	public static Type<?> actualParameterType(java.lang.reflect.Parameter param, Type<?> genericDeclaringClass) {
+		return genericType(param.getParameterizedType(), actualTypeArguments(genericDeclaringClass));
+	}
+
+	public static Type<?> fieldType(Field field) {
+		return genericType(field.getGenericType());
 	}
 
 	/**
@@ -71,19 +90,11 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 	 * parameters with lower bounds)
 	 */
 	public static Type<?> returnType(Method method) {
-		return type(method.getGenericReturnType());
-	}
-
-	public static Type<?> actualReturnType(Method member, Type<?> genericDeclaringClass) {
-		return type(member.getGenericReturnType(), actualTypeArguments(genericDeclaringClass));
+		return genericType(method.getGenericReturnType());
 	}
 
 	public static Type<?> parameterType(java.lang.reflect.Parameter param) {
-		return type(param.getParameterizedType());
-	}
-
-	public static Type<?> actualParameterType(java.lang.reflect.Parameter param, Type<?> genericDeclaringClass) {
-		return type(param.getParameterizedType(), actualTypeArguments(genericDeclaringClass));
+		return genericType(param.getParameterizedType());
 	}
 
 	public static Type<?>[] parameterTypes(Executable methodOrConstructor) {
@@ -92,72 +103,84 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 
 	private static Type<?>[] parameterTypes(
 			java.lang.reflect.Type[] genericParameterTypes) {
-		return Utils.arrayMap(genericParameterTypes, Type.class, Type::type);
+		return Utils.arrayMap(genericParameterTypes, Type.class, Type::genericType);
 	}
 
-	public static Type<?>[] wildcards(TypeVariable<?>... variables) {
-		Type<?>[] wildcards = new Type<?>[variables.length];
-		Arrays.fill(wildcards, WILDCARD);
-		for (int i = 0; i < variables.length; i++) {
-			wildcards[i] = wildcard(variables[i]);
-		}
-		return wildcards;
+	public static Type<?>[] actualTypes(TypeVariable<?>[] vars,
+			Map<TypeVariable<?>, Type<?>> actualTypeArguments) {
+		Type<?>[] actualTypes = new Type<?>[vars.length];
+		for (int i = 0; i < vars.length; i++)
+			actualTypes[i] = actualType(vars[i], actualTypeArguments);
+		return actualTypes;
 	}
 
-	private static Type<?> wildcard(TypeVariable<?> var) {
-		return var.getBounds().length == 1
-			? Type.type(var.getBounds()[0]).asUpperBound()
-			: WILDCARD;
+	private static Type<?> actualType(TypeVariable<?> var,
+			Map<TypeVariable<?>, Type<?>> actualTypeArguments) {
+		Type<?> actualType = actualTypeArguments.get(var);
+		if (actualType != null)
+			return actualType;
+		if (actualTypeArguments.containsKey(var)) // we have or are in the process of computing that variable
+			return Type.WILDCARD;
+		actualTypeArguments.put(var, null); // not yet have it but we want to stop looking it up again so we mark it by putting a null for the name
+		actualType = var.getBounds().length == 1
+				? Type.genericType(var.getBounds()[0], actualTypeArguments).asUpperBound()
+				: WILDCARD;
+		// now we actually have it and add it...
+		actualTypeArguments.put(var, actualType);
+		return actualType;
 	}
 
 	public static <T> Type<T> raw(Class<T> type) {
 		return new Type<>(type);
 	}
 
-	private static Type<?>[] types(java.lang.reflect.Type[] parameters,
-			Map<String, Type<?>> actualTypeArguments) {
-		return Utils.arrayMap(parameters, Type.class,
-				p -> type(p, actualTypeArguments));
+	private static Type<?>[] genericTypes(java.lang.reflect.Type[] types,
+			Map<TypeVariable<?>, Type<?>> actualTypeArguments) {
+		if (types.length == 0)
+			return new Type[0];
+		return Utils.arrayMap(types, Type.class,
+				p -> genericType(p, actualTypeArguments));
 	}
 
-	private static Type<?> type(java.lang.reflect.Type type) {
-		return type(type, Collections.emptyMap());
+	private static Type<?> genericType(java.lang.reflect.Type type) {
+		return genericType(type, emptyTypeArguments());
 	}
 
 	@SuppressWarnings("ChainOfInstanceofChecks")
-	public static Type<?> type(java.lang.reflect.Type type,
-			Map<String, Type<?>> actualTypeArguments) {
+	public static Type<?> genericType(java.lang.reflect.Type type,
+			Map<TypeVariable<?>, Type<?>> actualTypeArguments) {
 		if (type instanceof Class<?>)
 			return classType((Class<?>) type);
 		if (type instanceof ParameterizedType)
-			return parameterizedType((ParameterizedType) type,
+			return genericType((ParameterizedType) type,
 					actualTypeArguments);
-		if (type instanceof TypeVariable<?>) {
-			TypeVariable<?> var = (TypeVariable<?>) type;
-			Type<?> typeArgument = actualTypeArguments.get(var.getName());
-			return typeArgument == null ? wildcard(var) : typeArgument;
-		}
+		if (type instanceof TypeVariable<?>)
+			return actualType((TypeVariable<?>) type, actualTypeArguments);
 		if (type instanceof GenericArrayType) {
 			GenericArrayType gat = (GenericArrayType) type;
-			return type(gat.getGenericComponentType(),
+			return genericType(gat.getGenericComponentType(),
 					actualTypeArguments).addArrayDimension();
 		}
 		if (type instanceof WildcardType) {
 			WildcardType wt = (WildcardType) type;
 			java.lang.reflect.Type[] upperBounds = wt.getUpperBounds();
 			if (upperBounds.length == 1)
-				return type(upperBounds[0], actualTypeArguments).asUpperBound();
+				return genericType(upperBounds[0], actualTypeArguments).asUpperBound();
 		}
 		throw new UnsupportedOperationException(
 				"Type has no support yet: " + type);
 	}
 
-	private static <T> Type<T> parameterizedType(ParameterizedType type,
-			Map<String, Type<?>> actualTypeArguments) {
+	private static <T> Type<T> genericType(ParameterizedType type,
+			Map<TypeVariable<?>, Type<?>> actualTypeArguments) {
 		@SuppressWarnings("unchecked")
 		Class<T> rawType = (Class<T>) type.getRawType();
+		java.lang.reflect.Type[] typeArguments = type.getActualTypeArguments();
+		if (typeArguments.length == 1)
+			return new Type<>(rawType, new Type[] {
+					genericType(typeArguments[0], actualTypeArguments) });
 		return new Type<>(rawType,
-				types(type.getActualTypeArguments(), actualTypeArguments));
+				genericTypes(typeArguments, actualTypeArguments));
 	}
 
 	public final Class<T> rawType;
@@ -400,7 +423,8 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 	public Type<T> parametizedAsUpperBounds() {
 		if (!isParameterized())
 			return isRawType()
-				? parametized(wildcards(rawType.getTypeParameters()))
+				? parametized(actualTypes(rawType.getTypeParameters(),
+					emptyTypeArguments()))
 				: this;
 		if (allTypeParametersAreUpperBounds())
 			return this;
@@ -476,26 +500,34 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 		return str.toString();
 	}
 
-	private void checkTypeParameters(Type<?>... params) {
-		if (params.length == 0)
+	private void checkTypeParameters(Type<?>... args) {
+		if (args.length == 0)
 			return; // is treated as raw-type
 		if (arrayDimensions() > 0) {
-			baseType().checkTypeParameters(params);
+			baseType().checkTypeParameters(args);
 			return;
 		}
 		TypeVariable<Class<T>>[] vars = rawType.getTypeParameters();
-		if (vars.length != params.length)
+		if (vars.length != args.length)
 			throw new IllegalArgumentException(
-					"Invalid nuber of type arguments - " + rawType
+					"Invalid number of type arguments - " + rawType
 						+ " has type variables " + Arrays.toString(vars)
-						+ " but got:" + Arrays.toString(params));
-		for (int i = 0; i < vars.length; i++) {
-			for (java.lang.reflect.Type t : vars[i].getBounds()) {
-				Type<?> var = type(t, new HashMap<>());
-				if (t != Object.class && !params[i].isAssignableTo(var)) {
-					throw new IllegalArgumentException(params[i]
-						+ " is not assignable to the type variable: " + var);
-				}
+						+ " but got:" + Arrays.toString(args));
+		Map<TypeVariable<?>, Type<?>> actualTypeArguments = emptyTypeArguments();
+		for (int i = 0; i < vars.length; i++)
+			checkTypeParameters(vars[i], args[i], actualTypeArguments);
+	}
+
+	private void checkTypeParameters(TypeVariable<Class<T>> var, Type<?> arg,
+			Map<TypeVariable<?>, Type<?>> actualTypeArguments) {
+		for (java.lang.reflect.Type upperBound : var.getBounds()) {
+			Type<?> upperBoundType = genericType(upperBound, actualTypeArguments);
+			Type<?> varType = actualTypeArguments.get(var);
+			if (varType != null && arg.equalTo(varType))
+				return; // recursive definition
+			if (upperBound != Object.class && !arg.isAssignableTo(upperBoundType)) {
+				throw new IllegalArgumentException(arg
+					+ " is not assignable to the type variable: " + upperBoundType);
 			}
 		}
 	}
@@ -515,7 +547,7 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 		return res;
 	}
 
-	public Map<String, Type<?>> actualTypeArguments() {
+	public Map<TypeVariable<?>, Type<?>> actualTypeArguments() {
 		return actualTypeArguments(this);
 	}
 
@@ -529,12 +561,12 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 		Class<?> supertype = rawType;
 		java.lang.reflect.Type genericSupertype = null;
 		Type<?> type = this;
-		Map<String, Type<?>> actualTypeArguments = actualTypeArguments(type);
+		Map<TypeVariable<?>, Type<?>> actualTypeArguments = actualTypeArguments(type);
 		if (!isInterface())
 			res.add(OBJECT);
 		while (supertype != null) {
 			if (genericSupertype != null) {
-				type = type(genericSupertype, actualTypeArguments);
+				type = genericType(genericSupertype, actualTypeArguments);
 				res.add(type);
 			}
 			actualTypeArguments = actualTypeArguments(type);
@@ -548,22 +580,26 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 		return supertypes;
 	}
 
-	private static <V> Map<String, Type<?>> actualTypeArguments(Type<V> type) {
-		Map<String, Type<?>> actualTypeArguments = new LinkedHashMap<>();
-		TypeVariable<Class<V>>[] typeParams = type.rawType.getTypeParameters();
-		for (int i = 0; i < typeParams.length; i++) {
+	private static <V> Map<TypeVariable<?>, Type<?>> actualTypeArguments(Type<V> type) {
+		Map<TypeVariable<?>, Type<?>> actualTypeArguments = emptyTypeArguments();
+		TypeVariable<Class<V>>[] vars = type.rawType.getTypeParameters();
+		for (int i = 0; i < vars.length; i++) {
 			// it would be correct to use the joint type of the bounds but since it is not possible to create a type with illegal parameters it is ok to just use Object since there is no way to model a joint type
-			actualTypeArguments.put(typeParams[i].getName(), type.parameter(i));
+			actualTypeArguments.put(vars[i], type.parameter(i));
 		}
 		return actualTypeArguments;
 	}
 
+	public static Map<TypeVariable<?>, Type<?>> emptyTypeArguments() {
+		return new TreeMap<>(Type::typeVariableComparator);
+	}
+
 	private static void addSuperInterfaces(Set<Type<?>> res, Class<?> type,
-			Map<String, Type<?>> actualTypeArguments) {
+			Map<TypeVariable<?>, Type<?>> actualTypeArguments) {
 		Class<?>[] interfaces = type.getInterfaces();
 		java.lang.reflect.Type[] genericInterfaces = type.getGenericInterfaces();
 		for (int i = 0; i < interfaces.length; i++) {
-			Type<?> interfaceType = Type.type(genericInterfaces[i],
+			Type<?> interfaceType = Type.genericType(genericInterfaces[i],
 					actualTypeArguments);
 			if (!res.contains(interfaceType)) {
 				res.add(interfaceType);

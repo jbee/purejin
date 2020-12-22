@@ -13,13 +13,10 @@ import se.jbee.inject.lang.TypeVariable;
 import se.jbee.inject.lang.Utils;
 
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Constructor;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-import static java.util.stream.Collectors.toMap;
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.lang.Type.parameterTypes;
 import static se.jbee.inject.lang.Type.raw;
@@ -27,8 +24,6 @@ import static se.jbee.inject.lang.Utils.newArray;
 
 /**
  * Utility as a factory to create different kinds of {@link Supplier}s.
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Supply {
 
@@ -92,7 +87,7 @@ public final class Supply {
 	 * E.g. used to "forward" a {@link Collection} to {@link List} of same
 	 * element type.
 	 */
-	public static <T> Supplier<T> byParametrizedInstanceReference(
+	public static <T> Supplier<T> byParameterizedInstanceReference(
 			Instance<T> instance) {
 		return (dep, context) -> {
 			Type<? super T> type = dep.type();
@@ -103,27 +98,23 @@ public final class Supply {
 		};
 	}
 
-	public static <T> Supplier<T> byProducer(Produces<T> producer) {
-		if (producer.hasTypeVariables && producer.requestsActualType()) {
+	public static <T> Supplier<T> byProduction(Produces<T> produces) {
+		if (produces.declaresTypeParameters() && produces.requestsActualType()) {
 			// use a constant null hint to blank first parameter as it is filled in with actual type on method invocation
 			Hint<?> actualTypeHint = Hint.constantNull(
-					Type.parameterType(producer.target.getParameters()[0]));
-			return new Call<>(producer,
-					Hint.match(parameterTypes(producer.target),
-							Utils.arrayPrepend(actualTypeHint, producer.hints)),
+					Type.parameterType(produces.target.getParameters()[0]));
+			return new Produce<>(produces,
+					Hint.match(parameterTypes(produces.target),
+							Utils.arrayPrepend(actualTypeHint, produces.hints)),
 					Dependency::type);
 		}
-		return new Call<>(producer,
-				Hint.match(parameterTypes(producer.target), producer.hints), null);
+		return new Produce<>(produces,
+				Hint.match(parameterTypes(produces.target), produces.hints), null);
 	}
 
-	public static <T> Supplier<T> byNew(New<T> constructor) {
-		return new Construct<>(constructor.target, Hint.match(
-				parameterTypes(constructor.target), constructor.hints));
-	}
-
-	public static <T> Supplier<T> byAccess(Shares<T> constant) {
-		return new Access<>(constant);
+	public static <T> Supplier<T> byConstruction(Constructs<T> constructs) {
+		return new Construct<>(constructs, Hint.match(
+				parameterTypes(constructs.target), constructs.hints));
 	}
 
 	/**
@@ -188,71 +179,49 @@ public final class Supply {
 		}
 	}
 
-	private static final class Access<T> implements Annotated, Supplier<T> {
-
-		private final Shares<T> field;
-
-		Access(Shares<T> field) {
-			this.field = field;
-		}
-
-		@SuppressWarnings("unchecked")
-		@Override
-		public T supply(Dependency<? super T> dep, Injector context)
-				throws UnresolvableDependency {
-			return (T) Reflect.share(field.target, field.owner,
-					e -> UnresolvableDependency.SupplyFailed.valueOf(e, field.target));
-		}
-
-		@Override
-		public AnnotatedElement element() {
-			return field.target;
-		}
-
-	}
-
 	private static final class Construct<T> extends WithArgs<T>
 			implements Annotated {
 
-		private final Constructor<T> target;
+		private final Constructs<T> constructs;
 
-		Construct(Constructor<T> target, Hint<?>[] args) {
+		Construct(Constructs<T> constructs, Hint<?>[] args) {
 			super(args);
-			this.target = target;
+			this.constructs = constructs;
 		}
 
 		@Override
 		public AnnotatedElement element() {
-			return target;
+			return constructs.target;
 		}
 
 		@Override
+		@SuppressWarnings("unchecked")
 		protected T invoke(Object[] args, Injector context) {
-			return Reflect.construct(target, args,
-					e -> UnresolvableDependency.SupplyFailed.valueOf(e, target));
+			return (T) Reflect.construct(constructs.target, args,
+					e -> UnresolvableDependency.SupplyFailed.valueOf(e, constructs.target));
 		}
 
 		@Override
 		public String toString() {
-			return describe(target);
+			return describe(constructs.target);
 		}
 	}
 
-	private static final class Call<T> extends WithArgs<T>
+	private static final class Produce<T> extends WithArgs<T>
 			implements Annotated {
 
-		private Object owner;
+		private Object instance;
 		private final Produces<T> producer;
 		private final Class<T> returns;
-		private final Map<String, UnaryOperator<Type<?>>> typeVariableResolvers;
+		private final Map<java.lang.reflect.TypeVariable<?>, UnaryOperator<Type<?>>> typeVariableResolvers;
 
-		Call(Produces<T> producer, Hint<?>[] args,
+		Produce(Produces<T> producer, Hint<?>[] args,
 				Function<Dependency<?>, Object> supplyActual) {
 			super(args, supplyActual);
 			this.producer = producer;
-			this.returns = producer.returns.rawType;
-			this.owner = producer.owner;
-			this.typeVariableResolvers = producer.hasTypeVariables
+			this.returns = producer.actualType.rawType;
+			this.instance = producer.isHinted() ? null : producer.as;
+			this.typeVariableResolvers = producer.declaresTypeParameters()
 				? TypeVariable.typeVariables(
 						producer.target.getGenericReturnType())
 				: null;
@@ -265,20 +234,22 @@ public final class Supply {
 
 		@Override
 		protected T invoke(Object[] args, Injector context) {
-			if (producer.isInstanceMethod && owner == null)
-				owner = context.resolve(producer.target.getDeclaringClass());
-			return returns.cast(Reflect.produce(producer.target, owner, args,
+			if (instance == null && !producer.isStatic()) {
+				instance = producer.isHinted()
+					? producer.getAsHint().resolveIn(context)
+					: context.resolve(producer.target.getDeclaringClass());
+			}
+			return returns.cast(Reflect.produce(producer.target, instance, args,
 					e -> UnresolvableDependency.SupplyFailed.valueOf(e, producer.target)));
 		}
 
 		@Override
 		protected Hint<?>[] hintsFor(Dependency<? super T> dep) {
-			if (!producer.hasTypeVariables)
+			if (!producer.declaresTypeParameters())
 				return hints;
 			Hint<?>[] actualTypeHints = hints.clone();
-			Map<String, Type<?>> actualTypes = typeVariableResolvers.entrySet().stream() //
-					.collect(toMap(Entry::getKey,
-							e -> e.getValue().apply(dep.type())));
+			Map<java.lang.reflect.TypeVariable<?>, Type<?>> actualTypes = TypeVariable.actualTypesFor(
+					typeVariableResolvers, dep.type());
 			java.lang.reflect.Parameter[] params = producer.target.getParameters();
 			for (int i = 0; i < actualTypeHints.length; i++) {
 				actualTypeHints[i] = actualTypeHints[i] //

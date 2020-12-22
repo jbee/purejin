@@ -5,7 +5,7 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.config.NamesBy;
 import se.jbee.inject.config.ProducesBy;
 import se.jbee.inject.config.ScopesBy;
-import se.jbee.inject.config.SharesBy;
+import se.jbee.inject.config.AccessesBy;
 import se.jbee.inject.lang.Type;
 
 import static se.jbee.inject.lang.Type.classType;
@@ -33,7 +33,7 @@ public abstract class ConverterModule extends BinderModule {
 
 	private static final ProducesBy PRODUCES_BY = ProducesBy.OPTIMISTIC //
 			.returnTypeAssignableTo(ANY_CONVERTER_TYPE);
-	private static final SharesBy SHARES_BY = SharesBy.declaredFields(false) //
+	private static final AccessesBy SHARES_BY = AccessesBy.declaredFields(false) //
 			.typeAssignableTo(ANY_CONVERTER_TYPE);
 
 	@Override

@@ -83,7 +83,8 @@ class TestExampleCountBindingsBinds {
 	}
 
 	private static Injector injectorWithEnv(Class<? extends Bundle> root,
-			ValueBinder<?> binder) {
-		return Bootstrap.injector(Environment.DEFAULT.withBinder(binder), root);
+			ValueBinder<Binding<?>> binder) {
+		return Bootstrap.injector(
+				Environment.DEFAULT.withBinder(Binding.class, binder), root);
 	}
 }

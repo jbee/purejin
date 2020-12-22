@@ -4,12 +4,14 @@ import org.junit.jupiter.api.Test;
 import se.jbee.inject.lang.Type;
 
 import java.io.Serializable;
+import java.lang.annotation.ElementType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.lang.Type.*;
+import static test.integration.util.TestUtils.assertEqualMaps;
 
 @SuppressWarnings({ "rawtypes" })
 class TestType {
@@ -315,17 +317,17 @@ class TestType {
 
 	@Test
 	void actualTypeArguments() throws Exception {
-		assertEquals("{X=? extends java.io.Serializable, E=?}",
-				classType(XList.class).actualTypeArguments().toString());
-		assertEquals("{X=java.lang.String, E=java.lang.Integer}",
+		assertEqualMaps("{X=? extends java.io.Serializable, E=?}",
+				classType(XList.class).actualTypeArguments());
+		assertEqualMaps("{X=java.lang.String, E=java.lang.Integer}",
 				raw(XList.class).parametized(String.class,
-						Integer.class).actualTypeArguments().toString());
-		assertEquals("{X=java.lang.String, E=?}",
+						Integer.class).actualTypeArguments());
+		assertEqualMaps("{X=java.lang.String, E=?}",
 				returnType(getClass().getMethod(
-						"typeVariableWithActualTypeArgument")).actualTypeArguments().toString());
-		assertEquals("{X=? extends java.lang.Number, E=java.lang.Integer}",
+						"typeVariableWithActualTypeArgument")).actualTypeArguments());
+		assertEqualMaps("{X=? extends java.lang.Number, E=java.lang.Integer}",
 				returnType(getClass().getMethod(
-						"typeVariableWithActualTypeArgument2")).actualTypeArguments().toString());
+						"typeVariableWithActualTypeArgument2")).actualTypeArguments());
 	}
 
 	interface SimpleMap<A,B> {
@@ -378,6 +380,25 @@ class TestType {
 		Field values = SimpleMapImpl.class.getDeclaredField("values");
 		assertEquals(raw(Map.class).parametized(String.class, Integer.class),
 				Type.actualFieldType(values, actualMapType));
+	}
+
+	@Test
+	void recursiveSuperTypesDoNotCauseStackOverflow() {
+		Type<ElementType> enumType = classType(ElementType.class);
+		assertNotNull(enumType);
+		assertEquals("java.lang.Enum<java.lang.annotation.ElementType>",
+				Type.supertype(Enum.class, enumType).toString());
+	}
+
+	interface RecursiveType<T extends RecursiveType<T>> {
+
+	}
+
+	@Test
+	void recursiveTypesDoNotCauseStackOverflow() {
+		assertEquals(
+				"test.integration.api.TestType.RecursiveType<? extends test.integration.api.TestType.RecursiveType<?>>",
+				Type.classType(RecursiveType.class).toString());
 	}
 
 	private static void assertContains(Type<?>[] actual, Type<?> expected) {

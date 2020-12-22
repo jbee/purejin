@@ -5,8 +5,8 @@
  */
 package se.jbee.inject.binder;
 
-import se.jbee.inject.*;
 import se.jbee.inject.Supplier;
+import se.jbee.inject.*;
 import se.jbee.inject.bind.*;
 import se.jbee.inject.config.*;
 import se.jbee.inject.lang.Type;
@@ -27,7 +27,7 @@ import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Source.source;
 import static se.jbee.inject.Target.targeting;
 import static se.jbee.inject.config.Plugins.pluginPoint;
-import static se.jbee.inject.lang.Type.*;
+import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.lang.Utils.isClassConstructable;
 import static se.jbee.inject.lang.Utils.newArray;
 
@@ -601,7 +601,7 @@ public class Binder {
 	public static class AutoBinder {
 
 		private final RootBinder binder;
-		private final SharesBy sharesBy;
+		private final AccessesBy accessesBy;
 		private final ConstructsBy constructsBy;
 		private final ProducesBy producesBy;
 		private final NamesBy namesBy;
@@ -613,7 +613,7 @@ public class Binder {
 			this.binder = binder.on(bind.asSuper()).on(bind.next());
 			Env env = bind.env;
 			Package where = bind.source.pkg();
-			this.sharesBy = env.property(SharesBy.class, where);
+			this.accessesBy = env.property(AccessesBy.class, where);
 			this.constructsBy = env.property(ConstructsBy.class, where);
 			this.producesBy = env.property(ProducesBy.class, where);
 			this.namesBy = env.property(NamesBy.class, where).orElse(DEFAULT);
@@ -623,11 +623,11 @@ public class Binder {
 				: target -> scope;
 		}
 
-		private AutoBinder(RootBinder binder, SharesBy constantsBy,
+		private AutoBinder(RootBinder binder, AccessesBy constantsBy,
 				ConstructsBy constructsBy, ProducesBy producesBy,
 				NamesBy namesBy, ScopesBy scopesBy, HintsBy hintsBy) {
 			this.binder = binder;
-			this.sharesBy = constantsBy;
+			this.accessesBy = constantsBy;
 			this.constructsBy = constructsBy;
 			this.producesBy = producesBy;
 			this.namesBy = namesBy;
@@ -635,33 +635,33 @@ public class Binder {
 			this.hintsBy = hintsBy;
 		}
 
-		public AutoBinder shareBy(SharesBy mirror) {
+		public AutoBinder shareBy(AccessesBy mirror) {
 			return new AutoBinder(binder, mirror, constructsBy, producesBy,
 					namesBy, scopesBy, hintsBy);
 		}
 
 		public AutoBinder constructBy(ConstructsBy mirror) {
-			return new AutoBinder(binder, sharesBy, mirror, producesBy, namesBy,
+			return new AutoBinder(binder, accessesBy, mirror, producesBy, namesBy,
 					scopesBy, hintsBy);
 		}
 
 		public AutoBinder produceBy(ProducesBy mirror) {
-			return new AutoBinder(binder, sharesBy, constructsBy, mirror,
+			return new AutoBinder(binder, accessesBy, constructsBy, mirror,
 					namesBy, scopesBy, hintsBy);
 		}
 
 		public AutoBinder nameBy(NamesBy mirror) {
-			return new AutoBinder(binder, sharesBy, constructsBy, producesBy,
+			return new AutoBinder(binder, accessesBy, constructsBy, producesBy,
 					mirror.orElse(DEFAULT), scopesBy, hintsBy);
 		}
 
 		public AutoBinder scopeBy(ScopesBy mirror) {
-			return new AutoBinder(binder, sharesBy, constructsBy, producesBy,
+			return new AutoBinder(binder, accessesBy, constructsBy, producesBy,
 					namesBy, mirror, hintsBy);
 		}
 
 		public AutoBinder hintBy(HintsBy mirror) {
-			return new AutoBinder(binder, sharesBy, constructsBy, producesBy,
+			return new AutoBinder(binder, accessesBy, constructsBy, producesBy,
 					namesBy, scopesBy, mirror);
 		}
 
@@ -676,7 +676,11 @@ public class Binder {
 		}
 
 		public void in(Object impl, Hint<?>... construction) {
-			in(impl.getClass(), impl, construction);
+			if (impl instanceof  Hint) {
+				in(((Hint<?>) impl).asType.rawType, impl, construction);
+			} else {
+				in(impl.getClass(), impl, construction);
+			}
 		}
 
 		public void in(Class<?> impl, Hint<?>... construction) {
@@ -689,6 +693,8 @@ public class Binder {
 			boolean needsInstance2 = bindSharesIn(impl, instance);
 			if (!needsInstance1 && !needsInstance2)
 				return; // do not try to construct the class
+			if (instance != null && !(instance instanceof Hint))
+				return; // if there is an instance don't bind constructor unless it is just a Hint
 			Constructor<?> target = constructsBy
 					.reflect(impl.getDeclaredConstructors(), construction);
 			if (target != null)
@@ -696,14 +702,13 @@ public class Binder {
 		}
 
 		private boolean bindSharesIn(Class<?> impl, Object instance) {
-			Field[] constants = sharesBy.reflect(impl);
+			Field[] constants = accessesBy.reflect(impl);
 			if (constants == null || constants.length == 0)
 				return false;
 			boolean needsInstance = false;
 			for (Field constant : constants) {
-				binder.per(Scope.container).bind(namesBy.reflect(constant),
-						fieldType(constant)).to(instance, constant);
-				needsInstance |= !isStatic(constant.getModifiers());
+				if (asConstant(constant, instance))
+					needsInstance |= !isStatic(constant.getModifiers());
 			}
 			return needsInstance;
 		}
@@ -720,28 +725,38 @@ public class Binder {
 			return needsInstance;
 		}
 
+		public boolean asConstant(Field constant, Object instance) {
+			Accesses<?> accesses = Accesses.accesses(instance, constant);
+			binder.per(Scope.container) //
+					.bind(namesBy.reflect(constant), accesses.expectedType) //
+					.expand(accesses);
+			return true;
+		}
+
 		/**
 		 * This method will not make sure an instance of the {@link Method}'s
 		 * declaring class is created if needed. This must be bound elsewhere.
 		 *
-		 * @param target a method that is meant to create instances of the
+		 * @param target   a method that is meant to create instances of the
 		 *                 method return type
 		 * @param instance can be null to resolve the instance from {@link
-		 *                 Injector} context later (if needed)
-		 * @param hints    optional method argument {@link Hint}s
-		 * @return true if a target was bound, else false (this is e.g. the
-		 * case when the {@link Method} returns void)
+		 *                 Injector} context later (if needed). It can also be a
+		 *                 {@link Hint} to that instance. {@code null} for
+		 *                 {@code static} methods.
+		 * @param args     optional method argument {@link Hint}s
+		 * @return true if a target was bound, else false (this is e.g. the case
+		 * when the {@link Method} returns void)
 		 */
-		public boolean asProducer(Method target, Object instance, Hint<?>... hints) {
-			Type<?> returns = returnType(target);
-			if (returns.rawType == void.class || returns.rawType == Void.class)
+		public boolean asProducer(Method target, Object instance, Hint<?>... args) {
+			if (target.getReturnType() == void.class || target.getReturnType() == Void.class)
 				return false;
-			if (hints == null || hints.length == 0)
-				hints = hintsBy.applyTo(target);
+			if (args == null || args.length == 0)
+				args = hintsBy.applyTo(target);
 			Name scope = scopesBy.reflect(target);
+			Produces<?> produces = Produces.produces(instance, target, args);
 			binder.per(scope == null ? Scope.auto : scope) //
-					.bind(namesBy.reflect(target), returns) //
-					.to(instance, target, hints);
+					.bind(namesBy.reflect(target), produces.expectedType) //
+					.expand(produces);
 			return true;
 		}
 
@@ -941,26 +956,15 @@ public class Binder {
 			to(Instance.anyOf(raw(impl)));
 		}
 
-		public void to(Constructor<? extends T> target, Hint<?>... hints) {
+		public void to(Constructor<? extends T> target, Hint<?>... args) {
 			if (target == null)
 				throw InconsistentBinding.generic("Provided constructor was null");
-			if (hints.length == 0)
-				hints = env(HintsBy.class).applyTo(target);
-			expand(New.newInstance(target, hints));
+			if (args.length == 0)
+				args = env(HintsBy.class).applyTo(target);
+			expand(Constructs.constructs(locator.type(), target, args));
 		}
 
-		protected final void to(Object owner, Method target,
-				Hint<?>... hints) {
-			if (hints.length == 0)
-				hints = env(HintsBy.class).applyTo(target);
-			expand(Produces.produces(owner, target, hints));
-		}
-
-		protected final void to(Object owner, Field constant) {
-			expand(Shares.shares(owner, constant));
-		}
-
-		protected final void expand(Object value) {
+		protected final void expand(Ref value) {
 			declareBindingsIn(bind() //
 					.asType(locator, BindingType.VALUE, null), value);
 		}
@@ -971,7 +975,7 @@ public class Binder {
 			declareBindingsIn(binding, binding);
 		}
 
-		private void declareBindingsIn(Binding<?> binding, Object value) {
+		private void declareBindingsIn(Binding<?> binding, Ref value) {
 			bindings().addExpanded(env(), binding, value);
 		}
 
@@ -1110,7 +1114,7 @@ public class Binder {
 		}
 
 		public <I extends T> void toParametrized(Class<I> impl) {
-			expand(impl);
+			expand(new BridgeRef(impl));
 		}
 
 		public <I extends Supplier<? extends T>> void toSupplier(
@@ -1171,7 +1175,7 @@ public class Binder {
 
 		@SafeVarargs
 		public final void toElements(Hint<? extends E>... elems) {
-			expand(elems);
+			expand(new ArrayRef(elems));
 		}
 
 		@SafeVarargs

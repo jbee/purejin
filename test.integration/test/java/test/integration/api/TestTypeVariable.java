@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
+import static java.util.stream.Collectors.toMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.jbee.inject.lang.Type.raw;
@@ -114,8 +115,12 @@ class TestTypeVariable {
 	private static Map<String, UnaryOperator<Type<?>>> methodReturnTypeVariables(
 			String name) {
 		try {
-			return TypeVariable.typeVariables(Examples.class.getDeclaredMethod(
-					name).getGenericReturnType());
+			Map<java.lang.reflect.TypeVariable<?>, UnaryOperator<Type<?>>> var2mapper = TypeVariable.typeVariables(
+					Examples.class.getDeclaredMethod(
+							name).getGenericReturnType());
+
+			return var2mapper.entrySet().stream().collect(
+					toMap(e -> e.getKey().getName(), Map.Entry::getValue));
 		} catch (NoSuchMethodException | SecurityException e) {
 			throw new AssertionError(e);
 		}

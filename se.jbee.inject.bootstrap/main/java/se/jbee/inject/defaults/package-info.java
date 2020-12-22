@@ -13,7 +13,7 @@
  * default {@link se.jbee.inject.bind.ValueBinder}s:
  * </p>
  * <ul>
- * <li>{@link se.jbee.inject.binder.New}</li>
+ * <li>{@link se.jbee.inject.binder.Constructs}</li>
  * <li>{@link se.jbee.inject.binder.Constant}</li>
  * <li>{@link se.jbee.inject.binder.Produces}</li>
  * </ul>

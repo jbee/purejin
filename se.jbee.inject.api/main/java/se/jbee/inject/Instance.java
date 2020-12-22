@@ -16,12 +16,10 @@ import static se.jbee.inject.lang.Type.raw;
 /**
  * Used to tell that we don#t want just one singleton at a time but multiple
  * distinguished by the {@link Name} used.
- *
- * @author Jan Bernitt (jan@jbee.se)
- *
  */
-public final class Instance<T> implements Typed<T>, Qualifying<Instance<?>>,
-		Serializable, Comparable<Instance<?>> {
+public final class Instance<T>
+		implements Typed<T>, Ref, Qualifying<Instance<?>>, Serializable,
+		Comparable<Instance<?>> {
 
 	/**
 	 * When a wildcard-type is used as bound instance type the bind will be

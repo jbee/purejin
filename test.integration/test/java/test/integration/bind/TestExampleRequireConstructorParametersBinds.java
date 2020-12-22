@@ -11,7 +11,7 @@ import se.jbee.inject.bind.BindingType;
 import se.jbee.inject.bind.Bindings;
 import se.jbee.inject.bind.ValueBinder;
 import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.binder.New;
+import se.jbee.inject.binder.Constructs;
 import se.jbee.inject.binder.Supply;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Environment;
@@ -65,12 +65,12 @@ class TestExampleRequireConstructorParametersBinds {
 	 * {@link Constructor} parameters {@link DeclarationType#REQUIRED}.
 	 */
 	static final class RequiredConstructorParametersBinder
-			implements ValueBinder<New<?>> {
+			implements ValueBinder<Constructs<?>> {
 
 		@Override
-		public <T> void expand(Env env, New<?> value, Binding<T> incomplete,
+		public <T> void expand(Env env, Constructs<?> value, Binding<T> incomplete,
 				Bindings bindings) {
-			DefaultValueBinders.NEW.expand(env, value, incomplete, bindings);
+			DefaultValueBinders.CONSTRUCTS.expand(env, value, incomplete, bindings);
 			Type<?>[] params = Type.parameterTypes(value.target);
 			for (Type<?> param : params) {
 				bindings.addExpanded(env, required(param, incomplete));
@@ -88,10 +88,11 @@ class TestExampleRequireConstructorParametersBinds {
 	@Test
 	void missingBindingForFloatConstructorParameterCausesEagerExceptionDuringBootstrapping() {
 		Class<TestExampleRequireConstructorParametersBindsModule> root = TestExampleRequireConstructorParametersBindsModule.class;
-		ValueBinder<?> required = new RequiredConstructorParametersBinder();
+		ValueBinder<Constructs<?>> required = new RequiredConstructorParametersBinder();
 		Exception ex = assertThrows(NoResourceForDependency.class,
 				() -> Bootstrap.injector(
-						Environment.DEFAULT.withBinder(required), root));
+						Environment.DEFAULT.withBinder(Constructs.class, required),
+						root));
 		assertEquals(
 				"No resource for type(s)\n" + "\trequired: [java.lang.Float]",
 				ex.getMessage());

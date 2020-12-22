@@ -27,7 +27,7 @@ import static se.jbee.inject.lang.Type.raw;
  *
  * @param <T> The {@link Type} of the argument
  */
-public final class Hint<T> implements Typed<T> {
+public final class Hint<T> implements Typed<T>, Ref {
 
 	private static final Hint<?>[] NO_PARAMS = new Hint<?>[0];
 
@@ -233,15 +233,26 @@ public final class Hint<T> implements Typed<T> {
 	}
 
 	public Hint<?> withActualType(java.lang.reflect.Parameter param,
-			Map<String, Type<?>> actualTypeArguments) {
+			Map<java.lang.reflect.TypeVariable<?>, Type<?>> actualTypeArguments) {
 		if (value != null || absoluteRef != null)
 			return this;
 		java.lang.reflect.Type genericType = param.getParameterizedType();
-		Type<?> actualType = Type.type(genericType, actualTypeArguments);
+		Type<?> actualType = Type.genericType(genericType, actualTypeArguments);
 		if (param.getType() == Type.class) {
 			return constant(actualType.parameter(0));
 		}
 		return relativeReferenceTo(instance(relativeRef.name, actualType));
 	}
 
+	@SuppressWarnings("unchecked")
+	public T resolveIn(Injector context) {
+		if (asType.rawType == Injector.class)
+			return (T) context;
+		if (isConstant())
+			return value;
+		if (absoluteRef != null)
+			return context.resolve(absoluteRef);
+		// relative ref
+		return context.resolve(relativeRef);
+	}
 }

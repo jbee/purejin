@@ -5,10 +5,12 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Supply;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.config.Extension;
+import se.jbee.inject.config.HintsBy;
+import se.jbee.inject.lang.Type;
 
 import java.lang.reflect.Constructor;
 
-import static se.jbee.inject.binder.New.newInstance;
+import static se.jbee.inject.binder.Constructs.constructs;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
@@ -28,21 +30,26 @@ class ExtensionModule extends BinderModule {
 
 	@Override
 	protected void declare() {
-		ConstructsBy constructsBy = env(ConstructsBy.class);
 		asDefault() //
 				.per(Scope.dependencyType) //
 				.bind(raw(Extension.class).asUpperBound()) //
-				.toSupplier((dep, context) -> //
-				extension(constructsBy, dep, context));
+				.toSupplier(ExtensionModule::extension);
 	}
 
-	@SuppressWarnings("unchecked")
-	private static <T> T extension(ConstructsBy constructsBy, Dependency<?> dep,
-			Injector context) {
-		Constructor<T> ext = (Constructor<T>) constructsBy.reflect(
-				dep.type().rawType.getDeclaredConstructors());
-		context.resolve(Env.class).accessible(ext);
-		return Supply.byNew(newInstance(ext)) //
-				.supply((Dependency<? super T>) dep, context);
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	private static <T> T extension(Dependency<?> dep, Injector context) {
+		Env env = context.resolve(Env.class);
+		Package pkg = ExtensionModule.class.getPackage();
+		ConstructsBy constructsBy = env.property(ConstructsBy.class, pkg);
+		HintsBy hintsBy = env.property(HintsBy.class, pkg);
+		Type<?> expectedType = dep.type();
+		Constructor<?> ext = constructsBy.reflect(
+				expectedType.rawType.getDeclaredConstructors());
+		env.accessible(ext);
+		Hint<?>[] hints = hintsBy.applyTo(ext);
+		if (hints == null)
+			hints = Hint.none();
+		return (T) Supply.byConstruction(constructs(expectedType, ext, hints)) //
+				.supply((Dependency) dep, context);
 	}
 }

@@ -10,7 +10,7 @@ import se.jbee.inject.bind.Bindings;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.bind.ValueBinder;
 import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.binder.New;
+import se.jbee.inject.binder.Constructs;
 import se.jbee.inject.binder.Supply;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Environment;
@@ -52,7 +52,7 @@ class TestExampleFieldInjectionBinds {
 
 	@Target({ METHOD, FIELD })
 	@Retention(RUNTIME)
-	public @interface Inject {
+	private @interface Inject {
 
 	}
 
@@ -106,14 +106,14 @@ class TestExampleFieldInjectionBinds {
 	/**
 	 * Decorates the usual constructor with initialization.
 	 */
-	static final class FieldInjectionBinder implements ValueBinder<New<?>> {
+	static final class FieldInjectionBinder implements ValueBinder<Constructs<?>> {
 
 		@Override
-		public <T> void expand(Env env, New<?> constructor,
+		public <T> void expand(Env env, Constructs<?> constructor,
 				Binding<T> incomplete, Bindings bindings) {
 			env.accessible(constructor.target);
 			Supplier<T> supplier = new FieldInjectionSupplier<>(
-					Supply.byNew(constructor.typed(incomplete.type())));
+					Supply.byConstruction(constructor.typed(incomplete.type())));
 			bindings.addExpanded(env,
 					incomplete.complete(CONSTRUCTOR, supplier));
 		}
@@ -128,7 +128,7 @@ class TestExampleFieldInjectionBinds {
 	}
 
 	private static Injector injectorWithEnv(Class<? extends Bundle> root,
-			ValueBinder<?> binder) {
-		return Bootstrap.injector(Environment.DEFAULT.withBinder(binder), root);
+			ValueBinder<Constructs<?>> binder) {
+		return Bootstrap.injector(Environment.DEFAULT.withBinder(Constructs.class, binder), root);
 	}
 }
