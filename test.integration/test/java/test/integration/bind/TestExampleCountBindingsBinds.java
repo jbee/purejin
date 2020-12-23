@@ -53,8 +53,8 @@ class TestExampleCountBindingsBinds {
 		}
 
 		@Override
-		public <T> void expand(Env env, Binding<?> value, Binding<T> incomplete,
-				Bindings bindings) {
+		public <T> void expand(Env env, Binding<?> ref, Binding<T> item,
+				Bindings dest) {
 			expands++;
 		}
 	}

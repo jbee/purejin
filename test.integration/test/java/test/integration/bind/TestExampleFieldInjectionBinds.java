@@ -109,13 +109,13 @@ class TestExampleFieldInjectionBinds {
 	static final class FieldInjectionBinder implements ValueBinder<Constructs<?>> {
 
 		@Override
-		public <T> void expand(Env env, Constructs<?> constructor,
-				Binding<T> incomplete, Bindings bindings) {
-			env.accessible(constructor.target);
+		public <T> void expand(Env env, Constructs<?> ref, Binding<T> item,
+				Bindings dest) {
+			env.accessible(ref.target);
 			Supplier<T> supplier = new FieldInjectionSupplier<>(
-					Supply.byConstruction(constructor.typed(incomplete.type())));
-			bindings.addExpanded(env,
-					incomplete.complete(CONSTRUCTOR, supplier));
+					Supply.byConstruction(ref.typed(item.type())));
+			dest.addExpanded(env,
+					item.complete(CONSTRUCTOR, supplier));
 		}
 	}
 

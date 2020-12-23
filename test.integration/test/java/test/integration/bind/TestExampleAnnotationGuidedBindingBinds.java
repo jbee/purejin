@@ -12,6 +12,7 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BinderModuleWith;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Environment;
+import se.jbee.inject.config.ContractsBy;
 
 import java.io.Serializable;
 import java.lang.annotation.Retention;
@@ -76,7 +77,7 @@ class TestExampleAnnotationGuidedBindingBinds {
 		protected void declare(Class<?> annotated) {
 			per(Scope.application)
 					.withIndirectAccess() // withIndirectAccess just used as an example (not needed)
-					.superbind(annotated).toConstructor();
+					.contractbind(annotated).toConstructor();
 		}
 	}
 
@@ -162,6 +163,7 @@ class TestExampleAnnotationGuidedBindingBinds {
 	}
 
 	private final Env env = Environment.DEFAULT //
+			.with(ContractsBy.class, ContractsBy.OPTIMISTIC)
 			.withTypePattern(Service.class, new ServiceAnnotationPattern())
 			.withTypePattern(Contract.class, new ContractAnnotationPattern())
 			.withMethodPattern(Provides.class, new ProvidesAnnotationPattern());

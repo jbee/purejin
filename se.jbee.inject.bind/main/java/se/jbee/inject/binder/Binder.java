@@ -131,13 +131,13 @@ public class Binder {
 	}
 
 	/**
-	 * Same as {@link #superbind(Type)} where type was wrapped in {@link
+	 * Same as {@link #contractbind(Type)} where type was wrapped in {@link
 	 * Type#raw(Class)}.
 	 *
-	 * @see #superbind(Type)
+	 * @see #contractbind(Type)
 	 */
-	public final <T> TypedBinder<T> superbind(Class<T> type) {
-		return superbind(raw(type));
+	public final <T> TypedBinder<T> contractbind(Class<T> type) {
+		return contractbind(raw(type));
 	}
 
 	/**
@@ -159,8 +159,8 @@ public class Binder {
 	 * @param <T>  type that should be bound to all the types it implements
 	 * @return immutable binder API
 	 */
-	public final <T> TypedBinder<T> superbind(Type<T> type) {
-		return on(bind().asSuper()).bind(type);
+	public final <T> TypedBinder<T> contractbind(Type<T> type) {
+		return on(bind().asContract()).bind(type);
 	}
 
 	/**
@@ -309,10 +309,10 @@ public class Binder {
 	 * @since 8.1
 	 */
 	public ConnectBinder connect() {
-		Package pkg = bind.source.pkg();
+		Package ns = bind.source.pkg();
 		return new ConnectBinder(this,
-				env().property(CONNECT_QUALIFIER, ProducesBy.class, pkg,
-						env().property(ProducesBy.class, pkg)));
+				env().property(CONNECT_QUALIFIER, ProducesBy.class, ns,
+						env().property(ProducesBy.class, ns)));
 	}
 
 	public ConnectBinder connect(ProducesBy linksBy) {
@@ -637,16 +637,16 @@ public class Binder {
 
 		protected AutoBinder(RootBinder binder, Name scope) {
 			Bind bind = binder.bind();
-			this.binder = binder.on(bind.asSuper()).on(bind.next());
+			this.binder = binder.on(bind.asContract()).on(bind.next());
 			Env env = bind.env;
-			Package where = bind.source.pkg();
-			this.accessesBy = env.property(AccessesBy.class, where);
-			this.constructsBy = env.property(ConstructsBy.class, where);
-			this.producesBy = env.property(ProducesBy.class, where);
-			this.namesBy = env.property(NamesBy.class, where).orElse(DEFAULT);
-			this.hintsBy = env.property(HintsBy.class, where);
+			Package ns = bind.source.pkg();
+			this.accessesBy = env.property(AccessesBy.class, ns);
+			this.constructsBy = env.property(ConstructsBy.class, ns);
+			this.producesBy = env.property(ProducesBy.class, ns);
+			this.namesBy = env.property(NamesBy.class, ns).orElse(DEFAULT);
+			this.hintsBy = env.property(HintsBy.class, ns);
 			this.scopesBy = scope.equalTo(Scope.mirror)
-				? env.property(ScopesBy.class, where)
+				? env.property(ScopesBy.class, ns)
 				: target -> scope;
 		}
 
@@ -800,7 +800,7 @@ public class Binder {
 			Class<T> impl = target.getDeclaringClass();
 			Binder scopedBinder = binder.per(scope != null ? scope : Scope.auto).implicit();
 			if (name.isDefault()) {
-				scopedBinder.superbind(impl).to(target, hints);
+				scopedBinder.contractbind(impl).to(target, hints);
 			} else {
 				scopedBinder.bind(name, impl).to(target, hints);
 				for (Type<? super T> st : raw(impl).supertypes())

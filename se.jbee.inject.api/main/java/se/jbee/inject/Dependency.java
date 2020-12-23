@@ -165,8 +165,9 @@ public final class Dependency<T>
 		return injectingInto(new Locator<>(target), ScopeLifeCycle.ignore);
 	}
 
-	public Dependency<T> injectingInto(Package pkg) {
-		Target target = Target.ANY.in(packageAndSubPackagesOf(pkg));
+	public Dependency<T> injectingInto(Package ns) {
+		//FIXME the issue is thet ANY targets Object which then means the binding is only visible in java.lang
+		Target target = Target.ANY.in(packageAndSubPackagesOf(ns));
 		Injection injection = new Injection(Instance.ANY,
 				new Locator<>(Instance.ANY, target), ScopeLifeCycle.ignore);
 		if (hierarchy.length == 0)

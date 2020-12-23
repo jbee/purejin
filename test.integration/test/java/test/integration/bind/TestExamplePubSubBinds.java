@@ -11,30 +11,30 @@ import se.jbee.inject.binder.BinderModuleWith;
 import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Environment;
+import se.jbee.inject.config.ContractsBy;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static se.jbee.inject.Name.named;
 
 /**
  * A tests the shows how {@link BuildUp}s behind {@link Binder#boot(Class)} can
  * be used to automatically wire a pub-sub relation.
  * <p>
  * In the test scenario there is a interface for a {@link Publisher} and a
- * {@link Subscriber} and 3 {@link Service}s that all also implement {@link
- * Subscriber}. Goal is to have them all {@link Publisher#subscribe(Subscriber)}
- * to the {@link PublisherImpl} implementation. This works both for {@link
+ * {@link Subscriber}. All 3 services implement {@link Subscriber}. Goal is to
+ * have them all {@link Publisher#subscribe(Subscriber)} to the {@link
+ * PublisherImpl} implementation. This works both for {@link
  * Publisher#subscribe(Subscriber)} being defined in the interface or only in
  * the {@link PublisherImpl} implementation.
  * <p>
- * This example uses {@link Binder#multibind(Class)} to make each of the
+ * This example uses {@link Binder#contractbind(Class)} to make each of the
  * implementations a {@link Subscriber} that is known within the {@link
  * Injector} context. Another option would be to use {@link
- * Binder#superbind(Class)} to simply bind an implementation to all its
- * supertypes including its interfaces.
+ * Binder#multibind(Class)} and explicitly bind each service as a {@link
+ * Subscriber} as well.
  * <p>
  * With all {@link Subscriber}s available as {@link Subscriber[]} the
  * initialisation can be done in two ways. Eager wiring at the end of
@@ -75,10 +75,7 @@ class TestExamplePubSubBinds {
 		}
 	}
 
-	interface Service {
-	}
-
-	public static class SomeService implements Service, Subscriber {
+	public static class Service1 implements Subscriber {
 
 		int events;
 
@@ -89,7 +86,7 @@ class TestExamplePubSubBinds {
 
 	}
 
-	public static class AnotherService implements Service, Subscriber {
+	public static class Service2 implements Subscriber {
 
 		int events;
 
@@ -99,7 +96,7 @@ class TestExamplePubSubBinds {
 		}
 	}
 
-	public static class PredefinedService implements Service, Subscriber {
+	public static class Service3 implements Subscriber {
 
 		int events;
 
@@ -114,19 +111,17 @@ class TestExamplePubSubBinds {
 
 		@Override
 		protected void declare(Publisher value) {
-			bind(named("some"), Service.class).to(SomeService.class);
-			bind(named("ref"), Service.class).to(AnotherService.class);
-			bind(named("pre"), Service.class).to(PredefinedService.class);
-
-			multibind(Subscriber.class).to(SomeService.class);
-			multibind(Subscriber.class).to(AnotherService.class);
-			multibind(Subscriber.class).to(PredefinedService.class);
+			contractbind(Service1.class).to(Service1::new);
+			contractbind(Service2.class).to(Service2::new);
+			contractbind(Service3.class).to(Service3::new);
 
 			// since we are using a constant but we want it to be affected by
 			// BuildUp we bind it as a scoped constant
 			// the reason for using a constant is just so we can verify in the
 			// test that in eager case the subscription is created with the
 			// context whereas in lazy case on resolving the publisher
+			// in a non-test scenario we would just do:
+			// bind(Publisher.class).to(PublisherImpl.class);
 			bind(Publisher.class).toScoped(value);
 		}
 	}
@@ -164,7 +159,9 @@ class TestExamplePubSubBinds {
 	private static void assertSubscribedToPublisher(
 			Class<? extends Bundle> bundle, int initiallyExpectedSubscribers) {
 		PublisherImpl pub = new PublisherImpl();
-		Env env = Environment.DEFAULT.with(Publisher.class, pub);
+		Env env = Environment.DEFAULT
+				.with(Publisher.class, pub)
+				.with(ContractsBy.class, ContractsBy.OPTIMISTIC);
 		Injector context = Bootstrap.injector(env, bundle);
 		// at this point the context is created by not necessarily any instances
 		// this is where the difference between eager and lazy shows
@@ -172,9 +169,9 @@ class TestExamplePubSubBinds {
 		assertSame(pub, context.resolve(PublisherImpl.class));
 		assertEquals(3, pub.subs.size(), "lazy did not cause subscription");
 
-		SomeService sub1 = context.resolve(SomeService.class);
-		AnotherService sub2 = context.resolve(AnotherService.class);
-		PredefinedService sub3 = context.resolve(PredefinedService.class);
+		Service1 sub1 = context.resolve(Service1.class);
+		Service2 sub2 = context.resolve(Service2.class);
+		Service3 sub3 = context.resolve(Service3.class);
 
 		assertEquals(0, sub1.events);
 		assertEquals(0, sub2.events);

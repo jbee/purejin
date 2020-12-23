@@ -12,7 +12,7 @@ package se.jbee.inject;
  *
  * @since 8.1
  */
-public interface Ref {
+public interface Ref { // alternative name: Descriptor
 
 	/* just a marker */
 

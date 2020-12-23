@@ -60,17 +60,16 @@ public interface ValueBinder<R extends Ref> {
 	/**
 	 * Expands the incomplete {@link Binding} and value given to a complete
 	 * {@link Binding}(s) that are added to {@link Bindings}.
-	 *
-	 * @param ref    A {@link Class}, {@link Instance} or similar value that
+	 *  @param ref    A {@link Class}, {@link Instance} or similar value that
 	 *               express the intent of the incomplete binding. This {@link
 	 *               ValueBinder} will use it especially to decide the {@link
 	 *               Supplier} used and what further {@link Binding}s might be
 	 *               derived.
 	 * @param item   A usually incomplete {@link Binding} (without a {@link
 	 *               Supplier})
-	 * @param target complete {@link Binding}s are be added to it
+	 * @param dest complete {@link Binding}s are be added to it
 	 */
-	<T> void expand(Env env, R ref, Binding<T> item, Bindings target);
+	<T> void expand(Env env, R ref, Binding<T> item, Bindings dest);
 
 	/**
 	 * A {@link Completion} just uses the passed value to {@link
@@ -84,8 +83,8 @@ public interface ValueBinder<R extends Ref> {
 
 		@Override
 		default <T> void expand(Env env, R ref, Binding<T> item,
-				Bindings target) {
-			target.addExpanded(env, complete(env, item, ref));
+				Bindings dest) {
+			dest.addExpanded(env, complete(env, item, ref));
 		}
 
 		<T> Binding<T> complete(Env env, Binding<T> item, R ref);

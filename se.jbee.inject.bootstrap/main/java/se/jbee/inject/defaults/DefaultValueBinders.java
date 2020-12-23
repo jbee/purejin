@@ -9,6 +9,7 @@ import se.jbee.inject.*;
 import se.jbee.inject.bind.*;
 import se.jbee.inject.binder.*;
 import se.jbee.inject.config.ConstructsBy;
+import se.jbee.inject.config.ContractsBy;
 import se.jbee.inject.lang.Reflect;
 import se.jbee.inject.lang.Type;
 
@@ -36,7 +37,7 @@ public final class DefaultValueBinders {
 	public static final ValueBinder<Instance<?>> REFERENCE = DefaultValueBinders::bindReference;
 	public static final ValueBinder<Instance<?>> REFERENCE_PREFER_CONSTANTS = DefaultValueBinders::bindReferencePreferConstants;
 	public static final ValueBinder<Constant<?>> CONSTANT = DefaultValueBinders::bindConstant;
-	public static final ValueBinder<Binding<?>> SUPER_TYPES = DefaultValueBinders::bindSuperTypes;
+	public static final ValueBinder<Binding<?>> CONTRACTS = DefaultValueBinders::bindContractTypes;
 
 	private DefaultValueBinders() {
 		throw new UnsupportedOperationException("util");
@@ -44,19 +45,25 @@ public final class DefaultValueBinders {
 
 	/**
 	 * This {@link ValueBinder} adds bindings to super-types for {@link
-	 * Binding}s declared with {@link DeclarationType#SUPER} or {@link
+	 * Binding}s declared with {@link DeclarationType#CONTRACT} or {@link
 	 * DeclarationType#PROVIDED}.
 	 */
-	private static <T> void bindSuperTypes(Env env, Binding<?> ref,
-			Binding<T> item, Bindings target) {
-		target.add(env, item);
-		DeclarationType declarationType = item.source.declarationType;
-		if (declarationType != DeclarationType.SUPER && declarationType != DeclarationType.PROVIDED)
+	private static <T> void bindContractTypes(Env env, Binding<?> ref,
+			Binding<T> item, Bindings dest) {
+		DeclarationType dt = item.source.declarationType;
+		if (dt != DeclarationType.CONTRACT && dt != DeclarationType.PROVIDED) {
+			dest.add(env, item);
 			return;
+		}
+		Class<T> impl = item.type().rawType;
+		ContractsBy contractsBy = env.property(ContractsBy.class, impl.getPackage());
+		if (contractsBy.isContract(impl, impl))
+			dest.add(env, item);
 		for (Type<? super T> supertype : item.type().supertypes())
 			// Object is of course a superclass but not indented when doing super-binds
-			if (supertype.rawType != Object.class)
-				target.add(env, item.typed(supertype));
+			if (supertype.rawType != Object.class //
+					&& contractsBy.isContract(supertype.rawType, impl))
+				dest.add(env, item.typed(supertype));
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -103,12 +110,12 @@ public final class DefaultValueBinders {
 	}
 
 	private static <T> void bindConstant(Env env, Constant<?> ref,
-			Binding<T> item, Bindings target) {
+			Binding<T> item, Bindings dest) {
 		T constant = item.type().rawType.cast(ref.value);
 		Supplier<T> supplier = ref.scoped
 				? supplyScopedConstant(constant)
 				: supplyConstant(constant);
-		target.addExpanded(env,
+		dest.addExpanded(env,
 				item.complete(BindingType.PREDEFINED, supplier));
 		Class<?> impl = ref.value.getClass();
 		// implicitly bind to the exact type of the constant
@@ -116,7 +123,7 @@ public final class DefaultValueBinders {
 		if (ref.autoBindExactType && item.source.declarationType == DeclarationType.EXPLICIT && item.type().rawType != impl) {
 			@SuppressWarnings("unchecked")
 			Class<T> type = (Class<T>) ref.value.getClass();
-			target.addExpanded(env,
+			dest.addExpanded(env,
 					Binding.binding(item.signature.typed(raw(type)),
 							BindingType.PREDEFINED, supplier, item.scope,
 							item.source.typed(DeclarationType.IMPLICIT)));
@@ -124,41 +131,41 @@ public final class DefaultValueBinders {
 	}
 
 	private static <T> void bindReferencePreferConstants(Env env,
-			Instance<?> ref, Binding<T> item, Bindings target) {
+			Instance<?> ref, Binding<T> item, Bindings dest) {
 		Type<?> refType = ref.type();
 		if (isClassBanal(refType.rawType)) {
-			target.addExpanded(env, item, new Constant<>(
+			dest.addExpanded(env, item, new Constant<>(
 					Reflect.construct(refType.rawType, env::accessible,
 							RuntimeException::new)).manual());
 			//TODO shouldn't this use New instead?
 			return;
 		}
-		bindReference(env, ref, item, target);
+		bindReference(env, ref, item, dest);
 	}
 
 	private static <T> void bindReference(Env env, Instance<?> ref,
-			Binding<T> item, Bindings target) {
+			Binding<T> item, Bindings dest) {
 		Type<?> refType = ref.type();
 		if (isCompatibleSupplier(item.type(), refType)) {
 			@SuppressWarnings("unchecked")
 			Class<? extends Supplier<? extends T>> supplier = (Class<? extends Supplier<? extends T>>) refType.rawType;
-			target.addExpanded(env, item.complete(BindingType.REFERENCE,
+			dest.addExpanded(env, item.complete(BindingType.REFERENCE,
 					Supply.bySupplierReference(supplier)));
-			implicitlyBindToConstructor(env, ref, item, target);
+			implicitlyBindToConstructor(env, ref, item, dest);
 			return;
 		}
 		final Type<? extends T> type = refType.castTo(item.type());
 		final Instance<T> bound = item.signature.instance;
 		if (!bound.type().equalTo(type) || !ref.name.isCompatibleWith(
 				bound.name)) {
-			target.addExpanded(env, item.complete(BindingType.REFERENCE,
+			dest.addExpanded(env, item.complete(BindingType.REFERENCE,
 					Supply.byInstanceReference(ref.typed(type))));
-			implicitlyBindToConstructor(env, ref, item, target);
+			implicitlyBindToConstructor(env, ref, item, dest);
 			return;
 		}
 		if (type.isInterface())
 			throw InconsistentBinding.referenceLoop(item, ref, bound);
-		bindToConstructsBy(env, type.rawType, item, target);
+		bindToConstructsBy(env, type.rawType, item, dest);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -173,23 +180,23 @@ public final class DefaultValueBinders {
 	}
 
 	private static <T> void implicitlyBindToConstructor(Env env,
-			Instance<T> ref, Binding<?> item, Bindings target) {
+			Instance<T> ref, Binding<?> item, Bindings dest) {
 		Class<T> impl = ref.type().rawType;
 		if (isClassConstructable(impl)) {
 			Binding<T> binding = Binding.binding(
 					new Locator<>(ref).indirect(item.signature.target.indirect),
 					BindingType.CONSTRUCTOR, null, item.scope,
 					item.source.typed(DeclarationType.IMPLICIT));
-			bindToConstructsBy(env, impl, binding, target);
+			bindToConstructsBy(env, impl, binding, dest);
 		}
 	}
 
 	private static <T> void bindToConstructsBy(Env env, Class<? extends T> ref,
-			Binding<T> item, Bindings target) {
+			Binding<T> item, Bindings dest) {
 		Constructor<?> c = env.property(ConstructsBy.class,
 				item.source.pkg()).reflect(ref.getDeclaredConstructors());
 		if (c != null)
-			target.addExpanded(env, item,
+			dest.addExpanded(env, item,
 					Constructs.constructs(raw(c.getDeclaringClass()), c));
 	}
 }

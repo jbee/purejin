@@ -37,8 +37,8 @@ public final class Bind {
 		return as(DeclarationType.MULTI);
 	}
 
-	public Bind asSuper() {
-		return as(DeclarationType.SUPER);
+	public Bind asContract() {
+		return as(DeclarationType.CONTRACT);
 	}
 
 	public Bind asImplicit() {

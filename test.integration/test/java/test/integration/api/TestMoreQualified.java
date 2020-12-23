@@ -6,7 +6,6 @@ import se.jbee.inject.lang.Qualifying;
 import se.jbee.inject.lang.Type;
 
 import java.util.Arrays;
-import java.util.Comparator;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Instance.defaultInstanceOf;
@@ -16,101 +15,110 @@ import static se.jbee.inject.lang.Type.raw;
 
 class TestMoreQualified {
 
-	static class HigherNumberIsMoreApplicable
-			implements Qualifying<HigherNumberIsMoreApplicable> {
+	private static class HigherNumberIsMoreQualified
+			implements Qualifying<HigherNumberIsMoreQualified> {
 
 		final int value;
 
-		HigherNumberIsMoreApplicable(int value) {
+		HigherNumberIsMoreQualified(int value) {
 			this.value = value;
 		}
 
 		@Override
-		public boolean moreQualifiedThan(HigherNumberIsMoreApplicable other) {
+		public boolean moreQualifiedThan(HigherNumberIsMoreQualified other) {
 			return value > other.value;
 		}
 
 	}
 
-	static HigherNumberIsMoreApplicable hip(int value) {
-		return new HigherNumberIsMoreApplicable(value);
+	static HigherNumberIsMoreQualified hip(int value) {
+		return new HigherNumberIsMoreQualified(value);
 	}
 
 	@Test
-	void thatMoreApplicabilityEvalsToTrue() {
+	void moreQualifiedValueIsRecognisedAsMoreQualified() {
 		assertTrue(hip(2).moreQualifiedThan(hip(1)));
 	}
 
 	@Test
-	void thatEqualApplicabilityEvalsToFalse() {
+	void equallyQualifiedValueIsNotMoreQualified() {
 		assertFalse(hip(2).moreQualifiedThan(hip(2)));
 	}
 
 	@Test
-	void thatLessApplicabilityEvalsToFalse() {
+	void lessQualifiedValueIsNotMoreQualified() {
 		assertFalse(hip(1).moreQualifiedThan(hip(2)));
 	}
 
 	@Test
-	void thatMoreApplicabilityComesFirstInSortOrder() {
-		HigherNumberIsMoreApplicable[] values = new HigherNumberIsMoreApplicable[] {
+	void mostQualifiedIsFirstInSortOrder() {
+		HigherNumberIsMoreQualified[] values = new HigherNumberIsMoreQualified[] {
 				hip(1), hip(2) };
-		Arrays.sort(values, comparator(HigherNumberIsMoreApplicable.class));
+		Arrays.sort(values, Qualifying::compare);
 		assertEquals(2, values[0].value);
 	}
 
 	@Test
-	void thatSameTypeIsNotMoreApplicable() {
-		assertNotMoreApplicableThanItself(Type.raw(String.class));
+	void sameTypeIsNotMoreQualified() {
+		assertNotMoreQualifiedThanItself(Type.raw(String.class));
 	}
 
 	@Test
-	void thatSameDefaultNameIsNotMoreApplicable() {
-		assertNotMoreApplicableThanItself(Name.DEFAULT);
+	void sameDefaultNameIsNotMoreQualified() {
+		assertNotMoreQualifiedThanItself(Name.DEFAULT);
 	}
 
+	/**
+	 * This might sound a bit surprising at first. The reason is that an
+	 * "unnamed" instance is actually a named instance having the {@link
+	 * Name#DEFAULT} name. This is so that in case such a instance exists and
+	 * {@link Name#ANY} is used to resolve it you get the default named
+	 * instance. Should on the other hand a specific name be resolved it does
+	 * not matter that the default name is more qualified as it will not match
+	 * the specific name resolved.
+	 */
 	@Test
-	void thatUnnamedIsMoreApplicableThanNamedInstance() {
+	void unnamedIsMoreQualifiedThanNamedInstance() {
 		Type<Integer> type = raw(Integer.class);
 		Instance<Integer> named = instance(named("foo"), type);
 		Instance<Integer> unnamed = defaultInstanceOf(type);
-		assertMoreApplicable(unnamed, named);
+		assertMoreQualified(unnamed, named);
 	}
 
 	@Test
-	void thatUnnamedIsMoreApplicableThanNamed() {
+	void unnamedIsMoreQualifiedThanNamed() {
 		assertTrue(Name.DEFAULT.moreQualifiedThan(named("foo")));
 	}
 
 	@Test
-	void thatNamedIsNotMoreApplicableThanUnnamed() {
+	void namedIsNotMoreQualifiedThanUnnamed() {
 		assertFalse(named("bar").moreQualifiedThan(Name.DEFAULT));
 	}
 
 	@Test
-	void thatSameSpecificPackageIsNotMoreApplicable() {
-		assertNotMoreApplicableThanItself(Packages.packageOf(String.class));
+	void sameSpecificPackageIsNotMoreQualified() {
+		assertNotMoreQualifiedThanItself(Packages.packageOf(String.class));
 	}
 
 	@Test
-	void thatSpecificPackageIsMoreApplicableThanGlobal() {
-		assertMoreApplicable(Packages.packageOf(String.class), Packages.ALL);
+	void specificPackageIsMoreQualifiedThanGlobal() {
+		assertMoreQualified(Packages.packageOf(String.class), Packages.ALL);
 	}
 
 	@Test
-	void thatSpecificPackageIsMoreApplicableThanThatPackageWithItsSubPackages() {
-		assertMoreApplicable(Packages.packageOf(String.class),
+	void specificPackageIsMoreQualifiedThanThatPackageWithItsSubPackages() {
+		assertMoreQualified(Packages.packageOf(String.class),
 				Packages.packageAndSubPackagesOf(String.class));
 	}
 
 	@Test
-	void thatSpecificPackageIsMoreApplicableThanSubPackagesUnderIt() {
-		assertMoreApplicable(Packages.packageOf(String.class),
+	void specificPackageIsMoreQualifiedThanSubPackagesUnderIt() {
+		assertMoreQualified(Packages.packageOf(String.class),
 				Packages.subPackagesOf(String.class));
 	}
 
 	@Test
-	void thatApplicablityIsGivenByOrdinalStartingWithLowest() {
+	void qualificationIsGivenByOrdinalStartingWithLowest() {
 		DeclarationType[] types = DeclarationType.values();
 		for (int i = 1; i < types.length; i++) {
 			assertTrue(types[i].moreQualifiedThan(types[i - 1]));
@@ -118,27 +126,22 @@ class TestMoreQualified {
 	}
 
 	@Test
-	void thatExplicitSourceIsMoreApplicableThanAutoSource() {
+	void explicitSourceIsMoreQualifiedThanContractSource() {
 		Source source = Source.source(TestMoreQualified.class);
-		assertMoreApplicable(source.typed(DeclarationType.EXPLICIT),
-				source.typed(DeclarationType.SUPER));
+		assertMoreQualified(source.typed(DeclarationType.EXPLICIT),
+				source.typed(DeclarationType.CONTRACT));
 	}
 
-	private static <T extends Qualifying<? super T>> void assertMoreApplicable(
+	private static <T extends Qualifying<? super T>> void assertMoreQualified(
 			T morePrecise, T lessPrecise) {
 		assertTrue(morePrecise.moreQualifiedThan(lessPrecise));
 		assertFalse(lessPrecise.moreQualifiedThan(morePrecise));
 	}
 
-	private static <T extends Qualifying<? super T>> void assertNotMoreApplicableThanItself(
+	private static <T extends Qualifying<? super T>> void assertNotMoreQualifiedThanItself(
 			T type) {
 		assertFalse(type.moreQualifiedThan(type));
 		assertEquals(0, Qualifying.compare(type, type));
-	}
-
-	public static <T extends Qualifying<? super T>> Comparator<T> comparator(
-			@SuppressWarnings("unused") Class<T> cls) {
-		return (one, other) -> Qualifying.compare(one, other);
 	}
 
 }

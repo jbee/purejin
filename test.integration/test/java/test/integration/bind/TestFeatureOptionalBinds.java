@@ -5,6 +5,8 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.Environment;
+import se.jbee.inject.config.ContractsBy;
 import se.jbee.inject.defaults.DefaultFeature;
 
 import java.util.Optional;
@@ -25,13 +27,13 @@ class TestFeatureOptionalBinds {
 
 		@Override
 		protected void declare() {
-			superbind(int.class).to(5);
+			contractbind(int.class).to(5);
 			bind(String.class).to("foo");
 		}
-
 	}
 
 	private final Injector context = Bootstrap.injector(
+			Environment.DEFAULT.with(ContractsBy.class, ContractsBy.SUPER),
 			TestOptionalBindsModule.class);
 
 	@Test

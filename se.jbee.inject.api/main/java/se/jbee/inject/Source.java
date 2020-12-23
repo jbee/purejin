@@ -11,8 +11,6 @@ import java.io.Serializable;
 
 /**
  * Where does a bind come from and what type of declaration has it been.
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Source
 		implements Qualifying<Source>, Serializable, Comparable<Source> {

@@ -38,7 +38,7 @@ public final class Environment implements Env {
 	 */
 	public static final Environment DEFAULT = new Environment() //
 			.with(Edition.class, Edition.FULL) //
-			.withBinder(Binding.class, DefaultValueBinders.SUPER_TYPES) //
+			.withBinder(Binding.class, DefaultValueBinders.CONTRACTS) //
 			.withBinder(Constructs.class, DefaultValueBinders.CONSTRUCTS) //
 			.withBinder(Constant.class, DefaultValueBinders.CONSTANT) //
 			.withBinder(Produces.class, DefaultValueBinders.PRODUCES) //
@@ -52,6 +52,7 @@ public final class Environment implements Env {
 			.with(NamesBy.class, obj -> Name.DEFAULT) //
 			.with(ScopesBy.class, ScopesBy.AUTO) //
 			.with(HintsBy.class, param -> null) //
+			.with(ContractsBy.class, ContractsBy.PROTECTIVE) //
 			.with(Annotated.Enhancer.class, Annotated.SOURCE) //
 			.with(BindingConsolidation.class, DefaultBindingConsolidation::consolidate) //
 			.with(Env.GP_USE_DEEP_REFLECTION, false) //

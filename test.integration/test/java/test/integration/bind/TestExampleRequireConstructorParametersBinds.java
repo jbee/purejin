@@ -68,20 +68,20 @@ class TestExampleRequireConstructorParametersBinds {
 			implements ValueBinder<Constructs<?>> {
 
 		@Override
-		public <T> void expand(Env env, Constructs<?> value, Binding<T> incomplete,
-				Bindings bindings) {
-			DefaultValueBinders.CONSTRUCTS.expand(env, value, incomplete, bindings);
-			Type<?>[] params = Type.parameterTypes(value.target);
+		public <T> void expand(Env env, Constructs<?> ref, Binding<T> item,
+				Bindings dest) {
+			DefaultValueBinders.CONSTRUCTS.expand(env, ref, item, dest);
+			Type<?>[] params = Type.parameterTypes(ref.target);
 			for (Type<?> param : params) {
-				bindings.addExpanded(env, required(param, incomplete));
+				dest.addExpanded(env, required(param, item));
 			}
 		}
 
 		private static <T> Binding<T> required(Type<T> type,
-				Binding<?> binding) {
+				Binding<?> item) {
 			return Binding.binding(new Locator<>(Instance.anyOf(type)),
-					BindingType.REQUIRED, Supply.required(), binding.scope,
-					binding.source.typed(DeclarationType.REQUIRED));
+					BindingType.REQUIRED, Supply.required(), item.scope,
+					item.source.typed(DeclarationType.REQUIRED));
 		}
 	}
 
