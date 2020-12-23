@@ -14,7 +14,7 @@ import java.lang.reflect.Field;
  * @param <T> type of the constant shared
  * @since 8.1
  */
-public final class Accesses<T> extends ReflectiveRef<Field, T> implements Supplier<T> {
+public final class Accesses<T> extends ReflectiveDescriptor<Field, T> implements Supplier<T> {
 
 	public static <T> Accesses<? extends T> accesses(Type<T> expectedType, Object as, Field target) {
 		@SuppressWarnings("unchecked")
@@ -50,7 +50,7 @@ public final class Accesses<T> extends ReflectiveRef<Field, T> implements Suppli
 	 * This can be thought of as the default implementation.
 	 * <p>
 	 * So an {@link Accesses} can be used as the {@link Supplier} but it can
-	 * also just be used as the {@link Ref} and data to create another {@link
+	 * also just be used as the {@link Descriptor} and data to create another {@link
 	 * Supplier}.
 	 */
 	@SuppressWarnings("unchecked")

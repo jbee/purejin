@@ -44,8 +44,8 @@ public final class Environment implements Env {
 			.withBinder(Produces.class, DefaultValueBinders.PRODUCES) //
 			.withBinder(Accesses.class, DefaultValueBinders.SHARES) //
 			.withBinder(Instance.class, DefaultValueBinders.REFERENCE) //
-			.withBinder(Ref.BridgeRef.class, DefaultValueBinders.BRIDGE) //
-			.withBinder(Ref.ArrayRef.class, DefaultValueBinders.ARRAY) //
+			.withBinder(Descriptor.BridgeDescriptor.class, DefaultValueBinders.BRIDGE) //
+			.withBinder(Descriptor.ArrayDescriptor.class, DefaultValueBinders.ARRAY) //
 			.with(ConstructsBy.class, ConstructsBy.OPTIMISTIC) //
 			.with(AccessesBy.class, impl -> null) //
 			.with(ProducesBy.class, impl -> null) //
@@ -142,7 +142,7 @@ public final class Environment implements Env {
 		return this;
 	}
 
-	public <T extends Ref> Environment withBinder(Class<? extends Ref> property, ValueBinder<T> value) {
+	public <T extends Descriptor> Environment withBinder(Class<? extends Descriptor> property, ValueBinder<T> value) {
 		return with(raw(ValueBinder.class).parametized(classType(property)), value);
 	}
 

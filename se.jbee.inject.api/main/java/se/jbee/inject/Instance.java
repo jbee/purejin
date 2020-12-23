@@ -18,7 +18,7 @@ import static se.jbee.inject.lang.Type.raw;
  * distinguished by the {@link Name} used.
  */
 public final class Instance<T>
-		implements Typed<T>, Ref, Qualifying<Instance<?>>, Serializable,
+		implements Typed<T>, Descriptor, Qualifying<Instance<?>>, Serializable,
 		Comparable<Instance<?>> {
 
 	/**

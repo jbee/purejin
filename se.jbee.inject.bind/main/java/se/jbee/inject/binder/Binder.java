@@ -991,7 +991,7 @@ public class Binder {
 			expand(Constructs.constructs(locator.type(), target, args));
 		}
 
-		protected final void expand(Ref value) {
+		protected final void expand(Descriptor value) {
 			declareBindingsIn(bind() //
 					.asType(locator, BindingType.VALUE, null), value);
 		}
@@ -1002,7 +1002,7 @@ public class Binder {
 			declareBindingsIn(binding, binding);
 		}
 
-		private void declareBindingsIn(Binding<?> binding, Ref value) {
+		private void declareBindingsIn(Binding<?> binding, Descriptor value) {
 			bindings().addExpanded(env(), binding, value);
 		}
 
@@ -1141,7 +1141,7 @@ public class Binder {
 		}
 
 		public <I extends T> void toParametrized(Class<I> impl) {
-			expand(new BridgeRef(impl));
+			expand(new BridgeDescriptor(impl));
 		}
 
 		public <I extends Supplier<? extends T>> void toSupplier(
@@ -1202,7 +1202,7 @@ public class Binder {
 
 		@SafeVarargs
 		public final void toElements(Hint<? extends E>... elems) {
-			expand(new ArrayRef(elems));
+			expand(new ArrayDescriptor(elems));
 		}
 
 		@SafeVarargs

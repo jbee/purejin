@@ -56,7 +56,7 @@ public final class Bindings {
 		addExpanded(env, binding, binding);
 	}
 
-	public <V extends Ref> void addExpanded(Env env, Binding<?> binding, V value) {
+	public <V extends Descriptor> void addExpanded(Env env, Binding<?> binding, V value) {
 		@SuppressWarnings("unchecked")
 		Class<V> type = (Class<V>) value.getClass();
 		Package ns = binding.source.ident.getPackage();

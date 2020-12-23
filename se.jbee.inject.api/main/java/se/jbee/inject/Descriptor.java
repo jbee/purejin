@@ -12,24 +12,24 @@ package se.jbee.inject;
  *
  * @since 8.1
  */
-public interface Ref { // alternative name: Descriptor
+public interface Descriptor {
 
 	/* just a marker */
 
 
-	final class BridgeRef implements Ref {
+	final class BridgeDescriptor implements Descriptor {
 
 		public final Class<?> type;
 
-		public BridgeRef(Class<?> type) {
+		public BridgeDescriptor(Class<?> type) {
 			this.type = type;
 		}
 	}
 
-	final class ArrayRef implements Ref {
+	final class ArrayDescriptor implements Descriptor {
 		public final Hint<?>[] elements;
 
-		public ArrayRef(Hint<?>[] elements) {
+		public ArrayDescriptor(Hint<?>[] elements) {
 			this.elements = elements;
 		}
 	}

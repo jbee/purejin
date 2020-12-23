@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
 
 /**
  * A {@linkplain ValueBinder} is a pure function that transforms a source value
- * {@link Ref} of a certain type to one or more complete {@link Binding}s that
+ * {@link Descriptor} of a certain type to one or more complete {@link Binding}s that
  * are added to the target set of {@link Bindings}.
  *
  * <h2>How {@link ValueBinder}s Work</h2>
@@ -51,11 +51,11 @@ import java.lang.reflect.Method;
  * Further custom types can be added. In that case the {@link Env} must be
  * extended to include the {@link ValueBinder} that can handle the custom type.
  *
- * @param <R> The type of source value that is expanded by this {@link
+ * @param <D> The type of source value that is expanded by this {@link
  *            ValueBinder}
  */
 @FunctionalInterface
-public interface ValueBinder<R extends Ref> {
+public interface ValueBinder<D extends Descriptor> {
 
 	/**
 	 * Expands the incomplete {@link Binding} and value given to a complete
@@ -69,24 +69,24 @@ public interface ValueBinder<R extends Ref> {
 	 *               Supplier})
 	 * @param dest complete {@link Binding}s are be added to it
 	 */
-	<T> void expand(Env env, R ref, Binding<T> item, Bindings dest);
+	<T> void expand(Env env, D ref, Binding<T> item, Bindings dest);
 
 	/**
 	 * A {@link Completion} just uses the passed value to {@link
-	 * Completion#complete(Env, Binding, Ref)} the {@link Binding} and add it to
+	 * Completion#complete(Env, Binding, Descriptor)} the {@link Binding} and add it to
 	 * the {@link Bindings}. Its main purpose to to capture this recurring
 	 * pattern, reduce the duplication caused by it and make the code more
 	 * readable.
 	 */
 	@FunctionalInterface
-	interface Completion<R extends Ref> extends ValueBinder<R> {
+	interface Completion<D extends Descriptor> extends ValueBinder<D> {
 
 		@Override
-		default <T> void expand(Env env, R ref, Binding<T> item,
+		default <T> void expand(Env env, D ref, Binding<T> item,
 				Bindings dest) {
 			dest.addExpanded(env, complete(env, item, ref));
 		}
 
-		<T> Binding<T> complete(Env env, Binding<T> item, R ref);
+		<T> Binding<T> complete(Env env, Binding<T> item, D ref);
 	}
 }

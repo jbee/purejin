@@ -27,7 +27,7 @@ import static se.jbee.inject.lang.Type.raw;
  *
  * @param <T> The {@link Type} of the argument
  */
-public final class Hint<T> implements Typed<T>, Ref {
+public final class Hint<T> implements Typed<T>, Descriptor {
 
 	private static final Hint<?>[] NO_PARAMS = new Hint<?>[0];
 

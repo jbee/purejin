@@ -19,7 +19,8 @@ import static se.jbee.inject.lang.Type.classType;
  *
  * @param <T> Type of object created
  */
-public final class Constructs<T> extends ReflectiveRef<Constructor<?>, T> {
+public final class Constructs<T> extends
+		ReflectiveDescriptor<Constructor<?>, T> {
 
 	public static <T> Constructs<? extends T> constructs(Type<T> expectedType,
 			Constructor<?> target, Hint<?>... args) {

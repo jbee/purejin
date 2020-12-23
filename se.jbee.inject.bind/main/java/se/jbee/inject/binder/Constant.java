@@ -7,7 +7,7 @@ package se.jbee.inject.binder;
 
 import se.jbee.inject.Scope;
 import se.jbee.inject.bind.ValueBinder;
-import se.jbee.inject.Ref;
+import se.jbee.inject.Descriptor;
 
 /**
  * A {@link Constant} is the {@link ValueBinder} expansion wrapper type for any
@@ -15,7 +15,7 @@ import se.jbee.inject.Ref;
  *
  * @param <T> Type of the constant value
  */
-public final class Constant<T> implements Ref {
+public final class Constant<T> implements Descriptor {
 
 	public final T value;
 	public final boolean autoBindExactType;

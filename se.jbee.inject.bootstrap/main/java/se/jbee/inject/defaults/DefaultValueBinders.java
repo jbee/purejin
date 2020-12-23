@@ -29,8 +29,8 @@ import static se.jbee.inject.lang.Utils.isClassConstructable;
  */
 public final class DefaultValueBinders {
 
-	public static final ValueBinder.Completion<Ref.BridgeRef> BRIDGE = DefaultValueBinders::bindGenericReference;
-	public static final ValueBinder.Completion<Ref.ArrayRef> ARRAY = DefaultValueBinders::bindArrayElements;
+	public static final ValueBinder.Completion<Descriptor.BridgeDescriptor> BRIDGE = DefaultValueBinders::bindGenericReference;
+	public static final ValueBinder.Completion<Descriptor.ArrayDescriptor> ARRAY = DefaultValueBinders::bindArrayElements;
 	public static final ValueBinder.Completion<Constructs<?>> CONSTRUCTS = DefaultValueBinders::bindConstruction;
 	public static final ValueBinder.Completion<Produces<?>> PRODUCES = DefaultValueBinders::bindProduction;
 	public static final ValueBinder.Completion<Accesses<?>> SHARES = DefaultValueBinders::bindAccess;
@@ -68,7 +68,7 @@ public final class DefaultValueBinders {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private static <T> Binding<T> bindArrayElements(Env env, Binding<T> item,
-			Ref.ArrayRef ref) {
+			Descriptor.ArrayDescriptor ref) {
 		return item.complete(PREDEFINED,
 				createArraySupplier((Type) item.type(), ref.elements));
 	}
@@ -81,7 +81,7 @@ public final class DefaultValueBinders {
 	}
 
 	private static <T> Binding<T> bindGenericReference(Env env, Binding<T> item,
-			Ref.BridgeRef ref) {
+			Descriptor.BridgeDescriptor ref) {
 		return item.complete(BindingType.REFERENCE,
 				byParameterizedInstanceReference(
 						anyOf(raw(ref.type).castTo(item.type()))));

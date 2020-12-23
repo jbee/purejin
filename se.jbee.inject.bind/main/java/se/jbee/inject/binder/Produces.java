@@ -20,7 +20,7 @@ import static se.jbee.inject.lang.Type.parameterType;
  *
  * @param <T> type of the value yield by the factory method
  */
-public final class Produces<T> extends ReflectiveRef<Method, T> {
+public final class Produces<T> extends ReflectiveDescriptor<Method, T> {
 
 	public static <T> Produces<? extends T> produces(Type<T> expectedType,
 			Object owner, Method target, Hint<?>... args) {

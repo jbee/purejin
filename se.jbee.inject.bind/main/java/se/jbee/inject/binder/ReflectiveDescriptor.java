@@ -2,15 +2,15 @@ package se.jbee.inject.binder;
 
 import se.jbee.inject.Annotated;
 import se.jbee.inject.Hint;
-import se.jbee.inject.Ref;
+import se.jbee.inject.Descriptor;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.Typed;
 
 import java.lang.reflect.*;
 import java.util.function.Function;
 
-abstract class ReflectiveRef<M extends AnnotatedElement & Member, T>
-		implements Typed<T>, Annotated, Ref {
+abstract class ReflectiveDescriptor<M extends AnnotatedElement & Member, T>
+		implements Typed<T>, Annotated, Descriptor {
 
 	public final Type<? super T> expectedType;
 	public final Type<T> actualType;
@@ -18,7 +18,7 @@ abstract class ReflectiveRef<M extends AnnotatedElement & Member, T>
 	public final M target;
 	public final Hint<?>[] hints;
 
-	public ReflectiveRef(Type<? super T> expectedType, Object as, M target, Hint<?>[] hints,
+	public ReflectiveDescriptor(Type<? super T> expectedType, Object as, M target, Hint<?>[] hints,
 			Type<T> actualType) {
 		actualType.castTo(expectedType);
 		this.expectedType = expectedType;
