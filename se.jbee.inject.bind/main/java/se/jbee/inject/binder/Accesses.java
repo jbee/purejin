@@ -16,7 +16,8 @@ import java.lang.reflect.Field;
  */
 public final class Accesses<T> extends ReflectiveDescriptor<Field, T> implements Supplier<T> {
 
-	public static <T> Accesses<? extends T> accesses(Type<T> expectedType, Object as, Field target) {
+	public static <T> Accesses<? extends T> accesses(Type<T> expectedType,
+			Object as, Field target) {
 		@SuppressWarnings("unchecked")
 		Type<? extends T> actualType = (Type<? extends T>) actualType(as, target);
 		return new Accesses<>(expectedType, actualType, as, target);
@@ -28,7 +29,8 @@ public final class Accesses<T> extends ReflectiveDescriptor<Field, T> implements
 		return new Accesses<>(actualType, actualType, as, target);
 	}
 
-	private Accesses(Type<? super T> expectedType, Type<T> actualType, Object as, Field target) {
+	private Accesses(Type<? super T> expectedType, Type<T> actualType,
+			Object as, Field target) {
 		super(expectedType, as, target, Hint.none(), actualType);
 	}
 

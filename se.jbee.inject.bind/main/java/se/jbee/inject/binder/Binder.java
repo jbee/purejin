@@ -308,15 +308,15 @@ public class Binder {
 	 *
 	 * @since 8.1
 	 */
-	public ConnectBinder connect() {
+	public final ConnectBinder connect() {
 		Package ns = bind.source.pkg();
-		return new ConnectBinder(this,
+		return connect(
 				env().property(CONNECT_QUALIFIER, ProducesBy.class, ns,
 						env().property(ProducesBy.class, ns)));
 	}
 
-	public ConnectBinder connect(ProducesBy linksBy) {
-		return new ConnectBinder(this, linksBy);
+	public ConnectBinder connect(ProducesBy connectsBy) {
+		return new ConnectBinder(this, connectsBy);
 	}
 
 	public <T> ConnectTargetBinder<T> connect(Class<T> api) {
@@ -373,7 +373,7 @@ public class Binder {
 	 *            some method
 	 * @since 8.1
 	 */
-	public <T> BootBinder<T> boot(Class<T> target) {
+	public final <T> BootBinder<T> boot(Class<T> target) {
 		return boot(Name.DEFAULT, raw(target));
 	}
 
@@ -509,7 +509,7 @@ public class Binder {
 			this.plugin = plugin;
 		}
 
-		public void into(Class<?> pluginPoint) {
+		public final void into(Class<?> pluginPoint) {
 			into(pluginPoint, plugin.getCanonicalName());
 		}
 
@@ -552,7 +552,7 @@ public class Binder {
 		/**
 		 * @see #in(Type)
 		 */
-		public <T> ConnectTargetBinder<T> in(Class<T> target) {
+		public final <T> ConnectTargetBinder<T> in(Class<T> target) {
 			return in(raw(target));
 		}
 
@@ -587,22 +587,21 @@ public class Binder {
 			this.target = target;
 		}
 
-		public ConnectTargetBinder<T> asAction() {
+		public final ConnectTargetBinder<T> asAction() {
 			return to(ACTION_CONNECTOR);
 		}
 
-		public ConnectTargetBinder<T> to(String connectorName) {
+		public final ConnectTargetBinder<T> to(String connectorName) {
 			return to(named(connectorName));
 		}
 
-		public ConnectTargetBinder<T> to(Class<?> connectorName) {
+		public final ConnectTargetBinder<T> to(Class<?> connectorName) {
 			return to(named(connectorName));
 		}
 
 		public ConnectTargetBinder<T> to(Name connectorName) {
-			binder.upbind(target) //
-					.to((instance, as, context) ->
-							init(connectorName, instance, as, context));
+			binder.upbind(target).to((instance, as, context) -> //
+					init(connectorName, instance, as, context));
 			return this; // for multiple to
 		}
 
@@ -692,25 +691,25 @@ public class Binder {
 					namesBy, scopesBy, mirror);
 		}
 
-		public void in(Class<?> impl) {
+		public final void in(Class<?> impl) {
 			in(impl, Hint.none());
 		}
 
-		public void in(Class<?> impl, Class<?>... more) {
+		public final void in(Class<?> impl, Class<?>... more) {
 			in(impl);
 			for (Class<?> i : more)
 				in(i);
 		}
 
-		public void in(Object impl, Hint<?>... construction) {
-			if (impl instanceof  Hint) {
+		public final void in(Object impl, Hint<?>... construction) {
+			if (impl instanceof Hint) {
 				in(((Hint<?>) impl).asType.rawType, impl, construction);
 			} else {
 				in(impl.getClass(), impl, construction);
 			}
 		}
 
-		public void in(Class<?> impl, Hint<?>... construction) {
+		public final void in(Class<?> impl, Hint<?>... construction) {
 			in(impl, null, construction);
 		}
 
@@ -787,7 +786,7 @@ public class Binder {
 			return true;
 		}
 
-		public <T> void asConstructor(Constructor<T> target, Hint<?>... hints) {
+		public final <T> void asConstructor(Constructor<T> target, Hint<?>... hints) {
 			asConstructor(scopesBy.reflect(target), target, hints);
 		}
 
@@ -827,17 +826,17 @@ public class Binder {
 		// OPEN also allow naming for provided instances - this is used for
 		// value objects that become parameter; settings required and provided
 
-		public <T> void provide(Class<T> impl, Hint<?>... hints) {
+		public final <T> void provide(Class<T> impl, Hint<?>... hints) {
 			on(bind().asProvided()).bind(impl).toConstructor(hints);
 		}
 
-		public <T> void require(Class<T> dependency) {
-			require(raw(dependency));
+		public final <T> void require(Class<T> apiImplementation) {
+			require(raw(apiImplementation));
 		}
 
-		public <T> void require(Type<T> dependency) {
-			on(bind().asRequired()).bind(dependency).to(Supply.required(),
-					BindingType.REQUIRED);
+		public <T> void require(Type<T> apiImplementation) {
+			on(bind().asRequired()).bind(apiImplementation) //
+					.to(Supply.required(), BindingType.REQUIRED);
 		}
 
 		@Override
@@ -858,7 +857,7 @@ public class Binder {
 		 *
 		 * @since 8.1
 		 */
-		public TargetedBinder config() {
+		public final TargetedBinder config() {
 			return injectingInto(Config.class);
 		}
 
@@ -867,7 +866,7 @@ public class Binder {
 		 *
 		 * @since 8.1
 		 */
-		public TargetedBinder config(Class<?> ns) {
+		public final TargetedBinder config(Class<?> ns) {
 			return config().within(ns);
 		}
 
@@ -876,11 +875,11 @@ public class Binder {
 		 *
 		 * @since 8.1
 		 */
-		public TargetedBinder config(Instance<?> ns) {
+		public final TargetedBinder config(Instance<?> ns) {
 			return config().within(ns);
 		}
 
-		public TargetedBinder injectingInto(Class<?> target) {
+		public final TargetedBinder injectingInto(Class<?> target) {
 			return injectingInto(raw(target));
 		}
 
@@ -888,15 +887,15 @@ public class Binder {
 			return new TargetedBinder(root, bind().with(targeting(target)));
 		}
 
-		public TargetedBinder injectingInto(Name name, Class<?> type) {
+		public final TargetedBinder injectingInto(Name name, Class<?> type) {
 			return injectingInto(name, raw(type));
 		}
 
-		public TargetedBinder injectingInto(Name name, Type<?> type) {
+		public final TargetedBinder injectingInto(Name name, Type<?> type) {
 			return injectingInto(Instance.instance(name, type));
 		}
 
-		public TargetedBinder injectingInto(Type<?> target) {
+		public final TargetedBinder injectingInto(Type<?> target) {
 			return injectingInto(defaultInstanceOf(target));
 		}
 
@@ -916,23 +915,23 @@ public class Binder {
 			super(root, bind);
 		}
 
-		public Binder in(Packages packages) {
+		public final Binder in(Packages packages) {
 			return with(bind().target.in(packages));
 		}
 
-		public Binder inPackageAndSubPackagesOf(Class<?> type) {
+		public final Binder inPackageAndSubPackagesOf(Class<?> type) {
 			return with(bind().target.inPackageAndSubPackagesOf(type));
 		}
 
-		public Binder inPackageOf(Class<?> type) {
+		public final Binder inPackageOf(Class<?> type) {
 			return with(bind().target.inPackageOf(type));
 		}
 
-		public Binder inSubPackagesOf(Class<?> type) {
+		public final Binder inSubPackagesOf(Class<?> type) {
 			return with(bind().target.inSubPackagesOf(type));
 		}
 
-		public TargetedBinder within(Class<?> parent) {
+		public final TargetedBinder within(Class<?> parent) {
 			return within(raw(parent));
 		}
 
@@ -940,15 +939,15 @@ public class Binder {
 			return new TargetedBinder(root, bind().within(parent));
 		}
 
-		public TargetedBinder within(Name name, Class<?> parent) {
+		public final TargetedBinder within(Name name, Class<?> parent) {
 			return within(instance(name, raw(parent)));
 		}
 
-		public TargetedBinder within(Name name, Type<?> parent) {
+		public final TargetedBinder within(Name name, Type<?> parent) {
 			return within(instance(name, parent));
 		}
 
-		public TargetedBinder within(Type<?> parent) {
+		public final TargetedBinder within(Type<?> parent) {
 			return within(anyOf(parent));
 		}
 	}

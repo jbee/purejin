@@ -24,7 +24,7 @@ class TestType {
 		// needed to check supertypes() method
 	}
 
-	private static class Foo<A, B> extends Qux<A> {
+	private static class Foo<A, B> extends Qux<A> implements RandomAccess {
 		// needed to check supertypes() method
 	}
 
@@ -32,7 +32,7 @@ class TestType {
 		// needed to check supertypes() method
 	}
 
-	private interface QuxQux<T> {
+	private interface QuxQux<T> extends Serializable {
 		// needed to check supertypes() method
 	}
 
@@ -258,6 +258,13 @@ class TestType {
 				raw(Baz.class).parameterized(Integer.class));
 		assertContains(supertypes,
 				raw(QuxQux.class).parameterized(Float.class));
+		assertEquals(
+				"[test.integration.api.TestType.Baz<java.lang.Integer>, " +
+						"test.integration.api.TestType.Foo<java.lang.Float,java.lang.String>, " +
+						"java.util.RandomAccess, test.integration.api.TestType.Qux<java.lang.Float>, " +
+						"test.integration.api.TestType.QuxQux<java.lang.Float>, " +
+						"java.io.Serializable, java.lang.Object]",
+				supertypes.toString());
 	}
 
 	@Test

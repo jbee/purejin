@@ -76,7 +76,7 @@ public final class DefaultValueBinders {
 	@SuppressWarnings("unchecked")
 	private static <E> Supplier<E> createArraySupplier(Type<E[]> array,
 			Hint<?>[] elements) {
-		return (Supplier<E>) Supply.fromElements(array,
+		return (Supplier<E>) Supply.byElementReferences(array,
 				(Hint<? extends E>[]) elements);
 	}
 
@@ -174,7 +174,7 @@ public final class DefaultValueBinders {
 			return false;
 		if (requiredType.isAssignableTo(raw(Supplier.class)))
 			return false;
-		return providedType.toSuperType( Supplier.class) //
+		return providedType.toSuperType(Supplier.class) //
 				.parameter(0).isAssignableTo(requiredType);
 	}
 

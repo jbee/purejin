@@ -67,9 +67,9 @@ public final class Supply {
 				.supply(dep, context);
 	}
 
-	public static <E> Supplier<E[]> fromElements(Type<E[]> arrayType,
+	public static <E> Supplier<E[]> byElementReferences(Type<E[]> arrayType,
 			Hint<? extends E>[] elements) {
-		return new PredefinedArraySupplier<>(arrayType, elements);
+		return new ArrayElementReferencesSupplier<>(arrayType, elements);
 	}
 
 	public static <T> Supplier<T> byInstanceReference(Instance<T> instance) {
@@ -99,7 +99,7 @@ public final class Supply {
 	}
 
 	public static <T> Supplier<T> byProduction(Produces<T> produces) {
-		if (produces.declaresTypeParameters() && produces.requestsActualType()) {
+		if (produces.declaresTypeParameters() && produces.usesActualTypeFirstParameter()) {
 			// use a constant null hint to blank first parameter as it is filled in with actual type on method invocation
 			Hint<?> actualTypeHint = Hint.constantNull(
 					Type.parameterType(produces.target.getParameters()[0]));
@@ -153,12 +153,12 @@ public final class Supply {
 	 * A {@link Supplier} uses multiple different separate suppliers to provide
 	 * the elements of a array of the supplied type.
 	 */
-	private static final class PredefinedArraySupplier<E>
+	private static final class ArrayElementReferencesSupplier<E>
 			extends WithArgs<E[]> {
 
 		private final Type<E[]> arrayType;
 
-		PredefinedArraySupplier(Type<E[]> arrayType,
+		ArrayElementReferencesSupplier(Type<E[]> arrayType,
 				Hint<? extends E>[] elements) {
 			super(elements);
 			this.arrayType = arrayType;
@@ -168,7 +168,7 @@ public final class Supply {
 		@Override
 		protected E[] invoke(Object[] args, Injector context) {
 			@SuppressWarnings("unchecked")
-			E[] res = (E[]) newArray(arrayType.baseType().rawType, args.length);
+			E[] res = (E[]) newArray(arrayType.rawType.getComponentType(), args.length);
 			System.arraycopy(args, 0, res, 0, res.length);
 			return res;
 		}
@@ -264,11 +264,11 @@ public final class Supply {
 		}
 	}
 
-	public static String describe(Object behaviour) {
+	private static String describe(Object behaviour) {
 		return "<" + behaviour + ">";
 	}
 
-	public static String describe(Object behaviour, Object variant) {
+	private static String describe(Object behaviour, Object variant) {
 		return "<" + behaviour + ":" + variant + ">";
 	}
 

@@ -30,9 +30,7 @@ public class ServiceLoaderAnnotations extends BinderModule {
 	protected void declare() {
 		//TODO localise effect to package
 		for (ModuleWith<?> def : ServiceLoader.load(ModuleWith.class)) {
-			@SuppressWarnings("unchecked")
-			Type<? extends ModuleWith<?>> genericModuleType = (Type<? extends ModuleWith<?>>) raw(
-					def.getClass()).toSuperType(ModuleWith.class);
+			Type<?> genericModuleType = raw(def.getClass()).toSuperType(ModuleWith.class);
 			if (genericModuleType.parameter(0).rawType == Class.class) {
 				@SuppressWarnings("unchecked")
 				ModuleWith<Class<?>> effect = (ModuleWith<Class<?>>) def;

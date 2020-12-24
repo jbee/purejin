@@ -38,7 +38,8 @@ public final class Produces<T> extends ReflectiveDescriptor<Method, T> {
 		return new Produces<>(actualType, actualType, owner, target, args);
 	}
 
-	private Produces(Type<? super T> expectedType, Type<T> actualType, Object owner, Method target, Hint<?>[] hints) {
+	private Produces(Type<? super T> expectedType, Type<T> actualType,
+			Object owner, Method target, Hint<?>[] hints) {
 		super(expectedType, owner, target, hints, actualType);
 	}
 
@@ -67,12 +68,12 @@ public final class Produces<T> extends ReflectiveDescriptor<Method, T> {
 	 * @return true if the target {@link Method} has a matching {@link Type}
 	 * parameter as it first parameter, otherwise false
 	 */
-	public boolean requestsActualType() {
+	public boolean usesActualTypeFirstParameter() {
 		if (target.getParameterCount() == 0)
 			return false;
-		Type<?> parameterType = parameterType(target.getParameters()[0]);
-		if (parameterType.rawType != Type.class)
+		Type<?> arg0Type = parameterType(target.getParameters()[0]);
+		if (arg0Type.rawType != Type.class)
 			return false;
-		return parameterType.parameter(0).equalTo(type());
+		return arg0Type.parameter(0).equalTo(type());
 	}
 }

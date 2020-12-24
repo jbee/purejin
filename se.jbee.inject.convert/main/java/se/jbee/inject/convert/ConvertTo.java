@@ -44,7 +44,7 @@ public final class ConvertTo<B> {
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public ConvertTo(Converter<?, B> tail, Injector context) {
 		Class<? extends Converter> tailType = tail.getClass();
-		Type<? extends Converter> converterType = (Type<? extends Converter>) raw(
+		Type<?> converterType = raw(
 				tailType).toSuperType(Converter.class);
 		Type<?> directInputType = converterType.parameter(0);
 		this.out = (Type) converterType.parameter(1);

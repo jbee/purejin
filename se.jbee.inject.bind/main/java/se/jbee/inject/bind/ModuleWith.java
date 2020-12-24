@@ -25,8 +25,6 @@ import static se.jbee.inject.lang.Type.raw;
  *
  * @see Module
  *
- * @author Jan Bernitt (jan@jbee.se)
- *
  * @param <T> The type of the property value
  */
 @FunctionalInterface
@@ -57,5 +55,4 @@ public interface ModuleWith<T> extends Module {
 					getClass().getPackage());
 		declare(bindings, env, value);
 	}
-
 }
