@@ -116,7 +116,7 @@ class TestFeatureSelfInjectionBinds {
 
 			construct(Que.class);
 			bind(named("x"), Que.class).toConstructor(instance(named("y"),
-					raw(Foo.class).parametized(String.class)).asHint());
+					raw(Foo.class).parameterized(String.class)).asHint());
 		}
 	}
 
@@ -130,7 +130,7 @@ class TestFeatureSelfInjectionBinds {
 	@Test
 	void actualTypeFromAdHoc() {
 		Foo<?> fooString = context.resolve(
-				raw(Foo.class).parametized(String.class));
+				raw(Foo.class).parameterized(String.class));
 		assertSame(String.class, fooString.actualType.parameter(0).rawType);
 	}
 
@@ -142,19 +142,19 @@ class TestFeatureSelfInjectionBinds {
 
 	@Test
 	void actualTypeFromParameterNestedDeepType() {
-		assertEquals(raw(SuperFoo.class).parametized(Double.class),
+		assertEquals(raw(SuperFoo.class).parameterized(Double.class),
 				context.resolve(Bar.class).superFoo.actualType);
 	}
 
 	@Test
 	void actualTypeFromParameterNestedFlatWildcardType() {
-		assertEquals(raw(Foo.class).parametizedAsUpperBounds(),
+		assertEquals(raw(Foo.class).parameterizedAsUpperBounds(),
 				context.resolve(Que.class).genericFoo.actualType);
 	}
 
 	@Test
 	void actualTypeFromParameterNestedFlatWildcardTypeWithHintOverload() {
-		assertEquals(raw(Foo.class).parametized(String.class),
+		assertEquals(raw(Foo.class).parameterized(String.class),
 				context.resolve("x", Que.class).genericFoo.actualType);
 	}
 
@@ -177,7 +177,7 @@ class TestFeatureSelfInjectionBinds {
 	@Test
 	void actualNameFromAdHocInjected() {
 		assertEquals(named("ad-hoc"), context.resolve(named("ad-hoc"),
-				raw(Foo.class).parametized(String.class)).actualName);
+				raw(Foo.class).parameterized(String.class)).actualName);
 	}
 
 	@Test
@@ -213,9 +213,9 @@ class TestFeatureSelfInjectionBinds {
 	@Test
 	void actualDependencyFromAdHoc() {
 		@SuppressWarnings("rawtypes")
-		Type<Foo> type = raw(Foo.class).parametized(String.class);
+		Type<Foo> type = raw(Foo.class).parameterized(String.class);
 		assertSimilar(
-				dependency(type.asUpperBound().parametized(Type.WILDCARD)) //
+				dependency(type.asUpperBound().parameterized(Type.WILDCARD)) //
 				.injectingInto(anyOf(raw(Foo.class))), //
 				context.resolve(type).actualDependency);
 	}

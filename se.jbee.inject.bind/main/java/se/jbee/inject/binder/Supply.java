@@ -92,7 +92,7 @@ public final class Supply {
 		return (dep, context) -> {
 			Type<? super T> type = dep.type();
 			Instance<? extends T> parametrized = instance.typed(instance.type() //
-							.parametized(type.parameters()) //
+							.parameterized(type.parameters()) //
 							.upperBound(dep.type().isUpperBound()));
 			return context.resolve(dep.instanced(parametrized));
 		};
@@ -129,7 +129,7 @@ public final class Supply {
 			return () -> injector.resolve(dep);
 		@SuppressWarnings("unchecked")
 		Resource<? extends T> resource = injector.resolve(
-				dep.typed(raw(Resource.class).parametized(dep.type())));
+				dep.typed(raw(Resource.class).parameterized(dep.type())));
 		return () -> resource.generate(dep);
 	}
 

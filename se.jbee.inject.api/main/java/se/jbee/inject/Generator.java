@@ -26,12 +26,12 @@ public interface Generator<T> {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	static <T> Type<Generator<T>> generatorTypeOf(Type<T> providedType) {
-		return (Type) raw(Generator.class).parametized(providedType);
+		return (Type) raw(Generator.class).parameterized(providedType);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	static <T> Type<Generator<T>[]> generatorsTypeOf(Type<T> generatedType) {
-		return (Type) raw(Generator[].class).parametized(generatedType);
+		return (Type) raw(Generator[].class).parameterized(generatedType);
 	}
 
 	/**

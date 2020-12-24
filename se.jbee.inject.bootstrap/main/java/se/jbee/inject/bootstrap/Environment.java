@@ -143,7 +143,7 @@ public final class Environment implements Env {
 	}
 
 	public <T extends Descriptor> Environment withBinder(Class<? extends Descriptor> property, ValueBinder<T> value) {
-		return with(raw(ValueBinder.class).parametized(classType(property)), value);
+		return with(raw(ValueBinder.class).parameterized(classType(property)), value);
 	}
 
 	public <A extends Annotation> Environment withTypePattern(Class<A> qualifier,

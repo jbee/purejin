@@ -199,7 +199,7 @@ class TestFeatureActionBinds {
 	 */
 	private void createGenericServiceUUID() {
 		assertNotNull(context.resolve(
-				raw(GenericService.class).parametized(UUID.class)));
+				raw(GenericService.class).parameterized(UUID.class)));
 	}
 
 	/**

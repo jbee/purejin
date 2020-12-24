@@ -19,7 +19,7 @@ public interface Converter<A, B> {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	static <A, B> Type<Converter<A, B>> converterTypeOf(Type<A> a, Type<B> b) {
-		return (Type) Type.raw(Converter.class).parametized(a, b);
+		return (Type) Type.raw(Converter.class).parameterized(a, b);
 	}
 
 	/**

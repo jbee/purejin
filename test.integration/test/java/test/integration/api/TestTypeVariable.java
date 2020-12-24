@@ -43,12 +43,12 @@ class TestTypeVariable {
 	@Test
 	void simpleParameterizedType() {
 		assertActualType("example1", String.class, "E",
-				raw(List.class).parametized(String.class));
+				raw(List.class).parameterized(String.class));
 	}
 
 	@Test
 	void doubleParameterizedType() {
-		@SuppressWarnings("rawtypes") Type<Function> actual = raw(Function.class).parametized(String.class,
+		@SuppressWarnings("rawtypes") Type<Function> actual = raw(Function.class).parameterized(String.class,
 				Integer.class);
 		assertActualType("example2", String.class, "A", actual);
 		assertActualType("example2", Integer.class, "B", actual);
@@ -57,8 +57,8 @@ class TestTypeVariable {
 	@Test
 	void nestedParameterizedType() {
 		assertActualType("example3", String.class, "T",
-				raw(List.class).parametized(
-						raw(List.class).parametized(String.class)));
+				raw(List.class).parameterized(
+						raw(List.class).parameterized(String.class)));
 	}
 
 	@Test
@@ -76,27 +76,27 @@ class TestTypeVariable {
 	@Test
 	void mapWithParameterizedTypeGenericArray() {
 		assertActualType("example6", Float.class, "E",
-				raw(Map.class).parametized(raw(String.class),
-						raw(List.class).parametized(
+				raw(Map.class).parameterized(raw(String.class),
+						raw(List.class).parameterized(
 								raw(Float.class).addArrayDimension())));
 	}
 
 	@Test
 	void simpleWildcardType() {
 		assertActualType("example7", String.class, "E",
-				raw(List.class).parametized(String.class));
+				raw(List.class).parameterized(String.class));
 	}
 
 	@Test
 	void simpleGenericType() {
 		assertActualType("example8", String.class, "E",
-				raw(Class.class).parametized(String.class));
+				raw(Class.class).parameterized(String.class));
 	}
 
 	@Test
 	void simpleClassGenericType() {
 		assertActualType("example9", String.class, "C",
-				raw(List.class).parametized(String.class));
+				raw(List.class).parameterized(String.class));
 	}
 
 	private static void assertActualType(String method, Class<?> expected,

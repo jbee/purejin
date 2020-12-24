@@ -23,7 +23,7 @@ public interface Action<A, B> {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	static <A, B> Type<Action<A, B>> actionTypeOf(Type<A> in, Type<B> out) {
-		return (Type) raw(Action.class).parametized(in, out);
+		return (Type) raw(Action.class).parameterized(in, out);
 	}
 
 	static <A, B> Type<Action<A, B>> actionTypeOf(Class<A> in, Class<B> out) {

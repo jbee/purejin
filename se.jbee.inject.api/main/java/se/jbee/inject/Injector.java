@@ -91,7 +91,7 @@ public interface Injector {
 	default List<AnnotatedWith.AnnotatedInstance<?>> annotatedWith(
 			Class<? extends Annotation> annotationType) {
 		return resolve(raw(AnnotatedWith.class) //
-				.parametized(annotationType)).instances();
+				.parameterized(annotationType)).instances();
 	}
 
 	/**

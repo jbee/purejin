@@ -62,7 +62,7 @@ public final class Bindings {
 		Package ns = binding.source.ident.getPackage();
 		@SuppressWarnings("unchecked")
 		ValueBinder<V> binder = env.property(
-				raw(ValueBinder.class).parametized(classType(type)), ns);
+				raw(ValueBinder.class).parameterized(classType(type)), ns);
 		if (binder == null)
 			throw InconsistentBinding.undefinedValueBinderType(binding, type);
 		binder.expand(env, value, binding, this);

@@ -111,6 +111,6 @@ class TestExampleServiceFacadeBinds {
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	private static <A, B> Type<Service<A, B>> serviceTypeOf(Class<A> in, Class<B> out) {
-		return (Type) raw(Service.class).parametized(in, out);
+		return (Type) raw(Service.class).parameterized(in, out);
 	}
 }

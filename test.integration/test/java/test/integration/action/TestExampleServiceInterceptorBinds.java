@@ -131,7 +131,7 @@ class TestExampleServiceInterceptorBinds {
 	@Test
 	void beforeAndAfterAreInvokedOnSuccessfulServiceMethodCall() {
 		@SuppressWarnings("unchecked") Action<String, Integer> hashCode = context.resolve(
-				raw(Action.class).parametized(String.class, Integer.class));
+				raw(Action.class).parameterized(String.class, Integer.class));
 		assertNotNull(context.resolve(TheService.class));
 		int beforeCount = invocations.beforeCount;
 		int afterCount = invocations.afterCount;
@@ -144,7 +144,7 @@ class TestExampleServiceInterceptorBinds {
 	void afterExceptionIsInvokedWhenServiceMethodThrewException() {
 		@SuppressWarnings("unchecked")
 		Action<String, Void> fail = context.resolve(
-				raw(Action.class).parametized(String.class, Void.class));
+				raw(Action.class).parameterized(String.class, Void.class));
 		assertNotNull(context.resolve(TheService.class));
 		int afterExceptionCount = invocations.afterExceptionCount;
 		Exception e = assertThrows(ActionExecutionFailed.class,

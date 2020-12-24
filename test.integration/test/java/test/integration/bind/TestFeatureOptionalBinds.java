@@ -39,35 +39,35 @@ class TestFeatureOptionalBinds {
 	@Test
 	void optionalIsAvailableForExactType() {
 		assertEquals(Optional.of(5), context.resolve(
-				raw(Optional.class).parametized(Integer.class)));
+				raw(Optional.class).parameterized(Integer.class)));
 		assertEquals(Optional.of("foo"), context.resolve(
-				raw(Optional.class).parametized(String.class)));
+				raw(Optional.class).parameterized(String.class)));
 	}
 
 	@Test
 	void optionalIsAvailableForSuperType() {
 		assertEquals(Optional.of(5), context.resolve(
-				raw(Optional.class).parametized(Number.class)));
+				raw(Optional.class).parameterized(Number.class)));
 
 	}
 
 	@Test
 	void emptyOptionalReturnedOtherwise() {
 		assertEquals(Optional.empty(),
-				context.resolve(raw(Optional.class).parametized(Float.class)));
+				context.resolve(raw(Optional.class).parameterized(Float.class)));
 	}
 
 	@Test
 	void optionalOfOptionalOfIsAvailableForExactType() {
 		assertEquals(Optional.of(Optional.of(5)),
-				context.resolve(raw(Optional.class).parametized(
-						raw(Optional.class).parametized(Integer.class))));
+				context.resolve(raw(Optional.class).parameterized(
+						raw(Optional.class).parameterized(Integer.class))));
 	}
 
 	@Test
 	void emptyOptionalOfOptionalReturnedOtherwise() {
 		assertEquals(Optional.of(Optional.empty()),
-				context.resolve(raw(Optional.class).parametized(
-						raw(Optional.class).parametized(Float.class))));
+				context.resolve(raw(Optional.class).parameterized(
+						raw(Optional.class).parameterized(Float.class))));
 	}
 }

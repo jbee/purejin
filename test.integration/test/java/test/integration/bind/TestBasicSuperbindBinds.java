@@ -38,7 +38,7 @@ class TestBasicSuperbindBinds {
 		@Override
 		protected void declare() {
 			contractbind(Integer.class).to(42);
-			contractbind(raw(List.class).parametized(String.class)).to(emptyList());
+			contractbind(raw(List.class).parameterized(String.class)).to(emptyList());
 		}
 	}
 
@@ -64,6 +64,6 @@ class TestBasicSuperbindBinds {
 	@Test
 	void parametrizedSuperInterfaceOfSuperbindTypeIsBound() {
 		assertEquals(42, injector.resolve(
-				raw(Comparable.class).parametized(Integer.class)));
+				raw(Comparable.class).parameterized(Integer.class)));
 	}
 }

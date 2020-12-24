@@ -34,11 +34,11 @@ public interface ModuleWith<T> extends Module {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	Type<ModuleWith<Class<?>>> TYPE_ANNOTATION = //
-			(Type) raw(ModuleWith.class).parametized(Type.CLASS);
+			(Type) raw(ModuleWith.class).parameterized(Type.CLASS);
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	Type<ModuleWith<Method>> METHOD_ANNOTATION = //
-			(Type) raw(ModuleWith.class).parametized(Method.class);
+			(Type) raw(ModuleWith.class).parameterized(Method.class);
 
 	/**
 	 * @param bindings use to declare made bound within this {@link Module}.

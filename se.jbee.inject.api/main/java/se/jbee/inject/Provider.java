@@ -31,7 +31,7 @@ public interface Provider<T> {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	static <T> Type<Provider<T>> providerTypeOf(Type<T> providedType) {
-		return (Type) raw(Provider.class).parametized(providedType);
+		return (Type) raw(Provider.class).parameterized(providedType);
 	}
 
 	/**

@@ -251,8 +251,8 @@ class TestFeatureBootstrapper {
 				Environment.DEFAULT.with(ContractsBy.class, ContractsBy.OPTIMISTIC),
 				ReplacingBindsModule.class);
 		assertEquals(6, context.resolve(Number.class));
-		Resource<?>[] rs = context.resolve(raw(Resource.class).parametized(
-				Number.class).parametizedAsUpperBounds().addArrayDimension());
+		Resource<?>[] rs = context.resolve(raw(Resource.class).parameterized(
+				Number.class).parameterizedAsUpperBounds().addArrayDimension());
 		//TODO can this be limited to cases with a certain Scope so that container can be excluded?
 		assertEquals(4, rs.length);
 		assertEquals(1,

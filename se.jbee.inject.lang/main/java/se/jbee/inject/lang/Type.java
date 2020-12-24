@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.*;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
 /**
@@ -58,7 +57,7 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 		TypeVariable<?>[] vars = rawType.getTypeParameters();
 		return vars.length == 0
 				? this
-				: parametized(actualTypes(vars, emptyTypeArguments()));
+				: parameterized(actualTypes(vars, emptyTypeArguments()));
 	}
 
 	public static Type<?> actualFieldType(Field member, Type<?> genericDeclaringClass) {
@@ -301,7 +300,7 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 		return toSuperType(other.rawType).allParametersAreAssignableTo(other);
 	}
 
-	public boolean allParametersAreAssignableTo(Type<?> other) {
+	private boolean allParametersAreAssignableTo(Type<?> other) {
 		return Utils.arrayEquals(params, other.params, Type::asParameterAssignableTo);
 	}
 
@@ -412,10 +411,10 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 	 *         {@link #asUpperBound()}s. Use this to model &lt;?&gt; wildcard
 	 *         generic.
 	 */
-	public Type<T> parametizedAsUpperBounds() {
+	public Type<T> parameterizedAsUpperBounds() {
 		if (!isParameterized())
 			return isRawType()
-				? parametized(actualTypes(rawType.getTypeParameters(),
+				? parameterized(actualTypes(rawType.getTypeParameters(),
 					emptyTypeArguments()))
 				: this;
 		if (allTypeParametersAreUpperBounds())
@@ -439,11 +438,11 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 		return !Utils.arrayContains(params, p -> !p.isUpperBound());
 	}
 
-	public Type<T> parametized(Class<?>... typeParams) {
-		return parametized(Utils.arrayMap(typeParams, Type.class, Type::raw));
+	public Type<T> parameterized(Class<?>... typeParams) {
+		return parameterized(Utils.arrayMap(typeParams, Type.class, Type::raw));
 	}
 
-	public Type<T> parametized(Type<?>... params) {
+	public Type<T> parameterized(Type<?>... params) {
 		checkTypeParameters(params);
 		return new Type<>(upperBound, rawType, params);
 	}
@@ -453,7 +452,7 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 		return name(true);
 	}
 
-	void toString(StringBuilder str, boolean fullName) {
+	private void toString(StringBuilder str, boolean fullName) {
 		if (isUpperBound()) {
 			if (rawType == Object.class) {
 				str.append("?");
@@ -512,12 +511,12 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 
 	private void checkTypeParameters(TypeVariable<Class<T>> var, Type<?> arg,
 			Map<TypeVariable<?>, Type<?>> actualTypeArguments) {
-		for (java.lang.reflect.Type upperBound : var.getBounds()) {
-			Type<?> upperBoundType = genericType(upperBound, actualTypeArguments);
+		for (java.lang.reflect.Type genericUpperBound : var.getBounds()) {
+			Type<?> upperBoundType = genericType(genericUpperBound, actualTypeArguments);
 			Type<?> varType = actualTypeArguments.get(var);
 			if (varType != null && arg.equalTo(varType))
 				return; // recursive definition
-			if (upperBound != Object.class && !arg.isAssignableTo(upperBoundType)) {
+			if (genericUpperBound != Object.class && !arg.isAssignableTo(upperBoundType)) {
 				throw new IllegalArgumentException(arg
 					+ " is not assignable to the type variable: " + upperBoundType);
 			}
@@ -528,12 +527,14 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 	 * Returns the actual super-type of this {@link Type} (including its actual
 	 * type parameters) for the given super-{@link Class}.
 	 *
-	 * @see #castTo(Type)
-	 *
-	 * @param rawSuperType
+	 * @param rawSuperType a {@link Class} reference to a super-class or
+	 *                     super-interface of this {@link Type}. In other words
+	 *                     a {@link Class} type this {@link Type} would be
+	 *                     assignable to.
 	 * @return the actual super-{@link Type}
 	 * @throws ClassCastException if the given {@link Class} is no super-type of
 	 *                            this {@link Type}
+	 * @see #castTo(Type)
 	 */
 	@SuppressWarnings("unchecked")
 	public Type<? super T> toSuperType(Class<?> rawSuperType) {
@@ -549,17 +550,16 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 				return (Type<? super T>) raw(rawSuperType);
 			failedCastTo(rawSuperType);
 		}
-		AtomicReference<Type<?>> box = new AtomicReference<>();
+		Object[] box = new Object[1];
 		walkSuperTypes(this, !rawSuperType.isInterface(),
 				rawSuperType.isInterface(), true, t -> {
 			boolean found = t.rawType == rawSuperType;
-			if (found) box.set(t);
+			if (found) box[0] = t;
 			return !found;
 		});
-		Type<? super T> res = (Type<? super T>) box.get();
-		if (res == null)
+		if (box[0] == null)
 			failedCastTo(rawSuperType);
-		return res;
+		return (Type<? super T>) box[0];
 	}
 
 	private void failedCastTo(Class<?> rawSuperType) {
@@ -593,7 +593,7 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 		Map<TypeVariable<?>, Type<?>> actualTypeArguments = actualTypeArguments(
 				type);
 		if (walkInterfaceTypes && !walkSuperInterfaces(type.rawType, actualTypeArguments,
-				cancelOnFalse, consumer) && cancelOnFalse)
+				cancelOnFalse, consumer))
 			return false;
 		if (supertype == null)
 			return true; // done

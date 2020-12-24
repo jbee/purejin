@@ -85,21 +85,21 @@ class TestBasicCollectionBinds {
 	@Test
 	void listAsLowerBoundIsAvailable() {
 		Type<? extends List<Number>> wildcardListType = listTypeOf(
-				Number.class).parametizedAsUpperBounds();
+				Number.class).parameterizedAsUpperBounds();
 		assertInjectsItems(new Number[] { 846, 42, 42.0f }, wildcardListType);
 	}
 
 	@Test
 	void setAsLowerBoundIsAvailable() {
 		Type<? extends Set<Number>> wildcardSetType = setTypeOf(
-				Number.class).parametizedAsUpperBounds();
+				Number.class).parameterizedAsUpperBounds();
 		assertInjectsItems(new Number[] { 846, 42, 42.0f }, wildcardSetType);
 	}
 
 	@Test
 	void collectionAsLowerBoundIsAvailable() {
 		Type<? extends Collection<Number>> collectionType = collectionTypeOf(
-				Number.class).parametizedAsUpperBounds();
+				Number.class).parameterizedAsUpperBounds();
 		assertInjectsItems(new Number[] { 846, 42, 42.0f }, collectionType);
 	}
 

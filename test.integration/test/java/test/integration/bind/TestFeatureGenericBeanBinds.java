@@ -45,7 +45,7 @@ class TestFeatureGenericBeanBinds {
 		protected void declare() {
 			autobind().produceBy(ProducesBy.declaredMethods(false)) //
 					.in(Hint.relativeReferenceTo(raw(GenericBean.class)
-							.parametized(String.class)));
+							.parameterized(String.class)));
 		}
 	}
 

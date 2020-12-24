@@ -44,7 +44,7 @@ public interface Obtainable<T> {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	static <T> Type<Obtainable<T>> obtainableTypeOf(Type<T> obtained) {
-		return (Type) raw(Obtainable.class).parametized(obtained);
+		return (Type) raw(Obtainable.class).parameterized(obtained);
 	}
 
 	/**

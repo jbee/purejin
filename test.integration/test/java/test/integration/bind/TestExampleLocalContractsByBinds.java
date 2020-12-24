@@ -49,7 +49,7 @@ class TestExampleLocalContractsByBinds {
 	@Test
 	void protectiveContractsByAppliesOutsideOfJavaLang() {
 		assertEquals(BigInteger.valueOf(42L), context.resolve(
-				raw(Comparable.class).parametized(BigInteger.class)));
+				raw(Comparable.class).parameterized(BigInteger.class)));
 		assertThrows(UnresolvableDependency.NoResourceForDependency.class,
 				() -> context.resolve(BigInteger.class));
 		assertThrows(UnresolvableDependency.NoResourceForDependency.class,
