@@ -43,7 +43,8 @@ public final class Binding<T> extends ResourceDescriptor<T>
 	@SuppressWarnings("unchecked")
 	@Override
 	public <E> Binding<E> typed(Type<E> type) {
-		return new Binding<>(signature.typed(type().toSupertype(type)),
+		signature.type().castTo(type); // make sure it is a valid supertype
+		return new Binding<>(signature.typed(type),
 				this.type, (Supplier<? extends E>) supplier, scope, source,
 				annotations, verifier);
 	}

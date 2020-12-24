@@ -14,6 +14,8 @@ import se.jbee.inject.lang.Type;
 
 import java.lang.annotation.Annotation;
 
+import static se.jbee.inject.lang.Type.raw;
+
 /**
  * The default utility {@link ModuleWith}.
  *
@@ -45,9 +47,8 @@ public abstract class BinderModuleWith<T> extends InitializedBinder
 
 	@Override
 	public String toString() {
-		Type<?> preset = Type.supertype(ModuleWith.class,
-				Type.raw(getClass())).parameter(0);
-		return "module " + getClass().getSimpleName() + "[" + preset + "]";
+		Type<?> arg = raw(getClass()).toSuperType(ModuleWith.class).parameter(0);
+		return "module " + getClass().getSimpleName() + "[" + arg + "]";
 	}
 
 	/**

@@ -49,8 +49,7 @@ public interface ModuleWith<T> extends Module {
 
 	@Override
 	default void declare(Bindings bindings, Env env) {
-		Type<?> valueType = Type.supertype(ModuleWith.class,
-				raw(getClass())).parameter(0);
+		Type<?> valueType = raw(getClass()).toSuperType(ModuleWith.class).parameter(0);
 		@SuppressWarnings("unchecked")
 		final T value = valueType.rawType == Env.class
 			? (T) env

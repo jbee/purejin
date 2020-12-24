@@ -168,14 +168,13 @@ public final class DefaultValueBinders {
 		bindToConstructsBy(env, type.rawType, item, dest);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private static <T> boolean isCompatibleSupplier(Type<T> requiredType,
 			Type<?> providedType) {
 		if (!providedType.isAssignableTo(raw(Supplier.class)))
 			return false;
 		if (requiredType.isAssignableTo(raw(Supplier.class)))
 			return false;
-		return Type.supertype(Supplier.class, (Type) providedType) //
+		return providedType.toSuperType( Supplier.class) //
 				.parameter(0).isAssignableTo(requiredType);
 	}
 

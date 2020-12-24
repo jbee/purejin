@@ -8,6 +8,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.ContractsBy;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -37,10 +38,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  */
 class TestExampleAnnotatedContractsBinds {
 
+	@Documented
 	@Target(TYPE)
 	@Retention(RUNTIME)
 	@interface Contract {}
 
+	@Documented
 	@Target(TYPE)
 	@Retention(RUNTIME)
 	@interface ContractsProvided {

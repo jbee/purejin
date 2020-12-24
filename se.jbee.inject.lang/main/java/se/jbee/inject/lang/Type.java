@@ -9,6 +9,8 @@ import java.io.Serializable;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
 
 /**
  * A generic version of {@link Class} like {@link java.lang.reflect.Type} but
@@ -218,15 +220,10 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 
 	@SuppressWarnings("unchecked")
 	public <S> Type<? extends S> castTo(Type<S> supertype) {
-		toSupertype(supertype);
-		return (Type<S>) this;
-	}
-
-	public <S> Type<S> toSupertype(Type<S> supertype) {
 		if (!isAssignableTo(supertype))
 			throw new ClassCastException(
 					"Cannot cast " + this + " to " + supertype);
-		return supertype;
+		return (Type<S>) this;
 	}
 
 	public Type<? extends T> asUpperBound() {
@@ -301,10 +298,7 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 			return true; //raw type is ok - no parameters to check
 		if (other.rawType == rawType) // both have the same rawType
 			return allParametersAreAssignableTo(other);
-		@SuppressWarnings("unchecked")
-		Class<? super T> commonRawType = (Class<? super T>) other.rawType;
-		Type<?> asOther = supertype(commonRawType, this);
-		return asOther.allParametersAreAssignableTo(other);
+		return toSuperType(other.rawType).allParametersAreAssignableTo(other);
 	}
 
 	public boolean allParametersAreAssignableTo(Type<?> other) {
@@ -383,9 +377,7 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 			return true;
 		if (rawType == other.rawType)
 			return moreQualifiedParametersThan(other);
-		@SuppressWarnings("unchecked")
-		Type<?> asOther = supertype(rawType, (Type<? extends T>) other);
-		return moreQualifiedParametersThan(asOther);
+		return moreQualifiedParametersThan(other.toSuperType(rawType));
 	}
 
 	private boolean moreQualifiedParametersThan(Type<?> other) {
@@ -532,23 +524,47 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 		}
 	}
 
-	public static <S> Type<? extends S> supertype(Class<S> supertype,
-			Type<? extends S> type) {
-		if (supertype.getTypeParameters().length == 0)
-			return raw(supertype); // just for better performance
-		if (supertype == type.rawType)
-			return raw(supertype);
-		@SuppressWarnings("unchecked")
-		Type<? extends S> res = (Type<? extends S>) Utils.arrayFindFirst(
-				type.supertypes(), s -> s.rawType == supertype);
+	/**
+	 * Returns the actual super-type of this {@link Type} (including its actual
+	 * type parameters) for the given super-{@link Class}.
+	 *
+	 * @see #castTo(Type)
+	 *
+	 * @param rawSuperType
+	 * @return the actual super-{@link Type}
+	 * @throws ClassCastException if the given {@link Class} is no super-type of
+	 *                            this {@link Type}
+	 */
+	@SuppressWarnings("unchecked")
+	public Type<? super T> toSuperType(Class<?> rawSuperType) {
+		/*
+		This method has a central role as it is part of checking assignability.
+		Therefore we do make have some short paths in case we can avoid walking
+		the inheritance tree.
+		 */
+		if (rawSuperType == rawType)
+			return this;
+		if (rawSuperType.getTypeParameters().length == 0) {
+			if (rawSuperType.isAssignableFrom(rawType))
+				return (Type<? super T>) raw(rawSuperType);
+			failedCastTo(rawSuperType);
+		}
+		AtomicReference<Type<?>> box = new AtomicReference<>();
+		walkSuperTypes(this, !rawSuperType.isInterface(),
+				rawSuperType.isInterface(), true, t -> {
+			boolean found = t.rawType == rawSuperType;
+			if (found) box.set(t);
+			return !found;
+		});
+		Type<? super T> res = (Type<? super T>) box.get();
 		if (res == null)
-			throw new ClassCastException("`" + supertype
-				+ "` is not a supertype of: `" + type + "`");
+			failedCastTo(rawSuperType);
 		return res;
 	}
 
-	public Map<TypeVariable<?>, Type<?>> actualTypeArguments() {
-		return actualTypeArguments(this);
+	private void failedCastTo(Class<?> rawSuperType) {
+		throw new ClassCastException(
+				"The type " + this + " does not have a super-type: " + rawSuperType);
 	}
 
 	/**
@@ -556,28 +572,65 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 	 *         starting with the direct super-class followed by the direct
 	 *         super-interfaces continuing by going up the type hierarchy.
 	 */
-	public Type<? super T>[] supertypes() {
-		Set<Type<?>> res = new LinkedHashSet<>();
-		Class<?> supertype = rawType;
-		java.lang.reflect.Type genericSupertype = null;
-		Type<?> type = this;
-		Map<TypeVariable<?>, Type<?>> actualTypeArguments = actualTypeArguments(type);
-		if (!isInterface())
-			res.add(OBJECT);
-		while (supertype != null) {
-			if (genericSupertype != null) {
-				type = genericType(genericSupertype, actualTypeArguments);
-				res.add(type);
-			}
-			actualTypeArguments = actualTypeArguments(type);
-			addSuperInterfaces(res, supertype, actualTypeArguments);
-			genericSupertype = supertype.getGenericSuperclass();
-			supertype = supertype.getSuperclass();
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	public Set<Type<? super T>> supertypes() {
+		Set<Type<?>> supertypes = new LinkedHashSet<>();
+		walkSuperTypes(this, true, true, false, supertypes::add);
+		return (Set) supertypes;
+	}
+
+	/**
+	 * Walks the inheritance tree and passes all actual types implemented by
+	 * given {@code type} to the consumer.
+	 *
+	 * @return true, if the walking was cancelled by the consumer returning
+	 * false and while cancelOnFalse is true.
+	 */
+	private static boolean walkSuperTypes(Type<?> type,
+			boolean walkClassTypes, boolean walkInterfaceTypes,
+			boolean cancelOnFalse, Predicate<Type<?>> consumer) {
+		Class<?> supertype = type.rawType.getSuperclass();
+		Map<TypeVariable<?>, Type<?>> actualTypeArguments = actualTypeArguments(
+				type);
+		if (walkInterfaceTypes && !walkSuperInterfaces(type.rawType, actualTypeArguments,
+				cancelOnFalse, consumer) && cancelOnFalse)
+			return false;
+		if (supertype == null)
+			return true; // done
+		Type<?> superclass = genericType(type.rawType.getGenericSuperclass(),
+				actualTypeArguments);
+		if (walkClassTypes && !consumer.test(superclass) && cancelOnFalse)
+			return false;
+		return walkSuperTypes(superclass, walkClassTypes, walkInterfaceTypes,
+				cancelOnFalse, consumer);
+	}
+
+	/**
+	 * Walks the inheritance tree and passes all actual types implemented by
+	 * given {@code type} to the consumer.
+	 *
+	 * @return true, if the walking was cancelled by the consumer returning
+	 * false and while cancelOnFalse is true.
+	 */
+	private static boolean walkSuperInterfaces(Class<?> type,
+			Map<TypeVariable<?>, Type<?>> actualTypeArguments,
+			boolean cancelOnFalse, Predicate<Type<?>> consumer) {
+		Class<?>[] ix = type.getInterfaces();
+		java.lang.reflect.Type[] gix = type.getGenericInterfaces();
+		for (int i = 0; i < ix.length; i++) {
+			Type<?> interfaceType = Type.genericType(gix[i],
+					actualTypeArguments);
+			boolean res = consumer.test(interfaceType)
+					&& walkSuperInterfaces(ix[i],
+					actualTypeArguments(interfaceType), cancelOnFalse, consumer);
+			if (!res && cancelOnFalse)
+				return false;
 		}
-		@SuppressWarnings("unchecked")
-		Type<? super T>[] supertypes = (Type<? super T>[]) res.toArray(
-				new Type<?>[0]);
-		return supertypes;
+		return true;
+	}
+
+	public Map<TypeVariable<?>, Type<?>> actualTypeArguments() {
+		return actualTypeArguments(this);
 	}
 
 	private static <V> Map<TypeVariable<?>, Type<?>> actualTypeArguments(Type<V> type) {
@@ -592,21 +645,6 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 
 	public static Map<TypeVariable<?>, Type<?>> emptyTypeArguments() {
 		return new TreeMap<>(Type::typeVariableComparator);
-	}
-
-	private static void addSuperInterfaces(Set<Type<?>> res, Class<?> type,
-			Map<TypeVariable<?>, Type<?>> actualTypeArguments) {
-		Class<?>[] interfaces = type.getInterfaces();
-		java.lang.reflect.Type[] genericInterfaces = type.getGenericInterfaces();
-		for (int i = 0; i < interfaces.length; i++) {
-			Type<?> interfaceType = Type.genericType(genericInterfaces[i],
-					actualTypeArguments);
-			if (!res.contains(interfaceType)) {
-				res.add(interfaceType);
-				addSuperInterfaces(res, interfaces[i],
-						actualTypeArguments(interfaceType));
-			}
-		}
 	}
 
 	@SuppressWarnings({ "unchecked", "squid:S1541", "ChainOfInstanceofChecks" })

@@ -201,7 +201,7 @@ public final class Hint<T> implements Typed<T>, Descriptor {
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public <S> Hint<S> asType(Type<S> supertype) {
-		asType.toSupertype(supertype); // throws if this is not legal
+		asType.castTo(supertype); // throws if this is not legal
 		return new Hint<>((Type) supertype, value, relativeRef, absoluteRef);
 	}
 

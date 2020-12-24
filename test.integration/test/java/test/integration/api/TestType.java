@@ -250,7 +250,7 @@ class TestType {
 
 	@Test
 	void typeVariablesAreContainedResolvedInSupertypes() {
-		Type<? super Bar>[] supertypes = raw(Bar.class).parametized(
+		Set<Type<? super Bar>> supertypes = raw(Bar.class).parametized(
 				Integer.class, Float.class).supertypes();
 		assertContains(supertypes,
 				raw(Foo.class).parametized(Float.class, String.class));
@@ -262,9 +262,30 @@ class TestType {
 
 	@Test
 	void comparableSupertypeOfIntegerIsComparableInteger() {
-		assertTrue(Type.supertype(Comparable.class,
-				raw(Integer.class)).equalTo(
-						raw(Comparable.class).parametized(Integer.class)));
+		assertTrue(raw(Integer.class).toSuperType(Comparable.class).equalTo(
+				raw(Comparable.class).parametized(Integer.class)));
+	}
+
+	@Test
+	void supertypesContainsAllSuperClasses() {
+		Set<Type<? super Integer>> supertypes = raw(Integer.class).supertypes();
+		assertContains(supertypes, raw(Number.class));
+		assertContains(supertypes, OBJECT);
+	}
+
+	@Test
+	void supertypesContainsAllSuperInterfaces() {
+		Type<Integer> integer = raw(Integer.class);
+		Set<Type<? super Integer>> supertypes = integer.supertypes();
+		assertContains(supertypes, raw(Comparable.class).parametized(Integer.class));
+		assertContains(supertypes, raw(Serializable.class));
+		// later java versions have more, check all of Integer
+		for (Class<?> i : Integer.class.getInterfaces())
+			assertContains(supertypes, integer.toSuperType(i));
+		for (Class<?> i : Number.class.getInterfaces())
+			assertContains(supertypes, integer.toSuperType(i));
+		for (Class<?> i : Object.class.getInterfaces())
+			assertContains(supertypes, integer.toSuperType(i));
 	}
 
 	@Test
@@ -387,7 +408,7 @@ class TestType {
 		Type<ElementType> enumType = classType(ElementType.class);
 		assertNotNull(enumType);
 		assertEquals("java.lang.Enum<java.lang.annotation.ElementType>",
-				Type.supertype(Enum.class, enumType).toString());
+				enumType.toSuperType(Enum.class).toString());
 	}
 
 	interface RecursiveType<T extends RecursiveType<T>> {
@@ -401,12 +422,12 @@ class TestType {
 				Type.classType(RecursiveType.class).toString());
 	}
 
-	private static void assertContains(Type<?>[] actual, Type<?> expected) {
+	private static void assertContains(Set<? extends Type<?>> actual, Type<?> expected) {
 		for (Type<?> type : actual) {
 			if (type.equalTo(expected)) {
 				return;
 			}
 		}
-		fail(Arrays.toString(actual) + " should have contained: " + expected);
+		fail(actual + " should have contained: " + expected);
 	}
 }

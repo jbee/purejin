@@ -13,8 +13,8 @@ import java.lang.reflect.Method;
 
 /**
  * A {@linkplain ValueBinder} is a pure function that transforms a source value
- * {@link Descriptor} of a certain type to one or more complete {@link Binding}s that
- * are added to the target set of {@link Bindings}.
+ * {@link Descriptor} of a certain type to one or more complete {@link Binding}s
+ * that are added to the target set of {@link Bindings}.
  *
  * <h2>How {@link ValueBinder}s Work</h2>
  * Instead of binding a a {@link Locator} to a specific {@link Supplier} in one
@@ -28,7 +28,7 @@ import java.lang.reflect.Method;
  * source value into complete {@link Binding}s. This allows to customise and add
  * logic on low level.
  * <p>
- * The core source values are:
+ * Known {@link Descriptor}s are:
  * <ul>
  * <li>{@link Constructs}: Creates instances from
  * {@link Constructor}</li>
@@ -36,9 +36,9 @@ import java.lang.reflect.Method;
  * factory {@link Method}</li>
  * <li>{@link se.jbee.inject.binder.Constant}: Provides an instance from a
  * constant value.</li>
- * <li>{@link Class}: Creates a reference to the target type</li>
+ * <li>{@link se.jbee.inject.Descriptor.BridgeDescriptor}: Creates a reference to the target type</li>
  * <li>{@link Instance}: Creates a reference to the {@link Instance}</li>
- * <li>{@link se.jbee.inject.Hint[]}: Creates an array instance with elements lazily
+ * <li>{@link se.jbee.inject.Descriptor.ArrayDescriptor}: Creates an array instance with elements lazily
  * resolved from the {@link se.jbee.inject.Hint}s</li>
  * <li>{@link Binding}: It is its task to actually do
  * {@link Bindings#add(Env, Binding)}. All other {@link ValueBinder}s should use
@@ -58,25 +58,27 @@ import java.lang.reflect.Method;
 public interface ValueBinder<D extends Descriptor> {
 
 	/**
-	 * Expands the incomplete {@link Binding} and value given to a complete
-	 * {@link Binding}(s) that are added to {@link Bindings}.
-	 *  @param ref    A {@link Class}, {@link Instance} or similar value that
-	 *               express the intent of the incomplete binding. This {@link
-	 *               ValueBinder} will use it especially to decide the {@link
-	 *               Supplier} used and what further {@link Binding}s might be
-	 *               derived.
-	 * @param item   A usually incomplete {@link Binding} (without a {@link
-	 *               Supplier})
+	 * Expands the incomplete {@link Binding} and {@link Descriptor} value given
+	 * to one or more complete {@link Binding}(s) that are added to {@link
+	 * Bindings}.
+	 *
+	 * @param ref  A {@link Descriptor} value. Based upon the type of the {@link
+	 *             Descriptor} the {@link ValueBinder} to use was selected. It
+	 *             holds the information the {@link ValueBinder} needs to
+	 *             further process the {@link Binding}.
+	 * @param item A usually incomplete {@link Binding} (without a {@link
+	 *             Supplier}) encoding all the information about the binding in
+	 *             progress.
 	 * @param dest complete {@link Binding}s are be added to it
 	 */
 	<T> void expand(Env env, D ref, Binding<T> item, Bindings dest);
 
 	/**
-	 * A {@link Completion} just uses the passed value to {@link
-	 * Completion#complete(Env, Binding, Descriptor)} the {@link Binding} and add it to
-	 * the {@link Bindings}. Its main purpose to to capture this recurring
-	 * pattern, reduce the duplication caused by it and make the code more
-	 * readable.
+	 * A {@link Completion} just uses the passed {@link Descriptor} value to
+	 * {@link Completion#complete(Env, Binding, Descriptor)} the {@link Binding}
+	 * and add it to the {@link Bindings}. Its main purpose to to capture this
+	 * recurring pattern, reduce the duplication caused by it and make the code
+	 * more readable.
 	 */
 	@FunctionalInterface
 	interface Completion<D extends Descriptor> extends ValueBinder<D> {

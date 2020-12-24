@@ -12,6 +12,8 @@ import se.jbee.inject.bind.InconsistentBinding;
 import se.jbee.inject.bind.Toggled;
 import se.jbee.inject.lang.Type;
 
+import static se.jbee.inject.lang.Type.raw;
+
 /**
  * The default utility base class for {@link Toggled}s.
  *
@@ -38,8 +40,7 @@ public abstract class BundleFor<C> implements Toggled<C>,
 
 	@Override
 	public String toString() {
-		Type<?> module = Type.supertype(Toggled.class,
-				Type.raw(getClass())).parameter(0);
+		Type<?> module = raw(getClass()).toSuperType(Toggled.class).parameter(0);
 		return "bundle " + getClass().getSimpleName() + "[" + module + "]";
 	}
 
