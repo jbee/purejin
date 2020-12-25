@@ -10,69 +10,85 @@ import static se.jbee.inject.Name.named;
 class TestName {
 
 	@Test
-	void exactSameNameShouldBeCompatible() {
+	void specificNameIsCompatibleWithItself() {
 		assertTrue(named("foo").isCompatibleWith(named("foo")));
 	}
 
 	@Test
-	void wildcardShouldBeCompatibleToAnyName() {
+	void specificNameIsCompatibleWithAnyName() {
 		assertTrue(named("foo").isCompatibleWith(Name.ANY));
 	}
 
 	@Test
-	void exactSameNameFollowedByWildcardShouldBeCompatible() {
+	void specificNameIsCompatibleWithItselfAsPrefix() {
 		assertTrue(named("foo").isCompatibleWith(named("foo*")));
 	}
 
 	@Test
-	void letterFollwoedByWildcardShouldBeCompatible() {
+	void specificNameIsCompatibleWithSingleLetterPrefix() {
 		assertTrue(named("foo").isCompatibleWith(named("f*")));
 	}
 
 	@Test
-	void startOfNameFollowedByWildcardShouldBeCompatible() {
+	void specificNameIsCompatibleWithPartPrefix() {
 		assertTrue(named("foo").isCompatibleWith(named("fo*")));
 	}
 
 	@Test
-	void defaultShouldBeCompatibleToAnyName() {
+	void defaultIsCompatibleWithAnyName() {
 		assertTrue(Name.DEFAULT.isCompatibleWith(Name.ANY));
 	}
 
 	@Test
-	void anyShouldBeCompatibleToDefaultName() {
+	void anyIsCompatibleWithDefaultName() {
 		assertTrue(Name.ANY.isCompatibleWith(Name.DEFAULT));
 	}
 
 	@Test
-	void anyShouldBeCompatibleToWhateverName() {
+	void anyIsCompatibleWithSpecificName() {
 		assertTrue(Name.ANY.isCompatibleWith(named("foo")));
 	}
 
 	@Test
-	void prefixShouldBeCompatibleToSamePrefix() {
-		assertTrue(named("disk:").asPrefix().isCompatibleWith(
+	void patternIsNotCompatibleWithAnyName() {
+		assertFalse(named("foo*").isCompatibleWith(Name.ANY));
+	}
+
+	@Test
+	void prefixIsCompatibleWithNameHavingSamePrefix() {
+		assertTrue(named("disk").asPrefix().isCompatibleWith(
 				named("disk:/home/jan/")));
 	}
 
 	@Test
-	void prefixShouldBeCompatibleToSamePrefixInnerClassName() {
+	void prefixIsCompatibleWithSamePrefixInnerClassName() {
 		String prefix = "se.jbee.inject.bind.testpropertyannotationbinds$property:*";
 		String name = "se.jbee.inject.bind.testpropertyannotationbinds$property:foo";
 		assertTrue(named(prefix).isCompatibleWith(named(name)));
 	}
 
 	@Test
-	void infixShouldBeCompatibleToSameInfix() {
-		Name foobar = named("foo*bar");
-		assertTrue(foobar.isCompatibleWith(named("foobar")));
-		assertTrue(foobar.isCompatibleWith(named("footerbar")));
+	void infixIsCompatibleWithEmptyInsert() {
+		assertTrue(named("foo*bar").isCompatibleWith(named("foobar")));
 	}
 
 	@Test
-	void infixShouldNotBeCompatibleWithPrefixPartOfInfix() {
-		Name foobar = named("foo*bar");
-		assertFalse(foobar.isCompatibleWith(named("foobbar")));
-		assertFalse(foobar.isCompatibleWith(named("foo")));
+	void infixIsCompatibleWithRandomInsert() {
+		assertTrue(named("foo*bar").isCompatibleWith(named("footerbar")));
+	}
+
+	@Test
+	void infixIsNotCompatibleWithoutMatchingSuffix() {
+		assertFalse(named("foo*bar").isCompatibleWith(named("footbaz")));
+	}
+
+	@Test
+	void infixIsNotCompatibleWithPrefixPartOfInfix() {
+		assertFalse(named("foo*bar").isCompatibleWith(named("foo")));
+	}
+
+	@Test
+	void infixIsNotCompatibleWithPrefixWhenInsertStartsWithSuffix() {
+		assertFalse(named("foo*bar").isCompatibleWith(named("foobbar")));
 	}
 }

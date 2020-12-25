@@ -10,7 +10,6 @@ import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.lang.Reflect;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.TypeVariable;
-import se.jbee.inject.lang.Utils;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.*;
@@ -18,7 +17,6 @@ import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 import static se.jbee.inject.Instance.anyOf;
-import static se.jbee.inject.lang.Type.parameterTypes;
 import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.lang.Utils.newArray;
 
@@ -45,8 +43,6 @@ public final class Supply {
 	public static final ArrayBridge<List<?>> LIST_BRIDGE = Arrays::asList;
 	public static final ArrayBridge<Set<?>> SET_BRIDGE = //
 			elems -> new HashSet<>(Arrays.asList(elems));
-
-	private static final String SUPPLIES = "supplies";
 
 	/**
 	 * A {@link Supplier} used as fall-back. Should a required {@link Locator}
@@ -99,22 +95,13 @@ public final class Supply {
 	}
 
 	public static <T> Supplier<T> byProduction(Produces<T> produces) {
-		if (produces.declaresTypeParameters() && produces.usesActualTypeFirstParameter()) {
-			// use a constant null hint to blank first parameter as it is filled in with actual type on method invocation
-			Hint<?> actualTypeHint = Hint.constantNull(
-					Type.parameterType(produces.target.getParameters()[0]));
-			return new Produce<>(produces,
-					Hint.match(parameterTypes(produces.target),
-							Utils.arrayPrepend(actualTypeHint, produces.hints)),
-					Dependency::type);
-		}
-		return new Produce<>(produces,
-				Hint.match(parameterTypes(produces.target), produces.hints), null);
+		return produces.isGenericTypeAware()
+				? new Produce<>(produces, Dependency::type)
+				: new Produce<>(produces, null);
 	}
 
 	public static <T> Supplier<T> byConstruction(Constructs<T> constructs) {
-		return new Construct<>(constructs, Hint.match(
-				parameterTypes(constructs.target), constructs.hints));
+		return new Construct<>(constructs);
 	}
 
 	/**
@@ -175,7 +162,7 @@ public final class Supply {
 
 		@Override
 		public String toString() {
-			return describe(SUPPLIES, arrayType);
+			return "array " + arrayType + ": " + Arrays.toString(hints);
 		}
 	}
 
@@ -184,8 +171,8 @@ public final class Supply {
 
 		private final Constructs<T> constructs;
 
-		Construct(Constructs<T> constructs, Hint<?>[] args) {
-			super(args);
+		Construct(Constructs<T> constructs) {
+			super(constructs.actualParameters());
 			this.constructs = constructs;
 		}
 
@@ -203,7 +190,7 @@ public final class Supply {
 
 		@Override
 		public String toString() {
-			return describe(constructs.target);
+			return getClass().getSimpleName() + ": " + constructs;
 		}
 	}
 
@@ -211,46 +198,46 @@ public final class Supply {
 			implements Annotated {
 
 		private Object instance;
-		private final Produces<T> producer;
+		private final Produces<T> produces;
 		private final Class<T> returns;
 		private final Map<java.lang.reflect.TypeVariable<?>, UnaryOperator<Type<?>>> typeVariableResolvers;
 
-		Produce(Produces<T> producer, Hint<?>[] args,
+		Produce(Produces<T> produces,
 				Function<Dependency<?>, Object> supplyActual) {
-			super(args, supplyActual);
-			this.producer = producer;
-			this.returns = producer.actualType.rawType;
-			this.instance = producer.isHinted() ? null : producer.as;
-			this.typeVariableResolvers = producer.declaresTypeParameters()
+			super(produces.actualParameters(), supplyActual);
+			this.produces = produces;
+			this.returns = produces.actualType.rawType;
+			this.instance = produces.isHinted() ? null : produces.as;
+			this.typeVariableResolvers = produces.isGeneric()
 				? TypeVariable.typeVariables(
-						producer.target.getGenericReturnType())
+						produces.target.getGenericReturnType())
 				: null;
 		}
 
 		@Override
 		public AnnotatedElement element() {
-			return producer.target;
+			return produces.target;
 		}
 
 		@Override
 		protected T invoke(Object[] args, Injector context) {
-			if (instance == null && !producer.isStatic()) {
-				instance = producer.isHinted()
-					? producer.getAsHint().resolveIn(context)
-					: context.resolve(producer.target.getDeclaringClass());
+			if (instance == null && !produces.isStatic()) {
+				instance = produces.isHinted()
+					? produces.getAsHint().resolveIn(context)
+					: context.resolve(produces.target.getDeclaringClass());
 			}
-			return returns.cast(Reflect.produce(producer.target, instance, args,
-					e -> UnresolvableDependency.SupplyFailed.valueOf(e, producer.target)));
+			return returns.cast(Reflect.produce(produces.target, instance, args,
+					e -> UnresolvableDependency.SupplyFailed.valueOf(e, produces.target)));
 		}
 
 		@Override
 		protected Hint<?>[] hintsFor(Dependency<? super T> dep) {
-			if (!producer.declaresTypeParameters())
+			if (!produces.isGeneric())
 				return hints;
 			Hint<?>[] actualTypeHints = hints.clone();
 			Map<java.lang.reflect.TypeVariable<?>, Type<?>> actualTypes = TypeVariable.actualTypesFor(
 					typeVariableResolvers, dep.type());
-			java.lang.reflect.Parameter[] params = producer.target.getParameters();
+			java.lang.reflect.Parameter[] params = produces.target.getParameters();
 			for (int i = 0; i < actualTypeHints.length; i++) {
 				actualTypeHints[i] = actualTypeHints[i] //
 						.withActualType(params[i], actualTypes);
@@ -260,16 +247,8 @@ public final class Supply {
 
 		@Override
 		public String toString() {
-			return describe(producer.target);
+			return getClass().getSimpleName() + ": " + produces;
 		}
-	}
-
-	private static String describe(Object behaviour) {
-		return "<" + behaviour + ">";
-	}
-
-	private static String describe(Object behaviour, Object variant) {
-		return "<" + behaviour + ":" + variant + ">";
 	}
 
 	public abstract static class WithArgs<T> implements Supplier<T> {

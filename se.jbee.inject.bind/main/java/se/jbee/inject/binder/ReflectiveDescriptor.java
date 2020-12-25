@@ -3,6 +3,7 @@ package se.jbee.inject.binder;
 import se.jbee.inject.Annotated;
 import se.jbee.inject.Hint;
 import se.jbee.inject.Descriptor;
+import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.Typed;
 
@@ -16,16 +17,25 @@ abstract class ReflectiveDescriptor<M extends AnnotatedElement & Member, T>
 	public final Type<T> actualType;
 	public final Object as;
 	public final M target;
-	public final Hint<?>[] hints;
+	/**
+	 * The {@link Hint}s that are already determined (as they have been manually passed by the user)
+	 */
+	public final Hint<?>[] determined;
+	/**
+	 * The {@link HintsBy} strategy to use for those {@link Parameter}s that are undetermined so far.
+	 */
+	public final HintsBy undeterminedBy;
 
-	public ReflectiveDescriptor(Type<? super T> expectedType, Object as, M target, Hint<?>[] hints,
-			Type<T> actualType) {
+	public ReflectiveDescriptor(Type<? super T> expectedType,
+			Type<T> actualType, Object as, M target, HintsBy undeterminedBy,
+			Hint<?>[] determined) {
 		actualType.castTo(expectedType);
 		this.expectedType = expectedType;
 		this.actualType = actualType;
 		this.as = as;
 		this.target = target;
-		this.hints = hints;
+		this.undeterminedBy = undeterminedBy;
+		this.determined = determined;
 	}
 
 	@Override
@@ -96,6 +106,6 @@ abstract class ReflectiveDescriptor<M extends AnnotatedElement & Member, T>
 
 	@Override
 	public final String toString() {
-		return getClass().getSimpleName() + "[" + expectedType + "] <= " + target.getClass().getSimpleName() + "[" + actualType + "]";
+		return getClass().getSimpleName() + "[" + expectedType + "] <= " + target;
 	}
 }

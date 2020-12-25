@@ -10,6 +10,7 @@ import se.jbee.inject.bind.*;
 import se.jbee.inject.binder.*;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.config.ContractsBy;
+import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.lang.Reflect;
 import se.jbee.inject.lang.Type;
 
@@ -196,6 +197,7 @@ public final class DefaultValueBinders {
 				item.source.pkg()).reflect(ref.getDeclaredConstructors());
 		if (c != null)
 			dest.addExpanded(env, item,
-					Constructs.constructs(raw(c.getDeclaringClass()), c));
+					Constructs.constructs(raw(c.getDeclaringClass()), c,
+							env.property(HintsBy.class, c.getDeclaringClass().getPackage())));
 	}
 }

@@ -5,10 +5,7 @@
  */
 package se.jbee.inject.config;
 
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Hint;
-import se.jbee.inject.Instance;
-import se.jbee.inject.Name;
+import se.jbee.inject.*;
 import se.jbee.inject.lang.Type;
 
 import java.lang.reflect.Constructor;
@@ -17,7 +14,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
 import static se.jbee.inject.Instance.instance;
+import static se.jbee.inject.lang.Type.actualParameterType;
 import static se.jbee.inject.lang.Type.parameterType;
+import static se.jbee.inject.lang.Utils.arrayMap;
 
 /**
  * Extracts the {@link Hint} used to resolve the {@link Dependency}s for a
@@ -36,6 +35,8 @@ import static se.jbee.inject.lang.Type.parameterType;
 @FunctionalInterface
 public interface HintsBy {
 
+	HintsBy AUTO = param -> null;
+
 	/**
 	 * @return The {@link Hint} for the given {@link Parameter}.
 	 */
@@ -48,23 +49,30 @@ public interface HintsBy {
 	 * @param obj the {@link Method} or {@link Constructor} to hint for
 	 * @return the {@link Hint}s to use, zero length array for no hints
 	 */
-	default Hint<?>[] applyTo(Executable obj) {
+	default Hint<?>[] applyTo(Executable obj, Type<?> genericDeclaringClass,
+			Hint<?>... determined) {
 		if (obj.getParameterCount() == 0)
 			return Hint.none();
-		Hint<?>[] hints = new Hint[obj.getParameterCount()];
-		int hinted = 0;
-		int i = 0;
-		for (Parameter p : obj.getParameters()) {
-			Hint<?> hint = reflect(p);
-			if (hint == null) {
-				// prevent misunderstanding a later given hint for another parameter
-				hint = Hint.relativeReferenceTo(parameterType(p));
-			} else {
-				hinted++;
-			}
-			hints[i++] = hint;
+		Parameter[] params = obj.getParameters();
+		Hint<?>[] hints = new Hint[params.length];
+		Type<?>[] types = arrayMap(params, Type.class,
+				p -> actualParameterType(p, genericDeclaringClass));
+		// find position for the already given hints
+		for (Hint<?> hint : determined) {
+			int i = Hint.indexForType(types, hint, hints);
+			if (i < 0)
+				throw InconsistentDeclaration.incomprehensibleHint(hint);
+			hints[i] = hint.parameterized(types[i]);
 		}
-		return hinted > 0 ? hints : Hint.none();
+		// fill parameters without hints by either HintsBy or rel. type reference as default
+		for (int i = 0; i < hints.length; i++)
+			if (hints[i] == null) {
+				Hint<?> hint = reflect(params[i]);
+				hints[i] = hint != null
+						? hint.parameterized(types[i])
+						: Hint.relativeReferenceTo(types[i]);
+			}
+		return hints;
 	}
 
 	default HintsBy orElse(HintsBy whenNull) {

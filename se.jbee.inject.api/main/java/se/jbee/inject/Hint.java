@@ -128,6 +128,7 @@ public final class Hint<T> implements Typed<T>, Descriptor {
 		return true;
 	}
 
+	@Deprecated
 	public static Hint<?>[] match(Type<?>[] types, Hint<?>... hints) {
 		if (types.length == 0)
 			return NO_PARAMS;
@@ -144,7 +145,7 @@ public final class Hint<T> implements Typed<T>, Descriptor {
 		return args;
 	}
 
-	private static int indexForType(Type<?>[] types, Hint<?> hint,
+	public static int indexForType(Type<?>[] types, Hint<?> hint,
 			Hint<?>[] args) {
 		Type<?> target = hint.type();
 		// 1. lowest index with exact type match, or else
@@ -195,7 +196,7 @@ public final class Hint<T> implements Typed<T>, Descriptor {
 	 * effect but we still want to preserve the information for debugging so
 	 * we do not get confused.
 	 */
-	private Hint<?> parameterized(Type<?> type) {
+	public Hint<?> parameterized(Type<?> type) {
 		return type.moreQualifiedThan(asType) ? typed(type).asType(asType) : this;
 	}
 

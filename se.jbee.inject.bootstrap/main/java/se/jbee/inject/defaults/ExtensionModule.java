@@ -46,10 +46,7 @@ class ExtensionModule extends BinderModule {
 		Constructor<?> ext = constructsBy.reflect(
 				expectedType.rawType.getDeclaredConstructors());
 		env.accessible(ext);
-		Hint<?>[] hints = hintsBy.applyTo(ext);
-		if (hints == null)
-			hints = Hint.none();
-		return (T) Supply.byConstruction(constructs(expectedType, ext, hints)) //
+		return (T) Supply.byConstruction(constructs(expectedType, ext, hintsBy)) //
 				.supply((Dependency) dep, context);
 	}
 }

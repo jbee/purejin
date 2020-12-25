@@ -26,6 +26,7 @@ import static se.jbee.inject.Name.DEFAULT;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Source.source;
 import static se.jbee.inject.Target.targeting;
+import static se.jbee.inject.binder.Constructs.constructs;
 import static se.jbee.inject.config.Plugins.pluginPoint;
 import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.lang.Utils.isClassConstructable;
@@ -776,10 +777,8 @@ public class Binder {
 		public boolean asProducer(Method target, Object instance, Hint<?>... args) {
 			if (target.getReturnType() == void.class || target.getReturnType() == Void.class)
 				return false;
-			if (args == null || args.length == 0)
-				args = hintsBy.applyTo(target);
 			Name scope = scopesBy.reflect(target);
-			Produces<?> produces = Produces.produces(instance, target, args);
+			Produces<?> produces = Produces.produces(instance, target, hintsBy, args);
 			binder.per(scope == null ? Scope.auto : scope) //
 					.bind(namesBy.reflect(target), produces.expectedType) //
 					.expand(produces);
@@ -794,12 +793,12 @@ public class Binder {
 			if (target == null)
 				throw InconsistentBinding.generic("Provided Constructor was null");
 			Name name = namesBy.reflect(target);
-			if (hints.length == 0)
-				hints = hintsBy.applyTo(target);
 			Class<T> impl = target.getDeclaringClass();
 			Binder scopedBinder = binder.per(scope != null ? scope : Scope.auto).implicit();
 			if (name.isDefault()) {
-				scopedBinder.contractbind(impl).to(target, hints);
+				scopedBinder.contractbind(impl)
+						//TODO use actual type hint/ref
+						.expand(constructs(raw(impl), target, hintsBy, hints));
 			} else {
 				scopedBinder.bind(name, impl).to(target, hints);
 				for (Type<? super T> st : raw(impl).supertypes())
@@ -985,9 +984,7 @@ public class Binder {
 		public void to(Constructor<? extends T> target, Hint<?>... args) {
 			if (target == null)
 				throw InconsistentBinding.generic("Provided constructor was null");
-			if (args.length == 0)
-				args = env(HintsBy.class).applyTo(target);
-			expand(Constructs.constructs(locator.type(), target, args));
+			expand(constructs(locator.type(), target, env(HintsBy.class), args));
 		}
 
 		protected final void expand(Descriptor value) {

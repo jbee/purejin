@@ -26,8 +26,6 @@ import static se.jbee.inject.lang.Utils.*;
  * The default {@link Injector} implementation that is based on
  * {@link Resources} created from {@link ResourceDescriptor}s.
  *
- * @author Jan Bernitt (jan@jbee.se)
- *
  * @see Resources for bootstrapping of the {@link Injector} context
  * @see BuildUpResources for instance initialisation
  */
@@ -119,7 +117,8 @@ public final class Container implements Injector, Env {
 	private <T> Resource<?> resolveFromUpperBound(Dependency<T> dep) {
 		Type<T> type = dep.type();
 		Resource<?> match = arrayFindFirst(resources.forType(Type.WILDCARD),
-				c -> type.isAssignableTo(c.type()));
+				r -> type.isAssignableTo(r.type())
+						&& r.signature.instance.name.isCompatibleWith(dep.instance.name));
 		if (match != null)
 			return match;
 		throw noResourceFor(dep);
@@ -173,7 +172,7 @@ public final class Container implements Injector, Env {
 			Type<G> generatedType) {
 		Dependency<G> generatedTypeDep = dep.typed(generatedType);
 		if (generatedType.isUpperBound())
-			return resolveGenericResources(generatedType, generatedTypeDep);
+			return resolvePatternResources(generatedType, generatedTypeDep);
 		Resource<G>[] candidates = resources.forType(generatedType);
 		return candidates == null
 			? new Resource[0]
@@ -182,7 +181,7 @@ public final class Container implements Injector, Env {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <G> Resource<G>[] resolveGenericResources(Type<G> generatedType,
+	private <G> Resource<G>[] resolvePatternResources(Type<G> generatedType,
 			Dependency<G> generatedTypeDep) {
 		List<Resource<?>> res = new ArrayList<>();
 		for (Entry<Class<?>, Resource<?>[]> e : resources.entrySet())

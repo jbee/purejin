@@ -7,6 +7,7 @@ package se.jbee.inject.binder;
 
 import se.jbee.inject.Hint;
 import se.jbee.inject.bind.ValueBinder;
+import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.lang.Type;
 
 import java.lang.reflect.Constructor;
@@ -23,18 +24,20 @@ public final class Constructs<T> extends
 		ReflectiveDescriptor<Constructor<?>, T> {
 
 	public static <T> Constructs<? extends T> constructs(Type<T> expectedType,
-			Constructor<?> target, Hint<?>... args) {
+			Constructor<?> target, HintsBy undeterminedBy, Hint<?>... determined) {
 		checkBasicCompatibility(classType(target.getDeclaringClass()),
 				expectedType, target);
 		Hint<T> as = Hint.relativeReferenceTo(expectedType);
 		@SuppressWarnings("unchecked")
 		Type<? extends T> actualType = (Type<? extends T>) actualType(as, target);
-		return new Constructs<>(expectedType, actualType, as, target, args);
+		return new Constructs<>(expectedType, actualType, as, target,
+				undeterminedBy, determined);
 	}
 
 	private Constructs(Type<? super T> expectedType, Type<T> actualType,
-			Hint<?> as, Constructor<?> target, Hint<?>[] hints) {
-		super(expectedType, as, target, hints, actualType);
+			Hint<?> as, Constructor<?> target, HintsBy undeterminedBy,
+			Hint<?>[] determined) {
+		super(expectedType, actualType, as, target, undeterminedBy, determined);
 	}
 
 	private static Type<?> actualType(Hint<?> as, Constructor<?> target) {
@@ -49,5 +52,9 @@ public final class Constructs<T> extends
 	public <E> Constructs<E> typed(Type<E> supertype) {
 		type().castTo(supertype);
 		return (Constructs<E>) this;
+	}
+
+	public Hint<?>[] actualParameters() {
+		return undeterminedBy.applyTo(target, actualType, determined);
 	}
 }

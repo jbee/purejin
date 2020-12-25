@@ -1,6 +1,7 @@
 package se.jbee.inject.config;
 
 import se.jbee.inject.*;
+import se.jbee.inject.lang.Type;
 
 import java.util.Optional;
 
@@ -66,14 +67,20 @@ public class Config implements ContextAware<Config>, Extension {
 	public final class Value<A> {
 
 		private final String property;
-		private final Class<A> from;
+		private final Type<A> from;
 
-		private Value(String property, Class<A> from) {
+		private Value(String property, Type<A> from) {
 			this.property = property;
 			this.from = from;
 		}
 
 		public <B> Optional<B> as(Class<B> type) {
+			return as(raw(type));
+		}
+
+		public <B> Optional<B> as(Type<B> type) {
+			if (from.isAssignableTo(type))
+				return (Optional<B>) optionalValue(from, property);
 			Converter<A, B> converter = orElse(null,
 					() -> Config.this.context.resolve(
 							Converter.converterTypeOf(from, type)));
@@ -93,15 +100,23 @@ public class Config implements ContextAware<Config>, Extension {
 	}
 
 	public <T> Value<T> value(Class<T> srcType, String property) {
+		return value(raw(srcType), property);
+	}
+
+	public <T> Value<T> value(Type<T> srcType, String property) {
 		return new Value<>(property, srcType);
 	}
 
 	public <T> Optional<T> optionalValue(Class<T> type, String property) {
+		return optionalValue(raw(type), property);
+	}
+
+	public <T> Optional<T> optionalValue(Type<T> type, String property) {
 		return orElse(empty(), () -> ofNullable(
 				context.resolve(toDependency(type, property))));
 	}
 
-	private <T> Dependency<T> toDependency(Class<T> type, String property) {
+	private <T> Dependency<T> toDependency(Type<T> type, String property) {
 		Dependency<T> dep = dependency(type).named(property);
 		if (ns != null)
 			dep = dep.injectingInto(ns);

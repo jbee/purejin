@@ -1,6 +1,7 @@
 package se.jbee.inject.binder;
 
 import se.jbee.inject.*;
+import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.lang.Reflect;
 import se.jbee.inject.lang.Type;
 
@@ -31,7 +32,7 @@ public final class Accesses<T> extends ReflectiveDescriptor<Field, T> implements
 
 	private Accesses(Type<? super T> expectedType, Type<T> actualType,
 			Object as, Field target) {
-		super(expectedType, as, target, Hint.none(), actualType);
+		super(expectedType, actualType, as, target, HintsBy.AUTO, Hint.none());
 	}
 
 	private static Type<?> actualType(Object owner, Field target) {
