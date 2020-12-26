@@ -75,7 +75,8 @@ class TestExampleConfigPropertyAnnotationBinds {
 			bind(Converter.converterTypeOf(Integer.class, String.class)).to(String::valueOf);
 		}
 
-		<T> void bindConfigPropertySupplier(Type<T> type) {
+
+		private <T> void bindConfigPropertySupplier(Type<T> type) {
 			per(Scope.dependencyInstance) //
 					.bind(Name.named(ConfigProperty.class).asPrefix(), type) //
 					.toSupplier(TestExampleConfigPropertyAnnotationBindsModule::supplyConfigProperty);
