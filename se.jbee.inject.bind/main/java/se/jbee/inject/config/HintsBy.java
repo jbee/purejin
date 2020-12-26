@@ -22,14 +22,13 @@ import static se.jbee.inject.lang.Utils.arrayMap;
  * Extracts the {@link Hint} used to resolve the {@link Dependency}s for a
  * {@link Method} or {@link Constructor} {@link Parameter}.
  * <p>
- * The binder API uses {@link #applyTo(Executable)} to resolve the {@link Hint}s
- * for all {@link Parameter}s. By convention this uses a {@link
+ * The binder API uses {@link #applyTo(Executable, Type, Hint[])} to resolve the
+ * {@link Hint}s for all {@link Parameter}s. By convention this uses a {@link
  * Hint#relativeReferenceTo(Type)} for those {@link Parameter}s where the {@link
  * HintsBy} strategy did return {@code null}. If {@code null} was returned for
  * all {@link Parameter}s no {@link Hint}s will be used.
  *
  * @see NamesBy
- *
  * @since 8.1
  */
 @FunctionalInterface
@@ -62,15 +61,17 @@ public interface HintsBy {
 			int i = Hint.indexForType(types, hint, hints);
 			if (i < 0)
 				throw InconsistentDeclaration.incomprehensibleHint(hint);
-			hints[i] = hint.parameterized(types[i]);
+			hints[i] = hint.parameterized(types[i])
+					.at(InjectionPoint.at(params[i]));
 		}
 		// fill parameters without hints by either HintsBy or rel. type reference as default
 		for (int i = 0; i < hints.length; i++)
 			if (hints[i] == null) {
 				Hint<?> hint = reflect(params[i]);
-				hints[i] = hint != null
+				hints[i] = (hint != null
 						? hint.parameterized(types[i])
-						: Hint.relativeReferenceTo(types[i]);
+						: Hint.relativeReferenceTo(types[i]))
+					.at(InjectionPoint.at(params[i]));
 			}
 		return hints;
 	}

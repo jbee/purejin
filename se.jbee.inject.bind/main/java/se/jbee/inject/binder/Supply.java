@@ -59,7 +59,7 @@ public final class Supply {
 	 */
 	public static <T> Supplier<T> bySupplierReference(
 			Class<? extends Supplier<? extends T>> type) {
-		return (dep, context) -> context.resolve(dep.instanced(anyOf(type))) //
+		return (dep, context) -> context.resolve(dep.onInstance(anyOf(type))) //
 				.supply(dep, context);
 	}
 
@@ -71,7 +71,7 @@ public final class Supply {
 	public static <T> Supplier<T> byInstanceReference(Instance<T> instance) {
 		// Note that this is not "buffered" using Resources as it is used to
 		// implement the plain resolution
-		return (dep, context) -> context.resolve(dep.instanced(instance));
+		return (dep, context) -> context.resolve(dep.onInstance(instance));
 	}
 
 	public static <T> Supplier<T> byDependencyReference(
@@ -90,7 +90,7 @@ public final class Supply {
 			Instance<? extends T> parametrized = instance.typed(instance.type() //
 							.parameterized(type.parameters()) //
 							.upperBound(dep.type().isUpperBound()));
-			return context.resolve(dep.instanced(parametrized));
+			return context.resolve(dep.onInstance(parametrized));
 		};
 	}
 
@@ -203,8 +203,8 @@ public final class Supply {
 		private final Map<java.lang.reflect.TypeVariable<?>, UnaryOperator<Type<?>>> typeVariableResolvers;
 
 		Produce(Produces<T> produces,
-				Function<Dependency<?>, Object> supplyActual) {
-			super(produces.actualParameters(), supplyActual);
+				Function<Dependency<?>, Object> actualTypeSupplier) {
+			super(produces.actualParameters(), actualTypeSupplier);
 			this.produces = produces;
 			this.returns = produces.actualType.rawType;
 			this.instance = produces.isHinted() ? null : produces.as;
@@ -254,7 +254,7 @@ public final class Supply {
 	public abstract static class WithArgs<T> implements Supplier<T> {
 
 		protected final Hint<?>[] hints;
-		private final Function<Dependency<?>, Object> supplyActual;
+		private final Function<Dependency<?>, Object> actualTypeSupplier;
 		private InjectionSite previous;
 
 		WithArgs(Hint<?>[] params) {
@@ -262,9 +262,9 @@ public final class Supply {
 		}
 
 		WithArgs(Hint<?>[] hints,
-				Function<Dependency<?>, Object> supplyActual) {
+				Function<Dependency<?>, Object> actualTypeSupplier) {
 			this.hints = hints;
-			this.supplyActual = supplyActual;
+			this.actualTypeSupplier = actualTypeSupplier;
 		}
 
 		protected abstract T invoke(Object[] args, Injector context);
@@ -281,8 +281,8 @@ public final class Supply {
 				previous = local;
 			}
 			Object[] args = local.args(context);
-			if (supplyActual != null)
-				args[0] = supplyActual.apply(dep);
+			if (actualTypeSupplier != null)
+				args[0] = actualTypeSupplier.apply(dep);
 			return invoke(args, context);
 		}
 

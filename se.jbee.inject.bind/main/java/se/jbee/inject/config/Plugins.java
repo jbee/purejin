@@ -44,7 +44,7 @@ public final class Plugins implements ContextAware<Plugins>, Extension {
 
 	@Override
 	public Plugins inContext(Dependency<? super Plugins> context) {
-		if (context.isUntargeted())
+		if (context.isNotTargeted())
 			return target == null ? this : targeting(null);
 		return targeting(context.target().type.rawType);
 	}

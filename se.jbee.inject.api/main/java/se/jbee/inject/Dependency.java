@@ -50,13 +50,15 @@ public final class Dependency<T>
 
 	private static <T> Dependency<T> dependency(Instance<T> instance,
 			Injection[] hierarchy) {
-		return new Dependency<>(instance, hierarchy);
+		return new Dependency<>(null, instance, hierarchy);
 	}
 
+	private final transient InjectionPoint at;
 	private final Injection[] hierarchy;
 	public final Instance<T> instance;
 
-	private Dependency(Instance<T> instance, Injection... hierarchy) {
+	private Dependency(InjectionPoint at, Instance<T> instance, Injection... hierarchy) {
+		this.at = at;
 		this.instance = instance;
 		this.hierarchy = hierarchy;
 	}
@@ -93,7 +95,15 @@ public final class Dependency<T>
 
 	@Override
 	public <E> Dependency<E> typed(Type<E> type) {
-		return instanced(instance.typed(type));
+		return onInstance(instance.typed(type));
+	}
+
+	public Dependency<T> at(InjectionPoint point) {
+		return at == point ? this : new Dependency<>(point, instance, hierarchy);
+	}
+
+	public InjectionPoint at() {
+		return at == null ? InjectionPoint.NONE : at;
 	}
 
 	public Dependency<?> onTypeParameter() {
@@ -105,14 +115,14 @@ public final class Dependency<T>
 	}
 
 	public Dependency<T> named(Name name) {
-		return instanced(instance.named(name));
+		return onInstance(instance.named(name));
 	}
 
-	public <E> Dependency<E> instanced(Instance<E> instance) {
+	public <E> Dependency<E> onInstance(Instance<E> instance) {
 		return dependency(instance, hierarchy);
 	}
 
-	public Dependency<T> untargeted() {
+	public Dependency<T> simple() {
 		return dependency(instance, NO_TARGET);
 	}
 
@@ -123,7 +133,7 @@ public final class Dependency<T>
 					arrayMap(hierarchy, Injection::ignoredScoping));
 	}
 
-	public boolean isUntargeted() {
+	public boolean isNotTargeted() {
 		return hierarchy.length == 0;
 	}
 
@@ -166,13 +176,13 @@ public final class Dependency<T>
 	}
 
 	public Dependency<T> injectingInto(Package ns) {
-		//FIXME the issue is thet ANY targets Object which then means the binding is only visible in java.lang
+		//FIXME the issue is that ANY targets Object which then means the binding is only visible in java.lang
 		Target target = Target.ANY.in(packageAndSubPackagesOf(ns));
 		Injection injection = new Injection(Instance.ANY,
 				new Locator<>(Instance.ANY, target), ScopeLifeCycle.ignore);
 		if (hierarchy.length == 0)
-			return new Dependency<>(instance, injection);
-		return new Dependency<>(instance, arrayAppend(hierarchy, injection));
+			return new Dependency<>(at, instance, injection);
+		return new Dependency<>(at, instance, arrayAppend(hierarchy, injection));
 	}
 
 	public Dependency<T> injectingInto(Locator<?> target,
@@ -180,16 +190,16 @@ public final class Dependency<T>
 			throws DependencyCycle, UnstableDependency {
 		Injection injection = new Injection(instance, target, lifeCycle);
 		if (hierarchy.length == 0)
-			return new Dependency<>(instance, injection);
+			return new Dependency<>(at, instance, injection);
 		ensureStableScopeNesting(injection);
 		ensureNoDependencyCycle(injection);
-		return new Dependency<>(instance, arrayAppend(hierarchy, injection));
+		return new Dependency<>(at, instance, arrayAppend(hierarchy, injection));
 	}
 
 	public Dependency<T> uninject() {
 		return hierarchy.length <= 1
-			? untargeted()
-			: new Dependency<>(instance, arrayDropTail(hierarchy, 1));
+			? simple()
+			: new Dependency<>(at, instance, arrayDropTail(hierarchy, 1));
 	}
 
 	private void ensureNoDependencyCycle(Injection injection)

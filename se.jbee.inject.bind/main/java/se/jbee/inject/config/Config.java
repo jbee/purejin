@@ -44,7 +44,7 @@ public class Config implements ContextAware<Config>, Extension {
 	 */
 	@Override
 	public Config inContext(Dependency<? super Config> context) {
-		if (context.isUntargeted())
+		if (context.isNotTargeted())
 			return ns == null ? this : new Config(this.context, null);
 		Instance<?> target = context.target();
 		if (target.name.isAny())

@@ -35,10 +35,7 @@ public interface Annotated {
 	 */
 	Enhancer SOURCE = a -> a;
 
-	/**
-	 * NULL object that represents no {@link Annotation}s present.
-	 */
-	Annotated EMPTY = () -> new AnnotatedElement() {
+	AnnotatedElement NOT_ANNOTATED = new AnnotatedElement() {
 
 		@Override
 		public <T extends Annotation> T getAnnotation(Class<T> type) {
@@ -56,4 +53,10 @@ public interface Annotated {
 		}
 
 	};
+
+	/**
+	 * NULL object that represents no {@link Annotation}s present.
+	 */
+	Annotated EMPTY = () -> NOT_ANNOTATED;
+
 }

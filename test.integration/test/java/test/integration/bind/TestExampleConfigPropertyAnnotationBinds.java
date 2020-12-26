@@ -13,6 +13,7 @@ import se.jbee.inject.lang.Type;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.lang.reflect.AnnotatedElement;
 import java.util.NoSuchElementException;
 
 import static java.lang.annotation.ElementType.PARAMETER;
@@ -35,6 +36,11 @@ class TestExampleConfigPropertyAnnotationBinds {
 		 * @return name of the property
 		 */
 		String value();
+
+		/**
+		 * @return the type the property value was defined as
+		 */
+		Class<?> from() default String.class;
 	}
 
 	public static class Bean {
@@ -42,7 +48,8 @@ class TestExampleConfigPropertyAnnotationBinds {
 		final String a;
 		final String b;
 
-		public Bean(@ConfigProperty("a") String a, @ConfigProperty("b") String b) {
+		public Bean(@ConfigProperty("a") String a,
+				@ConfigProperty(value = "b", from = Integer.class) String b) {
 			this.a = a;
 			this.b = b;
 		}
@@ -55,7 +62,7 @@ class TestExampleConfigPropertyAnnotationBinds {
 		protected void declare() {
 			// some configuration value definitions
 			config(Bean.class).bind("a", String.class).to("a");
-			config(Bean.class).bind("b", String.class).to("b");
+			config(Bean.class).bind("b", Integer.class).to(42);
 
 			// assume somewhere else (in another module) we declare
 			construct(Bean.class);
@@ -63,21 +70,26 @@ class TestExampleConfigPropertyAnnotationBinds {
 			// and in some general setup module we declare the mechanism of
 			// providing config values
 			bindConfigPropertySupplier(Type.WILDCARD);
+
+			// and also we need a converter Integer => String
+			bind(Converter.converterTypeOf(Integer.class, String.class)).to(String::valueOf);
 		}
 
 		<T> void bindConfigPropertySupplier(Type<T> type) {
-			per(Scope.dependencyInstance).bind(Name.named(ConfigProperty.class).asPrefix(),
-					type).toSupplier(TestExampleConfigPropertyAnnotationBindsModule::supplyConfigProperty);
+			per(Scope.dependencyInstance) //
+					.bind(Name.named(ConfigProperty.class).asPrefix(), type) //
+					.toSupplier(TestExampleConfigPropertyAnnotationBindsModule::supplyConfigProperty);
 		}
 
 		@SuppressWarnings("unchecked")
 		static <T> T supplyConfigProperty(
 				Dependency<? super T> dep, Injector context) {
-			String property = dep.instance.name.toString().substring(
-					Name.named(ConfigProperty.class).toString().length());
-			Config config = context.resolve(dep.uninject().instanced(
+			AnnotatedElement e = dep.at().element();
+			ConfigProperty property = e.getAnnotation(ConfigProperty.class);
+			Config config = context.resolve(dep.uninject().onInstance(
 					Instance.defaultInstanceOf(Type.raw(Config.class))));
-			return (T) config.value(property).as(dep.type()).orElseThrow(
+			return (T) config.value(property.from(), property.value())
+					.as(dep.type()).orElseThrow(
 					() -> new UnresolvableDependency.SupplyFailed(
 							"No such configuration value or converter",
 							new NoSuchElementException()));
@@ -91,9 +103,12 @@ class TestExampleConfigPropertyAnnotationBinds {
 			TestExampleConfigPropertyAnnotationBindsModule.class);
 
 	@Test
-	void configPropertyIsInjectedAsNamedByTheAnnotation() {
-		Bean bean = context.resolve(Bean.class);
-		assertEquals("a", bean.a);
-		assertEquals("b", bean.b);
+	void configPropertyIsInjectedAsAskedByTheAnnotation() {
+		assertEquals("a", context.resolve(Bean.class).a);
+	}
+
+	@Test
+	void configPropertyIsInjectedAndConvertedAsAskedByTheAnnotation() {
+		assertEquals("42", context.resolve(Bean.class).b);
 	}
 }

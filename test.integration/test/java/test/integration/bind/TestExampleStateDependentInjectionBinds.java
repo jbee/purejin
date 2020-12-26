@@ -165,7 +165,7 @@ class TestExampleStateDependentInjectionBinds {
 			final Instance<T> actualToInject = Instance.instance(
 					named(actualState), type);
 			try {
-				return injector.resolve(dependency.instanced(actualToInject));
+				return injector.resolve(dependency.onInstance(actualToInject));
 			} catch (NoResourceForDependency e) {
 				if (actualState != null) { // when not trying default
 					return supply(dependency, injector, null); // try default
