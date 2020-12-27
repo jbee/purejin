@@ -189,6 +189,13 @@ public final class Supply {
 		}
 
 		@Override
+		protected Hint<?>[] hintsFor(Dependency<? super T> dep) {
+			if (dep.type().equalTo(constructs.actualType))
+				return hints;
+			return constructs.actualParameters(dep.type());
+		}
+
+		@Override
 		public String toString() {
 			return getClass().getSimpleName() + ": " + constructs;
 		}

@@ -215,7 +215,7 @@ class TestFeatureSelfInjectionBinds {
 		@SuppressWarnings("rawtypes")
 		Type<Foo> type = raw(Foo.class).parameterized(String.class);
 		assertSimilar(
-				dependency(type.asUpperBound().parameterized(Type.WILDCARD)) //
+				dependency(type.asUpperBound()) //
 				.injectingInto(anyOf(raw(Foo.class))), //
 				context.resolve(type).actualDependency);
 	}
@@ -231,7 +231,7 @@ class TestFeatureSelfInjectionBinds {
 	@Test
 	void actualDependencyFromParameterNestedDeep() {
 		Bar bar = context.resolve(Bar.class);
-		assertSimilar(dependency(Type.classType(SuperFoo.class)) //
+		assertSimilar(dependency(Type.raw(SuperFoo.class).parameterized(Double.class)) //
 						.injectingInto(Bar.class) //
 						.injectingInto(anyOf(SuperFoo.class)), //
 				bar.superFoo.actualDependency);

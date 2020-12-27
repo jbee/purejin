@@ -55,6 +55,10 @@ public final class Constructs<T> extends
 	}
 
 	public Hint<?>[] actualParameters() {
+		return actualParameters(actualType);
+	}
+
+	public Hint<?>[] actualParameters(Type<?> actualType) {
 		return undeterminedBy.applyTo(target, actualType, determined);
 	}
 }

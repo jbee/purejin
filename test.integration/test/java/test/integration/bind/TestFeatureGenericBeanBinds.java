@@ -1,6 +1,5 @@
 package test.integration.bind;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Hint;
 import se.jbee.inject.Injector;
@@ -74,7 +73,6 @@ class TestFeatureGenericBeanBinds {
 		assertEquals(singletonList("correct"), context.resolve(listTypeOf(String.class)));
 	}
 
-	@Disabled("Generic classes are not yet fully supported")
 	@Test
 	void adHocGenericConstruction() {
 		AnotherGenericBean<?> bean = context.resolve(
