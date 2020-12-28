@@ -9,7 +9,6 @@ import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.Typed;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
@@ -17,7 +16,6 @@ import java.util.Objects;
 
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Instance.instance;
-import static se.jbee.inject.lang.Type.parameterTypes;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
@@ -92,41 +90,6 @@ public final class Hint<T> implements Typed<T>, Descriptor {
 
 	public static <T> Hint<T> constantNull(Type<T> asType) {
 		return new Hint<>(asType, null, null, null, null);
-	}
-
-	public static boolean matchesInOrder(Executable member, Hint<?>[] hints) {
-		if (hints.length == 0)
-			return true;
-		Type<?>[] types = parameterTypes(member);
-		int i = 0;
-		for (Hint<?> hint : hints) {
-			while (i < types.length && !hint.asType.isAssignableTo(types[i]))
-				i++;
-			if (i >= types.length)
-				return false;
-		}
-		return true;
-	}
-
-	public static boolean matchesInRandomOrder(Executable member, Hint<?>[] hints) {
-		if (hints.length == 0)
-			return true;
-		Type<?>[] types = parameterTypes(member);
-		for (Hint<?> hint : hints) {
-			boolean matched = false;
-			int i = 0;
-			while (!matched && i < types.length) {
-				Type<?> type = types[i];
-				if (type != null && hint.asType.isAssignableTo(type)) {
-					types[i] = null; // nark as handled by removing it
-					matched = true;
-				}
-				i++;
-			}
-			if (!matched)
-				return false;
-		}
-		return true;
 	}
 
 	public static int indexForType(Type<?>[] types, Hint<?> hint,

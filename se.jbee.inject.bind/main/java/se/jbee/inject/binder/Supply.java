@@ -158,7 +158,7 @@ public final class Supply {
 		}
 
 		@Override
-		protected Hint<?>[] hintsFor(Dependency<? super E[]> dep) {
+		protected Hint<?>[] actualParametersFor(Dependency<? super E[]> dep, Injector context) {
 			return elements;
 		}
 
@@ -172,13 +172,9 @@ public final class Supply {
 			implements Annotated {
 
 		private final Constructs<T> constructs;
-		private final Hint<?>[] actualParameters;
 
 		Construct(Constructs<T> constructs) {
 			this.constructs = constructs;
-			// doing this eagerly for non generic classes is important
-			// to throw an exception during bootstrapping in case the hints given do not fit
-			this.actualParameters = constructs.isGeneric() ? null : constructs.actualParameters();
 		}
 
 		@Override
@@ -194,10 +190,8 @@ public final class Supply {
 		}
 
 		@Override
-		protected Hint<?>[] hintsFor(Dependency<? super T> dep) {
-			return constructs.isGeneric()
-					? constructs.actualParameters(dep.type())
-					: actualParameters;
+		protected Hint<?>[] actualParametersFor(Dependency<? super T> dep, Injector context) {
+			return constructs.actualParameters(dep.type(), context);
 		}
 
 		@Override
@@ -241,10 +235,13 @@ public final class Supply {
 		}
 
 		@Override
-		protected Hint<?>[] hintsFor(Dependency<? super T> dep) {
+		protected Hint<?>[] actualParametersFor(Dependency<? super T> dep, Injector context) {
+			//TODO it is not always sure that produces.actualDeclaringType() is the actual owner object type => look at dependency!
+			Hint<?>[] actualParameters = produces.actualParameters(
+					produces.actualDeclaringType(), context);
 			if (!produces.isGeneric())
-				return produces.actualParameters();
-			Hint<?>[] actualTypeHints = produces.actualParameters().clone();
+				return actualParameters;
+			Hint<?>[] actualTypeHints = actualParameters.clone();
 			Map<java.lang.reflect.TypeVariable<?>, Type<?>> actualTypes = TypeVariable.actualTypesFor(
 					typeVariableResolvers, dep.type());
 			java.lang.reflect.Parameter[] params = produces.target.getParameters();
@@ -272,7 +269,7 @@ public final class Supply {
 
 		protected abstract T invoke(Object[] args, Injector context);
 
-		protected abstract Hint<?>[] hintsFor(Dependency<? super T> dep);
+		protected abstract Hint<?>[] actualParametersFor(Dependency<? super T> dep, Injector context);
 
 		@Override
 		public T supply(Dependency<? super T> dep, Injector context)
@@ -282,7 +279,8 @@ public final class Supply {
 			// threads calling
 			InjectionSite local = previous;
 			if (local == null || !local.site.equalTo(dep)) {
-				local = new InjectionSite(context, dep, hintsFor(dep));
+				local = new InjectionSite(context, dep,
+						actualParametersFor(dep, context));
 				previous = local;
 			}
 			Object[] args = local.args(context);

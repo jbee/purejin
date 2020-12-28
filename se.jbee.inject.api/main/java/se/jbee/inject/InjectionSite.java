@@ -19,19 +19,19 @@ public final class InjectionSite {
 
 	public final Dependency<?> site;
 
-	private final Hint<?>[] hints;
+	private final Hint<?>[] actualParameters;
 	private final Generator<?>[] generators;
 	private final Object[] preResolvedArgs;
 	private final int[] lazyArgIndexes;
 	private final int lazyArgCount;
 
 	public InjectionSite(Injector injector, Dependency<?> site,
-			Hint<?>[] hints) {
+			Hint<?>[] actualParameters) {
 		this.site = site;
-		this.hints = hints;
-		this.generators = new Generator<?>[hints.length];
-		this.preResolvedArgs = new Object[hints.length];
-		this.lazyArgIndexes = new int[hints.length];
+		this.actualParameters = actualParameters;
+		this.generators = new Generator<?>[actualParameters.length];
+		this.preResolvedArgs = new Object[actualParameters.length];
+		this.lazyArgIndexes = new int[actualParameters.length];
 		this.lazyArgCount = preResolveArgs(injector);
 	}
 
@@ -42,7 +42,7 @@ public final class InjectionSite {
 		Object[] args = preResolvedArgs.clone();
 		for (int j = 0; j < lazyArgCount; j++) {
 			int i = lazyArgIndexes[j];
-			Hint<?> hint = hints[i];
+			Hint<?> hint = actualParameters[i];
 			Dependency<?> argDep = site.onInstance(hint.relativeRef).at(hint.at);
 			args[i] = generators[i] == null
 				? injector.resolve(argDep)
@@ -54,7 +54,7 @@ public final class InjectionSite {
 	private int preResolveArgs(Injector context) {
 		int lazyArgIndex = 0;
 		for (int i = 0; i < generators.length; i++) {
-			Hint<?> hint = hints[i];
+			Hint<?> hint = actualParameters[i];
 			if (hint.type().rawType == Injector.class) {
 				preResolvedArgs[i] = context;
 			} else if (hint.isConstant()) {

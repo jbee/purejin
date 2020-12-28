@@ -105,7 +105,6 @@ class TestBasicHintsBinds {
 		protected void declare() {
 			bind(Bar.class).toConstructor(Hint.relativeReferenceTo(Float.class));
 		}
-
 	}
 
 	private final Injector context = Bootstrap.injector(

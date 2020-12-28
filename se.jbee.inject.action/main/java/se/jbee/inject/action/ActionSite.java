@@ -42,7 +42,7 @@ public final class ActionSite<A, B> {
 		Env env = context.resolve(Env.class);
 		Hint<A> inHint = Hint.constantNull(in);
 		Hint<?>[] hints = env.property(HintsBy.class, ActionSite.class.getPackage())
-				.applyTo(target.action, target.as, inHint);
+				.applyTo(context, target.action, target.as, inHint);
 		this.injection = new InjectionSite(context,
 				dependency(out).injectingInto(target.as), hints);
 		this.inputIndex = asList(hints).indexOf(inHint);
