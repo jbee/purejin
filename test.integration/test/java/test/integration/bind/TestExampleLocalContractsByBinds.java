@@ -7,6 +7,7 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.EnvModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.config.ContractsBy;
+import se.jbee.inject.lang.Type;
 
 import java.math.BigInteger;
 
@@ -15,6 +16,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static se.jbee.inject.Packages.packageOf;
 import static se.jbee.inject.lang.Type.raw;
 
+/**
+ * This example shows how a implementation {@link Class} gets bound to its
+ * different contracts using {@link se.jbee.inject.binder.Binder#contractbind(Type)}
+ * and {@link ContractsBy} strategy.
+ */
 class TestExampleLocalContractsByBinds {
 
 	private static class TestExampleLocalContractsByBindsEnvModule

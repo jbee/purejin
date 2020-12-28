@@ -57,7 +57,7 @@ public final class DefaultValueBinders {
 			return;
 		}
 		Class<T> impl = item.type().rawType;
-		ContractsBy contractsBy = env.property(ContractsBy.class, impl);
+		ContractsBy contractsBy = env.in(impl).property(ContractsBy.class);
 		if (contractsBy.isContract(impl, impl))
 			dest.add(env, item);
 		for (Type<? super T> supertype : item.type().supertypes())
@@ -193,11 +193,11 @@ public final class DefaultValueBinders {
 
 	private static <T> void bindToConstructsBy(Env env, Class<? extends T> ref,
 			Binding<T> item, Bindings dest) {
-		Constructor<?> c = env.property(ConstructsBy.class, item.source.ident)
+		Constructor<?> c = env.property(ConstructsBy.class)
 				.reflect(ref.getDeclaredConstructors());
 		if (c != null)
 			dest.addExpanded(env, item,
 					Constructs.constructs(raw(c.getDeclaringClass()), c,
-							env.property(HintsBy.class, c.getDeclaringClass())));
+							env.in(c.getDeclaringClass()).property(HintsBy.class)));
 	}
 }

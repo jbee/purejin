@@ -3,6 +3,7 @@ package se.jbee.inject;
 import se.jbee.inject.lang.Cast;
 import se.jbee.inject.lang.Reflect;
 import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.Utils;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Member;
@@ -56,94 +57,89 @@ public interface Env {
 	<T> T property(Name qualifier, Type<T> property, Class<?> ns)
 			throws InconsistentDeclaration;
 
-	default <T> T property(Class<T> property, Class<?> ns)
-			throws InconsistentDeclaration {
-		return property(Name.DEFAULT, raw(property), ns);
+	default <T> T property(Class<T> property) {
+		return property(raw(property));
 	}
 
-	default <T> T property(Type<T> property, Class<?> ns)
-			throws InconsistentDeclaration {
-		return property(Name.DEFAULT, property, ns);
+	default <T> T property(Type<T> property) {
+		return property(Name.DEFAULT, property, null);
 	}
 
-	default <T> T property(String qualifier, Class<T> property, Class<?> ns) {
-		return property(named(qualifier), raw(property), ns);
+	default <T> T property(Class<T> property, T defaultValue) {
+		return property(raw(property), defaultValue);
 	}
 
-	default <T> T property(String qualifier, Class<T> property, Class<?> ns, T defaultValue) {
-		return property(named(qualifier), raw(property), ns, defaultValue);
+	default <T> T property(Type<T> property, T defaultValue) {
+		return property(Name.DEFAULT.value, property, defaultValue);
 	}
 
-	default <T> T property(Name qualifier, Type<T> property, Class<?> ns, T defaultValue) {
-		try {
-			return property(qualifier, property, ns);
-		} catch (InconsistentDeclaration e) {
-			return defaultValue;
+	default boolean property(String qualifier, boolean defaultValue) {
+		return property(qualifier, raw(boolean.class), defaultValue);
+	}
+
+	default <T> T property(String qualifier, Class<T> property) {
+		return property(named(qualifier), raw(property), null);
+	}
+
+	default <T> T property(String qualifier, Class<T> property, T defaultValue) {
+		return property(qualifier, raw(property), defaultValue);
+	}
+
+	default <T> T property(String qualifier, Type<T> property, T defaultValue) {
+		return Utils.orElse(defaultValue,
+				() ->  property(named(qualifier), property, null));
+	}
+
+	default Env in(Class<?> ns) {
+		final class EnvInNs implements Env {
+
+			final Env env;
+			final Class<?> ns;
+
+			EnvInNs(Env env, Class<?> ns) {
+				this.env = env;
+				this.ns = ns;
+			}
+
+			@Override
+			public Env in(Class<?> ns) {
+				return ns == null ? env : ns == this.ns ? this : new EnvInNs(env, ns);
+			}
+
+			@Override
+			public <T> T property(Name qualifier, Type<T> property, Class<?> ns) {
+				return env.property(qualifier, property, this.ns);
+			}
+
+			@Override
+			public String toString() {
+				return "Env[" + ns.getName() + "]";
+			}
 		}
-	}
-
-	/*
-	 * Global Properties (properties in the "global" space)
-	 *
-	 * This simply means if they are defined they will have the same value
-	 * independent of where they are resolved.
-	 */
-
-	default <T> T globalProperty(Type<T> property, T defaultValue) {
-		return globalProperty(Name.DEFAULT.value, property, defaultValue);
-	}
-
-	default boolean globalProperty(String qualifier, boolean defaultValue) {
-		return globalProperty(qualifier, raw(boolean.class), defaultValue);
-	}
-
-	default <T> T globalProperty(String qualifier, Type<T> property, T defaultValue) {
-		try {
-			return globalProperty(qualifier, property);
-		} catch (InconsistentDeclaration e) {
-			return defaultValue;
-		}
-	}
-
-	default <T> T globalProperty(String qualifier, Type<T> property) {
-		return property(named(qualifier), property, null);
-	}
-
-	default <T> T globalProperty(Type<T> property) {
-		return property(property, null);
-	}
-
-	default <T> T globalProperty(Class<T> property) {
-		return property(property, null);
+		return new EnvInNs(this, ns);
 	}
 
 	default <E extends Enum<E>> boolean toggled(Class<E> property, E feature) {
-		try {
-			if (feature == null) {
-				return globalProperty("null", raw(property)) == null;
-			}
-			return globalProperty(feature.name(),
-					raw(feature.getDeclaringClass())) != null;
-		} catch (InconsistentDeclaration e) {
-			return false;
-		}
+		return feature == null
+				? property("null", property, property.getEnumConstants()[0]) == null
+				: property(feature.name(), property,null) != null;
 	}
 
 	default <T extends  AccessibleObject & Member> void accessible(T target) {
-		if (globalProperty(Env.GP_USE_DEEP_REFLECTION, false)) {
-			Packages where = globalProperty(Env.GP_DEEP_REFLECTION_PACKAGES,
-					raw(Packages.class));
+		if (property(Env.GP_USE_DEEP_REFLECTION, false)) {
+			Packages where = property(Env.GP_DEEP_REFLECTION_PACKAGES,
+					Packages.class);
 			if (where.contains(target.getDeclaringClass()))
 				Reflect.accessible(target);
 		}
 	}
 
 	default <T> Verifier verifierFor(T target) {
-		if (!globalProperty(Env.GP_USE_VERIFICATION, false))
+		if (!property(Env.GP_USE_VERIFICATION, false))
 			return Verifier.AOK;
 		@SuppressWarnings("unchecked")
 		Class<T> targetClass = (Class<T>) target.getClass();
-		Function<T, Verifier> factory = globalProperty(Cast.functionTypeOf(
+		Function<T, Verifier> factory = property(Cast.functionTypeOf(
 				targetClass, Verifier.class), null);
 		return factory == null ? Verifier.AOK : factory.apply(target);
 	}

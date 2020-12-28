@@ -91,7 +91,7 @@ public final class DefaultBindingConsolidation {
 		}
 		if (!required.isEmpty())
 			throw new ResourceResolutionFailed(required, dropped);
-		return env.globalProperty(Env.GP_BIND_BINDINGS, false)
+		return env.property(Env.GP_BIND_BINDINGS, false)
 			   ? withListItselfInserted(res)
 			   : arrayOf(res, Binding.class);
 	}

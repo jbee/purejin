@@ -85,7 +85,7 @@ public final class Bootstrap {
 	public static Injector injector(Env env, Bindings bindings,
 			Module[] modules) {
 		return Container.injector(
-				env.globalProperty(BindingConsolidation.class) //
+				env.property(BindingConsolidation.class) //
 						.consolidate(env,
 								(bindings.declaredFrom(env, modules))));
 	}
@@ -115,7 +115,7 @@ public final class Bootstrap {
 
 		BuiltinBootstrapper(Env env) {
 			this.env = env;
-			this.edition = env.globalProperty(Edition.class);
+			this.edition = env.property(Edition.class);
 		}
 
 		@Override

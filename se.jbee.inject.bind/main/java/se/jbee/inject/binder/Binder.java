@@ -310,10 +310,9 @@ public class Binder {
 	 * @since 8.1
 	 */
 	public final ConnectBinder connect() {
-		Class<?> ns = bind.source.ident;
-		return connect(
-				env().property(CONNECT_QUALIFIER, ProducesBy.class, ns,
-						env().property(ProducesBy.class, ns)));
+		Env env = env();
+		return connect(env.property(CONNECT_QUALIFIER, ProducesBy.class,
+						env.property(ProducesBy.class)));
 	}
 
 	public ConnectBinder connect(ProducesBy connectsBy) {
@@ -639,14 +638,13 @@ public class Binder {
 			Bind bind = binder.bind();
 			this.binder = binder.on(bind.asContract()).on(bind.next());
 			Env env = bind.env;
-			Class<?> ns = bind.source.ident;
-			this.accessesBy = env.property(AccessesBy.class, ns);
-			this.constructsBy = env.property(ConstructsBy.class, ns);
-			this.producesBy = env.property(ProducesBy.class, ns);
-			this.namesBy = env.property(NamesBy.class, ns).orElse(DEFAULT);
-			this.hintsBy = env.property(HintsBy.class, ns);
+			this.accessesBy = env.property(AccessesBy.class);
+			this.constructsBy = env.property(ConstructsBy.class);
+			this.producesBy = env.property(ProducesBy.class);
+			this.namesBy = env.property(NamesBy.class).orElse(DEFAULT);
+			this.hintsBy = env.property(HintsBy.class);
 			this.scopesBy = scope.equalTo(Scope.mirror)
-				? env.property(ScopesBy.class, ns)
+				? env.property(ScopesBy.class)
 				: target -> scope;
 		}
 
@@ -974,7 +972,7 @@ public class Binder {
 		}
 
 		private <P> P env(Class<P> property) {
-			return env().property(property, bind().source.ident);
+			return env().property(property);
 		}
 
 		public <I extends T> void to(Class<I> impl) {

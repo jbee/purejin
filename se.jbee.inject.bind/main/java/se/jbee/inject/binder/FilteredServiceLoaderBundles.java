@@ -8,7 +8,6 @@ public abstract class FilteredServiceLoaderBundles extends BootstrapperBundle {
 
 	@Override
 	protected final void bootstrap() {
-		//TODO localise effect to package
 		for (Bundle bundle : ServiceLoader.load(Bundle.class)) {
 			Class<? extends Bundle> bundleId = bundle.getClass();
 			if (bootstrap(bundleId)) {

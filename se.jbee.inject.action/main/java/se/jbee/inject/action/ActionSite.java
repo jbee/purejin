@@ -39,9 +39,9 @@ public final class ActionSite<A, B> {
 		this.target = target;
 		this.in = in;
 		this.out = out;
-		Env env = context.resolve(Env.class);
+		Env env = context.resolve(Env.class).in(ActionSite.class);
 		Hint<A> inArg = Hint.constantNull(in);
-		Hint<?>[] actualParameters = env.property(HintsBy.class, ActionSite.class)
+		Hint<?>[] actualParameters = env.property(HintsBy.class)
 				.applyTo(context, target.action, target.as, inArg);
 		this.injection = new InjectionSite(context,
 				dependency(out).injectingInto(target.as), actualParameters);

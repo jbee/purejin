@@ -332,7 +332,7 @@ public enum DefaultFeature implements Toggled<DefaultFeature> {
 
 		@Override
 		protected void declare() {
-			asDefault().bind(Env.class).to(env());
+			asDefault().bind(Env.class).to(env().in(null));
 		}
 	}
 

@@ -63,7 +63,7 @@ public abstract class BinderModule extends InitializedBinder
 	}
 
 	protected final <P> P env(Class<P> property) {
-		return env().property(property, bind().source.ident);
+		return env().property(property);
 	}
 
 	@Override
