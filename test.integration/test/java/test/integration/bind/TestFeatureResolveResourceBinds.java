@@ -2,7 +2,6 @@ package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.*;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.lang.Type;
@@ -123,7 +122,8 @@ class TestFeatureResolveResourceBinds {
 	}
 
 	private void assertNoResource(Name name, Type<?> type) {
-		Exception ex = assertThrows(NoResourceForDependency.class,
+		Exception ex = assertThrows(
+				UnresolvableDependency.ResourceResolutionFailed.class,
 				() -> context.resolve(name, type),
 				"There should not be a resource for instance named " + name);
 		assertFalse(ex.getMessage().contains(": none"));

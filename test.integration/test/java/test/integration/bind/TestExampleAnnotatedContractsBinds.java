@@ -106,7 +106,7 @@ class TestExampleAnnotatedContractsBinds {
 
 	@Test
 	void notAnnotatedInterfacesAreNotBound() {
-		assertThrows(UnresolvableDependency.NoResourceForDependency.class,
+		assertThrows(UnresolvableDependency.ResourceResolutionFailed.class,
 				() -> context.resolve(Runnable.class));
 	}
 }

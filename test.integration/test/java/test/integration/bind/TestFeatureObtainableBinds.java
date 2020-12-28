@@ -85,7 +85,7 @@ class TestFeatureObtainableBinds {
 		assertEquals(
 				"No matching resource found.\n"
 						+ "\t dependency: java.lang.Integer *\n"
-						+ "\tavailable are (for same raw type): none\n\t",
+						+ "\tavailable are (for same raw type): none",
 				ex.getMessage());
 	}
 }

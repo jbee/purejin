@@ -1,7 +1,7 @@
 package se.jbee.inject.defaults;
 
 import se.jbee.inject.*;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import se.jbee.inject.UnresolvableDependency.ResourceResolutionFailed;
 import se.jbee.inject.bind.Binding;
 import se.jbee.inject.bind.BindingType;
 import se.jbee.inject.bind.InconsistentBinding;
@@ -90,7 +90,7 @@ public final class DefaultBindingConsolidation {
 			}
 		}
 		if (!required.isEmpty())
-			throw new NoResourceForDependency(required, dropped);
+			throw new ResourceResolutionFailed(required, dropped);
 		return env.globalProperty(Env.GP_BIND_BINDINGS, false)
 			   ? withListItselfInserted(res)
 			   : arrayOf(res, Binding.class);

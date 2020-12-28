@@ -69,14 +69,14 @@ class TestExampleManualContractBinds {
 
 	@Test
 	void otherInterfacesAreNotBound() {
-		assertThrows(UnresolvableDependency.NoResourceForDependency.class,
+		assertThrows(UnresolvableDependency.ResourceResolutionFailed.class,
 				() -> context.resolve(
 						raw(Comparable.class).parameterized(Integer.class)));
 	}
 
 	@Test
 	void exactTypeIsNotBound() {
-		assertThrows(UnresolvableDependency.NoResourceForDependency.class,
+		assertThrows(UnresolvableDependency.ResourceResolutionFailed.class,
 				() -> context.resolve(Integer.class));
 	}
 }

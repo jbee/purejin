@@ -1,7 +1,7 @@
 package se.jbee.inject.container;
 
 import se.jbee.inject.*;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import se.jbee.inject.UnresolvableDependency.ResourceResolutionFailed;
 import se.jbee.inject.lang.Lazy;
 import se.jbee.inject.lang.Type;
 
@@ -167,8 +167,8 @@ final class Resources {
 				throw noResourceFor(dep);
 			}
 
-			private NoResourceForDependency noResourceFor(Dependency<?> dep) {
-				return new NoResourceForDependency("During bootstrapping only ",
+			private ResourceResolutionFailed noResourceFor(Dependency<?> dep) {
+				return new ResourceResolutionFailed("During bootstrapping only ",
 						dep, lifeCycleResourceByScope.values().toArray(
 								new Resource[0]));
 			}

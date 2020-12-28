@@ -2,13 +2,11 @@ package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.*;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.binder.Binder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.config.NamesBy;
-import se.jbee.inject.config.ProducesBy;
 import test.integration.util.Resource;
 import test.integration.util.WebMethod;
 
@@ -187,7 +185,7 @@ class TestBasicCustomAutobindBinds {
 
 	@Test
 	void noMethodsAreBoundThatAreNotAssignableToSpecifiedType() {
-		assertThrows(NoResourceForDependency.class,
+		assertThrows(UnresolvableDependency.ResourceResolutionFailed.class,
 				() -> context.resolve(Character.class));
 	}
 
@@ -198,7 +196,7 @@ class TestBasicCustomAutobindBinds {
 
 	@Test
 	void noMethodsAreBoundThatAreNotInSpecifiedPackagesSet() {
-		assertThrows(NoResourceForDependency.class,
+		assertThrows(UnresolvableDependency.ResourceResolutionFailed.class,
 				() -> context.resolve(String.class));
 	}
 

@@ -4,7 +4,6 @@ import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.NoMethodForDependency;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 
 import java.lang.reflect.Array;
 
@@ -33,7 +32,7 @@ public class Decorate {
 					return Decorate.resolveArray(dep, root, branch);
 				try {
 					return branch.resolve(dep);
-				} catch (NoResourceForDependency | NoMethodForDependency e) {
+				} catch (UnresolvableDependency.ResourceResolutionFailed | NoMethodForDependency e) {
 					return root.resolve(dep);
 				}
 			}

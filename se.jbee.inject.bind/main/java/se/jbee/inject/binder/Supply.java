@@ -6,7 +6,6 @@
 package se.jbee.inject.binder;
 
 import se.jbee.inject.*;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.lang.Reflect;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.TypeVariable;
@@ -30,7 +29,7 @@ public final class Supply {
 			context);
 
 	private static final Supplier<?> REQUIRED = (dep, context) -> {
-		throw new NoResourceForDependency("Should never be called!", dep);
+		throw new UnresolvableDependency.ResourceResolutionFailed("Should never be called!", dep);
 	};
 
 	/**

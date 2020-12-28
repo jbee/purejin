@@ -5,7 +5,7 @@ import se.jbee.inject.DeclarationType;
 import se.jbee.inject.Env;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Locator;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import se.jbee.inject.UnresolvableDependency.ResourceResolutionFailed;
 import se.jbee.inject.bind.Binding;
 import se.jbee.inject.bind.BindingType;
 import se.jbee.inject.bind.Bindings;
@@ -89,7 +89,7 @@ class TestExampleRequireConstructorParametersBinds {
 	void missingBindingForFloatConstructorParameterCausesEagerExceptionDuringBootstrapping() {
 		Class<TestExampleRequireConstructorParametersBindsModule> root = TestExampleRequireConstructorParametersBindsModule.class;
 		ValueBinder<Constructs<?>> required = new RequiredConstructorParametersBinder();
-		Exception ex = assertThrows(NoResourceForDependency.class,
+		Exception ex = assertThrows(ResourceResolutionFailed.class,
 				() -> Bootstrap.injector(
 						Environment.DEFAULT.withBinder(Constructs.class, required),
 						root));

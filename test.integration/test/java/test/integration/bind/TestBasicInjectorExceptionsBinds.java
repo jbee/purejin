@@ -3,7 +3,8 @@ package test.integration.bind;
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Name;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import se.jbee.inject.UnresolvableDependency;
+import se.jbee.inject.UnresolvableDependency.ResourceResolutionFailed;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 
@@ -27,13 +28,13 @@ class TestBasicInjectorExceptionsBinds {
 
 	@Test
 	void exceptionIsThrownWhenResolvingAnUnboundDependency() {
-		assertThrows(NoResourceForDependency.class,
+		assertThrows(UnresolvableDependency.ResourceResolutionFailed.class,
 				() -> context.resolve(String.class));
 	}
 
 	@Test
 	void exceptionIsThrownWhenResolvingAnUnboundDependencyWithBoundRawType() {
-		assertThrows(NoResourceForDependency.class,
+		assertThrows(ResourceResolutionFailed.class,
 				() -> context.resolve(Name.DEFAULT, Integer.class));
 	}
 

@@ -18,6 +18,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static se.jbee.inject.lang.Cast.listTypeOf;
 import static se.jbee.inject.lang.Type.raw;
 
+/**
+ * A test that shows that class type variables can be used as long as actual
+ * type parameters are set using {@link Hint}s or a {@link
+ * se.jbee.inject.Dependency} with actual type parmaters.
+ */
 class TestFeatureGenericBeanBinds {
 
 	@SuppressWarnings("unchecked")
@@ -73,8 +78,8 @@ class TestFeatureGenericBeanBinds {
 
 			autobind().accessBy(AccessesBy.declaredFields(false)).in(
 					Hint.constant(new GenericAccess<>(42d))
-							.asType(raw(GenericAccess.class).parameterized(
-									Double.class)));
+							.asType(raw(GenericAccess.class) //
+									.parameterized(Double.class)));
 		}
 	}
 
@@ -105,4 +110,5 @@ class TestFeatureGenericBeanBinds {
 		assertEquals("correct", bean.a);
 		assertEquals(42, bean.b);
 	}
+
 }

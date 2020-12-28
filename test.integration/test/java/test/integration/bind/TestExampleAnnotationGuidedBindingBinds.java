@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Test;
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Scope;
+import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.UnresolvableDependency.IllegalAccess;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.bind.ModuleWith;
 import se.jbee.inject.binder.BinderModule;
@@ -189,7 +189,7 @@ class TestExampleAnnotationGuidedBindingBinds {
 		assertNotNull(answer);
 		assertEquals(42, answer.getAsInt());
 		// in contrast to @Service the @Contract only binds the named interfaces, so...
-		assertThrows(NoResourceForDependency.class,
+		assertThrows(UnresolvableDependency.ResourceResolutionFailed.class,
 				() -> context.resolve(LongSupplier.class));
 	}
 
