@@ -39,9 +39,9 @@ class ExtensionModule extends BinderModule {
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	private static <T> T extension(Dependency<?> dep, Injector context) {
 		Env env = context.resolve(Env.class);
-		Package pkg = ExtensionModule.class.getPackage();
-		ConstructsBy constructsBy = env.property(ConstructsBy.class, pkg);
-		HintsBy hintsBy = env.property(HintsBy.class, pkg);
+		Class<?> ns = ExtensionModule.class;
+		ConstructsBy constructsBy = env.property(ConstructsBy.class, ns);
+		HintsBy hintsBy = env.property(HintsBy.class, ns);
 		Type<?> expectedType = dep.type();
 		Constructor<?> ext = constructsBy.reflect(
 				expectedType.rawType.getDeclaredConstructors());

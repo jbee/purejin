@@ -95,7 +95,8 @@ public final class Bind {
 
 	private <T> Name effectiveScope(Locator<T> locator) {
 		Name effectiveScope = scope.equalTo(Scope.mirror) //
-				? env.property(ScopesBy.class, source.pkg()).reflect(locator.type().rawType)
+				? env.property(ScopesBy.class, source.ident)
+					.reflect(locator.type().rawType)
 				: scope;
 		return effectiveScope.equalTo(Scope.auto)
 			? Scope.application

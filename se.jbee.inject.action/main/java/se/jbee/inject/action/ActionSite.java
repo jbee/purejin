@@ -40,12 +40,12 @@ public final class ActionSite<A, B> {
 		this.in = in;
 		this.out = out;
 		Env env = context.resolve(Env.class);
-		Hint<A> inHint = Hint.constantNull(in);
-		Hint<?>[] hints = env.property(HintsBy.class, ActionSite.class.getPackage())
-				.applyTo(context, target.action, target.as, inHint);
+		Hint<A> inArg = Hint.constantNull(in);
+		Hint<?>[] actualParameters = env.property(HintsBy.class, ActionSite.class)
+				.applyTo(context, target.action, target.as, inArg);
 		this.injection = new InjectionSite(context,
-				dependency(out).injectingInto(target.as), hints);
-		this.inputIndex = asList(hints).indexOf(inHint);
+				dependency(out).injectingInto(target.as), actualParameters);
+		this.inputIndex = asList(actualParameters).indexOf(inArg);
 	}
 
 	public Object[] args(Injector context, Object input) {

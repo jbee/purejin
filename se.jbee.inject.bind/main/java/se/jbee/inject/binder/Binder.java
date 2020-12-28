@@ -310,7 +310,7 @@ public class Binder {
 	 * @since 8.1
 	 */
 	public final ConnectBinder connect() {
-		Package ns = bind.source.pkg();
+		Class<?> ns = bind.source.ident;
 		return connect(
 				env().property(CONNECT_QUALIFIER, ProducesBy.class, ns,
 						env().property(ProducesBy.class, ns)));
@@ -639,7 +639,7 @@ public class Binder {
 			Bind bind = binder.bind();
 			this.binder = binder.on(bind.asContract()).on(bind.next());
 			Env env = bind.env;
-			Package ns = bind.source.pkg();
+			Class<?> ns = bind.source.ident;
 			this.accessesBy = env.property(AccessesBy.class, ns);
 			this.constructsBy = env.property(ConstructsBy.class, ns);
 			this.producesBy = env.property(ProducesBy.class, ns);
@@ -974,7 +974,7 @@ public class Binder {
 		}
 
 		private <P> P env(Class<P> property) {
-			return env().property(property, bind().source.pkg());
+			return env().property(property, bind().source.ident);
 		}
 
 		public <I extends T> void to(Class<I> impl) {

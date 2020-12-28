@@ -52,7 +52,7 @@ public interface ModuleWith<T> extends Module {
 		final T value = valueType.rawType == Env.class
 			? (T) env
 			: (T) env.property(Name.DEFAULT, valueType,
-					getClass().getPackage());
+					getClass());
 		declare(bindings, env, value);
 	}
 }

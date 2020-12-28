@@ -53,28 +53,28 @@ public interface Env {
 
 	String GP_BIND_BINDINGS = "self-bind";
 
-	<T> T property(Name qualifier, Type<T> property, Package ns)
+	<T> T property(Name qualifier, Type<T> property, Class<?> ns)
 			throws InconsistentDeclaration;
 
-	default <T> T property(Class<T> property, Package ns)
+	default <T> T property(Class<T> property, Class<?> ns)
 			throws InconsistentDeclaration {
 		return property(Name.DEFAULT, raw(property), ns);
 	}
 
-	default <T> T property(Type<T> property, Package ns)
+	default <T> T property(Type<T> property, Class<?> ns)
 			throws InconsistentDeclaration {
 		return property(Name.DEFAULT, property, ns);
 	}
 
-	default <T> T property(String qualifier, Class<T> property, Package ns) {
+	default <T> T property(String qualifier, Class<T> property, Class<?> ns) {
 		return property(named(qualifier), raw(property), ns);
 	}
 
-	default <T> T property(String qualifier, Class<T> property, Package ns, T defaultValue) {
+	default <T> T property(String qualifier, Class<T> property, Class<?> ns, T defaultValue) {
 		return property(named(qualifier), raw(property), ns, defaultValue);
 	}
 
-	default <T> T property(Name qualifier, Type<T> property, Package ns, T defaultValue) {
+	default <T> T property(Name qualifier, Type<T> property, Class<?> ns, T defaultValue) {
 		try {
 			return property(qualifier, property, ns);
 		} catch (InconsistentDeclaration e) {

@@ -1,6 +1,5 @@
 package test.integration.bind;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency;
@@ -56,7 +55,6 @@ class TestExampleLocalContractsByBinds {
 				() -> context.resolve(Number.class));
 	}
 
-	@Disabled("Issue is the package namespacing of Env does not work")
 	@Test
 	void superContractsByAppliedWithinJavaLang() {
 		assertEquals("42", context.resolve(String.class));

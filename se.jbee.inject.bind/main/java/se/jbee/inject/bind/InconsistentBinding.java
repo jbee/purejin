@@ -40,10 +40,10 @@ public final class InconsistentBinding extends InconsistentDeclaration {
 	}
 
 	public static InconsistentBinding undefinedEnvProperty(Name name,
-			Type<?> property, Package scope) {
+			Type<?> property, Class<?> ns) {
 		return new InconsistentBinding(
 				"Missing environment property: "
-					+ name + " of type " + property + " in " + scope);
+					+ name + " of type " + property + " in " + ns);
 	}
 
 	public static InconsistentBinding illegalCompletion(Binding<?> completing,

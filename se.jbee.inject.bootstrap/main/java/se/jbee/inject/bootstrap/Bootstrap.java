@@ -115,7 +115,7 @@ public final class Bootstrap {
 
 		BuiltinBootstrapper(Env env) {
 			this.env = env;
-			this.edition = env.property(Edition.class, Env.class.getPackage());
+			this.edition = env.globalProperty(Edition.class);
 		}
 
 		@Override

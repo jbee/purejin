@@ -88,8 +88,4 @@ public final class Source
 			: new Source(ident, declarationType, totalDeclarations, 0);
 	}
 
-	public Package pkg() {
-		return ident.getPackage();
-	}
-
 }

@@ -100,7 +100,7 @@ public final class Environment implements Env {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T property(Name qualifier, Type<T> property, Package ns) {
+	public <T> T property(Name qualifier, Type<T> property, Class<?> ns) {
 		if (decorated != null && !override) {
 			try {
 				return decorated.property(qualifier, property, ns);

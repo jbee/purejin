@@ -48,7 +48,7 @@ public final class Bindings {
 		if (!complete.isComplete())
 			throw InconsistentBinding.addingIncomplete(complete);
 		Enhancer enhancer = env.property(Enhancer.class,
-				complete.source.ident.getPackage());
+				complete.source.ident);
 		list.add(complete.annotatedBy(enhancer.apply(complete.annotations)));
 	}
 
@@ -59,7 +59,7 @@ public final class Bindings {
 	public <V extends Descriptor> void addExpanded(Env env, Binding<?> binding, V value) {
 		@SuppressWarnings("unchecked")
 		Class<V> type = (Class<V>) value.getClass();
-		Package ns = binding.source.ident.getPackage();
+		Class<?> ns = binding.source.ident;
 		@SuppressWarnings("unchecked")
 		ValueBinder<V> binder = env.property(
 				raw(ValueBinder.class).parameterized(classType(type)), ns);
@@ -88,7 +88,7 @@ public final class Bindings {
 	private boolean addsAnnotatedType(Env env, Class<?> annotated, Annotation annotation) {
 		ModuleWith<Class<?>> then = env.property(
 				named(annotation.annotationType()),
-				ModuleWith.TYPE_ANNOTATION, annotated.getPackage(), null);
+				ModuleWith.TYPE_ANNOTATION, annotated, null);
 		if (then == null)
 			return false;
 		then.declare(this, env, annotated);
@@ -99,7 +99,7 @@ public final class Bindings {
 		ModuleWith<Method> then = env.property(
 				named(annotation.annotationType()),
 				ModuleWith.METHOD_ANNOTATION,
-				annotated.getDeclaringClass().getPackage(), null);
+				annotated.getDeclaringClass(), null);
 		if (then == null)
 			return false;
 		then.declare(this, env, annotated);
