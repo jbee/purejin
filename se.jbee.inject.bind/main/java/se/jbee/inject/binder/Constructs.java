@@ -54,6 +54,10 @@ public final class Constructs<T> extends
 		return (Constructs<E>) this;
 	}
 
+	public boolean isGeneric() {
+		return target.getDeclaringClass().getTypeParameters().length > 0;
+	}
+
 	public Hint<?>[] actualParameters() {
 		return actualParameters(actualType);
 	}

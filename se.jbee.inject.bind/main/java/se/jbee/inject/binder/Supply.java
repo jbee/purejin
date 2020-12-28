@@ -12,7 +12,6 @@ import se.jbee.inject.lang.TypeVariable;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.*;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 import static se.jbee.inject.Instance.anyOf;
@@ -94,9 +93,7 @@ public final class Supply {
 	}
 
 	public static <T> Supplier<T> byProduction(Produces<T> produces) {
-		return produces.isGenericTypeAware()
-				? new Produce<>(produces, Dependency::type)
-				: new Produce<>(produces, null);
+		return new Produce<>(produces);
 	}
 
 	public static <T> Supplier<T> byConstruction(Constructs<T> constructs) {
@@ -143,11 +140,12 @@ public final class Supply {
 			extends WithArgs<E[]> {
 
 		private final Type<E[]> arrayType;
+		private final Hint<? extends E>[] elements;
 
 		ArrayElementReferencesSupplier(Type<E[]> arrayType,
 				Hint<? extends E>[] elements) {
-			super(elements);
 			this.arrayType = arrayType;
+			this.elements = elements;
 		}
 
 		@SuppressWarnings("SuspiciousSystemArraycopy")
@@ -160,8 +158,13 @@ public final class Supply {
 		}
 
 		@Override
+		protected Hint<?>[] hintsFor(Dependency<? super E[]> dep) {
+			return elements;
+		}
+
+		@Override
 		public String toString() {
-			return "array " + arrayType + ": " + Arrays.toString(hints);
+			return "array " + arrayType + ": " + Arrays.toString(elements);
 		}
 	}
 
@@ -169,10 +172,13 @@ public final class Supply {
 			implements Annotated {
 
 		private final Constructs<T> constructs;
+		private final Hint<?>[] actualParameters;
 
 		Construct(Constructs<T> constructs) {
-			super(constructs.actualParameters());
 			this.constructs = constructs;
+			// doing this eagerly for non generic classes is important
+			// to throw an exception during bootstrapping in case the hints given do not fit
+			this.actualParameters = constructs.isGeneric() ? null : constructs.actualParameters();
 		}
 
 		@Override
@@ -189,9 +195,9 @@ public final class Supply {
 
 		@Override
 		protected Hint<?>[] hintsFor(Dependency<? super T> dep) {
-			if (dep.type().equalTo(constructs.actualType))
-				return hints;
-			return constructs.actualParameters(dep.type());
+			return constructs.isGeneric()
+					? constructs.actualParameters(dep.type())
+					: actualParameters;
 		}
 
 		@Override
@@ -208,9 +214,7 @@ public final class Supply {
 		private final Class<T> returns;
 		private final Map<java.lang.reflect.TypeVariable<?>, UnaryOperator<Type<?>>> typeVariableResolvers;
 
-		Produce(Produces<T> produces,
-				Function<Dependency<?>, Object> actualTypeSupplier) {
-			super(produces.actualParameters(), actualTypeSupplier);
+		Produce(Produces<T> produces) {
 			this.produces = produces;
 			this.returns = produces.actualType.rawType;
 			this.instance = produces.isHinted() ? null : produces.as;
@@ -239,12 +243,17 @@ public final class Supply {
 		@Override
 		protected Hint<?>[] hintsFor(Dependency<? super T> dep) {
 			if (!produces.isGeneric())
-				return hints;
-			Hint<?>[] actualTypeHints = hints.clone();
+				return produces.actualParameters();
+			Hint<?>[] actualTypeHints = produces.actualParameters().clone();
 			Map<java.lang.reflect.TypeVariable<?>, Type<?>> actualTypes = TypeVariable.actualTypesFor(
 					typeVariableResolvers, dep.type());
 			java.lang.reflect.Parameter[] params = produces.target.getParameters();
-			for (int i = 0; i < actualTypeHints.length; i++) {
+			int i = 0;
+			if (produces.isGenericTypeAware()) {
+				actualTypeHints[0] = Hint.constant(dep.type());
+				i++;
+			}
+			for (; i < actualTypeHints.length; i++) {
 				actualTypeHints[i] = actualTypeHints[i] //
 						.withActualType(params[i], actualTypes);
 			}
@@ -259,21 +268,11 @@ public final class Supply {
 
 	public abstract static class WithArgs<T> implements Supplier<T> {
 
-		protected final Hint<?>[] hints;
-		private final Function<Dependency<?>, Object> actualTypeSupplier;
 		private InjectionSite previous;
 
-		WithArgs(Hint<?>[] params) {
-			this(params, null);
-		}
-
-		WithArgs(Hint<?>[] hints,
-				Function<Dependency<?>, Object> actualTypeSupplier) {
-			this.hints = hints;
-			this.actualTypeSupplier = actualTypeSupplier;
-		}
-
 		protected abstract T invoke(Object[] args, Injector context);
+
+		protected abstract Hint<?>[] hintsFor(Dependency<? super T> dep);
 
 		@Override
 		public T supply(Dependency<? super T> dep, Injector context)
@@ -287,14 +286,7 @@ public final class Supply {
 				previous = local;
 			}
 			Object[] args = local.args(context);
-			if (actualTypeSupplier != null)
-				args[0] = actualTypeSupplier.apply(dep);
 			return invoke(args, context);
-		}
-
-		protected Hint<?>[] hintsFor(
-				@SuppressWarnings("unused") Dependency<? super T> dep) {
-			return hints;
 		}
 	}
 }
