@@ -17,6 +17,7 @@ import se.jbee.inject.lang.Type;
 import java.lang.reflect.Constructor;
 
 import static se.jbee.inject.Instance.anyOf;
+import static se.jbee.inject.Name.named;
 import static se.jbee.inject.bind.BindingType.*;
 import static se.jbee.inject.bind.Bindings.supplyConstant;
 import static se.jbee.inject.bind.Bindings.supplyScopedConstant;
@@ -57,7 +58,7 @@ public final class DefaultValueBinders {
 			return;
 		}
 		Class<T> impl = item.type().rawType;
-		ContractsBy contractsBy = env.property(Name.named(impl).toString(),
+		ContractsBy contractsBy = env.property(named(impl).toString(),
 				ContractsBy.class, env.property(ContractsBy.class));
 		if (contractsBy.isContract(impl, impl))
 			dest.add(env, item);
