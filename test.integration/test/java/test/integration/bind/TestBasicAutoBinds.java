@@ -51,7 +51,7 @@ class TestBasicAutoBinds {
 		@Override
 		protected void declare() {
 			// share field values for the primitives in this test
-			autobind().shareBy(AccessesBy.declaredFields(false)).in(this);
+			autobind().accessBy(AccessesBy.declaredFields(false)).in(this);
 
 			// bind methods as factories using Hint to find the one we want
 			autobind().produceBy(ProducesBy.OPTIMISTIC //

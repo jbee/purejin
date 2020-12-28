@@ -650,11 +650,11 @@ public class Binder {
 				: target -> scope;
 		}
 
-		private AutoBinder(RootBinder binder, AccessesBy constantsBy,
+		private AutoBinder(RootBinder binder, AccessesBy accessesBy,
 				ConstructsBy constructsBy, ProducesBy producesBy,
 				NamesBy namesBy, ScopesBy scopesBy, HintsBy hintsBy) {
 			this.binder = binder;
-			this.accessesBy = constantsBy;
+			this.accessesBy = accessesBy;
 			this.constructsBy = constructsBy;
 			this.producesBy = producesBy;
 			this.namesBy = namesBy;
@@ -662,7 +662,7 @@ public class Binder {
 			this.hintsBy = hintsBy;
 		}
 
-		public AutoBinder shareBy(AccessesBy mirror) {
+		public AutoBinder accessBy(AccessesBy mirror) {
 			return new AutoBinder(binder, mirror, constructsBy, producesBy,
 					namesBy, scopesBy, hintsBy);
 		}
@@ -717,7 +717,7 @@ public class Binder {
 		private void in(Class<?> impl, Object instance,
 				Hint<?>... construction) {
 			boolean needsInstance1 = bindProducesIn(impl, instance);
-			boolean needsInstance2 = bindSharesIn(impl, instance);
+			boolean needsInstance2 = bindAccessesIn(impl, instance);
 			if (!needsInstance1 && !needsInstance2)
 				return; // do not try to construct the class
 			if (instance != null && !(instance instanceof Hint))
@@ -728,7 +728,7 @@ public class Binder {
 				asConstructor(Scope.auto, target, construction);
 		}
 
-		private boolean bindSharesIn(Class<?> impl, Object instance) {
+		private boolean bindAccessesIn(Class<?> impl, Object instance) {
 			Field[] constants = accessesBy.reflect(impl);
 			if (constants == null || constants.length == 0)
 				return false;

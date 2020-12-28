@@ -88,7 +88,7 @@ class TestFeatureAnnotatedWithBinds {
 			bind(Service.class).to(ServiceImpl.class);
 			autobind() //
 					.produceBy(OPTIMISTIC.annotatedWith(Marker.class)) //
-					.shareBy(AccessesBy.OPTIMISTIC.annotatedWith(Marker.class)) //
+					.accessBy(AccessesBy.OPTIMISTIC.annotatedWith(Marker.class)) //
 					.in(this);
 		}
 

@@ -45,7 +45,7 @@ public abstract class ConverterModule extends BinderModule {
 		return autobind() //
 				.nameBy(NamesBy.DECLARED_NAME) //
 				.scopeBy(ScopesBy.RETURN_TYPE) //
-				.shareBy(SHARES_BY) //
+				.accessBy(SHARES_BY) //
 				.produceBy(PRODUCES_BY);
 	}
 

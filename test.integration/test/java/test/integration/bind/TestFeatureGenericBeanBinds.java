@@ -5,6 +5,7 @@ import se.jbee.inject.Hint;
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.config.AccessesBy;
 import se.jbee.inject.config.ProducesBy;
 import se.jbee.inject.lang.Type;
 
@@ -20,11 +21,11 @@ import static se.jbee.inject.lang.Type.raw;
 class TestFeatureGenericBeanBinds {
 
 	@SuppressWarnings("unchecked")
-	public static class GenericBean<T> {
+	public static class GenericProduction<T> {
 
-		final Type<GenericBean<T>> type;
+		final Type<GenericProduction<T>> type;
 
-		public GenericBean(Type<GenericBean<T>> type) {
+		public GenericProduction(Type<GenericProduction<T>> type) {
 			this.type = type;
 		}
 
@@ -39,11 +40,22 @@ class TestFeatureGenericBeanBinds {
 		}
 	}
 
-	public static class AnotherGenericBean<T> {
+	public static class GenericConstruction<A, B> {
 
-		final T value;
+		final A a;
+		final B b;
 
-		public AnotherGenericBean(T value) {
+		public GenericConstruction(A a, B b) {
+			this.a = a;
+			this.b = b;
+		}
+	}
+
+	public static class GenericAccess<T> {
+
+		public final T value;
+
+		public GenericAccess(T value) {
 			this.value = value;
 		}
 	}
@@ -52,11 +64,17 @@ class TestFeatureGenericBeanBinds {
 
 		@Override
 		protected void declare() {
-			construct(AnotherGenericBean.class);
+			construct(GenericConstruction.class);
+			bind(Integer.class).to(42); // just a test value to inject
 
 			autobind().produceBy(ProducesBy.declaredMethods(false)) //
-					.in(Hint.relativeReferenceTo(raw(GenericBean.class)
+					.in(Hint.relativeReferenceTo(raw(GenericProduction.class)
 							.parameterized(String.class)));
+
+			autobind().accessBy(AccessesBy.declaredFields(false)).in(
+					Hint.constant(new GenericAccess<>(42d))
+							.asType(raw(GenericAccess.class).parameterized(
+									Double.class)));
 		}
 	}
 
@@ -74,10 +92,17 @@ class TestFeatureGenericBeanBinds {
 	}
 
 	@Test
+	void hintedAccessOfGenericFieldType() {
+		assertEquals(42d, context.resolve(Double.class));
+	}
+
+	@Test
 	void adHocGenericConstruction() {
-		AnotherGenericBean<?> bean = context.resolve(
-				raw(AnotherGenericBean.class).parameterized(String.class));
+		GenericConstruction<?, ?> bean = context.resolve(
+				raw(GenericConstruction.class)
+						.parameterized(String.class, Integer.class));
 		assertNotNull(bean);
-		assertEquals("correct", bean.value);
+		assertEquals("correct", bean.a);
+		assertEquals(42, bean.b);
 	}
 }

@@ -59,7 +59,8 @@ public final class Accesses<T> extends ReflectiveDescriptor<Field, T> implements
 	@SuppressWarnings("unchecked")
 	@Override
 	public T supply(Dependency<? super T> dep, Injector context) {
-		return (T) Reflect.access(target, as,
+		Object instance = isHinted() ? getAsHint().resolveIn(context) : as;
+		return (T) Reflect.access(target, instance,
 				e -> UnresolvableDependency.SupplyFailed.valueOf(e, target));
 	}
 }
