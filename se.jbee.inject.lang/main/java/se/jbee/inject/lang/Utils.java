@@ -337,6 +337,41 @@ public final class Utils {
 				&& arrayContains(parameterTypes(c), classType(t), Type::equalTo); // then check full generic Type as it is much more work
 	}
 
+	public static boolean matchesInOrder(Executable member, Typed<?>[] hints) {
+		if (hints.length == 0)
+			return true;
+		Type<?>[] types = parameterTypes(member);
+		int i = 0;
+		for (Typed<?> hint : hints) {
+			while (i < types.length && !hint.type().isAssignableTo(types[i]))
+				i++;
+			if (i >= types.length)
+				return false;
+		}
+		return true;
+	}
+
+	public static boolean matchesInRandomOrder(Executable member, Typed<?>[] hints) {
+		if (hints.length == 0)
+			return true;
+		Type<?>[] types = parameterTypes(member);
+		for (Typed<?> hint : hints) {
+			boolean matched = false;
+			int i = 0;
+			while (!matched && i < types.length) {
+				Type<?> type = types[i];
+				if (type != null && hint.type().isAssignableTo(type)) {
+					types[i] = null; // nark as handled by removing it
+					matched = true;
+				}
+				i++;
+			}
+			if (!matched)
+				return false;
+		}
+		return true;
+	}
+
 	/* Char Sequences */
 
 	public static boolean seqRegionEquals(CharSequence s1, CharSequence s2,

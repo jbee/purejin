@@ -5,9 +5,9 @@
  */
 package se.jbee.inject.config;
 
-import se.jbee.inject.Hint;
 import se.jbee.inject.Packages;
 import se.jbee.inject.lang.Type;
+import se.jbee.inject.lang.Typed;
 import se.jbee.inject.lang.Utils;
 
 import java.lang.annotation.Annotation;
@@ -101,12 +101,12 @@ public interface ProducesBy {
 		return impl -> arrayFilter(reflect(impl), filter);
 	}
 
-	default ProducesBy selectStrictBy(Hint<?>... hints) {
-		return select(method -> Hint.matchesInOrder(method, hints));
+	default ProducesBy selectStrictBy(Typed<?>... hints) {
+		return select(method -> Utils.matchesInOrder(method, hints));
 	}
 
-	default ProducesBy selectBy(Hint<?>... hints) {
-		return select(method -> Hint.matchesInRandomOrder(method, hints));
+	default ProducesBy selectBy(Typed<?>... hints) {
+		return select(method -> Utils.matchesInRandomOrder(method, hints));
 	}
 
 	default ProducesBy returnTypeAssignableTo(Type<?> supertype) {

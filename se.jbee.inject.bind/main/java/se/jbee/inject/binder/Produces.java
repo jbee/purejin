@@ -87,13 +87,13 @@ public final class Produces<T> extends ReflectiveDescriptor<Method, T> {
 	}
 
 	public Hint<?>[] actualParameters() {
-		Hint<?>[] given = determined;
+		Hint<?>[] given = explicitHints;
 		if (isGenericTypeAware()) {
 			// use a constant null hint to blank first parameter as it is filled in with actual type on method invocation
 			Hint<?> actualTypeHint = Hint.constantNull(
 					Type.parameterType(target.getParameters()[0]));
 			given = arrayPrepend(actualTypeHint, given);
 		}
-		return undeterminedBy.applyTo(target, actualDeclaringType(), given);
+		return strategy.applyTo(target, actualDeclaringType(), given);
 	}
 }

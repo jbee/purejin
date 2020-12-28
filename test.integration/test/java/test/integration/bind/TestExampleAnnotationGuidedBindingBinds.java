@@ -41,6 +41,8 @@ import static se.jbee.inject.lang.Type.raw;
  * The effects of this follow the pattern as implemented in {@link
  * ServiceAnnotationPattern} which receives the annotated {@link Class} as an
  * argument.
+ *
+ * @see TestExampleConfigPropertyAnnotationBinds
  **/
 class TestExampleAnnotationGuidedBindingBinds {
 

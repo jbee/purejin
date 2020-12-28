@@ -18,24 +18,24 @@ abstract class ReflectiveDescriptor<M extends AnnotatedElement & Member, T>
 	public final Object as;
 	public final M target;
 	/**
-	 * The {@link Hint}s that are already determined (as they have been manually passed by the user)
+	 * The {@link Hint}s that have been manually passed by the user
 	 */
-	public final Hint<?>[] determined;
+	public final Hint<?>[] explicitHints;
 	/**
 	 * The {@link HintsBy} strategy to use for those {@link Parameter}s that are undetermined so far.
 	 */
-	public final HintsBy undeterminedBy;
+	public final HintsBy strategy;
 
 	public ReflectiveDescriptor(Type<? super T> expectedType,
-			Type<T> actualType, Object as, M target, HintsBy undeterminedBy,
-			Hint<?>[] determined) {
+			Type<T> actualType, Object as, M target, HintsBy strategy,
+			Hint<?>[] explicitHints) {
 		actualType.castTo(expectedType);
 		this.expectedType = expectedType;
 		this.actualType = actualType;
 		this.as = as;
 		this.target = target;
-		this.undeterminedBy = undeterminedBy;
-		this.determined = determined;
+		this.strategy = strategy;
+		this.explicitHints = explicitHints;
 	}
 
 	@Override

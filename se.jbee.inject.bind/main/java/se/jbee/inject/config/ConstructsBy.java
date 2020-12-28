@@ -6,6 +6,7 @@
 package se.jbee.inject.config;
 
 import se.jbee.inject.Hint;
+import se.jbee.inject.lang.Typed;
 import se.jbee.inject.lang.Utils;
 
 import java.lang.annotation.Annotation;
@@ -54,7 +55,7 @@ public interface ConstructsBy {
 	 */
 	ConstructsBy OPTIMISTIC = FIRST
 			.ignore(Utils::isRecursiveTypeParameterPresent) // ignore looping ones
-			.select(Hint::matchesInRandomOrder) // ignore those that don't match provided Hints
+			.select(Utils::matchesInRandomOrder) // ignore those that don't match provided Hints
 			.sortedBy(Utils::mostVisibleMostParametersToLeastVisibleLeastParameters);
 
 	default ConstructsBy sortedBy(Comparator<Constructor<?>> cmp) {
@@ -86,8 +87,15 @@ public interface ConstructsBy {
 				: reflect(arrayFilter(candidates, c -> filter.test(c, hints)), hints);
 	}
 
+	default ConstructsBy selectStrictBy(Typed<?>... hints) {
+		return select(constructor -> Utils.matchesInOrder(constructor, hints));
+	}
+
+	default ConstructsBy selectBy(Typed<?>... hints) {
+		return select(constructor -> Utils.matchesInRandomOrder(constructor, hints));
+	}
+
 	default ConstructsBy annotatedWith(Class<? extends Annotation> marker) {
 		return select(c -> c.isAnnotationPresent(marker));
 	}
-
 }

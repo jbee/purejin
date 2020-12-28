@@ -55,7 +55,7 @@ class TestBasicAutoBinds {
 
 			// bind methods as factories using Hint to find the one we want
 			autobind().produceBy(ProducesBy.OPTIMISTIC //
-					.selectStrictBy(Hint.signature(String.class, Integer.class))) //
+					.selectStrictBy(raw(String.class), raw(Integer.class))) //
 					.in(SelectMethodFromHints.class);
 
 			// bind methods as factories testing OR and OR-ELSE

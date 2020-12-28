@@ -63,6 +63,6 @@ public final class Constructs<T> extends
 	}
 
 	public Hint<?>[] actualParameters(Type<?> actualType) {
-		return undeterminedBy.applyTo(target, actualType, determined);
+		return strategy.applyTo(target, actualType, explicitHints);
 	}
 }

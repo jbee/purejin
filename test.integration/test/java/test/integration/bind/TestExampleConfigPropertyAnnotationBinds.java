@@ -3,6 +3,7 @@ package test.integration.bind;
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.*;
 import se.jbee.inject.binder.BinderModule;
+import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.Config;
@@ -24,6 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * A test that show how to add an annotation (here {@link ConfigProperty} that
  * will inject the {@link se.jbee.inject.config.Config} value of the same name
  * to the annotated {@link java.lang.reflect.Parameter}.
+ *
+ * @see TestExampleAnnotationGuidedBindingBinds
  */
 class TestExampleConfigPropertyAnnotationBinds {
 
@@ -55,8 +58,7 @@ class TestExampleConfigPropertyAnnotationBinds {
 		}
 	}
 
-	private static class TestExampleConfigPropertyAnnotationBindsModule extends
-			BinderModule {
+	private static class CommonSetupModule extends BinderModule {
 
 		@Override
 		protected void declare() {
@@ -67,19 +69,25 @@ class TestExampleConfigPropertyAnnotationBinds {
 			// assume somewhere else (in another module) we declare
 			construct(Bean.class);
 
-			// and in some general setup module we declare the mechanism of
-			// providing config values
-			bindConfigPropertySupplier(Type.WILDCARD);
-
 			// and also we need a converter Integer => String
 			bind(Converter.converterTypeOf(Integer.class, String.class)).to(String::valueOf);
 		}
+	}
 
+	@Installs(bundles = CommonSetupModule.class)
+	private static class Solution1 extends BinderModule {
+
+		@Override
+		protected void declare() {
+			// in some general setup module we declare the mechanism of
+			// providing config values
+			bindConfigPropertySupplier(Type.WILDCARD);
+		}
 
 		private <T> void bindConfigPropertySupplier(Type<T> type) {
 			per(Scope.dependencyInstance) //
 					.bind(Name.named(ConfigProperty.class).asPrefix(), type) //
-					.toSupplier(TestExampleConfigPropertyAnnotationBindsModule::supplyConfigProperty);
+					.toSupplier(Solution1::supplyConfigProperty);
 		}
 
 		@SuppressWarnings("unchecked")
@@ -97,19 +105,42 @@ class TestExampleConfigPropertyAnnotationBinds {
 		}
 	}
 
-	private final Injector context = Bootstrap.injector(
-			Environment.DEFAULT.with(HintsBy.class, HintsBy.instanceReference(
-					NamesBy.annotatedWith(ConfigProperty.class,
-							ConfigProperty::value, true))),
-			TestExampleConfigPropertyAnnotationBindsModule.class);
+	/**
+	 * Part of the solution is that we set a {@link HintsBy} strategy that
+	 * creates the appropriate {@link Hint} that then is resolved to the special
+	 * {@link Supplier} we have bound in {@link Solution1}.
+	 */
+	private static Injector bootstrapSolution1() {
+		return Bootstrap.injector(Environment.DEFAULT.with(HintsBy.class,
+				HintsBy.instanceReference(
+						NamesBy.annotatedWith(ConfigProperty.class,
+								ConfigProperty::value, true))),
+				Solution1.class);
+	}
+
+	/**
+	 * An alternative to {@link Solution1} that does not use a {@link Supplier}.
+	 * Instead the {@link Hint} computed by the custom {@link HintsBy} strategy
+	 * directly resolves the {@link ConfigProperty} and provides it as a {@link
+	 * Hint#constant(Object)}.
+	 */
+	@Installs(bundles = CommonSetupModule.class)
+	private static class Solution2 extends BinderModule {
+
+		@Override
+		protected void declare() {
+			//TODO
+		}
+	}
 
 	@Test
 	void configPropertyIsInjectedAsAskedByTheAnnotation() {
-		assertEquals("a", context.resolve(Bean.class).a);
+		assertEquals("a", bootstrapSolution1().resolve(Bean.class).a);
 	}
 
 	@Test
 	void configPropertyIsInjectedAndConvertedAsAskedByTheAnnotation() {
-		assertEquals("42", context.resolve(Bean.class).b);
+		assertEquals("42", bootstrapSolution1().resolve(Bean.class).b);
 	}
+
 }
