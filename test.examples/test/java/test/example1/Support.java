@@ -1,4 +1,4 @@
-package test.example.app;
+package test.example1;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;

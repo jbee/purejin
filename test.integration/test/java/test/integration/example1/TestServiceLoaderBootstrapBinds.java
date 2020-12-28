@@ -1,4 +1,4 @@
-package test.integration.example;
+package test.integration.example1;
 
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Env;
@@ -36,7 +36,7 @@ class TestServiceLoaderBootstrapBinds {
 		Injector context = Bootstrap.injector();
 		assertNotNull(context);
 		assertEquals(13, context.resolve(int.class).intValue());
-		assertEquals("test.example.app.MyFirstModule",
+		assertEquals("test.example1.MyFirstModule",
 				context.resolve(String.class));
 	}
 }
