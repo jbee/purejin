@@ -35,7 +35,9 @@ jobs:
           VERSION=8-ea+${SHA7}
           echo "VERSION=${VERSION}" >> ${GITHUB_ENV}
       - name: 'Build with Bach'
-        uses: sormuras/bach-build@main
+        uses: sormuras/bach-build@v1
+        with:
+          bach-version: 16
       - name: 'Report test summary'
         uses: docker://ghcr.io/enricomi/publish-unit-test-result-action:v1.6
         if: always()
