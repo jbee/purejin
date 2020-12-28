@@ -3,12 +3,16 @@ package se.jbee.inject.binder;
 import se.jbee.inject.Annotated;
 import se.jbee.inject.Hint;
 import se.jbee.inject.Descriptor;
+import se.jbee.inject.InconsistentDeclaration;
 import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.Typed;
 
 import java.lang.reflect.*;
 import java.util.function.Function;
+
+import static se.jbee.inject.lang.Type.actualParameterType;
+import static se.jbee.inject.lang.Utils.arrayMap;
 
 abstract class ReflectiveDescriptor<M extends AnnotatedElement & Member, T>
 		implements Typed<T>, Annotated, Descriptor {
@@ -26,7 +30,7 @@ abstract class ReflectiveDescriptor<M extends AnnotatedElement & Member, T>
 	 */
 	public final HintsBy strategy;
 
-	public ReflectiveDescriptor(Type<? super T> expectedType,
+	protected ReflectiveDescriptor(Type<? super T> expectedType,
 			Type<T> actualType, Object as, M target, HintsBy strategy,
 			Hint<?>[] explicitHints) {
 		actualType.castTo(expectedType);
@@ -66,6 +70,20 @@ abstract class ReflectiveDescriptor<M extends AnnotatedElement & Member, T>
 		if (!expectedType.isAssignableTo(memberType))
 			throw new IllegalArgumentException(
 					"Expected " + expectedType + " but the member " + target + " provides type " + memberType);
+	}
+
+	protected final void checkConsistentExplicitHints(Parameter[] params) {
+		if (explicitHints.length == 0)
+			return;
+		Type<?>[] types = arrayMap(params, Type.class,
+				p -> actualParameterType(p, actualDeclaringType()));
+		Hint<?>[] hints = new Hint[params.length];
+		for (Hint<?> hint : explicitHints) {
+			int i = Hint.indexForType(types, hint, hints);
+			if (i < 0)
+				throw InconsistentDeclaration.incomprehensibleHint(hint);
+			hints[i] = hint;
+		}
 	}
 
 	public boolean isStatic() {

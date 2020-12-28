@@ -51,7 +51,7 @@ public final class Environment implements Env {
 			.with(ProducesBy.class, impl -> null) //
 			.with(NamesBy.class, obj -> Name.DEFAULT) //
 			.with(ScopesBy.class, ScopesBy.AUTO) //
-			.with(HintsBy.class, param -> null) //
+			.with(HintsBy.class, (param, context) -> null) //
 			.with(ContractsBy.class, ContractsBy.PROTECTIVE) //
 			.with(Annotated.Enhancer.class, Annotated.SOURCE) //
 			.with(BindingConsolidation.class, DefaultBindingConsolidation::consolidate) //
