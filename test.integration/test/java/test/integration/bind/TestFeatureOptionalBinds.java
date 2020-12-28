@@ -5,6 +5,8 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.Environment;
+import se.jbee.inject.config.ContractsBy;
 import se.jbee.inject.defaults.DefaultFeature;
 
 import java.util.Optional;
@@ -25,47 +27,47 @@ class TestFeatureOptionalBinds {
 
 		@Override
 		protected void declare() {
-			superbind(int.class).to(5);
+			contractbind(int.class).to(5);
 			bind(String.class).to("foo");
 		}
-
 	}
 
 	private final Injector context = Bootstrap.injector(
+			Environment.DEFAULT.with(ContractsBy.class, ContractsBy.SUPER),
 			TestOptionalBindsModule.class);
 
 	@Test
 	void optionalIsAvailableForExactType() {
 		assertEquals(Optional.of(5), context.resolve(
-				raw(Optional.class).parametized(Integer.class)));
+				raw(Optional.class).parameterized(Integer.class)));
 		assertEquals(Optional.of("foo"), context.resolve(
-				raw(Optional.class).parametized(String.class)));
+				raw(Optional.class).parameterized(String.class)));
 	}
 
 	@Test
 	void optionalIsAvailableForSuperType() {
 		assertEquals(Optional.of(5), context.resolve(
-				raw(Optional.class).parametized(Number.class)));
+				raw(Optional.class).parameterized(Number.class)));
 
 	}
 
 	@Test
 	void emptyOptionalReturnedOtherwise() {
 		assertEquals(Optional.empty(),
-				context.resolve(raw(Optional.class).parametized(Float.class)));
+				context.resolve(raw(Optional.class).parameterized(Float.class)));
 	}
 
 	@Test
 	void optionalOfOptionalOfIsAvailableForExactType() {
 		assertEquals(Optional.of(Optional.of(5)),
-				context.resolve(raw(Optional.class).parametized(
-						raw(Optional.class).parametized(Integer.class))));
+				context.resolve(raw(Optional.class).parameterized(
+						raw(Optional.class).parameterized(Integer.class))));
 	}
 
 	@Test
 	void emptyOptionalOfOptionalReturnedOtherwise() {
 		assertEquals(Optional.of(Optional.empty()),
-				context.resolve(raw(Optional.class).parametized(
-						raw(Optional.class).parametized(Float.class))));
+				context.resolve(raw(Optional.class).parameterized(
+						raw(Optional.class).parameterized(Float.class))));
 	}
 }

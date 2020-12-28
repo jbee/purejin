@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  *
  * @see DependencyCycle
  * @see UnstableDependency
- * @see NoResourceForDependency
+ * @see ResourceResolutionFailed
  * @see NoMethodForDependency
  * @see SupplyFailed
  *
@@ -75,20 +75,22 @@ public abstract class UnresolvableDependency extends RuntimeException {
 	}
 
 	/**
-	 * An {@link Injector} couldn't find a {@link Resource} that matches a
-	 * {@link Dependency} to resolve.
+	 * An {@link Injector} couldn't find or identify the {@link Resource} that
+	 * matches a {@link Dependency} resolved. This is either because there is no
+	 * matching {@link Resource} or because it is unclear which {@link Resource}
+	 * is requested by the {@link Dependency}.
 	 */
-	public static final class NoResourceForDependency
+	public static final class ResourceResolutionFailed
 			extends UnresolvableDependency {
 
-		public <T> NoResourceForDependency(String msg, Dependency<T> dep,
+		public <T> ResourceResolutionFailed(String msg, Dependency<T> dep,
 				Resource<?>... available) {
-			super("No matching resource found.\n\t dependency: " + dep
+			super(msg + "\n\t dependency: " + dep
 				+ "\n\tavailable are (for same raw type): "
-				+ describe(available) + "\n\t" + msg);
+				+ describe(available));
 		}
 
-		public NoResourceForDependency(Collection<Type<?>> types,
+		public ResourceResolutionFailed(Collection<Type<?>> types,
 				List<?> dropped) {
 			super("No resource for type(s)\n\trequired: " + types
 				+ (dropped.isEmpty() ? "" : "\n\tdropped bindings:\n" + dropped));

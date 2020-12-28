@@ -188,7 +188,7 @@ public final class Imported {
 						end);
 			}
 		}
-		return base.parametized(actualTypeParameters);
+		return base.parameterized(actualTypeParameters);
 	}
 
 	private static void illegalAt(String msg, String signature, int index) {

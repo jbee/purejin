@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.lang.Type.classType;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
@@ -96,7 +97,7 @@ public final class BuildUpResources {
 		return instance;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings("unchecked")
 	private static <T, B extends BuildUp<?>> BuildUp<? super T> generateBuildUp(
 			Class<T> actualType, Resource<B> resource, Dependency<?> context) {
 		Locator<B> signature = resource.signature;
@@ -105,8 +106,7 @@ public final class BuildUpResources {
 		Type<?> required = signature.type().parameter(0);
 		if (!raw(actualType).isAssignableTo(required))
 			return null;
-		Type<?> provided = Type.supertype(required.rawType,
-				(Type) Type.classType(actualType));
+		Type<?> provided = classType(actualType).toSuperType(required.rawType);
 		if (!provided.isAssignableTo(required))
 			return null;
 		B buildUpInstance = resource.generate();

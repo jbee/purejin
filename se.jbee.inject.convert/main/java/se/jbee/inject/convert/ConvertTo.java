@@ -40,11 +40,12 @@ public final class ConvertTo<B> {
 	private final Type<B> out;
 	private final Map<Type<?>, Converter<?, B>> ins = new LinkedHashMap<>();
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	public ConvertTo(Converter<?, B> tail, Injector context) {
 		Class<? extends Converter> tailType = tail.getClass();
-		Type<? extends Converter> converterType = Type.supertype(
-				Converter.class, raw(tailType));
+		Type<?> converterType = raw(
+				tailType).toSuperType(Converter.class);
 		Type<?> directInputType = converterType.parameter(0);
 		this.out = (Type) converterType.parameter(1);
 		ins.put(directInputType, tail);

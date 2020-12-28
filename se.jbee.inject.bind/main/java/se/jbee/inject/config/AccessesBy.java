@@ -30,85 +30,85 @@ import static se.jbee.inject.lang.Utils.arrayFilter;
  * @since 8.1
  */
 @FunctionalInterface
-public interface SharesBy {
+public interface AccessesBy {
 
-	SharesBy OPTIMISTIC = declaredFields(f -> !f.isSynthetic(), true);
+	AccessesBy OPTIMISTIC = declaredFields(f -> !f.isSynthetic(), true);
 
 	/**
 	 * @return The {@link Field}s that should be used in the context this {@link
-	 * SharesBy} is used. Return {@code null} when no decision has been made.
+	 * AccessesBy} is used. Return {@code null} when no decision has been made.
 	 * Returns empty array when the decision is to not share any fields.
 	 */
 	Field[] reflect(Class<?> impl);
 
-	static SharesBy declaredFields(boolean includeInherited) {
+	static AccessesBy declaredFields(boolean includeInherited) {
 		return declaredFields(null, includeInherited);
 	}
-	static SharesBy declaredFields(Predicate<Field> filter, boolean includeInherited) {
+	static AccessesBy declaredFields(Predicate<Field> filter, boolean includeInherited) {
 		return fields(Class::getDeclaredFields, filter, includeInherited);
 	}
 
-	static SharesBy fields(Function<Class<?>, Field[]> pool,
+	static AccessesBy fields(Function<Class<?>, Field[]> pool,
 			Predicate<Field> filter, boolean includeInherited) {
 		return fields(pool, filter,
 				impl -> includeInherited ? Object.class : impl.getSuperclass());
 	}
 
-	static SharesBy fields(Function<Class<?>, Field[]> pool,
+	static AccessesBy fields(Function<Class<?>, Field[]> pool,
 			Predicate<Field> filter, UnaryOperator<Class<?>> end) {
 		return impl -> arrayFilter(impl, end.apply(impl), pool, filter)
 				.toArray(new Field[0]);
 	}
 
-	default SharesBy orElse(SharesBy whenNull) {
+	default AccessesBy orElse(AccessesBy whenNull) {
 		return impl -> {
 			Field[] res = reflect(impl);
 			return res != null ? res : whenNull.reflect(impl);
 		};
 	}
 
-	default SharesBy or(SharesBy other) {
+	default AccessesBy or(AccessesBy other) {
 		return impl -> Utils.arrayConcat(reflect(impl), other.reflect(impl));
 	}
 
-	default SharesBy ignoreStatic() {
+	default AccessesBy ignoreStatic() {
 		return withModifier(((IntPredicate) Modifier::isStatic).negate());
 	}
 
-	default SharesBy ignoreSynthetic() {
+	default AccessesBy ignoreSynthetic() {
 		return select(field -> !field.isSynthetic());
 	}
 
-	default SharesBy ignoreGenericType() {
+	default AccessesBy ignoreGenericType() {
 		return select(
 				field -> !(field.getGenericType() instanceof TypeVariable<?>));
 	}
 
-	default SharesBy ignore(Predicate<Field> filter) {
+	default AccessesBy ignore(Predicate<Field> filter) {
 		return select(filter.negate());
 	}
 
-	default SharesBy select(Predicate<Field> filter) {
+	default AccessesBy select(Predicate<Field> filter) {
 		return impl -> arrayFilter(this.reflect(impl), filter);
 	}
 
-	default SharesBy typeAssignableTo(Type<?> supertype) {
+	default AccessesBy typeAssignableTo(Type<?> supertype) {
 		return select(field -> fieldType(field).isAssignableTo(supertype));
 	}
 
-	default SharesBy withModifier(IntPredicate filter) {
+	default AccessesBy withModifier(IntPredicate filter) {
 		return select(field -> filter.test(field.getModifiers()));
 	}
 
-	default SharesBy annotatedWith(Class<? extends Annotation> marker) {
+	default AccessesBy annotatedWith(Class<? extends Annotation> marker) {
 		return select(field -> field.isAnnotationPresent(marker));
 	}
 
-	default SharesBy returnTypeIn(Packages filter) {
+	default AccessesBy returnTypeIn(Packages filter) {
 		return select(field -> filter.contains(raw(field.getType())));
 	}
 
-	default SharesBy in(Packages filter) {
+	default AccessesBy in(Packages filter) {
 		return impl -> filter.contains(raw(impl))
 			? this.reflect(impl)
 			: null;

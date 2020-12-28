@@ -2,6 +2,7 @@ package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
+import se.jbee.inject.Instance;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bind.BindingType;
 import se.jbee.inject.bind.Bundle;
@@ -20,13 +21,13 @@ import static org.junit.jupiter.api.Assertions.*;
  * An example of how to use {@link ValueBinder}s to customize the and binding
  * process.
  * <p>
- * This test demonstrates how the {@link DefaultValueBinders#INSTANCE_REF_LITE}
+ * This test demonstrates how the {@link DefaultValueBinders#REFERENCE_PREFER_CONSTANTS}
  * can be used to avoid bindings of type {@link BindingType#REFERENCE} where
  * possible.
  * <p>
  * This is the case when the referenced {@link Class} is banal in its
  * construction and it has no instance state on which it could depend. In such a
- * case the {@link DefaultValueBinders#INSTANCE_REF_LITE} will not create a
+ * case the {@link DefaultValueBinders#REFERENCE_PREFER_CONSTANTS} will not create a
  * reference to the referenced type and a implicit bind to constructor but a
  * direct bind to a constant instance created during bootstrapping.
  * <p>
@@ -64,7 +65,7 @@ class TestExamplePreferConstantsBinds {
 	void referencesAreAvoidedWhenPossible() {
 		Injector injector = injectorWithEnv(
 				TestExamplePreferConstantsBindsModule.class,
-				DefaultValueBinders.INSTANCE_REF_LITE);
+				DefaultValueBinders.REFERENCE_PREFER_CONSTANTS);
 		Serializable banal = injector.resolve(Serializable.class);
 		assertSame(BanalBean.class, banal.getClass());
 		RandomAccess nonBanal = injector.resolve(RandomAccess.class);
@@ -77,7 +78,8 @@ class TestExamplePreferConstantsBinds {
 	}
 
 	private static Injector injectorWithEnv(Class<? extends Bundle> root,
-			ValueBinder<?> binder) {
-		return Bootstrap.injector(Environment.DEFAULT.withBinder(binder), root);
+			ValueBinder<Instance<?>> binder) {
+		return Bootstrap.injector(
+				Environment.DEFAULT.withBinder(Instance.class, binder), root);
 	}
 }

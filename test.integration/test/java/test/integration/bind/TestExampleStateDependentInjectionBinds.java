@@ -2,7 +2,6 @@ package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.*;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.binder.Binder.RootBinder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
@@ -165,8 +164,8 @@ class TestExampleStateDependentInjectionBinds {
 			final Instance<T> actualToInject = Instance.instance(
 					named(actualState), type);
 			try {
-				return injector.resolve(dependency.instanced(actualToInject));
-			} catch (NoResourceForDependency e) {
+				return injector.resolve(dependency.onInstance(actualToInject));
+			} catch (UnresolvableDependency.ResourceResolutionFailed e) {
 				if (actualState != null) { // when not trying default
 					return supply(dependency, injector, null); // try default
 				}

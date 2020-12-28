@@ -6,7 +6,7 @@
 package se.jbee.inject.container;
 
 import se.jbee.inject.*;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import se.jbee.inject.UnresolvableDependency.ResourceResolutionFailed;
 import se.jbee.inject.lang.Type;
 
 import java.util.ArrayList;
@@ -25,8 +25,6 @@ import static se.jbee.inject.lang.Utils.*;
 /**
  * The default {@link Injector} implementation that is based on
  * {@link Resources} created from {@link ResourceDescriptor}s.
- *
- * @author Jan Bernitt (jan@jbee.se)
  *
  * @see Resources for bootstrapping of the {@link Injector} context
  * @see BuildUpResources for instance initialisation
@@ -107,8 +105,8 @@ public final class Container implements Injector, Env {
 			return resolveArray(dep, type.baseType());
 		if (isResourceResolution)
 			return (T) resolveFromUpperBound(dep.onTypeParameter());
-		return (T) resolveFromUpperBound(dep).generate(
-				(Dependency<Object>) dep);
+		return (T) resolveFromUpperBound(dep) //
+				.generate((Dependency<Object>) dep);
 	}
 
 	/**
@@ -119,13 +117,16 @@ public final class Container implements Injector, Env {
 	private <T> Resource<?> resolveFromUpperBound(Dependency<T> dep) {
 		Type<T> type = dep.type();
 		Resource<?> match = arrayFindFirst(resources.forType(Type.WILDCARD),
-				c -> type.isAssignableTo(c.type()));
+				r -> type.isAssignableTo(r.type())
+						&& r.signature.instance.name.isCompatibleWith(dep.instance.name));
 		if (match != null)
 			return match;
 		throw noResourceFor(dep);
 	}
 
 	private <T> Resource<T> mostQualifiedMatchFor(Dependency<T> dep) {
+		if (dep.type().equalTo(Type.WILDCARD) && dep.instance.name.isAny())
+			throwAmbiguousDependency(dep);
 		return mostQualifiedMatchIn(resources.forType(dep.type()), dep);
 	}
 
@@ -134,21 +135,27 @@ public final class Container implements Injector, Env {
 		return arrayFindFirst(rs, rx -> rx.signature.isMatching(dep));
 	}
 
-	private <T> NoResourceForDependency noResourceFor(Dependency<T> dep) {
+	private <T> ResourceResolutionFailed noResourceFor(Dependency<T> dep) {
 		Type<T> type = dep.type();
 		Type<?> listType = type.rawType == Resource.class
 			|| type.rawType == Generator.class ? type.parameter(0) : type;
-		return new NoResourceForDependency("", dep,
+		return new ResourceResolutionFailed("No matching resource found.", dep,
 				resources.forType(listType));
+	}
+
+	private static <T> void throwAmbiguousDependency(Dependency<T> dep) {
+		throw new ResourceResolutionFailed(
+				"Resolving any instance for any type is considered too ambiguous to be intentional",
+				dep);
 	}
 
 	@SuppressWarnings("unchecked")
 	private <T, E> T resolveArray(Dependency<T> dep, Type<E> elemType) {
 		final Class<E> rawElemType = elemType.rawType;
 		if (rawElemType == Resource.class || rawElemType == Generator.class)
-			return (T) resolveResources(dep, elemType.parameter(0));
+			return (T) resolveArrayElementResources(dep, elemType.parameter(0));
 		if (dep.type().rawType.getComponentType().isPrimitive())
-			throw new NoResourceForDependency(
+			throw new ResourceResolutionFailed(
 					"Primitive arrays cannot be used to inject all instances of the wrapper type. Use the wrapper array instead.",
 					dep);
 		Set<Integer> identities = new HashSet<>();
@@ -169,32 +176,32 @@ public final class Container implements Injector, Env {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T, G> Resource<G>[] resolveResources(Dependency<T> dep,
-			Type<G> generatedType) {
-		Dependency<G> generatedTypeDep = dep.typed(generatedType);
+	private <R, T> Resource<T>[] resolveArrayElementResources(Dependency<R> resourceDep,
+			Type<T> generatedType) {
+		Dependency<T> dep = resourceDep.typed(generatedType);
 		if (generatedType.isUpperBound())
-			return resolveGenericResources(generatedType, generatedTypeDep);
-		Resource<G>[] candidates = resources.forType(generatedType);
+			return resolveArrayElementResourcesForUpperBoundType(generatedType, dep);
+		Resource<T>[] candidates = resources.forType(generatedType);
 		return candidates == null
 			? new Resource[0]
 			: arrayFilter(candidates,
-					c -> c.signature.isCompatibleWith(generatedTypeDep));
+					c -> c.signature.isCompatibleWith(dep));
 	}
 
 	@SuppressWarnings("unchecked")
-	private <G> Resource<G>[] resolveGenericResources(Type<G> generatedType,
-			Dependency<G> generatedTypeDep) {
+	private <T> Resource<T>[] resolveArrayElementResourcesForUpperBoundType(
+			Type<T> generatedType, Dependency<T> dep) {
 		List<Resource<?>> res = new ArrayList<>();
 		for (Entry<Class<?>, Resource<?>[]> e : resources.entrySet())
 			if (raw(e.getKey()).isAssignableTo(generatedType))
-				addCompatibleResources(res, generatedTypeDep,
-						(Resource<? extends G>[]) e.getValue());
+				addCompatibleResources(res, dep,
+						(Resource<? extends T>[]) e.getValue());
 		return toArray(res, raw(Resource.class));
 	}
 
-	private static <G> void addCompatibleResources(List<Resource<?>> res,
-			Dependency<G> dep, Resource<? extends G>[] candidates) {
-		for (Resource<? extends G> candidate : candidates)
+	private static <T> void addCompatibleResources(List<Resource<?>> res,
+			Dependency<T> dep, Resource<? extends T>[] candidates) {
+		for (Resource<? extends T> candidate : candidates)
 			if (candidate.signature.isCompatibleWith(dep))
 				res.add(candidate);
 	}

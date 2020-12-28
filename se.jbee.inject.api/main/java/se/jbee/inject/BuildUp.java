@@ -47,7 +47,7 @@ public interface BuildUp<T> { // BuildUp + TearDown
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	static <T> Type<BuildUp<T>> buildUpTypeOf(Type<T> targetType) {
-		return (Type) raw(BuildUp.class).parametized(targetType);
+		return (Type) raw(BuildUp.class).parameterized(targetType);
 	}
 
 	/**
@@ -94,7 +94,7 @@ public interface BuildUp<T> { // BuildUp + TearDown
 	default boolean isFiltered() {
 		return this instanceof Predicate
 				&& classType(getClass()).isAssignableTo( //
-						raw(Predicate.class).parametized(Class.class));
+						raw(Predicate.class).parameterized(Class.class));
 	}
 
 	/**

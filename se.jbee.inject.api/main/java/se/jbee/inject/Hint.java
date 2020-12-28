@@ -13,6 +13,7 @@ import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Instance.instance;
@@ -27,7 +28,7 @@ import static se.jbee.inject.lang.Type.raw;
  *
  * @param <T> The {@link Type} of the argument
  */
-public final class Hint<T> implements Typed<T> {
+public final class Hint<T> implements Typed<T>, Descriptor {
 
 	private static final Hint<?>[] NO_PARAMS = new Hint<?>[0];
 
@@ -54,7 +55,7 @@ public final class Hint<T> implements Typed<T> {
 	 * @return A {@link Hint} representing the relative reference
 	 */
 	public static <T> Hint<T> relativeReferenceTo(Type<T> target) {
-		return new Hint<>(target, null, anyOf(target), null);
+		return new Hint<>(target, null, anyOf(target), null, null);
 	}
 
 	/**
@@ -67,7 +68,7 @@ public final class Hint<T> implements Typed<T> {
 	 * @return A {@link Hint} representing the relative reference
 	 */
 	public static <T> Hint<T> relativeReferenceTo(Instance<T> target) {
-		return new Hint<>(target.type, null, target, null);
+		return new Hint<>(target.type, null, target, null, null);
 	}
 
 	/**
@@ -78,7 +79,7 @@ public final class Hint<T> implements Typed<T> {
 	 * @return A {@link Hint} representing the absolute reference
 	 */
 	public static <T> Hint<T> absoluteReferenceTo(Dependency<T> target) {
-		return new Hint<>(target.type(), null, target.instance, target);
+		return new Hint<>(target.type(), null, target.instance, target, null);
 	}
 
 	public static <T> Hint<T> constant(T constant) {
@@ -86,11 +87,11 @@ public final class Hint<T> implements Typed<T> {
 			throw InconsistentDeclaration.incomprehensibleHint(null);
 		@SuppressWarnings("unchecked")
 		Type<T> type = (Type<T>) raw(constant.getClass());
-		return new Hint<>(type, constant, null, null);
+		return new Hint<>(type, constant, null, null, null);
 	}
 
 	public static <T> Hint<T> constantNull(Type<T> asType) {
-		return new Hint<>(asType, null, null, null);
+		return new Hint<>(asType, null, null, null, null);
 	}
 
 	public static boolean matchesInOrder(Executable member, Hint<?>[] hints) {
@@ -128,23 +129,7 @@ public final class Hint<T> implements Typed<T> {
 		return true;
 	}
 
-	public static Hint<?>[] match(Type<?>[] types, Hint<?>... hints) {
-		if (types.length == 0)
-			return NO_PARAMS;
-		Hint<?>[] args = new Hint<?>[types.length];
-		for (Hint<?> hint : hints) {
-			int i = indexForType(types, hint, args);
-			if (i < 0)
-				throw InconsistentDeclaration.incomprehensibleHint(hint);
-			args[i] = hint.parameterized(types[i]);
-		}
-		for (int i = 0; i < args.length; i++)
-			if (args[i] == null)
-				args[i] = Hint.relativeReferenceTo(types[i]);
-		return args;
-	}
-
-	private static int indexForType(Type<?>[] types, Hint<?> hint,
+	public static int indexForType(Type<?>[] types, Hint<?> hint,
 			Hint<?>[] args) {
 		Type<?> target = hint.type();
 		// 1. lowest index with exact type match, or else
@@ -168,13 +153,19 @@ public final class Hint<T> implements Typed<T> {
 	public final Instance<? extends T> relativeRef;
 	public final Dependency<? extends T> absoluteRef;
 	public final Type<T> asType;
+	public final InjectionPoint at;
 
-	public Hint(Type<T> asType, T value, Instance<? extends T> relativeRef,
-			Dependency<? extends T> absoluteRef) {
+	private Hint(Type<T> asType, T value, Instance<? extends T> relativeRef,
+			Dependency<? extends T> absoluteRef, InjectionPoint at) {
 		this.asType = asType;
 		this.value = value;
 		this.relativeRef = relativeRef;
 		this.absoluteRef = absoluteRef;
+		this.at = at;
+	}
+
+	public boolean isAtInjectionPoint() {
+		return at != null;
 	}
 
 	@Override
@@ -195,14 +186,18 @@ public final class Hint<T> implements Typed<T> {
 	 * effect but we still want to preserve the information for debugging so
 	 * we do not get confused.
 	 */
-	private Hint<?> parameterized(Type<?> type) {
+	public Hint<?> parameterized(Type<?> type) {
 		return type.moreQualifiedThan(asType) ? typed(type).asType(asType) : this;
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public <S> Hint<S> asType(Type<S> supertype) {
-		asType.toSupertype(supertype); // throws if this is not legal
-		return new Hint<>((Type) supertype, value, relativeRef, absoluteRef);
+		asType.castTo(supertype); // throws if this is not legal
+		return new Hint<>((Type) supertype, value, relativeRef, absoluteRef, at);
+	}
+
+	public Hint<T> at(InjectionPoint point) {
+		return at == point ? this : new Hint<>(asType, value, relativeRef, absoluteRef, point);
 	}
 
 	public <S> Hint<S> asType(Class<S> supertype) {
@@ -221,7 +216,7 @@ public final class Hint<T> implements Typed<T> {
 		Dependency<? extends E> newAbsRef = absoluteRef == null
 				? null
 				: absoluteRef.typed(type);
-		return new Hint<>(type, (E) value, newRelRef, newAbsRef);
+		return new Hint<>(type, (E) value, newRelRef, newAbsRef, at);
 	}
 
 	@Override
@@ -232,16 +227,48 @@ public final class Hint<T> implements Typed<T> {
 			+ " as " + asType;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof Hint))
+			return false;
+		Hint<?> other = (Hint<?>) obj;
+		if (isConstant())
+			return value == other.value;
+		if (!asType.equalTo(other.asType))
+			return false;
+		if (relativeRef != null)
+			return other.relativeRef != null && relativeRef.equalTo(other.relativeRef);
+		return other.absoluteRef != null && absoluteRef.equalTo(other.absoluteRef);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(value);
+	}
+
 	public Hint<?> withActualType(java.lang.reflect.Parameter param,
-			Map<String, Type<?>> actualTypeArguments) {
+			Map<java.lang.reflect.TypeVariable<?>, Type<?>> actualTypeArguments) {
 		if (value != null || absoluteRef != null)
 			return this;
 		java.lang.reflect.Type genericType = param.getParameterizedType();
-		Type<?> actualType = Type.type(genericType, actualTypeArguments);
+		Type<?> actualType = Type.genericType(genericType, actualTypeArguments);
 		if (param.getType() == Type.class) {
-			return constant(actualType.parameter(0));
+			return constant(actualType.parameter(0)).at(at);
 		}
-		return relativeReferenceTo(instance(relativeRef.name, actualType));
+		return relativeReferenceTo(instance(relativeRef.name, actualType)).at(at);
 	}
 
+	@SuppressWarnings("unchecked")
+	public T resolveIn(Injector context) {
+		if (asType.rawType == Injector.class)
+			return (T) context;
+		if (isConstant())
+			return value;
+		if (absoluteRef != null)
+			return context.resolve(absoluteRef);
+		// relative ref
+		return context.resolve(relativeRef);
+	}
 }

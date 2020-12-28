@@ -102,16 +102,26 @@ public final class Name
 		return value.isEmpty();
 	}
 
+	public boolean isPattern() {
+		return value.contains(WILDCARD+"");
+	}
+
 	@Override
 	public boolean moreQualifiedThan(Name other) {
-		final boolean thisIsDefault = isDefault();
-		final boolean otherIsDefault = other.isDefault();
+		// default is most qualified
+		boolean thisIsDefault = isDefault();
+		boolean otherIsDefault = other.isDefault();
 		if (thisIsDefault || otherIsDefault)
 			return !otherIsDefault;
-		final boolean thisIsAny = isAny();
-		final boolean otherIsAny = other.isAny();
+		// any is least qualified
+		boolean thisIsAny = isAny();
+		boolean otherIsAny = other.isAny();
 		if (thisIsAny || otherIsAny)
 			return !thisIsAny;
+		boolean thisIsPattern = isPattern();
+		boolean otherIsPattern = other.isPattern();
+		if (thisIsPattern || otherIsPattern)
+			return !thisIsPattern;
 		return value.length() > other.value.length()
 			&& value.startsWith(other.value);
 	}
@@ -122,8 +132,11 @@ public final class Name
 	}
 
 	public boolean isCompatibleWith(Name other) {
-		return isAny() || other.isAny() || other.value.equals(value)
-			|| matches(value, other.value) || matches(other.value, value);
+		if (isAny()) return true;
+		if (equalTo(other)) return true;
+		if (other.isAny()) return !isPattern();
+		if (!isPattern()) return matches(other.value, value);
+		return matches(value, other.value);
 	}
 
 	private static boolean matches(String pattern, String str) {

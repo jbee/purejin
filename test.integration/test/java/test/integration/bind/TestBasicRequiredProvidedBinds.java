@@ -2,7 +2,7 @@ package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -93,7 +93,7 @@ class TestBasicRequiredProvidedBinds {
 
 	@Test
 	void notProvidedRequiredBindThrowsException() {
-		assertThrows(NoResourceForDependency.class,
+		assertThrows(UnresolvableDependency.ResourceResolutionFailed.class,
 				() -> Bootstrap.injector(RequirementModule.class));
 	}
 
@@ -108,7 +108,7 @@ class TestBasicRequiredProvidedBinds {
 	void unusedProvidedBindIsNotAddedToInjectorContext() {
 		Injector context = Bootstrap.injector(
 				TestBasicRequiredProvidedBindsBundle.class);
-		assertThrows(NoResourceForDependency.class,
+		assertThrows(UnresolvableDependency.ResourceResolutionFailed.class,
 				() -> context.resolve(UnusedImpl.class),
 				"Should not be bound and therefore throw below exception");
 	}

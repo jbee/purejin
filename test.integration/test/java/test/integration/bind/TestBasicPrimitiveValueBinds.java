@@ -2,7 +2,7 @@ package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import se.jbee.inject.UnresolvableDependency.ResourceResolutionFailed;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.defaults.DefaultFeature;
@@ -90,7 +90,7 @@ class TestBasicPrimitiveValueBinds {
 	 */
 	@Test
 	void primitiveArrayNotWorkAsWrapperArrayClasses() {
-		assertThrows(NoResourceForDependency.class,
+		assertThrows(ResourceResolutionFailed.class,
 				() -> context.resolve(int[].class));
 	}
 

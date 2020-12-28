@@ -11,6 +11,7 @@ import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.ConstructsBy;
+import se.jbee.inject.config.ContractsBy;
 import se.jbee.inject.defaults.DefaultScopes;
 
 import java.lang.annotation.ElementType;
@@ -75,9 +76,9 @@ class TestFeatureBootstrapper {
 		protected void declare() {
 			asDefault().bind(Number.class).to(7);
 			asDefault().bind(Integer.class).to(11);
-			superbind(Integer.class).to(2);
-			superbind(Float.class).to(4f);
-			superbind(Double.class).to(42d);
+			contractbind(Integer.class).to(2);
+			contractbind(Float.class).to(4f);
+			contractbind(Double.class).to(42d);
 			bind(Number.class).to(6);
 		}
 	}
@@ -239,17 +240,19 @@ class TestFeatureBootstrapper {
 	}
 
 	/**
-	 * In the example {@link Number} is {@link DeclarationType#SUPER} bound for
+	 * In the example {@link Number} is {@link DeclarationType#CONTRACT} bound for
 	 * {@link Integer} and {@link Float} but an {@link DeclarationType#EXPLICIT}
 	 * bind done overrides these automatic binds. They are removed and no
 	 * {@link Generator} is created for them.
 	 */
 	@Test
 	void bindingsAreReplacedByMoreQualifiedOnes() {
-		Injector context = Bootstrap.injector(ReplacingBindsModule.class);
+		Injector context = Bootstrap.injector(
+				Environment.DEFAULT.with(ContractsBy.class, ContractsBy.OPTIMISTIC),
+				ReplacingBindsModule.class);
 		assertEquals(6, context.resolve(Number.class));
-		Resource<?>[] rs = context.resolve(raw(Resource.class).parametized(
-				Number.class).parametizedAsUpperBounds().addArrayDimension());
+		Resource<?>[] rs = context.resolve(raw(Resource.class).parameterized(
+				Number.class).parameterizedAsUpperBounds().addArrayDimension());
 		//TODO can this be limited to cases with a certain Scope so that container can be excluded?
 		assertEquals(4, rs.length);
 		assertEquals(1,

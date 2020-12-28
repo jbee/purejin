@@ -38,7 +38,7 @@ final class AnnotatedWithModule extends BinderModule {
 		asDefault() //
 				.per(Scope.dependencyType) //
 				.bind(anyOf(
-						raw(AnnotatedWith.class).parametizedAsUpperBounds())) //
+						raw(AnnotatedWith.class).parameterizedAsUpperBounds())) //
 				.toSupplier(AnnotatedWithModule::annotatedWith);
 	}
 

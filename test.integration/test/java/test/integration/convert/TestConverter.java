@@ -49,7 +49,7 @@ class TestConverter {
 	}
 
 	@Test
-	void chainsCanBeBuildByPrepanding() {
+	void chainsCanBeBuildByPrepending() {
 		Converter<String, Long> str2long = Long::parseLong;
 		Converter<Long, Integer> long2int = Long::intValue;
 		assertEquals(Integer.valueOf(13),

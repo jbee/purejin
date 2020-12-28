@@ -1,7 +1,6 @@
 package se.jbee.inject;
 
-import java.lang.annotation.Annotation;
-import java.lang.annotation.Retention;
+import java.lang.annotation.*;
 import java.lang.annotation.Target;
 import java.util.ServiceLoader;
 
@@ -38,6 +37,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *
  * @since 8.1
  */
+@Inherited
+@Documented
 @Retention(RUNTIME)
 @Target(TYPE)
 public @interface Extends {

@@ -12,10 +12,10 @@ import se.jbee.inject.bind.InconsistentBinding;
 import se.jbee.inject.bind.Toggled;
 import se.jbee.inject.lang.Type;
 
+import static se.jbee.inject.lang.Type.raw;
+
 /**
  * The default utility base class for {@link Toggled}s.
- *
- * @author Jan Bernitt (jan@jbee.se)
  *
  * @param <C> the type of the options values (usually an enum)
  */
@@ -32,14 +32,13 @@ public abstract class BundleFor<C> implements Toggled<C>,
 	}
 
 	@Override
-	public void install(Class<? extends Bundle> bundle, C flag) {
+	public final void install(Class<? extends Bundle> bundle, C flag) {
 		bootstrapper.install(bundle, flag);
 	}
 
 	@Override
-	public String toString() {
-		Type<?> module = Type.supertype(Toggled.class,
-				Type.raw(getClass())).parameter(0);
+	public final String toString() {
+		Type<?> module = raw(getClass()).toSuperType(Toggled.class).parameter(0);
 		return "bundle " + getClass().getSimpleName() + "[" + module + "]";
 	}
 

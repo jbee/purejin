@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Packages;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
+import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -48,7 +48,7 @@ class TestFeatureEditionPackageBinds {
 						.and(packageOf(Bootstrap.class)))));
 
 		Injector context = Bootstrap.injector(env, TestFeatureEditionPackageBindsModule.class);
-		assertThrows(NoResourceForDependency.class, () -> context.resolve(int.class),
+		assertThrows(UnresolvableDependency.ResourceResolutionFailed.class, () -> context.resolve(int.class),
 				"Should have thrown exception since EditionPackageBindsModule should not have been installed");
 
 		// an edition including the module in this test

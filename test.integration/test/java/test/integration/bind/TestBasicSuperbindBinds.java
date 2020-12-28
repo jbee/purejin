@@ -7,6 +7,8 @@ import se.jbee.inject.Supplier;
 import se.jbee.inject.binder.Binder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.bootstrap.Environment;
+import se.jbee.inject.config.ContractsBy;
 
 import java.io.Serializable;
 import java.util.List;
@@ -16,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
- * The tests demonstrates the meaning of a {@link Binder#superbind(Class)} call.
+ * The tests demonstrates the meaning of a {@link Binder#contractbind(Class)} call.
  * That will create multiple binds, one each for the type and all its
  * super-classes and -interfaces. All of them are bound to the same to-clause,
  * hence share the same {@link Supplier} (in the end all to-clauses become one).
@@ -35,12 +37,13 @@ class TestBasicSuperbindBinds {
 
 		@Override
 		protected void declare() {
-			superbind(Integer.class).to(42);
-			superbind(raw(List.class).parametized(String.class)).to(emptyList());
+			contractbind(Integer.class).to(42);
+			contractbind(raw(List.class).parameterized(String.class)).to(emptyList());
 		}
 	}
 
 	private final Injector injector = Bootstrap.injector(
+			Environment.DEFAULT.with(ContractsBy.class, ContractsBy.SUPER),
 			TestBasicSuperbindBindsModule.class);
 
 	@Test
@@ -61,6 +64,6 @@ class TestBasicSuperbindBinds {
 	@Test
 	void parametrizedSuperInterfaceOfSuperbindTypeIsBound() {
 		assertEquals(42, injector.resolve(
-				raw(Comparable.class).parametized(Integer.class)));
+				raw(Comparable.class).parameterized(Integer.class)));
 	}
 }

@@ -25,6 +25,8 @@ import static se.jbee.inject.Name.named;
  * sophisticated in how to identify and initialised fields based on annotations
  * found but the principle of using the {@link BuildUp} to add this feature
  * stays the same.
+ *
+ * @see TestExamplePostConstructBinds
  */
 class TestExampleBuildUpAnnotationGuidedInjectionBinds {
 

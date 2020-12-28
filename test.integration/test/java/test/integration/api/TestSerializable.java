@@ -17,7 +17,7 @@ class TestSerializable {
 	@Test
 	void typeIsSerializable() {
 		assertSerializable(Type.raw(String.class));
-		assertSerializable(Type.raw(List.class).parametized(Float.class));
+		assertSerializable(Type.raw(List.class).parameterized(Float.class));
 	}
 
 	@Test

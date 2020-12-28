@@ -6,29 +6,20 @@
 package se.jbee.inject.binder;
 
 import se.jbee.inject.*;
-import se.jbee.inject.UnresolvableDependency.NoResourceForDependency;
 import se.jbee.inject.lang.Reflect;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.TypeVariable;
-import se.jbee.inject.lang.Utils;
 
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Constructor;
 import java.util.*;
-import java.util.Map.Entry;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-import static java.util.stream.Collectors.toMap;
 import static se.jbee.inject.Instance.anyOf;
-import static se.jbee.inject.lang.Type.parameterTypes;
 import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.lang.Utils.newArray;
 
 /**
  * Utility as a factory to create different kinds of {@link Supplier}s.
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Supply {
 
@@ -37,7 +28,7 @@ public final class Supply {
 			context);
 
 	private static final Supplier<?> REQUIRED = (dep, context) -> {
-		throw new NoResourceForDependency("Should never be called!", dep);
+		throw new UnresolvableDependency.ResourceResolutionFailed("Should never be called!", dep);
 	};
 
 	/**
@@ -50,8 +41,6 @@ public final class Supply {
 	public static final ArrayBridge<List<?>> LIST_BRIDGE = Arrays::asList;
 	public static final ArrayBridge<Set<?>> SET_BRIDGE = //
 			elems -> new HashSet<>(Arrays.asList(elems));
-
-	private static final String SUPPLIES = "supplies";
 
 	/**
 	 * A {@link Supplier} used as fall-back. Should a required {@link Locator}
@@ -68,19 +57,19 @@ public final class Supply {
 	 */
 	public static <T> Supplier<T> bySupplierReference(
 			Class<? extends Supplier<? extends T>> type) {
-		return (dep, context) -> context.resolve(dep.instanced(anyOf(type))) //
+		return (dep, context) -> context.resolve(dep.onInstance(anyOf(type))) //
 				.supply(dep, context);
 	}
 
-	public static <E> Supplier<E[]> fromElements(Type<E[]> arrayType,
+	public static <E> Supplier<E[]> byElementReferences(Type<E[]> arrayType,
 			Hint<? extends E>[] elements) {
-		return new PredefinedArraySupplier<>(arrayType, elements);
+		return new ArrayElementReferencesSupplier<>(arrayType, elements);
 	}
 
 	public static <T> Supplier<T> byInstanceReference(Instance<T> instance) {
 		// Note that this is not "buffered" using Resources as it is used to
 		// implement the plain resolution
-		return (dep, context) -> context.resolve(dep.instanced(instance));
+		return (dep, context) -> context.resolve(dep.onInstance(instance));
 	}
 
 	public static <T> Supplier<T> byDependencyReference(
@@ -92,44 +81,29 @@ public final class Supply {
 	 * E.g. used to "forward" a {@link Collection} to {@link List} of same
 	 * element type.
 	 */
-	public static <T> Supplier<T> byParametrizedInstanceReference(
+	public static <T> Supplier<T> byParameterizedInstanceReference(
 			Instance<T> instance) {
 		return (dep, context) -> {
 			Type<? super T> type = dep.type();
 			Instance<? extends T> parametrized = instance.typed(instance.type() //
-							.parametized(type.parameters()) //
+							.parameterized(type.parameters()) //
 							.upperBound(dep.type().isUpperBound()));
-			return context.resolve(dep.instanced(parametrized));
+			return context.resolve(dep.onInstance(parametrized));
 		};
 	}
 
-	public static <T> Supplier<T> byProducer(Produces<T> producer) {
-		if (producer.hasTypeVariables && producer.requestsActualType()) {
-			// use a constant null hint to blank first parameter as it is filled in with actual type on method invocation
-			Hint<?> actualTypeHint = Hint.constantNull(
-					Type.parameterType(producer.target.getParameters()[0]));
-			return new Call<>(producer,
-					Hint.match(parameterTypes(producer.target),
-							Utils.arrayPrepend(actualTypeHint, producer.hints)),
-					Dependency::type);
-		}
-		return new Call<>(producer,
-				Hint.match(parameterTypes(producer.target), producer.hints), null);
+	public static <T> Supplier<T> byProduction(Produces<T> produces) {
+		return new Produce<>(produces);
 	}
 
-	public static <T> Supplier<T> byNew(New<T> constructor) {
-		return new Construct<>(constructor.target, Hint.match(
-				parameterTypes(constructor.target), constructor.hints));
-	}
-
-	public static <T> Supplier<T> byAccess(Shares<T> constant) {
-		return new Access<>(constant);
+	public static <T> Supplier<T> byConstruction(Constructs<T> constructs) {
+		return new Construct<>(constructs);
 	}
 
 	/**
 	 * This effectively avoid redoing {@link Resource} resolution for each
 	 * invocation. Instead the {@link Resource} is resolved once and
-	 * continiously used from there on to {@link Resource#generate(Dependency)}
+	 * continuously used from there on to {@link Resource#generate(Dependency)}
 	 * the values.
 	 */
 	public static <T> Provider<T> byLazyProvider(Dependency<T> dep,
@@ -138,7 +112,7 @@ public final class Supply {
 			return () -> injector.resolve(dep);
 		@SuppressWarnings("unchecked")
 		Resource<? extends T> resource = injector.resolve(
-				dep.typed(raw(Resource.class).parametized(dep.type())));
+				dep.typed(raw(Resource.class).parameterized(dep.type())));
 		return () -> resource.generate(dep);
 	}
 
@@ -162,125 +136,124 @@ public final class Supply {
 	 * A {@link Supplier} uses multiple different separate suppliers to provide
 	 * the elements of a array of the supplied type.
 	 */
-	private static final class PredefinedArraySupplier<E>
+	private static final class ArrayElementReferencesSupplier<E>
 			extends WithArgs<E[]> {
 
 		private final Type<E[]> arrayType;
+		private final Hint<? extends E>[] elements;
 
-		PredefinedArraySupplier(Type<E[]> arrayType,
+		ArrayElementReferencesSupplier(Type<E[]> arrayType,
 				Hint<? extends E>[] elements) {
-			super(elements);
 			this.arrayType = arrayType;
+			this.elements = elements;
 		}
 
 		@SuppressWarnings("SuspiciousSystemArraycopy")
 		@Override
 		protected E[] invoke(Object[] args, Injector context) {
 			@SuppressWarnings("unchecked")
-			E[] res = (E[]) newArray(arrayType.baseType().rawType, args.length);
+			E[] res = (E[]) newArray(arrayType.rawType.getComponentType(), args.length);
 			System.arraycopy(args, 0, res, 0, res.length);
 			return res;
 		}
 
 		@Override
+		protected Hint<?>[] hintsFor(Dependency<? super E[]> dep) {
+			return elements;
+		}
+
+		@Override
 		public String toString() {
-			return describe(SUPPLIES, arrayType);
+			return "array " + arrayType + ": " + Arrays.toString(elements);
 		}
-	}
-
-	private static final class Access<T> implements Annotated, Supplier<T> {
-
-		private final Shares<T> field;
-
-		Access(Shares<T> field) {
-			this.field = field;
-		}
-
-		@SuppressWarnings("unchecked")
-		@Override
-		public T supply(Dependency<? super T> dep, Injector context)
-				throws UnresolvableDependency {
-			return (T) Reflect.share(field.target, field.owner,
-					e -> UnresolvableDependency.SupplyFailed.valueOf(e, field.target));
-		}
-
-		@Override
-		public AnnotatedElement element() {
-			return field.target;
-		}
-
 	}
 
 	private static final class Construct<T> extends WithArgs<T>
 			implements Annotated {
 
-		private final Constructor<T> target;
+		private final Constructs<T> constructs;
+		private final Hint<?>[] actualParameters;
 
-		Construct(Constructor<T> target, Hint<?>[] args) {
-			super(args);
-			this.target = target;
+		Construct(Constructs<T> constructs) {
+			this.constructs = constructs;
+			// doing this eagerly for non generic classes is important
+			// to throw an exception during bootstrapping in case the hints given do not fit
+			this.actualParameters = constructs.isGeneric() ? null : constructs.actualParameters();
 		}
 
 		@Override
 		public AnnotatedElement element() {
-			return target;
+			return constructs.target;
 		}
 
 		@Override
+		@SuppressWarnings("unchecked")
 		protected T invoke(Object[] args, Injector context) {
-			return Reflect.construct(target, args,
-					e -> UnresolvableDependency.SupplyFailed.valueOf(e, target));
+			return (T) Reflect.construct(constructs.target, args,
+					e -> UnresolvableDependency.SupplyFailed.valueOf(e, constructs.target));
+		}
+
+		@Override
+		protected Hint<?>[] hintsFor(Dependency<? super T> dep) {
+			return constructs.isGeneric()
+					? constructs.actualParameters(dep.type())
+					: actualParameters;
 		}
 
 		@Override
 		public String toString() {
-			return describe(target);
+			return getClass().getSimpleName() + ": " + constructs;
 		}
 	}
 
-	private static final class Call<T> extends WithArgs<T>
+	private static final class Produce<T> extends WithArgs<T>
 			implements Annotated {
 
-		private Object owner;
-		private final Produces<T> producer;
+		private Object instance;
+		private final Produces<T> produces;
 		private final Class<T> returns;
-		private final Map<String, UnaryOperator<Type<?>>> typeVariableResolvers;
+		private final Map<java.lang.reflect.TypeVariable<?>, UnaryOperator<Type<?>>> typeVariableResolvers;
 
-		Call(Produces<T> producer, Hint<?>[] args,
-				Function<Dependency<?>, Object> supplyActual) {
-			super(args, supplyActual);
-			this.producer = producer;
-			this.returns = producer.returns.rawType;
-			this.owner = producer.owner;
-			this.typeVariableResolvers = producer.hasTypeVariables
+		Produce(Produces<T> produces) {
+			this.produces = produces;
+			this.returns = produces.actualType.rawType;
+			this.instance = produces.isHinted() ? null : produces.as;
+			this.typeVariableResolvers = produces.isGeneric()
 				? TypeVariable.typeVariables(
-						producer.target.getGenericReturnType())
+						produces.target.getGenericReturnType())
 				: null;
 		}
 
 		@Override
 		public AnnotatedElement element() {
-			return producer.target;
+			return produces.target;
 		}
 
 		@Override
 		protected T invoke(Object[] args, Injector context) {
-			if (producer.isInstanceMethod && owner == null)
-				owner = context.resolve(producer.target.getDeclaringClass());
-			return returns.cast(Reflect.produce(producer.target, owner, args,
-					e -> UnresolvableDependency.SupplyFailed.valueOf(e, producer.target)));
+			if (instance == null && !produces.isStatic()) {
+				instance = produces.isHinted()
+					? produces.getAsHint().resolveIn(context)
+					: context.resolve(produces.target.getDeclaringClass());
+			}
+			return returns.cast(Reflect.produce(produces.target, instance, args,
+					e -> UnresolvableDependency.SupplyFailed.valueOf(e, produces.target)));
 		}
 
 		@Override
 		protected Hint<?>[] hintsFor(Dependency<? super T> dep) {
-			if (!producer.hasTypeVariables)
-				return hints;
-			Hint<?>[] actualTypeHints = hints.clone();
-			Map<String, Type<?>> actualTypes = typeVariableResolvers.entrySet().stream() //
-					.collect(toMap(Entry::getKey,
-							e -> e.getValue().apply(dep.type())));
-			java.lang.reflect.Parameter[] params = producer.target.getParameters();
-			for (int i = 0; i < actualTypeHints.length; i++) {
+			if (!produces.isGeneric())
+				return produces.actualParameters();
+			Hint<?>[] actualTypeHints = produces.actualParameters().clone();
+			Map<java.lang.reflect.TypeVariable<?>, Type<?>> actualTypes = TypeVariable.actualTypesFor(
+					typeVariableResolvers, dep.type());
+			java.lang.reflect.Parameter[] params = produces.target.getParameters();
+			int i = 0;
+			if (produces.isGenericTypeAware()) {
+				actualTypeHints[0] = Hint.constant(dep.type());
+				i++;
+			}
+			for (; i < actualTypeHints.length; i++) {
 				actualTypeHints[i] = actualTypeHints[i] //
 						.withActualType(params[i], actualTypes);
 			}
@@ -289,35 +262,17 @@ public final class Supply {
 
 		@Override
 		public String toString() {
-			return describe(producer.target);
+			return getClass().getSimpleName() + ": " + produces;
 		}
-	}
-
-	public static String describe(Object behaviour) {
-		return "<" + behaviour + ">";
-	}
-
-	public static String describe(Object behaviour, Object variant) {
-		return "<" + behaviour + ":" + variant + ">";
 	}
 
 	public abstract static class WithArgs<T> implements Supplier<T> {
 
-		protected final Hint<?>[] hints;
-		private final Function<Dependency<?>, Object> supplyActual;
 		private InjectionSite previous;
 
-		WithArgs(Hint<?>[] params) {
-			this(params, null);
-		}
-
-		WithArgs(Hint<?>[] hints,
-				Function<Dependency<?>, Object> supplyActual) {
-			this.hints = hints;
-			this.supplyActual = supplyActual;
-		}
-
 		protected abstract T invoke(Object[] args, Injector context);
+
+		protected abstract Hint<?>[] hintsFor(Dependency<? super T> dep);
 
 		@Override
 		public T supply(Dependency<? super T> dep, Injector context)
@@ -331,14 +286,7 @@ public final class Supply {
 				previous = local;
 			}
 			Object[] args = local.args(context);
-			if (supplyActual != null)
-				args[0] = supplyActual.apply(dep);
 			return invoke(args, context);
-		}
-
-		protected Hint<?>[] hintsFor(
-				@SuppressWarnings("unused") Dependency<? super T> dep) {
-			return hints;
 		}
 	}
 }

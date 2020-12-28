@@ -2,6 +2,8 @@ package se.jbee.inject.binder;
 
 import se.jbee.inject.bind.Bundle;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -28,6 +30,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *
  * @since 8.1
  */
+@Inherited
+@Documented
 @Target(TYPE)
 @Retention(RUNTIME)
 public @interface Installs {

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
+import static java.util.stream.Collectors.toMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.jbee.inject.lang.Type.raw;
@@ -42,12 +43,12 @@ class TestTypeVariable {
 	@Test
 	void simpleParameterizedType() {
 		assertActualType("example1", String.class, "E",
-				raw(List.class).parametized(String.class));
+				raw(List.class).parameterized(String.class));
 	}
 
 	@Test
 	void doubleParameterizedType() {
-		@SuppressWarnings("rawtypes") Type<Function> actual = raw(Function.class).parametized(String.class,
+		@SuppressWarnings("rawtypes") Type<Function> actual = raw(Function.class).parameterized(String.class,
 				Integer.class);
 		assertActualType("example2", String.class, "A", actual);
 		assertActualType("example2", Integer.class, "B", actual);
@@ -56,8 +57,8 @@ class TestTypeVariable {
 	@Test
 	void nestedParameterizedType() {
 		assertActualType("example3", String.class, "T",
-				raw(List.class).parametized(
-						raw(List.class).parametized(String.class)));
+				raw(List.class).parameterized(
+						raw(List.class).parameterized(String.class)));
 	}
 
 	@Test
@@ -75,27 +76,27 @@ class TestTypeVariable {
 	@Test
 	void mapWithParameterizedTypeGenericArray() {
 		assertActualType("example6", Float.class, "E",
-				raw(Map.class).parametized(raw(String.class),
-						raw(List.class).parametized(
+				raw(Map.class).parameterized(raw(String.class),
+						raw(List.class).parameterized(
 								raw(Float.class).addArrayDimension())));
 	}
 
 	@Test
 	void simpleWildcardType() {
 		assertActualType("example7", String.class, "E",
-				raw(List.class).parametized(String.class));
+				raw(List.class).parameterized(String.class));
 	}
 
 	@Test
 	void simpleGenericType() {
 		assertActualType("example8", String.class, "E",
-				raw(Class.class).parametized(String.class));
+				raw(Class.class).parameterized(String.class));
 	}
 
 	@Test
 	void simpleClassGenericType() {
 		assertActualType("example9", String.class, "C",
-				raw(List.class).parametized(String.class));
+				raw(List.class).parameterized(String.class));
 	}
 
 	private static void assertActualType(String method, Class<?> expected,
@@ -114,8 +115,12 @@ class TestTypeVariable {
 	private static Map<String, UnaryOperator<Type<?>>> methodReturnTypeVariables(
 			String name) {
 		try {
-			return TypeVariable.typeVariables(Examples.class.getDeclaredMethod(
-					name).getGenericReturnType());
+			Map<java.lang.reflect.TypeVariable<?>, UnaryOperator<Type<?>>> var2mapper = TypeVariable.typeVariables(
+					Examples.class.getDeclaredMethod(
+							name).getGenericReturnType());
+
+			return var2mapper.entrySet().stream().collect(
+					toMap(e -> e.getKey().getName(), Map.Entry::getValue));
 		} catch (NoSuchMethodException | SecurityException e) {
 			throw new AssertionError(e);
 		}

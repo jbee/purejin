@@ -53,8 +53,8 @@ class TestExampleCountBindingsBinds {
 		}
 
 		@Override
-		public <T> void expand(Env env, Binding<?> value, Binding<T> incomplete,
-				Bindings bindings) {
+		public <T> void expand(Env env, Binding<?> ref, Binding<T> item,
+				Bindings dest) {
 			expands++;
 		}
 	}
@@ -83,7 +83,8 @@ class TestExampleCountBindingsBinds {
 	}
 
 	private static Injector injectorWithEnv(Class<? extends Bundle> root,
-			ValueBinder<?> binder) {
-		return Bootstrap.injector(Environment.DEFAULT.withBinder(binder), root);
+			ValueBinder<Binding<?>> binder) {
+		return Bootstrap.injector(
+				Environment.DEFAULT.withBinder(Binding.class, binder), root);
 	}
 }

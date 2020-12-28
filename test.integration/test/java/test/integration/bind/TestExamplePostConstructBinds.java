@@ -1,11 +1,13 @@
 package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
+import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Produces;
 import se.jbee.inject.binder.Supply;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.config.ProducesBy;
 import se.jbee.inject.lang.Type;
 
@@ -30,6 +32,9 @@ import static se.jbee.inject.lang.Type.classType;
  * <p>
  * This example also shows how a similar concept can be build more elegantly
  * using an interface.
+ *
+ * @see TestExampleBuildUpAnnotationGuidedInjectionBinds
+ * @see TestExamplePubSubBinds
  */
 class TestExamplePostConstructBinds {
 
@@ -81,8 +86,10 @@ class TestExamplePostConstructBinds {
 			// to call the method we use the Produces and Supply utilities
 			// which means we also support injecting parameters into these
 			// method calls
-			Produces<T> prod = (Produces<T>) Produces.produces(target, m);
-			Supply.byProducer(prod).supply(dependency(prod.returns) //
+			Produces<T> prod = (Produces<T>) Produces.produces(target, m,
+					context.resolve(Env.class).property(HintsBy.class,
+							m.getDeclaringClass().getPackage()));
+			Supply.byProduction(prod).supply(dependency(prod.actualType) //
 					// adds basic targeting so that injectingInto is respected when method arguments are injected
 					// to get fully correct target context a Supplier<BuildUp<Object>> would be needed instead of postConstructHook (BuildUp<Object>) so that the actual Dependency can be accessed
 					.injectingInto(classType(target.getClass())),

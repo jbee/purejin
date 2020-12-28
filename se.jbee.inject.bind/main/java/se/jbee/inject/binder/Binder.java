@@ -5,8 +5,8 @@
  */
 package se.jbee.inject.binder;
 
-import se.jbee.inject.*;
 import se.jbee.inject.Supplier;
+import se.jbee.inject.*;
 import se.jbee.inject.bind.*;
 import se.jbee.inject.config.*;
 import se.jbee.inject.lang.Type;
@@ -26,8 +26,9 @@ import static se.jbee.inject.Name.DEFAULT;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Source.source;
 import static se.jbee.inject.Target.targeting;
+import static se.jbee.inject.binder.Constructs.constructs;
 import static se.jbee.inject.config.Plugins.pluginPoint;
-import static se.jbee.inject.lang.Type.*;
+import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.lang.Utils.isClassConstructable;
 import static se.jbee.inject.lang.Utils.newArray;
 
@@ -131,13 +132,13 @@ public class Binder {
 	}
 
 	/**
-	 * Same as {@link #superbind(Type)} where type was wrapped in {@link
+	 * Same as {@link #contractbind(Type)} where type was wrapped in {@link
 	 * Type#raw(Class)}.
 	 *
-	 * @see #superbind(Type)
+	 * @see #contractbind(Type)
 	 */
-	public final <T> TypedBinder<T> superbind(Class<T> type) {
-		return superbind(raw(type));
+	public final <T> TypedBinder<T> contractbind(Class<T> type) {
+		return contractbind(raw(type));
 	}
 
 	/**
@@ -159,8 +160,8 @@ public class Binder {
 	 * @param <T>  type that should be bound to all the types it implements
 	 * @return immutable binder API
 	 */
-	public final <T> TypedBinder<T> superbind(Type<T> type) {
-		return on(bind().asSuper()).bind(type);
+	public final <T> TypedBinder<T> contractbind(Type<T> type) {
+		return on(bind().asContract()).bind(type);
 	}
 
 	/**
@@ -308,15 +309,15 @@ public class Binder {
 	 *
 	 * @since 8.1
 	 */
-	public ConnectBinder connect() {
-		Package pkg = bind.source.pkg();
-		return new ConnectBinder(this,
-				env().property(CONNECT_QUALIFIER, ProducesBy.class, pkg,
-						env().property(ProducesBy.class, pkg)));
+	public final ConnectBinder connect() {
+		Package ns = bind.source.pkg();
+		return connect(
+				env().property(CONNECT_QUALIFIER, ProducesBy.class, ns,
+						env().property(ProducesBy.class, ns)));
 	}
 
-	public ConnectBinder connect(ProducesBy linksBy) {
-		return new ConnectBinder(this, linksBy);
+	public ConnectBinder connect(ProducesBy connectsBy) {
+		return new ConnectBinder(this, connectsBy);
 	}
 
 	public <T> ConnectTargetBinder<T> connect(Class<T> api) {
@@ -373,12 +374,12 @@ public class Binder {
 	 *            some method
 	 * @since 8.1
 	 */
-	public <T> InitBinder<T> init(Class<T> target) {
-		return init(Name.DEFAULT, raw(target));
+	public final <T> BootBinder<T> boot(Class<T> target) {
+		return boot(Name.DEFAULT, raw(target));
 	}
 
-	public <T> InitBinder<T> init(Name name, Type<T> target) {
-		return new InitBinder<>(on(bind()), instance(name, target));
+	public <T> BootBinder<T> boot(Name name, Type<T> target) {
+		return new BootBinder<>(on(bind()), instance(name, target));
 	}
 
 	/**
@@ -404,11 +405,37 @@ public class Binder {
 		public final void run(UnaryOperator<T> function) {
 			to(((target, as, context) -> function.apply(target)));
 		}
+
+		public <R> void by(Instance<? extends R> related,
+				BiConsumer<T, R> initFunction) {
+			to((target, as, context) -> {
+				initFunction.accept(target,
+						context.resolve(dependency(related).injectingInto(as)));
+				return target;
+			});
+		}
+
+		public final <R> void forEach(Class<? extends R> related,
+				BiConsumer<T, R> initFunction) {
+			forEach(raw(related), initFunction);
+		}
+
+		public <R> void forEach(Type<? extends R> related,
+				BiConsumer<T, R> initFunction) {
+			Dependency<? extends R[]> dep = dependency(
+					related.addArrayDimension().asUpperBound());
+			to((target, as, context) -> {
+				for (R arg : context.resolve(dep.injectingInto(as)))
+					initFunction.accept(target, arg);
+				return target;
+			});
+		}
 	}
 
 	/**
 	 * Small utility to <b>eagerly</b> run an initialisation function for a
-	 * group instances managed by the {@link Injector}.
+	 * group instances managed by the {@link Injector} at the end of the
+	 * bootstrapping process.
 	 * <p>
 	 * The basic principle is that the {@link #target} {@link Instance} is
 	 * initialised on the basis of some other dependency instance that is
@@ -419,53 +446,54 @@ public class Binder {
 	 * instance of the matching type is constructed this initialisation is
 	 * performed directly after the {@link Injector} context is created.
 	 *
-	 * @param <T> type of the instances that should be build-up
+	 * @param <T> type of the instances that should be setup during
+	 *            bootstrapping
 	 * @since 8.1
 	 */
-	public static class InitBinder<T> {
+	public static class BootBinder<T> {
 
 		private final Binder binder;
 		private final Instance<T> target;
 
-		protected InitBinder(Binder binder, Instance<T> target) {
+		protected BootBinder(Binder binder, Instance<T> target) {
 			this.binder = binder;
 			this.target = target;
 		}
 
-		public <C> void forAny(Class<? extends C> dependency,
-				BiConsumer<T, C> initFunction) {
-			forEach(raw(dependency).addArrayDimension().asUpperBound(),
-					initFunction);
+		public final <R> void forEach(Class<? extends R> related,
+				BiConsumer<T, R> initFunction) {
+			forEach(raw(related), initFunction);
 		}
 
-		public <C> void forEach(Type<? extends C[]> dependencies,
-				BiConsumer<T, C> initFunction) {
-			binder.upbind().to((impl, as, injector) -> {
-				T obj = injector.resolve(target);
-				C[] args = injector.resolve(
-						dependency(dependencies).injectingInto(target));
-				for (C arg : args)
+		public <R> void forEach(Type<? extends R> related,
+				BiConsumer<T, R> initFunction) {
+			Dependency<? extends R[]> dep = dependency(
+					related.addArrayDimension().asUpperBound()) //
+					.injectingInto(target);
+			binder.upbind().to((impl, as, context) -> {
+				T obj = context.resolve(target);
+				for (R arg : context.resolve(dep))
 					initFunction.accept(obj, arg);
 				return impl;
 			});
 		}
 
-		public <C> void by(Class<? extends C> dependency,
-				BiConsumer<T, C> initFunction) {
-			by(defaultInstanceOf(raw(dependency)), initFunction);
+		public final <R> void by(Class<? extends R> related,
+				BiConsumer<T, R> initFunction) {
+			by(defaultInstanceOf(raw(related)), initFunction);
 		}
 
-		public <C> void by(Name depName, Class<? extends C> depType,
-				BiConsumer<T, C> initFunction) {
-			by(Instance.instance(depName, raw(depType)), initFunction);
+		public final <R> void by(Name relatedName,
+				Class<? extends R> relatedType, BiConsumer<T, R> initFunction) {
+			by(Instance.instance(relatedName, raw(relatedType)), initFunction);
 		}
 
-		public <C> void by(Instance<? extends C> dependency,
-				BiConsumer<T, C> initFunction) {
-			binder.upbind().to((impl, as, injector) -> {
-				T obj = injector.resolve(target);
-				C arg = injector.resolve(
-						dependency(dependency).injectingInto(target));
+		public <R> void by(Instance<? extends R> related,
+				BiConsumer<T, R> initFunction) {
+			binder.upbind().to((impl, as, context) -> {
+				T obj = context.resolve(target);
+				R arg = context.resolve(
+						dependency(related).injectingInto(as));
 				initFunction.accept(obj, arg);
 				return impl;
 			});
@@ -482,7 +510,7 @@ public class Binder {
 			this.plugin = plugin;
 		}
 
-		public void into(Class<?> pluginPoint) {
+		public final void into(Class<?> pluginPoint) {
 			into(pluginPoint, plugin.getCanonicalName());
 		}
 
@@ -525,7 +553,7 @@ public class Binder {
 		/**
 		 * @see #in(Type)
 		 */
-		public <T> ConnectTargetBinder<T> in(Class<T> target) {
+		public final <T> ConnectTargetBinder<T> in(Class<T> target) {
 			return in(raw(target));
 		}
 
@@ -560,22 +588,21 @@ public class Binder {
 			this.target = target;
 		}
 
-		public ConnectTargetBinder<T> asAction() {
+		public final ConnectTargetBinder<T> asAction() {
 			return to(ACTION_CONNECTOR);
 		}
 
-		public ConnectTargetBinder<T> to(String connectorName) {
+		public final ConnectTargetBinder<T> to(String connectorName) {
 			return to(named(connectorName));
 		}
 
-		public ConnectTargetBinder<T> to(Class<?> connectorName) {
+		public final ConnectTargetBinder<T> to(Class<?> connectorName) {
 			return to(named(connectorName));
 		}
 
 		public ConnectTargetBinder<T> to(Name connectorName) {
-			binder.upbind(target) //
-					.to((instance, as, context) ->
-							init(connectorName, instance, as, context));
+			binder.upbind(target).to((instance, as, context) -> //
+					init(connectorName, instance, as, context));
 			return this; // for multiple to
 		}
 
@@ -601,7 +628,7 @@ public class Binder {
 	public static class AutoBinder {
 
 		private final RootBinder binder;
-		private final SharesBy sharesBy;
+		private final AccessesBy accessesBy;
 		private final ConstructsBy constructsBy;
 		private final ProducesBy producesBy;
 		private final NamesBy namesBy;
@@ -610,24 +637,24 @@ public class Binder {
 
 		protected AutoBinder(RootBinder binder, Name scope) {
 			Bind bind = binder.bind();
-			this.binder = binder.on(bind.asSuper()).on(bind.next());
+			this.binder = binder.on(bind.asContract()).on(bind.next());
 			Env env = bind.env;
-			Package where = bind.source.pkg();
-			this.sharesBy = env.property(SharesBy.class, where);
-			this.constructsBy = env.property(ConstructsBy.class, where);
-			this.producesBy = env.property(ProducesBy.class, where);
-			this.namesBy = env.property(NamesBy.class, where).orElse(DEFAULT);
-			this.hintsBy = env.property(HintsBy.class, where);
+			Package ns = bind.source.pkg();
+			this.accessesBy = env.property(AccessesBy.class, ns);
+			this.constructsBy = env.property(ConstructsBy.class, ns);
+			this.producesBy = env.property(ProducesBy.class, ns);
+			this.namesBy = env.property(NamesBy.class, ns).orElse(DEFAULT);
+			this.hintsBy = env.property(HintsBy.class, ns);
 			this.scopesBy = scope.equalTo(Scope.mirror)
-				? env.property(ScopesBy.class, where)
+				? env.property(ScopesBy.class, ns)
 				: target -> scope;
 		}
 
-		private AutoBinder(RootBinder binder, SharesBy constantsBy,
+		private AutoBinder(RootBinder binder, AccessesBy accessesBy,
 				ConstructsBy constructsBy, ProducesBy producesBy,
 				NamesBy namesBy, ScopesBy scopesBy, HintsBy hintsBy) {
 			this.binder = binder;
-			this.sharesBy = constantsBy;
+			this.accessesBy = accessesBy;
 			this.constructsBy = constructsBy;
 			this.producesBy = producesBy;
 			this.namesBy = namesBy;
@@ -635,75 +662,80 @@ public class Binder {
 			this.hintsBy = hintsBy;
 		}
 
-		public AutoBinder shareBy(SharesBy mirror) {
+		public AutoBinder accessBy(AccessesBy mirror) {
 			return new AutoBinder(binder, mirror, constructsBy, producesBy,
 					namesBy, scopesBy, hintsBy);
 		}
 
 		public AutoBinder constructBy(ConstructsBy mirror) {
-			return new AutoBinder(binder, sharesBy, mirror, producesBy, namesBy,
+			return new AutoBinder(binder, accessesBy, mirror, producesBy, namesBy,
 					scopesBy, hintsBy);
 		}
 
 		public AutoBinder produceBy(ProducesBy mirror) {
-			return new AutoBinder(binder, sharesBy, constructsBy, mirror,
+			return new AutoBinder(binder, accessesBy, constructsBy, mirror,
 					namesBy, scopesBy, hintsBy);
 		}
 
 		public AutoBinder nameBy(NamesBy mirror) {
-			return new AutoBinder(binder, sharesBy, constructsBy, producesBy,
+			return new AutoBinder(binder, accessesBy, constructsBy, producesBy,
 					mirror.orElse(DEFAULT), scopesBy, hintsBy);
 		}
 
 		public AutoBinder scopeBy(ScopesBy mirror) {
-			return new AutoBinder(binder, sharesBy, constructsBy, producesBy,
+			return new AutoBinder(binder, accessesBy, constructsBy, producesBy,
 					namesBy, mirror, hintsBy);
 		}
 
 		public AutoBinder hintBy(HintsBy mirror) {
-			return new AutoBinder(binder, sharesBy, constructsBy, producesBy,
+			return new AutoBinder(binder, accessesBy, constructsBy, producesBy,
 					namesBy, scopesBy, mirror);
 		}
 
-		public void in(Class<?> impl) {
+		public final void in(Class<?> impl) {
 			in(impl, Hint.none());
 		}
 
-		public void in(Class<?> impl, Class<?>... more) {
+		public final void in(Class<?> impl, Class<?>... more) {
 			in(impl);
 			for (Class<?> i : more)
 				in(i);
 		}
 
-		public void in(Object impl, Hint<?>... construction) {
-			in(impl.getClass(), impl, construction);
+		public final void in(Object impl, Hint<?>... construction) {
+			if (impl instanceof Hint) {
+				in(((Hint<?>) impl).asType.rawType, impl, construction);
+			} else {
+				in(impl.getClass(), impl, construction);
+			}
 		}
 
-		public void in(Class<?> impl, Hint<?>... construction) {
+		public final void in(Class<?> impl, Hint<?>... construction) {
 			in(impl, null, construction);
 		}
 
 		private void in(Class<?> impl, Object instance,
 				Hint<?>... construction) {
 			boolean needsInstance1 = bindProducesIn(impl, instance);
-			boolean needsInstance2 = bindSharesIn(impl, instance);
+			boolean needsInstance2 = bindAccessesIn(impl, instance);
 			if (!needsInstance1 && !needsInstance2)
 				return; // do not try to construct the class
+			if (instance != null && !(instance instanceof Hint))
+				return; // if there is an instance don't bind constructor unless it is just a Hint
 			Constructor<?> target = constructsBy
 					.reflect(impl.getDeclaredConstructors(), construction);
 			if (target != null)
 				asConstructor(Scope.auto, target, construction);
 		}
 
-		private boolean bindSharesIn(Class<?> impl, Object instance) {
-			Field[] constants = sharesBy.reflect(impl);
+		private boolean bindAccessesIn(Class<?> impl, Object instance) {
+			Field[] constants = accessesBy.reflect(impl);
 			if (constants == null || constants.length == 0)
 				return false;
 			boolean needsInstance = false;
 			for (Field constant : constants) {
-				binder.per(Scope.container).bind(namesBy.reflect(constant),
-						fieldType(constant)).to(instance, constant);
-				needsInstance |= !isStatic(constant.getModifiers());
+				if (asConstant(constant, instance))
+					needsInstance |= !isStatic(constant.getModifiers());
 			}
 			return needsInstance;
 		}
@@ -720,32 +752,40 @@ public class Binder {
 			return needsInstance;
 		}
 
+		public boolean asConstant(Field constant, Object instance) {
+			Accesses<?> accesses = Accesses.accesses(instance, constant);
+			binder.per(Scope.container) //
+					.bind(namesBy.reflect(constant), accesses.expectedType) //
+					.expand(accesses);
+			return true;
+		}
+
 		/**
 		 * This method will not make sure an instance of the {@link Method}'s
 		 * declaring class is created if needed. This must be bound elsewhere.
 		 *
-		 * @param target a method that is meant to create instances of the
+		 * @param target   a method that is meant to create instances of the
 		 *                 method return type
 		 * @param instance can be null to resolve the instance from {@link
-		 *                 Injector} context later (if needed)
-		 * @param hints    optional method argument {@link Hint}s
-		 * @return true if a target was bound, else false (this is e.g. the
-		 * case when the {@link Method} returns void)
+		 *                 Injector} context later (if needed). It can also be a
+		 *                 {@link Hint} to that instance. {@code null} for
+		 *                 {@code static} methods.
+		 * @param args     optional method argument {@link Hint}s
+		 * @return true if a target was bound, else false (this is e.g. the case
+		 * when the {@link Method} returns void)
 		 */
-		public boolean asProducer(Method target, Object instance, Hint<?>... hints) {
-			Type<?> returns = returnType(target);
-			if (returns.rawType == void.class || returns.rawType == Void.class)
+		public boolean asProducer(Method target, Object instance, Hint<?>... args) {
+			if (target.getReturnType() == void.class || target.getReturnType() == Void.class)
 				return false;
-			if (hints == null || hints.length == 0)
-				hints = hintsBy.applyTo(target);
 			Name scope = scopesBy.reflect(target);
+			Produces<?> produces = Produces.produces(instance, target, hintsBy, args);
 			binder.per(scope == null ? Scope.auto : scope) //
-					.bind(namesBy.reflect(target), returns) //
-					.to(instance, target, hints);
+					.bind(namesBy.reflect(target), produces.expectedType) //
+					.expand(produces);
 			return true;
 		}
 
-		public <T> void asConstructor(Constructor<T> target, Hint<?>... hints) {
+		public final <T> void asConstructor(Constructor<T> target, Hint<?>... hints) {
 			asConstructor(scopesBy.reflect(target), target, hints);
 		}
 
@@ -753,12 +793,12 @@ public class Binder {
 			if (target == null)
 				throw InconsistentBinding.generic("Provided Constructor was null");
 			Name name = namesBy.reflect(target);
-			if (hints.length == 0)
-				hints = hintsBy.applyTo(target);
 			Class<T> impl = target.getDeclaringClass();
 			Binder scopedBinder = binder.per(scope != null ? scope : Scope.auto).implicit();
 			if (name.isDefault()) {
-				scopedBinder.superbind(impl).to(target, hints);
+				scopedBinder.contractbind(impl)
+						//TODO use actual type hint/ref
+						.expand(constructs(raw(impl), target, hintsBy, hints));
 			} else {
 				scopedBinder.bind(name, impl).to(target, hints);
 				for (Type<? super T> st : raw(impl).supertypes())
@@ -785,17 +825,17 @@ public class Binder {
 		// OPEN also allow naming for provided instances - this is used for
 		// value objects that become parameter; settings required and provided
 
-		public <T> void provide(Class<T> impl, Hint<?>... hints) {
+		public final <T> void provide(Class<T> impl, Hint<?>... hints) {
 			on(bind().asProvided()).bind(impl).toConstructor(hints);
 		}
 
-		public <T> void require(Class<T> dependency) {
-			require(raw(dependency));
+		public final <T> void require(Class<T> apiImplementation) {
+			require(raw(apiImplementation));
 		}
 
-		public <T> void require(Type<T> dependency) {
-			on(bind().asRequired()).bind(dependency).to(Supply.required(),
-					BindingType.REQUIRED);
+		public <T> void require(Type<T> apiImplementation) {
+			on(bind().asRequired()).bind(apiImplementation) //
+					.to(Supply.required(), BindingType.REQUIRED);
 		}
 
 		@Override
@@ -816,7 +856,7 @@ public class Binder {
 		 *
 		 * @since 8.1
 		 */
-		public TargetedBinder config() {
+		public final TargetedBinder config() {
 			return injectingInto(Config.class);
 		}
 
@@ -825,7 +865,7 @@ public class Binder {
 		 *
 		 * @since 8.1
 		 */
-		public TargetedBinder config(Class<?> ns) {
+		public final TargetedBinder config(Class<?> ns) {
 			return config().within(ns);
 		}
 
@@ -834,11 +874,11 @@ public class Binder {
 		 *
 		 * @since 8.1
 		 */
-		public TargetedBinder config(Instance<?> ns) {
+		public final TargetedBinder config(Instance<?> ns) {
 			return config().within(ns);
 		}
 
-		public TargetedBinder injectingInto(Class<?> target) {
+		public final TargetedBinder injectingInto(Class<?> target) {
 			return injectingInto(raw(target));
 		}
 
@@ -846,15 +886,15 @@ public class Binder {
 			return new TargetedBinder(root, bind().with(targeting(target)));
 		}
 
-		public TargetedBinder injectingInto(Name name, Class<?> type) {
+		public final TargetedBinder injectingInto(Name name, Class<?> type) {
 			return injectingInto(name, raw(type));
 		}
 
-		public TargetedBinder injectingInto(Name name, Type<?> type) {
+		public final TargetedBinder injectingInto(Name name, Type<?> type) {
 			return injectingInto(Instance.instance(name, type));
 		}
 
-		public TargetedBinder injectingInto(Type<?> target) {
+		public final TargetedBinder injectingInto(Type<?> target) {
 			return injectingInto(defaultInstanceOf(target));
 		}
 
@@ -874,23 +914,23 @@ public class Binder {
 			super(root, bind);
 		}
 
-		public Binder in(Packages packages) {
+		public final Binder in(Packages packages) {
 			return with(bind().target.in(packages));
 		}
 
-		public Binder inPackageAndSubPackagesOf(Class<?> type) {
+		public final Binder inPackageAndSubPackagesOf(Class<?> type) {
 			return with(bind().target.inPackageAndSubPackagesOf(type));
 		}
 
-		public Binder inPackageOf(Class<?> type) {
+		public final Binder inPackageOf(Class<?> type) {
 			return with(bind().target.inPackageOf(type));
 		}
 
-		public Binder inSubPackagesOf(Class<?> type) {
+		public final Binder inSubPackagesOf(Class<?> type) {
 			return with(bind().target.inSubPackagesOf(type));
 		}
 
-		public TargetedBinder within(Class<?> parent) {
+		public final TargetedBinder within(Class<?> parent) {
 			return within(raw(parent));
 		}
 
@@ -898,15 +938,15 @@ public class Binder {
 			return new TargetedBinder(root, bind().within(parent));
 		}
 
-		public TargetedBinder within(Name name, Class<?> parent) {
+		public final TargetedBinder within(Name name, Class<?> parent) {
 			return within(instance(name, raw(parent)));
 		}
 
-		public TargetedBinder within(Name name, Type<?> parent) {
+		public final TargetedBinder within(Name name, Type<?> parent) {
 			return within(instance(name, parent));
 		}
 
-		public TargetedBinder within(Type<?> parent) {
+		public final TargetedBinder within(Type<?> parent) {
 			return within(anyOf(parent));
 		}
 	}
@@ -941,26 +981,13 @@ public class Binder {
 			to(Instance.anyOf(raw(impl)));
 		}
 
-		public void to(Constructor<? extends T> target, Hint<?>... hints) {
+		public void to(Constructor<? extends T> target, Hint<?>... args) {
 			if (target == null)
 				throw InconsistentBinding.generic("Provided constructor was null");
-			if (hints.length == 0)
-				hints = env(HintsBy.class).applyTo(target);
-			expand(New.newInstance(target, hints));
+			expand(constructs(locator.type(), target, env(HintsBy.class), args));
 		}
 
-		protected final void to(Object owner, Method target,
-				Hint<?>... hints) {
-			if (hints.length == 0)
-				hints = env(HintsBy.class).applyTo(target);
-			expand(Produces.produces(owner, target, hints));
-		}
-
-		protected final void to(Object owner, Field constant) {
-			expand(Shares.shares(owner, constant));
-		}
-
-		protected final void expand(Object value) {
+		protected final void expand(Descriptor value) {
 			declareBindingsIn(bind() //
 					.asType(locator, BindingType.VALUE, null), value);
 		}
@@ -971,7 +998,7 @@ public class Binder {
 			declareBindingsIn(binding, binding);
 		}
 
-		private void declareBindingsIn(Binding<?> binding, Object value) {
+		private void declareBindingsIn(Binding<?> binding, Descriptor value) {
 			bindings().addExpanded(env(), binding, value);
 		}
 
@@ -1110,7 +1137,7 @@ public class Binder {
 		}
 
 		public <I extends T> void toParametrized(Class<I> impl) {
-			expand(impl);
+			expand(new BridgeDescriptor(impl));
 		}
 
 		public <I extends Supplier<? extends T>> void toSupplier(
@@ -1171,7 +1198,7 @@ public class Binder {
 
 		@SafeVarargs
 		public final void toElements(Hint<? extends E>... elems) {
-			expand(elems);
+			expand(new ArrayDescriptor(elems));
 		}
 
 		@SafeVarargs

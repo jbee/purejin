@@ -5,9 +5,9 @@ import se.jbee.inject.*;
 import se.jbee.inject.binder.Binder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
+import se.jbee.inject.config.AccessesBy;
 import se.jbee.inject.config.NamesBy;
 import se.jbee.inject.config.ProducesBy;
-import se.jbee.inject.config.SharesBy;
 
 import java.lang.reflect.Modifier;
 
@@ -23,7 +23,7 @@ import static test.integration.util.TestUtils.assertEqualSets;
  * java.lang.reflect.Field} in a (semi-) automatic way.
  * <p>
  * The user configures the selection process using strategy interfaces {@link
- * se.jbee.inject.config.ConstructsBy}, {@link ProducesBy}, {@link SharesBy} to
+ * se.jbee.inject.config.ConstructsBy}, {@link ProducesBy}, {@link AccessesBy} to
  * programmatically describe how to find and select the members to use and bind.
  * The created bindings can be further customised using the {@link
  * se.jbee.inject.config.ScopesBy} strategy to decide the {@link
@@ -51,7 +51,7 @@ class TestBasicAutoBinds {
 		@Override
 		protected void declare() {
 			// share field values for the primitives in this test
-			autobind().shareBy(SharesBy.declaredFields(false)).in(this);
+			autobind().accessBy(AccessesBy.declaredFields(false)).in(this);
 
 			// bind methods as factories using Hint to find the one we want
 			autobind().produceBy(ProducesBy.OPTIMISTIC //

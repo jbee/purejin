@@ -11,16 +11,22 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static se.jbee.inject.Name.named;
 
 /**
- * A very basic test that shows how {@link Binder#init(Class)} can be used to
- * build setter injection.
+ * A very basic test that shows how {@link Binder#boot(Class)} can be used to
+ * build explicit setter injection. That means each setter has to be bound.
  * <p>
- * In this particular example this is not adding the general feature of
+ * In this particular example this is <b>not</b> adding the general feature of
  * injecting setters but wiring specific instances to be injected using the
  * available setter. This is a viable strategy to adapt to 3rd party classes
- * that assume setter injection but it should not be overused. If setter
- * injection is wanted in general a single {@link se.jbee.inject.BuildUp} or a
- * custom {@link se.jbee.inject.bind.ValueBinder} can be used similar to the
- * example given in {@link TestExampleFieldInjectionBinds}.
+ * that assume setter injection but it should not be overused.
+ * <p>
+ * If setter injection is wanted in general a single {@link
+ * se.jbee.inject.BuildUp} or a custom {@link se.jbee.inject.bind.ValueBinder}
+ * can be used similar to the example given in {@link TestExampleFieldInjectionBinds}.
+ * <p>
+ * Also note that {@link Binder#boot(Class)} is eager, it occurs at the end of
+ * the bootstrapping of the {@link Injector} context while a {@link
+ * se.jbee.inject.BuildUp} as shown in {@link TestExampleFieldInjectionBinds} is
+ * lazy as it first occurs when the target instance is created.
  *
  * @see TestExampleFieldInjectionBinds
  */
@@ -52,11 +58,11 @@ class TestExampleSetterInjectionBinds {
 			construct(AnotherBean.class);
 
 			// link beans via setter
-			init(Bean.class).by(AnotherBean.class, Bean::setBar);
+			boot(Bean.class).by(AnotherBean.class, Bean::setBar);
 
 			// link a configuration via setter
 			bind(named("bar"), String.class).to("foo");
-			init(Bean.class).by(named("bar"), String.class, Bean::setFoo);
+			boot(Bean.class).by(named("bar"), String.class, Bean::setFoo);
 		}
 	}
 

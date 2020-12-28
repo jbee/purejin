@@ -25,8 +25,6 @@ import static se.jbee.inject.lang.Type.raw;
  *
  * @see Module
  *
- * @author Jan Bernitt (jan@jbee.se)
- *
  * @param <T> The type of the property value
  */
 @FunctionalInterface
@@ -34,11 +32,11 @@ public interface ModuleWith<T> extends Module {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	Type<ModuleWith<Class<?>>> TYPE_ANNOTATION = //
-			(Type) raw(ModuleWith.class).parametized(Type.CLASS);
+			(Type) raw(ModuleWith.class).parameterized(Type.CLASS);
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	Type<ModuleWith<Method>> METHOD_ANNOTATION = //
-			(Type) raw(ModuleWith.class).parametized(Method.class);
+			(Type) raw(ModuleWith.class).parameterized(Method.class);
 
 	/**
 	 * @param bindings use to declare made bound within this {@link Module}.
@@ -49,8 +47,7 @@ public interface ModuleWith<T> extends Module {
 
 	@Override
 	default void declare(Bindings bindings, Env env) {
-		Type<?> valueType = Type.supertype(ModuleWith.class,
-				raw(getClass())).parameter(0);
+		Type<?> valueType = raw(getClass()).toSuperType(ModuleWith.class).parameter(0);
 		@SuppressWarnings("unchecked")
 		final T value = valueType.rawType == Env.class
 			? (T) env
@@ -58,5 +55,4 @@ public interface ModuleWith<T> extends Module {
 					getClass().getPackage());
 		declare(bindings, env, value);
 	}
-
 }

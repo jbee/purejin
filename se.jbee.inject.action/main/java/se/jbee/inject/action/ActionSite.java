@@ -1,9 +1,7 @@
 package se.jbee.inject.action;
 
-import se.jbee.inject.Hint;
-import se.jbee.inject.InjectionSite;
-import se.jbee.inject.Injector;
-import se.jbee.inject.UnresolvableDependency;
+import se.jbee.inject.*;
+import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.lang.Reflect;
 import se.jbee.inject.lang.Type;
 
@@ -13,16 +11,12 @@ import java.util.function.Consumer;
 
 import static java.util.Arrays.asList;
 import static se.jbee.inject.Dependency.dependency;
-import static se.jbee.inject.lang.Type.actualParameterType;
 import static se.jbee.inject.lang.Type.actualReturnType;
-import static se.jbee.inject.lang.Utils.arrayMap;
 
 /**
  * Describes a unique action implementation point. That is the particular
  * {@link Method} that implements the {@link Action} for the input parameter
  * {@link Type}.
- *
- * @author Jan Bernitt
  *
  * @param <A> Type of the input parameter
  * @param <B> Type of the output value
@@ -45,12 +39,13 @@ public final class ActionSite<A, B> {
 		this.target = target;
 		this.in = in;
 		this.out = out;
-		Type<?>[] types = arrayMap(target.action.getParameters(), Type.class,
-				p -> actualParameterType(p, target.as));
+		Env env = context.resolve(Env.class);
+		Hint<A> inHint = Hint.constantNull(in);
+		Hint<?>[] hints = env.property(HintsBy.class, ActionSite.class.getPackage())
+				.applyTo(target.action, target.as, inHint);
 		this.injection = new InjectionSite(context,
-				dependency(out).injectingInto(target.as),
-				Hint.match(types, Hint.constantNull(in)));
-		this.inputIndex = asList(types).indexOf(in);
+				dependency(out).injectingInto(target.as), hints);
+		this.inputIndex = asList(hints).indexOf(inHint);
 	}
 
 	public Object[] args(Injector context, Object input) {

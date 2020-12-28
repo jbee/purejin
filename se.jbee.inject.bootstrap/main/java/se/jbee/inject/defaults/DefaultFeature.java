@@ -233,7 +233,7 @@ public enum DefaultFeature implements Toggled<DefaultFeature> {
 
 		@Override
 		public <T> T resolve(Dependency<T> dep) throws UnresolvableDependency {
-			throw new UnresolvableDependency.NoResourceForDependency(
+			throw new UnresolvableDependency.ResourceResolutionFailed(
 					"Empty SubContext Injector", dep);
 		}
 

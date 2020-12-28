@@ -67,7 +67,7 @@ class TestFeatureOptimisticConstructorBinds {
 			construct(IllegalSelfReference.class);
 
 			construct(LegalSelfReference.class);
-			bind(raw(LegalSelfReference.class).parametized(String.class))
+			bind(raw(LegalSelfReference.class).parameterized(String.class))
 					.to(new LegalSelfReference<>(null));
 
 			construct(PublicOverPrivate.class);
@@ -85,7 +85,7 @@ class TestFeatureOptimisticConstructorBinds {
 	@Test
 	void constructorsWithParametersOfSameTypeWithGenericsAreNotIgnored() {
 		assertNotNull(context.resolve(
-				raw(LegalSelfReference.class).parametized(Integer.class)));
+				raw(LegalSelfReference.class).parameterized(Integer.class)));
 	}
 
 	@Test

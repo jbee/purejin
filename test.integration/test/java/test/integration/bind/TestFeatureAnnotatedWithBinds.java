@@ -9,7 +9,7 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.bootstrap.Environment;
-import se.jbee.inject.config.SharesBy;
+import se.jbee.inject.config.AccessesBy;
 
 import java.lang.annotation.*;
 import java.lang.reflect.AnnotatedElement;
@@ -88,7 +88,7 @@ class TestFeatureAnnotatedWithBinds {
 			bind(Service.class).to(ServiceImpl.class);
 			autobind() //
 					.produceBy(OPTIMISTIC.annotatedWith(Marker.class)) //
-					.shareBy(SharesBy.OPTIMISTIC.annotatedWith(Marker.class)) //
+					.accessBy(AccessesBy.OPTIMISTIC.annotatedWith(Marker.class)) //
 					.in(this);
 		}
 

@@ -54,19 +54,19 @@ public final class Reflect {
 		return construct(target, new Object[0], exceptionTransformer);
 	}
 
-	public static Object produce(Method target, Object owner, Object[] args,
+	public static Object produce(Method target, Object instance, Object[] args,
 			Function<Exception, ? extends RuntimeException> exceptionTransformer) {
 		try {
-			return target.invoke(owner, args);
+			return target.invoke(instance, args);
 		} catch (Exception e) {
 			throw wrap(exceptionTransformer).apply(e);
 		}
 	}
 
-	public static Object share(Field target, Object owner,
+	public static Object access(Field target, Object instance,
 			Function<Exception, ? extends RuntimeException> exceptionTransformer) {
 		try {
-			return target.get(owner);
+			return target.get(instance);
 		} catch (Exception e) {
 			throw wrap(exceptionTransformer).apply(e);
 		}

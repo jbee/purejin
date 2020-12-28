@@ -32,7 +32,6 @@ class TestExampleInterfaceDecouplingBinds {
 			bind(named("c"), Decoupling.class).toConstructor(DefaultImpl.class);
 			bind(named("d"), Decoupling.class).toConstructor(DefaultImpl.class);
 		}
-
 	}
 
 	@Test

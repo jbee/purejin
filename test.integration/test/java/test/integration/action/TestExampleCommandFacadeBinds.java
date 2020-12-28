@@ -71,7 +71,7 @@ class TestExampleCommandFacadeBinds {
 	void commandBecomesUserFacadeForAction() {
 		@SuppressWarnings("unchecked")
 		Command<Integer> square = context.resolve(
-				raw(Command.class).parametized(Integer.class));
+				raw(Command.class).parameterized(Integer.class));
 		assertNotNull(context.resolve(MathService.class));
 		assertEquals(9L, square.calc(3));
 	}

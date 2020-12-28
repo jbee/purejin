@@ -27,7 +27,7 @@ public final class Cast {
 	}
 
 	public static <T> Type<List<T>> listTypeOf(Type<T> elementType) {
-		return (Type) raw(List.class).parametized(elementType);
+		return (Type) raw(List.class).parameterized(elementType);
 	}
 
 	public static <T> Type<Set<T>> setTypeOf(Class<T> elementType) {
@@ -35,7 +35,7 @@ public final class Cast {
 	}
 
 	public static <T> Type<Set<T>> setTypeOf(Type<T> elementType) {
-		return (Type) raw(Set.class).parametized(elementType);
+		return (Type) raw(Set.class).parameterized(elementType);
 	}
 
 	public static <T> Type<Collection<T>> collectionTypeOf(
@@ -45,7 +45,7 @@ public final class Cast {
 
 	public static <T> Type<Collection<T>> collectionTypeOf(
 			Type<T> elementType) {
-		return (Type) raw(Collection.class).parametized(elementType);
+		return (Type) raw(Collection.class).parameterized(elementType);
 	}
 
 	public static <A, B> Type<Function<A,B>> functionTypeOf(Class<A> a, Class<B> b) {
@@ -53,6 +53,6 @@ public final class Cast {
 	}
 
 	public static <A, B> Type<Function<A,B>> functionTypeOf(Type<A> a, Type<B> b) {
-		return (Type) Type.raw(Function.class).parametized(a, b);
+		return (Type) Type.raw(Function.class).parameterized(a, b);
 	}
 }

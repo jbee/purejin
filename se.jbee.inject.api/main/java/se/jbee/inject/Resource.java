@@ -32,7 +32,7 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <T> Type<Resource<T>> resourceTypeOf(Type<T> type) {
-		return (Type) raw(Resource.class).parametized(type);
+		return (Type) raw(Resource.class).parameterized(type);
 	}
 
 	public static <T> Type<Resource<T>[]> resourcesTypeOf(Class<T> type) {
@@ -41,7 +41,7 @@ public final class Resource<T> implements Comparable<Resource<?>>,
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <T> Type<Resource<T>[]> resourcesTypeOf(Type<T> type) {
-		return (Type) raw(Resource[].class).parametized(type);
+		return (Type) raw(Resource[].class).parameterized(type);
 	}
 
 	public final Generator<T> generator;

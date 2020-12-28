@@ -43,34 +43,35 @@ public final class InjectionSite {
 		for (int j = 0; j < lazyArgCount; j++) {
 			int i = lazyArgIndexes[j];
 			Hint<?> hint = hints[i];
+			Dependency<?> argDep = site.onInstance(hint.relativeRef).at(hint.at);
 			args[i] = generators[i] == null
-				? injector.resolve(site.instanced(hint.relativeRef))
-				: generate(generators[i], site.instanced(hint.relativeRef));
+				? injector.resolve(argDep)
+				: generate(generators[i], argDep);
 		}
 		return args;
 	}
 
-	private int preResolveArgs(Injector injector) {
+	private int preResolveArgs(Injector context) {
 		int lazyArgIndex = 0;
 		for (int i = 0; i < generators.length; i++) {
 			Hint<?> hint = hints[i];
 			if (hint.type().rawType == Injector.class) {
-				preResolvedArgs[i] = injector;
+				preResolvedArgs[i] = context;
 			} else if (hint.isConstant()) {
 				preResolvedArgs[i] = hint.value;
 			} else if (hint.type().arrayDimensions() == 1) {
 				lazyArgIndexes[lazyArgIndex++] = i;
 			} else if (hint.absoluteRef != null) {
-				preResolvedArgs[i] = injector.resolve(hint.absoluteRef);
+				preResolvedArgs[i] = context.resolve(hint.absoluteRef.at(hint.at));
 			} else { // relative ref
 				Instance<?> ref = hint.relativeRef;
-				Dependency<? extends Resource<?>> resourceDep = site.typed(
-						resourceTypeOf(ref.type)).named(ref.name);
-				Resource<?> resource = injector.resolve(resourceDep);
+				Dependency<? extends Resource<?>> resourceDep = site //
+						.typed(resourceTypeOf(ref.type)).named(ref.name).at(hint.at);
+				Resource<?> resource = context.resolve(resourceDep);
 				if (resource.lifeCycle.isPermanent()) {
 					//TODO and not has type variable involved
 					preResolvedArgs[i] = generate(resource,
-							site.instanced(hint.relativeRef));
+							site.onInstance(hint.relativeRef).at(hint.at));
 				} else {
 					lazyArgIndexes[lazyArgIndex++] = i;
 					generators[i] = resource;

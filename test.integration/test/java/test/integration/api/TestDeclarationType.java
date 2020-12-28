@@ -10,37 +10,37 @@ import static se.jbee.inject.DeclarationType.*;
 class TestDeclarationType {
 
 	@Test
-	void thatExplicitIsNotReplacedByExplicit() {
+	void explicitIsNotReplacedByExplicit() {
 		assertFalse(EXPLICIT.replacedBy(EXPLICIT));
 	}
 
 	@Test
-	void thatExplicitClashesWithExplicit() {
+	void explicitClashesWithExplicit() {
 		assertTrue(EXPLICIT.clashesWith(EXPLICIT));
 	}
 
 	@Test
-	void thatExplicitClashesWithMultiple() {
+	void explicitClashesWithMultiple() {
 		assertTrue(EXPLICIT.clashesWith(MULTI));
 		assertTrue(MULTI.clashesWith(EXPLICIT));
 	}
 
 	@Test
-	void thatImplicitDefaultAutoReplacedByMulti() {
+	void implicitDefaultContractAreReplacedByMulti() {
 		assertTrue(IMPLICIT.replacedBy(MULTI));
 		assertTrue(DEFAULT.replacedBy(MULTI));
-		assertTrue(SUPER.replacedBy(MULTI));
+		assertTrue(CONTRACT.replacedBy(MULTI));
 	}
 
 	@Test
-	void thatDefaultReplacedByAutoMultiOrExplicit() {
-		assertTrue(DEFAULT.replacedBy(SUPER));
+	void defaultIsReplacedByContractMultiOrExplicit() {
+		assertTrue(DEFAULT.replacedBy(CONTRACT));
 		assertTrue(DEFAULT.replacedBy(MULTI));
 		assertTrue(DEFAULT.replacedBy(EXPLICIT));
 	}
 
 	@Test
-	void thatRequiredIsNotReplacedByAnyOtherType() {
+	void requiredIsNotReplacedByAnyOtherType() {
 		for (DeclarationType type : DeclarationType.values()) {
 			if (type != REQUIRED) {
 				assertFalse(REQUIRED.replacedBy(type), type.name());
@@ -49,23 +49,22 @@ class TestDeclarationType {
 	}
 
 	@Test
-	void thatRequiredNotClashesWithRequired() {
+	void requiredDoesNotClashWithRequired() {
 		assertFalse(REQUIRED.clashesWith(REQUIRED));
 	}
 
 	@Test
-	void thatDefaultClashesWithDefault() {
+	void defaultClashesWithDefault() {
 		assertTrue(DEFAULT.clashesWith(DEFAULT));
 	}
 
 	@Test
-	void thatAutoNotClashesWithAuto() {
-		assertFalse(SUPER.clashesWith(SUPER));
+	void contractDoesNotClashWithContract() {
+		assertFalse(CONTRACT.clashesWith(CONTRACT));
 	}
 
 	@Test
-	void thatImplicitReplacedByImplicit() {
+	void implicitIsReplacedByImplicit() {
 		assertTrue(IMPLICIT.replacedBy(IMPLICIT));
 	}
-
 }

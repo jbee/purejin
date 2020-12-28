@@ -1,14 +1,14 @@
 package se.jbee.inject.bootstrap;
 
 import se.jbee.inject.*;
-import se.jbee.inject.bind.BindingConsolidation;
-import se.jbee.inject.bind.InconsistentBinding;
-import se.jbee.inject.bind.ModuleWith;
-import se.jbee.inject.bind.ValueBinder;
+import se.jbee.inject.bind.*;
+import se.jbee.inject.binder.Constant;
+import se.jbee.inject.binder.Constructs;
+import se.jbee.inject.binder.Produces;
+import se.jbee.inject.binder.Accesses;
 import se.jbee.inject.config.*;
 import se.jbee.inject.defaults.DefaultBindingConsolidation;
 import se.jbee.inject.defaults.DefaultValueBinders;
-import se.jbee.inject.lang.Reflect;
 import se.jbee.inject.lang.Type;
 
 import java.lang.annotation.Annotation;
@@ -18,6 +18,7 @@ import java.util.Map.Entry;
 
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
+import static se.jbee.inject.lang.Type.classType;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
@@ -37,20 +38,21 @@ public final class Environment implements Env {
 	 */
 	public static final Environment DEFAULT = new Environment() //
 			.with(Edition.class, Edition.FULL) //
-			.withBinder(DefaultValueBinders.SUPER_TYPES) //
-			.withBinder(DefaultValueBinders.NEW) //
-			.withBinder(DefaultValueBinders.CONSTANT) //
-			.withBinder(DefaultValueBinders.PRODUCES) //
-			.withBinder(DefaultValueBinders.SHARES) //
-			.withBinder(DefaultValueBinders.INSTANCE_REF) //
-			.withBinder(DefaultValueBinders.PARAMETRIZED_REF) //
-			.withBinder(DefaultValueBinders.ARRAY) //
+			.withBinder(Binding.class, DefaultValueBinders.CONTRACTS) //
+			.withBinder(Constructs.class, DefaultValueBinders.CONSTRUCTS) //
+			.withBinder(Constant.class, DefaultValueBinders.CONSTANT) //
+			.withBinder(Produces.class, DefaultValueBinders.PRODUCES) //
+			.withBinder(Accesses.class, DefaultValueBinders.SHARES) //
+			.withBinder(Instance.class, DefaultValueBinders.REFERENCE) //
+			.withBinder(Descriptor.BridgeDescriptor.class, DefaultValueBinders.BRIDGE) //
+			.withBinder(Descriptor.ArrayDescriptor.class, DefaultValueBinders.ARRAY) //
 			.with(ConstructsBy.class, ConstructsBy.OPTIMISTIC) //
-			.with(SharesBy.class, impl -> null) //
+			.with(AccessesBy.class, impl -> null) //
 			.with(ProducesBy.class, impl -> null) //
 			.with(NamesBy.class, obj -> Name.DEFAULT) //
 			.with(ScopesBy.class, ScopesBy.AUTO) //
 			.with(HintsBy.class, param -> null) //
+			.with(ContractsBy.class, ContractsBy.PROTECTIVE) //
 			.with(Annotated.Enhancer.class, Annotated.SOURCE) //
 			.with(BindingConsolidation.class, DefaultBindingConsolidation::consolidate) //
 			.with(Env.GP_USE_DEEP_REFLECTION, false) //
@@ -140,16 +142,8 @@ public final class Environment implements Env {
 		return this;
 	}
 
-	public <T> Environment withBinder(Class<? extends ValueBinder<T>> value) {
-		return withBinder(Reflect.construct(value, this::accessible,
-				e -> new InconsistentDeclaration("Failed to create ValueBinder of type: " + value, e)));
-	}
-
-	public <T> Environment withBinder(ValueBinder<T> value) {
-		@SuppressWarnings("unchecked")
-		Type<ValueBinder<T>> type = (Type<ValueBinder<T>>) Type.supertype(
-				ValueBinder.class, Type.raw(value.getClass()));
-		return with(type, value);
+	public <T extends Descriptor> Environment withBinder(Class<? extends Descriptor> property, ValueBinder<T> value) {
+		return with(raw(ValueBinder.class).parameterized(classType(property)), value);
 	}
 
 	public <A extends Annotation> Environment withTypePattern(Class<A> qualifier,

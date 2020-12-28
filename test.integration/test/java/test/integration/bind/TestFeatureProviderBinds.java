@@ -139,13 +139,13 @@ class TestFeatureProviderBinds {
 	void providersAreAvailableForLists() {
 		List<String> list = asList("foobar", "special");
 		assertInjectsProviderFor(list,
-				raw(List.class).parametized(String.class));
+				raw(List.class).parameterized(String.class));
 	}
 
 	@Test
 	void providersAreAvailableForSets() {
 		Set<String> set = new HashSet<>(asList("foobar", "special"));
-		assertInjectsProviderFor(set, raw(Set.class).parametized(String.class));
+		assertInjectsProviderFor(set, raw(Set.class).parameterized(String.class));
 	}
 
 	@Test

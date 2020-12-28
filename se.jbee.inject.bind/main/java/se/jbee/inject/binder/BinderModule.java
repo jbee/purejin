@@ -22,8 +22,6 @@ import static se.jbee.inject.Scope.container;
  * A {@link BinderModule} is also a {@link Bundle} so it should be used and
  * installed as such. It will than {@link Bundle#bootstrap(Bootstrapper)} itself
  * as a module.
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
 public abstract class BinderModule extends InitializedBinder
 		implements Bundle, Module {
