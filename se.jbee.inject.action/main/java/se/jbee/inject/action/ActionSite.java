@@ -39,7 +39,7 @@ public final class ActionSite<A, B> {
 		this.target = target;
 		this.in = in;
 		this.out = out;
-		Env env = context.resolve(Env.class).in(ActionSite.class);
+		Env env = context.resolve(Env.class).in(ActionModule.class);
 		Hint<A> inArg = Hint.constantNull(in);
 		Hint<?>[] actualParameters = env.property(HintsBy.class)
 				.applyTo(context, target.action, target.as, inArg);

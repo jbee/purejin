@@ -57,7 +57,8 @@ public final class DefaultValueBinders {
 			return;
 		}
 		Class<T> impl = item.type().rawType;
-		ContractsBy contractsBy = env.in(impl).property(ContractsBy.class);
+		ContractsBy contractsBy = env.property(Name.named(impl).toString(),
+				ContractsBy.class, env.property(ContractsBy.class));
 		if (contractsBy.isContract(impl, impl))
 			dest.add(env, item);
 		for (Type<? super T> supertype : item.type().supertypes())
@@ -198,6 +199,6 @@ public final class DefaultValueBinders {
 		if (c != null)
 			dest.addExpanded(env, item,
 					Constructs.constructs(raw(c.getDeclaringClass()), c,
-							env.in(c.getDeclaringClass()).property(HintsBy.class)));
+							env.property(HintsBy.class)));
 	}
 }

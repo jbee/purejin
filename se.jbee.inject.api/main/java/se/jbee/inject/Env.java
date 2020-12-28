@@ -116,7 +116,7 @@ public interface Env {
 				return "Env[" + ns.getName() + "]";
 			}
 		}
-		return new EnvInNs(this, ns);
+		return ns == null ? this : new EnvInNs(this, ns);
 	}
 
 	default <E extends Enum<E>> boolean toggled(Class<E> property, E feature) {

@@ -29,11 +29,10 @@ class TestExampleLocalContractsByBinds {
 		@Override
 		protected void declare() {
 			// our default
-			bind(ContractsBy.class).to(ContractsBy.PROTECTIVE);
+			bindContractsBy().to(ContractsBy.PROTECTIVE);
 
 			// our exception
-			in(packageOf(String.class)).bind(ContractsBy.class) //
-					.to(ContractsBy.SUPER);
+			bindContractsByOf(String.class).to(ContractsBy.SUPER);
 		}
 	}
 
