@@ -3,11 +3,11 @@ package test.integration.bind;
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
+import se.jbee.inject.Name;
 import se.jbee.inject.bind.Bindings;
 import se.jbee.inject.binder.BinderModuleWith;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.lang.Type;
 
 import java.util.List;
@@ -21,11 +21,12 @@ import static se.jbee.inject.lang.Cast.listTypeOf;
 
 /**
  * This test demonstrates how to set properties in the {@link Env} using the
- * {@link Environment} utility. The bound {@link Env} properties are passed into
- * {@link BinderModuleWith} as argument based on their specific type parameter
- * to {@link BinderModuleWith}'s type variable. The generic type used is the one
- * resolved from the {@link Env} and that is bound in setup using {@link
- * Environment#with(Type, Object)}.
+ * {@link Env#with(Name, Type, Object)} utility.
+ * <p>
+ * The bound {@link Env} properties are passed into {@link BinderModuleWith} as
+ * argument based on their specific type parameter to {@link BinderModuleWith}'s
+ * type variable. The generic type used is the one resolved from the {@link Env}
+ * and that is bound in setup using {@link Env#with(Type, Object)}.
  * <p>
  * A look into the implementation of {@link se.jbee.inject.bind.ModuleWith#declare(Bindings,
  * Env)} shows that this is just a convenience functionality build upon a
@@ -87,7 +88,7 @@ class TestBasicModuleWithBinds {
 	private final Injector context = injector();
 
 	private static Injector injector() {
-		Env env = Environment.DEFAULT //
+		Env env = Bootstrap.DEFAULT_ENV //
 				.with(Properties.class, exampleProperties()) //
 				.with(listTypeOf(String.class), asList("a", "b")) //
 				.with(listTypeOf(Integer.class), asList(1, 2));

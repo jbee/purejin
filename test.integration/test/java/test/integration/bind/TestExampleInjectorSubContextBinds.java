@@ -10,7 +10,6 @@ import se.jbee.inject.bootstrap.Bootstrap;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Name.DEFAULT;
-import static se.jbee.inject.lang.Type.raw;
 
 /**
  * A test that demonstrates how {@link Bundle}s (here in form of
@@ -80,7 +79,7 @@ class TestExampleInjectorSubContextBinds {
 
 	@Test
 	void anySubContextCanBeResolvedButItMightBeEmpty() {
-		Injector subContext = injector.subContext("withoutIntallIn");
+		Injector subContext = injector.subContext("withoutInstallIn");
 		assertNotNull(subContext);
 		Exception ex = assertThrows(UnresolvableDependency.class,
 				() -> subContext.resolve(Injector.class),
@@ -92,8 +91,8 @@ class TestExampleInjectorSubContextBinds {
 	void subContextEnvironmentIsSameAsRootContexts() {
 		Injector foo = injector.subContext("foo");
 		assertNotSame(foo, injector);
-		assertSame(injector.resolve(DEFAULT, raw(Env.class)),
-				foo.resolve(DEFAULT, raw(Env.class)));
+		assertSame(injector.resolve(DEFAULT, Env.class),
+				foo.resolve(DEFAULT, Env.class));
 	}
 
 }

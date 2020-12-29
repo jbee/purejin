@@ -301,7 +301,7 @@ public class Binder {
 	}
 
 	public <T> PluginBinder<T> plug(Class<T> plugin) {
-		return new PluginBinder<>(on(bind()), plugin);
+		return new PluginBinder<>(on(bind().next()), plugin);
 	}
 
 	/**
@@ -310,10 +310,9 @@ public class Binder {
 	 * @since 8.1
 	 */
 	public final ConnectBinder connect() {
-		Package ns = bind.source.pkg();
-		return connect(
-				env().property(CONNECT_QUALIFIER, ProducesBy.class, ns,
-						env().property(ProducesBy.class, ns)));
+		Env env = env();
+		return connect(env.property(CONNECT_QUALIFIER, ProducesBy.class,
+						env.property(ProducesBy.class)));
 	}
 
 	public ConnectBinder connect(ProducesBy connectsBy) {
@@ -379,7 +378,7 @@ public class Binder {
 	}
 
 	public <T> BootBinder<T> boot(Name name, Type<T> target) {
-		return new BootBinder<>(on(bind()), instance(name, target));
+		return new BootBinder<>(on(bind().next()), instance(name, target));
 	}
 
 	/**
@@ -639,14 +638,13 @@ public class Binder {
 			Bind bind = binder.bind();
 			this.binder = binder.on(bind.asContract()).on(bind.next());
 			Env env = bind.env;
-			Package ns = bind.source.pkg();
-			this.accessesBy = env.property(AccessesBy.class, ns);
-			this.constructsBy = env.property(ConstructsBy.class, ns);
-			this.producesBy = env.property(ProducesBy.class, ns);
-			this.namesBy = env.property(NamesBy.class, ns).orElse(DEFAULT);
-			this.hintsBy = env.property(HintsBy.class, ns);
+			this.accessesBy = env.property(AccessesBy.class);
+			this.constructsBy = env.property(ConstructsBy.class);
+			this.producesBy = env.property(ProducesBy.class);
+			this.namesBy = env.property(NamesBy.class).orElse(DEFAULT);
+			this.hintsBy = env.property(HintsBy.class);
 			this.scopesBy = scope.equalTo(Scope.mirror)
-				? env.property(ScopesBy.class, ns)
+				? env.property(ScopesBy.class)
 				: target -> scope;
 		}
 
@@ -662,34 +660,34 @@ public class Binder {
 			this.hintsBy = hintsBy;
 		}
 
-		public AutoBinder accessBy(AccessesBy mirror) {
-			return new AutoBinder(binder, mirror, constructsBy, producesBy,
+		public AutoBinder accessBy(AccessesBy strategy) {
+			return new AutoBinder(binder, strategy, constructsBy, producesBy,
 					namesBy, scopesBy, hintsBy);
 		}
 
-		public AutoBinder constructBy(ConstructsBy mirror) {
-			return new AutoBinder(binder, accessesBy, mirror, producesBy, namesBy,
+		public AutoBinder constructBy(ConstructsBy strategy) {
+			return new AutoBinder(binder, accessesBy, strategy, producesBy, namesBy,
 					scopesBy, hintsBy);
 		}
 
-		public AutoBinder produceBy(ProducesBy mirror) {
-			return new AutoBinder(binder, accessesBy, constructsBy, mirror,
+		public AutoBinder produceBy(ProducesBy strategy) {
+			return new AutoBinder(binder, accessesBy, constructsBy, strategy,
 					namesBy, scopesBy, hintsBy);
 		}
 
-		public AutoBinder nameBy(NamesBy mirror) {
+		public AutoBinder nameBy(NamesBy strategy) {
 			return new AutoBinder(binder, accessesBy, constructsBy, producesBy,
-					mirror.orElse(DEFAULT), scopesBy, hintsBy);
+					strategy.orElse(DEFAULT), scopesBy, hintsBy);
 		}
 
-		public AutoBinder scopeBy(ScopesBy mirror) {
+		public AutoBinder scopeBy(ScopesBy strategy) {
 			return new AutoBinder(binder, accessesBy, constructsBy, producesBy,
-					namesBy, mirror, hintsBy);
+					namesBy, strategy, hintsBy);
 		}
 
-		public AutoBinder hintBy(HintsBy mirror) {
+		public AutoBinder hintBy(HintsBy strategy) {
 			return new AutoBinder(binder, accessesBy, constructsBy, producesBy,
-					namesBy, scopesBy, mirror);
+					namesBy, scopesBy, strategy);
 		}
 
 		public final void in(Class<?> impl) {
@@ -899,7 +897,7 @@ public class Binder {
 		}
 
 		/**
-		 * Bind {@link Method}s and {@link Constructor}s based on mirrors.
+		 * Bind {@link Method}s and {@link Constructor}s based on strategies.
 		 *
 		 * @since 8.1
 		 */
@@ -974,7 +972,7 @@ public class Binder {
 		}
 
 		private <P> P env(Class<P> property) {
-			return env().property(property, bind().source.pkg());
+			return env().property(property);
 		}
 
 		public <I extends T> void to(Class<I> impl) {

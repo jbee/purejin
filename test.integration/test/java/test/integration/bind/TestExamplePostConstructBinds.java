@@ -87,8 +87,9 @@ class TestExamplePostConstructBinds {
 			// which means we also support injecting parameters into these
 			// method calls
 			Produces<T> prod = (Produces<T>) Produces.produces(target, m,
-					context.resolve(Env.class).property(HintsBy.class,
-							m.getDeclaringClass().getPackage()));
+					context.resolve(Env.class)
+							.in(m.getDeclaringClass())
+							.property(HintsBy.class, HintsBy.AUTO));
 			Supply.byProduction(prod).supply(dependency(prod.actualType) //
 					// adds basic targeting so that injectingInto is respected when method arguments are injected
 					// to get fully correct target context a Supplier<BuildUp<Object>> would be needed instead of postConstructHook (BuildUp<Object>) so that the actual Dependency can be accessed

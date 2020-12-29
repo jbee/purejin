@@ -11,7 +11,6 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.binder.BundleFor;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
@@ -98,7 +97,7 @@ class TestBasicBundleForBinds {
 
 	private static void assertChoiceResolvedToValue(Machine actualChoice,
 			String expectedValue) {
-		Env env = Environment.DEFAULT.withToggled(Machine.class, actualChoice);
+		Env env = Bootstrap.DEFAULT_ENV.withToggled(Machine.class, actualChoice);
 		Injector context = Bootstrap.injector(env,
 				TestBasicBundleForBindsBundle.class);
 		assertArrayEquals(new String[] { expectedValue },

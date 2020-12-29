@@ -38,7 +38,8 @@ public abstract class BinderModule extends InitializedBinder
 
 	@Override
 	public final void bootstrap(Bootstrapper bootstrap) {
-		bootstrap.installDefaults();
+		if (installDefaults())
+			bootstrap.installDefaults();
 		if (basis != null)
 			bootstrap.install(basis);
 		bootstrap.install(this);
@@ -63,7 +64,7 @@ public abstract class BinderModule extends InitializedBinder
 	}
 
 	protected final <P> P env(Class<P> property) {
-		return env().property(property, bind().source.pkg());
+		return env().property(property);
 	}
 
 	@Override
@@ -101,4 +102,8 @@ public abstract class BinderModule extends InitializedBinder
 	 * @see Module#declare(Bindings, Env)
 	 */
 	protected abstract void declare();
+
+	protected boolean installDefaults() {
+		return true;
+	}
 }

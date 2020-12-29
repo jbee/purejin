@@ -13,7 +13,6 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Constructs;
 import se.jbee.inject.binder.Supply;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -24,6 +23,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.bind.BindingType.CONSTRUCTOR;
+import static se.jbee.inject.bind.ValueBinder.valueBinderTypeOf;
 import static se.jbee.inject.lang.Type.fieldType;
 
 /**
@@ -129,6 +129,8 @@ class TestExampleFieldInjectionBinds {
 
 	private static Injector injectorWithEnv(Class<? extends Bundle> root,
 			ValueBinder<Constructs<?>> binder) {
-		return Bootstrap.injector(Environment.DEFAULT.withBinder(Constructs.class, binder), root);
+		return Bootstrap.injector(
+				Bootstrap.DEFAULT_ENV.with(valueBinderTypeOf(Constructs.class),
+						binder), root);
 	}
 }

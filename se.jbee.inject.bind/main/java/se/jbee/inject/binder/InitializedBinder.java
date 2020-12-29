@@ -6,6 +6,7 @@
 package se.jbee.inject.binder;
 
 import se.jbee.inject.Env;
+import se.jbee.inject.Extends;
 import se.jbee.inject.InconsistentDeclaration;
 import se.jbee.inject.bind.*;
 import se.jbee.inject.binder.Binder.RootBinder;
@@ -18,8 +19,6 @@ import static se.jbee.inject.lang.Type.raw;
  * {@link #__init__(Env, Bindings)} method.
  *
  * This allows to change the start {@link Bind} once.
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
 public abstract class InitializedBinder extends RootBinder {
 
@@ -38,7 +37,13 @@ public abstract class InitializedBinder extends RootBinder {
 
 	protected final void __init__(Env env, Bindings bindings) {
 		InconsistentBinding.nonnullThrowsReentranceException(initialized);
-		this.bind = init(bind.into(env, bindings));
+		Bind into = bind.into(env, bindings);
+		if (getClass().isAnnotationPresent(Extends.class)) {
+			Extends e = getClass().getAnnotation(Extends.class);
+			if (e.local())
+				into = into.with((into.target.inPackageAndSubPackagesOf(getClass())));
+		}
+		this.bind = init(into);
 		initialized = true;
 	}
 

@@ -7,7 +7,6 @@ import se.jbee.inject.UnresolvableDependency.IllegalAccess;
 import se.jbee.inject.binder.Binder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.ContractsBy;
 
 import java.io.Serializable;
@@ -90,8 +89,8 @@ class TestFeatureIndirectAccessOnlyBinds {
 
 	}
 
-	private final Injector injector = Bootstrap.injector(Environment.DEFAULT.with(
-			ContractsBy.class, ContractsBy.SUPER),
+	private final Injector injector = Bootstrap.injector(
+			Bootstrap.DEFAULT_ENV.with(ContractsBy.class, ContractsBy.SUPER),
 			TestFeatureIndirectAccessOnlyBindsModule.class);
 
 	@Test

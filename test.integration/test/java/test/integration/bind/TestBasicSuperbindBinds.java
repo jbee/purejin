@@ -7,7 +7,6 @@ import se.jbee.inject.Supplier;
 import se.jbee.inject.binder.Binder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.ContractsBy;
 
 import java.io.Serializable;
@@ -43,7 +42,7 @@ class TestBasicSuperbindBinds {
 	}
 
 	private final Injector injector = Bootstrap.injector(
-			Environment.DEFAULT.with(ContractsBy.class, ContractsBy.SUPER),
+			Bootstrap.DEFAULT_ENV.with(ContractsBy.class, ContractsBy.SUPER),
 			TestBasicSuperbindBindsModule.class);
 
 	@Test

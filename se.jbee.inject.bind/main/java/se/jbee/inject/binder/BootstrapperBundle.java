@@ -11,8 +11,6 @@ import se.jbee.inject.bind.*;
 /**
  * The default utility {@link Bundle} that is a {@link Bootstrapper} as well so
  * that bindings can be declared nicer.
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
 public abstract class BootstrapperBundle implements Bundle, Bootstrapper {
 

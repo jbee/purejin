@@ -15,20 +15,23 @@ import se.jbee.inject.binder.ServiceLoaderBundles;
 import se.jbee.inject.binder.ServiceLoaderEnvBundles;
 import se.jbee.inject.config.Edition;
 import se.jbee.inject.container.Container;
+import se.jbee.inject.defaults.DefaultEnv;
 import se.jbee.inject.defaults.DefaultsBundle;
 import se.jbee.inject.lang.Reflect;
 
 import java.util.*;
 
+import static se.jbee.inject.bind.Bindings.newBindings;
 import static se.jbee.inject.lang.Utils.arrayOf;
+import static se.jbee.inject.lang.Utils.arrayPrepend;
 
 /**
  * Utility to create an {@link Injector} or {@link Env} context from {@link
  * Bundle}s and {@link Module}s.
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Bootstrap {
+
+	public static final Env DEFAULT_ENV = DefaultEnv.bootstrap();
 
 	/**
 	 * @return The {@link Injector} context purely created from {@link Bundle}s
@@ -48,18 +51,21 @@ public final class Bootstrap {
 	}
 
 	public static Env env(Class<? extends Bundle> root) {
-		return Environment.DEFAULT.complete(injector(root).asEnv());
+		return env(DEFAULT_ENV, root);
 	}
 
 	@SafeVarargs
 	public static Env env(Class<? extends Bundle>... roots) {
-		return Environment.DEFAULT.complete(
-				injector(Environment.DEFAULT, Bindings.newBindings(),
-						roots).asEnv());
+		return env(DEFAULT_ENV, roots);
 	}
 
 	public static Env env(Env env, Class<? extends Bundle> root) {
-		return Environment.DEFAULT.complete(injector(env, root).asEnv());
+		return injector(env, newBindings(), root, DefaultEnv.class).asEnv();
+	}
+
+	@SafeVarargs
+	public static Env env(Env env, Class<? extends Bundle>... roots) {
+		return injector(env, newBindings(), arrayPrepend(DefaultEnv.class, roots)).asEnv();
 	}
 
 	@SafeVarargs
@@ -70,11 +76,11 @@ public final class Bootstrap {
 	}
 
 	public static Injector injector(Class<? extends Bundle> root) {
-		return injector(Environment.DEFAULT, root);
+		return injector(DEFAULT_ENV, root);
 	}
 
 	public static Injector injector(Env env, Class<? extends Bundle> root) {
-		return injector(env, root, Bindings.newBindings());
+		return injector(env, root, newBindings());
 	}
 
 	public static Injector injector(Env env, Class<? extends Bundle> root,
@@ -82,10 +88,10 @@ public final class Bootstrap {
 		return injector(env, bindings, modulariser(env).modularise(root));
 	}
 
-	public static Injector injector(Env env, Bindings bindings,
+	private static Injector injector(Env env, Bindings bindings,
 			Module[] modules) {
 		return Container.injector(
-				env.globalProperty(BindingConsolidation.class) //
+				env.property(BindingConsolidation.class) //
 						.consolidate(env,
 								(bindings.declaredFrom(env, modules))));
 	}
@@ -115,7 +121,7 @@ public final class Bootstrap {
 
 		BuiltinBootstrapper(Env env) {
 			this.env = env;
-			this.edition = env.property(Edition.class, Env.class.getPackage());
+			this.edition = env.property(Edition.class, Edition.FULL);
 		}
 
 		@Override

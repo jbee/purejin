@@ -7,7 +7,6 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.binder.BundleFor;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 
 import static test.integration.util.TestUtils.assertEqualSets;
 
@@ -17,8 +16,8 @@ import static test.integration.util.TestUtils.assertEqualSets;
  * associated {@link se.jbee.inject.bind.Bundle}.
  * <p>
  * This can be used as a classic feature toggle that is configured in the {@link
- * Env} using the {@link Environment#withToggled(Class, Enum[])} helper method
- * so set the selected options.
+ * Env} using the {@link Env#withToggled(Class, Enum[])} helper method so set
+ * the selected options.
  * <p>
  * Secondly this technique of using {@link Enum}s constant to represent {@link
  * se.jbee.inject.bind.Bundle} classes allows to hide those implementations
@@ -93,7 +92,7 @@ class TestBasicFeatureToggleBinds {
 
 	@Test
 	void multipleChoicesArePossible() {
-		Env env = Environment.DEFAULT.withToggled(Text.class, Text.A, Text.D);
+		Env env = Bootstrap.DEFAULT_ENV.withToggled(Text.class, Text.A, Text.D);
 		Injector injector = Bootstrap.injector(env, RootBundle.class);
 		assertEqualSets(new String[] { "A", "D" },
 				injector.resolve(String[].class));

@@ -1,6 +1,5 @@
 package test.integration.bind;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency;
@@ -8,14 +7,19 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.EnvModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.config.ContractsBy;
+import se.jbee.inject.lang.Type;
 
 import java.math.BigInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static se.jbee.inject.Packages.packageOf;
 import static se.jbee.inject.lang.Type.raw;
 
+/**
+ * This example shows how a implementation {@link Class} gets bound to its
+ * different contracts using {@link se.jbee.inject.binder.Binder#contractbind(Type)}
+ * and {@link ContractsBy} strategy.
+ */
 class TestExampleLocalContractsByBinds {
 
 	private static class TestExampleLocalContractsByBindsEnvModule
@@ -24,11 +28,10 @@ class TestExampleLocalContractsByBinds {
 		@Override
 		protected void declare() {
 			// our default
-			bind(ContractsBy.class).to(ContractsBy.PROTECTIVE);
+			bindContractsBy().to(ContractsBy.PROTECTIVE);
 
 			// our exception
-			in(packageOf(String.class)).bind(ContractsBy.class) //
-					.to(ContractsBy.SUPER);
+			bindContractsByOf(String.class).to(ContractsBy.SUPER);
 		}
 	}
 
@@ -56,7 +59,6 @@ class TestExampleLocalContractsByBinds {
 				() -> context.resolve(Number.class));
 	}
 
-	@Disabled("Issue is the package namespacing of Env does not work")
 	@Test
 	void superContractsByAppliedWithinJavaLang() {
 		assertEquals("42", context.resolve(String.class));

@@ -6,7 +6,6 @@ import se.jbee.inject.Hint;
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModuleWith;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.Connector;
 import se.jbee.inject.config.ProducesBy;
 
@@ -114,7 +113,7 @@ class TestFeatureConnectorBinds {
 			acceptedInstances.add(instance);
 			acceptedMethods.add(method);
 		};
-		Env env = Environment.DEFAULT.with(Connector.class, verifier);
+		Env env = Bootstrap.DEFAULT_ENV.with(Connector.class, verifier);
 		Injector context = Bootstrap.injector(env, TestFeatureConnectorBindsModule.class);
 		Bean expected = context.resolve("marked", Bean.class);
 		assertEquals("marked", expected.name);
@@ -126,7 +125,7 @@ class TestFeatureConnectorBinds {
 
 	@Test
 	void interfacesApplyDynamicLinkingToAssignableTypes() {
-		Env env = Environment.DEFAULT.with(Connector.class, (i, as, m) -> {});
+		Env env = Bootstrap.DEFAULT_ENV.with(Connector.class, (i, as, m) -> {});
 		Injector context = Bootstrap.injector(env, TestFeatureConnectorBindsModule.class);
 		assertTrue(context.resolve("marked", Bean.class).cleaned,
 				"clean was not called for marked bean");

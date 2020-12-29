@@ -1,14 +1,14 @@
-import test.example.app.MyEnvSetupBundle;
-import test.example.app.MyRootBundle;
-import test.example.app.SupportAnnotationPattern;
+import test.example1.MyEnvSetupBundle;
+import test.example1.MyRootBundle;
+import test.example1.SupportAnnotationPattern;
 
 /**
  * Contains an example application used in tests to test the {@link
  * java.util.ServiceLoader} based features.
  */
-@SuppressWarnings("Java9RedundantRequiresStatement") module test.example.app {
+@SuppressWarnings("Java9RedundantRequiresStatement") module test.examples {
 
-  exports test.example.app;
+  exports test.example1;
 
   requires transitive se.jbee.inject;
 

@@ -1,7 +1,7 @@
 package se.jbee.inject;
 
-import java.lang.annotation.*;
 import java.lang.annotation.Target;
+import java.lang.annotation.*;
 import java.util.ServiceLoader;
 
 import static java.lang.annotation.ElementType.TYPE;
@@ -14,7 +14,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *
  * <h2>Usages</h2>
  *
- * <h3>Providing Annotation Effects via ServiceLoader</h3>
+ * <h3>Providing Annotation Patterns via ServiceLoader</h3>
  * <p>
  * Annotate a {@code se.jbee.inject.bind.ModuleWith} implementation that should
  * load via {@link ServiceLoader} to implement the effects of an type level
@@ -51,13 +51,10 @@ public @interface Extends {
 	Class<?> value();
 
 	/**
-	 * @return the provided {@link Class}'s {@link Package} is the root package
-	 *         to which the extension is limited. It will be effective in this
-	 *         package and all its sub-packages but not in any other package.
-	 *
-	 *         The default value of {@link Object} indicates that the extension
-	 *         is not limited to any specific package and should apply
-	 *         everywhere.
+	 * @return if true the declarations made in the annotated module are limited
+	 * to the package the declaring class is defined in (including is
+	 * sub-packages). Not that this only has an effect on the directly annotated
+	 * class. It is not propagated to bundles installed by it.
 	 */
-	Class<?> in() default Object.class;
+	boolean local() default false;
 }

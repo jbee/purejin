@@ -63,7 +63,7 @@ public final class Container implements Injector, Env {
 	}
 
 	@Override
-	public <T> T property(Name qualifier, Type<T> property, Package ns) {
+	public <T> T property(Name qualifier, Type<T> property, Class<?> ns) {
 		try {
 			Dependency<T> global = dependency(instance(qualifier, property));
 			if (ns == null)

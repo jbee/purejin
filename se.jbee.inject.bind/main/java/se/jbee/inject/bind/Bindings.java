@@ -5,8 +5,8 @@
  */
 package se.jbee.inject.bind;
 
-import se.jbee.inject.Annotated.Enhancer;
 import se.jbee.inject.*;
+import se.jbee.inject.Annotated.Enhancer;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -47,8 +47,7 @@ public final class Bindings {
 	public <T> void add(Env env, Binding<T> complete) {
 		if (!complete.isComplete())
 			throw InconsistentBinding.addingIncomplete(complete);
-		Enhancer enhancer = env.property(Enhancer.class,
-				complete.source.ident.getPackage());
+		Enhancer enhancer = env.property(Enhancer.class, Annotated.SOURCE);
 		list.add(complete.annotatedBy(enhancer.apply(complete.annotations)));
 	}
 
@@ -59,10 +58,9 @@ public final class Bindings {
 	public <V extends Descriptor> void addExpanded(Env env, Binding<?> binding, V value) {
 		@SuppressWarnings("unchecked")
 		Class<V> type = (Class<V>) value.getClass();
-		Package ns = binding.source.ident.getPackage();
 		@SuppressWarnings("unchecked")
 		ValueBinder<V> binder = env.property(
-				raw(ValueBinder.class).parameterized(classType(type)), ns);
+				raw(ValueBinder.class).parameterized(classType(type)));
 		if (binder == null)
 			throw InconsistentBinding.undefinedValueBinderType(binding, type);
 		binder.expand(env, value, binding, this);
@@ -86,9 +84,9 @@ public final class Bindings {
 	}
 
 	private boolean addsAnnotatedType(Env env, Class<?> annotated, Annotation annotation) {
-		ModuleWith<Class<?>> then = env.property(
-				named(annotation.annotationType()),
-				ModuleWith.TYPE_ANNOTATION, annotated.getPackage(), null);
+		ModuleWith<Class<?>> then = env.in(annotated).property(
+				named(annotation.annotationType()).toString(),
+				ModuleWith.TYPE_ANNOTATION, null);
 		if (then == null)
 			return false;
 		then.declare(this, env, annotated);
@@ -96,10 +94,9 @@ public final class Bindings {
 	}
 
 	private boolean addsAnnotatedMethod(Env env, Method annotated, Annotation annotation) {
-		ModuleWith<Method> then = env.property(
-				named(annotation.annotationType()),
-				ModuleWith.METHOD_ANNOTATION,
-				annotated.getDeclaringClass().getPackage(), null);
+		ModuleWith<Method> then = env.in(annotated.getDeclaringClass()).property(
+				named(annotation.annotationType()).toString(),
+				ModuleWith.METHOD_ANNOTATION, null);
 		if (then == null)
 			return false;
 		then.declare(this, env, annotated);

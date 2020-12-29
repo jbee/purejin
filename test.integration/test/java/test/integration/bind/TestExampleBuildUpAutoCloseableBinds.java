@@ -8,7 +8,6 @@ import se.jbee.inject.binder.Binder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BinderModuleWith;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.lang.Type;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -136,8 +135,7 @@ class TestExampleBuildUpAutoCloseableBinds {
 
 	@Test
 	void buildUpCanMakeUseOfParametersUsingArgumentModules() {
-		Env env = Environment.DEFAULT.with(Integer.class,
-				42); // setup some parameter
+		Env env = Bootstrap.DEFAULT_ENV.with(Integer.class,	42); // setup some parameter
 		Injector injector = Bootstrap.injector(env,
 				TestExampleBuildUpAutoCloseableBindsModuleWith.class);
 

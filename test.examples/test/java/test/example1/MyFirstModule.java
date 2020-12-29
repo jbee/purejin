@@ -1,4 +1,4 @@
-package test.example.app;
+package test.example1;
 
 import se.jbee.inject.binder.BinderModuleWith;
 

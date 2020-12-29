@@ -17,13 +17,13 @@ import se.jbee.inject.lang.Type;
 import java.lang.reflect.Constructor;
 
 import static se.jbee.inject.Instance.anyOf;
+import static se.jbee.inject.Name.named;
 import static se.jbee.inject.bind.BindingType.*;
 import static se.jbee.inject.bind.Bindings.supplyConstant;
 import static se.jbee.inject.bind.Bindings.supplyScopedConstant;
 import static se.jbee.inject.binder.Supply.*;
 import static se.jbee.inject.lang.Type.raw;
-import static se.jbee.inject.lang.Utils.isClassBanal;
-import static se.jbee.inject.lang.Utils.isClassConstructable;
+import static se.jbee.inject.lang.Utils.*;
 
 /**
  * Utility with default {@link ValueBinder}s.
@@ -34,7 +34,7 @@ public final class DefaultValueBinders {
 	public static final ValueBinder.Completion<Descriptor.ArrayDescriptor> ARRAY = DefaultValueBinders::bindArrayElements;
 	public static final ValueBinder.Completion<Constructs<?>> CONSTRUCTS = DefaultValueBinders::bindConstruction;
 	public static final ValueBinder.Completion<Produces<?>> PRODUCES = DefaultValueBinders::bindProduction;
-	public static final ValueBinder.Completion<Accesses<?>> SHARES = DefaultValueBinders::bindAccess;
+	public static final ValueBinder.Completion<Accesses<?>> ACCESSES = DefaultValueBinders::bindAccess;
 	public static final ValueBinder<Instance<?>> REFERENCE = DefaultValueBinders::bindReference;
 	public static final ValueBinder<Instance<?>> REFERENCE_PREFER_CONSTANTS = DefaultValueBinders::bindReferencePreferConstants;
 	public static final ValueBinder<Constant<?>> CONSTANT = DefaultValueBinders::bindConstant;
@@ -57,7 +57,8 @@ public final class DefaultValueBinders {
 			return;
 		}
 		Class<T> impl = item.type().rawType;
-		ContractsBy contractsBy = env.property(ContractsBy.class, impl.getPackage());
+		ContractsBy contractsBy = env.property(named(impl).toString(),
+				ContractsBy.class, env.property(ContractsBy.class));
 		if (contractsBy.isContract(impl, impl))
 			dest.add(env, item);
 		for (Type<? super T> supertype : item.type().supertypes())
@@ -121,7 +122,10 @@ public final class DefaultValueBinders {
 		Class<?> impl = ref.value.getClass();
 		// implicitly bind to the exact type of the constant
 		// should that differ from the binding type
-		if (ref.autoBindExactType && item.source.declarationType == DeclarationType.EXPLICIT && item.type().rawType != impl) {
+		if (ref.autoBindExactType
+				&& item.source.declarationType == DeclarationType.EXPLICIT
+				&& item.type().rawType != impl
+				&& !isLambda(ref.value)) {
 			@SuppressWarnings("unchecked")
 			Class<T> type = (Class<T>) ref.value.getClass();
 			dest.addExpanded(env,
@@ -193,11 +197,11 @@ public final class DefaultValueBinders {
 
 	private static <T> void bindToConstructsBy(Env env, Class<? extends T> ref,
 			Binding<T> item, Bindings dest) {
-		Constructor<?> c = env.property(ConstructsBy.class,
-				item.source.pkg()).reflect(ref.getDeclaredConstructors());
+		Constructor<?> c = env.property(ConstructsBy.class)
+				.reflect(ref.getDeclaredConstructors());
 		if (c != null)
 			dest.addExpanded(env, item,
 					Constructs.constructs(raw(c.getDeclaringClass()), c,
-							env.property(HintsBy.class, c.getDeclaringClass().getPackage())));
+							env.property(HintsBy.class)));
 	}
 }

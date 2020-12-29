@@ -10,8 +10,6 @@ import se.jbee.inject.config.ScopesBy;
 
 /**
  * The data and behavior used to create binds.
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
 public final class Bind {
 
@@ -26,7 +24,7 @@ public final class Bind {
 
 	private Bind(Env env, Bindings bindings, Source source, Name scope,
 			Target target) {
-		this.env = env;
+		this.env = source == null || env == null ? env : env.in(source.ident);
 		this.bindings = bindings;
 		this.source = source;
 		this.scope = scope;
@@ -95,7 +93,8 @@ public final class Bind {
 
 	private <T> Name effectiveScope(Locator<T> locator) {
 		Name effectiveScope = scope.equalTo(Scope.mirror) //
-				? env.property(ScopesBy.class, source.pkg()).reflect(locator.type().rawType)
+				? env.property(ScopesBy.class)
+					.reflect(locator.type().rawType)
 				: scope;
 		return effectiveScope.equalTo(Scope.auto)
 			? Scope.application

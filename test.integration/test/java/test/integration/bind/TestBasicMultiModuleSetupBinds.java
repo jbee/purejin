@@ -9,7 +9,6 @@ import se.jbee.inject.bind.Module;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -51,7 +50,7 @@ class TestBasicMultiModuleSetupBinds {
 
 	@Test
 	void bindingSourceReflectsTheOrigin() {
-		Injector context = Bootstrap.injector(Environment.DEFAULT //
+		Injector context = Bootstrap.injector(Bootstrap.DEFAULT_ENV //
 						.with(Env.GP_BIND_BINDINGS, true),
 				TestBasicMultiModuleSetupBindsBundle.class);
 		Binding<?>[] bindings = context.resolve(Binding[].class);

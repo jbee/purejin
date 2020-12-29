@@ -11,7 +11,6 @@ import se.jbee.inject.bind.ModuleWith;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BinderModuleWith;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.ContractsBy;
 
 import java.io.Serializable;
@@ -26,6 +25,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.jupiter.api.Assertions.*;
+import static se.jbee.inject.Name.named;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
@@ -164,11 +164,11 @@ class TestExampleAnnotationGuidedBindingBinds {
 		}
 	}
 
-	private final Env env = Environment.DEFAULT //
+	private final Env env = Bootstrap.DEFAULT_ENV //
 			.with(ContractsBy.class, ContractsBy.OPTIMISTIC)
-			.withTypePattern(Service.class, new ServiceAnnotationPattern())
-			.withTypePattern(Contract.class, new ContractAnnotationPattern())
-			.withMethodPattern(Provides.class, new ProvidesAnnotationPattern());
+			.with(named(Service.class), ModuleWith.TYPE_ANNOTATION, new ServiceAnnotationPattern())
+			.with(named(Contract.class), ModuleWith.TYPE_ANNOTATION, new ContractAnnotationPattern())
+			.with(named(Provides.class), ModuleWith.METHOD_ANNOTATION, new ProvidesAnnotationPattern());
 
 	private final Injector context = Bootstrap.injector(env,
 			TestExampleAnnotationGuidedBindingBindsModule.class);

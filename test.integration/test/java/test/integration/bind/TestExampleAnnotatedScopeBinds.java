@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import se.jbee.inject.*;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.ScopesBy;
 import test.integration.util.Scoped;
 
@@ -29,8 +28,7 @@ class TestExampleAnnotatedScopeBinds {
 
 		@Override
 		public Env configure(Env env) {
-			return Environment.override(env) //
-					.with(ScopesBy.class, //
+			return env.with(ScopesBy.class, //
 							ScopesBy.annotatedWith(Scoped.class, Scoped::value));
 		}
 

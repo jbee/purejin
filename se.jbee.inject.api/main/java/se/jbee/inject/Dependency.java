@@ -16,7 +16,6 @@ import java.util.Iterator;
 
 import static java.util.Arrays.asList;
 import static se.jbee.inject.Instance.defaultInstanceOf;
-import static se.jbee.inject.Packages.packageAndSubPackagesOf;
 import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.lang.Utils.*;
 
@@ -173,16 +172,6 @@ public final class Dependency<T>
 	public <I> Dependency<T> injectingInto(Instance<I> target)
 			throws DependencyCycle, UnstableDependency {
 		return injectingInto(new Locator<>(target), ScopeLifeCycle.ignore);
-	}
-
-	public Dependency<T> injectingInto(Package ns) {
-		//FIXME the issue is that ANY targets Object which then means the binding is only visible in java.lang
-		Target target = Target.ANY.in(packageAndSubPackagesOf(ns));
-		Injection injection = new Injection(Instance.ANY,
-				new Locator<>(Instance.ANY, target), ScopeLifeCycle.ignore);
-		if (hierarchy.length == 0)
-			return new Dependency<>(at, instance, injection);
-		return new Dependency<>(at, instance, arrayAppend(hierarchy, injection));
 	}
 
 	public Dependency<T> injectingInto(Locator<?> target,

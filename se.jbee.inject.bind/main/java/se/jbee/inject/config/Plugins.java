@@ -1,6 +1,9 @@
 package se.jbee.inject.config;
 
-import se.jbee.inject.*;
+import se.jbee.inject.ContextAware;
+import se.jbee.inject.Dependency;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Name;
 
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.lang.Type.raw;
