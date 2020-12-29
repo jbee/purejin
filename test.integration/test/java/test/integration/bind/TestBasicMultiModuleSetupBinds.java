@@ -51,7 +51,7 @@ class TestBasicMultiModuleSetupBinds {
 	@Test
 	void bindingSourceReflectsTheOrigin() {
 		Injector context = Bootstrap.injector(Bootstrap.DEFAULT_ENV //
-						.with(Env.GP_BIND_BINDINGS, true),
+						.with(Env.BIND_BINDINGS, true),
 				TestBasicMultiModuleSetupBindsBundle.class);
 		Binding<?>[] bindings = context.resolve(Binding[].class);
 

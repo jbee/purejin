@@ -50,11 +50,4 @@ public @interface Extends {
 	 */
 	Class<?> value();
 
-	/**
-	 * @return if true the declarations made in the annotated module are limited
-	 * to the package the declaring class is defined in (including is
-	 * sub-packages). Not that this only has an effect on the directly annotated
-	 * class. It is not propagated to bundles installed by it.
-	 */
-	boolean local() default false;
 }

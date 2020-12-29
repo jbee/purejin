@@ -37,7 +37,7 @@ public abstract class BinderModuleWith<T> extends InitializedBinder
 
 	@Override
 	public void declare(Bindings bindings, Env env, T property) {
-		__init__(configure(env), bindings);
+		__init__(configure(env.withIsolate()), bindings);
 		declare(property);
 	}
 

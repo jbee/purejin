@@ -37,13 +37,7 @@ public abstract class InitializedBinder extends RootBinder {
 
 	protected final void __init__(Env env, Bindings bindings) {
 		InconsistentBinding.nonnullThrowsReentranceException(initialized);
-		Bind into = bind.into(env, bindings);
-		if (getClass().isAnnotationPresent(Extends.class)) {
-			Extends e = getClass().getAnnotation(Extends.class);
-			if (e.local())
-				into = into.with((into.target.inPackageAndSubPackagesOf(getClass())));
-		}
-		this.bind = init(into);
+		this.bind = init(bind.into(env, bindings));
 		initialized = true;
 	}
 
