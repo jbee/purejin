@@ -1,8 +1,8 @@
 package se.jbee.inject.binder;
 
 import se.jbee.inject.Annotated;
-import se.jbee.inject.Hint;
 import se.jbee.inject.Descriptor;
+import se.jbee.inject.Hint;
 import se.jbee.inject.InconsistentDeclaration;
 import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.lang.Type;

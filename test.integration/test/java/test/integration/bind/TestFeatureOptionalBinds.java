@@ -5,7 +5,6 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.ContractsBy;
 import se.jbee.inject.defaults.DefaultFeature;
 
@@ -33,7 +32,7 @@ class TestFeatureOptionalBinds {
 	}
 
 	private final Injector context = Bootstrap.injector(
-			Environment.DEFAULT.with(ContractsBy.class, ContractsBy.SUPER),
+			Bootstrap.DEFAULT_ENV.with(ContractsBy.class, ContractsBy.SUPER),
 			TestOptionalBindsModule.class);
 
 	@Test

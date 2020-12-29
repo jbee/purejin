@@ -8,7 +8,6 @@ import se.jbee.inject.action.Action;
 import se.jbee.inject.action.ActionModule;
 import se.jbee.inject.binder.Binder;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.ProducesBy;
 
 import java.lang.annotation.Retention;
@@ -90,7 +89,7 @@ class TestExampleAnnotatedActionsBinds {
 
 	@Test
 	void annotatedMethodIsBoundAsActionWithGlobalSelector() {
-		Env env = Environment.DEFAULT.with(Binder.CONNECT_QUALIFIER,
+		Env env = Bootstrap.DEFAULT_ENV.with(Binder.CONNECT_QUALIFIER,
 				ProducesBy.class, OPTIMISTIC.annotatedWith(Marker.class));
 		annotatedMethodIsBoundAsAction(Bootstrap.injector(env,
 				TestExampleAnnotatedActionsBindsModule2.class));
@@ -98,7 +97,7 @@ class TestExampleAnnotatedActionsBinds {
 
 	@Test
 	void notAnnotatedMethodIsNotBoundAsActionWithGlobalSelector() {
-		Env env = Environment.DEFAULT.with(Binder.CONNECT_QUALIFIER,
+		Env env = Bootstrap.DEFAULT_ENV.with(Binder.CONNECT_QUALIFIER,
 				ProducesBy.class, OPTIMISTIC.annotatedWith(Marker.class));
 		notAnnotatedMethodIsNotBoundAsAction(Bootstrap.injector(env,
 				TestExampleAnnotatedActionsBindsModule2.class));

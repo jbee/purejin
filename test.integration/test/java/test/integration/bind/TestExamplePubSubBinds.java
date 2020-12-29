@@ -10,7 +10,6 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BinderModuleWith;
 import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.ContractsBy;
 
 import java.util.ArrayList;
@@ -159,7 +158,7 @@ class TestExamplePubSubBinds {
 	private static void assertSubscribedToPublisher(
 			Class<? extends Bundle> bundle, int initiallyExpectedSubscribers) {
 		PublisherImpl pub = new PublisherImpl();
-		Env env = Environment.DEFAULT
+		Env env = Bootstrap.DEFAULT_ENV
 				.with(Publisher.class, pub)
 				.with(ContractsBy.class, ContractsBy.OPTIMISTIC);
 		Injector context = Bootstrap.injector(env, bundle);

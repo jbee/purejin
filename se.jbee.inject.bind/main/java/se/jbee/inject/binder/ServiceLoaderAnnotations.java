@@ -24,7 +24,7 @@ import static se.jbee.inject.lang.Type.raw;
  *
  * @since 8.1
  */
-public class ServiceLoaderAnnotations extends BinderModule {
+public class ServiceLoaderAnnotations extends EnvModule {
 
 	@Override
 	protected void declare() {

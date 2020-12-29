@@ -5,7 +5,6 @@ import se.jbee.inject.*;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.Config;
 import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.config.NamesBy;
@@ -118,7 +117,7 @@ class TestExampleConfigPropertyAnnotationBinds {
 	 * {@link Supplier} we have bound in {@link Solution1}.
 	 */
 	private static Injector bootstrapSolution1() {
-		return Bootstrap.injector(Environment.DEFAULT.with(HintsBy.class,
+		return Bootstrap.injector(Bootstrap.DEFAULT_ENV.with(HintsBy.class,
 				HintsBy.instanceReference(
 						NamesBy.annotatedWith(ConfigProperty.class,
 								ConfigProperty::value, true))),
@@ -137,7 +136,7 @@ class TestExampleConfigPropertyAnnotationBinds {
 	 * Therefore more sophisticated targeting would not work as expected.
 	 */
 	private static Injector bootstrapSolution2() {
-		return Bootstrap.injector(Environment.DEFAULT.with(HintsBy.class,
+		return Bootstrap.injector(Bootstrap.DEFAULT_ENV.with(HintsBy.class,
 				((param, context) -> {
 					if (!param.isAnnotationPresent(ConfigProperty.class))
 						return null;

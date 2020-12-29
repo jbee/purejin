@@ -8,7 +8,6 @@ import se.jbee.inject.bind.Toggled;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.Edition;
 import se.jbee.inject.config.Feature;
 
@@ -129,7 +128,7 @@ class TestFeatureEditionFeatureBinds {
 
 	private static void assertEditionInstalls(Edition edition,
 			Integer... expected) {
-		Env env = Environment.DEFAULT.with(Edition.class, edition);
+		Env env = Bootstrap.DEFAULT_ENV.with(Edition.class, edition);
 		Injector injector = Bootstrap.injector(env, RootBundle.class);
 		assertEqualSets(expected, injector.resolve(Integer[].class));
 	}

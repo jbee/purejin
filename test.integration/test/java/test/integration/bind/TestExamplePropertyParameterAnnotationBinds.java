@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import se.jbee.inject.*;
 import se.jbee.inject.binder.BinderModuleWith;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.config.NamesBy;
 
@@ -33,8 +32,8 @@ import static se.jbee.inject.lang.Type.raw;
  * In this example the custom {@link HintsBy} strategy is only overridden for
  * the scope of the declaring {@link BinderModuleWith}. This could equally be
  * applied "globally" by setting it in the {@link Env} using {@link
- * Environment#with(Class, Object)} before the {@link Injector} is bootstrapped
- * from the {@link Env}.
+ * Env#with(Class, Object)} before the {@link Injector} is bootstrapped from the
+ * {@link Env}.
  */
 class TestExamplePropertyParameterAnnotationBinds {
 
@@ -58,7 +57,7 @@ class TestExamplePropertyParameterAnnotationBinds {
 		 */
 		@Override
 		protected Env configure(Env env) {
-			return Environment.override(env).with(HintsBy.class, HintsBy.instanceReference(
+			return env.with(HintsBy.class, HintsBy.instanceReference(
 					NamesBy.annotatedWith(Property.class, Property::value, true)));
 		}
 
@@ -100,7 +99,7 @@ class TestExamplePropertyParameterAnnotationBinds {
 		Properties properties = new Properties();
 		properties.put("foo", "property1");
 		properties.put("bar", "property2");
-		Env env = Environment.DEFAULT.with(Properties.class, properties);
+		Env env = Bootstrap.DEFAULT_ENV.with(Properties.class, properties);
 		Injector context = Bootstrap.injector(env,
 				TestExamplePropertyParameterAnnotationBindsModule.class);
 		ExampleBean bean = context.resolve(ExampleBean.class);

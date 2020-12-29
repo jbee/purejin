@@ -16,7 +16,6 @@ import java.util.Iterator;
 
 import static java.util.Arrays.asList;
 import static se.jbee.inject.Instance.defaultInstanceOf;
-import static se.jbee.inject.Packages.packageAndSubPackagesOf;
 import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.lang.Utils.*;
 

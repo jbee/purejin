@@ -2,10 +2,10 @@ package se.jbee.inject.convert;
 
 import se.jbee.inject.Converter;
 import se.jbee.inject.binder.BinderModule;
+import se.jbee.inject.config.AccessesBy;
 import se.jbee.inject.config.NamesBy;
 import se.jbee.inject.config.ProducesBy;
 import se.jbee.inject.config.ScopesBy;
-import se.jbee.inject.config.AccessesBy;
 import se.jbee.inject.lang.Type;
 
 import static se.jbee.inject.lang.Type.classType;

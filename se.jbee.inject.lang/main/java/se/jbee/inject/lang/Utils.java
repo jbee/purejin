@@ -16,7 +16,8 @@ import static java.lang.System.arraycopy;
 import static java.lang.reflect.Array.newInstance;
 import static java.lang.reflect.Modifier.*;
 import static java.util.Arrays.copyOf;
-import static se.jbee.inject.lang.Type.*;
+import static se.jbee.inject.lang.Type.classType;
+import static se.jbee.inject.lang.Type.parameterTypes;
 
 /**
  * Language level utility methods for the library.
@@ -293,6 +294,10 @@ public final class Utils {
 			&& cls.getDeclaredConstructors().length == 1
 			&& cls.getDeclaredConstructors()[0].getParameterCount() == 0
 			&& isClassConceptStateless(cls);
+	}
+
+	public static boolean isLambda(Object obj) {
+		return obj != null && obj.getClass().getName().contains("$$Lambda$");
 	}
 
 	/* Members */

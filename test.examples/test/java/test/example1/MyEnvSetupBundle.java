@@ -2,10 +2,10 @@ package test.example1;
 
 import se.jbee.inject.Env;
 import se.jbee.inject.Extends;
-import se.jbee.inject.binder.BinderModule;
+import se.jbee.inject.binder.EnvModule;
 
 @Extends(Env.class)
-public class MyEnvSetupBundle extends BinderModule {
+public class MyEnvSetupBundle extends EnvModule {
 
 	@Override
 	protected void declare() {

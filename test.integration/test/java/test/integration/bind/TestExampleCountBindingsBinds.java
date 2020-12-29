@@ -10,9 +10,9 @@ import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.bind.ValueBinder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static se.jbee.inject.bind.ValueBinder.valueBinderTypeOf;
 
 /**
  * An example of how to use {@link ValueBinder}s to customize the and binding
@@ -84,7 +84,7 @@ class TestExampleCountBindingsBinds {
 
 	private static Injector injectorWithEnv(Class<? extends Bundle> root,
 			ValueBinder<Binding<?>> binder) {
-		return Bootstrap.injector(
-				Environment.DEFAULT.withBinder(Binding.class, binder), root);
+		return Bootstrap.injector(Bootstrap.DEFAULT_ENV.with(
+				valueBinderTypeOf(Binding.class), binder), root);
 	}
 }

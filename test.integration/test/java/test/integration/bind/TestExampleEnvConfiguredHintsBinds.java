@@ -7,7 +7,6 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BinderModuleWith;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 
 import java.util.Properties;
 
@@ -61,7 +60,7 @@ class TestExampleEnvConfiguredHintsBinds {
 		Properties props = new Properties();
 		props.put("x", "abc");
 		props.put("y", 12);
-		Env env = Environment.DEFAULT.with(Properties.class, props);
+		Env env = Bootstrap.DEFAULT_ENV.with(Properties.class, props);
 		Injector injector = Bootstrap.injector(env, Example1Module1.class);
 		MyClass obj = injector.resolve(MyClass.class);
 		assertEquals(12, obj.twelve);

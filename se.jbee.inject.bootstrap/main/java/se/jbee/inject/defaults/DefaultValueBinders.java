@@ -23,8 +23,7 @@ import static se.jbee.inject.bind.Bindings.supplyConstant;
 import static se.jbee.inject.bind.Bindings.supplyScopedConstant;
 import static se.jbee.inject.binder.Supply.*;
 import static se.jbee.inject.lang.Type.raw;
-import static se.jbee.inject.lang.Utils.isClassBanal;
-import static se.jbee.inject.lang.Utils.isClassConstructable;
+import static se.jbee.inject.lang.Utils.*;
 
 /**
  * Utility with default {@link ValueBinder}s.
@@ -35,7 +34,7 @@ public final class DefaultValueBinders {
 	public static final ValueBinder.Completion<Descriptor.ArrayDescriptor> ARRAY = DefaultValueBinders::bindArrayElements;
 	public static final ValueBinder.Completion<Constructs<?>> CONSTRUCTS = DefaultValueBinders::bindConstruction;
 	public static final ValueBinder.Completion<Produces<?>> PRODUCES = DefaultValueBinders::bindProduction;
-	public static final ValueBinder.Completion<Accesses<?>> SHARES = DefaultValueBinders::bindAccess;
+	public static final ValueBinder.Completion<Accesses<?>> ACCESSES = DefaultValueBinders::bindAccess;
 	public static final ValueBinder<Instance<?>> REFERENCE = DefaultValueBinders::bindReference;
 	public static final ValueBinder<Instance<?>> REFERENCE_PREFER_CONSTANTS = DefaultValueBinders::bindReferencePreferConstants;
 	public static final ValueBinder<Constant<?>> CONSTANT = DefaultValueBinders::bindConstant;
@@ -123,7 +122,10 @@ public final class DefaultValueBinders {
 		Class<?> impl = ref.value.getClass();
 		// implicitly bind to the exact type of the constant
 		// should that differ from the binding type
-		if (ref.autoBindExactType && item.source.declarationType == DeclarationType.EXPLICIT && item.type().rawType != impl) {
+		if (ref.autoBindExactType
+				&& item.source.declarationType == DeclarationType.EXPLICIT
+				&& item.type().rawType != impl
+				&& !isLambda(ref.value)) {
 			@SuppressWarnings("unchecked")
 			Class<T> type = (Class<T>) ref.value.getClass();
 			dest.addExpanded(env,

@@ -8,7 +8,6 @@ import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.AccessesBy;
 
 import java.lang.annotation.*;
@@ -99,7 +98,7 @@ class TestFeatureAnnotatedWithBinds {
 	}
 
 	private final Injector injector = Bootstrap.injector(
-			Environment.DEFAULT.with(Annotated.Enhancer.class,
+			Bootstrap.DEFAULT_ENV.with(Annotated.Enhancer.class,
 					TestFeatureAnnotatedWithBinds::advancedAnnotations),
 			TestFeatureAnnotatedWithBindsModule.class);
 

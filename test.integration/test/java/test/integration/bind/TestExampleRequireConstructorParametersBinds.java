@@ -14,7 +14,6 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Constructs;
 import se.jbee.inject.binder.Supply;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.defaults.DefaultValueBinders;
 import se.jbee.inject.lang.Type;
 
@@ -22,6 +21,7 @@ import java.lang.reflect.Constructor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static se.jbee.inject.bind.ValueBinder.valueBinderTypeOf;
 
 /**
  * An example of how to use {@link ValueBinder}s to customize the and binding
@@ -90,9 +90,8 @@ class TestExampleRequireConstructorParametersBinds {
 		Class<TestExampleRequireConstructorParametersBindsModule> root = TestExampleRequireConstructorParametersBindsModule.class;
 		ValueBinder<Constructs<?>> required = new RequiredConstructorParametersBinder();
 		Exception ex = assertThrows(ResourceResolutionFailed.class,
-				() -> Bootstrap.injector(
-						Environment.DEFAULT.withBinder(Constructs.class, required),
-						root));
+				() -> Bootstrap.injector(Bootstrap.DEFAULT_ENV.with(
+						valueBinderTypeOf(Constructs.class), required), root));
 		assertEquals(
 				"No resource for type(s)\n" + "\trequired: [java.lang.Float]",
 				ex.getMessage());

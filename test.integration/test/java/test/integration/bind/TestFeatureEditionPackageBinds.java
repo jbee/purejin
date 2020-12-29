@@ -8,7 +8,6 @@ import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.Edition;
 import se.jbee.inject.defaults.DefaultsBundle;
 
@@ -42,7 +41,7 @@ class TestFeatureEditionPackageBinds {
 		assertEquals(42, injector.resolve(int.class).intValue());
 
 		// an edition without the module in this test
-		Env env = Environment.DEFAULT.with(Edition.class,
+		Env env = Bootstrap.DEFAULT_ENV.with(Edition.class,
 				Edition.includes(subPackagesOf(TestFeatureEditionPackageBinds.class) //
 						.and(packageOf(DefaultsBundle.class)
 						.and(packageOf(Bootstrap.class)))));
@@ -52,7 +51,7 @@ class TestFeatureEditionPackageBinds {
 				"Should have thrown exception since EditionPackageBindsModule should not have been installed");
 
 		// an edition including the module in this test
-		env = Environment.DEFAULT.with(Edition.class, Edition.includes(
+		env = Bootstrap.DEFAULT_ENV.with(Edition.class, Edition.includes(
 				packageAndSubPackagesOf(TestFeatureEditionPackageBinds.class) //
 						.and(packageOf(DefaultsBundle.class))
 						.and(packageOf(Bootstrap.class))));

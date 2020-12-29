@@ -1,7 +1,10 @@
 package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
-import se.jbee.inject.*;
+import se.jbee.inject.Env;
+import se.jbee.inject.Injector;
+import se.jbee.inject.Scope;
+import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.binder.Binder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -23,22 +26,21 @@ import static test.integration.util.TestUtils.assertEqualSets;
  * java.lang.reflect.Field} in a (semi-) automatic way.
  * <p>
  * The user configures the selection process using strategy interfaces {@link
- * se.jbee.inject.config.ConstructsBy}, {@link ProducesBy}, {@link AccessesBy} to
- * programmatically describe how to find and select the members to use and bind.
- * The created bindings can be further customised using the {@link
+ * se.jbee.inject.config.ConstructsBy}, {@link ProducesBy}, {@link AccessesBy}
+ * to programmatically describe how to find and select the members to use and
+ * bind. The created bindings can be further customised using the {@link
  * se.jbee.inject.config.ScopesBy} strategy to decide the {@link
  * se.jbee.inject.Scope} used, and {@link se.jbee.inject.config.HintsBy} to
  * decides what arguments to use for {@link java.lang.reflect.Parameter}s of
  * bound {@link java.lang.reflect.Executable}s.
  * <p>
  * All this strategies are "globally" bound in the {@link se.jbee.inject.Env}
- * simply using {@link se.jbee.inject.bootstrap.Environment#with(Class,
- * Object)}. These settings can be adjusted, overridden or replaced per {@link
- * BinderModule} by overriding it {@link BinderModule#configure(Env)} method.
- * Last but not least the strategies can be set individually just for the {@link
- * Binder.ScopedBinder#autobind()} call using its {@link
- * se.jbee.inject.binder.Binder.AutoBinder#produceBy(ProducesBy)} (and similar)
- * methods.
+ * simply using {@link Env#with(Class, Object)}. These settings can be adjusted,
+ * overridden or replaced per {@link BinderModule} by overriding it {@link
+ * BinderModule#configure(Env)} method. Last but not least the strategies can be
+ * set individually just for the {@link Binder.ScopedBinder#autobind()} call
+ * using its {@link se.jbee.inject.binder.Binder.AutoBinder#produceBy(ProducesBy)}
+ * (and similar) methods.
  */
 class TestBasicAutoBinds {
 

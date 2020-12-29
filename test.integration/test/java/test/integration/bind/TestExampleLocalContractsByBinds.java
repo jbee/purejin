@@ -13,7 +13,6 @@ import java.math.BigInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static se.jbee.inject.Packages.packageOf;
 import static se.jbee.inject.lang.Type.raw;
 
 /**

@@ -5,8 +5,8 @@
  */
 package se.jbee.inject.bind;
 
-import se.jbee.inject.Annotated.Enhancer;
 import se.jbee.inject.*;
+import se.jbee.inject.Annotated.Enhancer;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -47,7 +47,7 @@ public final class Bindings {
 	public <T> void add(Env env, Binding<T> complete) {
 		if (!complete.isComplete())
 			throw InconsistentBinding.addingIncomplete(complete);
-		Enhancer enhancer = env.property(Enhancer.class);
+		Enhancer enhancer = env.property(Enhancer.class, Annotated.SOURCE);
 		list.add(complete.annotatedBy(enhancer.apply(complete.annotations)));
 	}
 

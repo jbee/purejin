@@ -9,7 +9,6 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.config.ContractsBy;
 import se.jbee.inject.defaults.DefaultScopes;
@@ -180,8 +179,7 @@ class TestFeatureBootstrapper {
 
 		@Override
 		public Env configure(Env env) {
-			return Environment.override(env) //
-					.with(ConstructsBy.class,
+			return env.with(ConstructsBy.class,
 							OPTIMISTIC.annotatedWith(ConstructFrom.class));
 		}
 
@@ -248,7 +246,7 @@ class TestFeatureBootstrapper {
 	@Test
 	void bindingsAreReplacedByMoreQualifiedOnes() {
 		Injector context = Bootstrap.injector(
-				Environment.DEFAULT.with(ContractsBy.class, ContractsBy.OPTIMISTIC),
+				Bootstrap.DEFAULT_ENV.with(ContractsBy.class, ContractsBy.OPTIMISTIC),
 				ReplacingBindsModule.class);
 		assertEquals(6, context.resolve(Number.class));
 		Resource<?>[] rs = context.resolve(raw(Resource.class).parameterized(

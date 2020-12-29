@@ -301,7 +301,7 @@ public class Binder {
 	}
 
 	public <T> PluginBinder<T> plug(Class<T> plugin) {
-		return new PluginBinder<>(on(bind()), plugin);
+		return new PluginBinder<>(on(bind().next()), plugin);
 	}
 
 	/**
@@ -378,7 +378,7 @@ public class Binder {
 	}
 
 	public <T> BootBinder<T> boot(Name name, Type<T> target) {
-		return new BootBinder<>(on(bind()), instance(name, target));
+		return new BootBinder<>(on(bind().next()), instance(name, target));
 	}
 
 	/**
@@ -660,34 +660,34 @@ public class Binder {
 			this.hintsBy = hintsBy;
 		}
 
-		public AutoBinder accessBy(AccessesBy mirror) {
-			return new AutoBinder(binder, mirror, constructsBy, producesBy,
+		public AutoBinder accessBy(AccessesBy strategy) {
+			return new AutoBinder(binder, strategy, constructsBy, producesBy,
 					namesBy, scopesBy, hintsBy);
 		}
 
-		public AutoBinder constructBy(ConstructsBy mirror) {
-			return new AutoBinder(binder, accessesBy, mirror, producesBy, namesBy,
+		public AutoBinder constructBy(ConstructsBy strategy) {
+			return new AutoBinder(binder, accessesBy, strategy, producesBy, namesBy,
 					scopesBy, hintsBy);
 		}
 
-		public AutoBinder produceBy(ProducesBy mirror) {
-			return new AutoBinder(binder, accessesBy, constructsBy, mirror,
+		public AutoBinder produceBy(ProducesBy strategy) {
+			return new AutoBinder(binder, accessesBy, constructsBy, strategy,
 					namesBy, scopesBy, hintsBy);
 		}
 
-		public AutoBinder nameBy(NamesBy mirror) {
+		public AutoBinder nameBy(NamesBy strategy) {
 			return new AutoBinder(binder, accessesBy, constructsBy, producesBy,
-					mirror.orElse(DEFAULT), scopesBy, hintsBy);
+					strategy.orElse(DEFAULT), scopesBy, hintsBy);
 		}
 
-		public AutoBinder scopeBy(ScopesBy mirror) {
+		public AutoBinder scopeBy(ScopesBy strategy) {
 			return new AutoBinder(binder, accessesBy, constructsBy, producesBy,
-					namesBy, mirror, hintsBy);
+					namesBy, strategy, hintsBy);
 		}
 
-		public AutoBinder hintBy(HintsBy mirror) {
+		public AutoBinder hintBy(HintsBy strategy) {
 			return new AutoBinder(binder, accessesBy, constructsBy, producesBy,
-					namesBy, scopesBy, mirror);
+					namesBy, scopesBy, strategy);
 		}
 
 		public final void in(Class<?> impl) {
@@ -897,7 +897,7 @@ public class Binder {
 		}
 
 		/**
-		 * Bind {@link Method}s and {@link Constructor}s based on mirrors.
+		 * Bind {@link Method}s and {@link Constructor}s based on strategies.
 		 *
 		 * @since 8.1
 		 */

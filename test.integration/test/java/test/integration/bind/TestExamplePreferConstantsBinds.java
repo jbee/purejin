@@ -9,13 +9,13 @@ import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.bind.ValueBinder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.defaults.DefaultValueBinders;
 
 import java.io.Serializable;
 import java.util.RandomAccess;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static se.jbee.inject.bind.ValueBinder.valueBinderTypeOf;
 
 /**
  * An example of how to use {@link ValueBinder}s to customize the and binding
@@ -80,6 +80,7 @@ class TestExamplePreferConstantsBinds {
 	private static Injector injectorWithEnv(Class<? extends Bundle> root,
 			ValueBinder<Instance<?>> binder) {
 		return Bootstrap.injector(
-				Environment.DEFAULT.withBinder(Instance.class, binder), root);
+				Bootstrap.DEFAULT_ENV.with(valueBinderTypeOf(Instance.class),
+						binder), root);
 	}
 }

@@ -29,4 +29,9 @@ public abstract class EnvModule extends BinderModule {
 	public final TypedBinder<ContractsBy> bindContractsByOf(Class<?> type) {
 		return bind(Name.named(type), ContractsBy.class);
 	}
+
+	@Override
+	protected final boolean installDefaults() {
+		return false;
+	}
 }

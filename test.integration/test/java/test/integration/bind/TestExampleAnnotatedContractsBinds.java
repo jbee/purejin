@@ -5,7 +5,6 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.bootstrap.Environment;
 import se.jbee.inject.config.ContractsBy;
 
 import java.lang.annotation.Documented;
@@ -85,7 +84,7 @@ class TestExampleAnnotatedContractsBinds {
 	}
 
 	private final Injector context = Bootstrap.injector(
-			Environment.DEFAULT.with(ContractsBy.class,
+			Bootstrap.DEFAULT_ENV.with(ContractsBy.class,
 					ContractsBy.SUPER.annotatedWith(Contract.class).or(
 							ContractsBy.SUPER.annotatedWith(
 									ContractsProvided.class,

@@ -7,8 +7,12 @@ import se.jbee.inject.lang.Utils;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Member;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
+import static se.jbee.inject.Instance.instance;
+import static se.jbee.inject.Name.DEFAULT;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.lang.Type.raw;
 
@@ -81,6 +85,10 @@ public interface Env {
 		return property(named(qualifier), raw(property), null);
 	}
 
+	default <T> T property(String qualifier, Type<T> property) {
+		return property(named(qualifier), property, null);
+	}
+
 	default <T> T property(String qualifier, Class<T> property, T defaultValue) {
 		return property(qualifier, raw(property), defaultValue);
 	}
@@ -91,19 +99,19 @@ public interface Env {
 	}
 
 	default Env in(Class<?> ns) {
-		final class EnvInNs implements Env {
+		final class EnvIn implements Env {
 
 			final Env env;
 			final Class<?> ns;
 
-			EnvInNs(Env env, Class<?> ns) {
+			EnvIn(Env env, Class<?> ns) {
 				this.env = env;
 				this.ns = ns;
 			}
 
 			@Override
 			public Env in(Class<?> ns) {
-				return ns == null ? env : ns == this.ns ? this : new EnvInNs(env, ns);
+				return ns == null ? env : ns == this.ns ? this : new EnvIn(env, ns);
 			}
 
 			@Override
@@ -113,10 +121,78 @@ public interface Env {
 
 			@Override
 			public String toString() {
-				return "Env[" + ns.getName() + "]";
+				return "EnvIn[" + ns.getName() + "]\n" + env.toString();
 			}
 		}
-		return ns == null ? this : new EnvInNs(this, ns);
+		return ns == null ? this : new EnvIn(this, ns);
+	}
+
+	default Env with(String qualifier, boolean value) {
+		return with(qualifier, boolean.class, value);
+	}
+
+	default <V> Env with(Class<V> property, V value) {
+		return with(raw(property), value);
+	}
+
+	default <V> Env with(Type<V> property, V value) {
+		return with(DEFAULT, property, value);
+	}
+
+	default <V> Env with(String qualifier, Class<V> property, V value) {
+		return with(named(qualifier), raw(property), value);
+	}
+
+	default <V> Env with(String qualifier, Type<V> property, V value) {
+		return with(named(qualifier), property, value);
+	}
+
+	default <V> Env with(Name qualifier, Type<V> property, V value) {
+		/*
+		 * Adds an overriding map of "global" values.
+		 * This is mostly used to tweak the bootstrapping.
+		 */
+		final class EnvWith implements Env {
+
+			final Env env;
+			final Map<Instance<?>, Object> values = new HashMap<>();
+
+			EnvWith(Env env) {
+				this.env = env;
+			}
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public <T> T property(Name qualifier, Type<T> property, Class<?> ns)
+					throws InconsistentDeclaration {
+				Instance<T> key = instance(qualifier, property);
+				if (values.containsKey(key))
+					return (T) values.get(key);
+				return env.property(qualifier, property, ns);
+			}
+
+			@Override
+			public <T> Env with(Name qualifier, Type<T> property, T value) {
+				values.put(instance(qualifier, property), value);
+				return this;
+			}
+
+			@Override
+			public String toString() {
+				return "EnvWith{" + "env=" + env + ", values=" + values + '}';
+			}
+		}
+		return new EnvWith(this).with(qualifier, property, value);
+	}
+
+	default <F extends Enum<F>> Env withToggled(Class<F> flags, F... enabled) {
+		Env res = this;
+		for (F flag : enabled) {
+			res = flag == null
+					? res.with("null", flags, null)
+					: res.with(flag.name(), raw(flags), flag);
+		}
+		return res;
 	}
 
 	default <E extends Enum<E>> boolean toggled(Class<E> property, E feature) {
