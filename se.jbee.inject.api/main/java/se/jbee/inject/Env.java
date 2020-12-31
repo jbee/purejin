@@ -226,20 +226,21 @@ public interface Env {
 		return new EnvWith(this, new HashMap<>()).with(qualifier, property, value);
 	}
 
-	default <F extends Enum<F>> Env withToggled(Class<F> flags, F... enabled) {
+	@SuppressWarnings("unchecked")
+	default <E extends Enum<E>> Env withDependent(Class<E> set, E... elements) {
 		Env res = this;
-		for (F flag : enabled) {
-			res = flag == null
-					? res.with("null", flags, null)
-					: res.with(flag.name(), raw(flags), flag);
+		for (E e : elements) {
+			res = e == null
+					? res.with("null", set, null)
+					: res.with(e.name(), raw(set), e);
 		}
 		return res;
 	}
 
-	default <E extends Enum<E>> boolean toggled(Class<E> property, E feature) {
-		return feature == null
-				? property("null", property, property.getEnumConstants()[0]) == null
-				: property(feature.name(), property,null) != null;
+	default <E extends Enum<E>> boolean isInstalled(Class<E> dependentOn, E element) {
+		return element == null
+				? property("null", dependentOn, dependentOn.getEnumConstants()[0]) == null
+				: property(element.name(), dependentOn,null) != null;
 	}
 
 	default <T extends  AccessibleObject & Member> void accessible(T target) {

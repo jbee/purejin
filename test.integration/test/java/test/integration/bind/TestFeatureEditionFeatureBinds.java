@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bind.Bootstrapper;
-import se.jbee.inject.bind.Toggled;
+import se.jbee.inject.bind.Dependent;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -84,13 +84,13 @@ class TestFeatureEditionFeatureBinds {
 
 	@Featured(AnnotatedFeature.BAZ)
 	private enum FeaturedOptionBundle
-			implements Toggled<FeaturedOptionBundle> {
+			implements Dependent<FeaturedOptionBundle> {
 		QUX;
 
 		@Override
 		public void bootstrap(
-				Bootstrapper.ToggledBootstrapper<FeaturedOptionBundle> bootstrapper) {
-			bootstrapper.install(AnotherModule.class, QUX);
+				Bootstrapper.DependentBootstrapper<FeaturedOptionBundle> bootstrapper) {
+			bootstrapper.installDependentOn(QUX, AnotherModule.class);
 		}
 
 	}

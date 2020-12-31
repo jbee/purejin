@@ -8,7 +8,7 @@ package se.jbee.inject.defaults;
 import se.jbee.inject.*;
 import se.jbee.inject.bind.Bootstrapper;
 import se.jbee.inject.bind.Bundle;
-import se.jbee.inject.bind.Toggled;
+import se.jbee.inject.bind.Dependent;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Supply;
 import se.jbee.inject.config.Extension;
@@ -30,7 +30,7 @@ import static se.jbee.inject.lang.Type.raw;
 /**
  * Installs all the build-in functionality by using the core API.
  */
-public enum DefaultFeature implements Toggled<DefaultFeature> {
+public enum DefaultFeature implements Dependent<DefaultFeature> {
 	/**
 	 * Adds: {@link Provider}s can be injected for all bound types.
 	 */
@@ -106,21 +106,21 @@ public enum DefaultFeature implements Toggled<DefaultFeature> {
 
 	@Override
 	public void bootstrap(
-			Bootstrapper.ToggledBootstrapper<DefaultFeature> bootstrapper) {
-		bootstrapper.install(ListBridgeModule.class, LIST);
-		bootstrapper.install(SetBridgeModule.class, SET);
-		bootstrapper.install(CollectionBridgeModule.class, COLLECTION);
-		bootstrapper.install(ProviderBridgeModule.class, PROVIDER);
-		bootstrapper.install(LoggerModule.class, LOGGER);
-		bootstrapper.install(OptionalBridgeModule.class, OPTIONAL);
-		bootstrapper.install(SubContextModule.class, SUB_CONTEXT);
-		bootstrapper.install(DefaultEnvModule.class, ENV);
-		bootstrapper.install(DefaultScopes.class, SCOPES);
-		bootstrapper.install(ExtensionModule.class, EXTENSION);
-		bootstrapper.install(PrimitiveArraysModule.class, PRIMITIVE_ARRAYS);
-		bootstrapper.install(AnnotatedWithModule.class, ANNOTATED_WITH);
-		bootstrapper.install(ObtainableModule.class, OBTAINABLE);
-		bootstrapper.install(SelfModule.class, SELF);
+			Bootstrapper.DependentBootstrapper<DefaultFeature> bootstrapper) {
+		bootstrapper.installDependentOn(LIST, ListBridgeModule.class);
+		bootstrapper.installDependentOn(SET, SetBridgeModule.class);
+		bootstrapper.installDependentOn(COLLECTION, CollectionBridgeModule.class);
+		bootstrapper.installDependentOn(PROVIDER, ProviderBridgeModule.class);
+		bootstrapper.installDependentOn(LOGGER, LoggerModule.class);
+		bootstrapper.installDependentOn(OPTIONAL, OptionalBridgeModule.class);
+		bootstrapper.installDependentOn(SUB_CONTEXT, SubContextModule.class);
+		bootstrapper.installDependentOn(ENV, DefaultEnvModule.class);
+		bootstrapper.installDependentOn(SCOPES, DefaultScopes.class);
+		bootstrapper.installDependentOn(EXTENSION, ExtensionModule.class);
+		bootstrapper.installDependentOn(PRIMITIVE_ARRAYS, PrimitiveArraysModule.class);
+		bootstrapper.installDependentOn(ANNOTATED_WITH, AnnotatedWithModule.class);
+		bootstrapper.installDependentOn(OBTAINABLE, ObtainableModule.class);
+		bootstrapper.installDependentOn(SELF, SelfModule.class);
 	}
 
 	private static class LoggerModule extends BinderModule {

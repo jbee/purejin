@@ -45,28 +45,28 @@ public abstract class BootstrapperBundle implements Bundle, Bootstrapper {
 
 	@Override
 	@SafeVarargs
-	public final <M extends Enum<M> & Toggled<M>> void install(M... modules) {
-		bootstrap.install(modules);
+	public final <M extends Enum<M> & Dependent<M>> void install(M... elements) {
+		bootstrap.install(elements);
 	}
 
 	@Override
 	public final <C extends Enum<C>> void install(
-			Class<? extends Toggled<C>> bundle, Class<C> property) {
-		bootstrap.install(bundle, property);
+			Class<? extends Dependent<C>> bundle, Class<C> dependentOn) {
+		bootstrap.install(bundle, dependentOn);
 	}
 
 	@Override
 	@SafeVarargs
-	public final <O extends Enum<O> & Toggled<O>> void uninstall(O... flags) {
-		bootstrap.uninstall(flags);
+	public final <O extends Enum<O> & Dependent<O>> void uninstall(O... elements) {
+		bootstrap.uninstall(elements);
 	}
 
-	protected final <O extends Enum<O> & Toggled<O>> void installAll(
+	protected final <O extends Enum<O> & Dependent<O>> void installAll(
 			Class<O> optionsOfType) {
 		install(optionsOfType.getEnumConstants());
 	}
 
-	protected final <O extends Enum<O> & Toggled<O>> void uninstallAll(
+	protected final <O extends Enum<O> & Dependent<O>> void uninstallAll(
 			Class<O> optionsOfType) {
 		uninstall(optionsOfType.getEnumConstants());
 	}

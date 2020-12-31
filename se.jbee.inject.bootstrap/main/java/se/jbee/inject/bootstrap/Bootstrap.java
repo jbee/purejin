@@ -19,6 +19,7 @@ import se.jbee.inject.defaults.DefaultEnv;
 import se.jbee.inject.defaults.DefaultsBundle;
 import se.jbee.inject.lang.Reflect;
 
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 import static se.jbee.inject.bind.Bindings.newBindings;
@@ -38,7 +39,11 @@ public final class Bootstrap {
 	 * found using {@link java.util.ServiceLoader}.
 	 */
 	public static Injector injector() {
-		return injector(env(), ServiceLoaderBundles.class);
+		return injector(env());
+	}
+
+	public static Injector injector(Env env) {
+		return injector(env, ServiceLoaderBundles.class);
 	}
 
 	/**
@@ -47,7 +52,11 @@ public final class Bootstrap {
 	 * se.jbee.inject.Extends} annotation referring to the {@link Env} class.
 	 */
 	public static Env env() {
-		return env(ServiceLoaderEnvBundles.class, ServiceLoaderAnnotations.class);
+		return env(DEFAULT_ENV);
+	}
+
+	public static Env env(Env env) {
+		return env(env, ServiceLoaderEnvBundles.class, ServiceLoaderAnnotations.class);
 	}
 
 	public static Env env(Class<? extends Bundle> root) {
@@ -155,18 +164,21 @@ public final class Bootstrap {
 		private <T> T createBundle(Class<T> bundle) {
 			// OBS: Here we do not use the env but always make the bundles accessible
 			// as this is kind of designed into the concept
-			return Reflect.construct(bundle, Reflect::accessible,
+			return Reflect.construct(bundle, c-> {
+					if (!Modifier.isPublic(c.getModifiers()))
+						Reflect.accessible(c);
+					},
 					e -> new InconsistentDeclaration("Failed to create bundle: " + bundle, e));
 		}
 
 		@Override
 		public <F extends Enum<F>> void install(
-				Class<? extends Toggled<F>> bundle, final Class<F> flags) {
+				Class<? extends Dependent<F>> bundle, final Class<F> dependentOn) {
 			if (!edition.featured(bundle))
 				return;
-			createBundle(bundle).bootstrap((bundleForFlag, flag) -> {
+			createBundle(bundle).bootstrap((actual, bundleForFlag) -> {
 				// NB: null is a valid value to define what happens when no configuration is present
-				if (env.toggled(flags, flag)) {
+				if (env.isInstalled(dependentOn, actual)) {
 					BuiltinBootstrapper.this.install(bundleForFlag);
 				}
 			});
@@ -174,14 +186,14 @@ public final class Bootstrap {
 
 		@Override
 		@SafeVarargs
-		public final <F extends Enum<F> & Toggled<F>> void install(F... flags) {
-			if (flags.length > 0) {
-				final F flag0 = flags[0];
+		public final <F extends Enum<F> & Dependent<F>> void install(F... elements) {
+			if (elements.length > 0) {
+				final F flag0 = elements[0];
 				if (!edition.featured(flag0.getClass()))
 					return;
-				final EnumSet<F> installing = EnumSet.of(flag0, flags);
-				flag0.bootstrap((bundle, flag) -> {
-					if (installing.contains(flag))
+				final EnumSet<F> installing = EnumSet.of(flag0, elements);
+				flag0.bootstrap((on, bundle) -> {
+					if (installing.contains(on))
 						BuiltinBootstrapper.this.install(bundle);
 				});
 			}
@@ -189,12 +201,13 @@ public final class Bootstrap {
 
 		@Override
 		@SafeVarargs
-		public final <F extends Enum<F> & Toggled<F>> void uninstall(
-				F... flags) {
-			if (flags.length > 0) {
-				final EnumSet<F> uninstalling = EnumSet.of(flags[0], flags);
-				flags[0].bootstrap((bundle, flag) -> {
-					if (uninstalling.contains(flag))
+		public final <F extends Enum<F> & Dependent<F>> void uninstall(
+				F... elements) {
+			if (elements.length > 0) {
+				final EnumSet<F> uninstalling = EnumSet.of(elements[0],
+						elements);
+				elements[0].bootstrap((on, bundle) -> {
+					if (uninstalling.contains(on))
 						uninstall(bundle);
 				});
 			}

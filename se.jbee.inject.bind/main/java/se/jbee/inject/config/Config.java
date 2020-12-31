@@ -90,6 +90,12 @@ public class Config implements ContextAware<Config>, Extension {
 					.map(converter::convert);
 		}
 
+		public Source source() {
+			Dependency<A> dep = toDependency(from, property);
+			Resource<?> r = context.resolve(dep.typed(Resource.resourceTypeOf(dep.type())));
+			return r.source;
+		}
+
 		public <B> B as(Class<B> type, B defaultValue) {
 			return as(type).orElse(defaultValue);
 		}

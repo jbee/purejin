@@ -8,22 +8,25 @@ package se.jbee.inject.bind;
 import se.jbee.inject.Env;
 
 /**
- * The basic idea is to split the binding process into 2 steps: installing
- * modules and do bindings in the installed modules.
- *
- * Thereby it is possible to keep track of the modules that should be installed
- * before actually install them. This has two major benefits:
- *
- * 1. it is possible and intentional to declare installation of the same module
- * as often as wanted or needed without actually installing them more then once.
+ * The basic idea is to split the binding process into 3 steps:
+ * <ol>
+ * <li>identify the set of installed {@link Bundle}s</li>
+ * <li>derive the set of installed {@link Module}s from the installed {@link Bundle}s</li>
+ * <li>collect the declared {@link Binding}s within each {@link Module} to a total set of {@link Bindings}</li>
+ * </ol>
+ * <p>
+ * This split allows to keep track of the {@link Module}s that should be installed
+ * before actually installing them. This has two major benefits:
+ * <ul>
+ * <li>It is possible and not conflicting to declare the installation of the same {@link Bundle} and/or {@link Module}
+ * multiple times without actually installing them more then once.
  * This allows to see other modules as needed dependencies or 'parent'-modules.
+ * This is the basis of composing software modules that do not know about each other but that might share a 3rd software module.</li>
  *
- * 2. the installation can be the first step of the verification (in a
- * unit-test). The binding can be omitted so that overall test of a
- * configuration can be very fast.
- *
- * @author Jan Bernitt (jan@jbee.se)
- *
+ * <li>Software modules can remove and replace parts of the overall setup by uninstalling {@link Bundle}s and indirectly the {@link Module}s they would have installed.
+ * This allows to the the {@link Bundle} tree as a setup where any node or subtree can be replaced without loosing clarity of what the result will look like. Yet through modularisation into {@link Bundle}s and {@link Module}s parts of a removed tree can be reincorporated by installing them as part of another {@link Bundle}.
+ * This is the basis of composed software.</li>
+ * </ul>
  */
 public interface Bootstrapper {
 
@@ -36,66 +39,77 @@ public interface Bootstrapper {
 
 	/**
 	 * Uninstalling is very different from overriding. It allows to totally
-	 * remove a well defined part from the consideration while a override
-	 * complects the overridden and the overriding {@linkplain Bundle} with each
-	 * other and requires to consider both in a complected form.
-	 *
-	 * To allow predictability uninstalling is a final decision.
-	 * Further calls that {@link #install(Class)} for the very same
-	 * {@link Bundle} will not re-install it.
-	 *
+	 * remove a well defined part from the consideration while an override would
+	 * complect the overridden and the overriding declarations with each other
+	 * and requires to consider both in a complected form.
+	 * <p>
+	 * To allow predictability uninstalling is a final decision. Further calls
+	 * that {@link #install(Class)} for the very same {@link Bundle} will not
+	 * re-install it independent of when they occur.
+	 * <p>
 	 * There is no need to uninstall a {@link Module} since uninstalling the
 	 * {@linkplain Bundle} that installed the module will effectively uninstall
 	 * the module as well (as long as that module is not installed by another
 	 * installed bundle too). Allowing to uninstall separate {@link Module}s
 	 * would break the well defined borders of bundles and lead to the need to
 	 * consider something close to overrides.
+	 * <p>
+	 * If an individual {@link Module} should be possible to add or remove wrap
+	 * it in a dedicated {@link Bundle} (most {@link Module}s extend a base
+	 * class that is a {@link Bundle} as well and therefore can be targeted
+	 * individually) or have a look at {@link Dependent} installation.
 	 */
 	void uninstall(Class<? extends Bundle> bundle);
 
 	/**
-	 * @param module the {@link Module} to install (within the parent
-	 *            {@link Bundle} that is given implicit - the
-	 *            {@link Bootstrapper} keeps track of that)
+	 * @param module the {@link Module} to install (within the parent {@link
+	 *               Bundle} that is given implicit - the {@link Bootstrapper}
+	 *               keeps track of that)
 	 */
 	void install(Module module);
 
 	/**
-	 * @param flags for the {@link Bundle}s that should be installed.
+	 * @param elements for the {@link Bundle}s that should be installed.
 	 */
 	@SuppressWarnings("unchecked")
-	<F extends Enum<F> & Toggled<F>> void install(F... flags);
+	<E extends Enum<E> & Dependent<E>> void install(E... elements);
 
 	/**
-	 * @param flags for the {@link Bundle}s that are uninstalled.
+	 * @param elements for the {@link Bundle}s that are uninstalled.
 	 */
 	@SuppressWarnings("unchecked")
-	<F extends Enum<F> & Toggled<F>> void uninstall(F... flags);
+	<E extends Enum<E> & Dependent<E>> void uninstall(E... elements);
 
 	/**
 	 * @param bundle the {@link Bundle} to install
-	 * @param flags The {@link Enum} representing all flags possible for the
-	 *            {@link Toggled}
+	 * @param dependentOn  The {@link Enum} representing all dependentOn possible for the
+	 *               {@link Dependent}
 	 */
-	<F extends Enum<F>> void install(Class<? extends Toggled<F>> bundle,
-			Class<F> flags);
+	<E extends Enum<E>> void install(Class<? extends Dependent<E>> bundle,
+			Class<E> dependentOn);
 
 	/**
-	 * @param <F> The {@link Enum} representing all flags possible for the
-	 *            {@link Toggled}
+	 * The "inner" bootstrapper used when
+	 *
+	 * @param <E> A type used to define a set of possible options. Users can set
+	 *            none, one, multiple or all of the options using {@link
+	 *            Env#withDependent(Class, Enum[])} (or binds of similar
+	 *            effect).
 	 */
 	@FunctionalInterface
-	interface ToggledBootstrapper<F> {
+	interface DependentBootstrapper<E> {
 
 		/**
-		 * Installs the {@link Bundle} when the given flag is
-		 * {@link Env#toggled(Class, Enum)}. The set of toggled flags
-		 * is always constant during the bootstrapping process.
+		 * Installs the {@link Bundle} when the given element is {@link
+		 * Env#isInstalled(Class, Enum)}.
+		 * <p>
+		 * The set of flags is always constant during the bootstrapping process
+		 * and set using {@link Env#withDependent(Class, Enum[])}
 		 *
-		 * If the flag isn't toggled the this call has no effect. No
-		 * installation occurs.
+		 * @param element     when this element is/was set in the {@link Env}
+		 * @param bundle a {@link Bundle} to install
 		 */
-		void install(Class<? extends Bundle> bundle, F flag);
+		void installDependentOn(E element, Class<? extends Bundle> bundle);
 
 	}
 

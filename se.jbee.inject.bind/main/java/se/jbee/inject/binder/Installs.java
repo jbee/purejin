@@ -1,6 +1,7 @@
 package se.jbee.inject.binder;
 
 import se.jbee.inject.bind.Bundle;
+import se.jbee.inject.bind.Dependent;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Inherited;
@@ -15,7 +16,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * <p>
  * Its main purpose is to be used when writing a {@link BinderModule} or {@link
  * BinderModuleWith} which depends upon other {@link Bundle}s or {@link
- * se.jbee.inject.bind.Toggled} bundles being installed. In such a case the
+ * Dependent} bundles being installed. In such a case the
  * {@link BinderModule} or {@link BinderModuleWith} can be annotated instead
  * referencing to its "dependencies" which avoid needing to create a bundle that
  * installs the module and the dependencies.
@@ -43,14 +44,14 @@ public @interface Installs {
 	Class<? extends Bundle>[] bundles() default {};
 
 	/**
-	 * @return Must be a {@link se.jbee.inject.bind.Toggled} {@link Enum} type.
+	 * @return Must be a {@link Dependent} {@link Enum} type.
 	 * If {@link #selection()} is empty all its features are installed.
 	 * Otherwise only the features named in {@link #selection()} are installed.
 	 */
 	Class<? extends Enum> features() default Enum.class;
 
 	/**
-	 * @return When {@link #features()} refers to a {@link se.jbee.inject.bind.Toggled}
+	 * @return When {@link #features()} refers to a {@link Dependent}
 	 * {@link Enum} type the selection contains the enum constant names of the
 	 * features that should be installed. If all should be installed this can be
 	 * empty (default value).

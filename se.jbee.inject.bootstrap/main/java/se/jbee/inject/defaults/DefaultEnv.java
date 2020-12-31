@@ -11,6 +11,10 @@ import se.jbee.inject.lang.Type;
 
 import static se.jbee.inject.lang.Type.raw;
 
+/**
+ * The {@link se.jbee.inject.bind.Module} that setups the values required in an
+ * {@link Env} used with the {@link Binder} API.
+ */
 public class DefaultEnv extends ConstantsModule {
 
 	public static Env bootstrap() {

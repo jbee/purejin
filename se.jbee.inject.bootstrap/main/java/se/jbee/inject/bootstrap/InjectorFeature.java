@@ -5,7 +5,7 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.bind.Bindings;
 import se.jbee.inject.bind.Bootstrapper;
 import se.jbee.inject.bind.Bundle;
-import se.jbee.inject.bind.Toggled;
+import se.jbee.inject.bind.Dependent;
 import se.jbee.inject.binder.BinderModule;
 
 import java.util.function.Function;
@@ -18,7 +18,7 @@ import static se.jbee.inject.lang.Cast.functionTypeOf;
  * By default the {@link Bootstrap} utility will install all features.
  * Use {@link Bootstrapper#uninstall(Enum[])} to remove any unwanted capability.
  */
-public enum InjectorFeature implements Toggled<InjectorFeature> {
+public enum InjectorFeature implements Dependent<InjectorFeature> {
 	/**
 	 * Binds a {@link Function} that given an array of {@link Class} (that must
 	 * extend {@link Bundle}) creates or returns an {@link Injector} sub-context
@@ -30,8 +30,9 @@ public enum InjectorFeature implements Toggled<InjectorFeature> {
 
 	@Override
 	public void bootstrap(
-			Bootstrapper.ToggledBootstrapper<InjectorFeature> bootstrapper) {
-		bootstrapper.install(SubContextFunction.class, SUB_CONTEXT_FUNCTION);
+			Bootstrapper.DependentBootstrapper<InjectorFeature> bootstrapper) {
+		bootstrapper.installDependentOn(SUB_CONTEXT_FUNCTION,
+				SubContextFunction.class);
 	}
 
 	static final class SubContextFunction extends BinderModule {
