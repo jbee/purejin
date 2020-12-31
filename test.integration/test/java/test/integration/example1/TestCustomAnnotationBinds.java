@@ -1,10 +1,12 @@
 package test.integration.example1;
 
 import org.junit.jupiter.api.Test;
+import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bind.ModuleWith;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
+import test.Example;
 import test.example1.Support;
 
 import java.util.ServiceLoader;
@@ -44,7 +46,8 @@ class TestCustomAnnotationBinds {
 	 */
 	@Test
 	void customAnnotationsAddedViaServiceLoader() {
-	   Injector injector = Bootstrap.injector(Bootstrap.env(),
+		Env env = Example.EXAMPLE_1.env();
+		Injector injector = Bootstrap.injector(env,
 				TestCustomAnnotationBindsModule.class);
 		MySupportService service = injector.resolve(MySupportService.class);
 		assertNotNull(service);

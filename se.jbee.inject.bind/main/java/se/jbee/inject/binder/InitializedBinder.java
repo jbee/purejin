@@ -6,7 +6,6 @@
 package se.jbee.inject.binder;
 
 import se.jbee.inject.Env;
-import se.jbee.inject.Extends;
 import se.jbee.inject.InconsistentDeclaration;
 import se.jbee.inject.bind.*;
 import se.jbee.inject.binder.Binder.RootBinder;
@@ -37,13 +36,7 @@ public abstract class InitializedBinder extends RootBinder {
 
 	protected final void __init__(Env env, Bindings bindings) {
 		InconsistentBinding.nonnullThrowsReentranceException(initialized);
-		Bind into = bind.into(env, bindings);
-		if (getClass().isAnnotationPresent(Extends.class)) {
-			Extends e = getClass().getAnnotation(Extends.class);
-			if (e.local())
-				into = into.with((into.target.inPackageAndSubPackagesOf(getClass())));
-		}
-		this.bind = init(into);
+		this.bind = init(bind.into(env, bindings));
 		initialized = true;
 	}
 
@@ -61,7 +54,7 @@ public abstract class InitializedBinder extends RootBinder {
 			}
 			if (installs.features() != Enum.class) {
 				Class<?> features = installs.features();
-				if (!raw(features).isAssignableTo(raw(Toggled.class)))
+				if (!raw(features).isAssignableTo(raw(Dependent.class)))
 					throw new InconsistentDeclaration(
 							"@Installs feature Class must be compatible with <F extends Enum<F> & Toggled<F>>");
 				install(bootstrap, (Class) features, installs.selection());
@@ -69,7 +62,7 @@ public abstract class InitializedBinder extends RootBinder {
 		}
 	}
 
-	private <F extends Enum<F> & Toggled<F>> void install(
+	private <F extends Enum<F> & Dependent<F>> void install(
 			Bootstrapper bootstrap, Class<F> features, String[] names) {
 		if (names.length == 0) {
 			bootstrap.install(features.getEnumConstants());

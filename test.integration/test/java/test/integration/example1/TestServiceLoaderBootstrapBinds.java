@@ -6,7 +6,7 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.binder.ServiceLoaderBundles;
 import se.jbee.inject.binder.ServiceLoaderEnvBundles;
-import se.jbee.inject.bootstrap.Bootstrap;
+import test.Example;
 
 import java.util.ServiceLoader;
 
@@ -33,10 +33,10 @@ class TestServiceLoaderBootstrapBinds {
 
 	@Test
 	void serviceLoaderCanBeUsedToDeclareModuleRoots() {
-		Injector context = Bootstrap.injector();
+		Injector context = Example.EXAMPLE_1.injector();
 		assertNotNull(context);
 		assertEquals(13, context.resolve(int.class).intValue());
-		assertEquals("test.example1.MyFirstModule",
+		assertEquals("test.example1.Example1Module",
 				context.resolve(String.class));
 	}
 }

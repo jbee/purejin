@@ -793,12 +793,12 @@ public class Binder {
 			Name name = namesBy.reflect(target);
 			Class<T> impl = target.getDeclaringClass();
 			Binder scopedBinder = binder.per(scope != null ? scope : Scope.auto).implicit();
+			scopedBinder.bind(name, impl).to(target, hints);
 			if (name.isDefault()) {
 				scopedBinder.contractbind(impl)
 						//TODO use actual type hint/ref
 						.expand(constructs(raw(impl), target, hintsBy, hints));
 			} else {
-				scopedBinder.bind(name, impl).to(target, hints);
 				for (Type<? super T> st : raw(impl).supertypes())
 					if (st.isInterface())
 						scopedBinder.implicit().bind(name, st).to(name, impl);

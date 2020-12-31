@@ -21,17 +21,18 @@ import static se.jbee.inject.lang.Type.raw;
  * Type}s and the values instances of the key type.
  * <p>
  * To distinguish multiple values of the same {@link Type} a {@link Name}
- * qualifier is added.
+ * qualifier can be added added.
  * <p>
  * To avoid collisions between qualified properties as used within different
- * software modules that do not know about each other {@link Packages} are used
- * as namespaces.
+ * software modules properties are usually defined local to the defining
+ * software module. During lookup the {@link Class} of the processed module
+ * is used as the name-space key.
  * <p>
- * Properties that are considered namespace specific are resolved providing that
- * {@link Package} namespace based on the {@link Class} that uses the property.
+ * Properties that are considered namespace specific are resolved providing the
+ * {@link Class} of the defining module or "bean".
  * <p>
- * Properties that are considered "globally" used do not use a particular {@link
- * Package} as namespace which makes them "global".
+ * Properties that are considered "globally" used do not use a particular
+ * namespace ({@code null}).
  */
 @FunctionalInterface
 public interface Env {
@@ -41,22 +42,28 @@ public interface Env {
 	 * make private members accessible using
 	 * {@link java.lang.reflect.AccessibleObject#setAccessible(boolean)}
 	 */
-	String GP_USE_DEEP_REFLECTION = "deep-reflection";
+	String USE_DEEP_REFLECTION = "deep-reflection";
 
 	/**
 	 * Property name used to configure the set of {@link Packages} where deep
-	 * reflection is allowed given {@link #GP_USE_DEEP_REFLECTION} is true.
+	 * reflection is allowed given {@link #USE_DEEP_REFLECTION} is true.
 	 */
-	String GP_DEEP_REFLECTION_PACKAGES = "deep-reflection-packages";
+	String DEEP_REFLECTION_PACKAGES = "deep-reflection-packages";
 
 	/**
 	 * Property name used to configure a boolean if {@link Verifier}s are tried
 	 * to be resolved during the binding process. If not, {@link Verifier#AOK}
 	 * (no validation) is used (default).
 	 */
-	String GP_USE_VERIFICATION = "verify";
+	String USE_VERIFICATION = "verify";
 
-	String GP_BIND_BINDINGS = "self-bind";
+	/**
+	 * Boolean flag property which when set to {@code true} adds the bindings
+	 * that were the basis of an {@link Injector} or {@link Env} context as
+	 * a {@link Resource} in the context that can be resolved as array type of
+	 * the binding class used.
+	 */
+	String BIND_BINDINGS = "self-bind";
 
 	<T> T property(Name qualifier, Type<T> property, Class<?> ns)
 			throws InconsistentDeclaration;
@@ -101,8 +108,8 @@ public interface Env {
 	default Env in(Class<?> ns) {
 		final class EnvIn implements Env {
 
-			final Env env;
-			final Class<?> ns;
+			private final Env env;
+			private final Class<?> ns;
 
 			EnvIn(Env env, Class<?> ns) {
 				this.env = env;
@@ -125,6 +132,15 @@ public interface Env {
 			}
 		}
 		return ns == null ? this : new EnvIn(this, ns);
+	}
+
+	/**
+	 * @return An {@link Env} which isolates previous contributions using {@code
+	 * with} from future ones. In other words the set of added properties added
+	 * so far is not be changed by future {@code with} calls.
+	 */
+	default Env withIsolate() {
+		return this;
 	}
 
 	default Env with(String qualifier, boolean value) {
@@ -154,11 +170,13 @@ public interface Env {
 		 */
 		final class EnvWith implements Env {
 
-			final Env env;
-			final Map<Instance<?>, Object> values = new HashMap<>();
+			private final Env env;
+			private final Map<Instance<?>, Object> values;
+			private boolean isolate = false;
 
-			EnvWith(Env env) {
+			EnvWith(Env env, Map<Instance<?>, Object> values) {
 				this.env = env;
+				this.values = values;
 			}
 
 			@SuppressWarnings("unchecked")
@@ -172,38 +190,62 @@ public interface Env {
 			}
 
 			@Override
+			public Env withIsolate() {
+				isolate = true;
+				return this;
+			}
+
+			@Override
 			public <T> Env with(Name qualifier, Type<T> property, T value) {
+				if (isolate)
+					return new EnvWith(this, new HashMap<>()).with(qualifier, property, value);
 				values.put(instance(qualifier, property), value);
 				return this;
 			}
 
 			@Override
+			public Env in(Class<?> ns) {
+				Env in = env.in(ns);
+				return in == env ? this : new EnvWith(in, values);
+			}
+
+			@Override
 			public String toString() {
-				return "EnvWith{" + "env=" + env + ", values=" + values + '}';
+				StringBuilder str = new StringBuilder();
+				str.append("EnvWith[");
+				for (Map.Entry<Instance<?>, Object> e : values.entrySet()) {
+					str.append("\n  ").append(e.getKey().type.simpleName());
+					if (!e.getKey().name.isDefault())
+						str.append(" \"").append(e.getKey().name).append('"');
+					str.append(" = ").append(e.getValue());
+				}
+				str.append("\n]\n").append(env);
+				return str.toString();
 			}
 		}
-		return new EnvWith(this).with(qualifier, property, value);
+		return new EnvWith(this, new HashMap<>()).with(qualifier, property, value);
 	}
 
-	default <F extends Enum<F>> Env withToggled(Class<F> flags, F... enabled) {
+	@SuppressWarnings("unchecked")
+	default <E extends Enum<E>> Env withDependent(Class<E> set, E... elements) {
 		Env res = this;
-		for (F flag : enabled) {
-			res = flag == null
-					? res.with("null", flags, null)
-					: res.with(flag.name(), raw(flags), flag);
+		for (E e : elements) {
+			res = e == null
+					? res.with("null", set, null)
+					: res.with(e.name(), raw(set), e);
 		}
 		return res;
 	}
 
-	default <E extends Enum<E>> boolean toggled(Class<E> property, E feature) {
-		return feature == null
-				? property("null", property, property.getEnumConstants()[0]) == null
-				: property(feature.name(), property,null) != null;
+	default <E extends Enum<E>> boolean isInstalled(Class<E> dependentOn, E element) {
+		return element == null
+				? property("null", dependentOn, dependentOn.getEnumConstants()[0]) == null
+				: property(element.name(), dependentOn,null) != null;
 	}
 
 	default <T extends  AccessibleObject & Member> void accessible(T target) {
-		if (property(Env.GP_USE_DEEP_REFLECTION, false)) {
-			Packages where = property(Env.GP_DEEP_REFLECTION_PACKAGES,
+		if (property(Env.USE_DEEP_REFLECTION, false)) {
+			Packages where = property(Env.DEEP_REFLECTION_PACKAGES,
 					Packages.class);
 			if (where.contains(target.getDeclaringClass()))
 				Reflect.accessible(target);
@@ -211,7 +253,7 @@ public interface Env {
 	}
 
 	default <T> Verifier verifierFor(T target) {
-		if (!property(Env.GP_USE_VERIFICATION, false))
+		if (!property(Env.USE_VERIFICATION, false))
 			return Verifier.AOK;
 		@SuppressWarnings("unchecked")
 		Class<T> targetClass = (Class<T>) target.getClass();

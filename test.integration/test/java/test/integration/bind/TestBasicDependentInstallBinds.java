@@ -16,15 +16,17 @@ import static test.integration.util.TestUtils.assertEqualSets;
  * associated {@link se.jbee.inject.bind.Bundle}.
  * <p>
  * This can be used as a classic feature toggle that is configured in the {@link
- * Env} using the {@link Env#withToggled(Class, Enum[])} helper method so set
+ * Env} using the {@link Env#withDependent(Class, Enum[])} helper method so set
  * the selected options.
  * <p>
  * Secondly this technique of using {@link Enum}s constant to represent {@link
  * se.jbee.inject.bind.Bundle} classes allows to hide those implementations
  * behind the {@link Enum} that behaves as the API to outside world so it can
  * reference them when installing or uninstalling them.
+ *
+ * @see TestBasicBundleForBinds
  */
-class TestBasicFeatureToggleBinds {
+class TestBasicDependentInstallBinds {
 
 	private enum Text {
 		A, B, C, D, E
@@ -74,11 +76,11 @@ class TestBasicFeatureToggleBinds {
 
 		@Override
 		protected void bootstrap() {
-			install(A.class, Text.A);
-			install(B.class, Text.B);
-			install(C.class, Text.C);
-			install(D.class, Text.D);
-			install(E.class, Text.E);
+			installDependentOn(Text.A, A.class);
+			installDependentOn(Text.B, B.class);
+			installDependentOn(Text.C, C.class);
+			installDependentOn(Text.D, D.class);
+			installDependentOn(Text.E, E.class);
 		}
 	}
 
@@ -92,7 +94,7 @@ class TestBasicFeatureToggleBinds {
 
 	@Test
 	void multipleChoicesArePossible() {
-		Env env = Bootstrap.DEFAULT_ENV.withToggled(Text.class, Text.A, Text.D);
+		Env env = Bootstrap.DEFAULT_ENV.withDependent(Text.class, Text.A, Text.D);
 		Injector injector = Bootstrap.injector(env, RootBundle.class);
 		assertEqualSets(new String[] { "A", "D" },
 				injector.resolve(String[].class));

@@ -2,7 +2,7 @@ package test.example1;
 
 import se.jbee.inject.binder.BinderModuleWith;
 
-public class MyFirstModule extends BinderModuleWith<Integer> {
+public class Example1Module extends BinderModuleWith<Integer> {
 
 	@Override
 	protected void declare(Integer value) {

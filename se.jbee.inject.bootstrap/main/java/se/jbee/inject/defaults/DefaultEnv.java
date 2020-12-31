@@ -11,6 +11,10 @@ import se.jbee.inject.lang.Type;
 
 import static se.jbee.inject.lang.Type.raw;
 
+/**
+ * The {@link se.jbee.inject.bind.Module} that setups the values required in an
+ * {@link Env} used with the {@link Binder} API.
+ */
 public class DefaultEnv extends ConstantsModule {
 
 	public static Env bootstrap() {
@@ -57,13 +61,14 @@ public class DefaultEnv extends ConstantsModule {
 		bind(BindingConsolidation.class).to(DefaultBindingConsolidation::consolidate);
 
 		// do not use deep reflection (set accessible) (but if enabled use it everywhere)
-		bind(Env.GP_USE_DEEP_REFLECTION, boolean.class).to(false);
-		bind(Env.GP_DEEP_REFLECTION_PACKAGES, Packages.class).to(Packages.ALL);
+		bind(Env.USE_DEEP_REFLECTION, boolean.class).to(false);
+		bind(Env.DEEP_REFLECTION_PACKAGES, Packages.class).to(Packages.ALL);
 
 		// verification is off
-		bind(Env.GP_USE_VERIFICATION, boolean.class).to(false);
+		bind(Env.USE_VERIFICATION, boolean.class).to(false);
 
 		// extras
 		bind(Plugins.class).toFactory(Plugins::new);
+		bind(Annotated.Enhancer.class).to(Annotated.SOURCE);
 	}
 }

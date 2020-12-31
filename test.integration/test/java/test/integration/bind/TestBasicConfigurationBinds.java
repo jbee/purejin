@@ -2,6 +2,7 @@ package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
+import se.jbee.inject.Source;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.config.Config;
@@ -82,5 +83,12 @@ class TestBasicConfigurationBinds {
 	@Test
 	void convertedConfiguration() {
 		assertNotNull(config.value("uuid").as(UUID.class).orElse(null));
+	}
+
+	@Test
+	void sourceOfConfigValueIsAvailable() {
+		Source source = config.value("foo").source();
+		assertNotNull(source);
+		assertSame(TestBasicConfigurationBindsModule.class, source.ident);
 	}
 }

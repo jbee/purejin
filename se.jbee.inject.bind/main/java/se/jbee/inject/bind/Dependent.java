@@ -6,22 +6,20 @@
 package se.jbee.inject.bind;
 
 import se.jbee.inject.Env;
-import se.jbee.inject.bind.Bootstrapper.ToggledBootstrapper;
+import se.jbee.inject.bind.Bootstrapper.DependentBootstrapper;
 
 /**
  * A {@link Bundle} that does installs {@link Bundle}s in connected to a feature
  * flag represented by an {@link Enum} constant. If the flag is
- * {@link Env#toggled(Class, Enum)} the {@link Bundle} is installed,
+ * {@link Env#isInstalled(Class, Enum)} the {@link Bundle} is installed,
  * otherwise it isn't.
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
 @FunctionalInterface
-public interface Toggled<F> {
+public interface Dependent<F> {
 
 	/**
-	 * @param bootstrapper the {@link ToggledBootstrapper} this bundle should
+	 * @param bootstrapper the {@link DependentBootstrapper} this bundle should
 	 *            install itself in.
 	 */
-	void bootstrap(ToggledBootstrapper<F> bootstrapper);
+	void bootstrap(DependentBootstrapper<F> bootstrapper);
 }

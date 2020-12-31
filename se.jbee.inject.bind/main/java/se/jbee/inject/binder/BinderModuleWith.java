@@ -22,8 +22,6 @@ import static se.jbee.inject.lang.Type.raw;
  * A {@link BinderModuleWith} is also a {@link Bundle} so it should be used and
  * installed as such. It will than {@link Bundle#bootstrap(Bootstrapper)} itself
  * as a module.
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
 public abstract class BinderModuleWith<T> extends InitializedBinder
 		implements Bundle, ModuleWith<T> {
@@ -37,7 +35,7 @@ public abstract class BinderModuleWith<T> extends InitializedBinder
 
 	@Override
 	public void declare(Bindings bindings, Env env, T property) {
-		__init__(configure(env), bindings);
+		__init__(configure(env.withIsolate()), bindings);
 		declare(property);
 	}
 

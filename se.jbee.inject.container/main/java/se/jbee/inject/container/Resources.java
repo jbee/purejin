@@ -77,15 +77,18 @@ final class Resources {
 
 	private static void toString(StringBuilder b, String group,
 			Resource<?>[] rs) {
-		b.append(group).append('\n');
+		b.append("  ").append(group).append('\n');
 		for (Resource<?> rx : rs) {
 			Locator<?> r = rx.signature;
-			b.append("\t#").append(rx.serialID).append(' ');
-			b.append(r.type().simpleName()).append(' ');
-			b.append(r.instance.name).append(' ');
-			b.append(r.target).append(' ');
-			b.append(rx.lifeCycle).append(' ');
-			b.append(rx.source).append('\n');
+			b.append("\t#").append(rx.serialID).append("\t ");
+			String id = r.type().simpleName();
+			if (!r.instance.name.isDefault())
+				id += " \"" + r.instance.name+"\"";
+			b.append(String.format("%-40s ", id));
+			if (!r.target.isAny())
+				b.append(r.target).append(' ');
+			b.append("⏳ ").append(rx.lifeCycle).append(' ');
+			b.append("⚡ ").append(rx.source).append('\n');
 		}
 	}
 

@@ -2,11 +2,11 @@ package test.example1;
 
 import se.jbee.inject.binder.BootstrapperBundle;
 
-public class MyRootBundle extends BootstrapperBundle {
+public class Example1RootBundle extends BootstrapperBundle {
 
 	@Override
 	protected void bootstrap() {
-		install(MyFirstModule.class);
+		install(Example1Module.class);
 	}
 
 }

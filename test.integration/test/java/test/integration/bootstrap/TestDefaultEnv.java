@@ -66,9 +66,9 @@ class TestDefaultEnv {
 	@Test
 	void defaultEnvDefinesDefaultSettings() {
 		Env env = DefaultEnv.bootstrap();
-		assertDefined(env, Env.GP_USE_DEEP_REFLECTION, boolean.class);
-		assertDefined(env, Env.GP_USE_VERIFICATION, boolean.class);
-		assertDefined(env, Env.GP_DEEP_REFLECTION_PACKAGES, Packages.class);
+		assertDefined(env, Env.USE_DEEP_REFLECTION, boolean.class);
+		assertDefined(env, Env.USE_VERIFICATION, boolean.class);
+		assertDefined(env, Env.DEEP_REFLECTION_PACKAGES, Packages.class);
 	}
 
 	private static void assertDefined(Env env, Class<?> property) {

@@ -14,6 +14,11 @@ import se.jbee.inject.config.ContractsBy;
 public abstract class EnvModule extends BinderModule {
 
 	@Override
+	protected final boolean installDefaults() {
+		return false;
+	}
+
+	@Override
 	protected Bind init(Bind bind) {
 		return bind.per(Scope.container);
 	}
@@ -30,8 +35,4 @@ public abstract class EnvModule extends BinderModule {
 		return bind(Name.named(type), ContractsBy.class);
 	}
 
-	@Override
-	protected final boolean installDefaults() {
-		return false;
-	}
 }

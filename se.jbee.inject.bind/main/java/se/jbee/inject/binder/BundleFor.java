@@ -6,45 +6,45 @@
 package se.jbee.inject.binder;
 
 import se.jbee.inject.bind.Bootstrapper;
-import se.jbee.inject.bind.Bootstrapper.ToggledBootstrapper;
+import se.jbee.inject.bind.Bootstrapper.DependentBootstrapper;
 import se.jbee.inject.bind.Bundle;
+import se.jbee.inject.bind.Dependent;
 import se.jbee.inject.bind.InconsistentBinding;
-import se.jbee.inject.bind.Toggled;
 import se.jbee.inject.lang.Type;
 
 import static se.jbee.inject.lang.Type.raw;
 
 /**
- * The default utility base class for {@link Toggled}s.
+ * The default utility base class for {@link Dependent}s.
  *
- * @param <C> the type of the options values (usually an enum)
+ * @param <E> the type of the options values (usually an enum)
  */
-public abstract class BundleFor<C> implements Toggled<C>,
-		ToggledBootstrapper<C> {
+public abstract class BundleFor<E> implements Dependent<E>,
+		Bootstrapper.DependentBootstrapper<E> {
 
-	private Bootstrapper.ToggledBootstrapper<C> bootstrapper;
+	private DependentBootstrapper<E> bootstrapper;
 
 	@Override
-	public void bootstrap(Bootstrapper.ToggledBootstrapper<C> bs) {
+	public void bootstrap(Bootstrapper.DependentBootstrapper<E> bs) {
 		InconsistentBinding.nonnullThrowsReentranceException(bootstrapper);
 		this.bootstrapper = bs;
 		bootstrap();
 	}
 
 	@Override
-	public final void install(Class<? extends Bundle> bundle, C flag) {
-		bootstrapper.install(bundle, flag);
+	public final void installDependentOn(E element, Class<? extends Bundle> bundle) {
+		bootstrapper.installDependentOn(element, bundle);
 	}
 
 	@Override
 	public final String toString() {
-		Type<?> module = raw(getClass()).toSuperType(Toggled.class).parameter(0);
+		Type<?> module = raw(getClass()).toSuperType(Dependent.class).parameter(0);
 		return "bundle " + getClass().getSimpleName() + "[" + module + "]";
 	}
 
 	/**
-	 * Use {@link #install(Class, Object)} for option dependent {@link Bundle}
-	 * installation.
+	 * Use {@link DependentBootstrapper#installDependentOn(Object, Class)} for
+	 * option dependent {@link Bundle} installation.
 	 */
 	protected abstract void bootstrap();
 }
