@@ -6,11 +6,13 @@
 package se.jbee.inject.defaults;
 
 import se.jbee.inject.*;
+import se.jbee.inject.bind.Bindings;
 import se.jbee.inject.bind.Bootstrapper;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.bind.Dependent;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Supply;
+import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.config.Extension;
 import se.jbee.inject.config.Plugins;
 import se.jbee.inject.lang.Lazy;
@@ -202,20 +204,32 @@ public enum DefaultFeature implements Dependent<DefaultFeature> {
 		}
 	}
 
+	/**
+	 * Provides {@link Injector} sub-contexts on the basis of {@link Plugins}s.
+	 * When installing a {@link Bundle} in a sub-context this simply plugs that
+	 * {@link Bundle} into the point of the sub-context which is {@link
+	 * Injector} and the sub-context {@link Name}.
+	 * <p>
+	 * Extracting the {@link Bundle}s via {@link Plugins} is one part. The
+	 * creation of the {@link Injector} from those {@link Bundle}s is extracted
+	 * into a separate {@link Function} so this can be replaced independently.
+	 */
 	private static final class SubContextModule extends BinderModule
 			implements se.jbee.inject.Supplier<Injector>, Injector {
 
-		@SuppressWarnings("rawtypes")
-		public static final Type<Function<Class[], Injector>> INJECTOR_PROVIDER_TYPE = functionTypeOf(
-				Class[].class, Injector.class);
-
 		@Override
 		protected void declare() {
-			require(INJECTOR_PROVIDER_TYPE);
+			asDefault().bind(functionTypeOf(Class[].class, Injector.class)) //
+					.to(roots -> createSubContextFromRootBundles(env().in(null), roots));
 			asDefault() //
 					.per(Scope.dependencyInstance) //
 					.starbind(Injector.class) //
 					.toSupplier(this);
+		}
+
+		@SuppressWarnings({"rawtypes", "unchecked"})
+		private Injector createSubContextFromRootBundles(Env env, Class[] roots) {
+			return Bootstrap.injector(env, Bindings.newBindings(), roots);
 		}
 
 		@Override
@@ -228,7 +242,7 @@ public enum DefaultFeature implements Dependent<DefaultFeature> {
 					dep.instance.name.toString());
 			if (bundles.length == 0)
 				return this; // this module acts as an Injector that directly fails to resolve any Dependency
-			return context.resolve(INJECTOR_PROVIDER_TYPE).apply(bundles);
+			return context.resolve(functionTypeOf(Class[].class, Injector.class)).apply(bundles);
 		}
 
 		@Override
@@ -236,7 +250,6 @@ public enum DefaultFeature implements Dependent<DefaultFeature> {
 			throw new UnresolvableDependency.ResourceResolutionFailed(
 					"Empty SubContext Injector", dep);
 		}
-
 	}
 
 	private static final class ObtainableModule extends BinderModule {
