@@ -132,7 +132,7 @@ public final class Container implements Injector, Env {
 
 	private static <T> Resource<T> mostQualifiedMatchIn(Resource<T>[] rs,
 			Dependency<T> dep) {
-		return arrayFindFirst(rs, rx -> rx.signature.isAvailableFor(dep));
+		return arrayFindFirst(rs, rx -> rx.signature.isUsableFor(dep));
 	}
 
 	private <T> ResourceResolutionFailed noResourceFor(Dependency<T> dep) {
@@ -185,7 +185,7 @@ public final class Container implements Injector, Env {
 		return candidates == null
 			? new Resource[0]
 			: arrayFilter(candidates,
-					c -> c.signature.isAvailableInstanceWise(dep));
+					c -> c.signature.isUsableInstanceWise(dep));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -202,7 +202,7 @@ public final class Container implements Injector, Env {
 	private static <T> void addCompatibleResources(List<Resource<?>> res,
 			Dependency<T> dep, Resource<? extends T>[] candidates) {
 		for (Resource<? extends T> candidate : candidates)
-			if (candidate.signature.isAvailableInstanceWise(dep))
+			if (candidate.signature.isUsableInstanceWise(dep))
 				res.add(candidate);
 	}
 
@@ -211,7 +211,7 @@ public final class Container implements Injector, Env {
 			Resource<? extends E>[] elementResources) {
 		Dependency<E> elemDep = dep.typed(elementType);
 		for (Resource<? extends E> elemResource : elementResources) {
-			if (elemResource.signature.isAvailableFor(elemDep)) {
+			if (elemResource.signature.isUsableFor(elemDep)) {
 				E instance = elemResource.generate(elemDep);
 				if (identities.add(identityHashCode(instance)))
 					elements.add(instance);

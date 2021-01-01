@@ -37,14 +37,14 @@ public final class Locator<T> implements Typed<T>, Qualifying<Locator<?>>,
 		this.target = target;
 	}
 
-	public boolean isAvailableFor(Dependency<? super T> dep) {
-		return isAvailableNameWise(dep) // check names first since default goes sorts first but will not match any named
-			&& isAvailableTargetWise(dep)//
-			&& isAvailableTypeWise(dep); // most 'expensive' check so we do it last
+	public boolean isUsableFor(Dependency<? super T> dep) {
+		return isUsableNameWise(dep) // check names first since default goes sorts first but will not match any named
+				&& isUsableTypeWise(dep)
+				&& isUsableTargetWise(dep);
 	}
 
-	public boolean isAvailableInstanceWise(Dependency<? super T> dep) {
-		return isAvailableNameWise(dep) && isAvailableTypeWise(dep);
+	public boolean isUsableInstanceWise(Dependency<? super T> dep) {
+		return isUsableNameWise(dep) && isUsableTypeWise(dep);
 	}
 
 	/**
@@ -58,11 +58,11 @@ public final class Locator<T> implements Typed<T>, Qualifying<Locator<?>>,
 	 * Integer} can be assigned to the offered type, here {@link Number}. Then
 	 * {@link Integer} is an available type.
 	 */
-	public boolean isAvailableTypeWise(Dependency<? super T> dep) {
-		return isAvailableType(dep.type(), instance.type());
+	public boolean isUsableTypeWise(Dependency<? super T> dep) {
+		return isGeneratableType(dep.type(), instance.type());
 	}
 
-	private static boolean isAvailableType(Type<?> required, Type<?> offered) {
+	private static boolean isGeneratableType(Type<?> required, Type<?> offered) {
 		if (offered.isAssignableTo(required))
 			return true;
 		if (!required.rawType.isAssignableFrom(offered.rawType)
@@ -70,35 +70,36 @@ public final class Locator<T> implements Typed<T>, Qualifying<Locator<?>>,
 			return false;
 		Type<?>[] offeredParams = offered.parameters();
 		for (int i = 0; i < offeredParams.length; i++) {
-			if (!isAvailableTypeParameter(required.parameter(i), offeredParams[i]))
+			if (!isGeneratableTypeParameter(required.parameter(i), offeredParams[i]))
 				return false;
 		}
 		return true;
 	}
 
-	private static boolean isAvailableTypeParameter(Type<?> required, Type<?> offered) {
+	private static boolean isGeneratableTypeParameter(Type<?> required,
+			Type<?> offered) {
 		if (offered.isUpperBound())
 			return required.isAssignableTo(offered);
 		// (not a ? extends parameter)
 		if (required.rawType != offered.rawType)
 			return false;
 		// ok, these are of the same raw type, what about the parameters?
-		return isAvailableType(required, offered);
+		return isGeneratableType(required, offered);
 	}
 
 	/**
 	 * Does the given {@link Dependency} occur in the right package and for the
 	 * right target ?
 	 */
-	public boolean isAvailableTargetWise(Dependency<? super T> dep) {
-		return target.isAvailableFor(dep);
+	public boolean isUsableTargetWise(Dependency<? super T> dep) {
+		return target.isUsableFor(dep);
 	}
 
 	/**
 	 * Does this {@link Locator} provide the instance wanted by the given
 	 * {@link Dependency}'s {@link Name}
 	 */
-	public boolean isAvailableNameWise(Dependency<? super T> dep) {
+	public boolean isUsableNameWise(Dependency<? super T> dep) {
 		return instance.name.isCompatibleWith(dep.instance.name);
 	}
 
@@ -154,7 +155,7 @@ public final class Locator<T> implements Typed<T>, Qualifying<Locator<?>>,
 
 	/**
 	 * @since 8.1
-	 * @return a {@link Dependency} that {@link #isAvailableFor(Dependency)} this
+	 * @return a {@link Dependency} that {@link #isUsableFor(Dependency)} this
 	 *         {@link Locator}.
 	 */
 	public Dependency<T> toDependency() {
