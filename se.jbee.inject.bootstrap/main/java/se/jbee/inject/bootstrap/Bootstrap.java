@@ -17,6 +17,7 @@ import se.jbee.inject.config.Edition;
 import se.jbee.inject.container.Container;
 import se.jbee.inject.defaults.DefaultEnv;
 import se.jbee.inject.defaults.DefaultsBundle;
+import se.jbee.inject.lang.Lazy;
 import se.jbee.inject.lang.Reflect;
 
 import java.lang.reflect.Modifier;
@@ -33,6 +34,28 @@ import static se.jbee.inject.lang.Utils.arrayPrepend;
 public final class Bootstrap {
 
 	public static final Env DEFAULT_ENV = DefaultEnv.bootstrap();
+
+	private static final Lazy<Env> SERVICE_LOADER_ENV = new Lazy<>();
+	private static final Lazy<Injector> SERVICE_LOADER_INJECTOR = new Lazy<>();
+
+	/**
+	 * @return The {@link Env} purely defined by {@link Bundle}s provided via
+	 * {@link ServiceLoader}. Once created this method always returns the same
+	 * {@link Env} instance.
+	 */
+	public static Env currentEnv() {
+		return SERVICE_LOADER_ENV.get(Bootstrap::env);
+	}
+
+	/**
+	 * @return The {@link Injector} purely defined by {@link Bundle}s provided
+	 * via {@link ServiceLoader}. The bootstrapping always uses the {@link
+	 * #currentEnv()}. Once created this method always returns the same {@link
+	 * Injector} instance.
+	 */
+	public static Injector currentInjector() {
+		return SERVICE_LOADER_INJECTOR.get(() -> injector(currentEnv()));
+	}
 
 	/**
 	 * @return The {@link Injector} context purely created from {@link Bundle}s
