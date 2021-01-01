@@ -18,8 +18,6 @@ import static se.jbee.inject.lang.Type.raw;
  *
  * This can be restricted by the {@link Packages} the injected that is injected
  * is defined in or the {@link Type} of the receiving instance.
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
 @SuppressWarnings("squid:S1448")
 public final class Target
@@ -100,25 +98,30 @@ public final class Target
 		return equalTo(ANY);
 	}
 
-	public boolean isAvailableFor(Dependency<?> dep) {
-		return isAny() || isAccessibleFor(dep) && isCompatibleWith(dep);
+	public boolean isUsableFor(Dependency<?> dep) {
+		return isAny() || isUsablePackageWise(dep) && isUsableInstanceWise(dep);
 	}
 
 	/**
 	 * @return true in case the actual types of the injection hierarchy are
 	 *         assignable with the ones demanded by this target.
 	 */
-	public boolean isCompatibleWith(Dependency<?> dep) {
-		return areParentsCompatibleWith(dep)
-			&& (instance.isAny() || isCompatibleWith(dep.target()));
+	public boolean isUsableInstanceWise(Dependency<?> dep) {
+		return (instance.isAny() || isUsableInstanceWise(dep.target()))
+				&& isUsableParentWise(dep);
 	}
 
-	private boolean isCompatibleWith(Instance<?> target) {
-		return instance.name.isCompatibleWith(target.name)
-			&& isAssignableTo(instance.type(), target.type());
+	private boolean isUsableInstanceWise(Instance<?> required) {
+		return isSuitableInstance(required, this.instance);
 	}
 
-	private boolean areParentsCompatibleWith(Dependency<?> dep) {
+	private static boolean isSuitableInstance(Instance<?> required,
+			Instance<?> offered) {
+		return offered.name.isCompatibleWith(required.name)
+			&& isUsableTypeWise(required.type(), offered.type());
+	}
+
+	private boolean isUsableParentWise(Dependency<?> dep) {
 		if (parents.isAny())
 			return true;
 		int pl = parents.depth();
@@ -128,7 +131,7 @@ public final class Target
 		}
 		int pi = 0;
 		while (pl <= il && pl > 0) {
-			if (isAssignableTo(parents.at(pi).type(), dep.target(il).type())) {
+			if (isSuitableInstance(parents.at(pi), dep.target(il))) {
 				pl--;
 				pi++;
 			}
@@ -137,14 +140,14 @@ public final class Target
 		return pl == 0;
 	}
 
-	private static boolean isAssignableTo(Type<?> type, Type<?> targetType) {
-		return type.isInterface() || type.isAbstract()
-			? targetType.isAssignableTo(type)
-			: targetType.equalTo(type);
+	private static boolean isUsableTypeWise(Type<?> required, Type<?> offered) {
+		return offered.isInterface() || offered.isAbstract()
+			? required.isAssignableTo(offered)
+			: required.equalTo(offered);
 	}
 
-	public boolean isAccessibleFor(Dependency<?> dependency) {
-		return this == ANY || packages.contains(dependency.target().type());
+	public boolean isUsablePackageWise(Dependency<?> dep) {
+		return this == ANY || packages.contains(dep.target().type());
 	}
 
 	@Override

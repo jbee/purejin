@@ -17,8 +17,8 @@ class TestTarget {
 	void thatTargetInstancesNeedsToBeMatchedByDependencies() {
 		Target target = targeting(List.class);
 		Dependency<String> dependency = dependency(String.class);
-		assertFalse(target.isAvailableFor(dependency));
+		assertFalse(target.isUsableFor(dependency));
 		assertTrue(
-				target.isAccessibleFor(dependency.injectingInto(List.class)));
+				target.isUsablePackageWise(dependency.injectingInto(List.class)));
 	}
 }
