@@ -136,7 +136,6 @@ public final class Bootstrap {
 		@Override
 		public void installDefaults() {
 			install(DefaultsBundle.class);
-			install(InjectorFeature.SUB_CONTEXT_FUNCTION);
 		}
 
 		@Override
