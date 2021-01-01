@@ -37,13 +37,13 @@ public final class Locator<T> implements Typed<T>, Qualifying<Locator<?>>,
 		this.target = target;
 	}
 
-	public boolean isUsableFor(Dependency<? super T> dep) {
+	public boolean isUsableFor(Dependency<?> dep) {
 		return isUsableNameWise(dep) // check names first since default goes sorts first but will not match any named
 				&& isUsableTypeWise(dep)
 				&& isUsableTargetWise(dep);
 	}
 
-	public boolean isUsableInstanceWise(Dependency<? super T> dep) {
+	public boolean isUsableInstanceWise(Dependency<?> dep) {
 		return isUsableNameWise(dep) && isUsableTypeWise(dep);
 	}
 
@@ -58,13 +58,15 @@ public final class Locator<T> implements Typed<T>, Qualifying<Locator<?>>,
 	 * Integer} can be assigned to the offered type, here {@link Number}. Then
 	 * {@link Integer} is an available type.
 	 */
-	public boolean isUsableTypeWise(Dependency<? super T> dep) {
+	public boolean isUsableTypeWise(Dependency<?> dep) {
 		return isGeneratableType(dep.type(), instance.type());
 	}
 
 	private static boolean isGeneratableType(Type<?> required, Type<?> offered) {
 		if (offered.isAssignableTo(required))
 			return true;
+		if (offered.isUpperBound())
+			return required.isAssignableTo(offered);
 		if (!required.rawType.isAssignableFrom(offered.rawType)
 				|| !offered.hasTypeParameter())
 			return false;
@@ -91,7 +93,7 @@ public final class Locator<T> implements Typed<T>, Qualifying<Locator<?>>,
 	 * Does the given {@link Dependency} occur in the right package and for the
 	 * right target ?
 	 */
-	public boolean isUsableTargetWise(Dependency<? super T> dep) {
+	public boolean isUsableTargetWise(Dependency<?> dep) {
 		return target.isUsableFor(dep);
 	}
 
@@ -99,7 +101,7 @@ public final class Locator<T> implements Typed<T>, Qualifying<Locator<?>>,
 	 * Does this {@link Locator} provide the instance wanted by the given
 	 * {@link Dependency}'s {@link Name}
 	 */
-	public boolean isUsableNameWise(Dependency<? super T> dep) {
+	public boolean isUsableNameWise(Dependency<?> dep) {
 		return instance.name.isCompatibleWith(dep.instance.name);
 	}
 
