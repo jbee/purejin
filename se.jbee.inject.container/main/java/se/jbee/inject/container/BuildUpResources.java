@@ -101,7 +101,7 @@ public final class BuildUpResources {
 	private static <T, B extends BuildUp<?>> BuildUp<? super T> generateBuildUp(
 			Class<T> actualType, Resource<B> resource, Dependency<?> context) {
 		Locator<B> signature = resource.signature;
-		if (!signature.target.isAccessibleFor(context)) //OBS! here we only check general accessability as other parts need to be checked dynamically
+		if (!signature.target.isAvailablePackageWise(context)) //OBS! here we only check general accessability as other parts need to be checked dynamically
 			return null;
 		Type<?> required = signature.type().parameter(0);
 		if (!raw(actualType).isAssignableTo(required))

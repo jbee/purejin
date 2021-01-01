@@ -19,6 +19,6 @@ class TestTarget {
 		Dependency<String> dependency = dependency(String.class);
 		assertFalse(target.isAvailableFor(dependency));
 		assertTrue(
-				target.isAccessibleFor(dependency.injectingInto(List.class)));
+				target.isAvailablePackageWise(dependency.injectingInto(List.class)));
 	}
 }

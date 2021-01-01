@@ -103,7 +103,7 @@ final class Resources {
 		for (Resource<?>[] forType : byRawType.values())
 			for (Resource<?> resource : forType) {
 				Type<?> type = resource.type();
-				if (type.isUpperBound() || type.isParameterizedAsUpperBound()) //TODO this should not be needed as this should match by raw type list
+				if (type.isUpperBound())
 					res.add(resource);
 			}
 		Collections.sort(res);
