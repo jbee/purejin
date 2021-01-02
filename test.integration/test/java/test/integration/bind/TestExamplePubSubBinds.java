@@ -1,7 +1,7 @@
 package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
-import se.jbee.inject.BuildUp;
+import se.jbee.inject.Lift;
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bind.Bundle;
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
- * A tests the shows how {@link BuildUp}s behind {@link Binder#boot(Class)} can
+ * A tests the shows how {@link Lift}s behind {@link Binder#boot(Class)} can
  * be used to automatically wire a pub-sub relation.
  * <p>
  * In the test scenario there is a interface for a {@link Publisher} and a
@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  * initialisation can be done in two ways. Eager wiring at the end of
  * bootstrapping the {@link Injector} is done using {@link Binder#boot(Class)}
  * (see {@link EagerSolution}). Lazy wiring at the point where the {@link
- * Publisher} is created/resolved is done using {@link Binder#upbind(Class)}
+ * Publisher} is created/resolved is done using {@link Binder#lift(Class)}
  * (see {@link LazySolution}).
  *
  * @see TestExamplePostConstructBinds
@@ -140,7 +140,7 @@ class TestExamplePubSubBinds {
 
 		@Override
 		protected void declare() {
-			upbind(Publisher.class) //
+			lift(Publisher.class) //
 					.forEach(Subscriber.class, Publisher::subscribe);
 		}
 	}

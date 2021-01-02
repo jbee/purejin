@@ -250,30 +250,30 @@ public class Binder {
 	}
 
 	/**
-	 * Bind a {@link BuildUp} for the {@link Injector} itself.
+	 * Bind a {@link Lift} for the {@link Injector} itself.
 	 *
 	 * @return immutable fluent API
 	 */
-	public final UpbindBinder<Injector> upbind() {
-		return upbind(Injector.class);
+	public final LiftBinder<Injector> lift() {
+		return lift(Injector.class);
 	}
 
 	/**
-	 * Bind a {@link BuildUp} that affects all types assignable to provided type.
+	 * Bind a {@link Lift} that affects all types assignable to provided type.
 	 *
 	 * @return immutable fluent API
 	 */
-	public final <T> UpbindBinder<T> upbind(Class<T> type) {
-		return upbind(raw(type));
+	public final <T> LiftBinder<T> lift(Class<T> type) {
+		return lift(raw(type));
 	}
 
 	/**
-	 * Bind a {@link BuildUp} that affects all types assignable to provided type.
+	 * Bind a {@link Lift} that affects all types assignable to provided type.
 	 *
 	 * @return immutable fluent API
 	 */
-	public final <T> UpbindBinder<T> upbind(Type<T> type) {
-		return multibind(BuildUp.buildUpTypeOf(type)).wrapAs(UpbindBinder::new);
+	public final <T> LiftBinder<T> lift(Type<T> type) {
+		return multibind(Lift.liftTypeOf(type)).wrapAs(LiftBinder::new);
 	}
 
 	public final <T> TypedBinder<T> multibind(Class<T> type) {
@@ -382,15 +382,15 @@ public class Binder {
 	}
 
 	/**
-	 * Small utility to <b>lazily</b> run an initialisation function for the
-	 * target instances of the bound {@link BuildUp}.
+	 * Small utility to <b>lazily</b> run an "initialisation" function for the
+	 * target instances of the bound {@link Lift}.
 	 *
-	 * @param <T> type of the instances being {@link BuildUp}
+	 * @param <T> type of the instances being {@link Lift}
 	 * @since 8.1
 	 */
-	public static class UpbindBinder<T> extends TypedBinder<BuildUp<T>> {
+	public static class LiftBinder<T> extends TypedBinder<Lift<T>> {
 
-		UpbindBinder(Bind bind, Locator<BuildUp<T>> locator) {
+		LiftBinder(Bind bind, Locator<Lift<T>> locator) {
 			super(bind, locator);
 		}
 
@@ -441,7 +441,7 @@ public class Binder {
 	 * resolved during initialisation phase and provided to the {@link
 	 * BiConsumer} function. This can be one or many of such instances.
 	 * <p>
-	 * In contrast to a plain {@link BuildUp} that runs <b>lazily</b> when an
+	 * In contrast to a plain {@link Lift} that runs <b>lazily</b> when an
 	 * instance of the matching type is constructed this initialisation is
 	 * performed directly after the {@link Injector} context is created.
 	 *
@@ -469,7 +469,7 @@ public class Binder {
 			Dependency<? extends R[]> dep = dependency(
 					related.addArrayDimension().asUpperBound()) //
 					.injectingInto(target);
-			binder.upbind().to((impl, as, context) -> {
+			binder.lift().to((impl, as, context) -> {
 				T obj = context.resolve(target);
 				for (R arg : context.resolve(dep))
 					initFunction.accept(obj, arg);
@@ -489,7 +489,7 @@ public class Binder {
 
 		public <R> void by(Instance<? extends R> related,
 				BiConsumer<T, R> initFunction) {
-			binder.upbind().to((impl, as, context) -> {
+			binder.lift().to((impl, as, context) -> {
 				T obj = context.resolve(target);
 				R arg = context.resolve(
 						dependency(related).injectingInto(as));
@@ -550,10 +550,10 @@ public class Binder {
 		}
 
 		/**
-		 * @see #in(Type)
+		 * @see #inAny(Type)
 		 */
-		public final <T> ConnectTargetBinder<T> in(Class<T> target) {
-			return in(raw(target));
+		public final <T> ConnectTargetBinder<T> inAny(Class<T> target) {
+			return inAny(raw(target));
 		}
 
 		/**
@@ -564,7 +564,7 @@ public class Binder {
 		 * @param <T>    target bean type or interface implemented by targets
 		 * @return binder for fluent API
 		 */
-		public <T> ConnectTargetBinder<T> in(Type<T> target) {
+		public <T> ConnectTargetBinder<T> inAny(Type<T> target) {
 			return new ConnectTargetBinder<>(binder, connectsBy, target);
 		}
 	}
@@ -600,12 +600,12 @@ public class Binder {
 		}
 
 		public ConnectTargetBinder<T> to(Name connectorName) {
-			binder.upbind(target).to((instance, as, context) -> //
-					init(connectorName, instance, as, context));
+			binder.lift(target).to((instance, as, context) -> //
+					connect(connectorName, instance, as, context));
 			return this; // for multiple to
 		}
 
-		private T init(Name connectorName, T instance, Type<?> as,
+		private T connect(Name connectorName, T instance, Type<?> as,
 				Injector context) {
 			Method[] connected = connectsBy.reflect(instance.getClass());
 			if (connected != null && connected.length > 0) {

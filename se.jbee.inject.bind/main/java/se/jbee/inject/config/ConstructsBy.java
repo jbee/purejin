@@ -87,11 +87,11 @@ public interface ConstructsBy {
 				: reflect(arrayFilter(candidates, c -> filter.test(c, hints)), hints);
 	}
 
-	default ConstructsBy selectStrictBy(Typed<?>... hints) {
+	default ConstructsBy parameterTypesStrictlyMatch(Typed<?>... hints) {
 		return select(constructor -> Utils.matchesInOrder(constructor, hints));
 	}
 
-	default ConstructsBy selectBy(Typed<?>... hints) {
+	default ConstructsBy parameterTypesMatch(Typed<?>... hints) {
 		return select(constructor -> Utils.matchesInRandomOrder(constructor, hints));
 	}
 

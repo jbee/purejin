@@ -27,7 +27,7 @@ import static se.jbee.inject.lang.Utils.*;
  * {@link Resources} created from {@link ResourceDescriptor}s.
  *
  * @see Resources for bootstrapping of the {@link Injector} context
- * @see BuildUpResources for instance initialisation
+ * @see LiftResources for instance initialisation
  */
 public final class Container implements Injector, Env {
 
@@ -36,19 +36,19 @@ public final class Container implements Injector, Env {
 	}
 
 	private final Resources resources;
-	private final BuildUpResources buildUpResources;
+	private final LiftResources liftResources;
 	private final Observer observer;
 	private final Injector builtUp;
 
 	private Container(ResourceDescriptor<?>... descriptors) {
 		this.resources = new Resources(this::supplyInContext,
 				scope -> resolve(scope, Scope.class), descriptors);
-		this.buildUpResources = new BuildUpResources(
+		this.liftResources = new LiftResources(
 				orElse((t, arr) -> arr,
-						() -> resolve(BuildUp.Sequencer.class)),
-				resolve(resourcesTypeOf(BuildUp.buildUpTypeOf(Type.WILDCARD))));
+						() -> resolve(Lift.Sequencer.class)),
+				resolve(resourcesTypeOf(Lift.liftTypeOf(Type.WILDCARD))));
 		this.observer = resolvePostConstructObserver();
-		this.builtUp = buildUpResources.buildUp(this);
+		this.builtUp = liftResources.lift(this);
 		resources.verifyIn(this);
 		resources.initEager();
 	}
@@ -227,7 +227,7 @@ public final class Container implements Injector, Env {
 
 	/**
 	 * Can be called by a {@link Generator} to create an instance from a
-	 * {@link Supplier} and have {@link BuildUp}s applied for it as well as
+	 * {@link Supplier} and have {@link Lift}s applied for it as well as
 	 * notifying {@link Observer}s.
 	 */
 	private <T> T supplyInContext(Dependency<? super T> injected,
@@ -236,8 +236,8 @@ public final class Container implements Injector, Env {
 		T instance = supplier.supply(injected, context);
 		if (instance != null
 			&& !resource.lifeCycle.scope.equalTo(Scope.reference)) {
-			if (buildUpResources != null)
-				instance = buildUpResources.buildUp(instance, injected,
+			if (liftResources != null)
+				instance = liftResources.lift(instance, injected,
 						context);
 			if (observer != null
 				&& resource.lifeCycle.isPermanent()) {

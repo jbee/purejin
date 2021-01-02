@@ -1,7 +1,7 @@
 package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
-import se.jbee.inject.BuildUp;
+import se.jbee.inject.Lift;
 import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency.ResourceResolutionFailed;
 import se.jbee.inject.binder.BinderModule;
@@ -45,7 +45,7 @@ class TestExampleManualContractBinds {
 			bind(ContractsBy.class).toScoped(ContractsBy.NONE);
 			// but we do decorate the default behaviour with the one accepting all in the set of declared contract
 			// those are all we added somewhere using: addContract(Class)
-			bind(BuildUp.buildUpTypeOf(ContractsBy.class))
+			bind(Lift.liftTypeOf(ContractsBy.class))
 					.to(ContractsBy::buildUpDeclaredSet);
 		}
 	}

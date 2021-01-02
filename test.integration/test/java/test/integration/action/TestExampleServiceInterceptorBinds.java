@@ -60,7 +60,7 @@ class TestExampleServiceInterceptorBinds {
 		@Override
 		protected void declare() {
 			construct(TheService.class);
-			connect(ProducesBy.OPTIMISTIC).in(TheService.class).asAction();
+			connect(ProducesBy.OPTIMISTIC).inAny(TheService.class).asAction();
 			// register the interceptor
 			plug(AssertInvocationInterceptor.class) //
 					.into(ServiceInterceptor.class);

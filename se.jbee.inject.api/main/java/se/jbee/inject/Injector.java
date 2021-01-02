@@ -110,7 +110,7 @@ public interface Injector {
 
 		/**
 		 * Called by an {@link Injector} context when an instance was created
-		 * and after eventual {@link BuildUp} initialisation have been applied.
+		 * and after eventual {@link Lift} initialisation have been applied.
 		 * <p>
 		 * Note that this method is only called for typical "singleton"
 		 * instances of an application with a permanent scope ({@link

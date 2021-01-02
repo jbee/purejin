@@ -1,7 +1,7 @@
 package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
-import se.jbee.inject.BuildUp;
+import se.jbee.inject.Lift;
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
- * Basic example of how to use {@link BuildUp} on a specific type.
+ * Basic example of how to use {@link Lift} on a specific type.
  *
  * In the example the interface {@link MyListener} should be initialised. The
  * classes {@link MyService} and {@link MyServiceExtension} implement the
@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  *
  * @since 8.1
  */
-class TestBasicBuildUpBinds {
+class TestBasicLiftBinds {
 
 	public interface MyListener {
 
@@ -54,11 +54,11 @@ class TestBasicBuildUpBinds {
 
 		@Override
 		protected void declare() {
-			upbind(MyListener.class).to(
-					(BuildUp<MyListener>) (l, as, injector) -> l.inc(1));
+			lift(MyListener.class).to(
+					(Lift<MyListener>) (l, as, injector) -> l.inc(1));
 			injectingInto(MyServiceExtension.class) //
-					.upbind(MyListener.class) //
-					.to((BuildUp<MyListener>) (l, as, injector) -> l.inc(2));
+					.lift(MyListener.class) //
+					.to((Lift<MyListener>) (l, as, injector) -> l.inc(2));
 			construct(MyService.class);
 			construct(MyOtherService.class);
 			construct(MyServiceExtension.class);

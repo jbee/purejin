@@ -139,9 +139,8 @@ public final class DefaultValueBinders {
 			Instance<?> ref, Binding<T> item, Bindings dest) {
 		Type<?> refType = ref.type();
 		if (isClassBanal(refType.rawType)) {
-			ConstructsBy constructsBy = env.property(ConstructsBy.class);
-			Constructor<?> target = constructsBy.reflect(
-					refType.rawType.getDeclaredConstructors());
+			Constructor<?> target = env.property(ConstructsBy.class) //
+					.reflect(refType.rawType.getDeclaredConstructors());
 			if (target != null) {
 				dest.addExpanded(env, item, constructs(refType, target,
 						env.property(HintsBy.class)));
@@ -159,7 +158,7 @@ public final class DefaultValueBinders {
 			Class<? extends Supplier<? extends T>> supplier = (Class<? extends Supplier<? extends T>>) refType.rawType;
 			dest.addExpanded(env, item.complete(BindingType.REFERENCE,
 					Supply.bySupplierReference(supplier)));
-			implicitlyBindToConstructor(env, ref, item, dest);
+			implicitlyExpandConstructs(env, ref, item, dest);
 			return;
 		}
 		final Type<? extends T> type = refType.castTo(item.type());
@@ -168,12 +167,12 @@ public final class DefaultValueBinders {
 				bound.name)) {
 			dest.addExpanded(env, item.complete(BindingType.REFERENCE,
 					Supply.byInstanceReference(ref.typed(type))));
-			implicitlyBindToConstructor(env, ref, item, dest);
+			implicitlyExpandConstructs(env, ref, item, dest);
 			return;
 		}
 		if (type.isInterface())
 			throw InconsistentBinding.referenceLoop(item, ref, bound);
-		bindToConstructsBy(env, type.rawType, item, dest);
+		expandConstructs(env, type.rawType, item, dest);
 	}
 
 	private static <T> boolean isCompatibleSupplier(Type<T> requiredType,
@@ -186,7 +185,7 @@ public final class DefaultValueBinders {
 				.parameter(0).isAssignableTo(requiredType);
 	}
 
-	private static <T> void implicitlyBindToConstructor(Env env,
+	private static <T> void implicitlyExpandConstructs(Env env,
 			Instance<T> ref, Binding<?> item, Bindings dest) {
 		Class<T> impl = ref.type().rawType;
 		if (isClassConstructable(impl)) {
@@ -194,13 +193,13 @@ public final class DefaultValueBinders {
 					new Locator<>(ref).indirect(item.signature.target.indirect),
 					BindingType.CONSTRUCTOR, null, item.scope,
 					item.source.typed(DeclarationType.IMPLICIT));
-			bindToConstructsBy(env, impl, binding, dest);
+			expandConstructs(env, impl, binding, dest);
 		}
 	}
 
-	private static <T> void bindToConstructsBy(Env env, Class<? extends T> ref,
+	private static <T> void expandConstructs(Env env, Class<? extends T> ref,
 			Binding<T> item, Bindings dest) {
-		Constructor<?> c = env.property(ConstructsBy.class)
+		Constructor<?> c = env.property(ConstructsBy.class) //
 				.reflect(ref.getDeclaredConstructors());
 		if (c != null)
 			dest.addExpanded(env, item,

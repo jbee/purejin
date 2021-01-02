@@ -21,6 +21,4 @@ public interface Connector {
 	 */
 	void connect(Object instance, Type<?> as, Method connected);
 
-	//TODO add a default bind for a Connector of any name that just logs a warning
-
 }

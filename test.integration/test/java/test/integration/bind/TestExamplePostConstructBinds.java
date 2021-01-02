@@ -33,7 +33,7 @@ import static se.jbee.inject.lang.Type.classType;
  * This example also shows how a similar concept can be build more elegantly
  * using an interface.
  *
- * @see TestExampleBuildUpAnnotationGuidedInjectionBinds
+ * @see TestExampleLiftAnnotationGuidedInjectionBinds
  * @see TestExamplePubSubBinds
  */
 class TestExamplePostConstructBinds {
@@ -61,10 +61,10 @@ class TestExamplePostConstructBinds {
 			injectingInto(Bean.class).bind(int.class).to(42);
 
 			// @PostConstruct
-			upbind(Object.class).to((TestExamplePostConstructBindsModule::postConstructHook));
+			lift(Object.class).to((TestExamplePostConstructBindsModule::postConstructHook));
 
 			// IPostConstruct (name just used to avoid name clash in this example)
-			upbind(IPostConstruct.class).run(IPostConstruct::setUp);
+			lift(IPostConstruct.class).run(IPostConstruct::setUp);
 		}
 
 		private static Object postConstructHook(Object target, Type<?> as,

@@ -41,7 +41,7 @@ class TestExampleCommandFacadeBinds {
 		@Override
 		protected void declare() {
 			construct(MathService.class);
-			connect(ProducesBy.OPTIMISTIC).in(MathService.class).asAction();
+			connect(ProducesBy.OPTIMISTIC).inAny(MathService.class).asAction();
 			per(Scope.dependencyType) //
 					.starbind(Command.class) //
 					.toSupplier(CommandModule::supply);

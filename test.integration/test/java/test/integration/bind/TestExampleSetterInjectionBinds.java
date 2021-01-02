@@ -2,6 +2,7 @@ package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
+import se.jbee.inject.Lift;
 import se.jbee.inject.binder.Binder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -20,12 +21,12 @@ import static se.jbee.inject.Name.named;
  * that assume setter injection but it should not be overused.
  * <p>
  * If setter injection is wanted in general a single {@link
- * se.jbee.inject.BuildUp} or a custom {@link se.jbee.inject.bind.ValueBinder}
+ * Lift} or a custom {@link se.jbee.inject.bind.ValueBinder}
  * can be used similar to the example given in {@link TestExampleFieldInjectionBinds}.
  * <p>
  * Also note that {@link Binder#boot(Class)} is eager, it occurs at the end of
  * the bootstrapping of the {@link Injector} context while a {@link
- * se.jbee.inject.BuildUp} as shown in {@link TestExampleFieldInjectionBinds} is
+ * Lift} as shown in {@link TestExampleFieldInjectionBinds} is
  * lazy as it first occurs when the target instance is created.
  *
  * @see TestExampleFieldInjectionBinds

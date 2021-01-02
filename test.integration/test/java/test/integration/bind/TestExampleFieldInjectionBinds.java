@@ -1,10 +1,7 @@
 package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Env;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Supplier;
+import se.jbee.inject.*;
 import se.jbee.inject.bind.Binding;
 import se.jbee.inject.bind.Bindings;
 import se.jbee.inject.bind.Bundle;
@@ -40,7 +37,7 @@ import static se.jbee.inject.lang.Type.fieldType;
  * <p>
  * It should be noted that this is just one possible way to add a feature like
  * field injection. Another solution would be the use of {@link
- * se.jbee.inject.BuildUp}s.
+ * Lift}s.
  * <p>
  * For more examples on {@link ValueBinder}s have a look at:
  *

@@ -67,6 +67,12 @@ class TestLocator {
 	}
 
 	@Test
+	void sameTypeAsRawTypeIsUsable() {
+		assertIsUsable(raw(List.class).parameterized(Integer.class),
+				raw(List.class));
+	}
+
+	@Test
 	void sameTypeWithIncompatibleUpperBoundTypeParameterIsNotUsable() {
 		assertIsNotUsable(raw(List.class).parameterized(Integer.class),
 				raw(List.class).parameterized(

@@ -81,7 +81,7 @@ class TestFeatureConnectorBinds {
 			// the marking as "my-linker"
 			injectingInto(named("marked"), Bean.class) //
 					.connect(ProducesBy.OPTIMISTIC.annotatedWith(Marked.class)) //
-					.in(Bean.class) //
+					.inAny(Bean.class) //
 					.to("my-linker");
 
 			// 2 named instances, one should match for marking, other should not

@@ -69,10 +69,10 @@ class TestFeatureActionBinds {
 			per(dependencyType).bind(GenericService.class).toConstructor();
 
 			ConnectBinder connectAll = connect(ProducesBy.OPTIMISTIC);
-			connectAll.in(MyService.class).asAction();
-			connectAll.in(MyOtherService.class).asAction();
-			connectAll.in(HandlerService.class).asAction();
-			connectAll.in(GenericService.class).asAction();
+			connectAll.inAny(MyService.class).asAction();
+			connectAll.inAny(MyOtherService.class).asAction();
+			connectAll.inAny(HandlerService.class).asAction();
+			connectAll.inAny(GenericService.class).asAction();
 		}
 	}
 

@@ -2,6 +2,7 @@ package se.jbee.inject.config;
 
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
+import se.jbee.inject.Lift;
 import se.jbee.inject.lang.Type;
 
 import java.lang.annotation.Annotation;
@@ -84,17 +85,17 @@ public interface ContractsBy {
 	}
 
 	/**
-	 * Is used as {@link se.jbee.inject.BuildUp} to add a {@link
+	 * Is used as {@link Lift} to add a {@link
 	 * #declaredSet(Set)} if "global" API types to the {@link ContractsBy}
 	 * strategy set.
 	 * <p>
-	 * This uses the {@link se.jbee.inject.BuildUp} so that during the
+	 * This uses the {@link Lift} so that during the
 	 * bootstrapping of the {@link Env} the API {@link Class}es can be added
 	 * from different software modules. When the {@link ContractsBy} configured
 	 * is resolved it gets decorated by the set.
 	 * <p>
 	 * Note that a default {@link ContractsBy} must be set explicitly and that
-	 * it must be bound with scoping so that {@link se.jbee.inject.BuildUp}
+	 * it must be bound with scoping so that {@link Lift}
 	 * occurs.
 	 *
 	 * {@inheritDoc}

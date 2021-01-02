@@ -39,7 +39,7 @@ class TestExampleAnnotatedActionsBinds {
 		protected void declare() {
 			construct(Bean.class);
 			connect(OPTIMISTIC.annotatedWith(Marker.class)) //
-					.in(Bean.class).asAction();
+					.inAny(Bean.class).asAction();
 		}
 	}
 
@@ -55,7 +55,7 @@ class TestExampleAnnotatedActionsBinds {
 		@Override
 		protected void declare() {
 			construct(Bean.class);
-			connect().in(Bean.class).asAction();
+			connect().inAny(Bean.class).asAction();
 		}
 	}
 
