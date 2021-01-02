@@ -21,8 +21,6 @@ import se.jbee.inject.lang.Qualifying;
  * It is important to distinguish binds in that way since binds always have to
  * be unambiguous. Two equivalent binds would
  * {@link #clashesWith(DeclarationType)} each other.
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
 public enum DeclarationType implements Qualifying<DeclarationType> {
 

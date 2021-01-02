@@ -11,7 +11,6 @@ import se.jbee.inject.binder.*;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.config.ContractsBy;
 import se.jbee.inject.config.HintsBy;
-import se.jbee.inject.lang.Reflect;
 import se.jbee.inject.lang.Type;
 
 import java.lang.reflect.Constructor;
@@ -21,6 +20,7 @@ import static se.jbee.inject.Name.named;
 import static se.jbee.inject.bind.BindingType.*;
 import static se.jbee.inject.bind.Bindings.supplyConstant;
 import static se.jbee.inject.bind.Bindings.supplyScopedConstant;
+import static se.jbee.inject.binder.Constructs.constructs;
 import static se.jbee.inject.binder.Supply.*;
 import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.lang.Utils.*;
@@ -139,11 +139,14 @@ public final class DefaultValueBinders {
 			Instance<?> ref, Binding<T> item, Bindings dest) {
 		Type<?> refType = ref.type();
 		if (isClassBanal(refType.rawType)) {
-			dest.addExpanded(env, item, new Constant<>(
-					Reflect.construct(refType.rawType, env::accessible,
-							RuntimeException::new)).manual());
-			//TODO shouldn't this use New instead?
-			return;
+			ConstructsBy constructsBy = env.property(ConstructsBy.class);
+			Constructor<?> target = constructsBy.reflect(
+					refType.rawType.getDeclaredConstructors());
+			if (target != null) {
+				dest.addExpanded(env, item, constructs(refType, target,
+						env.property(HintsBy.class)));
+				return;
+			}
 		}
 		bindReference(env, ref, item, dest);
 	}
@@ -201,7 +204,7 @@ public final class DefaultValueBinders {
 				.reflect(ref.getDeclaredConstructors());
 		if (c != null)
 			dest.addExpanded(env, item,
-					Constructs.constructs(raw(c.getDeclaringClass()), c,
+					constructs(raw(c.getDeclaringClass()), c,
 							env.property(HintsBy.class)));
 	}
 }
