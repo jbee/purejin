@@ -143,6 +143,7 @@ public abstract class ActionModule extends BinderModule {
 		private final Injector context;
 		private final Executor executor;
 		private final java.util.function.Supplier<List<ActionSite<A, B>>> sites;
+		private final AtomicInteger nextSite = new AtomicInteger();
 
 		LazyAction(Injector context, Executor executor,
 				java.util.function.Supplier<List<ActionSite<A, B>>> sites) {
@@ -154,12 +155,21 @@ public abstract class ActionModule extends BinderModule {
 		@Override
 		public B run(A input) throws ActionExecutionFailed {
 			List<ActionSite<A, B>> activeSites = this.sites.get();
+			if (activeSites.isEmpty())
+				return null;
 			if (activeSites.size() == 1)
 				return executor.run(activeSites.get(0),
 						activeSites.get(0).args(context, input), input);
-			for (ActionSite<A, B> site : activeSites)
-				executor.run(site, site.args(context, input), input);
-			return null;
+			Class<B> out = activeSites.get(0).out.rawType;
+			if (out == void.class || out == Void.class) {
+				for (ActionSite<A, B> site : activeSites)
+					executor.run(site, site.args(context, input), input);
+				return null;
+			}
+			// round robin
+			int i = nextSite.getAndIncrement();
+			ActionSite<A,B> site = activeSites.get(i % activeSites.size());
+			return executor.run(site, site.args(context, input), input);
 		}
 	}
 }
