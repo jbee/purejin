@@ -75,9 +75,9 @@ class TestFeatureBootstrapper {
 		protected void declare() {
 			asDefault().bind(Number.class).to(7);
 			asDefault().bind(Integer.class).to(11);
-			contractbind(Integer.class).to(2);
-			contractbind(Float.class).to(4f);
-			contractbind(Double.class).to(42d);
+			withContractAccess().bind(Integer.class).to(2);
+			withContractAccess().bind(Float.class).to(4f);
+			withContractAccess().bind(Double.class).to(42d);
 			bind(Number.class).to(6);
 		}
 	}

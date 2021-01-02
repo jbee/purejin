@@ -50,7 +50,7 @@ class TestBasicInjectorObserverBinds {
 		final List<Object> created = new ArrayList<>();
 
 		@Override
-		public void afterBuildUp(Resource<?> resource, Object instance) {
+		public void afterLift(Resource<?> resource, Object instance) {
 			created.add(instance);
 		}
 	}

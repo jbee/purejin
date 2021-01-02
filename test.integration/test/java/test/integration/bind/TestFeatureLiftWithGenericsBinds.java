@@ -21,7 +21,7 @@ class TestFeatureLiftWithGenericsBinds {
 
 	}
 
-	static class TestFeatureBuildUpWithGenericsBindsModule extends BinderModule {
+	static class TestFeatureLiftWithGenericsBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
@@ -44,10 +44,10 @@ class TestFeatureLiftWithGenericsBinds {
 	}
 
 	private final Injector context = Bootstrap.injector(
-			TestFeatureBuildUpWithGenericsBindsModule.class);
+			TestFeatureLiftWithGenericsBindsModule.class);
 
 	@Test
-	void buildUpOnlyAffectExactTypeMatches() {
+	void liftOnlyAffectExactTypeMatches() {
 		assertEquals(new HashSet<>(asList("b", "a")),
 				new HashSet<>(context.resolve(listTypeOf(String.class))));
 		assertEquals(asList(1), context.resolve(listTypeOf(Integer.class)));

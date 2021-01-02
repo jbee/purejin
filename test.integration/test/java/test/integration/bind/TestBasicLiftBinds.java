@@ -50,7 +50,7 @@ class TestBasicLiftBinds {
 
 	}
 
-	private static class TestBasicBuildUpBindsModule extends BinderModule {
+	private static class TestBasicLiftBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
@@ -66,9 +66,9 @@ class TestBasicLiftBinds {
 	}
 
 	@Test
-	void buildUpTookPlace() {
+	void liftTookPlace() {
 		Injector injector = Bootstrap.injector(
-				TestBasicBuildUpBindsModule.class);
+				TestBasicLiftBindsModule.class);
 		assertEquals(1, injector.resolve(MyService.class).sum);
 		assertEquals(3, injector.resolve(MyServiceExtension.class).sum);
 		assertNotNull(injector.resolve(MyOtherService.class));

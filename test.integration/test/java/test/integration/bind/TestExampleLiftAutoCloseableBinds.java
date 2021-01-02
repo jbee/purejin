@@ -118,7 +118,7 @@ class TestExampleLiftAutoCloseableBinds {
 	static boolean moduleInitRan = false;
 
 	@Test
-	void buildUpCanBeUsedToCloseAnyAutoCloseable() {
+	void liftCanBeUsedToCloseAnyAutoCloseable() {
 		Injector injector = Bootstrap.injector(
 				TestExampleLiftAutoCloseableBindsModule.class);
 
@@ -134,7 +134,7 @@ class TestExampleLiftAutoCloseableBinds {
 	}
 
 	@Test
-	void buildUpCanMakeUseOfParametersUsingArgumentModules() {
+	void liftCanMakeUseOfParametersUsingArgumentModules() {
 		Env env = Bootstrap.DEFAULT_ENV.with(Integer.class,	42); // setup some parameter
 		Injector injector = Bootstrap.injector(env,
 				TestExampleLiftAutoCloseableBindsModuleWith.class);

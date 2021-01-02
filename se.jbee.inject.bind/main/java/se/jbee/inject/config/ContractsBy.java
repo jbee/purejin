@@ -100,7 +100,7 @@ public interface ContractsBy {
 	 *
 	 * {@inheritDoc}
 	 */
-	static ContractsBy buildUpDeclaredSet(ContractsBy target, Type<?> as,
+	static ContractsBy liftDeclaredSet(ContractsBy target, Type<?> as,
 			Injector context) {
 		Class<?>[] apis = context.resolve(Plugins.class) //
 				.targeting(Env.class) //

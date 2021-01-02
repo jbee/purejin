@@ -49,7 +49,7 @@ class TestFeatureLiftInjectorBinds {
 		}
 	}
 
-	static class TestFeatureBuildUpInjectorBindsModule extends BinderModule {
+	static class TestFeatureLiftInjectorBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
@@ -66,7 +66,7 @@ class TestFeatureLiftInjectorBinds {
 	}
 
 	private static Injector injector = Bootstrap.injector(
-			TestFeatureBuildUpInjectorBindsModule.class);
+			TestFeatureLiftInjectorBindsModule.class);
 
 	@Test
 	void bootstrappingReturnsDecoratedInjector() {

@@ -29,7 +29,7 @@ class TestFeatureLiftSequencerBinds {
 		List<String> names = new ArrayList<>();
 	}
 
-	static final class TestFeatureBuildUpSequencerBindsModule
+	static final class TestFeatureLiftSequencerBindsModule
 			extends BinderModule implements Lift.Sequencer {
 
 		@Override
@@ -75,10 +75,10 @@ class TestFeatureLiftSequencerBinds {
 	}
 
 	private final Injector injector = Bootstrap.injector(
-			TestFeatureBuildUpSequencerBindsModule.class);
+			TestFeatureLiftSequencerBindsModule.class);
 
 	@Test
-	void orderOfBuildUpsIsAffectedBySequencer() {
+	void orderOfLiftsIsAffectedBySequencer() {
 		assertEquals(asList("c", "b", "a"), injector.resolve(Bean.class).names);
 	}
 }

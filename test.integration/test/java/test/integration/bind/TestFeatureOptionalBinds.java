@@ -26,7 +26,7 @@ class TestFeatureOptionalBinds {
 
 		@Override
 		protected void declare() {
-			contractbind(int.class).to(5);
+			withContractAccess().bind(int.class).to(5);
 			bind(String.class).to("foo");
 		}
 	}

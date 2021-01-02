@@ -71,7 +71,7 @@ class TestExampleSetterInjectionBinds {
 			TestExampleSetterInjectionBindsModule.class);
 
 	@Test
-	void setterInjectionCanBeAddedUsingBuildUp() {
+	void setterInjectionCanBeAddedUsingLift() {
 		Bean bean = context.resolve(Bean.class);
 		AnotherBean anotherBean = context.resolve(AnotherBean.class);
 

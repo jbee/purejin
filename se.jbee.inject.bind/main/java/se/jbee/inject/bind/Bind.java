@@ -63,11 +63,15 @@ public final class Bind {
 		return new Bind(env, bindings, source, scope, target);
 	}
 
+	public Bind into(Env env, Bindings bindings) {
+		return new Bind(env, bindings, source, scope, target);
+	}
+
 	public Bind with(Target target) {
 		return new Bind(env, bindings, source, scope, target);
 	}
 
-	public Bind into(Env env, Bindings bindings) {
+	public Bind with(Env env) {
 		return new Bind(env, bindings, source, scope, target);
 	}
 

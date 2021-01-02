@@ -23,10 +23,10 @@ import java.util.ServiceLoader;
  * preferred where possible.
  */
 @Extends(Support.class)
-public class SupportAnnotationPattern extends BinderModuleWith<Class<?>> {
+public class SupportAnnotationTemplet extends BinderModuleWith<Class<?>> {
 
 	@Override
 	protected void declare(Class<?> annotated) {
-		per(Scope.application).contractbind(annotated).toConstructor();
+		per(Scope.application).withContractAccess().bind(annotated).toConstructor();
 	}
 }

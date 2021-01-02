@@ -83,7 +83,7 @@ class TestExampleLiftProxyDecorationBinds {
 			TestExampleLiftProxyDecorationBindsModule.class);
 
 	@Test
-	void injectorCanBeDecoratedUsingBuildUps() {
+	void injectorCanBeDecoratedUsingLifts() {
 		assertSame(DelegatingInjector.class, injector.getClass());
 	}
 
@@ -93,7 +93,7 @@ class TestExampleLiftProxyDecorationBinds {
 	}
 
 	@Test
-	void injectedInjectorCanBeDecoratedUsingBuildUps() {
+	void injectedInjectorCanBeDecoratedUsingLifts() {
 		assertSame(DelegatingInjector.class,
 				injector.resolve(Injector.class).getClass());
 		assertSame(DelegatingInjector.class,
@@ -101,7 +101,7 @@ class TestExampleLiftProxyDecorationBinds {
 	}
 
 	@Test
-	void resolvedInstancesCanBeDocratedUsingBuildUps() {
+	void resolvedInstancesCanBeDecoratedUsingLifts() {
 		Shape s = injector.resolve(Shape.class);
 		assertNotNull(s);
 		assertSame(s, injector.resolve(Shape.class));

@@ -75,7 +75,7 @@ class TestExampleLiftAnnotationGuidedInjectionBinds {
 			TestExampleLiftAnnotationGuidedInjectionBindsModule.class);
 
 	@Test
-	void buildUpCanBeUsedToAddAnnotationBasedInjection() {
+	void liftCanBeUsedToAddAnnotationBasedInjection() {
 		SomeBean bean = injector.resolve(SomeBean.class);
 		assertEquals(42, bean.someField.intValue());
 		assertEquals("x", bean.someNamedField);

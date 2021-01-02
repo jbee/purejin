@@ -48,9 +48,9 @@ public enum DeclarationType implements Qualifying<DeclarationType> {
 	PROVIDED,
 
 	/**
-	 * A {@code contractbind} has been used. That is binding a class or instance
-	 * to the exact type as {@link #EXPLICIT} and to the set of super-classes
-	 * and -interfaces that are considered a contract.
+	 * A {@code withContractAccess()} has been used. That is binding a class or
+	 * instance to the exact type as {@link #EXPLICIT} and to the set of
+	 * super-classes and -interfaces that are considered a contract.
 	 */
 	CONTRACT,
 

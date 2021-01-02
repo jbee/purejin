@@ -3,6 +3,7 @@ package test.integration.bind;
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency;
+import se.jbee.inject.binder.Binder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.config.ContractsBy;
@@ -24,13 +25,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * <p>
  * This builds upon the concept of {@link ContractsBy} which selects the
  * super-classes and super-interfaces of bound types if they are bound as {@link
- * se.jbee.inject.binder.Binder#contractbind(Class)}.
+ * Binder#withContractAccess()}.
  * <p>
  * In this example we also create a utility extension {@link ProjectBaseModule}
  * of the default {@link BinderModule} which is assumed to be used as base class
  * for the application project. It adds a convenience method {@link
  * ProjectBaseModule#addBean(Class)} which internally creates the {@link
- * se.jbee.inject.binder.Binder#contractbind(Class)}.
+ * Binder#withContractAccess()}.
  *
  * This is only meant to show a more realistic way how a project would use
  * annotation guided contracts.
@@ -71,7 +72,7 @@ class TestExampleAnnotatedContractsBinds {
 	private static abstract class ProjectBaseModule extends BinderModule {
 
 		void addBean(Class<?> bean) {
-			contractbind(bean).toConstructor();
+			withContractAccess().bind(bean).toConstructor();
 		}
 	}
 

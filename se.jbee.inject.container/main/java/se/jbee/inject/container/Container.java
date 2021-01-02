@@ -241,7 +241,7 @@ public final class Container implements Injector, Env {
 						context);
 			if (observer != null
 				&& resource.lifeCycle.isPermanent()) {
-				observer.afterBuildUp(resource, instance);
+				observer.afterLift(resource, instance);
 			}
 		}
 		return instance;

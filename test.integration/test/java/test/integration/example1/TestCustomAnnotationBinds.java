@@ -33,7 +33,7 @@ class TestCustomAnnotationBinds {
 
 		@Override
 		protected void declare() {
-			patternbind(MySupportService.class);
+			detectAt(MySupportService.class);
 		}
 	}
 

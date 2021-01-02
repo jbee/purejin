@@ -120,7 +120,7 @@ public interface Injector {
 		 *                 provided instance
 		 * @param instance the created instance to observe by this listener
 		 */
-		void afterBuildUp(Resource<?> resource, Object instance);
+		void afterLift(Resource<?> resource, Object instance);
 
 		/**
 		 * Observes only instances in the provided scope.
@@ -133,7 +133,7 @@ public interface Injector {
 			Observer self = this;
 			return (resource, instance) -> {
 				if (resource.lifeCycle.scope.equalTo(scope))
-					self.afterBuildUp(resource, instance);
+					self.afterLift(resource, instance);
 			};
 		}
 
@@ -151,7 +151,7 @@ public interface Injector {
 				return observers[0];
 			return (resource, instance) -> {
 				for (Observer observer : observers)
-					observer.afterBuildUp(resource, instance);
+					observer.afterLift(resource, instance);
 			};
 		}
 	}
