@@ -861,7 +861,7 @@ public class Binder {
 		 *
 		 * @since 8.1
 		 */
-		public final TargetedBinder config() {
+		public final TargetedBinder configure() {
 			return injectingInto(Config.class);
 		}
 
@@ -870,8 +870,8 @@ public class Binder {
 		 *
 		 * @since 8.1
 		 */
-		public final TargetedBinder config(Class<?> ns) {
-			return config().within(ns);
+		public final TargetedBinder configure(Class<?> ns) {
+			return configure().within(ns);
 		}
 
 		/**
@@ -879,8 +879,8 @@ public class Binder {
 		 *
 		 * @since 8.1
 		 */
-		public final TargetedBinder config(Instance<?> ns) {
-			return config().within(ns);
+		public final TargetedBinder configure(Instance<?> ns) {
+			return configure().within(ns);
 		}
 
 		public final TargetedBinder injectingInto(Class<?> target) {
