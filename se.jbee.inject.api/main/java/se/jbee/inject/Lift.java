@@ -76,6 +76,16 @@ public interface Lift<T> {
 	 */
 	T lift(T target, Type<?> as, Injector context);
 
+	/**
+	 * Using this method is a way to start with a lambda and add the filter this
+	 * way in case the {@link Lift} should only apply in a specific filter
+	 * condition.
+	 *
+	 * @param test a {@link Predicate} that given the actual type of the lifted
+	 *             instance returns true if this {@link Lift} should be applied,
+	 *             else false
+	 * @return This {@link Lift} but only called when the test returns true
+	 */
 	default Lift<T> onlyWhen(Predicate<Class<?>> test) {
 		// we need a class here to implement Predicate as well
 		class LiftWhen implements Lift<T>, Predicate<Class<?>> {

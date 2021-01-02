@@ -117,7 +117,7 @@ public final class Bootstrap {
 
 	public static Injector injector(Env env, Class<? extends Bundle> root,
 			Bindings bindings) {
-		return injector(env, bindings, modulariser(env).modularise(root));
+		return injector(env, bindings, modules(env).installedModules(root));
 	}
 
 	private static Injector injector(Env env, Bindings bindings,
@@ -128,11 +128,11 @@ public final class Bootstrap {
 								(bindings.declaredFrom(env, modules))));
 	}
 
-	public static Modulariser modulariser(Env env) {
+	public static ModuleBootstrapper modules(Env env) {
 		return new BuiltinBootstrapper(env);
 	}
 
-	public static Bundler bundler(Env env) {
+	public static BundleBootstrapper bundles(Env env) {
 		return new BuiltinBootstrapper(env);
 	}
 
@@ -141,7 +141,7 @@ public final class Bootstrap {
 	}
 
 	private static final class BuiltinBootstrapper
-			implements Bootstrapper, Bundler, Modulariser {
+			implements Bootstrapper, BundleBootstrapper, ModuleBootstrapper {
 
 		private final Map<Class<? extends Bundle>, Set<Class<? extends Bundle>>> bundleChildren = new IdentityHashMap<>();
 		private final Map<Class<? extends Bundle>, List<Module>> bundleModules = new IdentityHashMap<>();
@@ -246,12 +246,12 @@ public final class Bootstrap {
 		}
 
 		@Override
-		public Module[] modularise(Class<? extends Bundle> root) {
-			return modulesOf(bundle(root));
+		public Module[] installedModules(Class<? extends Bundle> root) {
+			return modulesOf(installedBundles(root));
 		}
 
 		@Override
-		public Class<? extends Bundle>[] bundle(Class<? extends Bundle> root) {
+		public Class<? extends Bundle>[] installedBundles(Class<? extends Bundle> root) {
 			return bundleAll(root);
 		}
 

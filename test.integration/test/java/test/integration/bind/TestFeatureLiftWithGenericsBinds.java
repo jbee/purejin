@@ -50,7 +50,7 @@ class TestFeatureLiftWithGenericsBinds {
 			TestFeatureLiftWithGenericsBindsModule.class);
 
 	@Test
-	void liftOnlyAffectsExactTypeMatches() {
+	void liftOnlyAffectsActualTypesThatAreAssignable() {
 		assertEquals(new HashSet<>(asList("b", "a")),
 				new HashSet<>(context.resolve(listTypeOf(String.class))));
 		assertEquals(singletonList(1), context.resolve(listTypeOf(Integer.class)));
