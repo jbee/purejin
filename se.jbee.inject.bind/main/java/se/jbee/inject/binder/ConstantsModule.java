@@ -11,7 +11,7 @@ import static se.jbee.inject.Source.source;
 import static se.jbee.inject.bind.BindingType.PREDEFINED;
 
 /**
- * A alternative simplified binder API that is particularly useful as it does
+ * An alternative simplified binder API that is particularly useful as it does
  * not require any {@link Env} properties to work.
  *
  * Therefore it is for example used to bootstrap the initial {@link Env}.
