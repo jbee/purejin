@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.lang.Cast.listTypeOf;
 
@@ -37,6 +38,8 @@ class TestFeatureLiftWithGenericsBinds {
 				target.add("b");
 				return target;
 			});
+
+			// construct the base values
 			bind(listTypeOf(String.class)).to(StringList.class);
 			bind(listTypeOf(Integer.class)).to(IntegerList.class);
 		}
@@ -47,9 +50,9 @@ class TestFeatureLiftWithGenericsBinds {
 			TestFeatureLiftWithGenericsBindsModule.class);
 
 	@Test
-	void liftOnlyAffectExactTypeMatches() {
+	void liftOnlyAffectsExactTypeMatches() {
 		assertEquals(new HashSet<>(asList("b", "a")),
 				new HashSet<>(context.resolve(listTypeOf(String.class))));
-		assertEquals(asList(1), context.resolve(listTypeOf(Integer.class)));
+		assertEquals(singletonList(1), context.resolve(listTypeOf(Integer.class)));
 	}
 }

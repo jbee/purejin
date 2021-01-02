@@ -1071,17 +1071,16 @@ public class Binder {
 
 		/**
 		 * By default constants are not scoped. This implies that no
-		 * initialisation occurs for constants.
-		 *
+		 * initialisation occurs for constants as they are directly returned
+		 * from the {@link Generator} which simply holds the returned constant
+		 * value.
+		 * <p>
 		 * In contrast to {@link #to(Object)} a scoped constant exist within a
 		 * {@link Scope} like instances created by the container. This has the
-		 * effect of running initialisation for the provided constant similar to
-		 * the initialisation that occurs for instances created by the
-		 * container.
-		 *
-		 * @since 8.1
+		 * "side-effect" that {@link Lift} initialisation as usual.
 		 *
 		 * @param constant a "bean" instance
+		 * @since 8.1
 		 */
 		public final void toScoped(T constant) {
 			expand(new Constant<>(constant).scoped());

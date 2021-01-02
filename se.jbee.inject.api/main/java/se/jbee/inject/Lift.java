@@ -17,16 +17,16 @@ import static se.jbee.inject.lang.Type.raw;
  * A {@link Lift} is similar to a "post construct interceptor" that is
  * called after an object is created. In contrast to a classic post construct
  * the {@link Lift} concept allow to modify, wrap or even replace the
- * instance that is build-up.
+ * instance that is lifted.
  * <p>
  * {@link Lift}s are matched based on the actual type of the target argument.
- * If target can be assigned to the {@link Lift}'s target type the {@link
+ * If a target can be assigned to the {@link Lift}'s target type the {@link
  * Lift#lift(Object, Type, Injector)} is called.
  * <p>
  * {@link Lift}s allow to run initialisation code once and build more
  * powerful mechanisms on top of it.
  * <p>
- * A {@link Lift} can also implement {@link Predicate} of {@link Class} to
+ * A {@link Lift} can also implement a {@link Predicate} of {@link Class} to
  * add a {@link Class} based filter so it does not automatically apply to all
  * instances that are assignable to its type parameter.
  * <p>
@@ -75,6 +75,23 @@ public interface Lift<T> {
 	 * or decorator instance.
 	 */
 	T lift(T target, Type<?> as, Injector context);
+
+	default Lift<T> onlyWhen(Predicate<Class<?>> test) {
+		// we need a class here to implement Predicate as well
+		class LiftWhen implements Lift<T>, Predicate<Class<?>> {
+
+			@Override
+			public boolean test(Class<?> actualType) {
+				return test.test(actualType);
+			}
+
+			@Override
+			public T lift(T target, Type<?> as, Injector context) {
+				return Lift.this.lift(target, as, context);
+			}
+		}
+		return new LiftWhen();
+	}
 
 	/**
 	 * Mostly defined to capture the contract by convention that when a {@link

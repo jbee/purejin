@@ -101,7 +101,7 @@ public final class LiftResources {
 	private static <T, L extends Lift<?>> Lift<? super T> generateLift(
 			Class<T> actualType, Resource<L> resource, Dependency<?> context) {
 		Locator<L> signature = resource.signature;
-		if (!signature.target.isUsablePackageWise(context)) //OBS! here we only check general accessability as other parts need to be checked dynamically
+		if (!signature.target.isUsablePackageWise(context)) //OBS! here we only check general accessibility as other parts need to be checked dynamically
 			return null;
 		Type<?> required = signature.type().parameter(0);
 		if (!raw(actualType).isAssignableTo(required))
