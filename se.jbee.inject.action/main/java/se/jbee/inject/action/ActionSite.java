@@ -117,7 +117,7 @@ public final class ActionSite<A, B> {
 			return actualReturnType(action, as);
 		}
 
-		public <A, B> boolean isApplicableFor(Type<A> in, Type<B> out) {
+		public <A, B> boolean isUsableFor(Type<A> in, Type<B> out) {
 			if (!returnType().equalTo(out))
 				return false;
 			if (in.equalTo(Type.VOID) && action.getParameterCount() == 0)
