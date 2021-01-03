@@ -9,7 +9,8 @@ import se.jbee.inject.Env;
 import se.jbee.inject.InconsistentDeclaration;
 import se.jbee.inject.bind.*;
 import se.jbee.inject.binder.Binder.RootBinder;
-import se.jbee.inject.lang.Utils;
+
+import java.lang.annotation.Annotation;
 
 import static se.jbee.inject.lang.Type.raw;
 
@@ -56,21 +57,35 @@ public abstract class InitializedBinder extends RootBinder {
 				Class<?> features = installs.features();
 				if (!raw(features).isAssignableTo(raw(Dependent.class)))
 					throw new InconsistentDeclaration(
-							"@Installs feature Class must be compatible with <F extends Enum<F> & Toggled<F>>");
-				install(bootstrap, (Class) features, installs.selection());
+							"@Installs#features() Class must be compatible with <F extends Enum<F> & Toggled<F>>");
+				Class<? extends Annotation> by = installs.by();
+				Annotation selection = by == Annotation.class
+						? null
+						: bundle.getAnnotation(by);
+				install(bootstrap, (Class) features, selection);
 			}
 		}
 	}
 
-	private <F extends Enum<F> & Dependent<F>> void install(
-			Bootstrapper bootstrap, Class<F> features, String[] names) {
-		if (names.length == 0) {
+	@SuppressWarnings("unchecked")
+	private <E extends Enum<E> & Dependent<E>> void install(
+			Bootstrapper bootstrap, Class<E> features, Annotation selection) {
+		if (selection == null) {
 			bootstrap.install(features.getEnumConstants());
 		} else {
-			F[] installed = Utils.newArray(features, names.length);
-			for (int i = 0; i < names.length; i++)
-				installed[i] = Enum.valueOf(features, names[i]);
-			bootstrap.install(installed);
+			try {
+				Object[] value = (Object[]) selection.getClass()
+						.getMethod("value")
+						.invoke(selection);
+				if (value.length == 0)
+					return;
+				if (value[0].getClass() != features)
+					throw new InconsistentDeclaration(
+							"The annotation referenced by @Installs#by() must have the same component enum type as @Installs#s#features()");
+				bootstrap.install((E[]) value);
+			} catch (Exception ex) {
+				throw new InconsistentDeclaration(ex);
+			}
 		}
 	}
 }

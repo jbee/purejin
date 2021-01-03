@@ -7,6 +7,7 @@ import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.config.ContractsBy;
 import se.jbee.inject.defaults.DefaultFeature;
+import se.jbee.inject.defaults.DefaultFeatures;
 
 import java.util.Optional;
 
@@ -21,7 +22,8 @@ import static se.jbee.inject.lang.Type.raw;
  */
 class TestFeatureOptionalBinds {
 
-	@Installs(features = DefaultFeature.class, selection = "OPTIONAL")
+	@Installs(features = DefaultFeature.class, by = DefaultFeatures.class)
+	@DefaultFeatures(DefaultFeature.OPTIONAL)
 	private static final class TestOptionalBindsModule extends BinderModule {
 
 		@Override

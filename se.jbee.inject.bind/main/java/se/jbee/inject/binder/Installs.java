@@ -3,10 +3,7 @@ package se.jbee.inject.binder;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.bind.Dependent;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -45,16 +42,26 @@ public @interface Installs {
 
 	/**
 	 * @return Must be a {@link Dependent} {@link Enum} type.
-	 * If {@link #selection()} is empty all its features are installed.
-	 * Otherwise only the features named in {@link #selection()} are installed.
+	 * If {@link #by()} is empty all its features are installed.
+	 * Otherwise only the features named in {@link #by()} are installed.
 	 */
 	Class<? extends Enum> features() default Enum.class;
 
 	/**
-	 * @return When {@link #features()} refers to a {@link Dependent}
-	 * {@link Enum} type the selection contains the enum constant names of the
-	 * features that should be installed. If all should be installed this can be
-	 * empty (default value).
+	 * @return When {@link #features()} refers to a {@link Dependent} {@link
+	 * Enum} this can be set in addition to refer to another {@link Annotation}
+	 * which is used to declare the set of features that should be installed.
+	 * <p>
+	 * If this property is not set all features of the {@link #features()}
+	 * enumeration are installed.
+	 * <p>
+	 * If this property refers to another annotation but the annotation is not
+	 * present in combination with {@link Installs} all features are installed.
+	 *
+	 * The referenced {@link Annotation} is expected to have a property called
+	 * {@code value()} which has an array type of the same {@link Enum} class
+	 * specified by {@link #features()}.
 	 */
-	String[] selection() default {};
+	Class<? extends Annotation> by() default Annotation.class;
+
 }
