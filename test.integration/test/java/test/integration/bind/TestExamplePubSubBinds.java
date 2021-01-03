@@ -1,7 +1,7 @@
 package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
-import se.jbee.inject.BuildUp;
+import se.jbee.inject.Lift;
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bind.Bundle;
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
- * A tests the shows how {@link BuildUp}s behind {@link Binder#boot(Class)} can
+ * A tests the shows how {@link Lift}s behind {@link Binder#boot(Class)} can
  * be used to automatically wire a pub-sub relation.
  * <p>
  * In the test scenario there is a interface for a {@link Publisher} and a
@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  * Publisher#subscribe(Subscriber)} being defined in the interface or only in
  * the {@link PublisherImpl} implementation.
  * <p>
- * This example uses {@link Binder#contractbind(Class)} to make each of the
+ * This example uses {@link Binder#withContractAccess()} to make each of the
  * implementations a {@link Subscriber} that is known within the {@link
  * Injector} context. Another option would be to use {@link
  * Binder#multibind(Class)} and explicitly bind each service as a {@link
@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  * initialisation can be done in two ways. Eager wiring at the end of
  * bootstrapping the {@link Injector} is done using {@link Binder#boot(Class)}
  * (see {@link EagerSolution}). Lazy wiring at the point where the {@link
- * Publisher} is created/resolved is done using {@link Binder#upbind(Class)}
+ * Publisher} is created/resolved is done using {@link Binder#lift(Class)}
  * (see {@link LazySolution}).
  *
  * @see TestExamplePostConstructBinds
@@ -110,12 +110,12 @@ class TestExamplePubSubBinds {
 
 		@Override
 		protected void declare(Publisher value) {
-			contractbind(Service1.class).to(Service1::new);
-			contractbind(Service2.class).to(Service2::new);
-			contractbind(Service3.class).to(Service3::new);
+			withContractAccess().bind(Service1.class).to(Service1::new);
+			withContractAccess().bind(Service2.class).to(Service2::new);
+			withContractAccess().bind(Service3.class).to(Service3::new);
 
 			// since we are using a constant but we want it to be affected by
-			// BuildUp we bind it as a scoped constant
+			// Lift we bind it as a scoped constant
 			// the reason for using a constant is just so we can verify in the
 			// test that in eager case the subscription is created with the
 			// context whereas in lazy case on resolving the publisher
@@ -140,7 +140,7 @@ class TestExamplePubSubBinds {
 
 		@Override
 		protected void declare() {
-			upbind(Publisher.class) //
+			lift(Publisher.class) //
 					.forEach(Subscriber.class, Publisher::subscribe);
 		}
 	}

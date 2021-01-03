@@ -9,10 +9,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.lang.Cast.listTypeOf;
 
-class TestFeatureBuildUpWithGenericsBinds {
+class TestFeatureLiftWithGenericsBinds {
 
 	public static class StringList extends ArrayList<String> {
 	}
@@ -21,22 +22,24 @@ class TestFeatureBuildUpWithGenericsBinds {
 
 	}
 
-	static class TestFeatureBuildUpWithGenericsBindsModule extends BinderModule {
+	static class TestFeatureLiftWithGenericsBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			upbind(listTypeOf(String.class)).to((target, as, context) -> {
+			lift(listTypeOf(String.class)).to((target, as, context) -> {
 				target.add("a");
 				return target;
 			});
-			upbind(listTypeOf(Integer.class)).to((target, as, context) -> {
+			lift(listTypeOf(Integer.class)).to((target, as, context) -> {
 				target.add(1);
 				return target;
 			});
-			upbind(StringList.class).to((target, as, context) -> {
+			lift(StringList.class).to((target, as, context) -> {
 				target.add("b");
 				return target;
 			});
+
+			// construct the base values
 			bind(listTypeOf(String.class)).to(StringList.class);
 			bind(listTypeOf(Integer.class)).to(IntegerList.class);
 		}
@@ -44,12 +47,12 @@ class TestFeatureBuildUpWithGenericsBinds {
 	}
 
 	private final Injector context = Bootstrap.injector(
-			TestFeatureBuildUpWithGenericsBindsModule.class);
+			TestFeatureLiftWithGenericsBindsModule.class);
 
 	@Test
-	void buildUpOnlyAffectExactTypeMatches() {
+	void liftOnlyAffectsActualTypesThatAreAssignable() {
 		assertEquals(new HashSet<>(asList("b", "a")),
 				new HashSet<>(context.resolve(listTypeOf(String.class))));
-		assertEquals(asList(1), context.resolve(listTypeOf(Integer.class)));
+		assertEquals(singletonList(1), context.resolve(listTypeOf(Integer.class)));
 	}
 }

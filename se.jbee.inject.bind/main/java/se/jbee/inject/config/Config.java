@@ -15,9 +15,17 @@ import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.lang.Utils.orElse;
 
 /**
+ * The {@link Config} is a runtime-configuration of the application. It allows
+ * other "external" software modules to contribute to the configuration of other
+ * software components.
+ * <p>
  * A {@link Config} is an {@link Extension} that uses the {@link Dependency}
  * hierarchy to effectively name-space configuration values to avoid name
  * collisions.
+ *
+ * As it is {@link ContextAware} it can be injected into the configured bean
+ * already being scoped to the target, that means only the configurations for
+ * the target instance are "in scope" or visible.
  *
  * @since 8.1
  */

@@ -69,10 +69,10 @@ class TestFeatureActionBinds {
 			per(dependencyType).bind(GenericService.class).toConstructor();
 
 			ConnectBinder connectAll = connect(ProducesBy.OPTIMISTIC);
-			connectAll.in(MyService.class).asAction();
-			connectAll.in(MyOtherService.class).asAction();
-			connectAll.in(HandlerService.class).asAction();
-			connectAll.in(GenericService.class).asAction();
+			connectAll.inAny(MyService.class).asAction();
+			connectAll.inAny(MyOtherService.class).asAction();
+			connectAll.inAny(HandlerService.class).asAction();
+			connectAll.inAny(GenericService.class).asAction();
 		}
 	}
 
@@ -102,8 +102,14 @@ class TestFeatureActionBinds {
 
 		static int calls;
 
+		int count = 0;
+
 		public void handle(String event) {
 			calls++;
+		}
+
+		public long count(String query) {
+			return count++;
 		}
 	}
 
@@ -171,6 +177,30 @@ class TestFeatureActionBinds {
 		assertNotSame(a, b, "services should be different instances");
 		handler.run("a + b");
 		assertEquals(3, HandlerService.calls);
+	}
+
+	@Test
+	void actionsUseRoundRobinWhenMultipleSiteWithNonVoidReturnTypeExist() {
+		Action<String, Long> handler = context.resolve(
+				actionTypeOf(String.class, long.class));
+		assertNotNull(handler);
+
+		HandlerService a = context.resolve("a", HandlerService.class);
+		HandlerService b = context.resolve("b", HandlerService.class);
+		assertNotSame(a, b, "services should be different instances");
+
+		assertEquals(0, a.count);
+		assertEquals(0, b.count);
+		handler.run("does not matter");
+		assertEquals(1, a.count + b.count);
+		handler.run("does not matter");
+		assertEquals(1, a.count);
+		assertEquals(1, b.count);
+		handler.run("does not matter");
+		assertEquals(3, a.count + b.count);
+		handler.run("does not matter");
+		assertEquals(2, a.count);
+		assertEquals(2, b.count);
 	}
 
 	@Test

@@ -65,8 +65,8 @@ class TestExampleConfigPropertyAnnotationBinds {
 		@Override
 		protected void declare() {
 			// some configuration value definitions
-			config(Bean.class).bind("a", String.class).to("a");
-			config(Bean.class).bind("b", Integer.class).to(42);
+			configure(Bean.class).bind("a", String.class).to("a");
+			configure(Bean.class).bind("b", Integer.class).to(42);
 
 			// assume somewhere else (in another module) we declare
 			construct(Bean.class);

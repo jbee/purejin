@@ -6,6 +6,7 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.defaults.DefaultFeature;
+import se.jbee.inject.defaults.DefaultFeatures;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -24,7 +25,8 @@ import static se.jbee.inject.Name.named;
  */
 class TestBasicPrimitiveArrayBridgeBinds {
 
-	@Installs(features = DefaultFeature.class, selection = "PRIMITIVE_ARRAYS")
+	@Installs(features = DefaultFeature.class, by = DefaultFeatures.class)
+	@DefaultFeatures(DefaultFeature.PRIMITIVE_ARRAYS)
 	private static class TestBasicCustomPrimitiveArrayBindsModule
 			extends BinderModule {
 

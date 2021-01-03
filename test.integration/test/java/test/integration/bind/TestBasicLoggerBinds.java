@@ -6,6 +6,7 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.defaults.DefaultFeature;
+import se.jbee.inject.defaults.DefaultFeatures;
 
 import java.util.logging.Logger;
 
@@ -22,7 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  */
 class TestBasicLoggerBinds {
 
-	@Installs(features = DefaultFeature.class, selection = "LOGGER")
+	@Installs(features = DefaultFeature.class, by = DefaultFeatures.class)
+	@DefaultFeatures(DefaultFeature.LOGGER)
 	private static class TestBasicLoggerBindsModule extends BinderModule {
 
 		@Override

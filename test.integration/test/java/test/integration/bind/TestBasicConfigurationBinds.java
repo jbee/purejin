@@ -15,6 +15,19 @@ import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Converter.converterTypeOf;
 import static se.jbee.inject.Name.named;
 
+/**
+ * The {@link Config} {@link se.jbee.inject.config.Extension} is a helper to
+ * organise runtime configuration of the application that is made as part of the
+ * binding process.
+ * <p>
+ * Localised binds are used to declare the individual configuration properties.
+ * To ease this process the {@link se.jbee.inject.binder.Binder.ScopedBinder#configure(Class)}
+ * helps to understand localisation as configuration for a specific target
+ * {@link Class} or {@link se.jbee.inject.Instance}.
+ * <p>
+ * This configuration is then accessed by injecting the {@link Config} into the
+ * target type.
+ */
 class TestBasicConfigurationBinds {
 
 	public static final class Bean {
@@ -32,14 +45,14 @@ class TestBasicConfigurationBinds {
 		@Override
 		protected void declare() {
 			bind(Bean.class).toConstructor();
-			config().bind(named("foo"), String.class).to("bar");
-			config().bind(named("foo"), int.class).to(13);
-			TargetedBinder beanConfig = config(Bean.class);
+			configure().bind(named("foo"), String.class).to("bar");
+			configure().bind(named("foo"), int.class).to(13);
+			TargetedBinder beanConfig = configure(Bean.class);
 			beanConfig.bind(named("foo"), String.class).to("que");
 			beanConfig.bind(named("foo"), int.class).to(42);
 			bind(converterTypeOf(String.class, UUID.class)).to(
 					UUID::fromString);
-			config().bind(named("uuid"), String.class).to(
+			configure().bind(named("uuid"), String.class).to(
 					UUID.randomUUID().toString());
 		}
 	}
@@ -55,14 +68,14 @@ class TestBasicConfigurationBinds {
 	}
 
 	@Test
-	void namespacedConfiguration() {
+	void perTypeConfiguration() {
 		Config beanConfig = config.of(Bean.class);
 		assertEquals("que", beanConfig.stringValue("foo"));
 		assertEquals(42, beanConfig.intValue("foo"));
 	}
 
 	@Test
-	void namespacedConfigurationIsInjected() {
+	void configurationIsInjectedInTargetNamespace() {
 		Config beanConfig = injector.resolve(Bean.class).config;
 		assertEquals("que", beanConfig.stringValue("foo"));
 		assertEquals(42, beanConfig.intValue("foo"));

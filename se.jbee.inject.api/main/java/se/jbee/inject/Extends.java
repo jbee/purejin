@@ -14,7 +14,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *
  * <h2>Usages</h2>
  *
- * <h3>Providing Annotation Patterns via ServiceLoader</h3>
+ * <h3>Providing Annotation Templet via ServiceLoader</h3>
  * <p>
  * Annotate a {@code se.jbee.inject.bind.ModuleWith} implementation that should
  * load via {@link ServiceLoader} to implement the effects of an type level

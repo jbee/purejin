@@ -1,6 +1,6 @@
 import test.ExamplesBundle;
 import test.ExamplesEnvBundle;
-import test.example1.SupportAnnotationPattern;
+import test.example1.SupportAnnotationTemplet;
 
 /**
  * Contains an example application used in tests to test the {@link
@@ -17,5 +17,5 @@ open module test.examples {
 
   provides se.jbee.inject.bind.Bundle with ExamplesBundle, ExamplesEnvBundle;
 
-  provides se.jbee.inject.bind.ModuleWith with SupportAnnotationPattern;
+  provides se.jbee.inject.bind.ModuleWith with SupportAnnotationTemplet;
 }

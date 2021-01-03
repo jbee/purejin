@@ -96,7 +96,7 @@ public class Binder {
 	 * @param types all types to bind using annotations present on the type and
 	 *              their methods
 	 */
-	public void patternbind(Class<?>... types) {
+	public void detectAt(Class<?>... types) {
 		Bindings bindings = bindings();
 		for (Class<?> type : types) {
 			bindings.addAnnotated(bind().env, type);
@@ -115,6 +115,37 @@ public class Binder {
 	}
 
 	/**
+	 * Binds all supertypes of a bound type that are considered a contract type
+	 * by the current {@link ContractsBy} strategy.
+	 * <p>
+	 * For example binding {@link Integer} with {@link ContractsBy#SUPER} (all
+	 * super classes) adds references that bind {@link Number} to {@link
+	 * Integer}, {@link java.io.Serializable} to {@link Integer} and so forth
+	 * for all types it does implement.
+	 * <p>
+	 * Should these reference clash with another explicit binding, for example
+	 * {@link Number} was bound to some other value provider, the explicit
+	 * binding takes precedence. Also several contract-bound bindings from the
+	 * same type to different implementors do not clash and are removed because
+	 * they are ambiguous. So usually using {@code withContractAccess} does not
+	 * create issues with clashing bindings.
+	 * <p>
+	 * Note also that the usage of this "modifier" allows to declare
+	 * combinations that do not make much sense. For example using a {@code
+	 * to}-clause that refers to a sub-type.
+	 *
+	 * @return a {@link Binder} that binds all subsequent {@code bind} calls not
+	 * as the exact type but as all contract types.
+	 */
+	public final Binder withContractAccess() {
+		return on(bind().asContract());
+	}
+
+	public final Binder withContractAccess(ContractsBy strategy) {
+		return on(bind().asContract().with(env().with(ContractsBy.class, strategy)));
+	}
+
+	/**
 	 * Explicitly binds an array type to a specific list of elements.
 	 *
 	 * Note that this method is only used in case an array type should be bound explicitly.
@@ -129,39 +160,6 @@ public class Binder {
 	 */
 	public <E> TypedElementBinder<E> arraybind(Class<E[]> type) {
 		return new TypedElementBinder<>(bind(), defaultInstanceOf(raw(type)));
-	}
-
-	/**
-	 * Same as {@link #contractbind(Type)} where type was wrapped in {@link
-	 * Type#raw(Class)}.
-	 *
-	 * @see #contractbind(Type)
-	 */
-	public final <T> TypedBinder<T> contractbind(Class<T> type) {
-		return contractbind(raw(type));
-	}
-
-	/**
-	 * Binds the exact provided type and adds references from all types it
-	 * implements to the provided type. For example auto-binding {@link Integer}
-	 * adds references that bind {@link Number} to {@link Integer}, {@link
-	 * java.io.Serializable} to {@link Integer} and so forth for all types it
-	 * does implement.
-	 * <p>
-	 * Should these automatically created reference clash with another explicit
-	 * bindings, for example {@link Number} was bound to some other value
-	 * provider, the explicit binding takes precedence. Also several auto-bound
-	 * bindings from the same type to different implementors do not clash and
-	 * are removed because they are ambiguous. So usually using {@code autobind}
-	 * does not create issues with clashing bindings.
-	 *
-	 * @param type usually an implementation type implementing multiple
-	 *             contracts
-	 * @param <T>  type that should be bound to all the types it implements
-	 * @return immutable binder API
-	 */
-	public final <T> TypedBinder<T> contractbind(Type<T> type) {
-		return on(bind().asContract()).bind(type);
 	}
 
 	/**
@@ -250,30 +248,30 @@ public class Binder {
 	}
 
 	/**
-	 * Bind a {@link BuildUp} for the {@link Injector} itself.
+	 * Bind a {@link Lift} for the {@link Injector} itself.
 	 *
 	 * @return immutable fluent API
 	 */
-	public final UpbindBinder<Injector> upbind() {
-		return upbind(Injector.class);
+	public final LiftBinder<Injector> lift() {
+		return lift(Injector.class);
 	}
 
 	/**
-	 * Bind a {@link BuildUp} that affects all types assignable to provided type.
+	 * Bind a {@link Lift} that affects all types assignable to provided type.
 	 *
 	 * @return immutable fluent API
 	 */
-	public final <T> UpbindBinder<T> upbind(Class<T> type) {
-		return upbind(raw(type));
+	public final <T> LiftBinder<T> lift(Class<T> type) {
+		return lift(raw(type));
 	}
 
 	/**
-	 * Bind a {@link BuildUp} that affects all types assignable to provided type.
+	 * Bind a {@link Lift} that affects all types assignable to provided type.
 	 *
 	 * @return immutable fluent API
 	 */
-	public final <T> UpbindBinder<T> upbind(Type<T> type) {
-		return multibind(BuildUp.buildUpTypeOf(type)).wrapAs(UpbindBinder::new);
+	public final <T> LiftBinder<T> lift(Type<T> type) {
+		return multibind(Lift.liftTypeOf(type)).wrapAs(LiftBinder::new);
 	}
 
 	public final <T> TypedBinder<T> multibind(Class<T> type) {
@@ -382,15 +380,15 @@ public class Binder {
 	}
 
 	/**
-	 * Small utility to <b>lazily</b> run an initialisation function for the
-	 * target instances of the bound {@link BuildUp}.
+	 * Small utility to <b>lazily</b> run an "initialisation" function for the
+	 * target instances of the bound {@link Lift}.
 	 *
-	 * @param <T> type of the instances being {@link BuildUp}
+	 * @param <T> type of the instances being {@link Lift}
 	 * @since 8.1
 	 */
-	public static class UpbindBinder<T> extends TypedBinder<BuildUp<T>> {
+	public static class LiftBinder<T> extends TypedBinder<Lift<T>> {
 
-		UpbindBinder(Bind bind, Locator<BuildUp<T>> locator) {
+		LiftBinder(Bind bind, Locator<Lift<T>> locator) {
 			super(bind, locator);
 		}
 
@@ -441,7 +439,7 @@ public class Binder {
 	 * resolved during initialisation phase and provided to the {@link
 	 * BiConsumer} function. This can be one or many of such instances.
 	 * <p>
-	 * In contrast to a plain {@link BuildUp} that runs <b>lazily</b> when an
+	 * In contrast to a plain {@link Lift} that runs <b>lazily</b> when an
 	 * instance of the matching type is constructed this initialisation is
 	 * performed directly after the {@link Injector} context is created.
 	 *
@@ -469,7 +467,7 @@ public class Binder {
 			Dependency<? extends R[]> dep = dependency(
 					related.addArrayDimension().asUpperBound()) //
 					.injectingInto(target);
-			binder.upbind().to((impl, as, context) -> {
+			binder.lift().to((impl, as, context) -> {
 				T obj = context.resolve(target);
 				for (R arg : context.resolve(dep))
 					initFunction.accept(obj, arg);
@@ -489,7 +487,7 @@ public class Binder {
 
 		public <R> void by(Instance<? extends R> related,
 				BiConsumer<T, R> initFunction) {
-			binder.upbind().to((impl, as, context) -> {
+			binder.lift().to((impl, as, context) -> {
 				T obj = context.resolve(target);
 				R arg = context.resolve(
 						dependency(related).injectingInto(as));
@@ -550,10 +548,10 @@ public class Binder {
 		}
 
 		/**
-		 * @see #in(Type)
+		 * @see #inAny(Type)
 		 */
-		public final <T> ConnectTargetBinder<T> in(Class<T> target) {
-			return in(raw(target));
+		public final <T> ConnectTargetBinder<T> inAny(Class<T> target) {
+			return inAny(raw(target));
 		}
 
 		/**
@@ -564,7 +562,7 @@ public class Binder {
 		 * @param <T>    target bean type or interface implemented by targets
 		 * @return binder for fluent API
 		 */
-		public <T> ConnectTargetBinder<T> in(Type<T> target) {
+		public <T> ConnectTargetBinder<T> inAny(Type<T> target) {
 			return new ConnectTargetBinder<>(binder, connectsBy, target);
 		}
 	}
@@ -600,12 +598,12 @@ public class Binder {
 		}
 
 		public ConnectTargetBinder<T> to(Name connectorName) {
-			binder.upbind(target).to((instance, as, context) -> //
-					init(connectorName, instance, as, context));
+			binder.lift(target).to((instance, as, context) -> //
+					connect(connectorName, instance, as, context));
 			return this; // for multiple to
 		}
 
-		private T init(Name connectorName, T instance, Type<?> as,
+		private T connect(Name connectorName, T instance, Type<?> as,
 				Injector context) {
 			Method[] connected = connectsBy.reflect(instance.getClass());
 			if (connected != null && connected.length > 0) {
@@ -633,6 +631,7 @@ public class Binder {
 		private final NamesBy namesBy;
 		private final ScopesBy scopesBy;
 		private final HintsBy hintsBy;
+		private final ContractsBy contractsBy;
 
 		protected AutoBinder(RootBinder binder, Name scope) {
 			Bind bind = binder.bind();
@@ -643,6 +642,7 @@ public class Binder {
 			this.producesBy = env.property(ProducesBy.class);
 			this.namesBy = env.property(NamesBy.class).orElse(DEFAULT);
 			this.hintsBy = env.property(HintsBy.class);
+			this.contractsBy = env.property(ContractsBy.class);
 			this.scopesBy = scope.equalTo(Scope.mirror)
 				? env.property(ScopesBy.class)
 				: target -> scope;
@@ -650,7 +650,8 @@ public class Binder {
 
 		private AutoBinder(RootBinder binder, AccessesBy accessesBy,
 				ConstructsBy constructsBy, ProducesBy producesBy,
-				NamesBy namesBy, ScopesBy scopesBy, HintsBy hintsBy) {
+				NamesBy namesBy, ScopesBy scopesBy, HintsBy hintsBy,
+				ContractsBy contractsBy) {
 			this.binder = binder;
 			this.accessesBy = accessesBy;
 			this.constructsBy = constructsBy;
@@ -658,36 +659,42 @@ public class Binder {
 			this.namesBy = namesBy;
 			this.scopesBy = scopesBy;
 			this.hintsBy = hintsBy;
+			this.contractsBy = contractsBy;
 		}
 
 		public AutoBinder accessBy(AccessesBy strategy) {
 			return new AutoBinder(binder, strategy, constructsBy, producesBy,
-					namesBy, scopesBy, hintsBy);
+					namesBy, scopesBy, hintsBy, contractsBy);
 		}
 
 		public AutoBinder constructBy(ConstructsBy strategy) {
 			return new AutoBinder(binder, accessesBy, strategy, producesBy, namesBy,
-					scopesBy, hintsBy);
+					scopesBy, hintsBy, contractsBy);
 		}
 
 		public AutoBinder produceBy(ProducesBy strategy) {
 			return new AutoBinder(binder, accessesBy, constructsBy, strategy,
-					namesBy, scopesBy, hintsBy);
+					namesBy, scopesBy, hintsBy, contractsBy);
 		}
 
 		public AutoBinder nameBy(NamesBy strategy) {
 			return new AutoBinder(binder, accessesBy, constructsBy, producesBy,
-					strategy.orElse(DEFAULT), scopesBy, hintsBy);
+					strategy.orElse(DEFAULT), scopesBy, hintsBy, contractsBy);
 		}
 
 		public AutoBinder scopeBy(ScopesBy strategy) {
 			return new AutoBinder(binder, accessesBy, constructsBy, producesBy,
-					namesBy, strategy, hintsBy);
+					namesBy, strategy, hintsBy, contractsBy);
 		}
 
 		public AutoBinder hintBy(HintsBy strategy) {
 			return new AutoBinder(binder, accessesBy, constructsBy, producesBy,
-					namesBy, scopesBy, strategy);
+					namesBy, scopesBy, strategy, contractsBy);
+		}
+
+		public AutoBinder contractBy(ContractsBy strategy) {
+			return new AutoBinder(binder, accessesBy, constructsBy, producesBy,
+					namesBy, scopesBy, hintsBy, strategy);
 		}
 
 		public final void in(Class<?> impl) {
@@ -795,7 +802,7 @@ public class Binder {
 			Binder scopedBinder = binder.per(scope != null ? scope : Scope.auto).implicit();
 			scopedBinder.bind(name, impl).to(target, hints);
 			if (name.isDefault()) {
-				scopedBinder.contractbind(impl)
+				scopedBinder.withContractAccess(contractsBy).bind(impl)
 						//TODO use actual type hint/ref
 						.expand(constructs(raw(impl), target, hintsBy, hints));
 			} else {
@@ -854,7 +861,7 @@ public class Binder {
 		 *
 		 * @since 8.1
 		 */
-		public final TargetedBinder config() {
+		public final TargetedBinder configure() {
 			return injectingInto(Config.class);
 		}
 
@@ -863,8 +870,8 @@ public class Binder {
 		 *
 		 * @since 8.1
 		 */
-		public final TargetedBinder config(Class<?> ns) {
-			return config().within(ns);
+		public final TargetedBinder configure(Class<?> ns) {
+			return configure().within(ns);
 		}
 
 		/**
@@ -872,8 +879,8 @@ public class Binder {
 		 *
 		 * @since 8.1
 		 */
-		public final TargetedBinder config(Instance<?> ns) {
-			return config().within(ns);
+		public final TargetedBinder configure(Instance<?> ns) {
+			return configure().within(ns);
 		}
 
 		public final TargetedBinder injectingInto(Class<?> target) {
@@ -1064,17 +1071,16 @@ public class Binder {
 
 		/**
 		 * By default constants are not scoped. This implies that no
-		 * initialisation occurs for constants.
-		 *
+		 * initialisation occurs for constants as they are directly returned
+		 * from the {@link Generator} which simply holds the returned constant
+		 * value.
+		 * <p>
 		 * In contrast to {@link #to(Object)} a scoped constant exist within a
 		 * {@link Scope} like instances created by the container. This has the
-		 * effect of running initialisation for the provided constant similar to
-		 * the initialisation that occurs for instances created by the
-		 * container.
-		 *
-		 * @since 8.1
+		 * "side-effect" that {@link Lift} initialisation as usual.
 		 *
 		 * @param constant a "bean" instance
+		 * @since 8.1
 		 */
 		public final void toScoped(T constant) {
 			expand(new Constant<>(constant).scoped());

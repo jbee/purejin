@@ -49,7 +49,7 @@ class TestExampleServiceFacadeBinds {
 		protected void declare() {
 			construct(MathService.class);
 			construct(MathDependentService.class);
-			connect(ProducesBy.OPTIMISTIC).in(MathService.class).asAction();
+			connect(ProducesBy.OPTIMISTIC).inAny(MathService.class).asAction();
 			per(Scope.dependencyType)
 					.starbind(Service.class) //
 					.toSupplier(ServiceModule::supply);

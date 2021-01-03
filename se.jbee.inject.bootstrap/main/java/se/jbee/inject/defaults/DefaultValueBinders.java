@@ -11,7 +11,6 @@ import se.jbee.inject.binder.*;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.config.ContractsBy;
 import se.jbee.inject.config.HintsBy;
-import se.jbee.inject.lang.Reflect;
 import se.jbee.inject.lang.Type;
 
 import java.lang.reflect.Constructor;
@@ -21,6 +20,7 @@ import static se.jbee.inject.Name.named;
 import static se.jbee.inject.bind.BindingType.*;
 import static se.jbee.inject.bind.Bindings.supplyConstant;
 import static se.jbee.inject.bind.Bindings.supplyScopedConstant;
+import static se.jbee.inject.binder.Constructs.constructs;
 import static se.jbee.inject.binder.Supply.*;
 import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.lang.Utils.*;
@@ -139,11 +139,13 @@ public final class DefaultValueBinders {
 			Instance<?> ref, Binding<T> item, Bindings dest) {
 		Type<?> refType = ref.type();
 		if (isClassBanal(refType.rawType)) {
-			dest.addExpanded(env, item, new Constant<>(
-					Reflect.construct(refType.rawType, env::accessible,
-							RuntimeException::new)).manual());
-			//TODO shouldn't this use New instead?
-			return;
+			Constructor<?> target = env.property(ConstructsBy.class) //
+					.reflect(refType.rawType.getDeclaredConstructors());
+			if (target != null) {
+				dest.addExpanded(env, item, constructs(refType, target,
+						env.property(HintsBy.class)));
+				return;
+			}
 		}
 		bindReference(env, ref, item, dest);
 	}
@@ -156,7 +158,7 @@ public final class DefaultValueBinders {
 			Class<? extends Supplier<? extends T>> supplier = (Class<? extends Supplier<? extends T>>) refType.rawType;
 			dest.addExpanded(env, item.complete(BindingType.REFERENCE,
 					Supply.bySupplierReference(supplier)));
-			implicitlyBindToConstructor(env, ref, item, dest);
+			implicitlyExpandConstructs(env, ref, item, dest);
 			return;
 		}
 		final Type<? extends T> type = refType.castTo(item.type());
@@ -165,12 +167,12 @@ public final class DefaultValueBinders {
 				bound.name)) {
 			dest.addExpanded(env, item.complete(BindingType.REFERENCE,
 					Supply.byInstanceReference(ref.typed(type))));
-			implicitlyBindToConstructor(env, ref, item, dest);
+			implicitlyExpandConstructs(env, ref, item, dest);
 			return;
 		}
 		if (type.isInterface())
 			throw InconsistentBinding.referenceLoop(item, ref, bound);
-		bindToConstructsBy(env, type.rawType, item, dest);
+		expandConstructs(env, type.rawType, item, dest);
 	}
 
 	private static <T> boolean isCompatibleSupplier(Type<T> requiredType,
@@ -183,7 +185,7 @@ public final class DefaultValueBinders {
 				.parameter(0).isAssignableTo(requiredType);
 	}
 
-	private static <T> void implicitlyBindToConstructor(Env env,
+	private static <T> void implicitlyExpandConstructs(Env env,
 			Instance<T> ref, Binding<?> item, Bindings dest) {
 		Class<T> impl = ref.type().rawType;
 		if (isClassConstructable(impl)) {
@@ -191,17 +193,17 @@ public final class DefaultValueBinders {
 					new Locator<>(ref).indirect(item.signature.target.indirect),
 					BindingType.CONSTRUCTOR, null, item.scope,
 					item.source.typed(DeclarationType.IMPLICIT));
-			bindToConstructsBy(env, impl, binding, dest);
+			expandConstructs(env, impl, binding, dest);
 		}
 	}
 
-	private static <T> void bindToConstructsBy(Env env, Class<? extends T> ref,
+	private static <T> void expandConstructs(Env env, Class<? extends T> ref,
 			Binding<T> item, Bindings dest) {
-		Constructor<?> c = env.property(ConstructsBy.class)
+		Constructor<?> c = env.property(ConstructsBy.class) //
 				.reflect(ref.getDeclaredConstructors());
 		if (c != null)
 			dest.addExpanded(env, item,
-					Constructs.constructs(raw(c.getDeclaringClass()), c,
+					constructs(raw(c.getDeclaringClass()), c,
 							env.property(HintsBy.class)));
 	}
 }

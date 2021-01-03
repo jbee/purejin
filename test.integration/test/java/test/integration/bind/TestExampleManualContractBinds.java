@@ -1,9 +1,10 @@
 package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
-import se.jbee.inject.BuildUp;
+import se.jbee.inject.Lift;
 import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency.ResourceResolutionFailed;
+import se.jbee.inject.binder.Binder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.EnvModule;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -16,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
- * A example that shows how API contract for {@link se.jbee.inject.binder.Binder#contractbind(Class)}
+ * A example that shows how API contract for {@link Binder#withContractAccess()}
  * are explicitly declared using {@link EnvModule#addContract(Class)}.
  * <p>
  * Contracts are all the types a bound type is assignable to and that are
@@ -45,8 +46,8 @@ class TestExampleManualContractBinds {
 			bind(ContractsBy.class).toScoped(ContractsBy.NONE);
 			// but we do decorate the default behaviour with the one accepting all in the set of declared contract
 			// those are all we added somewhere using: addContract(Class)
-			bind(BuildUp.buildUpTypeOf(ContractsBy.class))
-					.to(ContractsBy::buildUpDeclaredSet);
+			bind(Lift.liftTypeOf(ContractsBy.class))
+					.to(ContractsBy::liftDeclaredSet);
 		}
 	}
 
@@ -55,7 +56,7 @@ class TestExampleManualContractBinds {
 
 		@Override
 		protected void declare() {
-			contractbind(Integer.class).to(42);
+			withContractAccess().bind(Integer.class).to(42);
 		}
 	}
 

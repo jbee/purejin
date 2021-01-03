@@ -101,16 +101,16 @@ public interface ProducesBy {
 		return impl -> arrayFilter(reflect(impl), filter);
 	}
 
-	default ProducesBy selectStrictBy(Typed<?>... hints) {
+	default ProducesBy parameterTypesStrictlyMatch(Typed<?>... hints) {
 		return select(method -> Utils.matchesInOrder(method, hints));
 	}
 
-	default ProducesBy selectBy(Typed<?>... hints) {
+	default ProducesBy parameterTypesMatch(Typed<?>... hints) {
 		return select(method -> Utils.matchesInRandomOrder(method, hints));
 	}
 
-	default ProducesBy returnTypeAssignableTo(Type<?> supertype) {
-		return select(method -> returnType(method).isAssignableTo(supertype));
+	default ProducesBy returnTypeAssignableTo(Typed<?> supertype) {
+		return select(method -> returnType(method).isAssignableTo(supertype.type()));
 	}
 
 	default ProducesBy withModifier(IntPredicate filter) {

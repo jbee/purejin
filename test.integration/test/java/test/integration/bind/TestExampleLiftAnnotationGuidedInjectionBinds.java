@@ -1,7 +1,7 @@
 package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
-import se.jbee.inject.BuildUp;
+import se.jbee.inject.Lift;
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -14,24 +14,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.Name.named;
 
 /**
- * This test demonstrates how a {@link BuildUp} for {@link Object} can be
+ * This test demonstrates how a {@link Lift} for {@link Object} can be
  * used to add annotation based injection to the {@link Injector}.
  *
  * In this basic example the {@link Resource} annotation is used to mark field
  * that should be injected. The naive implementation of the annotation
- * {@link BuildUp} then iterates the {@link Field}s of the target to check
+ * {@link Lift} then iterates the {@link Field}s of the target to check
  * for the annotation and inject the fields resolving them from the
  * {@link Injector} context. A serious implementation obviously has to be more
  * sophisticated in how to identify and initialised fields based on annotations
- * found but the principle of using the {@link BuildUp} to add this feature
+ * found but the principle of using the {@link Lift} to add this feature
  * stays the same.
  *
  * @see TestExamplePostConstructBinds
  */
-class TestExampleBuildUpAnnotationGuidedInjectionBinds {
+class TestExampleLiftAnnotationGuidedInjectionBinds {
 
-	static final class TestExampleBuildUpAnnotationGuidedInjectionBindsModule
-			extends BinderModule implements BuildUp<Object> {
+	static final class TestExampleLiftAnnotationGuidedInjectionBindsModule
+			extends BinderModule implements Lift<Object> {
 
 		@Override
 		protected void declare() {
@@ -39,11 +39,11 @@ class TestExampleBuildUpAnnotationGuidedInjectionBinds {
 			bind(String.class).to("y");
 			bind(named("x"), String.class).to("x");
 			construct(SomeBean.class);
-			upbind(Object.class).to(this);
+			lift(Object.class).to(this);
 		}
 
 		@Override
-		public Object buildUp(Object target, Type<?> as, Injector context) {
+		public Object lift(Object target, Type<?> as, Injector context) {
 			for (Field f : target.getClass().getDeclaredFields()) {
 				if (f.isAnnotationPresent(Resource.class)) {
 					try {
@@ -72,10 +72,10 @@ class TestExampleBuildUpAnnotationGuidedInjectionBinds {
 	}
 
 	private final Injector injector = Bootstrap.injector(
-			TestExampleBuildUpAnnotationGuidedInjectionBindsModule.class);
+			TestExampleLiftAnnotationGuidedInjectionBindsModule.class);
 
 	@Test
-	void buildUpCanBeUsedToAddAnnotationBasedInjection() {
+	void liftCanBeUsedToAddAnnotationBasedInjection() {
 		SomeBean bean = injector.resolve(SomeBean.class);
 		assertEquals(42, bean.someField.intValue());
 		assertEquals("x", bean.someNamedField);

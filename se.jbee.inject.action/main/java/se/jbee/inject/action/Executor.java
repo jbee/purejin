@@ -29,6 +29,6 @@ public interface Executor {
 	 *             execution. The cause should be the exception causing the
 	 *             problem, not another wrapper like {@link SupplyFailed}.
 	 */
-	<I, O> O run(ActionSite<I, O> site, Object[] args, I value)
+	<I, O> O execute(ActionSite<I, O> site, Object[] args, I value)
 			throws ActionExecutionFailed;
 }

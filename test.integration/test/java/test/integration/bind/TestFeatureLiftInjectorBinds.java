@@ -12,13 +12,13 @@ import static se.jbee.inject.Name.named;
 
 /**
  * A test that demonstrates that the {@link Injector} can be decorated using a
- * {@link BuildUp} and that the decorated {@link Injector} is passed to
+ * {@link Lift} and that the decorated {@link Injector} is passed to
  * {@link Supplier}s when resolving {@link Dependency}s.
  */
-class TestFeatureBuildUpInjectorBinds {
+class TestFeatureLiftInjectorBinds {
 
 	public static class DecoratingInjector implements Injector,
-			BuildUp<Injector> {
+			Lift<Injector> {
 
 		private final Injector decorated;
 
@@ -33,7 +33,7 @@ class TestFeatureBuildUpInjectorBinds {
 		}
 
 		@Override
-		public Injector buildUp(Injector target, Type<?> as,
+		public Injector lift(Injector target, Type<?> as,
 				Injector context) {
 			//OBS: context is the undecorated Injector (there might have been other decorations applied before)
 			// use target instead!
@@ -49,11 +49,11 @@ class TestFeatureBuildUpInjectorBinds {
 		}
 	}
 
-	static class TestFeatureBuildUpInjectorBindsModule extends BinderModule {
+	static class TestFeatureLiftInjectorBindsModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			upbind().to(DecoratingInjector.class);
+			lift().to(DecoratingInjector.class);
 			bind(named("supplied"), Bean.class).toSupplier(this::supply);
 			bind(named("constructed"), Bean.class).toConstructor();
 		}
@@ -66,7 +66,7 @@ class TestFeatureBuildUpInjectorBinds {
 	}
 
 	private static Injector injector = Bootstrap.injector(
-			TestFeatureBuildUpInjectorBindsModule.class);
+			TestFeatureLiftInjectorBindsModule.class);
 
 	@Test
 	void bootstrappingReturnsDecoratedInjector() {

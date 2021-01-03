@@ -3,8 +3,9 @@ package test.integration.api;
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.DeclarationType;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toSet;
+import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.DeclarationType.*;
 
 class TestDeclarationType {
@@ -66,5 +67,15 @@ class TestDeclarationType {
 	@Test
 	void implicitIsReplacedByImplicit() {
 		assertTrue(IMPLICIT.replacedBy(IMPLICIT));
+	}
+
+	/**
+	 * The letters are used as ID when printing the type so they should be unique
+	 */
+	@Test
+	void firstLetterIsUnique() {
+		assertEquals(values().length,
+				stream(values()).map(e -> e.name().charAt(0)) //
+						.collect(toSet()).size());
 	}
 }

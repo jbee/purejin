@@ -1,7 +1,7 @@
 package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
-import se.jbee.inject.BuildUp;
+import se.jbee.inject.Lift;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Injector;
 import se.jbee.inject.UnresolvableDependency;
@@ -14,10 +14,10 @@ import java.lang.reflect.Proxy;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests demonstrates how to use {@link BuildUp}s to decorate the
+ * Tests demonstrates how to use {@link Lift}s to decorate the
  * {@link Injector} or bound instances.
  */
-class TestExampleBuildUpProxyDecorationBinds {
+class TestExampleLiftProxyDecorationBinds {
 
 	interface Shape {
 
@@ -32,21 +32,21 @@ class TestExampleBuildUpProxyDecorationBinds {
 		}
 	}
 
-	private static class TestExampleBuildUpProxyDecorationBindsModule
-			extends BinderModule implements BuildUp<Shape> {
+	private static class TestExampleLiftProxyDecorationBindsModule
+			extends BinderModule implements Lift<Shape> {
 
 		@Override
 		protected void declare() {
-			upbind().to((injector, as, __) -> new DelegatingInjector(injector));
+			lift().to((injector, as, __) -> new DelegatingInjector(injector));
 			bind(int.class).to(42);
 			bind(Foo.class).toConstructor();
 
 			bind(Shape.class).to(() -> new Area()); // OBS: A constant would not work as it is resolved using a shortcut
-			upbind(Shape.class).to(this);
+			lift(Shape.class).to(this);
 		}
 
 		@Override
-		public Shape buildUp(Shape target, Type<?> as, Injector context) {
+		public Shape lift(Shape target, Type<?> as, Injector context) {
 			return (Shape) Proxy.newProxyInstance(
 					target.getClass().getClassLoader(),
 					new Class[] { Shape.class },
@@ -80,10 +80,10 @@ class TestExampleBuildUpProxyDecorationBinds {
 	}
 
 	private final Injector injector = Bootstrap.injector(
-			TestExampleBuildUpProxyDecorationBindsModule.class);
+			TestExampleLiftProxyDecorationBindsModule.class);
 
 	@Test
-	void injectorCanBeDecoratedUsingBuildUps() {
+	void injectorCanBeDecoratedUsingLifts() {
 		assertSame(DelegatingInjector.class, injector.getClass());
 	}
 
@@ -93,7 +93,7 @@ class TestExampleBuildUpProxyDecorationBinds {
 	}
 
 	@Test
-	void injectedInjectorCanBeDecoratedUsingBuildUps() {
+	void injectedInjectorCanBeDecoratedUsingLifts() {
 		assertSame(DelegatingInjector.class,
 				injector.resolve(Injector.class).getClass());
 		assertSame(DelegatingInjector.class,
@@ -101,7 +101,7 @@ class TestExampleBuildUpProxyDecorationBinds {
 	}
 
 	@Test
-	void resolvedInstancesCanBeDocratedUsingBuildUps() {
+	void resolvedInstancesCanBeDecoratedUsingLifts() {
 		Shape s = injector.resolve(Shape.class);
 		assertNotNull(s);
 		assertSame(s, injector.resolve(Shape.class));

@@ -29,17 +29,17 @@ import static se.jbee.inject.Name.named;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
- * This test demonstrates how {@link se.jbee.inject.binder.Binder#patternbind(Class[])}
+ * This test demonstrates how {@link se.jbee.inject.binder.Binder#detectAt(Class[])}
  * in combination with user {@link java.lang.annotation.Annotation}s can be used
  * to define your own concepts. The effect of such a concept is defined as
- * {@link ModuleWith} (here {@link ServiceAnnotationPattern}) that is added to
+ * {@link ModuleWith} (here {@link ServiceAnnotationTemplet}) that is added to
  * the {@link Env} which links the user {@link java.lang.annotation.Annotation}
  * and its effect.
  * <p>
  * With such a pattern present in the {@link Env} annotated classes are now
- * simply added using {@link se.jbee.inject.binder.Binder#patternbind(Class[])}.
+ * simply added using {@link se.jbee.inject.binder.Binder#detectAt(Class[])}.
  * The effects of this follow the pattern as implemented in {@link
- * ServiceAnnotationPattern} which receives the annotated {@link Class} as an
+ * ServiceAnnotationTemplet} which receives the annotated {@link Class} as an
  * argument.
  *
  * @see TestExampleConfigPropertyAnnotationBinds
@@ -73,13 +73,13 @@ class TestExampleAnnotationGuidedBindingBinds {
 	/**
 	 * Applies the effects of the {@link Service} annotation.
 	 */
-	static class ServiceAnnotationPattern extends BinderModuleWith<Class<?>> {
+	static class ServiceAnnotationTemplet extends BinderModuleWith<Class<?>> {
 
 		@Override
 		protected void declare(Class<?> annotated) {
 			per(Scope.application)
 					.withIndirectAccess() // withIndirectAccess just used as an example (not needed)
-					.contractbind(annotated).toConstructor();
+					.withContractAccess().bind(annotated).toConstructor();
 		}
 	}
 
@@ -87,7 +87,7 @@ class TestExampleAnnotationGuidedBindingBinds {
 	 * Applies the effect of the {@link Contract} annotation which binds the
 	 * class for all named interfaces.
 	 */
-	static class ContractAnnotationPattern extends BinderModuleWith<Class<?>> {
+	static class ContractAnnotationTemplet extends BinderModuleWith<Class<?>> {
 
 		@Override
 		protected void declare(Class<?> annotated) {
@@ -107,7 +107,7 @@ class TestExampleAnnotationGuidedBindingBinds {
 		}
 	}
 
-	static class ProvidesAnnotationPattern extends BinderModuleWith<Method> {
+	static class ProvidesAnnotationTemplet extends BinderModuleWith<Method> {
 
 		@Override
 		protected void declare(Method annotated) {
@@ -158,17 +158,17 @@ class TestExampleAnnotationGuidedBindingBinds {
 
 		@Override
 		protected void declare() {
-			patternbind(SomeServiceImpl.class);
-			patternbind(Answer.class);
-			patternbind(Bean.class);
+			detectAt(SomeServiceImpl.class);
+			detectAt(Answer.class);
+			detectAt(Bean.class);
 		}
 	}
 
 	private final Env env = Bootstrap.DEFAULT_ENV //
 			.with(ContractsBy.class, ContractsBy.OPTIMISTIC)
-			.with(named(Service.class), ModuleWith.TYPE_ANNOTATION, new ServiceAnnotationPattern())
-			.with(named(Contract.class), ModuleWith.TYPE_ANNOTATION, new ContractAnnotationPattern())
-			.with(named(Provides.class), ModuleWith.METHOD_ANNOTATION, new ProvidesAnnotationPattern());
+			.with(named(Service.class), ModuleWith.TYPE_ANNOTATION, new ServiceAnnotationTemplet())
+			.with(named(Contract.class), ModuleWith.TYPE_ANNOTATION, new ContractAnnotationTemplet())
+			.with(named(Provides.class), ModuleWith.METHOD_ANNOTATION, new ProvidesAnnotationTemplet());
 
 	private final Injector context = Bootstrap.injector(env,
 			TestExampleAnnotationGuidedBindingBindsModule.class);

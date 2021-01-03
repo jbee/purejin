@@ -5,10 +5,7 @@
  */
 package se.jbee.inject.action;
 
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Injector;
-import se.jbee.inject.Scope;
-import se.jbee.inject.Supplier;
+import se.jbee.inject.*;
 import se.jbee.inject.UnresolvableDependency.NoMethodForDependency;
 import se.jbee.inject.bind.Module;
 import se.jbee.inject.binder.BinderModule;
@@ -25,7 +22,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableList;
+import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.lang.Type.actualReturnType;
+import static se.jbee.inject.lang.Type.raw;
 
 /**
  * Base {@link Module} that needs to be extended and installed at least once to
@@ -50,12 +51,18 @@ public abstract class ActionModule extends BinderModule {
 		public void declare() {
 			construct(ActionSupplier.class);
 			asDefault().per(Scope.dependencyType) //
-					.starbind(Action.class).toSupplier(ActionSupplier.class);
+					.starbind(Action.class) //
+					.toSupplier(ActionSupplier.class);
 			asDefault().bind(ACTION_CONNECTOR, Connector.class) //
 					.to(ActionSupplier.class);
 			asDefault().per(Scope.application) //
 					.bind(Executor.class) //
 					.to(this::run);
+
+			asDefault().bind(ActionStrategy.class)
+					.to(RoundRobinStrategy.class);
+			asDefault().injectingInto(Void.class).bind(ActionStrategy.class)
+					.to(MulticastStrategy.class);
 		}
 
 		<A, B> B run(ActionSite<A, B> site, Object[] args, A value) {
@@ -69,25 +76,20 @@ public abstract class ActionModule extends BinderModule {
 		/**
 		 * A list of discovered methods for each implementation class.
 		 */
-		private final Map<Type<?>, Set<ActionSite.ActionTarget>> methodsByReturnType = new ConcurrentHashMap<>();
+		private final Map<Type<?>, Set<ActionSite.ActionTarget>> targetsByReturnType = new ConcurrentHashMap<>();
+
 		/**
 		 * All already created {@link Action}s identified by a unique function
 		 * signature.
 		 */
 		private final Map<String, Action<?, ?>> actionsBySignature = new ConcurrentHashMap<>();
 
-		private final Injector injector;
-		private final Executor executor;
 		private final AtomicInteger connectedCount = new AtomicInteger();
-
-		public ActionSupplier(Injector injector) {
-			this.injector = injector;
-			this.executor = injector.resolve(Executor.class);
-		}
 
 		@Override
 		public void connect(Object instance, Type<?> as, Method connected) {
-			methodsByReturnType.computeIfAbsent(actualReturnType(connected, as),
+			targetsByReturnType.computeIfAbsent(
+					actualReturnType(connected, as),
 					key -> ConcurrentHashMap.newKeySet()).add(
 					new ActionSite.ActionTarget(instance, as, connected));
 			connectedCount.incrementAndGet();
@@ -97,69 +99,60 @@ public abstract class ActionModule extends BinderModule {
 		public Action<?, ?> supply(Dependency<? super Action<?, ?>> dep,
 				Injector context) {
 			Type<? super Action<?, ?>> type = dep.type();
-			return provide(type.parameter(0), type.parameter(1));
+			return provide(type.parameter(0), type.parameter(1), context);
 		}
 
 		@SuppressWarnings("unchecked")
-		private <A, B> Action<A, B> provide(Type<A> in, Type<B> out) {
+		private <A, B> Action<A, B> provide(Type<A> in, Type<B> out,
+				Injector context) {
 			return (Action<A, B>) actionsBySignature.computeIfAbsent(
-					getSignature(in, out), key -> newAction(in, out));
+					getSignature(in, out), key -> newAction(in, out, context));
 		}
 
 		private <A, B> String getSignature(Type<A> in, Type<B> out) {
 			return in + "->" + out;
 		}
 
-		private <A, B> Action<?, ?> newAction(Type<A> in, Type<B> out) {
+		private <A, B> Action<A, B> newAction(Type<A> in, Type<B> out,
+				Injector context) {
 			AtomicReference<List<ActionSite<A,B>>> cache = new AtomicReference<>();
-			AtomicInteger cachedAtConnectionCount = new AtomicInteger();
-			return new LazyAction<>(injector, executor, () -> {
-				if (cachedAtConnectionCount.get() < connectedCount.get()) {
-					cache.set(null);
-					cachedAtConnectionCount.set(connectedCount.get());
+			AtomicInteger cachedAtCount = new AtomicInteger();
+			@SuppressWarnings("unchecked")
+			ActionStrategy<A, B> strategy = context.resolve(dependency(
+					raw(ActionStrategy.class).parameterized(in, out)).injectingInto(out));
+			return input -> {
+				List<ActionSite<A, B>> sites = cache.updateAndGet(list -> {
+					int count = connectedCount.get();
+					if (list != null && cachedAtCount.get() == count)
+						return list;
+					cachedAtCount.set(count);
+					return resolveActions(in, out, context, cachedAtCount);
+				});
+				try {
+					return strategy.execute(input, sites);
+				} catch (DisconnectException ex) {
+					throw new NoMethodForDependency(out, in);
 				}
-				return cache.updateAndGet(list -> list != null ? list : resolveActions(in, out));
-			});
+			};
 		}
 
-		private <A, B> List<ActionSite<A,B>> resolveActions(Type<A> in, Type<B> out) {
-			Set<ActionSite.ActionTarget> targets = methodsByReturnType.get(out);
+		private <A, B> List<ActionSite<A, B>> resolveActions(Type<A> in,
+				Type<B> out, Injector context, AtomicInteger cachedAtCount) {
+			Set<ActionSite.ActionTarget> targets = targetsByReturnType.get(out);
 			if (targets == null)
-				throw new NoMethodForDependency(out, in);
-			List<ActionSite<A,B>> matching = new ArrayList<>(1);
+				return emptyList();
+			List<ActionSite<A, B>> matching = new ArrayList<>();
 			for (ActionSite.ActionTarget candidate : targets) {
-				if (candidate.isApplicableFor(in, out))
-					matching.add(new ActionSite<>(candidate, in, out, injector));
+				if (candidate.isUsableFor(in, out))
+					matching.add(new ActionSite<>(candidate, in, out, context,
+							site -> {
+								targets.remove(candidate);
+								cachedAtCount.set(0); // invalidate cache
+							}));
 			}
-			if (matching.isEmpty())
-				throw new NoMethodForDependency(out, in);
-			return matching;
-		}
-
-	}
-
-	private static final class LazyAction<A, B> implements Action<A, B> {
-
-		private final Injector context;
-		private final Executor executor;
-		private final java.util.function.Supplier<List<ActionSite<A, B>>> sites;
-
-		LazyAction(Injector context, Executor executor,
-				java.util.function.Supplier<List<ActionSite<A, B>>> sites) {
-			this.context = context;
-			this.executor = executor;
-			this.sites = sites;
-		}
-
-		@Override
-		public B run(A input) throws ActionExecutionFailed {
-			List<ActionSite<A, B>> activeSites = this.sites.get();
-			if (activeSites.size() == 1)
-				return executor.run(activeSites.get(0),
-						activeSites.get(0).args(context, input), input);
-			for (ActionSite<A, B> site : activeSites)
-				executor.run(site, site.args(context, input), input);
-			return null;
+			return matching.isEmpty()
+					? emptyList()
+					: unmodifiableList(matching);
 		}
 	}
 }

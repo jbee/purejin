@@ -14,8 +14,6 @@ import se.jbee.inject.Env;
  *
  * @see Bundle
  * @see ModuleWith
- *
- * @author Jan Bernitt (jan@jbee.se)
  */
 @FunctionalInterface
 public interface Module {

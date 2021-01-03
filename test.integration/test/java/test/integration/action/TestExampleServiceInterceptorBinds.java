@@ -60,7 +60,7 @@ class TestExampleServiceInterceptorBinds {
 		@Override
 		protected void declare() {
 			construct(TheService.class);
-			connect(ProducesBy.OPTIMISTIC).in(TheService.class).asAction();
+			connect(ProducesBy.OPTIMISTIC).inAny(TheService.class).asAction();
 			// register the interceptor
 			plug(AssertInvocationInterceptor.class) //
 					.into(ServiceInterceptor.class);
@@ -172,7 +172,7 @@ class TestExampleServiceInterceptorBinds {
 		}
 
 		@Override
-		public <A, B> B run(ActionSite<A, B> site, Object[] args, A value)
+		public <A, B> B execute(ActionSite<A, B> site, Object[] args, A value)
 				throws ActionExecutionFailed {
 			if (interceptors.length == 0) {
 				return site.call(args, null);
