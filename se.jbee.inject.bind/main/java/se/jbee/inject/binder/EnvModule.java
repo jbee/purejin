@@ -22,6 +22,13 @@ import se.jbee.inject.config.ContractsBy;
  * understood as belonging to the {@link Env}. This is a convention then picked
  * up by {@link ServiceLoaderEnvBundles}.
  *
+ * When using {@link EnvModule} as base class the resulting binds are like
+ * "globals" in the {@link Env}. To localise the effect of the binding to the
+ * package of the module (and its sub-packages) use the {@link LocalEnvModule}
+ * as base class.
+ *
+ * @see LocalEnvModule
+ *
  * @since 8.1
  */
 @Extends(Env.class)

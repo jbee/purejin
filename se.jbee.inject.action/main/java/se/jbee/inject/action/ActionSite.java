@@ -7,6 +7,7 @@ import se.jbee.inject.lang.Type;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import static java.util.Arrays.asList;
@@ -31,14 +32,17 @@ public final class ActionSite<A, B> {
 	public final ActionTarget target;
 	public final Type<A> in;
 	public final Type<B> out;
+	private final AtomicBoolean isDisconnected = new AtomicBoolean();
+	private final Runnable disconnect;
 	private final InjectionSite injection;
 	private final int inputIndex;
 
 	public ActionSite(ActionTarget target, Type<A> in, Type<B> out,
-			Injector context) {
+			Injector context, Consumer<ActionSite<?, ?>> disconnect) {
 		this.target = target;
 		this.in = in;
 		this.out = out;
+		this.disconnect = () -> disconnect.accept(ActionSite.this);
 		Env env = context.resolve(Env.class).in(ActionModule.class);
 		Hint<A> inArg = Hint.constantNull(in);
 		Hint<?>[] actualParameters = env.property(HintsBy.class)
@@ -46,6 +50,15 @@ public final class ActionSite<A, B> {
 		this.injection = new InjectionSite(context,
 				dependency(out).injectingInto(target.as), actualParameters);
 		this.inputIndex = asList(actualParameters).indexOf(inArg);
+	}
+
+	private void disconnect() {
+		if (isDisconnected.compareAndSet(false, true))
+			disconnect.run();
+	}
+
+	public boolean isDisconnected() {
+		return isDisconnected.get();
 	}
 
 	public Object[] args(Injector context, Object input) {
@@ -62,6 +75,8 @@ public final class ActionSite<A, B> {
 	}
 
 	public B call(Object[] args, Consumer<Exception> errorHandler) throws ActionExecutionFailed {
+		if (isDisconnected())
+			throw new DisconnectException("Action already disconnected.");
 		try {
 			Method action = target.action;
 			return out.rawType.cast(
@@ -72,7 +87,10 @@ public final class ActionSite<A, B> {
 			if (e.getCause() instanceof Exception) {
 				ex = (Exception) e.getCause();
 			}
-			if (errorHandler != null)
+			if (ex instanceof DisconnectException) {
+				disconnect();
+				throw (DisconnectException) ex;
+			} else if (errorHandler != null)
 				errorHandler.accept(ex);
 			throw new ActionExecutionFailed(
 					"Exception on invocation of the action", ex);
