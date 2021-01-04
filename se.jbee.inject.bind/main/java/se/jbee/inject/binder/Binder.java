@@ -638,76 +638,67 @@ public class Binder {
 	public static class AutoBinder {
 
 		private final RootBinder binder;
-		private final AccessesBy accessesBy;
-		private final ConstructsBy constructsBy;
-		private final ProducesBy producesBy;
-		private final NamesBy namesBy;
-		private final ScopesBy scopesBy;
-		private final HintsBy hintsBy;
-		private final PublishesBy publishesBy;
+		private final Env env;
 
 		protected AutoBinder(RootBinder binder, Name scope) {
-			Bind bind = binder.bind();
-			this.binder = binder.on(bind.asPublished()).on(bind.next());
-			Env env = bind.env;
-			this.accessesBy = env.property(AccessesBy.class);
-			this.constructsBy = env.property(ConstructsBy.class);
-			this.producesBy = env.property(ProducesBy.class);
-			this.namesBy = env.property(NamesBy.class).orElse(DEFAULT);
-			this.hintsBy = env.property(HintsBy.class);
-			this.publishesBy = env.property(PublishesBy.class);
-			this.scopesBy = scope.equalTo(Scope.mirror)
-				? env.property(ScopesBy.class)
-				: target -> scope;
+			this(binder.on(binder.bind().asPublished())
+					.on(binder.bind().next()), env(binder, scope));
 		}
 
-		private AutoBinder(RootBinder binder, AccessesBy accessesBy,
-				ConstructsBy constructsBy, ProducesBy producesBy,
-				NamesBy namesBy, ScopesBy scopesBy, HintsBy hintsBy,
-				PublishesBy publishesBy) {
+		private static Env env(RootBinder binder, Name scope) {
+			Env env = binder.env().withIsolate();
+			return scope.equalTo(Scope.mirror)
+					? env
+					: env.with(ScopesBy.class, target -> scope);
+		}
+
+		private AutoBinder(RootBinder binder, Env env) {
 			this.binder = binder;
-			this.accessesBy = accessesBy;
-			this.constructsBy = constructsBy;
-			this.producesBy = producesBy;
-			this.namesBy = namesBy;
-			this.scopesBy = scopesBy;
-			this.hintsBy = hintsBy;
-			this.publishesBy = publishesBy;
+			this.env = env;
+		}
+
+		private NamesBy namesBy() {
+			return env.property(NamesBy.class).orElse(DEFAULT);
+		}
+
+		private HintsBy hintsBy() {
+			return env.property(HintsBy.class);
+		}
+
+		private ScopesBy scopesBy() {
+			return env.property(ScopesBy.class);
+		}
+
+		private AutoBinder with(Env env) {
+			return new AutoBinder(binder, env);
 		}
 
 		public AutoBinder accessBy(AccessesBy strategy) {
-			return new AutoBinder(binder, strategy, constructsBy, producesBy,
-					namesBy, scopesBy, hintsBy, publishesBy);
+			return with(env.with(AccessesBy.class, strategy));
 		}
 
 		public AutoBinder constructBy(ConstructsBy strategy) {
-			return new AutoBinder(binder, accessesBy, strategy, producesBy, namesBy,
-					scopesBy, hintsBy, publishesBy);
+			return with(env.with(ConstructsBy.class, strategy));
 		}
 
 		public AutoBinder produceBy(ProducesBy strategy) {
-			return new AutoBinder(binder, accessesBy, constructsBy, strategy,
-					namesBy, scopesBy, hintsBy, publishesBy);
+			return with(env.with(ProducesBy.class, strategy));
 		}
 
 		public AutoBinder nameBy(NamesBy strategy) {
-			return new AutoBinder(binder, accessesBy, constructsBy, producesBy,
-					strategy.orElse(DEFAULT), scopesBy, hintsBy, publishesBy);
+			return with(env.with(NamesBy.class, strategy));
 		}
 
 		public AutoBinder scopeBy(ScopesBy strategy) {
-			return new AutoBinder(binder, accessesBy, constructsBy, producesBy,
-					namesBy, strategy, hintsBy, publishesBy);
+			return with(env.with(ScopesBy.class, strategy));
 		}
 
 		public AutoBinder hintBy(HintsBy strategy) {
-			return new AutoBinder(binder, accessesBy, constructsBy, producesBy,
-					namesBy, scopesBy, strategy, publishesBy);
+			return with(env.with(HintsBy.class, strategy));
 		}
 
-		public AutoBinder contractBy(PublishesBy strategy) {
-			return new AutoBinder(binder, accessesBy, constructsBy, producesBy,
-					namesBy, scopesBy, hintsBy, strategy);
+		public AutoBinder publishBy(PublishesBy strategy) {
+			return with(env.with(PublishesBy.class, strategy));
 		}
 
 		public final void in(Class<?> impl) {
@@ -740,14 +731,14 @@ public class Binder {
 				return; // do not try to construct the class
 			if (instance != null && !(instance instanceof Hint))
 				return; // if there is an instance don't bind constructor unless it is just a Hint
-			Constructor<?> target = constructsBy
+			Constructor<?> target = env.property(ConstructsBy.class)
 					.reflect(impl.getDeclaredConstructors(), construction);
 			if (target != null)
 				asConstructor(Scope.auto, target, construction);
 		}
 
 		private boolean bindAccessesIn(Class<?> impl, Object instance) {
-			Field[] constants = accessesBy.reflect(impl);
+			Field[] constants = env.property(AccessesBy.class).reflect(impl);
 			if (constants == null || constants.length == 0)
 				return false;
 			boolean needsInstance = false;
@@ -759,7 +750,7 @@ public class Binder {
 		}
 
 		private boolean bindProducesIn(Class<?> impl, Object instance) {
-			Method[] producers = producesBy.reflect(impl);
+			Method[] producers = env.property(ProducesBy.class).reflect(impl);
 			if (producers == null)
 				return false;
 			boolean needsInstance = false;
@@ -773,7 +764,7 @@ public class Binder {
 		public boolean asConstant(Field constant, Object instance) {
 			Accesses<?> accesses = Accesses.accesses(instance, constant);
 			binder.per(Scope.container) //
-					.bind(namesBy.reflect(constant), accesses.expectedType) //
+					.bind(namesBy().reflect(constant), accesses.expectedType) //
 					.expand(accesses);
 			return true;
 		}
@@ -795,29 +786,29 @@ public class Binder {
 		public boolean asProducer(Method target, Object instance, Hint<?>... args) {
 			if (target.getReturnType() == void.class || target.getReturnType() == Void.class)
 				return false;
-			Name scope = scopesBy.reflect(target);
-			Produces<?> produces = Produces.produces(instance, target, hintsBy, args);
+			Name scope = scopesBy().reflect(target);
+			Produces<?> produces = Produces.produces(instance, target, hintsBy(), args);
 			binder.per(scope == null ? Scope.auto : scope) //
-					.bind(namesBy.reflect(target), produces.expectedType) //
+					.bind(namesBy().reflect(target), produces.expectedType) //
 					.expand(produces);
 			return true;
 		}
 
 		public final <T> void asConstructor(Constructor<T> target, Hint<?>... hints) {
-			asConstructor(scopesBy.reflect(target), target, hints);
+			asConstructor(scopesBy().reflect(target), target, hints);
 		}
 
 		public <T> void asConstructor(Name scope, Constructor<T> target, Hint<?>... hints) {
 			if (target == null)
 				throw InconsistentBinding.generic("Provided Constructor was null");
-			Name name = namesBy.reflect(target);
+			Name name = namesBy().reflect(target);
 			Class<T> impl = target.getDeclaringClass();
 			Binder scopedBinder = binder.per(scope != null ? scope : Scope.auto).implicit();
 			scopedBinder.bind(name, impl).to(target, hints);
 			if (name.isDefault()) {
-				scopedBinder.withPublishedAccess(publishesBy).bind(impl)
+				scopedBinder.withPublishedAccess(env.property(PublishesBy.class)).bind(impl)
 						//TODO use actual type hint/ref
-						.expand(constructs(raw(impl), target, hintsBy, hints));
+						.expand(constructs(raw(impl), target, hintsBy(), hints));
 			} else {
 				for (Type<? super T> st : raw(impl).supertypes())
 					if (st.isInterface())

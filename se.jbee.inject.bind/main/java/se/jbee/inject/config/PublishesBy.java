@@ -12,6 +12,19 @@ import java.util.function.Function;
 
 import static java.util.Arrays.asList;
 
+/**
+ * {@link PublishesBy} is a strategy to decide which of the types an actual
+ * value type is assignable to should also operate as its API. That means the
+ * value or implementation is bound to that API type.
+ * <p>
+ * Using a strategy to decide the bound API types is most of all a convenience
+ * tool that allows to avoid or shorten declarations and to reduce stating a
+ * concept or strategy in multiple places in form of their current
+ * manifestation.
+ * <p>
+ * For example, a strategy could be to only access bound types using interfaces.
+ * The {@link #PROTECTIVE} strategy could be used to easily do this.
+ */
 @FunctionalInterface
 public interface PublishesBy {
 
