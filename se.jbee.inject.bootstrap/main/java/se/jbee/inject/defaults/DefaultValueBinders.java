@@ -9,7 +9,7 @@ import se.jbee.inject.*;
 import se.jbee.inject.bind.*;
 import se.jbee.inject.binder.*;
 import se.jbee.inject.config.ConstructsBy;
-import se.jbee.inject.config.ContractsBy;
+import se.jbee.inject.config.PublishesBy;
 import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.lang.Type;
 
@@ -38,7 +38,7 @@ public final class DefaultValueBinders {
 	public static final ValueBinder<Instance<?>> REFERENCE = DefaultValueBinders::bindReference;
 	public static final ValueBinder<Instance<?>> REFERENCE_PREFER_CONSTANTS = DefaultValueBinders::bindReferencePreferConstants;
 	public static final ValueBinder<Constant<?>> CONSTANT = DefaultValueBinders::bindConstant;
-	public static final ValueBinder<Binding<?>> CONTRACTS = DefaultValueBinders::bindContractTypes;
+	public static final ValueBinder<Binding<?>> PUBLISHED_APIS = DefaultValueBinders::bindPublishedTypes;
 
 	private DefaultValueBinders() {
 		throw new UnsupportedOperationException("util");
@@ -46,25 +46,25 @@ public final class DefaultValueBinders {
 
 	/**
 	 * This {@link ValueBinder} adds bindings to super-types for {@link
-	 * Binding}s declared with {@link DeclarationType#CONTRACT} or {@link
+	 * Binding}s declared with {@link DeclarationType#PUBLISHED} or {@link
 	 * DeclarationType#PROVIDED}.
 	 */
-	private static <T> void bindContractTypes(Env env, Binding<?> ref,
+	private static <T> void bindPublishedTypes(Env env, Binding<?> ref,
 			Binding<T> item, Bindings dest) {
 		DeclarationType dt = item.source.declarationType;
-		if (dt != DeclarationType.CONTRACT && dt != DeclarationType.PROVIDED) {
+		if (dt != DeclarationType.PUBLISHED && dt != DeclarationType.PROVIDED) {
 			dest.add(env, item);
 			return;
 		}
 		Class<T> impl = item.type().rawType;
-		ContractsBy contractsBy = env.property(named(impl).toString(),
-				ContractsBy.class, env.property(ContractsBy.class));
-		if (contractsBy.isContract(impl, impl))
+		PublishesBy publishesBy = env.property(named(impl).toString(),
+				PublishesBy.class, env.property(PublishesBy.class));
+		if (publishesBy.isPublishedAs(impl, impl))
 			dest.add(env, item);
 		for (Type<? super T> supertype : item.type().supertypes())
 			// Object is of course a superclass but not indented when doing super-binds
 			if (supertype.rawType != Object.class //
-					&& contractsBy.isContract(supertype.rawType, impl))
+					&& publishesBy.isPublishedAs(supertype.rawType, impl))
 				dest.add(env, item.typed(supertype));
 	}
 

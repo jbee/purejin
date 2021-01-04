@@ -5,7 +5,7 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.config.ContractsBy;
+import se.jbee.inject.config.PublishesBy;
 import se.jbee.inject.defaults.DefaultFeature;
 import se.jbee.inject.defaults.DefaultFeatures;
 
@@ -28,13 +28,13 @@ class TestFeatureOptionalBinds {
 
 		@Override
 		protected void declare() {
-			withContractAccess().bind(int.class).to(5);
+			withPublishedAccess().bind(int.class).to(5);
 			bind(String.class).to("foo");
 		}
 	}
 
 	private final Injector context = Bootstrap.injector(
-			Bootstrap.DEFAULT_ENV.with(ContractsBy.class, ContractsBy.SUPER),
+			Bootstrap.DEFAULT_ENV.with(PublishesBy.class, PublishesBy.SUPER),
 			TestOptionalBindsModule.class);
 
 	@Test

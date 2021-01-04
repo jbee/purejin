@@ -10,7 +10,7 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BinderModuleWith;
 import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.config.ContractsBy;
+import se.jbee.inject.config.PublishesBy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  * Publisher#subscribe(Subscriber)} being defined in the interface or only in
  * the {@link PublisherImpl} implementation.
  * <p>
- * This example uses {@link Binder#withContractAccess()} to make each of the
+ * This example uses {@link Binder#withPublishedAccess()} to make each of the
  * implementations a {@link Subscriber} that is known within the {@link
  * Injector} context. Another option would be to use {@link
  * Binder#multibind(Class)} and explicitly bind each service as a {@link
@@ -110,9 +110,9 @@ class TestExamplePubSubBinds {
 
 		@Override
 		protected void declare(Publisher value) {
-			withContractAccess().bind(Service1.class).to(Service1::new);
-			withContractAccess().bind(Service2.class).to(Service2::new);
-			withContractAccess().bind(Service3.class).to(Service3::new);
+			withPublishedAccess().bind(Service1.class).to(Service1::new);
+			withPublishedAccess().bind(Service2.class).to(Service2::new);
+			withPublishedAccess().bind(Service3.class).to(Service3::new);
 
 			// since we are using a constant but we want it to be affected by
 			// Lift we bind it as a scoped constant
@@ -160,7 +160,7 @@ class TestExamplePubSubBinds {
 		PublisherImpl pub = new PublisherImpl();
 		Env env = Bootstrap.DEFAULT_ENV
 				.with(Publisher.class, pub)
-				.with(ContractsBy.class, ContractsBy.OPTIMISTIC);
+				.with(PublishesBy.class, PublishesBy.OPTIMISTIC);
 		Injector context = Bootstrap.injector(env, bundle);
 		// at this point the context is created by not necessarily any instances
 		// this is where the difference between eager and lazy shows

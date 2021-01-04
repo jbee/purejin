@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.action.Action.actionTypeOf;
 import static se.jbee.inject.lang.Type.actualReturnType;
 import static se.jbee.inject.lang.Type.raw;
 
@@ -61,7 +62,8 @@ public abstract class ActionModule extends BinderModule {
 
 			asDefault().bind(ActionStrategy.class)
 					.to(RoundRobinStrategy.class);
-			asDefault().injectingInto(Void.class).bind(ActionStrategy.class)
+			asDefault().injectingInto(actionTypeOf(Type.WILDCARD, Type.VOID)) //
+					.bind(ActionStrategy.class) //
 					.to(MulticastStrategy.class);
 		}
 
@@ -119,7 +121,8 @@ public abstract class ActionModule extends BinderModule {
 			AtomicInteger cachedAtCount = new AtomicInteger();
 			@SuppressWarnings("unchecked")
 			ActionStrategy<A, B> strategy = context.resolve(dependency(
-					raw(ActionStrategy.class).parameterized(in, out)).injectingInto(out));
+					raw(ActionStrategy.class).parameterized(in, out))
+					.injectingInto(actionTypeOf(in, out)));
 			return input -> {
 				List<ActionSite<A, B>> sites = cache.updateAndGet(list -> {
 					int count = connectedCount.get();

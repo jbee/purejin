@@ -27,6 +27,6 @@ public class SupportAnnotationTemplet extends BinderModuleWith<Class<?>> {
 
 	@Override
 	protected void declare(Class<?> annotated) {
-		per(Scope.application).withContractAccess().bind(annotated).toConstructor();
+		per(Scope.application).withPublishedAccess().bind(annotated).toConstructor();
 	}
 }

@@ -6,7 +6,7 @@ import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.binder.Binder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.config.ContractsBy;
+import se.jbee.inject.config.PublishesBy;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -23,18 +23,20 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * ContractsProvided} which is put on a service to point out interfaces
  * implemented.
  * <p>
- * This builds upon the concept of {@link ContractsBy} which selects the
+ * This builds upon the concept of {@link PublishesBy} which selects the
  * super-classes and super-interfaces of bound types if they are bound as {@link
- * Binder#withContractAccess()}.
+ * Binder#withPublishedAccess()}.
  * <p>
  * In this example we also create a utility extension {@link ProjectBaseModule}
  * of the default {@link BinderModule} which is assumed to be used as base class
  * for the application project. It adds a convenience method {@link
  * ProjectBaseModule#addBean(Class)} which internally creates the {@link
- * Binder#withContractAccess()}.
+ * Binder#withPublishedAccess()}.
  *
  * This is only meant to show a more realistic way how a project would use
  * annotation guided contracts.
+ *
+ * @see TestExampleLocalPublishesByBinds
  */
 class TestExampleAnnotatedContractsBinds {
 
@@ -72,7 +74,7 @@ class TestExampleAnnotatedContractsBinds {
 	private static abstract class ProjectBaseModule extends BinderModule {
 
 		void addBean(Class<?> bean) {
-			withContractAccess().bind(bean).toConstructor();
+			withPublishedAccess().bind(bean).toConstructor();
 		}
 	}
 
@@ -85,9 +87,9 @@ class TestExampleAnnotatedContractsBinds {
 	}
 
 	private final Injector context = Bootstrap.injector(
-			Bootstrap.DEFAULT_ENV.with(ContractsBy.class,
-					ContractsBy.SUPER.annotatedWith(Contract.class).or(
-							ContractsBy.SUPER.annotatedWith(
+			Bootstrap.DEFAULT_ENV.with(PublishesBy.class,
+					PublishesBy.SUPER.annotatedWith(Contract.class).or(
+							PublishesBy.SUPER.annotatedWith(
 									ContractsProvided.class,
 									ContractsProvided::value))),
 			SomeServiceModule.class);

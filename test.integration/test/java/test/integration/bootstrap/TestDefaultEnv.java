@@ -55,7 +55,7 @@ class TestDefaultEnv {
 		assertDefined(env, NamesBy.class);
 		assertDefined(env, ScopesBy.class);
 		assertDefined(env, HintsBy.class);
-		assertDefined(env, ContractsBy.class);
+		assertDefined(env, PublishesBy.class);
 	}
 
 	@Test

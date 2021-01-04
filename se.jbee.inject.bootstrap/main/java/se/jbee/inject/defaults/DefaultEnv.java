@@ -39,7 +39,7 @@ public class DefaultEnv extends ConstantsModule {
 		bind(Scope.container, raw(ScopeLifeCycle.class)).to(ScopeLifeCycle.container);
 
 		// ValueBinders
-		bindValueBinder(Binding.class).to(DefaultValueBinders.CONTRACTS);
+		bindValueBinder(Binding.class).to(DefaultValueBinders.PUBLISHED_APIS);
 		bindValueBinder(Constructs.class).to(DefaultValueBinders.CONSTRUCTS);
 		bindValueBinder(Constant.class).to(DefaultValueBinders.CONSTANT);
 		bindValueBinder(Produces.class).to(DefaultValueBinders.PRODUCES);
@@ -55,7 +55,7 @@ public class DefaultEnv extends ConstantsModule {
 		bind(NamesBy.class).to(obj -> Name.DEFAULT);
 		bind(ScopesBy.class).to(ScopesBy.AUTO);
 		bind(HintsBy.class).to(((param, context) -> null));
-		bind(ContractsBy.class).to(ContractsBy.PROTECTIVE);
+		bind(PublishesBy.class).to(PublishesBy.PROTECTIVE);
 
 		// how to cull and verify the Bindings made
 		bind(BindingConsolidation.class).to(DefaultBindingConsolidation::consolidate);
