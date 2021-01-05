@@ -11,7 +11,6 @@ import se.jbee.inject.bind.Bootstrapper;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.bind.Dependent;
 import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.binder.ConstantsModule;
 import se.jbee.inject.binder.Supply;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.config.*;

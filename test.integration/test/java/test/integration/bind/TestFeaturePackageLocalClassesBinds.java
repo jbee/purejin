@@ -47,7 +47,6 @@ class TestFeaturePackageLocalClassesBinds {
 	private final Injector context = Bootstrap.injector(
 			TestFeaturePackageLocalClassesBindsModule.class);
 
-
 	@Test
 	void localNewBindAllowsCreatingDefaultVisibleBeans() {
 		assertNotNull(context.resolve(DefaultVisibleBean.class));

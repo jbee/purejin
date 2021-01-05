@@ -10,6 +10,7 @@ import se.jbee.inject.UnresolvableDependency.NoMethodForDependency;
 import se.jbee.inject.bind.Module;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.config.Connector;
+import se.jbee.inject.config.Invoke;
 import se.jbee.inject.config.ProducesBy;
 import se.jbee.inject.lang.Type;
 
@@ -46,7 +47,7 @@ public abstract class ActionModule extends BinderModule {
 		super(ActionBaseModule.class);
 	}
 
-	private static final class ActionBaseModule extends BinderModule {
+	public static final class ActionBaseModule extends BinderModule {
 
 		@Override
 		public void declare() {
@@ -88,12 +89,20 @@ public abstract class ActionModule extends BinderModule {
 
 		private final AtomicInteger connectedCount = new AtomicInteger();
 
+		private final Injector context;
+
+		public ActionSupplier(Injector context) {
+			this.context = context;
+		}
+
 		@Override
 		public void connect(Object instance, Type<?> as, Method connected) {
+			Invoke invoke = context.resolve(dependency(Invoke.class) //
+					.injectingInto(connected.getDeclaringClass()));
 			targetsByReturnType.computeIfAbsent(
 					actualReturnType(connected, as),
 					key -> ConcurrentHashMap.newKeySet()).add(
-					new ActionSite.ActionTarget(instance, as, connected));
+					new ActionSite.ActionTarget(instance, as, connected, invoke));
 			connectedCount.incrementAndGet();
 		}
 

@@ -1,13 +1,8 @@
 package se.jbee.inject.lang;
 
 import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.function.Consumer;
 import java.util.function.Function;
-
-import static se.jbee.inject.lang.Type.raw;
 
 public final class Reflect {
 
@@ -24,43 +19,6 @@ public final class Reflect {
 		/* J11: if (!obj.canAccess(null)) */
 			obj.setAccessible(true);
 		return obj;
-	}
-
-	private static <T> Constructor<T> noArgsConstructor(Class<T> type) {
-		if (type.isInterface() || type.isEnum() || type.isPrimitive())
-			throw new IllegalArgumentException("Type is not constructed: " + raw(type).toString());
-		try {
-			return type.getDeclaredConstructor();
-		} catch (RuntimeException e) {
-			throw e;
-		} catch (Exception e) {
-			throw new IllegalArgumentException("Failed to access no argument constructor for type: " + raw(type), e);
-		}
-	}
-
-	public static <T> T construct(Constructor<T> target, Object[] args,
-			Function<Exception, ? extends RuntimeException> exceptionTransformer) {
-		try {
-			return target.newInstance(args);
-		} catch (Exception e) {
-			throw wrap(exceptionTransformer).apply(e);
-		}
-	}
-
-	public static <T> T construct(Class<T> type, Consumer<Constructor<T>> init,
-			Function<Exception, ? extends RuntimeException> exceptionTransformer) {
-		Constructor<T> target = noArgsConstructor(type);
-		init.accept(target);
-		return construct(target, new Object[0], exceptionTransformer);
-	}
-
-	public static Object produce(Method target, Object instance, Object[] args,
-			Function<Exception, ? extends RuntimeException> exceptionTransformer) {
-		try {
-			return target.invoke(instance, args);
-		} catch (Exception e) {
-			throw wrap(exceptionTransformer).apply(e);
-		}
 	}
 
 	public static Object access(Field target, Object instance,

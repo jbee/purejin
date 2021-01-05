@@ -6,8 +6,8 @@
 package se.jbee.inject.binder;
 
 import se.jbee.inject.*;
+import se.jbee.inject.config.Invoke;
 import se.jbee.inject.config.New;
-import se.jbee.inject.lang.Reflect;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.TypeVariable;
 
@@ -213,6 +213,7 @@ public final class Supply {
 			implements Annotated {
 
 		private Object instance;
+		private Invoke invoke;
 		private final Produces<T> produces;
 		private final Class<T> returns;
 		private final Map<java.lang.reflect.TypeVariable<?>, UnaryOperator<Type<?>>> typeVariableResolvers;
@@ -239,8 +240,14 @@ public final class Supply {
 					? produces.getAsHint().resolveIn(context)
 					: context.resolve(produces.target.getDeclaringClass());
 			}
-			return returns.cast(Reflect.produce(produces.target, instance, args,
-					e -> UnresolvableDependency.SupplyFailed.valueOf(e, produces.target)));
+			if (invoke == null)
+				invoke = context.resolve(dependency(Invoke.class)
+						.injectingInto(produces.target.getDeclaringClass()));
+			try {
+				return returns.cast(invoke.call(produces.target, instance, args));
+			} catch (Exception e) {
+				throw UnresolvableDependency.SupplyFailed.valueOf(e, produces.target);
+			}
 		}
 
 		@Override

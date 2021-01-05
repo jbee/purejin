@@ -2,9 +2,10 @@ package se.jbee.inject.action;
 
 import se.jbee.inject.*;
 import se.jbee.inject.config.HintsBy;
-import se.jbee.inject.lang.Reflect;
+import se.jbee.inject.config.Invoke;
 import se.jbee.inject.lang.Type;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -79,18 +80,19 @@ public final class ActionSite<A, B> {
 			throw new DisconnectException("Action already disconnected.");
 		try {
 			Method action = target.action;
-			return out.rawType.cast(
-					Reflect.produce(action, target.instance, args,
-					e -> UnresolvableDependency.SupplyFailed.valueOf(e, action)));
-		} catch (UnresolvableDependency.SupplyFailed e) {
-			Exception ex = e;
-			if (e.getCause() instanceof Exception) {
-				ex = (Exception) e.getCause();
-			}
-			if (ex instanceof DisconnectException) {
+				return out.rawType.cast(
+						target.invoke.call(action, target.instance, args));
+		} catch (InvocationTargetException ex) {
+			if (ex.getTargetException() instanceof DisconnectException) {
 				disconnect();
-				throw (DisconnectException) ex;
-			} else if (errorHandler != null)
+				throw (DisconnectException) ex.getTargetException();
+			}
+			if (errorHandler != null)
+				errorHandler.accept((Exception) ex.getCause());
+			throw new ActionExecutionFailed(
+					"Exception on invocation of the action", ex.getCause());
+		} catch (Exception ex) {
+			if (errorHandler != null)
 				errorHandler.accept(ex);
 			throw new ActionExecutionFailed(
 					"Exception on invocation of the action", ex);
@@ -103,14 +105,17 @@ public final class ActionSite<A, B> {
 	}
 
 	public static final class ActionTarget {
+
 		public final Object instance;
 		public final Type<?> as;
 		public final Method action;
+		public final Invoke invoke;
 
-		ActionTarget(Object instance, Type<?> as, Method action) {
+		ActionTarget(Object instance, Type<?> as, Method action, Invoke invoke) {
 			this.instance = instance;
 			this.as = as;
 			this.action = action;
+			this.invoke = invoke;
 		}
 
 		public Type<?> returnType() {

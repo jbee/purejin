@@ -1098,18 +1098,18 @@ public class Binder {
 			toConstant(constant);
 		}
 
-		public final void toMany(T constant1, T constant2) {
+		public final void toMultiple(T constant1, T constant2) {
 			onMulti().toConstant(constant1).toConstant(constant2);
 		}
 
-		public final void toMany(T constant1, T constant2, T constant3) {
+		public final void toMultiple(T constant1, T constant2, T constant3) {
 			onMulti().toConstant(constant1) //
 					.toConstant(constant2) //
 					.toConstant(constant3);
 		}
 
 		@SafeVarargs
-		public final void toMany(T constant1, T... constants) {
+		public final void toMultiple(T constant1, T... constants) {
 			TypedBinder<T> multibinder = onMulti().toConstant(constant1);
 			for (T constant : constants)
 				multibinder.toConstant(constant);

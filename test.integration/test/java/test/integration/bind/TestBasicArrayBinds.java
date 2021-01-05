@@ -52,7 +52,7 @@ class TestBasicArrayBinds {
 			injectingInto(CMD_2, Command.class).multibind(Number.class).to(5L);
 
 			bind(CMD_3, Command.class).toConstructor();
-			injectingInto(CMD_3, Command.class).bind(Number.class).toMany(1, 6d, 8);
+			injectingInto(CMD_3, Command.class).bind(Number.class).toMultiple(1, 6d, 8);
 
 			bind(CMD_4, Command.class).toConstructor(
 					Hint.constant(new Number[] { 2d, 9 }));
