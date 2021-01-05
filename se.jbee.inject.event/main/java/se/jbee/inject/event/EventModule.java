@@ -55,7 +55,7 @@ public abstract class EventModule extends BinderModule {
 			asDefault().bind(PolicyProvider.class).to(
 					handlerType -> EventPolicy.DEFAULT);
 			asDefault().injectingInto(EventProcessor.class).bind(
-					ExecutorService.class).to(Executors::newWorkStealingPool);
+					ExecutorService.class).toProvider(Executors::newWorkStealingPool);
 		}
 
 	}

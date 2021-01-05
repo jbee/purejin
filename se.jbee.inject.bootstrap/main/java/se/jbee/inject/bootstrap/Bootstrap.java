@@ -14,13 +14,14 @@ import se.jbee.inject.binder.ServiceLoaderAnnotations;
 import se.jbee.inject.binder.ServiceLoaderBundles;
 import se.jbee.inject.binder.ServiceLoaderEnvBundles;
 import se.jbee.inject.config.Edition;
+import se.jbee.inject.config.New;
 import se.jbee.inject.container.Container;
 import se.jbee.inject.defaults.DefaultEnv;
 import se.jbee.inject.defaults.DefaultsBundle;
 import se.jbee.inject.lang.Lazy;
 import se.jbee.inject.lang.Reflect;
 
-import java.lang.reflect.Modifier;
+import java.lang.reflect.Constructor;
 import java.util.*;
 
 import static se.jbee.inject.bind.Bindings.newBindings;
@@ -150,10 +151,12 @@ public final class Bootstrap {
 		private final LinkedList<Class<? extends Bundle>> stack = new LinkedList<>();
 		private final Env env;
 		private final Edition edition;
+		private final New newBundle;
 
 		BuiltinBootstrapper(Env env) {
 			this.env = env;
 			this.edition = env.property(Edition.class, Edition.FULL);
+			this.newBundle = env.in(Bundle.class).property(New.class);
 		}
 
 		@Override
@@ -186,11 +189,14 @@ public final class Bootstrap {
 		private <T> T createBundle(Class<T> bundle) {
 			// OBS: Here we do not use the env but always make the bundles accessible
 			// as this is kind of designed into the concept
-			return Reflect.construct(bundle, c-> {
-					if (!Modifier.isPublic(c.getModifiers()))
-						Reflect.accessible(c);
-					},
-					e -> new InconsistentDeclaration("Failed to create bundle: " + bundle, e));
+			try {
+				Constructor<T> c = bundle.getDeclaredConstructor();
+				Reflect.accessible(c);
+				return newBundle.call(c, new Object[0]);
+			} catch (Exception e) {
+				throw new InconsistentDeclaration(
+						"Failed to create bundle: " + bundle, e);
+			}
 		}
 
 		@Override

@@ -9,6 +9,10 @@ import se.jbee.inject.config.*;
 import se.jbee.inject.container.Container;
 import se.jbee.inject.lang.Type;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
 import static se.jbee.inject.lang.Type.raw;
 
 /**
@@ -57,12 +61,13 @@ public class DefaultEnv extends ConstantsModule {
 		bind(HintsBy.class).to(((param, context) -> null));
 		bind(PublishesBy.class).to(PublishesBy.PROTECTIVE);
 
+		// reflection
+		bind(New.class).to(Constructor::newInstance);
+		bind(Invoke.class).to(Method::invoke);
+		bind(Get.class).to(Field::get);
+
 		// how to cull and verify the Bindings made
 		bind(BindingConsolidation.class).to(DefaultBindingConsolidation::consolidate);
-
-		// do not use deep reflection (set accessible) (but if enabled use it everywhere)
-		bind(Env.USE_DEEP_REFLECTION, boolean.class).to(false);
-		bind(Env.DEEP_REFLECTION_PACKAGES, Packages.class).to(Packages.ALL);
 
 		// verification is off
 		bind(Env.USE_VERIFICATION, boolean.class).to(false);

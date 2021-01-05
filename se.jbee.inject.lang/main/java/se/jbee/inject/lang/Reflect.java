@@ -77,7 +77,7 @@ public final class Reflect {
 		return e -> {
 			if (e instanceof IllegalAccessException) {
 				IllegalAccessException extended = new IllegalAccessException(
-						e.getMessage() + "\n\tEither make the member accessible by making it public or switch on deep reflection by setting Env.GP_USE_DEEP_REFLECTION property to true before bootstrapping the Injector context");
+						e.getMessage() + "\n\tEither make the member accessible by making it public or switch on deep reflection by setting Env.USE_DEEP_REFLECTION property to true before bootstrapping the Injector context");
 				extended.setStackTrace(e.getStackTrace());
 				extended.initCause(e.getCause());
 				e = extended;

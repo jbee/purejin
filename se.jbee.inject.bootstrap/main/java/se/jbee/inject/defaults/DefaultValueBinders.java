@@ -91,21 +91,18 @@ public final class DefaultValueBinders {
 
 	private static <T> Binding<T> bindConstruction(Env env, Binding<T> item,
 			Constructs<?> ref) {
-		env.accessible(ref.target);
 		return item.complete(CONSTRUCTOR, byConstruction(ref.typed(item.type()))) //
 				.verifiedBy(env.verifierFor(ref));
 	}
 
 	private static <T> Binding<T> bindProduction(Env env, Binding<T> item,
 			Produces<?> ref) {
-		env.accessible(ref.target);
 		return item.complete(METHOD, byProduction(ref.typed(item.type()))) //
 				.verifiedBy(env.verifierFor(ref));
 	}
 
 	private static <T> Binding<T> bindAccess(Env env, Binding<T> item,
 			Accesses<?> ref) {
-		env.accessible(ref.target);
 		// reference itself is used as supplier, as it also provides the default implementation
 		return item.complete(FIELD, ref.typed(item.type())) //
 				.verifiedBy(env.verifierFor(ref));
@@ -142,8 +139,7 @@ public final class DefaultValueBinders {
 			Constructor<?> target = env.property(ConstructsBy.class) //
 					.reflect(refType.rawType.getDeclaredConstructors());
 			if (target != null) {
-				dest.addExpanded(env, item, constructs(refType, target,
-						env.property(HintsBy.class)));
+				dest.addExpanded(env, item, constructs(refType, target, env));
 				return;
 			}
 		}
@@ -203,7 +199,6 @@ public final class DefaultValueBinders {
 				.reflect(ref.getDeclaredConstructors());
 		if (c != null)
 			dest.addExpanded(env, item,
-					constructs(raw(c.getDeclaringClass()), c,
-							env.property(HintsBy.class)));
+					constructs(raw(c.getDeclaringClass()), c, env));
 	}
 }

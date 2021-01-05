@@ -34,23 +34,23 @@ class TestBasicPrimitiveArrayBridgeBinds {
 		protected void declare() {
 			bind(int.class).to(1);
 			bind(named("wrapper"), Integer.class).to(2);
-			bind(named("some"), Integer.class).to(() -> 3);
+			bind(named("some"), Integer.class).toProvider(() -> 3);
 
 			bind(long.class).to(4L);
 			bind(named("wrapper"), Long.class).to(5L);
-			bind(named("some"), Long.class).to(() -> 6L);
+			bind(named("some"), Long.class).toProvider(() -> 6L);
 
 			bind(float.class).to(7f);
 			bind(named("wrapper"), Float.class).to(8f);
-			bind(named("some"), Float.class).to(() -> 9f);
+			bind(named("some"), Float.class).toProvider(() -> 9f);
 
 			bind(double.class).to(10d);
 			bind(named("wrapper"), Double.class).to(11d);
-			bind(named("some"), Double.class).to(() -> 12d);
+			bind(named("some"), Double.class).toProvider(() -> 12d);
 
 			bind(boolean.class).to(true);
 			bind(named("wrapper"), Boolean.class).to(true);
-			bind(named("some"), Boolean.class).to(() -> true);
+			bind(named("some"), Boolean.class).toProvider(() -> true);
 		}
 	}
 

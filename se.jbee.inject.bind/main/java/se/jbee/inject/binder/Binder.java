@@ -734,7 +734,7 @@ public class Binder {
 			Constructor<?> target = env.property(ConstructsBy.class)
 					.reflect(impl.getDeclaredConstructors(), construction);
 			if (target != null)
-				asConstructor(Scope.auto, target, construction);
+				toConstructor(Scope.auto, target, construction);
 		}
 
 		private boolean bindAccessesIn(Class<?> impl, Object instance) {
@@ -794,21 +794,21 @@ public class Binder {
 			return true;
 		}
 
-		public final <T> void asConstructor(Constructor<T> target, Hint<?>... hints) {
-			asConstructor(scopesBy().reflect(target), target, hints);
+		public final <T> void toConstructor(Constructor<T> target, Hint<?>... hints) {
+			toConstructor(scopesBy().reflect(target), target, hints);
 		}
 
-		public <T> void asConstructor(Name scope, Constructor<T> target, Hint<?>... hints) {
+		public <T> void toConstructor(Name scope, Constructor<T> target, Hint<?>... hints) {
 			if (target == null)
 				throw InconsistentBinding.generic("Provided Constructor was null");
 			Name name = namesBy().reflect(target);
 			Class<T> impl = target.getDeclaringClass();
 			Binder scopedBinder = binder.per(scope != null ? scope : Scope.auto).implicit();
-			scopedBinder.bind(name, impl).to(target, hints);
+			scopedBinder.bind(name, impl).toConstructor(target, hints);
 			if (name.isDefault()) {
 				scopedBinder.withPublishedAccess(env.property(PublishesBy.class)).bind(impl)
 						//TODO use actual type hint/ref
-						.expand(constructs(raw(impl), target, hintsBy(), hints));
+						.expand(constructs(raw(impl), target, env, hints));
 			} else {
 				for (Type<? super T> st : raw(impl).supertypes())
 					if (st.isInterface())
@@ -927,6 +927,10 @@ public class Binder {
 			return with(bind().target.in(packages));
 		}
 
+		public final Binder locally() {
+			return inPackageOf(bind().source.ident);
+		}
+
 		public final Binder inPackageAndSubPackagesOf(Class<?> type) {
 			return with(bind().target.inPackageAndSubPackagesOf(type));
 		}
@@ -990,10 +994,10 @@ public class Binder {
 			to(Instance.anyOf(raw(impl)));
 		}
 
-		public void to(Constructor<? extends T> target, Hint<?>... args) {
+		public void toConstructor(Constructor<? extends T> target, Hint<?>... args) {
 			if (target == null)
 				throw InconsistentBinding.generic("Provided constructor was null");
-			expand(constructs(locator.type(), target, env(HintsBy.class), args));
+			expand(constructs(locator.type(), target, env(), args));
 		}
 
 		protected final void expand(Descriptor value) {
@@ -1069,8 +1073,8 @@ public class Binder {
 		/**
 		 * @since 8.1
 		 */
-		public void to(java.util.function.Supplier<? extends T> method) {
-			toSupplier((Dependency<? super T> d, Injector i) -> method.get());
+		public void toProvider(java.util.function.Supplier<? extends T> method) {
+			toSupplier((dep, context) -> method.get());
 		}
 
 		/**
@@ -1094,18 +1098,18 @@ public class Binder {
 			toConstant(constant);
 		}
 
-		public final void to(T constant1, T constant2) {
+		public final void toMany(T constant1, T constant2) {
 			onMulti().toConstant(constant1).toConstant(constant2);
 		}
 
-		public final void to(T constant1, T constant2, T constant3) {
+		public final void toMany(T constant1, T constant2, T constant3) {
 			onMulti().toConstant(constant1) //
 					.toConstant(constant2) //
 					.toConstant(constant3);
 		}
 
 		@SafeVarargs
-		public final void to(T constant1, T... constants) {
+		public final void toMany(T constant1, T... constants) {
 			TypedBinder<T> multibinder = onMulti().toConstant(constant1);
 			for (T constant : constants)
 				multibinder.toConstant(constant);
@@ -1125,7 +1129,7 @@ public class Binder {
 			if (target == null)
 				throw InconsistentBinding.generic(
 						"No usable Constructor for type: " + impl);
-			to(target, hints);
+			toConstructor(target, hints);
 		}
 
 		public void toConstructor(Hint<?>... hints) {

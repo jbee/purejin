@@ -47,9 +47,9 @@ class TestBasicMultibindBinds {
 			multibind(Integer.class).to(1);
 			multibind(foo, Integer.class).to(2);
 			multibind(bar, Integer.class).to(4);
-			bind(Long.class).to(1L, 2L, 3L, 4L);
-			bind(Float.class).to(2f, 3f);
-			bind(Double.class).to(5d, 6d, 7d);
+			bind(Long.class).toMany(1L, 2L, 3L, 4L);
+			bind(Float.class).toMany(2f, 3f);
+			bind(Double.class).toMany(5d, 6d, 7d);
 		}
 	}
 

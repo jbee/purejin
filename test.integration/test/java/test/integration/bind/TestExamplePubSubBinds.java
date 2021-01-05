@@ -110,9 +110,9 @@ class TestExamplePubSubBinds {
 
 		@Override
 		protected void declare(Publisher value) {
-			withPublishedAccess().bind(Service1.class).to(Service1::new);
-			withPublishedAccess().bind(Service2.class).to(Service2::new);
-			withPublishedAccess().bind(Service3.class).to(Service3::new);
+			withPublishedAccess().bind(Service1.class).toProvider(Service1::new);
+			withPublishedAccess().bind(Service2.class).toProvider(Service2::new);
+			withPublishedAccess().bind(Service3.class).toProvider(Service3::new);
 
 			// since we are using a constant but we want it to be affected by
 			// Lift we bind it as a scoped constant

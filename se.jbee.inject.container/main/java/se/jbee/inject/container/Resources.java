@@ -208,11 +208,13 @@ final class Resources {
 		Function<Resource<T>, Generator<T>> generatorFactory = //
 				resource -> createGenerator(context, scopes, resource,
 						descriptor.supplier);
-		ScopeLifeCycle scoping = lifeCycleByScope.get(descriptor.scope);
-		if (scoping == null)
+		ScopeLifeCycle lifeCycle = lifeCycleByScope.get(descriptor.scope);
+		if (lifeCycle == null && descriptor.scope == Scope.container)
+			lifeCycle = ScopeLifeCycle.container; // default
+		if (lifeCycle == null)
 			throw new InconsistentDeclaration("Scope `" + descriptor.scope
 				+ "` is used but not defined for: " + descriptor);
-		return new Resource<>(serialID, descriptor.source, scoping,
+		return new Resource<>(serialID, descriptor.source, lifeCycle,
 				descriptor.signature, descriptor.annotations,
 				descriptor.verifier, generatorFactory);
 	}

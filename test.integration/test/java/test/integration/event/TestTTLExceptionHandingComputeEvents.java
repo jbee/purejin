@@ -83,7 +83,7 @@ class TestTTLExceptionHandingComputeEvents {
 		protected void declare() {
 			handle(Handler.class);
 			construct(SlowService.class);
-			injectingInto(EventProcessor.class).bind(ExecutorService.class).to(
+			injectingInto(EventProcessor.class).bind(ExecutorService.class).toProvider(
 					Executors::newSingleThreadExecutor);
 			bind(PolicyProvider.class).to(event -> EventPolicy.DEFAULT.withTTL(5));
 		}

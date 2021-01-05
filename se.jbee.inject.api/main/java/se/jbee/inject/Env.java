@@ -1,12 +1,9 @@
 package se.jbee.inject;
 
 import se.jbee.inject.lang.Cast;
-import se.jbee.inject.lang.Reflect;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.Utils;
 
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Member;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -36,19 +33,6 @@ import static se.jbee.inject.lang.Type.raw;
  */
 @FunctionalInterface
 public interface Env {
-
-	/**
-	 * Property name used to configure a boolean if reflection is allowed to
-	 * make private members accessible using
-	 * {@link java.lang.reflect.AccessibleObject#setAccessible(boolean)}
-	 */
-	String USE_DEEP_REFLECTION = "deep-reflection";
-
-	/**
-	 * Property name used to configure the set of {@link Packages} where deep
-	 * reflection is allowed given {@link #USE_DEEP_REFLECTION} is true.
-	 */
-	String DEEP_REFLECTION_PACKAGES = "deep-reflection-packages";
 
 	/**
 	 * Property name used to configure a boolean if {@link Verifier}s are tried
@@ -241,15 +225,6 @@ public interface Env {
 		return element == null
 				? property("null", dependentOn, dependentOn.getEnumConstants()[0]) == null
 				: property(element.name(), dependentOn,null) != null;
-	}
-
-	default <T extends  AccessibleObject & Member> void accessible(T target) {
-		if (property(Env.USE_DEEP_REFLECTION, false)) {
-			Packages where = property(Env.DEEP_REFLECTION_PACKAGES,
-					Packages.class);
-			if (where.contains(target.getDeclaringClass()))
-				Reflect.accessible(target);
-		}
 	}
 
 	default <T> Verifier verifierFor(T target) {

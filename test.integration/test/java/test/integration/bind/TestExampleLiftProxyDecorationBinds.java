@@ -41,7 +41,7 @@ class TestExampleLiftProxyDecorationBinds {
 			bind(int.class).to(42);
 			bind(Foo.class).toConstructor();
 
-			bind(Shape.class).to(() -> new Area()); // OBS: A constant would not work as it is resolved using a shortcut
+			bind(Shape.class).toProvider(() -> new Area()); // OBS: A constant would not work as it is resolved using a shortcut
 			lift(Shape.class).to(this);
 		}
 
