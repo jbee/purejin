@@ -23,8 +23,8 @@ import static se.jbee.inject.Scope.container;
  * installed as such. It will than {@link Bundle#bootstrap(Bootstrapper)} itself
  * as a module.
  */
-public abstract class BinderModule extends InitializedBinder
-		implements Bundle, Module {
+public abstract class BinderModule extends AbstractBinderModule
+		implements Module {
 
 	private final Class<? extends Bundle> basis;
 
@@ -35,6 +35,11 @@ public abstract class BinderModule extends InitializedBinder
 	protected BinderModule(Class<? extends Bundle> basis) {
 		this.basis = basis;
 	}
+
+	/**
+	 * @see Module#declare(Bindings, Env)
+	 */
+	protected abstract void declare();
 
 	@Override
 	public final void bootstrap(Bootstrapper bootstrap) {
@@ -47,7 +52,7 @@ public abstract class BinderModule extends InitializedBinder
 	}
 
 	@Override
-	public void declare(Bindings bindings, Env env) {
+	public final void declare(Bindings bindings, Env env) {
 		__init__(configure(env), bindings);
 		declare();
 	}
@@ -97,11 +102,6 @@ public abstract class BinderModule extends InitializedBinder
 	protected final TypedBinder<Scope> bindScope(Name scope) {
 		return per(container).bind(scope, Scope.class);
 	}
-
-	/**
-	 * @see Module#declare(Bindings, Env)
-	 */
-	protected abstract void declare();
 
 	protected boolean installDefaults() {
 		return true;

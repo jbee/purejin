@@ -7,7 +7,7 @@ import se.jbee.inject.binder.Binder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.EnvModule;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.config.ContractsBy;
+import se.jbee.inject.config.PublishesBy;
 
 import java.math.BigInteger;
 
@@ -17,10 +17,12 @@ import static se.jbee.inject.lang.Type.raw;
 
 /**
  * This example shows how a implementation {@link Class} gets bound to its
- * different contracts using {@link Binder#withContractAccess()} and {@link
- * ContractsBy} strategy.
+ * different APIs using {@link Binder#withPublishedAccess()} and {@link
+ * PublishesBy} strategy.
+ *
+ * @see TestExampleAnnotatedContractsBinds
  */
-class TestExampleLocalContractsByBinds {
+class TestExampleLocalPublishesByBinds {
 
 	private static class TestExampleLocalContractsByBindsEnvModule
 			extends EnvModule {
@@ -28,29 +30,29 @@ class TestExampleLocalContractsByBinds {
 		@Override
 		protected void declare() {
 			// our default
-			bindContractsBy().to(ContractsBy.PROTECTIVE);
+			publish().to(PublishesBy.PROTECTIVE);
 
 			// our exception
-			bindContractsByOf(String.class).to(ContractsBy.SUPER);
+			publish(String.class).to(PublishesBy.SUPER);
 		}
 	}
 
-	private static class TestExampleLocalContractsByBindsModule
+	private static class TestExampleLocalPublishesByBindsModule
 			extends BinderModule {
 
 		@Override
 		protected void declare() {
-			withContractAccess().bind(String.class).to("42");
-			withContractAccess().bind(BigInteger.class).to(BigInteger.valueOf(42L));
+			withPublishedAccess().bind(String.class).to("42");
+			withPublishedAccess().bind(BigInteger.class).to(BigInteger.valueOf(42L));
 		}
 	}
 
 	private final Injector context = Bootstrap.injector(
 			Bootstrap.env(TestExampleLocalContractsByBindsEnvModule.class),
-			TestExampleLocalContractsByBindsModule.class);
+			TestExampleLocalPublishesByBindsModule.class);
 
 	@Test
-	void protectiveContractsByAppliesOutsideOfJavaLang() {
+	void protectivePublishesByAppliesOutsideOfJavaLang() {
 		assertEquals(BigInteger.valueOf(42L), context.resolve(
 				raw(Comparable.class).parameterized(BigInteger.class)));
 		assertThrows(UnresolvableDependency.ResourceResolutionFailed.class,
@@ -60,7 +62,7 @@ class TestExampleLocalContractsByBinds {
 	}
 
 	@Test
-	void superContractsByAppliedWithinJavaLang() {
+	void superPublishesByAppliedWithinJavaLang() {
 		assertEquals("42", context.resolve(String.class));
 		assertEquals("42", context.resolve(CharSequence.class));
 	}

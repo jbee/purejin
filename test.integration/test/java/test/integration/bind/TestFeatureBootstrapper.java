@@ -10,7 +10,7 @@ import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.config.ConstructsBy;
-import se.jbee.inject.config.ContractsBy;
+import se.jbee.inject.config.PublishesBy;
 import se.jbee.inject.defaults.DefaultScopes;
 
 import java.lang.annotation.ElementType;
@@ -75,9 +75,9 @@ class TestFeatureBootstrapper {
 		protected void declare() {
 			asDefault().bind(Number.class).to(7);
 			asDefault().bind(Integer.class).to(11);
-			withContractAccess().bind(Integer.class).to(2);
-			withContractAccess().bind(Float.class).to(4f);
-			withContractAccess().bind(Double.class).to(42d);
+			withPublishedAccess().bind(Integer.class).to(2);
+			withPublishedAccess().bind(Float.class).to(4f);
+			withPublishedAccess().bind(Double.class).to(42d);
 			bind(Number.class).to(6);
 		}
 	}
@@ -238,7 +238,7 @@ class TestFeatureBootstrapper {
 	}
 
 	/**
-	 * In the example {@link Number} is {@link DeclarationType#CONTRACT} bound for
+	 * In the example {@link Number} is {@link DeclarationType#PUBLISHED} bound for
 	 * {@link Integer} and {@link Float} but an {@link DeclarationType#EXPLICIT}
 	 * bind done overrides these automatic binds. They are removed and no
 	 * {@link Generator} is created for them.
@@ -246,7 +246,7 @@ class TestFeatureBootstrapper {
 	@Test
 	void bindingsAreReplacedByMoreQualifiedOnes() {
 		Injector context = Bootstrap.injector(
-				Bootstrap.DEFAULT_ENV.with(ContractsBy.class, ContractsBy.OPTIMISTIC),
+				Bootstrap.DEFAULT_ENV.with(PublishesBy.class, PublishesBy.OPTIMISTIC),
 				ReplacingBindsModule.class);
 		assertEquals(6, context.resolve(Number.class));
 		Resource<?>[] rs = context.resolve(raw(Resource.class).parameterized(

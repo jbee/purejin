@@ -6,7 +6,8 @@
 package se.jbee.inject.binder;
 
 import se.jbee.inject.*;
-import se.jbee.inject.lang.Reflect;
+import se.jbee.inject.config.Invoke;
+import se.jbee.inject.config.New;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.TypeVariable;
 
@@ -14,6 +15,7 @@ import java.lang.reflect.AnnotatedElement;
 import java.util.*;
 import java.util.function.UnaryOperator;
 
+import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.lang.Utils.newArray;
@@ -172,6 +174,7 @@ public final class Supply {
 			implements Annotated {
 
 		private final Constructs<T> constructs;
+		private New newInstance;
 
 		Construct(Constructs<T> constructs) {
 			this.constructs = constructs;
@@ -185,8 +188,14 @@ public final class Supply {
 		@Override
 		@SuppressWarnings("unchecked")
 		protected T invoke(Object[] args, Injector context) {
-			return (T) Reflect.construct(constructs.target, args,
-					e -> UnresolvableDependency.SupplyFailed.valueOf(e, constructs.target));
+			try {
+				if (newInstance == null)
+					newInstance = context.resolve(dependency(New.class)
+							.injectingInto(constructs.target.getDeclaringClass()));
+				return (T) newInstance.call(constructs.target, args);
+			} catch (Exception e) {
+				throw UnresolvableDependency.SupplyFailed.valueOf(e, constructs.target);
+			}
 		}
 
 		@Override
@@ -204,6 +213,7 @@ public final class Supply {
 			implements Annotated {
 
 		private Object instance;
+		private Invoke invoke;
 		private final Produces<T> produces;
 		private final Class<T> returns;
 		private final Map<java.lang.reflect.TypeVariable<?>, UnaryOperator<Type<?>>> typeVariableResolvers;
@@ -230,8 +240,14 @@ public final class Supply {
 					? produces.getAsHint().resolveIn(context)
 					: context.resolve(produces.target.getDeclaringClass());
 			}
-			return returns.cast(Reflect.produce(produces.target, instance, args,
-					e -> UnresolvableDependency.SupplyFailed.valueOf(e, produces.target)));
+			if (invoke == null)
+				invoke = context.resolve(dependency(Invoke.class)
+						.injectingInto(produces.target.getDeclaringClass()));
+			try {
+				return returns.cast(invoke.call(produces.target, instance, args));
+			} catch (Exception e) {
+				throw UnresolvableDependency.SupplyFailed.valueOf(e, produces.target);
+			}
 		}
 
 		@Override

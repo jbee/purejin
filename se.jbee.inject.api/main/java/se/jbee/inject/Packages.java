@@ -35,6 +35,8 @@ public final class Packages
 	 */
 	public static final Packages DEFAULT = new Packages(new String[0], false);
 
+	public static final Packages TEST = new Packages("test.", true);
+
 	public static Packages packageAndSubPackagesOf(Class<?> type) {
 		return new Packages(packageNameOf(type), true);
 	}

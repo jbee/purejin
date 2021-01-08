@@ -10,6 +10,7 @@ import se.jbee.inject.UnresolvableDependency.NoMethodForDependency;
 import se.jbee.inject.bind.Module;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.config.Connector;
+import se.jbee.inject.config.Invoke;
 import se.jbee.inject.config.ProducesBy;
 import se.jbee.inject.lang.Type;
 
@@ -25,6 +26,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.action.Action.actionTypeOf;
 import static se.jbee.inject.lang.Type.actualReturnType;
 import static se.jbee.inject.lang.Type.raw;
 
@@ -45,7 +47,7 @@ public abstract class ActionModule extends BinderModule {
 		super(ActionBaseModule.class);
 	}
 
-	private static final class ActionBaseModule extends BinderModule {
+	public static final class ActionBaseModule extends BinderModule {
 
 		@Override
 		public void declare() {
@@ -61,7 +63,8 @@ public abstract class ActionModule extends BinderModule {
 
 			asDefault().bind(ActionStrategy.class)
 					.to(RoundRobinStrategy.class);
-			asDefault().injectingInto(Void.class).bind(ActionStrategy.class)
+			asDefault().injectingInto(actionTypeOf(Type.WILDCARD, Type.VOID)) //
+					.bind(ActionStrategy.class) //
 					.to(MulticastStrategy.class);
 		}
 
@@ -86,12 +89,20 @@ public abstract class ActionModule extends BinderModule {
 
 		private final AtomicInteger connectedCount = new AtomicInteger();
 
+		private final Injector context;
+
+		public ActionSupplier(Injector context) {
+			this.context = context;
+		}
+
 		@Override
 		public void connect(Object instance, Type<?> as, Method connected) {
+			Invoke invoke = context.resolve(dependency(Invoke.class) //
+					.injectingInto(connected.getDeclaringClass()));
 			targetsByReturnType.computeIfAbsent(
 					actualReturnType(connected, as),
 					key -> ConcurrentHashMap.newKeySet()).add(
-					new ActionSite.ActionTarget(instance, as, connected));
+					new ActionSite.ActionTarget(instance, as, connected, invoke));
 			connectedCount.incrementAndGet();
 		}
 
@@ -119,7 +130,8 @@ public abstract class ActionModule extends BinderModule {
 			AtomicInteger cachedAtCount = new AtomicInteger();
 			@SuppressWarnings("unchecked")
 			ActionStrategy<A, B> strategy = context.resolve(dependency(
-					raw(ActionStrategy.class).parameterized(in, out)).injectingInto(out));
+					raw(ActionStrategy.class).parameterized(in, out))
+					.injectingInto(actionTypeOf(in, out)));
 			return input -> {
 				List<ActionSite<A, B>> sites = cache.updateAndGet(list -> {
 					int count = connectedCount.get();

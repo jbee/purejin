@@ -126,10 +126,10 @@ class TestMoreQualified {
 	}
 
 	@Test
-	void explicitSourceIsMoreQualifiedThanContractSource() {
+	void explicitSourceIsMoreQualifiedThanPublishedSource() {
 		Source source = Source.source(TestMoreQualified.class);
 		assertMoreQualified(source.typed(DeclarationType.EXPLICIT),
-				source.typed(DeclarationType.CONTRACT));
+				source.typed(DeclarationType.PUBLISHED));
 	}
 
 	private static <T extends Qualifying<? super T>> void assertMoreQualified(

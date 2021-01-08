@@ -55,7 +55,15 @@ class TestDefaultEnv {
 		assertDefined(env, NamesBy.class);
 		assertDefined(env, ScopesBy.class);
 		assertDefined(env, HintsBy.class);
-		assertDefined(env, ContractsBy.class);
+		assertDefined(env, PublishesBy.class);
+	}
+
+	@Test
+	void defaultEnvDefinesReflection() {
+		Env env = DefaultEnv.bootstrap();
+		assertDefined(env, New.class);
+		assertDefined(env, Invoke.class);
+		assertDefined(env, Get.class);
 	}
 
 	@Test
@@ -66,9 +74,7 @@ class TestDefaultEnv {
 	@Test
 	void defaultEnvDefinesDefaultSettings() {
 		Env env = DefaultEnv.bootstrap();
-		assertDefined(env, Env.USE_DEEP_REFLECTION, boolean.class);
 		assertDefined(env, Env.USE_VERIFICATION, boolean.class);
-		assertDefined(env, Env.DEEP_REFLECTION_PACKAGES, Packages.class);
 	}
 
 	private static void assertDefined(Env env, Class<?> property) {

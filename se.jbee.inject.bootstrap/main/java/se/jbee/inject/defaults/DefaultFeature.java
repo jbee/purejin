@@ -13,13 +13,15 @@ import se.jbee.inject.bind.Dependent;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Supply;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.config.Extension;
-import se.jbee.inject.config.Plugins;
+import se.jbee.inject.config.*;
 import se.jbee.inject.lang.Lazy;
 import se.jbee.inject.lang.Type;
 import se.jbee.inject.lang.Utils;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Function;
 import java.util.logging.Logger;
@@ -97,7 +99,9 @@ public enum DefaultFeature implements Dependent<DefaultFeature> {
 	/**
 	 * Adds: injection {@link Type}, {@link Name} and {@link Dependency}.
 	 */
-	SELF(true)
+	SELF(true),
+
+	REFLECT(true)
 	;
 
 	public final boolean installedByDefault;
@@ -123,6 +127,17 @@ public enum DefaultFeature implements Dependent<DefaultFeature> {
 		bootstrapper.installDependentOn(ANNOTATED_WITH, AnnotatedWithModule.class);
 		bootstrapper.installDependentOn(OBTAINABLE, ObtainableModule.class);
 		bootstrapper.installDependentOn(SELF, SelfModule.class);
+		bootstrapper.installDependentOn(REFLECT, ReflectModule.class);
+	}
+
+	private static class ReflectModule extends BinderModule {
+
+		@Override
+		protected void declare() {
+			asDefault().bind(New.class).to(Constructor::newInstance);
+			asDefault().bind(Invoke.class).to(Method::invoke);
+			asDefault().bind(Get.class).to(Field::get);
+		}
 	}
 
 	private static class LoggerModule extends BinderModule {

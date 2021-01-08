@@ -8,7 +8,7 @@ import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.binder.Binder;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.config.ContractsBy;
+import se.jbee.inject.config.PublishesBy;
 
 import java.io.Serializable;
 import java.util.List;
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static se.jbee.inject.lang.Type.raw;
 
 /**
- * The tests demonstrates the meaning of a {@link Binder#withContractAccess()}
+ * The tests demonstrates the meaning of a {@link Binder#withPublishedAccess()}
  * call. That will create multiple binds, one each for the type and all its
  * super-classes and -interfaces. All of them are bound to the same to-clause,
  * hence share the same {@link Supplier} (in the end all to-clauses become
@@ -39,16 +39,16 @@ class TestBasicSuperbindBinds {
 
 		@Override
 		protected void declare() {
-			withContractAccess().bind(Integer.class).to(42);
-			withContractAccess()
+			withPublishedAccess().bind(Integer.class).to(42);
+			withPublishedAccess()
 					.bind(raw(List.class).parameterized(String.class)).to(emptyList());
-			withContractAccess(((api, impl) -> api == CharSequence.class))
+			withPublishedAccess(((api, impl) -> api == CharSequence.class))
 					.bind(String.class).to("answer");
 		}
 	}
 
 	private final Injector context = Bootstrap.injector(
-			Bootstrap.DEFAULT_ENV.with(ContractsBy.class, ContractsBy.SUPER),
+			Bootstrap.DEFAULT_ENV.with(PublishesBy.class, PublishesBy.SUPER),
 			TestBasicSuperbindBindsModule.class);
 
 	@Test

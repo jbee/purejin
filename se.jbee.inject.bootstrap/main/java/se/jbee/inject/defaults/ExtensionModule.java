@@ -5,7 +5,6 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Supply;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.config.Extension;
-import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.lang.Type;
 
 import java.lang.reflect.Constructor;
@@ -38,14 +37,12 @@ class ExtensionModule extends BinderModule {
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	private static <T> T extension(Dependency<?> dep, Injector context) {
-		Env env = context.resolve(Env.class);
-		ConstructsBy constructsBy = env.property(ConstructsBy.class);
-		HintsBy hintsBy = env.property(HintsBy.class);
 		Type<?> expectedType = dep.type();
+		Env env = context.resolve(Env.class).in(expectedType.rawType);
+		ConstructsBy constructsBy = env.property(ConstructsBy.class);
 		Constructor<?> ext = constructsBy.reflect(
 				expectedType.rawType.getDeclaredConstructors());
-		env.accessible(ext);
-		return (T) Supply.byConstruction(constructs(expectedType, ext, hintsBy)) //
+		return (T) Supply.byConstruction(constructs(expectedType, ext, env)) //
 				.supply((Dependency) dep, context);
 	}
 }

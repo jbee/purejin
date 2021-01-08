@@ -3,21 +3,21 @@ package test.integration.bind;
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bind.Bootstrapper;
-import se.jbee.inject.bind.Bundle;
+import se.jbee.inject.binder.AbstractBinderModule;
 import se.jbee.inject.binder.BinderModule;
-import se.jbee.inject.binder.InitializedBinder;
 import se.jbee.inject.bootstrap.Bootstrap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TestExampleLambdaBinds {
 
-	static class TestExampleLambdaBindsBundle extends InitializedBinder implements Bundle {
+	static class TestExampleLambdaBindsBundle extends AbstractBinderModule {
 
 		@Override
 		public void bootstrap(Bootstrapper bootstrap) {
-			bootstrap.install((bindings, env) //
-			-> bindings.declaredFrom(env, new TestExampleLambdaBindsModule()));
+			bootstrap.install((bindings, env)
+					-> bindings.declaredFrom(env,
+					new TestExampleLambdaBindsModule()));
 		}
 
 	}

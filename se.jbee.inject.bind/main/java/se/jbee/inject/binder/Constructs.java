@@ -5,6 +5,7 @@
  */
 package se.jbee.inject.binder;
 
+import se.jbee.inject.Env;
 import se.jbee.inject.Hint;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bind.ValueBinder;
@@ -25,6 +26,12 @@ public final class Constructs<T> extends
 		ReflectiveDescriptor<Constructor<?>, T> {
 
 	public static <T> Constructs<? extends T> constructs(Type<T> expectedType,
+			Constructor<?> target, Env env, Hint<?>... explicitHints) {
+		return constructs(expectedType, target,
+				env.property(HintsBy.class), explicitHints);
+	}
+
+	private static <T> Constructs<? extends T> constructs(Type<T> expectedType,
 			Constructor<?> target, HintsBy strategy, Hint<?>... explicitHints) {
 		checkBasicCompatibility(classType(target.getDeclaringClass()),
 				expectedType, target);

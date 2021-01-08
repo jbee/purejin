@@ -61,13 +61,11 @@ class TestBasicInjectingIntoBinds {
 			construct(A.class);
 			injectingInto(A.class).bind(B.class).to(B_IN_A);
 			// special A
-			Name special = named("special");
-			construct(special, A.class);
-			injectingInto(special, A.class).bind(B.class).to(B_EVERYWHERE_ELSE);
+			construct("special", A.class);
+			injectingInto("special", A.class).bind(B.class).to(B_EVERYWHERE_ELSE);
 			// awesome A
-			Name awesome = named("awesome");
-			construct(awesome, A.class);
-			injectingInto(awesome, A.class).bind(B.class).to(B_IN_AWESOME_A);
+			construct("awesome", A.class);
+			injectingInto("awesome", A.class).bind(B.class).to(B_IN_AWESOME_A);
 			// B
 			bind(B.class).to(B_EVERYWHERE_ELSE);
 			// C

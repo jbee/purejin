@@ -35,8 +35,8 @@ public final class Bind {
 		return as(DeclarationType.MULTI);
 	}
 
-	public Bind asContract() {
-		return as(DeclarationType.CONTRACT);
+	public Bind asPublished() {
+		return as(DeclarationType.PUBLISHED);
 	}
 
 	public Bind asImplicit() {

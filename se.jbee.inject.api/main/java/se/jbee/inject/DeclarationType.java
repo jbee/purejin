@@ -48,11 +48,11 @@ public enum DeclarationType implements Qualifying<DeclarationType> {
 	PROVIDED,
 
 	/**
-	 * A {@code withContractAccess()} has been used. That is binding a class or
+	 * A {@code withPublishedAccess()} has been used. That is binding a class or
 	 * instance to the exact type as {@link #EXPLICIT} and to the set of
 	 * super-classes and -interfaces that are considered a contract.
 	 */
-	CONTRACT,
+	PUBLISHED,
 
 	/**
 	 * A bind that is meant to co-exist with others that might have the same
@@ -98,7 +98,7 @@ public enum DeclarationType implements Qualifying<DeclarationType> {
 	 *         false
 	 */
 	public boolean droppedWith(DeclarationType other) {
-		return this == other && (this == CONTRACT || this == PROVIDED);
+		return this == other && (this == PUBLISHED || this == PROVIDED);
 	}
 
 }

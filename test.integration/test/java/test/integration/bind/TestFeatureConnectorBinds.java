@@ -79,7 +79,7 @@ class TestFeatureConnectorBinds {
 		@Override
 		protected void declare(Connector verifier) {
 			// the marking as "my-linker"
-			injectingInto(named("marked"), Bean.class) //
+			injectingInto("marked", Bean.class) //
 					.connect(ProducesBy.OPTIMISTIC.annotatedWith(Marked.class)) //
 					.inAny(Bean.class) //
 					.to("my-linker");

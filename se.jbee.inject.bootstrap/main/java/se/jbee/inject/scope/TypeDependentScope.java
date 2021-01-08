@@ -27,9 +27,27 @@ public final class TypeDependentScope implements Scope {
 	 *
 	 * @since 8.1
 	 */
-	public static final Scope JVM = new TypeDependentScope(
-			TypeDependentScope::instanceSignature);
+	public static final Scope JVM = scope(TypeDependentScope::instanceSignature);
 
+	public static Scope scope(Function<Dependency<?>, String> injectionKey) {
+		return new TypeDependentScope(injectionKey);
+	}
+
+	public static Scope perTypeSignature() {
+		return scope(TypeDependentScope::typeSignature);
+	}
+
+	public static Scope perInstanceSignature() {
+		return scope(TypeDependentScope::instanceSignature);
+	}
+
+	public static Scope perHierarchicalInstanceSignature() {
+		return scope(TypeDependentScope::hierarchicalInstanceSignature);
+	}
+
+	public static Scope perTargetInstanceSignature() {
+		return scope(TypeDependentScope::targetInstanceSignature);
+	}
 	public static String typeSignature(Dependency<?> dep) {
 		return dep.type().toString();
 	}

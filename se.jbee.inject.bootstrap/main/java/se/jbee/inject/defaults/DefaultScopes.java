@@ -61,17 +61,13 @@ public final class DefaultScopes extends BinderModule
 				Scope.Controller.forScope(Scope.worker)).toGenerator(
 						gen -> null); // dummy generator as the scope will supply
 
-		bindScope(Scope.dependency).to(() -> new TypeDependentScope(
-				TypeDependentScope::hierarchicalInstanceSignature));
-		bindScope(Scope.dependencyInstance).to(() -> new TypeDependentScope(
-				TypeDependentScope::instanceSignature));
-		bindScope(Scope.dependencyType).to(() -> new TypeDependentScope(
-				TypeDependentScope::typeSignature));
-		bindScope(Scope.targetInstance).to(() -> new TypeDependentScope(
-				TypeDependentScope::targetInstanceSignature));
+		bindScope(Scope.dependency).toProvider(TypeDependentScope::perHierarchicalInstanceSignature);
+		bindScope(Scope.dependencyInstance).toProvider(TypeDependentScope::perInstanceSignature);
+		bindScope(Scope.dependencyType).toProvider(TypeDependentScope::perTypeSignature);
+		bindScope(Scope.targetInstance).toProvider(TypeDependentScope::perTargetInstanceSignature);
 
 		bindScope(named("disk:*")).toSupplier(this);
-		per(container).bind(ScheduledExecutorService.class).to(
+		per(container).bind(ScheduledExecutorService.class).toProvider(
 				Executors::newSingleThreadScheduledExecutor);
 	}
 

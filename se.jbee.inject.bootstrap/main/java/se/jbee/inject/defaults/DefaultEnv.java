@@ -9,13 +9,17 @@ import se.jbee.inject.config.*;
 import se.jbee.inject.container.Container;
 import se.jbee.inject.lang.Type;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
 import static se.jbee.inject.lang.Type.raw;
 
 /**
  * The {@link se.jbee.inject.bind.Module} that setups the values required in an
  * {@link Env} used with the {@link Binder} API.
  */
-public class DefaultEnv extends ConstantsModule {
+public class DefaultEnv extends SimpleModule {
 
 	public static Env bootstrap() {
 		return Container.injector(Bindings.newBindings()
@@ -39,7 +43,7 @@ public class DefaultEnv extends ConstantsModule {
 		bind(Scope.container, raw(ScopeLifeCycle.class)).to(ScopeLifeCycle.container);
 
 		// ValueBinders
-		bindValueBinder(Binding.class).to(DefaultValueBinders.CONTRACTS);
+		bindValueBinder(Binding.class).to(DefaultValueBinders.PUBLISHED_APIS);
 		bindValueBinder(Constructs.class).to(DefaultValueBinders.CONSTRUCTS);
 		bindValueBinder(Constant.class).to(DefaultValueBinders.CONSTANT);
 		bindValueBinder(Produces.class).to(DefaultValueBinders.PRODUCES);
@@ -55,14 +59,17 @@ public class DefaultEnv extends ConstantsModule {
 		bind(NamesBy.class).to(obj -> Name.DEFAULT);
 		bind(ScopesBy.class).to(ScopesBy.AUTO);
 		bind(HintsBy.class).to(((param, context) -> null));
-		bind(ContractsBy.class).to(ContractsBy.PROTECTIVE);
+		bind(PublishesBy.class).to(PublishesBy.PROTECTIVE);
+
+		// reflection
+		bind(Get.class).to(Field::get);
+		bind(Invoke.class).to(Method::invoke);
+		bind(New.class).to(Constructor::newInstance);
+		inPackageAndSubPackagesOf(DefaultEnv.class).bind(New.class).to(DefaultEnv::newInstance);
+		in(Packages.TEST).bind(New.class).to(DefaultEnv::newInstance);
 
 		// how to cull and verify the Bindings made
 		bind(BindingConsolidation.class).to(DefaultBindingConsolidation::consolidate);
-
-		// do not use deep reflection (set accessible) (but if enabled use it everywhere)
-		bind(Env.USE_DEEP_REFLECTION, boolean.class).to(false);
-		bind(Env.DEEP_REFLECTION_PACKAGES, Packages.class).to(Packages.ALL);
 
 		// verification is off
 		bind(Env.USE_VERIFICATION, boolean.class).to(false);
@@ -70,5 +77,10 @@ public class DefaultEnv extends ConstantsModule {
 		// extras
 		bind(Plugins.class).toFactory(Plugins::new);
 		bind(Annotated.Enhancer.class).to(Annotated.SOURCE);
+	}
+
+	private static <T> T newInstance(Constructor<T> target, Object[] args) throws Exception {
+		target.setAccessible(true);
+		return target.newInstance(args);
 	}
 }

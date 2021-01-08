@@ -29,7 +29,7 @@ class TestFeatureDiskScopeBinds {
 		@Override
 		protected void declare() {
 			AtomicInteger counter = new AtomicInteger();
-			per(myDisk).bind(AtomicInteger.class).to(() -> {
+			per(myDisk).bind(AtomicInteger.class).toProvider(() -> {
 				// increment each time this provider is asked so we know
 				counter.incrementAndGet();
 				return counter;

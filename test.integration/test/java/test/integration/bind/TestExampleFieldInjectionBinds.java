@@ -108,7 +108,6 @@ class TestExampleFieldInjectionBinds {
 		@Override
 		public <T> void expand(Env env, Constructs<?> ref, Binding<T> item,
 				Bindings dest) {
-			env.accessible(ref.target);
 			Supplier<T> supplier = new FieldInjectionSupplier<>(
 					Supply.byConstruction(ref.typed(item.type())));
 			dest.addExpanded(env,

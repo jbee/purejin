@@ -46,7 +46,7 @@ public abstract class EventModule extends BinderModule {
 			context.resolve(EventProcessor.class).getProxy(handlerType));
 	}
 
-	private static final class EventBaseModule extends BinderModule {
+	public static final class EventBaseModule extends BinderModule {
 
 		@Override
 		protected void declare() {
@@ -55,7 +55,7 @@ public abstract class EventModule extends BinderModule {
 			asDefault().bind(PolicyProvider.class).to(
 					handlerType -> EventPolicy.DEFAULT);
 			asDefault().injectingInto(EventProcessor.class).bind(
-					ExecutorService.class).to(Executors::newWorkStealingPool);
+					ExecutorService.class).toProvider(Executors::newWorkStealingPool);
 		}
 
 	}

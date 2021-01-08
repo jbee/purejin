@@ -24,7 +24,7 @@ class TestFeatureTypeDependentScopes {
 
 	@Test
 	void dependencyTypeScopeEnsuresSingletonPerExactGenericType() {
-		Scope scope = new TypeDependentScope(TypeDependentScope::typeSignature);
+		Scope scope = TypeDependentScope.perTypeSignature();
 		A a = new A();
 		B b = new B();
 		Provider<A> ia = () -> a;

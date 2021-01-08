@@ -1,11 +1,13 @@
 package se.jbee.inject.binder;
 
 import se.jbee.inject.*;
+import se.jbee.inject.config.Get;
 import se.jbee.inject.config.HintsBy;
-import se.jbee.inject.lang.Reflect;
 import se.jbee.inject.lang.Type;
 
 import java.lang.reflect.Field;
+
+import static se.jbee.inject.Dependency.dependency;
 
 /**
  * Accesses a value that is extracted from a {@link Field}. The {@link Field} is
@@ -60,7 +62,12 @@ public final class Accesses<T> extends ReflectiveDescriptor<Field, T> implements
 	@Override
 	public T supply(Dependency<? super T> dep, Injector context) {
 		Object instance = isHinted() ? getAsHint().resolveIn(context) : as;
-		return (T) Reflect.access(target, instance,
-				e -> UnresolvableDependency.SupplyFailed.valueOf(e, target));
+		Get get = context.resolve(dependency(Get.class)
+				.injectingInto(target.getDeclaringClass()));
+		try {
+			return (T) expectedType.rawType.cast(get.call(target, instance));
+		} catch (Exception ex) {
+			throw UnresolvableDependency.SupplyFailed.valueOf(ex, target);
+		}
 	}
 }

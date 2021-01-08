@@ -14,13 +14,13 @@ import se.jbee.inject.binder.ServiceLoaderAnnotations;
 import se.jbee.inject.binder.ServiceLoaderBundles;
 import se.jbee.inject.binder.ServiceLoaderEnvBundles;
 import se.jbee.inject.config.Edition;
+import se.jbee.inject.config.New;
 import se.jbee.inject.container.Container;
 import se.jbee.inject.defaults.DefaultEnv;
 import se.jbee.inject.defaults.DefaultsBundle;
 import se.jbee.inject.lang.Lazy;
-import se.jbee.inject.lang.Reflect;
 
-import java.lang.reflect.Modifier;
+import java.lang.reflect.Constructor;
 import java.util.*;
 
 import static se.jbee.inject.bind.Bindings.newBindings;
@@ -186,11 +186,13 @@ public final class Bootstrap {
 		private <T> T createBundle(Class<T> bundle) {
 			// OBS: Here we do not use the env but always make the bundles accessible
 			// as this is kind of designed into the concept
-			return Reflect.construct(bundle, c-> {
-					if (!Modifier.isPublic(c.getModifiers()))
-						Reflect.accessible(c);
-					},
-					e -> new InconsistentDeclaration("Failed to create bundle: " + bundle, e));
+			try {
+				New newBundle = env.in(bundle).property(New.class);
+				return newBundle.call(bundle.getDeclaredConstructor(), new Object[0]);
+			} catch (Exception e) {
+				throw new InconsistentDeclaration(
+						"Failed to create bundle: " + bundle, e);
+			}
 		}
 
 		@Override

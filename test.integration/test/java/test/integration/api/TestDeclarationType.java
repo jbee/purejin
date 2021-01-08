@@ -27,15 +27,15 @@ class TestDeclarationType {
 	}
 
 	@Test
-	void implicitDefaultContractAreReplacedByMulti() {
+	void implicitDefaultPublishedAreReplacedByMulti() {
 		assertTrue(IMPLICIT.replacedBy(MULTI));
 		assertTrue(DEFAULT.replacedBy(MULTI));
-		assertTrue(CONTRACT.replacedBy(MULTI));
+		assertTrue(PUBLISHED.replacedBy(MULTI));
 	}
 
 	@Test
-	void defaultIsReplacedByContractMultiOrExplicit() {
-		assertTrue(DEFAULT.replacedBy(CONTRACT));
+	void defaultIsReplacedByPublishedMultiOrExplicit() {
+		assertTrue(DEFAULT.replacedBy(PUBLISHED));
 		assertTrue(DEFAULT.replacedBy(MULTI));
 		assertTrue(DEFAULT.replacedBy(EXPLICIT));
 	}
@@ -60,8 +60,8 @@ class TestDeclarationType {
 	}
 
 	@Test
-	void contractDoesNotClashWithContract() {
-		assertFalse(CONTRACT.clashesWith(CONTRACT));
+	void publishedDoesNotClashWithPublished() {
+		assertFalse(PUBLISHED.clashesWith(PUBLISHED));
 	}
 
 	@Test
@@ -70,11 +70,13 @@ class TestDeclarationType {
 	}
 
 	/**
-	 * The letters are used as ID when printing the type so they should be unique
+	 * The letters are used as ID when printing the type so they should be
+	 * unique, except {@link DeclarationType#PUBLISHED} and {@link
+	 * DeclarationType#PROVIDED}.
 	 */
 	@Test
 	void firstLetterIsUnique() {
-		assertEquals(values().length,
+		assertEquals(values().length -1,
 				stream(values()).map(e -> e.name().charAt(0)) //
 						.collect(toSet()).size());
 	}

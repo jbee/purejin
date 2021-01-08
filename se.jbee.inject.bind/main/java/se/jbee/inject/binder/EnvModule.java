@@ -1,11 +1,11 @@
 package se.jbee.inject.binder;
 
-import se.jbee.inject.Env;
-import se.jbee.inject.Extends;
-import se.jbee.inject.Name;
-import se.jbee.inject.Scope;
+import se.jbee.inject.*;
 import se.jbee.inject.bind.Bind;
-import se.jbee.inject.config.ContractsBy;
+import se.jbee.inject.config.PublishesBy;
+import se.jbee.inject.lang.Type;
+
+import java.util.Set;
 
 /**
  * Base {@link se.jbee.inject.bind.Module} for usage when declaring an {@link
@@ -44,16 +44,36 @@ public abstract class EnvModule extends BinderModule {
 		return bind.per(Scope.container);
 	}
 
-	public final void addContract(Class<?> api) {
-		injectingInto(Env.class).plug(api).into(ContractsBy.class);
+	/**
+	 * Adds the provided {@link Class} as one that if implemented is published
+	 * as API when bound as {@link Binder#withPublishedAccess()}.
+	 * <p>
+	 * Note that this only has a consequential effect if the general {@link
+	 * PublishesBy} strategy uses {@link PublishesBy#declaredSet(Set)}, for
+	 * example via {@link PublishesBy#liftDeclaredSet(PublishesBy, Type,
+	 * Injector)}.
+	 *
+	 * @param api A type that should considered an API of implemented by a type
+	 *            bound with {@link Binder#withPublishedAccess()}
+	 */
+	public final void addPublishedAPI(Class<?> api) {
+		injectingInto(Env.class).plug(api).into(PublishesBy.class);
 	}
 
-	public final TypedBinder<ContractsBy> bindContractsBy() {
-		return bind(ContractsBy.class);
+	/**
+	 * Bind the default {@link PublishesBy} strategy
+	 */
+	public final TypedBinder<PublishesBy> publish() {
+		return bind(PublishesBy.class);
 	}
 
-	public final TypedBinder<ContractsBy> bindContractsByOf(Class<?> type) {
-		return bind(Name.named(type), ContractsBy.class);
+	/**
+	 * Bind the {@link PublishesBy} strategy for a specific implementation type
+	 *
+	 * @param implementation a type bound using {@link Binder#withPublishedAccess()}
+	 */
+	public final TypedBinder<PublishesBy> publish(Class<?> implementation) {
+		return bind(Name.named(implementation), PublishesBy.class);
 	}
 
 }
