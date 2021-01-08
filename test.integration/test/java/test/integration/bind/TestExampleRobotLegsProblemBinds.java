@@ -3,7 +3,6 @@ package test.integration.bind;
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
-import se.jbee.inject.Name;
 import se.jbee.inject.Scope;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -63,9 +62,6 @@ class TestExampleRobotLegsProblemBinds {
 		}
 	}
 
-	static final Name left = Name.named("left");
-	static final Name right = Name.named("right");
-
 	/**
 	 * Each {@link Foot} could be explicitly bound to its respective {@link
 	 * Leg}.
@@ -74,10 +70,10 @@ class TestExampleRobotLegsProblemBinds {
 
 		@Override
 		protected void declare() {
-			bind(left, Leg.class).toConstructor();
-			bind(right, Leg.class).toConstructor();
-			injectingInto(left, Leg.class).bind(Foot.class).to(left, Foot.class);
-			injectingInto(right, Leg.class).bind(Foot.class).to(right, Foot.class);
+			bind("left", Leg.class).toConstructor();
+			bind("right", Leg.class).toConstructor();
+			injectingInto("left", Leg.class).bind(Foot.class).to("left", Foot.class);
+			injectingInto("right", Leg.class).bind(Foot.class).to("right", Foot.class);
 		}
 	}
 
@@ -90,8 +86,8 @@ class TestExampleRobotLegsProblemBinds {
 
 		@Override
 		protected void declare() {
-			bind(left, Leg.class).toConstructor();
-			bind(right, Leg.class).toConstructor();
+			bind("left", Leg.class).toConstructor();
+			bind("right", Leg.class).toConstructor();
 			per(Scope.targetInstance).construct(Foot.class);
 		}
 	}
@@ -110,8 +106,8 @@ class TestExampleRobotLegsProblemBinds {
 
 	private static void assertRobotHasDifferentLegsWithDifferentFeet(
 			Injector context) {
-		Leg leftLeg = context.resolve(left, Leg.class);
-		Leg rightLeg = context.resolve(right, Leg.class);
+		Leg leftLeg = context.resolve("left", Leg.class);
+		Leg rightLeg = context.resolve("right", Leg.class);
 		assertNotSame(rightLeg, leftLeg, "same leg");
 		assertNotSame(rightLeg.foot, leftLeg.foot, "same foot");
 	}

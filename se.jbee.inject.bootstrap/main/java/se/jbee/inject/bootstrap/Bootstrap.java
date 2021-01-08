@@ -19,7 +19,6 @@ import se.jbee.inject.container.Container;
 import se.jbee.inject.defaults.DefaultEnv;
 import se.jbee.inject.defaults.DefaultsBundle;
 import se.jbee.inject.lang.Lazy;
-import se.jbee.inject.lang.Reflect;
 
 import java.lang.reflect.Constructor;
 import java.util.*;
@@ -151,12 +150,10 @@ public final class Bootstrap {
 		private final LinkedList<Class<? extends Bundle>> stack = new LinkedList<>();
 		private final Env env;
 		private final Edition edition;
-		private final New newBundle;
 
 		BuiltinBootstrapper(Env env) {
 			this.env = env;
 			this.edition = env.property(Edition.class, Edition.FULL);
-			this.newBundle = env.in(Bundle.class).property(New.class);
 		}
 
 		@Override
@@ -190,9 +187,8 @@ public final class Bootstrap {
 			// OBS: Here we do not use the env but always make the bundles accessible
 			// as this is kind of designed into the concept
 			try {
-				Constructor<T> c = bundle.getDeclaredConstructor();
-				Reflect.accessible(c);
-				return newBundle.call(c, new Object[0]);
+				New newBundle = env.in(bundle).property(New.class);
+				return newBundle.call(bundle.getDeclaredConstructor(), new Object[0]);
 			} catch (Exception e) {
 				throw new InconsistentDeclaration(
 						"Failed to create bundle: " + bundle, e);

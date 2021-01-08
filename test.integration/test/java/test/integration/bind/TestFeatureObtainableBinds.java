@@ -7,6 +7,8 @@ import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 
+import java.util.Arrays;
+
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,9 +41,9 @@ class TestFeatureObtainableBinds {
 
 		@Override
 		protected void declare() {
-			multibind(named("a"), Plugin.class).to(new Plugin("a"));
-			multibind(named("b"), Plugin.class).to(new Plugin("b"));
-			multibind(named("c"), Plugin.class).toFactory(context -> {
+			multibind("a", Plugin.class).to(new Plugin("a"));
+			multibind("b", Plugin.class).to(new Plugin("b"));
+			multibind("c", Plugin.class).toFactory(context -> {
 				throw new UnresolvableDependency.SupplyFailed("Error", new IllegalStateException());
 			});
 			bind(String.class).to("The name");
@@ -55,13 +57,13 @@ class TestFeatureObtainableBinds {
 	@Test
 	void obtainsArrayElementsThatCouldBeResolved() {
 		Manager manager = context.resolve(Manager.class);
-		assertEquals(asList("a", "b"), asList(manager.plugins).stream()
+		assertEquals(asList("a", "b"), Arrays.stream(manager.plugins)
 				.map(p -> p.name).collect(toList()));
 	}
 
 	@Test
 	void obtainsEmptyArray() {
-		assertArrayEquals(new Integer[0], (Integer[]) context.resolve( //
+		assertArrayEquals(new Integer[0], context.resolve( //
 				obtainableTypeOf(Integer[].class)).obtain());
 	}
 
@@ -81,7 +83,7 @@ class TestFeatureObtainableBinds {
 	void obtainsOriginalExceptionWhenInstanceCanNotBeResolved() {
 		Obtainable<?> box = context.resolve(obtainableTypeOf(Integer.class));
 		Exception ex = assertThrows(UnresolvableDependency.class,
-				() -> box.orElseThrow());
+				box::orElseThrow);
 		assertEquals(
 				"No matching resource found.\n"
 						+ "\t dependency: java.lang.Integer *\n"

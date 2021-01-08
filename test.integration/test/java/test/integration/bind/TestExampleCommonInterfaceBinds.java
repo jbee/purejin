@@ -2,7 +2,6 @@ package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
-import se.jbee.inject.Name;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
@@ -11,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
+import static se.jbee.inject.Name.named;
 import static se.jbee.inject.lang.Type.raw;
 import static test.integration.util.TestUtils.assertEqualSets;
 
@@ -41,19 +41,15 @@ class TestExampleCommonInterfaceBinds {
 
 	}
 
-	static final Name left = Name.named("left");
-	static final Name right = Name.named("right");
-	static final Name special = Name.named("special");
-
 	static class Module1 extends BinderModule {
 
 		@Override
 		protected void declare() {
-			bind(left, A.class).to(B.class);
-			bind(right, A.class).to(left, B.class);
-			bind(left, B.class).toConstructor();
+			bind("left", A.class).to(B.class);
+			bind("right", A.class).to("left", B.class);
+			bind("left", B.class).toConstructor();
 			bind(B.class).toConstructor();
-			injectingInto(left, B.class).bind(A[].class).to(special, A[].class);
+			injectingInto("left", B.class).bind(A[].class).to("special", A[].class);
 			arraybind(A[].class).to(new A[0]);
 		}
 	}
@@ -62,7 +58,7 @@ class TestExampleCommonInterfaceBinds {
 
 		@Override
 		protected void declare() {
-			multibind(special, A.class).to(C.class);
+			multibind("special", A.class).to(C.class);
 		}
 	}
 
@@ -70,7 +66,7 @@ class TestExampleCommonInterfaceBinds {
 
 		@Override
 		protected void declare() {
-			multibind(special, A.class).to(D.class);
+			multibind("special", A.class).to(D.class);
 		}
 
 	}
@@ -91,13 +87,13 @@ class TestExampleCommonInterfaceBinds {
 		Injector injector = Bootstrap.injector(
 				TestExampleCommonInterfaceBindsBundle.class);
 		B b = injector.resolve(B.class);
-		B leftB = injector.resolve(left, B.class);
+		B leftB = injector.resolve("left", B.class);
 		assertNotSame(b, leftB);
 		assertEquals(2, leftB.as.length);
 		C c = injector.resolve(dependency(C.class).injectingInto(
-				instance(left, raw(B.class))));
+				instance(named("left"), raw(B.class))));
 		D d = injector.resolve(dependency(D.class).injectingInto(
-				instance(left, raw(B.class))));
+				instance(named("left"), raw(B.class))));
 		assertEqualSets(new A[] { c, d }, leftB.as);
 	}
 }

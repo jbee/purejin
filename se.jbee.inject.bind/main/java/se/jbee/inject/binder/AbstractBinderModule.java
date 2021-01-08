@@ -20,12 +20,13 @@ import static se.jbee.inject.lang.Type.raw;
  *
  * This allows to change the start {@link Bind} once.
  */
-public abstract class InitializedBinder extends RootBinder {
+public abstract class AbstractBinderModule extends RootBinder
+		implements Bundle {
 
 	private Bind bind;
-	private Boolean initialized;
+	private Boolean declaring;
 
-	protected InitializedBinder() {
+	protected AbstractBinderModule() {
 		super(Bind.UNINITIALIZED);
 		this.bind = super.bind();
 	}
@@ -36,9 +37,9 @@ public abstract class InitializedBinder extends RootBinder {
 	}
 
 	protected final void __init__(Env env, Bindings bindings) {
-		InconsistentBinding.nonnullThrowsReentranceException(initialized);
+		InconsistentBinding.nonnullThrowsReentranceException(declaring);
 		this.bind = init(bind.into(env, bindings));
-		initialized = true;
+		declaring = true;
 	}
 
 	protected Bind init(Bind bind) {
@@ -46,10 +47,9 @@ public abstract class InitializedBinder extends RootBinder {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected final void installAnnotated(Class<? extends Bundle> bundle,
+	protected static void installAnnotated(Class<? extends Bundle> bundle,
 			Bootstrapper bootstrap) {
-		if (bundle.isAnnotationPresent(Installs.class)) {
-			Installs installs = bundle.getAnnotation(Installs.class);
+		for (Installs installs : bundle.getAnnotationsByType(Installs.class)) {
 			for (Class<? extends Bundle> b : installs.bundles()) {
 				bootstrap.install(b);
 			}
@@ -68,7 +68,7 @@ public abstract class InitializedBinder extends RootBinder {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <E extends Enum<E> & Dependent<E>> void install(
+	private static <E extends Enum<E> & Dependent<E>> void install(
 			Bootstrapper bootstrap, Class<E> features, Annotation selection) {
 		if (selection == null) {
 			bootstrap.install(features.getEnumConstants());

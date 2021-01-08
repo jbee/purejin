@@ -46,7 +46,7 @@ public abstract class EventModule extends BinderModule {
 			context.resolve(EventProcessor.class).getProxy(handlerType));
 	}
 
-	private static final class EventBaseModule extends BinderModule {
+	public static final class EventBaseModule extends BinderModule {
 
 		@Override
 		protected void declare() {

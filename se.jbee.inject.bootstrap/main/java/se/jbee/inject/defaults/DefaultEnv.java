@@ -19,7 +19,7 @@ import static se.jbee.inject.lang.Type.raw;
  * The {@link se.jbee.inject.bind.Module} that setups the values required in an
  * {@link Env} used with the {@link Binder} API.
  */
-public class DefaultEnv extends ConstantsModule {
+public class DefaultEnv extends SimpleModule {
 
 	public static Env bootstrap() {
 		return Container.injector(Bindings.newBindings()
@@ -62,9 +62,11 @@ public class DefaultEnv extends ConstantsModule {
 		bind(PublishesBy.class).to(PublishesBy.PROTECTIVE);
 
 		// reflection
-		bind(New.class).to(Constructor::newInstance);
-		bind(Invoke.class).to(Method::invoke);
 		bind(Get.class).to(Field::get);
+		bind(Invoke.class).to(Method::invoke);
+		bind(New.class).to(Constructor::newInstance);
+		inPackageAndSubPackagesOf(DefaultEnv.class).bind(New.class).to(DefaultEnv::newInstance);
+		in(Packages.TEST).bind(New.class).to(DefaultEnv::newInstance);
 
 		// how to cull and verify the Bindings made
 		bind(BindingConsolidation.class).to(DefaultBindingConsolidation::consolidate);
@@ -75,5 +77,10 @@ public class DefaultEnv extends ConstantsModule {
 		// extras
 		bind(Plugins.class).toFactory(Plugins::new);
 		bind(Annotated.Enhancer.class).to(Annotated.SOURCE);
+	}
+
+	private static <T> T newInstance(Constructor<T> target, Object[] args) throws Exception {
+		target.setAccessible(true);
+		return target.newInstance(args);
 	}
 }

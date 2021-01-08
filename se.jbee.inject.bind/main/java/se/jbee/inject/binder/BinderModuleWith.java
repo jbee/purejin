@@ -23,8 +23,8 @@ import static se.jbee.inject.lang.Type.raw;
  * installed as such. It will than {@link Bundle#bootstrap(Bootstrapper)} itself
  * as a module.
  */
-public abstract class BinderModuleWith<T> extends InitializedBinder
-		implements Bundle, ModuleWith<T> {
+public abstract class BinderModuleWith<T> extends AbstractBinderModule
+		implements ModuleWith<T> {
 
 	@Override
 	public final void bootstrap(Bootstrapper bootstrap) {
@@ -34,7 +34,7 @@ public abstract class BinderModuleWith<T> extends InitializedBinder
 	}
 
 	@Override
-	public void declare(Bindings bindings, Env env, T property) {
+	public final void declare(Bindings bindings, Env env, T property) {
 		__init__(configure(env.withIsolate()), bindings);
 		declare(property);
 	}

@@ -5,17 +5,19 @@
  */
 package se.jbee.inject.binder;
 
-import se.jbee.inject.Supplier;
 import se.jbee.inject.*;
 import se.jbee.inject.bind.*;
+import se.jbee.inject.binder.spi.*;
 import se.jbee.inject.config.*;
 import se.jbee.inject.lang.Type;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.*;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 
 import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Arrays.stream;
@@ -33,7 +35,7 @@ import static se.jbee.inject.lang.Utils.isClassConstructable;
 import static se.jbee.inject.lang.Utils.newArray;
 
 /**
- * The default implementation of a fluent binder interface that provides a lot
+ * The default implementation of a fluent binder API that provides a lot
  * of utility methods to improve readability and keep binding compact.
  */
 @SuppressWarnings({ "squid:S1448", "squid:S1200", "ClassReferencesSubclass" })
@@ -256,8 +258,8 @@ public class Binder {
 	 * @param type both the implementation type and the type the created
 	 *             instance(s) should be known as
 	 */
-	public final void construct(Name name, Class<?> type) {
-		construct(instance(name, raw(type)));
+	public final void construct(String name, Class<?> type) {
+		construct(instance(named(name), raw(type)));
 	}
 
 	/**
@@ -295,8 +297,8 @@ public class Binder {
 		return on(bind().asMulti()).bind(instance);
 	}
 
-	public final <T> TypedBinder<T> multibind(Name name, Class<T> type) {
-		return multibind(instance(name, raw(type)));
+	public final <T> TypedBinder<T> multibind(String name, Class<T> type) {
+		return multibind(instance(named(name), raw(type)));
 	}
 
 	public final <T> TypedBinder<T> multibind(Name name, Type<T> type) {
@@ -526,7 +528,7 @@ public class Binder {
 
 		public void into(Class<?> pluginPoint, String property) {
 			binder.multibind(pluginPoint(pluginPoint, property),
-					Class.class).to(plugin);
+					raw(Class.class)).to(plugin);
 			if (isClassConstructable(plugin))
 				binder.implicit().construct(plugin);
 			// we allow both collections of classes that have a common
@@ -673,31 +675,31 @@ public class Binder {
 			return new AutoBinder(binder, env);
 		}
 
-		public AutoBinder accessBy(AccessesBy strategy) {
+		public final AutoBinder accessBy(AccessesBy strategy) {
 			return with(env.with(AccessesBy.class, strategy));
 		}
 
-		public AutoBinder constructBy(ConstructsBy strategy) {
+		public final AutoBinder constructBy(ConstructsBy strategy) {
 			return with(env.with(ConstructsBy.class, strategy));
 		}
 
-		public AutoBinder produceBy(ProducesBy strategy) {
+		public final AutoBinder produceBy(ProducesBy strategy) {
 			return with(env.with(ProducesBy.class, strategy));
 		}
 
-		public AutoBinder nameBy(NamesBy strategy) {
+		public final AutoBinder nameBy(NamesBy strategy) {
 			return with(env.with(NamesBy.class, strategy));
 		}
 
-		public AutoBinder scopeBy(ScopesBy strategy) {
+		public final AutoBinder scopeBy(ScopesBy strategy) {
 			return with(env.with(ScopesBy.class, strategy));
 		}
 
-		public AutoBinder hintBy(HintsBy strategy) {
+		public final AutoBinder hintBy(HintsBy strategy) {
 			return with(env.with(HintsBy.class, strategy));
 		}
 
-		public AutoBinder publishBy(PublishesBy strategy) {
+		public final AutoBinder publishBy(PublishesBy strategy) {
 			return with(env.with(PublishesBy.class, strategy));
 		}
 
@@ -854,57 +856,16 @@ public class Binder {
 
 	}
 
-	public static class ScopedBinder extends TargetedBinder {
+	public static class ScopedBinder extends TargetedBinder implements
+			ConfiguringInstanceLocalBinder<TargetedBinder> {
 
 		protected ScopedBinder(RootBinder root, Bind bind) {
 			super(root, bind);
 		}
 
-		/**
-		 * Root for container "global" configuration.
-		 *
-		 * @since 8.1
-		 */
-		public final TargetedBinder configure() {
-			return injectingInto(Config.class);
-		}
-
-		/**
-		 * Root for target type specific configuration.
-		 *
-		 * @since 8.1
-		 */
-		public final TargetedBinder configure(Class<?> ns) {
-			return configure().within(ns);
-		}
-
-		/**
-		 * Root for {@link Instance} specific configuration.
-		 *
-		 * @since 8.1
-		 */
-		public final TargetedBinder configure(Instance<?> ns) {
-			return configure().within(ns);
-		}
-
-		public final TargetedBinder injectingInto(Class<?> target) {
-			return injectingInto(raw(target));
-		}
-
+		@Override
 		public TargetedBinder injectingInto(Instance<?> target) {
 			return new TargetedBinder(root, bind().with(targeting(target)));
-		}
-
-		public final TargetedBinder injectingInto(Name name, Class<?> type) {
-			return injectingInto(name, raw(type));
-		}
-
-		public final TargetedBinder injectingInto(Name name, Type<?> type) {
-			return injectingInto(Instance.instance(name, type));
-		}
-
-		public final TargetedBinder injectingInto(Type<?> target) {
-			return injectingInto(defaultInstanceOf(target));
 		}
 
 		/**
@@ -917,54 +878,29 @@ public class Binder {
 		}
 	}
 
-	public static class TargetedBinder extends Binder {
+	public static class TargetedBinder extends Binder
+			implements ParentLocalBinder<TargetedBinder>,
+			PackageLocalBinder<Binder> {
 
 		protected TargetedBinder(RootBinder root, Bind bind) {
 			super(root, bind);
-		}
-
-		public final Binder in(Packages packages) {
-			return with(bind().target.in(packages));
 		}
 
 		public final Binder locally() {
 			return inPackageOf(bind().source.ident);
 		}
 
-		public final Binder inPackageAndSubPackagesOf(Class<?> type) {
-			return with(bind().target.inPackageAndSubPackagesOf(type));
-		}
-
-		public final Binder inPackageOf(Class<?> type) {
-			return with(bind().target.inPackageOf(type));
-		}
-
-		public final Binder inSubPackagesOf(Class<?> type) {
-			return with(bind().target.inSubPackagesOf(type));
-		}
-
-		public final TargetedBinder within(Class<?> parent) {
-			return within(raw(parent));
+		public final Binder in(Packages packages) {
+			return with(bind().target.in(packages));
 		}
 
 		public TargetedBinder within(Instance<?> parent) {
 			return new TargetedBinder(root, bind().within(parent));
 		}
-
-		public final TargetedBinder within(Name name, Class<?> parent) {
-			return within(instance(name, raw(parent)));
-		}
-
-		public final TargetedBinder within(Name name, Type<?> parent) {
-			return within(instance(name, parent));
-		}
-
-		public final TargetedBinder within(Type<?> parent) {
-			return within(anyOf(parent));
-		}
 	}
 
-	public static class TypedBinder<T> {
+	public static class TypedBinder<T> implements ReferenceBinder<T>,
+			SupplierBinder<T> {
 
 		private final Bind bind;
 		protected final Locator<T> locator;
@@ -990,10 +926,6 @@ public class Binder {
 			return env().property(property);
 		}
 
-		public <I extends T> void to(Class<I> impl) {
-			to(Instance.anyOf(raw(impl)));
-		}
-
 		public void toConstructor(Constructor<? extends T> target, Hint<?>... args) {
 			if (target == null)
 				throw InconsistentBinding.generic("Provided constructor was null");
@@ -1015,66 +947,9 @@ public class Binder {
 			bindings().addExpanded(env(), binding, value);
 		}
 
-		public void toSupplier(Supplier<? extends T> supplier) {
+		@Override
+		public final void toSupplier(Supplier<? extends T> supplier) {
 			to(supplier, BindingType.PREDEFINED);
-		}
-
-		public <I extends Supplier<? extends T>> void toSupplier(Function<Injector, I> factory) {
-			AtomicReference<I> cache = new AtomicReference<>();
-			toSupplier((dep, context) ->
-					cache.updateAndGet(e -> e != null ? e :
-							factory.apply(context)).supply(dep, context));
-		}
-
-		/**
-		 * Utility method that creates the instances from the {@link Injector}
-		 * context given.
-		 *
-		 * This is used when a full {@link Supplier} contract is not needed to
-		 * save stating the not needed {@link Dependency} argument.
-		 *
-		 * @since 8.1
-		 */
-		public void toFactory(Function<Injector, T> factory) {
-			toSupplier((dep, context) -> factory.apply(context));
-		}
-
-		/**
-		 * This method will bind the provided {@link Generator} in a way that
-		 * bypasses {@link Scope} effects. The provided {@link Generator} is
-		 * directly called to generate the instance each time it should be
-		 * injected.
-		 * <p>
-		 * If a {@link Scope} should apply use {@link #toSupplier(Supplier)}
-		 * instead or create a {@link Generator} bridge that does not implement
-		 * {@link Generator} itself.
-		 *
-		 * @param generator used to create instances directly (with no {@link
-		 *                  Scope} around it)
-		 * @since 8.1
-		 */
-		public void toGenerator(Generator<? extends T> generator) {
-			toSupplier(Supplier.nonScopedBy(generator));
-		}
-
-		/**
-		 * In contrast to {@link #toGenerator(Generator)} this is just an
-		 * ordinary adapter between {@link Generator} and {@link Supplier}. The
-		 * provided {@link Generator} becomes usable as {@link Supplier}
-		 * internally with all normal {@link Scope}ing effects occurring.
-		 *
-		 * @param generator used to create instances with a {@link Scope}
-		 * @since 8.1
-		 */
-		public void toScopedGenerator(Generator<? extends  T> generator) {
-			toSupplier((dep, context) -> generator.generate(dep));
-		}
-
-		/**
-		 * @since 8.1
-		 */
-		public void toProvider(java.util.function.Supplier<? extends T> method) {
-			toSupplier((dep, context) -> method.get());
 		}
 
 		/**
@@ -1136,15 +1011,8 @@ public class Binder {
 			toConstructor(getType().rawType, hints);
 		}
 
-		public <I extends T> void to(Name name, Class<I> type) {
-			to(instance(name, raw(type)));
-		}
-
-		public <I extends T> void to(Name name, Type<I> type) {
-			to(instance(name, type));
-		}
-
-		public <I extends T> void to(Instance<I> instance) {
+		@Override
+		public final <I extends T> void to(Instance<I> instance) {
 			expand(instance);
 		}
 

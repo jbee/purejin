@@ -1,10 +1,7 @@
 package test.integration.util;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -60,7 +57,9 @@ public final class TestUtils {
 	}
 
 	public static <E> void assertEqualSets(E[] expected, E[] actual) {
-		assertEquals(expected.length, actual.length);
+		assertEquals(expected.length, actual.length,
+				() -> "expected " + Arrays.toString(
+						expected) + " but got: " + Arrays.toString(actual));
 		assertEquals(set(expected), set(actual));
 	}
 

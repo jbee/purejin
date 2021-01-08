@@ -33,9 +33,6 @@ import static test.integration.util.TestUtils.assertEqualSets;
  */
 class TestBasicMultibindBinds {
 
-	static final Name foo = named("foo");
-	static final Name bar = named("bar");
-
 	/**
 	 * Just split to show that usually multiple {@code multibind}s are made in
 	 * different {@link se.jbee.inject.bind.Module}s.
@@ -45,8 +42,8 @@ class TestBasicMultibindBinds {
 		@Override
 		protected void declare() {
 			multibind(Integer.class).to(1);
-			multibind(foo, Integer.class).to(2);
-			multibind(bar, Integer.class).to(4);
+			multibind("foo", Integer.class).to(2);
+			multibind("bar", Integer.class).to(4);
 			bind(Long.class).toMultiple(1L, 2L, 3L, 4L);
 			bind(Float.class).toMultiple(2f, 3f);
 			bind(Double.class).toMultiple(5d, 6d, 7d);
@@ -62,8 +59,8 @@ class TestBasicMultibindBinds {
 		@Override
 		protected void declare() {
 			multibind(Integer.class).to(11);
-			multibind(foo, Integer.class).to(3);
-			multibind(bar, Integer.class).to(5);
+			multibind("foo", Integer.class).to(3);
+			multibind("bar", Integer.class).to(5);
 		}
 	}
 
@@ -83,9 +80,9 @@ class TestBasicMultibindBinds {
 
 	@Test
 	void multipleNamedElementsCanBeBound() {
-		Integer[] foos = context.resolve(foo, Integer[].class);
+		Integer[] foos = context.resolve("foo", Integer[].class);
 		assertEqualSets(new Integer[] { 2, 3 }, foos);
-		Integer[] bars = context.resolve(bar, Integer[].class);
+		Integer[] bars = context.resolve("bar", Integer[].class);
 		assertEqualSets(new Integer[] { 4, 5 }, bars);
 		Integer[] defaults = context.resolve(Name.DEFAULT, Integer[].class);
 		assertEqualSets(new Integer[] { 1, 11 }, defaults);
@@ -95,17 +92,17 @@ class TestBasicMultibindBinds {
 
 	@Test
 	void multipleBoundNamedElementsCanUsedAsList() {
-		List<Integer> foos = context.resolve(foo, listTypeOf(Integer.class));
+		List<Integer> foos = context.resolve(named("foo"), listTypeOf(Integer.class));
 		assertEqualSets(new Integer[] { 2, 3 }, foos.toArray());
-		List<Integer> bars = context.resolve(bar, listTypeOf(Integer.class));
+		List<Integer> bars = context.resolve(named("bar"), listTypeOf(Integer.class));
 		assertEqualSets(new Integer[] { 4, 5 }, bars.toArray());
 	}
 
 	@Test
 	void multipleBoundNamedElementsCanUsedAsSet() {
-		Set<Integer> foos = context.resolve(foo, setTypeOf(Integer.class));
+		Set<Integer> foos = context.resolve(named("foo"), setTypeOf(Integer.class));
 		assertEqualSets(new Integer[] { 2, 3 }, foos.toArray());
-		Set<Integer> bars = context.resolve(bar, setTypeOf(Integer.class));
+		Set<Integer> bars = context.resolve(named("bar"), setTypeOf(Integer.class));
 		assertEqualSets(new Integer[] { 4, 5 }, bars.toArray());
 	}
 

@@ -10,5 +10,4 @@ module se.jbee.inject.event {
 
 	exports se.jbee.inject.event;
 
-	opens se.jbee.inject.event to se.jbee.inject.lang;
 }

@@ -106,13 +106,13 @@ class TestFeatureSelfInjectionBinds {
 			per(Scope.dependencyInstance).bind(Name.ANY, SuperFoo.class).toConstructor();
 
 			// give the Foo in Bar a name we can check for
-			injectingInto(Bar.class).construct(named("myNameNested"), Foo.class);
+			injectingInto(Bar.class).construct("myNameNested", Foo.class);
 
 			// give SuperFoo in Bar a name using a Hint
 			bind(Bar.class).toConstructor(
 					instance(named("special"), raw(SuperFoo.class)).asHint());
 
-			injectingInto(SuperFoo.class).bind(Foo.class).to(named("inner"), Foo.class);
+			injectingInto(SuperFoo.class).bind(Foo.class).to("inner", Foo.class);
 
 			construct(Que.class);
 			bind(named("x"), Que.class).toConstructor(instance(named("y"),
