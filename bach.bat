@@ -10,8 +10,8 @@ GOTO END
 del .bach\cache\com.github.sormuras.bach@*.jar >nul 2>&1
 SETLOCAL
 SET tag=%2
-IF [%tag%]==[] SET tag=early-access
-jshell -R-Dreboot -R-Dversion=%tag% https://bit.ly/bach-main-init
+IF [%tag%]==[] SET tag=16-ea
+jshell -R-Dreboot -R-Dversion=%tag% https://github.com/sormuras/bach/raw/releases/16/init
 ENDLOCAL
 
 :END
