@@ -1,8 +1,3 @@
 #!/usr/bin/env bash
 
-if [[ $1 != 'init' ]]; then
-  java --module-path .bach/cache --module com.github.sormuras.bach "$@"
-else
-  rm -f .bach/cache/com.github.sormuras.bach@*.jar
-  jshell -R-Dreboot -R-Dversion=${2:-16-ea} https://github.com/sormuras/bach/raw/releases/16/init
-fi
+java --module-path .bach/cache --module com.github.sormuras.bach "$@"
