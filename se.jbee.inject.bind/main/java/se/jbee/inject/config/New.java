@@ -19,6 +19,23 @@ import java.lang.reflect.Constructor;
 @FunctionalInterface
 public interface New {
 
+	/**
+	 * An implementation of this method should basically just call {@link
+	 * Constructor#newInstance(Object...)}.
+	 * <p>
+	 * To work around visibility limitations the implementation of this method
+	 * can be defined and bound in the package of the called {@link
+	 * Constructor}.
+	 * <p>
+	 * Alternatively an implementation could for example use {@link
+	 * java.lang.reflect.AccessibleObject#setAccessible(boolean)} to make the
+	 * {@link Constructor} accessible before calling it.
+	 * <p>
+	 * The implementation could also do an entirely different thing as long as
+	 * the result is equivalent to calling the provided {@link Constructor} with
+	 * the provided arguments.
+	 *
+	 * @see Constructor#newInstance(Object...)
+	 */
 	<T> T call(Constructor<T> target, Object[] args) throws Exception;
-
 }

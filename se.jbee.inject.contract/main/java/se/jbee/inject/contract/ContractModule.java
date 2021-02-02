@@ -3,7 +3,7 @@
  *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject.event;
+package se.jbee.inject.contract;
 
 import se.jbee.inject.bind.Module;
 import se.jbee.inject.binder.BinderModule;
@@ -17,9 +17,9 @@ import java.util.concurrent.Executors;
  *
  * @since 8.1
  */
-public abstract class EventModule extends BinderModule {
+public abstract class ContractModule extends BinderModule {
 
-	protected EventModule() {
+	protected ContractModule() {
 		super(EventBaseModule.class);
 	}
 

@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.function.Function;
 
 import static java.util.Arrays.copyOfRange;
+import static se.jbee.inject.Name.named;
 
 /**
  * A set of {@link Resources} encapsulates the state and bootstrapping of
@@ -208,11 +209,18 @@ final class Resources {
 		Function<Resource<T>, Generator<T>> generatorFactory = //
 				resource -> createGenerator(context, scopes, resource,
 						descriptor.supplier);
-		ScopeLifeCycle lifeCycle = lifeCycleByScope.get(descriptor.scope);
-		if (lifeCycle == null && descriptor.scope == Scope.container)
+		Name scope = descriptor.scope;
+		ScopeLifeCycle lifeCycle = lifeCycleByScope.get(scope);
+		if (lifeCycle == null && scope.isNamespaced()) {
+			ScopeLifeCycle group = lifeCycleByScope.get( //
+					named("@"+ scope.namespace()));
+			if (group != null)
+				lifeCycle = group.derive(scope);
+		}
+		if (lifeCycle == null && scope == Scope.container)
 			lifeCycle = ScopeLifeCycle.container; // default
 		if (lifeCycle == null)
-			throw new InconsistentDeclaration("Scope `" + descriptor.scope
+			throw new InconsistentDeclaration("Scope `" + scope
 				+ "` is used but not defined for: " + descriptor);
 		return new Resource<>(serialID, descriptor.source, lifeCycle,
 				descriptor.signature, descriptor.annotations,

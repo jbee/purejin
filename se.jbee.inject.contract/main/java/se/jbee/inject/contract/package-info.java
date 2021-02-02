@@ -4,7 +4,7 @@
  *
  * <h2>Registering Handlers</h2>
  * Any vanilla java interface can be registered as an event handler using {@link
- * se.jbee.inject.event.EventModule#handle(java.lang.Class)}.
+ * se.jbee.inject.contract.ContractModule#handle(java.lang.Class)}.
  *
  * <h2>Sending Events</h2>
  * The event handler interface is injected into the calling managed instance and
@@ -16,4 +16,4 @@
  * instance is injected during bootstrapping of the application or bind the
  * instance in an {@link se.jbee.inject.ScopeLifeCycle#eager()} scope.
  */
-package se.jbee.inject.event;
+package se.jbee.inject.contract;

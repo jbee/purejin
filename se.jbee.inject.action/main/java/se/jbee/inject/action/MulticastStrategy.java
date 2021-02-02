@@ -12,9 +12,9 @@ import java.util.List;
 public final class MulticastStrategy<A, B> implements ActionStrategy<A, B> {
 
 	private final Injector context;
-	private final Executor executor;
+	private final ActionExecutor executor;
 
-	public MulticastStrategy(Injector context, Executor executor) {
+	public MulticastStrategy(Injector context, ActionExecutor executor) {
 		this.context = context;
 		this.executor = executor;
 	}

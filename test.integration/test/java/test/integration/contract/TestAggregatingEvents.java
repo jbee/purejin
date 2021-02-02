@@ -1,14 +1,14 @@
-package test.integration.event;
+package test.integration.contract;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.event.EventModule;
-import se.jbee.inject.event.EventPolicy;
-import se.jbee.inject.event.EventPolicy.Flags;
-import se.jbee.inject.event.PolicyProvider;
+import se.jbee.inject.contract.ContractModule;
+import se.jbee.inject.contract.EventPolicy;
+import se.jbee.inject.contract.EventPolicy.Flags;
+import se.jbee.inject.contract.PolicyProvider;
 
 import java.util.function.BinaryOperator;
 
@@ -60,7 +60,7 @@ class TestAggregatingEvents {
 
 	}
 
-	private static class TestAggregatingEventsModule extends EventModule {
+	private static class TestAggregatingEventsModule extends ContractModule {
 
 		@Override
 		protected void declare() {

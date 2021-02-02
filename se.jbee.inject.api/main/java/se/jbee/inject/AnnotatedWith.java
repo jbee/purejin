@@ -70,13 +70,13 @@ public interface AnnotatedWith<A extends Annotation> {
 	final class AnnotatedInstance<T> {
 
 		public final Supplier<T> instance;
-		public final Class<? super T> role;
+		public final Type<? super T> as;
 		public final AnnotatedElement annotations;
 
-		public AnnotatedInstance(Supplier<T> instance, Class<? super T> role,
+		public AnnotatedInstance(Supplier<T> instance, Type<? super T> as,
 				AnnotatedElement annotations) {
 			this.instance = instance;
-			this.role = role;
+			this.as = as;
 			this.annotations = annotations;
 		}
 	}

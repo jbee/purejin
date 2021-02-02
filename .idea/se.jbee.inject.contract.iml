@@ -2,14 +2,13 @@
 <module type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
-    <content url="file://$MODULE_DIR$/se.jbee.inject.event">
-      <sourceFolder url="file://$MODULE_DIR$/se.jbee.inject.event/main/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/se.jbee.inject.event/main/java-module" isTestSource="false" />
+    <content url="file://$MODULE_DIR$/se.jbee.inject.contract">
+      <sourceFolder url="file://$MODULE_DIR$/se.jbee.inject.contract/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/se.jbee.inject.contract/main/java-module" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="se.jbee.inject.bootstrap" />
-    <orderEntry type="module" module-name="se.jbee.inject.bind" />
     <orderEntry type="module" module-name="se.jbee.inject.api" />
+    <orderEntry type="module" module-name="se.jbee.inject.bind" />
     <orderEntry type="module" module-name="se.jbee.inject.lang" />
     <orderEntry type="inheritedJdk" />
   </component>

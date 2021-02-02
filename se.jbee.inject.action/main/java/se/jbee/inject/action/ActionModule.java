@@ -27,6 +27,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.action.Action.actionTypeOf;
+import static se.jbee.inject.binder.spi.ConnectorBinder.ACTION_CONNECTOR;
 import static se.jbee.inject.lang.Type.actualReturnType;
 import static se.jbee.inject.lang.Type.raw;
 
@@ -58,7 +59,7 @@ public abstract class ActionModule extends BinderModule {
 			asDefault().bind(ACTION_CONNECTOR, Connector.class) //
 					.to(ActionSupplier.class);
 			asDefault().per(Scope.application) //
-					.bind(Executor.class) //
+					.bind(ActionExecutor.class) //
 					.to(this::run);
 
 			asDefault().bind(ActionStrategy.class)

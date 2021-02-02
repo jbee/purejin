@@ -56,7 +56,7 @@ class TestName {
 
 	@Test
 	void prefixIsCompatibleWithNameHavingSamePrefix() {
-		assertTrue(named("disk").asPrefix().isCompatibleWith(
+		assertTrue(Name.ANY.in("disk").isCompatibleWith(
 				named("disk:/home/jan/")));
 	}
 

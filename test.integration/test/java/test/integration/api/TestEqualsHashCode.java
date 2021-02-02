@@ -108,6 +108,8 @@ class TestEqualsHashCode {
 			return String.valueOf(base);
 		if (cls == Class.class)
 			return cls;
+		if (cls == Name.class)
+			return Name.named(String.valueOf(base));
 		if (cls == Type.class)
 			return Type.raw(cls).upperBound(base % 2 == 1);
 		if (cls == Instances.class)

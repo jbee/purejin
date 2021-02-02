@@ -17,6 +17,7 @@ import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.action.Action.actionTypeOf;
+import static se.jbee.inject.binder.spi.ConnectorBinder.CONNECT_QUALIFIER;
 import static se.jbee.inject.config.ProducesBy.OPTIMISTIC;
 
 /**
@@ -89,7 +90,7 @@ class TestExampleAnnotatedActionsBinds {
 
 	@Test
 	void annotatedMethodIsBoundAsActionWithGlobalSelector() {
-		Env env = Bootstrap.DEFAULT_ENV.with(Binder.CONNECT_QUALIFIER,
+		Env env = Bootstrap.DEFAULT_ENV.with(CONNECT_QUALIFIER,
 				ProducesBy.class, OPTIMISTIC.annotatedWith(Marker.class));
 		annotatedMethodIsBoundAsAction(Bootstrap.injector(env,
 				TestExampleAnnotatedActionsBindsModule2.class));
@@ -97,7 +98,7 @@ class TestExampleAnnotatedActionsBinds {
 
 	@Test
 	void notAnnotatedMethodIsNotBoundAsActionWithGlobalSelector() {
-		Env env = Bootstrap.DEFAULT_ENV.with(Binder.CONNECT_QUALIFIER,
+		Env env = Bootstrap.DEFAULT_ENV.with(CONNECT_QUALIFIER,
 				ProducesBy.class, OPTIMISTIC.annotatedWith(Marker.class));
 		notAnnotatedMethodIsNotBoundAsAction(Bootstrap.injector(env,
 				TestExampleAnnotatedActionsBindsModule2.class));

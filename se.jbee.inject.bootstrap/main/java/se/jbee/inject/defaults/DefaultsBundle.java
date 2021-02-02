@@ -17,9 +17,6 @@ public final class DefaultsBundle extends BootstrapperBundle {
 
 	@Override
 	protected void bootstrap() {
-		for (DefaultFeature f : DefaultFeature.values())
-			if (f.installedByDefault)
-				install(f);
+		install(DefaultFeature.INSTALLED_BY_DEFAULT);
 	}
-
 }

@@ -3,7 +3,7 @@
  *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject.event;
+package se.jbee.inject.contract;
 
 import se.jbee.inject.lang.Type;
 
@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BinaryOperator;
 
 import static java.lang.reflect.Proxy.newProxyInstance;
-import static se.jbee.inject.event.EventException.unwrapGet;
+import static se.jbee.inject.contract.EventException.unwrapGet;
 import static se.jbee.inject.lang.Type.returnType;
 
 /**

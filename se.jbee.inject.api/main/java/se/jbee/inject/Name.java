@@ -9,6 +9,9 @@ import se.jbee.inject.lang.Qualifying;
 import se.jbee.inject.lang.Type;
 
 import java.io.Serializable;
+import java.util.IdentityHashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 /**
  * A {@link Name} is used as discriminator in cases where multiple
@@ -16,6 +19,17 @@ import java.io.Serializable;
  */
 public final class Name
 		implements Qualifying<Name>, Serializable, Comparable<Name> {
+
+	private static final Map<Class<?>, Function<?, String>> ofType = new IdentityHashMap<>();
+
+	public static <T> void registerNaming(Class<T> type, Function<T, String> naming) {
+		ofType.put(type, naming);
+	}
+
+	static {
+		registerNaming(Class.class, Class::getName);
+		registerNaming(Package.class, Package::getName);
+	}
 
 	/**
 	 * Character used as wild-card when matching names.
@@ -47,12 +61,14 @@ public final class Name
 
 	final String value;
 
-	public static Name named(Object name) {
-		if (name instanceof Class) {
-			Class<?> cls = (Class<?>) name;
-			return named(cls.getName() + NAMESPACE);
-		}
-		return named(String.valueOf(name));
+	public static <T> Name named(T name) {
+		if (name == null)
+			return named("null");
+		@SuppressWarnings("unchecked")
+		Function<T, String> naming = (Function<T, String>) ofType.get(name.getClass());
+		return naming == null
+				? named(String.valueOf(name))
+				: named(naming.apply(name));
 	}
 
 	public static Name named(String name) {
@@ -68,16 +84,24 @@ public final class Name
 		return value;
 	}
 
+	public Name in(Name ns) {
+		return in(ns.isNamespaced() ? ns.namespace() : ns.value);
+	}
+
+	public Name in(String ns) {
+		return new Name(ns + NAMESPACE + value);
+	}
+
 	public String withoutNamespace() {
 		return value.substring(value.indexOf(NAMESPACE) + 1);
 	}
 
-	public Name asPrefix() {
-		return isAny() ? this : named(value + WILDCARD);
+	public String namespace() {
+		return isNamespaced() ? value.substring(0, value.indexOf(NAMESPACE)) : "";
 	}
 
-	public Name concat(String suffix) {
-		return named(value + suffix);
+	public boolean isNamespaced() {
+		return value.indexOf(NAMESPACE) >= 0;
 	}
 
 	@Override

@@ -1,16 +1,14 @@
-package se.jbee.inject.scope;
+package se.jbee.inject.disk;
 
-import se.jbee.inject.Dependency;
-import se.jbee.inject.Provider;
-import se.jbee.inject.Scope;
-import se.jbee.inject.UnresolvableDependency;
+import se.jbee.inject.*;
+import se.jbee.inject.event.On;
+import se.jbee.inject.schedule.Scheduled;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
@@ -36,9 +34,6 @@ import static se.jbee.inject.lang.Type.raw;
  */
 public final class DiskScope implements Scope, Closeable {
 
-	public static final long SYNC_INTERVAL_DEFAULT_DURATION = 60 * 1000L;
-	public static final String SYNC_INTERVAL = "sync";
-
 	private static final class DiskEntry implements Serializable {
 
 		final Serializable obj;
@@ -62,14 +57,9 @@ public final class DiskScope implements Scope, Closeable {
 	private final File rootDir;
 	private final Function<Dependency<?>, String> dep2name;
 
-	public DiskScope(long syncInterval, ScheduledExecutorService executor,
-			File rootDir, Function<Dependency<?>, String> dep2name) {
+	public DiskScope(File rootDir, Function<Dependency<?>, String> dep2name) {
 		this.rootDir = rootDir;
 		this.dep2name = dep2name;
-		if (syncInterval > 0) {
-			executor.scheduleAtFixedRate(this::syncToDisk, syncInterval,
-					syncInterval, TimeUnit.MILLISECONDS);
-		}
 		Runtime.getRuntime().addShutdownHook(new Thread(this::close));
 	}
 
@@ -127,11 +117,13 @@ public final class DiskScope implements Scope, Closeable {
 		}
 	}
 
+	@On(On.Shutdown.class)
 	@Override
 	public void close() {
 		syncToDisk();
 	}
 
+	@Scheduled(every = 1, unit = TimeUnit.MINUTES)
 	private void syncToDisk() {
 		if (!dirReady())
 			return;

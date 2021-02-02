@@ -10,15 +10,15 @@ import se.jbee.inject.UnresolvableDependency.SupplyFailed;
 import java.lang.reflect.Method;
 
 /**
- * The {@link Executor} invokes the actual action {@link Method}. It is an
+ * The {@link ActionExecutor} invokes the actual action {@link Method}. It is an
  * abstraction for the inner mechanics of {@link Action}s so that these can be
- * customised by replacing the {@link Executor} by making a bind (see
+ * customised by replacing the {@link ActionExecutor} by making a bind (see
  * {@link ActionModule}).
  *
  * @see Action
  */
 @FunctionalInterface
-public interface Executor {
+public interface ActionExecutor {
 
 	/**
 	 * Runs an {@link Action} by invoking the underlying method.
@@ -29,6 +29,6 @@ public interface Executor {
 	 *             execution. The cause should be the exception causing the
 	 *             problem, not another wrapper like {@link SupplyFailed}.
 	 */
-	<I, O> O execute(ActionSite<I, O> site, Object[] args, I value)
+	<A, B> B execute(ActionSite<A, B> site, Object[] args, A value)
 			throws ActionExecutionFailed;
 }

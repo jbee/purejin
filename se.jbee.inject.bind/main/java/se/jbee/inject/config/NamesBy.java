@@ -74,7 +74,7 @@ public interface NamesBy {
 			if (!obj.isAnnotationPresent(annotation))
 				return null;
 			String name = property.apply(obj.getAnnotation(annotation));
-			return absoluteName ? named(annotation).concat(name) : named(name);
+			return absoluteName ? named(name).in(named(annotation)) : named(name);
 		};
 	}
 }

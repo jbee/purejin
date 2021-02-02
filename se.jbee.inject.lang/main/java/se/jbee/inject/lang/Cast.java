@@ -8,6 +8,8 @@ package se.jbee.inject.lang;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static se.jbee.inject.lang.Type.raw;
@@ -54,5 +56,23 @@ public final class Cast {
 
 	public static <A, B> Type<Function<A,B>> functionTypeOf(Type<A> a, Type<B> b) {
 		return (Type) Type.raw(Function.class).parameterized(a, b);
+	}
+
+	public static <A, B, C> Type<BiFunction<A, B, C>> biFunctionTypeOf(
+			Class<A> a, Class<B> b, Class<C> c) {
+		return biFunctionTypeOf(raw(a), raw(b), raw(c));
+	}
+
+	public static <A, B, C> Type<BiFunction<A, B, C>> biFunctionTypeOf(
+			Type<A> a, Type<B> b, Type<C> c) {
+		return (Type) Type.raw(BiFunction.class).parameterized(a, b, c);
+	}
+
+	public static <T> Type<Consumer<T>> consumerTypeOf(Class<T> consumedType) {
+		return consumerTypeOf(raw(consumedType));
+	}
+
+	public static <T> Type<Consumer<T>> consumerTypeOf(Type<T> consumedType) {
+		return (Type) Type.raw(Consumer.class).parameterized(consumedType);
 	}
 }

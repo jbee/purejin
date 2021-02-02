@@ -16,10 +16,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class RoundRobinStrategy<A, B> implements ActionStrategy<A, B> {
 
 	private final Injector context;
-	private final Executor executor;
+	private final ActionExecutor executor;
 	private final AtomicInteger callCount = new AtomicInteger();
 
-	public RoundRobinStrategy(Injector context,	Executor executor) {
+	public RoundRobinStrategy(Injector context,	ActionExecutor executor) {
 		this.context = context;
 		this.executor = executor;
 	}

@@ -1,10 +1,10 @@
-package test.integration.event;
+package test.integration.contract;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.event.*;
+import se.jbee.inject.contract.*;
 
 import java.util.concurrent.*;
 
@@ -77,7 +77,7 @@ class TestTTLExceptionHandingComputeEvents {
 	}
 
 	private static final class TestTTLExceptionHandingComputeEventsModule
-			extends EventModule {
+			extends ContractModule {
 
 		@Override
 		protected void declare() {

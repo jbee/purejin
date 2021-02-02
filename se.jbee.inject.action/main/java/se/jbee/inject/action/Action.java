@@ -13,7 +13,7 @@ import static se.jbee.inject.lang.Type.raw;
  * The low user level representation of an action (a operation or
  * micro-service).
  *
- * @see Executor
+ * @see ActionExecutor
  *
  * @param <A> The type of the input
  * @param <B> The type of the output

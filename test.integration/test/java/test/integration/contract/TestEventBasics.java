@@ -1,10 +1,10 @@
-package test.integration.event;
+package test.integration.contract;
 
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.event.EventModule;
-import se.jbee.inject.event.UnboxingFuture;
+import se.jbee.inject.contract.ContractModule;
+import se.jbee.inject.contract.UnboxingFuture;
 
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ class TestEventBasics {
 
 	}
 
-	private static class TestEventsModule extends EventModule {
+	private static class TestEventsModule extends ContractModule {
 
 		@Override
 		protected void declare() {

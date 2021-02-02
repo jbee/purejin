@@ -1,10 +1,10 @@
-package test.integration.event;
+package test.integration.contract;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.event.EventModule;
+import se.jbee.inject.contract.ContractModule;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Name.named;
@@ -32,7 +32,7 @@ class TestRoundRobinComputeEvents {
 	}
 
 	private static final class TestRoundRobinComputeEventsModule
-			extends EventModule {
+			extends ContractModule {
 
 		@Override
 		protected void declare() {

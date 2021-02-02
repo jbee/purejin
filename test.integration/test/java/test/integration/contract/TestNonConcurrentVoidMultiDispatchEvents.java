@@ -1,13 +1,13 @@
-package test.integration.event;
+package test.integration.contract;
 
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Scope;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.event.EventModule;
-import se.jbee.inject.event.EventPolicy;
-import se.jbee.inject.event.EventProcessor;
-import se.jbee.inject.event.PolicyProvider;
+import se.jbee.inject.contract.ContractModule;
+import se.jbee.inject.contract.EventPolicy;
+import se.jbee.inject.contract.EventProcessor;
+import se.jbee.inject.contract.PolicyProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,7 +83,7 @@ class TestNonConcurrentVoidMultiDispatchEvents {
 	}
 
 	private static final class TestMultiDispatchEventsModule
-			extends EventModule {
+			extends ContractModule {
 
 		@Override
 		protected void declare() {

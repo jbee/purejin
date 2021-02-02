@@ -25,17 +25,17 @@ public final class InjectionSite {
 	private final int[] lazyArgIndexes;
 	private final int lazyArgCount;
 
-	public InjectionSite(Injector injector, Dependency<?> site,
+	public InjectionSite(Injector context, Dependency<?> site,
 			Hint<?>[] actualParameters) {
 		this.site = site;
 		this.actualParameters = actualParameters;
 		this.generators = new Generator<?>[actualParameters.length];
 		this.preResolvedArgs = new Object[actualParameters.length];
 		this.lazyArgIndexes = new int[actualParameters.length];
-		this.lazyArgCount = preResolveArgs(injector);
+		this.lazyArgCount = preResolveArgs(context);
 	}
 
-	public Object[] args(Injector injector) throws UnresolvableDependency {
+	public Object[] args(Injector context) throws UnresolvableDependency {
 		if (lazyArgCount == 0)
 			return preResolvedArgs;
 		// in this case we have to copy to become thread-safe!
@@ -45,7 +45,7 @@ public final class InjectionSite {
 			Hint<?> hint = actualParameters[i];
 			Dependency<?> argDep = site.onInstance(hint.relativeRef).at(hint.at);
 			args[i] = generators[i] == null
-				? injector.resolve(argDep)
+				? context.resolve(argDep)
 				: generate(generators[i], argDep);
 		}
 		return args;

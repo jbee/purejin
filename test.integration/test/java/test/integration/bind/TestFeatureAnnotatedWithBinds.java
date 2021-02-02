@@ -20,6 +20,7 @@ import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static se.jbee.inject.config.ProducesBy.OPTIMISTIC;
+import static se.jbee.inject.lang.Type.raw;
 
 class TestFeatureAnnotatedWithBinds {
 
@@ -146,7 +147,7 @@ class TestFeatureAnnotatedWithBinds {
 		assertEquals(1, annotated.size());
 		assertSame(injector.resolve(Service.class),
 				annotated.get(0).instance.get());
-		assertEquals(ServiceImpl.class, annotated.get(0).role);
+		assertEquals(raw(ServiceImpl.class), annotated.get(0).as);
 	}
 
 	@Test

@@ -3,7 +3,7 @@
  *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject.event;
+package se.jbee.inject.contract;
 
 /**
  * A function to derive event handling {@link EventPolicy} from the event type.

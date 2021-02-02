@@ -20,6 +20,7 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.Dependency.dependency;
+import static se.jbee.inject.Name.named;
 import static se.jbee.inject.lang.Type.parameterType;
 import static se.jbee.inject.lang.Type.raw;
 
@@ -94,7 +95,7 @@ class TestExampleConfigPropertyAnnotationBinds {
 
 		private <T> void bindConfigPropertySupplier(Type<T> type) {
 			per(Scope.dependencyInstance) //
-					.bind(Name.named(ConfigProperty.class).asPrefix(), type) //
+					.bind(Name.ANY.in(named(ConfigProperty.class)), type) //
 					.toSupplier((dep, context) ->
 							resolveConfigProperty(dep, context, dep.at().element()));
 		}

@@ -10,6 +10,7 @@ open module test.integration {
 	requires se.jbee.inject.convert;
 	requires se.jbee.inject.action;
 	requires se.jbee.inject.event;
+	requires se.jbee.inject.contract;
 
 	requires test.examples; // <- module under test
 }
