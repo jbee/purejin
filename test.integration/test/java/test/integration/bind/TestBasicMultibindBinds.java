@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.lang.Cast.listTypeOf;
 import static se.jbee.inject.lang.Cast.setTypeOf;
-import static test.integration.util.TestUtils.assertEqualSets;
+import static test.integration.Assertions.assertEqualSets;
 
 /**
  * A {@link se.jbee.inject.binder.Binder.TypedBinder#multibind(Type)} is a

@@ -13,7 +13,7 @@ import se.jbee.inject.config.Feature;
 
 import java.lang.annotation.*;
 
-import static test.integration.util.TestUtils.assertEqualSets;
+import static test.integration.Assertions.assertEqualSets;
 
 /**
  * A test that demonstrates how to use {@link Feature}s and {@link Edition}s to

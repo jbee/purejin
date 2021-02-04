@@ -2,6 +2,7 @@ package se.jbee.inject.schedule;
 
 import se.jbee.inject.*;
 import se.jbee.inject.binder.BinderModule;
+import se.jbee.inject.config.Config;
 import se.jbee.inject.config.Connector;
 import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.config.Invoke;
@@ -20,8 +21,7 @@ import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.binder.spi.ConnectorBinder.SCHEDULER_CONNECTOR;
 import static se.jbee.inject.lang.Cast.consumerTypeOf;
-import static se.jbee.inject.lang.Type.actualReturnType;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.inject.lang.Type.*;
 
 public final class SchedulerModule extends BinderModule {
 
@@ -40,9 +40,14 @@ public final class SchedulerModule extends BinderModule {
 				.to(SchedulerModule::annotated);
 	}
 
-	public static Schedule annotated(Object obj, Type<?> as, Method target) {
+	public static Schedule annotated(Object obj, Type<?> as, Method target, Injector context) {
 		Scheduled scheduled = target.getAnnotation(Scheduled.class);
 		long intervalMillis = scheduled.unit().toMillis(scheduled.every());
+		String property = scheduled.by();
+		if (!property.isEmpty()) {
+			intervalMillis = context.resolve(dependency(Config.class).injectingInto(as))
+					.longValue(property, intervalMillis);
+		}
 		return new Schedule(obj, as, target, intervalMillis, 0L);
 	}
 
@@ -69,18 +74,20 @@ public final class SchedulerModule extends BinderModule {
 
 		private Runnable createTask(Schedule schedule) {
 			Method target = schedule.scheduled;
+			Type<?> objType = actualType(schedule.instance, schedule.as);
 			Dependency<?> dep = dependency(
-					actualReturnType(target, schedule.as)) //
-					.injectingInto(schedule.as);
+					actualReturnType(target, objType)) //
+					.injectingInto(objType);
 			InjectionSite site = new InjectionSite(context, dep,
-					hintsBy.applyTo(context, target, schedule.as));
+					hintsBy.applyTo(context, target, objType));
 			Invoke invoke = context.resolve(dependency(Invoke.class) //
 					.injectingInto(target.getDeclaringClass()));
 			return () -> {
 				try {
 					invoke.call(target, schedule.instance, site.args(context));
 				} catch (Exception ex) {
-					//TODO log
+					ex.printStackTrace();
+					//TODO log or event?
 				}
 			};
 		}
@@ -110,7 +117,7 @@ public final class SchedulerModule extends BinderModule {
 			if (factory == null)
 				throw new InconsistentDeclaration(
 						"Scheduler factory type not bound: " + type);
-			scheduler.accept(factory.create(instance, as, connected));
+			scheduler.accept(factory.create(instance, as, connected, context));
 		}
 	}
 }

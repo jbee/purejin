@@ -1,4 +1,4 @@
-package test.integration.bind;
+package test.integration.event;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,13 +19,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class TestFeatureDiskScopeBinds {
+/**
+ * A test that verifies that objects in disk scope are restored from disk.
+ *
+ * @see TestFeatureDiskScopeSync
+ */
+class TestFeatureDiskScopePersistence {
 
 	static final File dir = new File("target/scope/test");
 	static final Name myDisk = Scope.disk(dir);
 
 	@Installs(bundles = DiskScopeModule.class)
-	private static final class TestFeatureDiskScopeBindsModule
+	private static final class TestFeatureDiskScopePersistenceModule
 			extends BinderModule {
 
 		@Override
@@ -49,7 +54,8 @@ class TestFeatureDiskScopeBinds {
 
 	@Test
 	void diskScopePreservesStateOnDisk() {
-		Injector injector = Bootstrap.injector(TestFeatureDiskScopeBindsModule.class);
+		Injector injector = Bootstrap.injector(
+				TestFeatureDiskScopePersistenceModule.class);
 		AtomicInteger actualCounter = injector.resolve(AtomicInteger.class);
 		assertEquals(1, actualCounter.intValue());
 		actualCounter = injector.resolve(AtomicInteger.class);
@@ -61,7 +67,7 @@ class TestFeatureDiskScopeBinds {
 
 		// simulated restart
 		disk.close();
-		assertNotNull(Bootstrap.injector(TestFeatureDiskScopeBindsModule.class));
+		assertNotNull(Bootstrap.injector(TestFeatureDiskScopePersistenceModule.class));
 
 		assertEquals(5, actualCounter.intValue());
 	}

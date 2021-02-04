@@ -10,8 +10,9 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static se.jbee.inject.lang.Cast.listTypeOf;
 import static se.jbee.inject.lang.Type.*;
-import static test.integration.util.TestUtils.assertEqualMaps;
+import static test.integration.Assertions.assertEqualMaps;
 
 @SuppressWarnings({ "rawtypes" })
 class TestType {
@@ -408,6 +409,14 @@ class TestType {
 		Field values = SimpleMapImpl.class.getDeclaredField("values");
 		assertEquals(raw(Map.class).parameterized(String.class, Integer.class),
 				Type.actualFieldType(values, actualMapType));
+	}
+
+	@Test
+	void actualObjectType() {
+		ArrayList<String> obj = new ArrayList<>();
+		assertEquals(raw(ArrayList.class).parameterized(String.class),
+				Type.actualType(obj,
+						listTypeOf(String.class)));
 	}
 
 	@Test

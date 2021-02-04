@@ -6,7 +6,7 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
 
-import static test.integration.util.TestUtils.assertEqualSets;
+import static test.integration.Assertions.assertEqualSets;
 
 /**
  * Just a short example that shows that the {@link Installs} annotation while

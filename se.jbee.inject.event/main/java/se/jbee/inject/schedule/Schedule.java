@@ -1,5 +1,6 @@
 package se.jbee.inject.schedule;
 
+import se.jbee.inject.Injector;
 import se.jbee.inject.lang.Type;
 
 import java.lang.reflect.Method;
@@ -9,7 +10,7 @@ public final class Schedule {
 	@FunctionalInterface
 	public interface ScheduleFactory {
 
-		Schedule create(Object instance, Type<?> as, Method scheduled);
+		Schedule create(Object instance, Type<?> as, Method scheduled, Injector context);
 
 	}
 

@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
@@ -34,7 +35,7 @@ import static se.jbee.inject.lang.Type.raw;
  */
 public final class DiskScope implements Scope, Closeable {
 
-	private static final class DiskEntry implements Serializable {
+	public static final class DiskEntry implements Serializable {
 
 		final Serializable obj;
 		final long asOfLastModified;
@@ -56,11 +57,13 @@ public final class DiskScope implements Scope, Closeable {
 	private final Map<String, DiskEntry> entriesByName = new ConcurrentSkipListMap<>();
 	private final File rootDir;
 	private final Function<Dependency<?>, String> dep2name;
+	private final Consumer<DiskEntry> disk;
 
-	public DiskScope(File rootDir, Function<Dependency<?>, String> dep2name) {
+	public DiskScope(File rootDir, Function<Dependency<?>, String> dep2name,
+			Consumer<DiskEntry> disk) {
 		this.rootDir = rootDir;
 		this.dep2name = dep2name;
-		Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+		this.disk = disk;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -94,7 +97,7 @@ public final class DiskScope implements Scope, Closeable {
 		Serializable res = (Serializable) provider.provide();
 		DiskEntry entry = new DiskEntry(res, lastModified, file);
 		if (dirReady())
-			syncToDisk(entry);
+			disk.accept(entry);
 		return entry;
 	}
 
@@ -102,7 +105,21 @@ public final class DiskScope implements Scope, Closeable {
 		return rootDir.exists() || rootDir.mkdirs();
 	}
 
-	private static void syncToDisk(DiskEntry entry) {
+	@On(On.Shutdown.class)
+	@Override
+	public void close() {
+		syncToDisk();
+	}
+
+	@Scheduled(every = 1, unit = TimeUnit.MINUTES, by = "syncTime")
+	public void syncToDisk() {
+		if (!dirReady())
+			return;
+		for (DiskEntry e : entriesByName.values())
+			disk.accept(e);
+	}
+
+	public static void syncToDisk(DiskEntry entry) {
 		if (!entry.syncing.compareAndSet(false, true))
 			return; // already doing it...
 		try (ObjectOutputStream out = new ObjectOutputStream(
@@ -115,19 +132,5 @@ public final class DiskScope implements Scope, Closeable {
 		} finally {
 			entry.syncing.set(false);
 		}
-	}
-
-	@On(On.Shutdown.class)
-	@Override
-	public void close() {
-		syncToDisk();
-	}
-
-	@Scheduled(every = 1, unit = TimeUnit.MINUTES)
-	private void syncToDisk() {
-		if (!dirReady())
-			return;
-		for (DiskEntry e : entriesByName.values())
-			syncToDisk(e);
 	}
 }

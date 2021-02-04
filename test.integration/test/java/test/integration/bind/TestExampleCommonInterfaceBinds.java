@@ -12,7 +12,7 @@ import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.lang.Type.raw;
-import static test.integration.util.TestUtils.assertEqualSets;
+import static test.integration.Assertions.assertEqualSets;
 
 /**
  * Solution for cycle on common interface injecting other implementations into

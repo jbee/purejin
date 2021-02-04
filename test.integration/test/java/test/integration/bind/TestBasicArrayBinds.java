@@ -8,7 +8,7 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 
 import static se.jbee.inject.Name.named;
-import static test.integration.util.TestUtils.assertEqualSets;
+import static test.integration.Assertions.assertEqualSets;
 
 /**
  * How to inject different arrays into different instances of the same parent

@@ -9,8 +9,7 @@ import se.jbee.inject.scope.TypeDependentScope;
 
 import java.io.File;
 
-import static se.jbee.inject.Name.named;
-import static se.jbee.inject.config.ProducesBy.declaredMethods;
+import static se.jbee.inject.lang.Cast.consumerTypeOf;
 
 @Installs(bundles = SchedulerModule.class)
 public final class DiskScopeModule extends BinderModule {
@@ -20,9 +19,15 @@ public final class DiskScopeModule extends BinderModule {
 		bindLifeCycle(ScopeLifeCycle.disk);
 		bindScope(Name.ANY.in("disk")) //
 				.toSupplier(DiskScopeModule::createDiskScope);
-		connect(declaredMethods(false).annotatedWith(Scheduled.class)) //
-				.inAny(DiskScope.class) //
-				.asScheduled(named(Scheduled.class));
+
+		// usually when we save to disk we actually want to do that
+		asDefault().bind(consumerTypeOf(DiskScope.DiskEntry.class)) //
+				.to(DiskScope::syncToDisk);
+
+		// have scheduler pick up the annotated methods
+		schedule(DiskScope.class, Scheduled.class);
+
+		//TODO pick up "On" events
 	}
 
 	/**
@@ -33,6 +38,7 @@ public final class DiskScopeModule extends BinderModule {
 	 */
 	private static Scope createDiskScope(Dependency<? super Scope> dep, Injector context) {
 		return new DiskScope(new File(dep.instance.name.withoutNamespace()),
-				TypeDependentScope::instanceSignature);
+				TypeDependentScope::instanceSignature, context.resolve(
+				consumerTypeOf(DiskScope.DiskEntry.class)));
 	}
 }

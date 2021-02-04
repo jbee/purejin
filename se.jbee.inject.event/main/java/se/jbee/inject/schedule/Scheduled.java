@@ -13,10 +13,31 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(METHOD)
 public @interface Scheduled {
 
+	/**
+	 * @return The {@link TimeUnit} used for the {@link #every()} and {@link #starting()} property.
+	 */
 	TimeUnit unit() default TimeUnit.SECONDS;
 
-	int every();
+	/**
+	 * @return length of the scheduled interval in millis, seconds, minutes (depending on {@link #unit()})
+	 */
+	int every() default 1;
 
+	/**
+	 * @return
+	 */
 	int starting() default -1;
 
+	/**
+	 * @return name of the {@link se.jbee.inject.config.Config} property in case
+	 * the time is not given directly by {@link #every()} and {@link #unit()}.
+	 * <p>
+	 * The annotated type is used as context for the {@link
+	 * se.jbee.inject.config.Config}.
+	 * <p>
+	 * If this property is defined the time defined by {@link #every()} and
+	 * {@link #unit()} acts as a default or fallback in case the configuration
+	 * is not defined.
+	 */
+	String by() default "";
 }

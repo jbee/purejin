@@ -4,10 +4,11 @@ import org.junit.jupiter.api.Test;
 import se.jbee.inject.*;
 import se.jbee.inject.lang.Type;
 
-import java.io.Serializable;
+import java.io.*;
 import java.util.List;
 
-import static test.integration.util.TestUtils.assertSerializable;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Make sure the value objects of the library are {@link Serializable}.
@@ -82,4 +83,28 @@ class TestSerializable {
 		assertSerializable(dep.injectingInto(Integer.class));
 	}
 
+	private static void assertSerializable(Serializable obj) {
+		try {
+			byte[] binObj = serialize(obj);
+			Serializable obj2 = deserialize(binObj);
+			assertEquals(obj, obj2);
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+	}
+
+	private static byte[] serialize(Serializable obj) throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(baos);
+		oos.writeObject(obj);
+		oos.close();
+		return baos.toByteArray();
+	}
+
+	private static Serializable deserialize(byte[] b)
+			throws IOException, ClassNotFoundException {
+		ByteArrayInputStream bais = new ByteArrayInputStream(b);
+		ObjectInputStream ois = new ObjectInputStream(bais);
+		return (Serializable) ois.readObject();
+	}
 }

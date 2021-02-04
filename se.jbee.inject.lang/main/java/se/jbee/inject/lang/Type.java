@@ -44,6 +44,17 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 		return raw(type).varTypeParametersAsWildcards();
 	}
 
+	@SuppressWarnings("unchecked")
+	public static <T> Type<? extends T> actualType(T instance, Type<?> as) {
+		Class<?> rawType = instance.getClass();
+		if (as.rawType == rawType)
+			return (Type<? extends T>) as;
+		TypeVariable<? extends Class<?>>[] generics = rawType.getTypeParameters();
+		if (generics.length == 0)
+			return (Type<? extends T>) raw(rawType);
+		throw new UnsupportedOperationException("Not supported yet");
+	}
+
 	public static int typeVariableComparator(TypeVariable<?> a, TypeVariable<?> b) {
 		int res = a.getName().compareTo(b.getName());
 		if (res != 0)

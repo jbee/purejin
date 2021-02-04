@@ -14,7 +14,7 @@ import java.io.Serializable;
 import java.util.concurrent.Callable;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static test.integration.util.TestUtils.assertEqualSets;
+import static test.integration.Assertions.assertEqualSets;
 
 /**
  * Plug-in-binds are a convenient way to define a named set of classes. The name

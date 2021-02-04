@@ -95,4 +95,5 @@ public final class TypeVariable {
 		return variables.entrySet().stream().collect(
 				toMap(Map.Entry::getKey, e -> e.getValue().apply(actualType)));
 	}
+
 }

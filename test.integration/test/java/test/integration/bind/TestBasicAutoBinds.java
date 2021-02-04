@@ -16,7 +16,7 @@ import java.lang.reflect.Modifier;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.lang.Type.raw;
-import static test.integration.util.TestUtils.assertEqualSets;
+import static test.integration.Assertions.assertEqualSets;
 
 /**
  * A test that shows usage of {@link Binder.ScopedBinder#autobind()}.

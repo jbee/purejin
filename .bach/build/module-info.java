@@ -1,5 +1,6 @@
 import com.github.sormuras.bach.project.Feature;
 import com.github.sormuras.bach.project.ProjectInfo;
+import com.github.sormuras.bach.project.ProjectInfo.Link;
 import com.github.sormuras.bach.project.ProjectInfo.Tweak;
 
 @ProjectInfo(
@@ -7,8 +8,12 @@ import com.github.sormuras.bach.project.ProjectInfo.Tweak;
         version = "8-ea",
         compileModulesForJavaRelease = 8,
         features = {
-                Feature.GENERATE_API_DOCUMENTATION,
+              //  Feature.GENERATE_API_DOCUMENTATION,
                 Feature.INCLUDE_SOURCES_IN_MODULAR_JAR
+        },
+        links = {
+                @Link(module = "awaitility.test.support", to = "org.awaitility:awaitility-test-support:3.1.6"),
+                @Link(module = "awaitility", to = "org.awaitility:awaitility:4.0.3"),
         },
         tweaks = {
                 @Tweak(tool = "javac", with = {"-encoding", "UTF-8", "-g", "-parameters"}),

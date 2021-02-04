@@ -11,6 +11,7 @@ import se.jbee.inject.binder.spi.*;
 import se.jbee.inject.config.*;
 import se.jbee.inject.lang.Type;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -31,6 +32,7 @@ import static se.jbee.inject.Target.targeting;
 import static se.jbee.inject.binder.Constructs.constructs;
 import static se.jbee.inject.binder.spi.ConnectorBinder.CONNECT_QUALIFIER;
 import static se.jbee.inject.config.Plugins.pluginPoint;
+import static se.jbee.inject.config.ProducesBy.declaredMethods;
 import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.lang.Utils.isClassConstructable;
 import static se.jbee.inject.lang.Utils.newArray;
@@ -320,6 +322,12 @@ public class Binder {
 	public <T> ConnectTargetBinder<T> connect(Class<T> api) {
 		return new ConnectTargetBinder<>(this,
 				ProducesBy.OPTIMISTIC.in(api), raw(api));
+	}
+
+	public void schedule(Class<?> bean, Class<? extends Annotation> schedule) {
+		connect(declaredMethods(false).annotatedWith(schedule)) //
+				.inAny(bean) //
+				.asScheduled(named(schedule));
 	}
 
 	protected Binder on(Bind bind) {
