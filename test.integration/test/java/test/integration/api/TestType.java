@@ -412,11 +412,29 @@ class TestType {
 	}
 
 	@Test
-	void actualObjectType() {
+	void actualInstanceTypeWithoutGenericsIsRawInstanceType() {
+		assertEquals(raw(String.class),
+				actualInstanceType("Hello", raw(String.class)));
+	}
+
+	@Test
+	void actualInstanceTypeWithoutGenericsAsInterfaceIsRawInstanceType() {
+		assertEquals(raw(String.class),
+				actualInstanceType("Hello", raw(CharSequence.class)));
+	}
+
+	@Test
+	void actualInstanceTypeWithoutGenericsAsSupertypeIsRawInstanceType() {
+		assertEquals(raw(String.class),
+				actualInstanceType("Hello", raw(Object.class)));
+	}
+
+	@Test
+	void actualInstanceTypeWithGenericsIsNotYetSupported() {
 		ArrayList<String> obj = new ArrayList<>();
-		assertEquals(raw(ArrayList.class).parameterized(String.class),
-				Type.actualType(obj,
-						listTypeOf(String.class)));
+		Type<List<String>> actualType = listTypeOf(String.class);
+		assertThrows(UnsupportedOperationException.class,
+				() -> actualInstanceType(obj, actualType));
 	}
 
 	@Test

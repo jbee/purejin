@@ -74,7 +74,7 @@ public final class SchedulerModule extends BinderModule {
 
 		private Runnable createTask(Schedule schedule) {
 			Method target = schedule.scheduled;
-			Type<?> objType = actualType(schedule.instance, schedule.as);
+			Type<?> objType = actualInstanceType(schedule.instance, schedule.as);
 			Dependency<?> dep = dependency(
 					actualReturnType(target, objType)) //
 					.injectingInto(objType);

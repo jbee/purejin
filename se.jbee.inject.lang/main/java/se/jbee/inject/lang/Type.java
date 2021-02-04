@@ -45,7 +45,7 @@ public final class Type<T> implements Qualifying<Type<?>>, Typed<T>,
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> Type<? extends T> actualType(T instance, Type<?> as) {
+	public static <T> Type<? extends T> actualInstanceType(T instance, Type<?> as) {
 		Class<?> rawType = instance.getClass();
 		if (as.rawType == rawType)
 			return (Type<? extends T>) as;

@@ -8,7 +8,7 @@ import com.github.sormuras.bach.project.ProjectInfo.Tweak;
         version = "8-ea",
         compileModulesForJavaRelease = 8,
         features = {
-              //  Feature.GENERATE_API_DOCUMENTATION,
+                Feature.GENERATE_API_DOCUMENTATION,
                 Feature.INCLUDE_SOURCES_IN_MODULAR_JAR
         },
         links = {
