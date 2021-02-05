@@ -16,11 +16,12 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.lang.Cast.consumerTypeOf;
+import static se.jbee.junit.assertion.Assertions.assertGreaterThanOrEqual;
+import static se.jbee.junit.assertion.Assertions.assertTrueWithin;
 import static test.integration.Assertions.assertSameElements;
-import static test.integration.Assertions.assertTrueWithin;
 
 /**
  * A test to verify that the {@link se.jbee.inject.schedule.Scheduled}
@@ -64,7 +65,8 @@ class TestFeatureDiskScopeSync {
 		Injector context = Bootstrap.injector(env, TestFeatureDiskScopeSyncModule.class);
 
 		assertEquals("Hello", context.resolve(String.class));
-		assertTrueWithin(40L, recorded::size, greaterThanOrEqualTo(4));
+		assertTrueWithin(ofMillis(40),
+				() -> assertGreaterThanOrEqual(4, recorded.size()));
 		assertSameElements(recorded); // make sure all recorded entries are indeed the same
 	}
 }

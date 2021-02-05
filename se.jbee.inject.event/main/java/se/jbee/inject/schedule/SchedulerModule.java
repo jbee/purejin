@@ -38,6 +38,9 @@ public final class SchedulerModule extends BinderModule {
 				.toProvider(Executors::newSingleThreadScheduledExecutor);
 		asDefault().bind(named(Scheduled.class), ScheduleFactory.class)
 				.to(SchedulerModule::annotated);
+
+		// connect Scheduled
+		schedule(Scheduled.Aware.class, Scheduled.class);
 	}
 
 	public static Schedule annotated(Object obj, Type<?> as, Method target, Injector context) {
@@ -86,7 +89,6 @@ public final class SchedulerModule extends BinderModule {
 				try {
 					invoke.call(target, schedule.instance, site.args(context));
 				} catch (Exception ex) {
-					ex.printStackTrace();
 					//TODO log or event?
 				}
 			};

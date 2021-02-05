@@ -14,6 +14,17 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface Scheduled {
 
 	/**
+	 * Marker interface to be implemented by managed instances that use the
+	 * {@link Scheduled} annotation to mark methods that should be scheduled.
+	 * <p>
+	 * There is nothing special about this interface except that the {@link
+	 * SchedulerModule} connects it to the {@link Scheduled} annotation so
+	 * instances of implementing classes get connected via {@link
+	 * se.jbee.inject.Lift}.
+	 */
+	interface Aware {}
+
+	/**
 	 * @return The {@link TimeUnit} used for the {@link #every()} and {@link #starting()} property.
 	 */
 	TimeUnit unit() default TimeUnit.SECONDS;

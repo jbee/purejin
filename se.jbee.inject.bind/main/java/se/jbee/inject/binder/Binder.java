@@ -325,7 +325,7 @@ public class Binder {
 	}
 
 	public void schedule(Class<?> bean, Class<? extends Annotation> schedule) {
-		connect(declaredMethods(false).annotatedWith(schedule)) //
+		connect(declaredMethods(true).annotatedWith(schedule)) //
 				.inAny(bean) //
 				.asScheduled(named(schedule));
 	}

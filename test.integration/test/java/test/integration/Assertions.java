@@ -1,15 +1,8 @@
 package test.integration;
 
-import org.hamcrest.Matcher;
-
 import java.util.*;
-import java.util.concurrent.Callable;
 
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-import static java.time.Duration.ofMillis;
 import static java.util.Arrays.asList;
-import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
@@ -28,13 +21,6 @@ public final class Assertions {
 		E e1 = actual.iterator().next();
 		for (E e : actual)
 			assertSame(e1, e);
-	}
-
-	public static <T> void assertTrueWithin(long millis, Callable<T> supplier, Matcher<? super T> matcher) {
-		await()
-				.atMost(ofMillis(millis))
-				.with().pollDelay(ofMillis(max(5, min(100, millis / 2))))
-				.until(supplier, matcher);
 	}
 
 	public static <E> void assertEqualSets(E[] expected, E[] actual) {

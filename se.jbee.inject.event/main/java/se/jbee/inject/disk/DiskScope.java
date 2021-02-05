@@ -33,7 +33,7 @@ import static se.jbee.inject.lang.Type.raw;
  *
  * @since 8.1
  */
-public final class DiskScope implements Scope, Closeable {
+public final class DiskScope implements Scope, Closeable, Scheduled.Aware {
 
 	public static final class DiskEntry implements Serializable {
 

@@ -3,7 +3,6 @@ package se.jbee.inject.disk;
 import se.jbee.inject.*;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Installs;
-import se.jbee.inject.schedule.Scheduled;
 import se.jbee.inject.schedule.SchedulerModule;
 import se.jbee.inject.scope.TypeDependentScope;
 
@@ -23,9 +22,6 @@ public final class DiskScopeModule extends BinderModule {
 		// usually when we save to disk we actually want to do that
 		asDefault().bind(consumerTypeOf(DiskScope.DiskEntry.class)) //
 				.to(DiskScope::syncToDisk);
-
-		// have scheduler pick up the annotated methods
-		schedule(DiskScope.class, Scheduled.class);
 
 		//TODO pick up "On" events
 	}
