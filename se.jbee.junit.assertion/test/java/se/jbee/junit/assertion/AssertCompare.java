@@ -3,6 +3,8 @@ package se.jbee.junit.assertion;
 import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.fail;
+import static se.jbee.junit.assertion.AssertionUtils.buildPrefix;
+import static se.jbee.junit.assertion.AssertionUtils.formatExpectedButWas;
 
 final class AssertCompare {
 
@@ -22,12 +24,12 @@ final class AssertCompare {
 
 	static <T extends Comparable<T>> void assertLessThanOrEqual(T expected, T actual, Supplier<String> message) {
 		if (actual.compareTo(expected) > 0)
-			failCompare(actual, ">=", expected, message);
+			failCompare(actual, "<=", expected, message);
 	}
 
 	static <T extends Comparable<T>> void assertLessThanOrEqual(T expected, T actual, String message) {
 		if (actual.compareTo(expected) > 0)
-			failCompare(actual, ">=", expected, message);
+			failCompare(actual, "<=", expected, message);
 	}
 
 	static <T extends Comparable<T>> void assertGreaterThan(T expected, T actual, Supplier<String> message) {
@@ -42,12 +44,12 @@ final class AssertCompare {
 
 	static <T extends Comparable<T>> void assertLessThan(T expected, T actual, Supplier<String> message) {
 		if (actual.compareTo(expected) >= 0)
-			failCompare(actual, ">", expected, message);
+			failCompare(actual, "<", expected, message);
 	}
 
 	static <T extends Comparable<T>> void assertLessThan(T expected, T actual, String message) {
 		if (actual.compareTo(expected) >= 0)
-			failCompare(actual, ">", expected, message);
+			failCompare(actual, "<", expected, message);
 	}
 
 	private static <T extends Comparable<T>> void failCompare(
@@ -57,16 +59,7 @@ final class AssertCompare {
 
 	private static <T extends Comparable<T>> void failCompare(
 			T actual, String op, T expected, String msg) {
-		fail(buildPrefix(msg) + formatCompare(actual, op, expected));
+		fail(buildPrefix(msg) + formatExpectedButWas(op, expected, actual));
 	}
 
-	private static String buildPrefix(String message) {
-		return message != null && !message.trim().isEmpty() ? message + " ==> " : "";
-	}
-
-	private static <T extends Comparable<T>> String formatCompare(
-			T actual, String op, T expected) {
-		return String.format("expected: %s <%s> but was: <%s>", //
-				op, expected, actual);
-	}
 }

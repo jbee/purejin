@@ -12,7 +12,7 @@ import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.lang.Type.raw;
-import static test.integration.Assertions.assertEqualSets;
+import static se.jbee.junit.assertion.Assertions.assertEqualsIgnoreOrder;
 
 /**
  * Solution for cycle on common interface injecting other implementations into
@@ -94,6 +94,6 @@ class TestExampleCommonInterfaceBinds {
 				instance(named("left"), raw(B.class))));
 		D d = injector.resolve(dependency(D.class).injectingInto(
 				instance(named("left"), raw(B.class))));
-		assertEqualSets(new A[] { c, d }, leftB.as);
+		assertEqualsIgnoreOrder(new A[] { c, d }, leftB.as);
 	}
 }

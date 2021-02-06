@@ -6,14 +6,15 @@ import se.jbee.inject.config.Config;
 import se.jbee.inject.config.Connector;
 import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.config.Invoke;
-import se.jbee.inject.schedule.Schedule.ScheduleFactory;
 import se.jbee.inject.lang.Type;
+import se.jbee.inject.schedule.Schedule.ScheduleFactory;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -27,15 +28,27 @@ public final class SchedulerModule extends BinderModule {
 
 	public static final Type<Consumer<Schedule>> SCHEDULER_TYPE = consumerTypeOf(Schedule.class);
 
+	/**
+	 * Main point of this interface is to limit the surface of the API to set in
+	 * oder to change the execution of the {@link DefaultScheduler}.
+	 * <p>
+	 * This does correspond to {@link java.util.concurrent.ScheduledExecutorService#scheduleAtFixedRate(Runnable,
+	 * long, long, TimeUnit)}.
+	 */
+	@FunctionalInterface
+	public interface ScheduledExecutor {
+
+		void executeInSchedule(Runnable task, long initialDelay, long period, TimeUnit unit);
+	}
+
 	@Override
 	protected void declare() {
 		asDefault().bind(Name.ANY.in(SCHEDULER_CONNECTOR), raw(Connector.class)) //
 				.toSupplier(SchedulerConnector.class);
 		asDefault().bind(SCHEDULER_TYPE) //
 				.to(DefaultScheduler.class);
-		asDefault().injectingInto(DefaultScheduler.class) //
-				.bind(ScheduledExecutorService.class) //
-				.toProvider(Executors::newSingleThreadScheduledExecutor);
+		asDefault().bind(ScheduledExecutor.class) //
+				.toProvider(() -> Executors.newSingleThreadScheduledExecutor()::scheduleAtFixedRate);
 		asDefault().bind(named(Scheduled.class), ScheduleFactory.class)
 				.to(SchedulerModule::annotated);
 
@@ -51,16 +64,17 @@ public final class SchedulerModule extends BinderModule {
 			intervalMillis = context.resolve(dependency(Config.class).injectingInto(as))
 					.longValue(property, intervalMillis);
 		}
-		return new Schedule(obj, as, target, intervalMillis, 0L);
+		return new Schedule(obj, as, target, Duration.ofMillis(intervalMillis),
+				LocalDateTime.now());
 	}
 
 	public static class DefaultScheduler implements Consumer<Schedule> {
 
 		private final Injector context;
 		private final HintsBy hintsBy;
-		private final ScheduledExecutorService executor;
+		private final ScheduledExecutor executor;
 
-		public DefaultScheduler(Injector context, ScheduledExecutorService executor) {
+		public DefaultScheduler(Injector context, ScheduledExecutor executor) {
 			this.context = context;
 			this.executor = executor;
 			this.hintsBy = context.resolve(Env.class)
@@ -70,8 +84,9 @@ public final class SchedulerModule extends BinderModule {
 
 		@Override
 		public void accept(Schedule schedule) {
-			executor.scheduleAtFixedRate(createTask(schedule), schedule.initialDelayMillis,
-					schedule.intervalMillis,
+			executor.executeInSchedule(createTask(schedule),
+					schedule.delayNow().toMillis(),
+					schedule.interval.toMillis(),
 					TimeUnit.MILLISECONDS);
 		}
 

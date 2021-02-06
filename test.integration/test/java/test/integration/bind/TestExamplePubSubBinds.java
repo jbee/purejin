@@ -1,9 +1,9 @@
 package test.integration.bind;
 
 import org.junit.jupiter.api.Test;
-import se.jbee.inject.Lift;
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
+import se.jbee.inject.Lift;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.binder.Binder;
 import se.jbee.inject.binder.BinderModule;

@@ -12,7 +12,7 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.lang.Cast.listTypeOf;
 import static se.jbee.inject.lang.Type.*;
-import static test.integration.Assertions.assertEqualMaps;
+import static se.jbee.junit.assertion.Assertions.assertToStringEquals;
 
 @SuppressWarnings({ "rawtypes" })
 class TestType {
@@ -346,15 +346,15 @@ class TestType {
 
 	@Test
 	void actualTypeArguments() throws Exception {
-		assertEqualMaps("{X=? extends java.io.Serializable, E=?}",
+		assertToStringEquals("{X=? extends java.io.Serializable, E=?}",
 				classType(XList.class).actualTypeArguments());
-		assertEqualMaps("{X=java.lang.String, E=java.lang.Integer}",
+		assertToStringEquals("{X=java.lang.String, E=java.lang.Integer}",
 				raw(XList.class).parameterized(String.class,
 						Integer.class).actualTypeArguments());
-		assertEqualMaps("{X=java.lang.String, E=?}",
+		assertToStringEquals("{X=java.lang.String, E=?}",
 				returnType(getClass().getMethod(
 						"typeVariableWithActualTypeArgument")).actualTypeArguments());
-		assertEqualMaps("{X=? extends java.lang.Number, E=java.lang.Integer}",
+		assertToStringEquals("{X=? extends java.lang.Number, E=java.lang.Integer}",
 				returnType(getClass().getMethod(
 						"typeVariableWithActualTypeArgument2")).actualTypeArguments());
 	}

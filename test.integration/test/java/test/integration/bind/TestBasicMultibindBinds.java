@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.lang.Cast.listTypeOf;
 import static se.jbee.inject.lang.Cast.setTypeOf;
-import static test.integration.Assertions.assertEqualSets;
+import static se.jbee.junit.assertion.Assertions.assertEqualsIgnoreOrder;
 
 /**
  * A {@link se.jbee.inject.binder.Binder.TypedBinder#multibind(Type)} is a
@@ -81,35 +81,35 @@ class TestBasicMultibindBinds {
 	@Test
 	void multipleNamedElementsCanBeBound() {
 		Integer[] foos = context.resolve("foo", Integer[].class);
-		assertEqualSets(new Integer[] { 2, 3 }, foos);
+		assertEqualsIgnoreOrder(new Integer[] { 2, 3 }, foos);
 		Integer[] bars = context.resolve("bar", Integer[].class);
-		assertEqualSets(new Integer[] { 4, 5 }, bars);
+		assertEqualsIgnoreOrder(new Integer[] { 4, 5 }, bars);
 		Integer[] defaults = context.resolve(Name.DEFAULT, Integer[].class);
-		assertEqualSets(new Integer[] { 1, 11 }, defaults);
+		assertEqualsIgnoreOrder(new Integer[] { 1, 11 }, defaults);
 		Integer[] anys = context.resolve(Name.ANY, Integer[].class);
-		assertEqualSets(new Integer[] { 1, 2, 3, 4, 5, 11 }, anys);
+		assertEqualsIgnoreOrder(new Integer[] { 1, 2, 3, 4, 5, 11 }, anys);
 	}
 
 	@Test
 	void multipleBoundNamedElementsCanUsedAsList() {
 		List<Integer> foos = context.resolve(named("foo"), listTypeOf(Integer.class));
-		assertEqualSets(new Integer[] { 2, 3 }, foos.toArray());
+		assertEqualsIgnoreOrder(new Integer[] { 2, 3 }, foos.toArray());
 		List<Integer> bars = context.resolve(named("bar"), listTypeOf(Integer.class));
-		assertEqualSets(new Integer[] { 4, 5 }, bars.toArray());
+		assertEqualsIgnoreOrder(new Integer[] { 4, 5 }, bars.toArray());
 	}
 
 	@Test
 	void multipleBoundNamedElementsCanUsedAsSet() {
 		Set<Integer> foos = context.resolve(named("foo"), setTypeOf(Integer.class));
-		assertEqualSets(new Integer[] { 2, 3 }, foos.toArray());
+		assertEqualsIgnoreOrder(new Integer[] { 2, 3 }, foos.toArray());
 		Set<Integer> bars = context.resolve(named("bar"), setTypeOf(Integer.class));
-		assertEqualSets(new Integer[] { 4, 5 }, bars.toArray());
+		assertEqualsIgnoreOrder(new Integer[] { 4, 5 }, bars.toArray());
 	}
 
 	@Test
 	void multipleToConstantsCanBeBound() {
 		List<Long> longs = context.resolve(listTypeOf(long.class));
-		assertEqualSets(new Long[] { 1L, 2L, 3L, 4L }, longs.toArray());
+		assertEqualsIgnoreOrder(new Long[] { 1L, 2L, 3L, 4L }, longs.toArray());
 		assertEquals(2, context.resolve(Float[].class).length);
 		assertEquals(3, context.resolve(Double[].class).length);
 	}

@@ -8,29 +8,22 @@ import static java.time.Duration.ofMillis;
 
 public final class Await {
 
-	private static final Await DEFAULT = new Await(ofMillis(5), ofMillis(100),
-			Duration.ZERO);
-
-	public static Await await() {
-		return DEFAULT;
+	public static Await atMost(Duration maxWaitTime) {
+		return new Await(Duration.ZERO, maxWaitTime, Duration.ZERO);
 	}
 
 	private final Duration pollInterval;
 	public final Duration maxWaitTime;
 	public final Duration minWaitTime;
 
-	public Await(Duration pollInterval, Duration maxWaitTime,
+	private Await(Duration pollInterval, Duration maxWaitTime,
 			Duration minWaitTime) {
 		this.pollInterval = pollInterval;
 		this.maxWaitTime = maxWaitTime;
 		this.minWaitTime = minWaitTime;
 	}
 
-	public Await inInterval(Duration pollInterval) {
-		return new Await(pollInterval, maxWaitTime, minWaitTime);
-	}
-
-	public Await atMost(Duration maxWaitTime) {
+	public Await tryInInterval(Duration pollInterval) {
 		return new Await(pollInterval, maxWaitTime, minWaitTime);
 	}
 
@@ -39,7 +32,7 @@ public final class Await {
 	}
 
 	public Duration pollInterval() {
-		if (pollInterval != null)
+		if (!pollInterval.isZero())
 			return pollInterval;
 		long maxWaitMillis = maxWaitTime.toMillis();
 		return ofMillis(max(1, min(100, maxWaitMillis / 10)));

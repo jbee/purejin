@@ -1,6 +1,5 @@
 package test.integration.example0;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Env;
 import se.jbee.inject.bootstrap.Bootstrap;

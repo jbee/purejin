@@ -16,7 +16,7 @@ import java.lang.reflect.Modifier;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.lang.Type.raw;
-import static test.integration.Assertions.assertEqualSets;
+import static se.jbee.junit.assertion.Assertions.assertEqualsIgnoreOrder;
 
 /**
  * A test that shows usage of {@link Binder.ScopedBinder#autobind()}.
@@ -139,7 +139,7 @@ class TestBasicAutoBinds {
 	@Test
 	void methodSelectionWithOr() {
 		assertTrue(context.resolve(boolean.class), "wrong boolean method bound");
-		assertEqualSets(new Integer[] { 2, 3, 12 },
+		assertEqualsIgnoreOrder(new Integer[] { 2, 3, 12 },
 				context.resolve(Integer[].class));
 		assertThrows(UnresolvableDependency.class,
 				() -> context.resolve(double.class), "should not be bound");

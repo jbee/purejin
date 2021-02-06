@@ -10,18 +10,18 @@ import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.disk.DiskScope;
 import se.jbee.inject.disk.DiskScopeModule;
+import se.jbee.inject.schedule.SchedulerModule;
+import test.integration.event.RecordingScheduledExecutor.Job;
 
 import java.io.File;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
-import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static se.jbee.inject.lang.Cast.consumerTypeOf;
-import static se.jbee.junit.assertion.Assertions.assertGreaterThanOrEqual;
-import static se.jbee.junit.assertion.Assertions.assertTrueWithin;
-import static test.integration.Assertions.assertSameElements;
+import static se.jbee.junit.assertion.Assertions.assertAllSame;
 
 /**
  * A test to verify that the {@link se.jbee.inject.schedule.Scheduled}
@@ -46,9 +46,14 @@ class TestFeatureDiskScopeSync {
 
 			bind(consumerTypeOf(DiskScope.DiskEntry.class)).to(recorder);
 
-			// in this test we want the scheduler to call sync every 5ms
+			// in this test we want the scheduler to call sync every 20ms
 			configure(DiskScope.class) //
-					.bind("syncTime", long.class).to(5L); //ms
+					.bind("syncTime", long.class).to(20L); //ms
+
+			// but we also "stub" the executor so we can simulate the calls
+			// and check we get instructed correctly
+			bind(SchedulerModule.ScheduledExecutor.class)
+					.to(env().property(SchedulerModule.ScheduledExecutor.class));
 		}
 	}
 
@@ -61,12 +66,31 @@ class TestFeatureDiskScopeSync {
 	void schedulerCallsSyncInConfiguredInterval() {
 		List<DiskScope.DiskEntry> recorded = new CopyOnWriteArrayList<>();
 		Consumer<DiskScope.DiskEntry> recorder = recorded::add;
-		Env env = Bootstrap.DEFAULT_ENV.with(consumerTypeOf(DiskScope.DiskEntry.class), recorder);
+		RecordingScheduledExecutor executor = new RecordingScheduledExecutor();
+		Env env = Bootstrap.DEFAULT_ENV
+				.with(consumerTypeOf(DiskScope.DiskEntry.class), recorder)
+				.with(SchedulerModule.ScheduledExecutor.class, executor);
 		Injector context = Bootstrap.injector(env, TestFeatureDiskScopeSyncModule.class);
 
 		assertEquals("Hello", context.resolve(String.class));
-		assertTrueWithin(ofMillis(40),
-				() -> assertGreaterThanOrEqual(4, recorded.size()));
-		assertSameElements(recorded); // make sure all recorded entries are indeed the same
+		// after we now have created the scheduled "bean" and by that the scheduler
+		// the executor should have gotten a job
+		assertEquals(1, executor.recorded.size());
+		// verify the details of that job
+		Job last = executor.lastRecorded();
+		assertNotNull(last);
+		assertNotNull(last.task);
+		assertEquals(20L, last.unit.toMillis(last.period));
+		assertEquals(0L, last.initialDelay);
+		// now we simulate the scheduler work
+		assertEquals(1, recorded.size(), "loading does not update to disk");
+		last.task.run();
+		assertEquals(2, recorded.size());
+		last.task.run();
+		assertEquals(3, recorded.size());
+		last.task.run();
+		assertEquals(4, recorded.size());
+		assertAllSame(recorded); // make sure all recorded entries are indeed the same
 	}
+
 }

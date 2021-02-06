@@ -4,10 +4,8 @@
     <exclude-output />
     <content url="file://$MODULE_DIR$/se.jbee.junit.assertion">
       <sourceFolder url="file://$MODULE_DIR$/se.jbee.junit.assertion/test/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/se.jbee.junit.assertion/test/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/se.jbee.junit.assertion/test/java-module" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="11" jdkType="JavaSDK" />
+    <orderEntry type="jdk" jdkName="16" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="bach-external-modules" level="project" />
   </component>
