@@ -56,10 +56,10 @@ jobs:
           prerelease: true
           title: "purejin ${{ env.VERSION }}"
           files: |
-            .bach/workspace/modules/se.jbee.lang@${{ env.VERSION }}.jar
-            .bach/workspace/modules/se.jbee.inject@${{ env.VERSION }}.jar
-            .bach/workspace/modules/se.jbee.inject.api@${{ env.VERSION }}.jar
-            .bach/workspace/modules/se.jbee.inject.container@${{ env.VERSION }}.jar
-            .bach/workspace/modules/se.jbee.inject.bind@${{ env.VERSION }}.jar
-            .bach/workspace/modules/se.jbee.inject.bootstrap@${{ env.VERSION }}.jar
-            .bach/workspace/modules/se.jbee.inject.action@${{ env.VERSION }}.jar
+            .bach/workspace/modules/se.jbee.lang@*-ea.jar
+            .bach/workspace/modules/se.jbee.inject@*-ea.jar
+            .bach/workspace/modules/se.jbee.inject.api@*-ea.jar
+            .bach/workspace/modules/se.jbee.inject.container@*-ea.jar
+            .bach/workspace/modules/se.jbee.inject.bind@$*-ea.jar
+            .bach/workspace/modules/se.jbee.inject.bootstrap@*-ea.jar
+            .bach/workspace/modules/se.jbee.inject.action@*-ea.jar
