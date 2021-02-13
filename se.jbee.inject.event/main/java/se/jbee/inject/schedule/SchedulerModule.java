@@ -14,8 +14,12 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import static se.jbee.inject.Dependency.dependency;
@@ -37,23 +41,28 @@ public final class SchedulerModule extends BinderModule {
 	 */
 	@FunctionalInterface
 	public interface ScheduledExecutor {
-
-		void executeInSchedule(Runnable task, long initialDelay, long period, TimeUnit unit);
+		Future<?> executeInSchedule(Runnable task, long initialDelay, long period, TimeUnit unit);
 	}
 
 	@Override
 	protected void declare() {
+		// link connections of type schedule to the connector
 		asDefault().bind(Name.ANY.in(SCHEDULER_CONNECTOR), raw(Connector.class)) //
 				.toSupplier(SchedulerConnector.class);
+
+		// use DefaultScheduler to schedule Schedule objects
 		asDefault().bind(SCHEDULER_TYPE) //
 				.to(DefaultScheduler.class);
+
+		// execute the actual scheduling using scheduleAtFixedRate
 		asDefault().bind(ScheduledExecutor.class) //
 				.toProvider(() -> Executors.newSingleThreadScheduledExecutor()::scheduleAtFixedRate);
+
 		asDefault().bind(named(Scheduled.class), ScheduleFactory.class)
 				.to(SchedulerModule::annotated);
 
 		// connect Scheduled
-		schedule(Scheduled.Aware.class, Scheduled.class);
+		scheduleIn(Scheduled.Aware.class, Scheduled.class);
 	}
 
 	public static Schedule annotated(Object obj, Type<?> as, Method target, Injector context) {
@@ -64,8 +73,9 @@ public final class SchedulerModule extends BinderModule {
 			intervalMillis = context.resolve(dependency(Config.class).injectingInto(as))
 					.longValue(property, intervalMillis);
 		}
+		//TODO use start from annotation
 		return new Schedule(obj, as, target, Duration.ofMillis(intervalMillis),
-				LocalDateTime.now());
+				LocalDateTime.now(), scheduled.maxFails());
 	}
 
 	public static class DefaultScheduler implements Consumer<Schedule> {
@@ -84,13 +94,14 @@ public final class SchedulerModule extends BinderModule {
 
 		@Override
 		public void accept(Schedule schedule) {
-			executor.executeInSchedule(createTask(schedule),
+			AtomicReference<Future<?>> cancellation = new AtomicReference<>();
+			cancellation.set(executor.executeInSchedule(createTask(schedule, cancellation),
 					schedule.delayNow().toMillis(),
 					schedule.interval.toMillis(),
-					TimeUnit.MILLISECONDS);
+					TimeUnit.MILLISECONDS));
 		}
 
-		private Runnable createTask(Schedule schedule) {
+		private Runnable createTask(Schedule schedule, AtomicReference<Future<?>> cancellation) {
 			Method target = schedule.scheduled;
 			Type<?> objType = actualInstanceType(schedule.instance, schedule.as);
 			Dependency<?> dep = dependency(
@@ -100,11 +111,23 @@ public final class SchedulerModule extends BinderModule {
 					hintsBy.applyTo(context, target, objType));
 			Invoke invoke = context.resolve(dependency(Invoke.class) //
 					.injectingInto(target.getDeclaringClass()));
+			AtomicInteger consecutiveFailedRuns = new AtomicInteger();
 			return () -> {
+				if (cancellation.get().isCancelled())
+					throw new CancellationException(
+							"Schedule is cancelled: " + schedule);
 				try {
 					invoke.call(target, schedule.instance, site.args(context));
+					consecutiveFailedRuns.set(0);
+				} catch (InterruptedException ex) {
+					cancellation.get().cancel(true);
+					Thread.currentThread().interrupt();
 				} catch (Exception ex) {
-					//TODO log or event?
+					//TODO also emit event?
+					if (schedule.cancelAfterFailedRuns() && consecutiveFailedRuns
+							.incrementAndGet() >= schedule.cancelAfterConsecutiveFailedRuns)
+						cancellation.get().cancel(true);
+					throw new RuntimeException(ex);
 				}
 			};
 		}

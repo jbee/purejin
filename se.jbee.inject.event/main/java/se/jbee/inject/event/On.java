@@ -36,4 +36,7 @@ public @interface On {
 	Class<?>[] value();
 
 	DispatchType proceed() default DispatchType.SEQUENTIAL;
+
+	//TODO what to do when receiving threw an exception => strategy interface referenced by class? or better build on bindings for more flexibility and consistency of event types?
+	// maybe even both: method level is for individual setting, default is "use global", global is via binding
 }

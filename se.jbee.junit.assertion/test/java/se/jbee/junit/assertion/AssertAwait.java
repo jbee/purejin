@@ -97,7 +97,7 @@ final class AssertAwait {
 				try {
 					TimeUnit.MILLISECONDS.sleep(remainingMillis);
 					return;
-				} catch (InterruptedException var12) {
+				} catch (InterruptedException ex) {
 					interrupted = true;
 					remainingMillis = end - currentTimeMillis();
 				}

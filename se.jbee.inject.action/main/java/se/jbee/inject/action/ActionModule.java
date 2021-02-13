@@ -62,11 +62,11 @@ public abstract class ActionModule extends BinderModule {
 					.bind(ActionExecutor.class) //
 					.to(this::run);
 
-			asDefault().bind(ActionStrategy.class)
-					.to(RoundRobinStrategy.class);
+			asDefault().bind(ActionDispatch.class)
+					.to(RoundRobinDispatch.class);
 			asDefault().injectingInto(actionTypeOf(Type.WILDCARD, Type.VOID)) //
-					.bind(ActionStrategy.class) //
-					.to(MulticastStrategy.class);
+					.bind(ActionDispatch.class) //
+					.to(MulticastDispatch.class);
 		}
 
 		<A, B> B run(ActionSite<A, B> site, Object[] args, A value) {
@@ -130,8 +130,8 @@ public abstract class ActionModule extends BinderModule {
 			AtomicReference<List<ActionSite<A,B>>> cache = new AtomicReference<>();
 			AtomicInteger cachedAtCount = new AtomicInteger();
 			@SuppressWarnings("unchecked")
-			ActionStrategy<A, B> strategy = context.resolve(dependency(
-					raw(ActionStrategy.class).parameterized(in, out))
+			ActionDispatch<A, B> strategy = context.resolve(dependency(
+					raw(ActionDispatch.class).parameterized(in, out))
 					.injectingInto(actionTypeOf(in, out)));
 			return input -> {
 				List<ActionSite<A, B>> sites = cache.updateAndGet(list -> {

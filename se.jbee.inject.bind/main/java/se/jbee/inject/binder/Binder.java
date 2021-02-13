@@ -324,10 +324,16 @@ public class Binder {
 				ProducesBy.OPTIMISTIC.in(api), raw(api));
 	}
 
-	public void schedule(Class<?> bean, Class<? extends Annotation> schedule) {
+	public void scheduleIn(Class<?> bean, Class<? extends Annotation> schedule) {
 		connect(declaredMethods(true).annotatedWith(schedule)) //
-				.inAny(bean) //
-				.asScheduled(named(schedule));
+			.inAny(bean) //
+			.asScheduled(named(schedule));
+	}
+
+	public void receiveIn(Class<?> bean, Class<? extends Annotation> onEvent) {
+		connect(declaredMethods(true).annotatedWith(onEvent)) //
+			.inAny(bean) //
+			.asEvent();
 	}
 
 	protected Binder on(Bind bind) {

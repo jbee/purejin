@@ -51,4 +51,11 @@ public @interface Scheduled {
 	 * is not defined.
 	 */
 	String by() default "";
+
+	/**
+	 * @return maximum number of consecutive execution failures after which
+	 * scheduling is cancelled. If zero or negative execution is never
+	 * cancelled.
+	 */
+	int maxFails() default 1;
 }

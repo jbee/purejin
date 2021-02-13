@@ -5,7 +5,7 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.action.Action;
 import se.jbee.inject.action.ActionModule;
 import se.jbee.inject.action.ActionSite;
-import se.jbee.inject.action.ActionStrategy;
+import se.jbee.inject.action.ActionDispatch;
 import se.jbee.inject.bootstrap.Bootstrap;
 
 import java.util.ArrayList;
@@ -17,29 +17,30 @@ import static se.jbee.inject.config.ProducesBy.declaredMethods;
 
 /**
  * This is a double test. It tests the feature of setting your own {@link
- * se.jbee.inject.action.ActionStrategy} as well as if the list of {@link
+ * ActionDispatch} as well as if the list of {@link
  * se.jbee.inject.action.ActionSite}s provided to the {@link
- * se.jbee.inject.action.ActionStrategy} is cached by the core as long as no
+ * ActionDispatch} is cached by the core as long as no
  * change did occur. That means no suitable {@link java.lang.reflect.Method}
  * connected or disconnected.
  */
-class TestFeatureActionStrategyBinds {
+class TestFeatureActionDispatchBinds {
 
-	private static class TestFeatureActionStrategyBindsModule extends
+	private static class TestFeatureActionDispatchBindsModule extends
 			ActionModule {
 
 		@Override
 		protected void declare() {
-			bind(ActionStrategy.class).to(RecordingStrategy.class);
+			bind(ActionDispatch.class).to(RecordingActionDispatch.class);
 
 			connect(declaredMethods(false)).inAny(Bean.class).asAction();
 			construct(Bean.class);
 		}
 	}
 
-	public static class RecordingStrategy<A> implements ActionStrategy<A, A> {
+	public static class RecordingActionDispatch<A> implements
+			ActionDispatch<A, A> {
 
-		private List<List<ActionSite<A, A>>> recorded = new ArrayList<>();
+		private final List<List<ActionSite<A, A>>> recorded = new ArrayList<>();
 
 		@Override
 		public A execute(A input, List<ActionSite<A, A>> sites) {
@@ -59,7 +60,7 @@ class TestFeatureActionStrategyBinds {
 	}
 
 	private final Injector context = Bootstrap.injector(
-			TestFeatureActionStrategyBindsModule.class);
+			TestFeatureActionDispatchBindsModule.class);
 
 	@Test
 	void listOfActionSitesIsCachedWhenNotChanged() {
@@ -69,7 +70,8 @@ class TestFeatureActionStrategyBinds {
 		Bean backend = context.resolve(Bean.class); // connects the backend
 		assertNull(backend.lastParam);
 
-		RecordingStrategy strategy = context.resolve(RecordingStrategy.class);
+		RecordingActionDispatch<?> strategy = context.resolve(
+				RecordingActionDispatch.class);
 		assertEquals(0, strategy.recorded.size());
 
 		frontend.run("Hello!");

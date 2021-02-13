@@ -3,8 +3,9 @@ package se.jbee.inject.action;
 import java.util.List;
 
 /**
- * An {@link ActionStrategy} implements the algorithm that is used to select and
- * call one or more {@link ActionSite} to produce the {@link Action} output.
+ * An {@link ActionDispatch} implements the algorithm that is used to
+ * select and call one or more {@link ActionSite} to produce the {@link Action}
+ * output.
  * <p>
  * Different implementations have different strategies to select the {@link
  * ActionSite} to use for each particular call and how to handle different types
@@ -12,12 +13,12 @@ import java.util.List;
  *
  * @param <A> key input value type (parameter type of the {@link Action})
  * @param <B> output value type (return type of the {@link Action})
- * @see RoundRobinStrategy
- * @see MulticastStrategy
+ * @see RoundRobinDispatch
+ * @see MulticastDispatch
  * @since 8.1
  */
 @FunctionalInterface
-public interface ActionStrategy<A, B> {
+public interface ActionDispatch<A, B> {
 
 	/**
 	 * Executes an {@link ActionSite} by using one or more of the available

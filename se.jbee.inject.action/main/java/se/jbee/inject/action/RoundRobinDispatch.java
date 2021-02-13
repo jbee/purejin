@@ -7,19 +7,20 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * The {@link RoundRobinStrategy} tries to use all available {@link ActionSite}
+ * The {@link RoundRobinDispatch} tries to use all available {@link ActionSite}
  * equally often.
  * <p>
  * This basic implementation does not have any particular guarantees of fairness
  * in the presence of a changing list due to dynamic connects and disconnects.
  */
-public final class RoundRobinStrategy<A, B> implements ActionStrategy<A, B> {
+public final class RoundRobinDispatch<A, B> implements
+		ActionDispatch<A, B> {
 
 	private final Injector context;
 	private final ActionExecutor executor;
 	private final AtomicInteger callCount = new AtomicInteger();
 
-	public RoundRobinStrategy(Injector context,	ActionExecutor executor) {
+	public RoundRobinDispatch(Injector context,	ActionExecutor executor) {
 		this.context = context;
 		this.executor = executor;
 	}

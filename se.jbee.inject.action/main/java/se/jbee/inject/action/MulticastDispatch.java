@@ -6,15 +6,16 @@ import se.jbee.inject.Injector;
 import java.util.List;
 
 /**
- * The {@link MulticastStrategy} calls all {@link ActionSite}s and returns the
+ * The {@link MulticastDispatch} calls all {@link ActionSite}s and returns the
  * last successful result.
  */
-public final class MulticastStrategy<A, B> implements ActionStrategy<A, B> {
+public final class MulticastDispatch<A, B> implements
+		ActionDispatch<A, B> {
 
 	private final Injector context;
 	private final ActionExecutor executor;
 
-	public MulticastStrategy(Injector context, ActionExecutor executor) {
+	public MulticastDispatch(Injector context, ActionExecutor executor) {
 		this.context = context;
 		this.executor = executor;
 	}

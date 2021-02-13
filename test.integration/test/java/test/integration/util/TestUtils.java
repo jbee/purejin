@@ -16,7 +16,7 @@ public final class TestUtils {
 	}
 
 	@SuppressWarnings("squid:S2925")
-	public static boolean await(long millis) {
+	private static boolean await(long millis) {
 		try {
 			Thread.sleep(millis);
 			return true;

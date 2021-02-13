@@ -1,7 +1,6 @@
 module se.jbee.junit.assertion {
 
-	requires org.junit.jupiter;
-	requires org.junit.vintage.engine;
+	requires org.junit.jupiter.api;
 
 	exports se.jbee.junit.assertion;
 

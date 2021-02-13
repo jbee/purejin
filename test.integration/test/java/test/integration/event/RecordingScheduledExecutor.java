@@ -4,6 +4,8 @@ import se.jbee.inject.schedule.SchedulerModule;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 class RecordingScheduledExecutor
@@ -27,9 +29,11 @@ class RecordingScheduledExecutor
 	final List<Job> recorded = new ArrayList<>();
 
 	@Override
-	public void executeInSchedule(Runnable task, long initialDelay,
+	public Future<?> executeInSchedule(Runnable task, long initialDelay,
 			long period, TimeUnit unit) {
-		recorded.add(new Job(task, initialDelay, period, unit));
+		Job job = new Job(task, initialDelay, period, unit);
+		recorded.add(job);
+		return CompletableFuture.completedFuture(job);
 	}
 
 	Job lastRecorded() {

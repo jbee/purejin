@@ -97,7 +97,7 @@ class TestTTLExceptionHandingComputeEvents {
 	@Test
 	void thatTimeoutExceptionIsThrownIfHandlerMethodThrowsSuperclassException() {
 		assertThrowsTimeoutException(
-				() -> handler.slowMethodThatThrowsException());
+				handler::slowMethodThatThrowsException);
 	}
 
 	@Test
