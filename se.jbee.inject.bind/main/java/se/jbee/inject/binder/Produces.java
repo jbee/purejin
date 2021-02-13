@@ -9,12 +9,12 @@ import se.jbee.inject.Hint;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bind.ValueBinder;
 import se.jbee.inject.config.HintsBy;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.lang.reflect.Method;
 
-import static se.jbee.inject.lang.Type.parameterType;
-import static se.jbee.inject.lang.Utils.arrayPrepend;
+import static se.jbee.lang.Type.parameterType;
+import static se.jbee.lang.Utils.arrayPrepend;
 
 /**
  * A {@link Produces} is the {@link ValueBinder} expansion wrapper for a method

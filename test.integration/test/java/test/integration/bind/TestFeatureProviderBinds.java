@@ -7,7 +7,7 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.defaults.DefaultFeature;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.util.HashSet;
 import java.util.List;
@@ -18,8 +18,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Provider.providerTypeOf;
-import static se.jbee.inject.lang.Cast.listTypeOf;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Cast.listTypeOf;
+import static se.jbee.lang.Type.raw;
 
 /**
  * {@link Provider}s are a common concept in dependency injection used to inject

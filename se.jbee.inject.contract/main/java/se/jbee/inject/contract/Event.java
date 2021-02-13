@@ -5,7 +5,7 @@
  */
 package se.jbee.inject.contract;
 
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.lang.reflect.Method;
 import java.util.function.BinaryOperator;

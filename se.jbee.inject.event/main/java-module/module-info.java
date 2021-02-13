@@ -4,7 +4,7 @@
  */
 module se.jbee.inject.event {
 
-	requires se.jbee.inject.lang;
+	requires se.jbee.lang;
 	requires se.jbee.inject.api;
 	requires se.jbee.inject.bind;
 	requires se.jbee.inject.bootstrap;

@@ -8,7 +8,7 @@ package se.jbee.inject;
 import java.io.Serializable;
 
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Utils.*;
+import static se.jbee.lang.Utils.*;
 
 /**
  * A {@link ScopeLifeCycle} is an immutable description for the life-cycle

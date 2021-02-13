@@ -2,7 +2,7 @@ package test.integration.api;
 
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.*;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 class TestResource {
 

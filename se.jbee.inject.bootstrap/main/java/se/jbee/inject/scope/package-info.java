@@ -23,7 +23,7 @@
  * <li>{@link se.jbee.inject.scope.DiskScope}: {@link java.io.File} based scope
  * for {@link java.io.Serializable} values in a particular directory.</li>
  * <li>{@link se.jbee.inject.scope.TypeDependentScope}: Implementation for
- * singletons per resolved {@link java.lang.Class}, {@link se.jbee.inject.lang.Type},
+ * singletons per resolved {@link java.lang.Class}, {@link se.jbee.lang.Type},
  * {@link se.jbee.inject.Instance} or full
  * {@link se.jbee.inject.Dependency}.</li>
  * <li>{@link se.jbee.inject.scope.SnapshotScope}: A utility

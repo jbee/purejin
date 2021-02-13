@@ -15,7 +15,7 @@ import se.jbee.inject.config.ProducesBy;
 import java.lang.reflect.Modifier;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 import static se.jbee.junit.assertion.Assertions.assertEqualsIgnoreOrder;
 
 /**

@@ -5,13 +5,13 @@
  */
 package se.jbee.inject;
 
-import se.jbee.inject.lang.Qualifying;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Qualifying;
+import se.jbee.lang.Type;
 
 import java.io.Serializable;
 
 import static se.jbee.inject.Packages.*;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * Describes where a {@link Locator} is available for injection.

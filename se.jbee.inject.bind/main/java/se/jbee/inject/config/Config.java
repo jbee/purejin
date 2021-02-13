@@ -1,7 +1,7 @@
 package se.jbee.inject.config;
 
 import se.jbee.inject.*;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.util.Optional;
 
@@ -11,8 +11,8 @@ import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.defaultInstanceOf;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Type.raw;
-import static se.jbee.inject.lang.Utils.orElse;
+import static se.jbee.lang.Type.raw;
+import static se.jbee.lang.Utils.orElse;
 
 /**
  * The {@link Config} is a runtime-configuration of the application. It allows

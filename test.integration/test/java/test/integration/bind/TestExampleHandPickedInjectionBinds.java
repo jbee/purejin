@@ -6,12 +6,12 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * Test illustrates how to inject specific implementations for a parameter that

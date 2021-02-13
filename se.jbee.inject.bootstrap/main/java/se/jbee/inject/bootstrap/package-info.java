@@ -11,9 +11,11 @@
  * a root {@link se.jbee.inject.bind.Bundle} and convert the resulting {@link
  * se.jbee.inject.Injector} to an {@link se.jbee.inject.Env} using {@link
  * se.jbee.inject.Injector#asEnv()}. Most often such a setup will use {@link
- * se.jbee.inject.Env#with(se.jbee.inject.Name, se.jbee.inject.lang.Type,
+ * se.jbee.inject.Env#with(se.jbee.inject.Name, Type,
  * java.lang.Object)} to add properties to the resulting environment that are
  * only available at runtime like command line arguments.
  * </p>
  */
 package se.jbee.inject.bootstrap;
+
+import se.jbee.lang.Type;

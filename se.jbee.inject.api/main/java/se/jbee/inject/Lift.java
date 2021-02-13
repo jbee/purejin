@@ -5,13 +5,13 @@
  */
 package se.jbee.inject;
 
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.lang.annotation.Annotation;
 import java.util.function.Predicate;
 
-import static se.jbee.inject.lang.Type.classType;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.classType;
+import static se.jbee.lang.Type.raw;
 
 /**
  * A {@link Lift} is similar to a "post construct interceptor" that is

@@ -18,13 +18,13 @@ import se.jbee.inject.config.New;
 import se.jbee.inject.container.Container;
 import se.jbee.inject.defaults.DefaultEnv;
 import se.jbee.inject.defaults.DefaultsBundle;
-import se.jbee.inject.lang.Lazy;
+import se.jbee.lang.Lazy;
 
 import java.util.*;
 
 import static se.jbee.inject.bind.Bindings.newBindings;
-import static se.jbee.inject.lang.Utils.arrayOf;
-import static se.jbee.inject.lang.Utils.arrayPrepend;
+import static se.jbee.lang.Utils.arrayOf;
+import static se.jbee.lang.Utils.arrayPrepend;
 
 /**
  * Utility to create an {@link Injector} or {@link Env} context from {@link

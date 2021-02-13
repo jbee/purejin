@@ -12,7 +12,7 @@ import se.jbee.inject.config.ProducesBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static se.jbee.inject.action.Action.actionTypeOf;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * This test demonstrates the {@link Action} concept can be used for higher

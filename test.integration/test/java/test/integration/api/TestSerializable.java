@@ -2,7 +2,7 @@ package test.integration.api;
 
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.*;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.io.*;
 import java.util.List;

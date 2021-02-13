@@ -5,9 +5,9 @@
  */
 package se.jbee.inject;
 
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * A indirection that resolves the instance lazily when {@link #provide()} is

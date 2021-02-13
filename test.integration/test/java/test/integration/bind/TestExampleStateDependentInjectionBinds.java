@@ -9,7 +9,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.config.NamesBy;
 import se.jbee.inject.defaults.DefaultFeature;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 import test.integration.util.Resource;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -18,7 +18,7 @@ import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Provider.providerTypeOf;
 import static se.jbee.inject.config.ProducesBy.OPTIMISTIC;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * The {@link Injector} context is "immutable" once it is created. This refer to

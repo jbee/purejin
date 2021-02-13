@@ -5,7 +5,7 @@
  */
 package se.jbee.inject;
 
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.InvocationTargetException;

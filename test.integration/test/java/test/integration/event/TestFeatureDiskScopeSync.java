@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static se.jbee.inject.lang.Cast.consumerTypeOf;
+import static se.jbee.lang.Cast.consumerTypeOf;
 import static se.jbee.junit.assertion.Assertions.assertAllSame;
 
 /**

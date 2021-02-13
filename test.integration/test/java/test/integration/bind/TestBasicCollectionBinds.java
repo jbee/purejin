@@ -6,8 +6,8 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.defaults.DefaultFeature;
-import se.jbee.inject.lang.Cast;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Cast;
+import se.jbee.lang.Type;
 
 import java.util.Collection;
 import java.util.List;
@@ -19,8 +19,8 @@ import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Cast.*;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Cast.*;
+import static se.jbee.lang.Type.raw;
 
 class TestBasicCollectionBinds {
 

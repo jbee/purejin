@@ -12,7 +12,7 @@ import se.jbee.inject.defaults.DefaultFeature;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * This test demonstrates how to add user defined primitive array support.

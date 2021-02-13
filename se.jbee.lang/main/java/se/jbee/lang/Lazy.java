@@ -1,4 +1,4 @@
-package se.jbee.inject.lang;
+package se.jbee.lang;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;

@@ -19,7 +19,7 @@ import static se.jbee.inject.Packages.packageAndSubPackagesOf;
 import static se.jbee.inject.Provider.providerTypeOf;
 import static se.jbee.inject.config.ProducesBy.OPTIMISTIC;
 import static se.jbee.inject.config.ProducesBy.declaredMethods;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * This test demonstrates the use of {@link Binder.ScopedBinder#autobind()} in

@@ -10,7 +10,7 @@
     <orderEntry type="module" module-name="se.jbee.inject.bind" exported="" />
     <orderEntry type="module" module-name="se.jbee.inject.container" exported="" />
     <orderEntry type="module" module-name="se.jbee.inject.bootstrap" exported="" />
-    <orderEntry type="module" module-name="se.jbee.inject.lang" exported="" />
+    <orderEntry type="module" module-name="se.jbee.lang" exported="" />
     <orderEntry type="inheritedJdk" />
   </component>
 </module>

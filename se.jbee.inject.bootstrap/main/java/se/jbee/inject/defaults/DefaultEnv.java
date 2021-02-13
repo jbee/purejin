@@ -7,13 +7,13 @@ import se.jbee.inject.bind.Bindings;
 import se.jbee.inject.binder.*;
 import se.jbee.inject.config.*;
 import se.jbee.inject.container.Container;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * The {@link se.jbee.inject.bind.Module} that setups the values required in an

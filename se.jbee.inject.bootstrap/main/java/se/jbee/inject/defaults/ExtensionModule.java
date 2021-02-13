@@ -5,12 +5,12 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Supply;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.config.Extension;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.lang.reflect.Constructor;
 
 import static se.jbee.inject.binder.Constructs.constructs;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * Provides a {@link Supplier} that can resolve all types extending an

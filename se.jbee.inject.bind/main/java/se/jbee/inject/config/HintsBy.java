@@ -6,7 +6,7 @@
 package se.jbee.inject.config;
 
 import se.jbee.inject.*;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
@@ -14,9 +14,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
 import static se.jbee.inject.Instance.instance;
-import static se.jbee.inject.lang.Type.actualParameterType;
-import static se.jbee.inject.lang.Type.parameterType;
-import static se.jbee.inject.lang.Utils.arrayMap;
+import static se.jbee.lang.Type.actualParameterType;
+import static se.jbee.lang.Type.parameterType;
+import static se.jbee.lang.Utils.arrayMap;
 
 /**
  * Extracts the {@link Hint} used to resolve the {@link Dependency}s for a

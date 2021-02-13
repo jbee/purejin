@@ -9,7 +9,7 @@ import se.jbee.inject.binder.Supply;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.config.ProducesBy;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -19,7 +19,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.Dependency.dependency;
-import static se.jbee.inject.lang.Type.classType;
+import static se.jbee.lang.Type.classType;
 
 /**
  * This example shows the effect of the java enterprise {@code PostConstruct}

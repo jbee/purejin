@@ -14,9 +14,9 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Supply;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.config.*;
-import se.jbee.inject.lang.Lazy;
-import se.jbee.inject.lang.Type;
-import se.jbee.inject.lang.Utils;
+import se.jbee.lang.Lazy;
+import se.jbee.lang.Type;
+import se.jbee.lang.Utils;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -25,12 +25,11 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Function;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import static se.jbee.inject.Resource.resourcesTypeOf;
 import static se.jbee.inject.Scope.application;
-import static se.jbee.inject.lang.Cast.functionTypeOf;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Cast.functionTypeOf;
+import static se.jbee.lang.Type.raw;
 
 /**
  * Installs all the build-in functionality by using the core API.

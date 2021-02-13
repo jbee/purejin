@@ -11,7 +11,7 @@ module se.jbee.inject.bootstrap {
 
 	requires java.logging;
 
-	requires se.jbee.inject.lang;
+	requires se.jbee.lang;
 	requires se.jbee.inject.api;
 	requires se.jbee.inject.bind;
 	requires se.jbee.inject.container;

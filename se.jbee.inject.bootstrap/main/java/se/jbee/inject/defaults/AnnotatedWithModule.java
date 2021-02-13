@@ -10,7 +10,7 @@ import java.util.*;
 import static java.util.Collections.unmodifiableList;
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * Provides a {@link se.jbee.inject.Supplier} that can resolve all {@link AnnotatedWith}

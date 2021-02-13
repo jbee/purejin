@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Set;
 
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Type.classType;
-import static se.jbee.inject.lang.Type.raw;
-import static se.jbee.inject.lang.Utils.arrayOf;
-import static se.jbee.inject.lang.Utils.isClassConceptStateless;
+import static se.jbee.lang.Type.classType;
+import static se.jbee.lang.Type.raw;
+import static se.jbee.lang.Utils.arrayOf;
+import static se.jbee.lang.Utils.isClassConceptStateless;
 
 /**
  * {@link Bindings} accumulate the {@link Binding} during the bootstrapping.

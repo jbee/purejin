@@ -4,7 +4,7 @@
  */
 module se.jbee.inject.action {
 
-	requires se.jbee.inject.lang;
+	requires se.jbee.lang;
 	requires se.jbee.inject.api;
 	requires se.jbee.inject.bind;
 

@@ -20,7 +20,7 @@ import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static se.jbee.inject.config.ProducesBy.OPTIMISTIC;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 class TestFeatureAnnotatedWithBinds {
 

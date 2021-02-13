@@ -1,7 +1,7 @@
 package se.jbee.inject.container;
 
 import se.jbee.inject.*;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.util.Comparator;
 import java.util.IdentityHashMap;
@@ -10,8 +10,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import static se.jbee.inject.Dependency.dependency;
-import static se.jbee.inject.lang.Type.classType;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.classType;
+import static se.jbee.lang.Type.raw;
 
 /**
  * A {@link LiftResources} encapsulates the state and processing of

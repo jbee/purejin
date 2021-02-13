@@ -8,7 +8,7 @@ import se.jbee.inject.scope.TypeDependentScope;
 
 import java.io.File;
 
-import static se.jbee.inject.lang.Cast.consumerTypeOf;
+import static se.jbee.lang.Cast.consumerTypeOf;
 
 @Installs(bundles = SchedulerModule.class)
 public final class DiskScopeModule extends BinderModule {

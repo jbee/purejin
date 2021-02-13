@@ -1,8 +1,8 @@
 package se.jbee.inject.config;
 
 import se.jbee.inject.Packages;
-import se.jbee.inject.lang.Type;
-import se.jbee.inject.lang.Utils;
+import se.jbee.lang.Type;
+import se.jbee.lang.Utils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -13,9 +13,9 @@ import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-import static se.jbee.inject.lang.Type.fieldType;
-import static se.jbee.inject.lang.Type.raw;
-import static se.jbee.inject.lang.Utils.arrayFilter;
+import static se.jbee.lang.Type.fieldType;
+import static se.jbee.lang.Type.raw;
+import static se.jbee.lang.Utils.arrayFilter;
 
 /**
  * Picks the {@link Field}s that are bound as constants for the {@link Field}'s

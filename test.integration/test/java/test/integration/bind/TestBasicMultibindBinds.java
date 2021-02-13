@@ -7,15 +7,15 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.defaults.DefaultFeature;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Cast.listTypeOf;
-import static se.jbee.inject.lang.Cast.setTypeOf;
+import static se.jbee.lang.Cast.listTypeOf;
+import static se.jbee.lang.Cast.setTypeOf;
 import static se.jbee.junit.assertion.Assertions.assertEqualsIgnoreOrder;
 
 /**

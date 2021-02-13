@@ -10,11 +10,11 @@ import se.jbee.inject.Hint;
 import se.jbee.inject.Injector;
 import se.jbee.inject.bind.ValueBinder;
 import se.jbee.inject.config.HintsBy;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.lang.reflect.Constructor;
 
-import static se.jbee.inject.lang.Type.classType;
+import static se.jbee.lang.Type.classType;
 
 /**
  * A {@link Constructs} is the {@link ValueBinder} expansion wrapper for {@link

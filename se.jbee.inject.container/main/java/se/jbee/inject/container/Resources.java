@@ -2,8 +2,8 @@ package se.jbee.inject.container;
 
 import se.jbee.inject.*;
 import se.jbee.inject.UnresolvableDependency.ResourceResolutionFailed;
-import se.jbee.inject.lang.Lazy;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Lazy;
+import se.jbee.lang.Type;
 
 import java.util.*;
 import java.util.Map.Entry;

@@ -6,7 +6,7 @@ import se.jbee.inject.UnresolvableDependency.ResourceResolutionFailed;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.defaults.DefaultFeature;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Name.named;

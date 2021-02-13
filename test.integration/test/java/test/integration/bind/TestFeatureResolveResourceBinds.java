@@ -4,14 +4,14 @@ import org.junit.jupiter.api.Test;
 import se.jbee.inject.*;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * Using the fluent API of {@link se.jbee.inject.bind.Bundle}s and {@link

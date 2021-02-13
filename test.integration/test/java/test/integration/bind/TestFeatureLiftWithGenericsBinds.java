@@ -11,7 +11,7 @@ import java.util.HashSet;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static se.jbee.inject.lang.Cast.listTypeOf;
+import static se.jbee.lang.Cast.listTypeOf;
 
 class TestFeatureLiftWithGenericsBinds {
 

@@ -5,13 +5,13 @@ import se.jbee.inject.UnresolvableDependency.ResourceResolutionFailed;
 import se.jbee.inject.bind.Binding;
 import se.jbee.inject.bind.BindingType;
 import se.jbee.inject.bind.InconsistentBinding;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.Collections.binarySearch;
-import static se.jbee.inject.lang.Utils.arrayOf;
+import static se.jbee.lang.Utils.arrayOf;
 
 /**
  * Is the default implementation for {@link se.jbee.inject.bind.BindingConsolidation}.

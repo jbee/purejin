@@ -5,7 +5,7 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Lift;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 import test.integration.util.Resource;
 
 import java.lang.reflect.Field;

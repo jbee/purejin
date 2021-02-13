@@ -5,7 +5,7 @@ import se.jbee.inject.config.NamesBy;
 import se.jbee.inject.config.ProducesBy;
 import test.example2.Bus;
 
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 public class BusEnvModule extends LocalEnvModule {
 

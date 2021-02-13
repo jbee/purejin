@@ -10,7 +10,7 @@ import se.jbee.inject.bind.*;
 import se.jbee.inject.binder.*;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.config.PublishesBy;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.lang.reflect.Constructor;
 
@@ -21,8 +21,8 @@ import static se.jbee.inject.bind.Bindings.supplyConstant;
 import static se.jbee.inject.bind.Bindings.supplyScopedConstant;
 import static se.jbee.inject.binder.Constructs.constructs;
 import static se.jbee.inject.binder.Supply.*;
-import static se.jbee.inject.lang.Type.raw;
-import static se.jbee.inject.lang.Utils.*;
+import static se.jbee.lang.Type.raw;
+import static se.jbee.lang.Utils.*;
 
 /**
  * Utility with default {@link ValueBinder}s.

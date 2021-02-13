@@ -5,7 +5,7 @@
  */
 package se.jbee.inject;
 
-import se.jbee.inject.lang.Qualifying;
+import se.jbee.lang.Qualifying;
 
 import java.io.Serializable;
 

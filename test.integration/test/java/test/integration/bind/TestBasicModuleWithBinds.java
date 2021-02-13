@@ -8,7 +8,7 @@ import se.jbee.inject.bind.Bindings;
 import se.jbee.inject.binder.BinderModuleWith;
 import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.util.List;
 import java.util.Properties;
@@ -17,7 +17,7 @@ import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Cast.listTypeOf;
+import static se.jbee.lang.Cast.listTypeOf;
 
 /**
  * This test demonstrates how to set properties in the {@link Env} using the

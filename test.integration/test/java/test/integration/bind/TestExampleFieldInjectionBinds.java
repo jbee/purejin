@@ -21,7 +21,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.bind.BindingType.CONSTRUCTOR;
 import static se.jbee.inject.bind.ValueBinder.valueBinderTypeOf;
-import static se.jbee.inject.lang.Type.fieldType;
+import static se.jbee.lang.Type.fieldType;
 
 /**
  * An example of how to use {@link ValueBinder}s to customize the and binding

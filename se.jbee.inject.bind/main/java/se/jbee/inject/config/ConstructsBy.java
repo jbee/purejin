@@ -6,8 +6,8 @@
 package se.jbee.inject.config;
 
 import se.jbee.inject.Hint;
-import se.jbee.inject.lang.Typed;
-import se.jbee.inject.lang.Utils;
+import se.jbee.lang.Typed;
+import se.jbee.lang.Utils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -16,7 +16,7 @@ import java.util.Comparator;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
-import static se.jbee.inject.lang.Utils.arrayFilter;
+import static se.jbee.lang.Utils.arrayFilter;
 
 /**
  * Picks the {@link Constructor} to use to construct objects of a given

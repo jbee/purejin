@@ -7,7 +7,7 @@ import se.jbee.inject.Lift;
 import se.jbee.inject.UnresolvableDependency;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.lang.reflect.Proxy;
 

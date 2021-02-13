@@ -5,15 +5,15 @@
  */
 package se.jbee.inject;
 
-import se.jbee.inject.lang.Qualifying;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Qualifying;
+import se.jbee.lang.Type;
 
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 
 import static java.util.Arrays.asList;
-import static se.jbee.inject.lang.Utils.*;
+import static se.jbee.lang.Utils.*;
 
 /**
  * A set of {@link Package}s described one or more root packages (on the same

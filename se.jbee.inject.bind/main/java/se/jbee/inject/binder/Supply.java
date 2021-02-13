@@ -8,8 +8,8 @@ package se.jbee.inject.binder;
 import se.jbee.inject.*;
 import se.jbee.inject.config.Invoke;
 import se.jbee.inject.config.New;
-import se.jbee.inject.lang.Type;
-import se.jbee.inject.lang.TypeVariable;
+import se.jbee.lang.Type;
+import se.jbee.lang.TypeVariable;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.*;
@@ -17,8 +17,8 @@ import java.util.function.UnaryOperator;
 
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.anyOf;
-import static se.jbee.inject.lang.Type.raw;
-import static se.jbee.inject.lang.Utils.newArray;
+import static se.jbee.lang.Type.raw;
+import static se.jbee.lang.Utils.newArray;
 
 /**
  * Utility as a factory to create different kinds of {@link Supplier}s.
