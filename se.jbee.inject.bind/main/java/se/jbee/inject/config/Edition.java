@@ -6,7 +6,7 @@
 package se.jbee.inject.config;
 
 import se.jbee.inject.Packages;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.lang.annotation.Annotation;
 import java.util.EnumSet;

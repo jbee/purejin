@@ -5,8 +5,8 @@
  */
 package se.jbee.inject;
 
-import se.jbee.inject.lang.Type;
-import se.jbee.inject.lang.Typed;
+import se.jbee.lang.Type;
+import se.jbee.lang.Typed;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -16,7 +16,7 @@ import java.util.Objects;
 
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Instance.instance;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * A {@link Hint} is a suggested reference for parameters of a

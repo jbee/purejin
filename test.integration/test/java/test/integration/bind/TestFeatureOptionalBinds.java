@@ -12,7 +12,7 @@ import se.jbee.inject.defaults.DefaultFeatures;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * Simply demonstration of how to add injection of {@link Optional} parameters.

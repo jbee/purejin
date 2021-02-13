@@ -6,9 +6,8 @@
 package se.jbee.inject.config;
 
 import se.jbee.inject.Packages;
-import se.jbee.inject.lang.Type;
-import se.jbee.inject.lang.Typed;
-import se.jbee.inject.lang.Utils;
+import se.jbee.lang.Typed;
+import se.jbee.lang.Utils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -19,9 +18,9 @@ import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-import static se.jbee.inject.lang.Type.raw;
-import static se.jbee.inject.lang.Type.returnType;
-import static se.jbee.inject.lang.Utils.arrayFilter;
+import static se.jbee.lang.Type.raw;
+import static se.jbee.lang.Type.returnType;
+import static se.jbee.lang.Utils.arrayFilter;
 
 /**
  * Extracts the relevant {@link Method}s for a given target {@link Class}. These

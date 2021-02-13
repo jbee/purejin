@@ -14,7 +14,7 @@ import java.io.Serializable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * A example that shows how API contract for {@link Binder#withPublishedAccess()}

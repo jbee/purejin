@@ -7,7 +7,7 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.config.AccessesBy;
 import se.jbee.inject.config.ProducesBy;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.util.Collections;
 import java.util.List;
@@ -15,8 +15,8 @@ import java.util.List;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static se.jbee.inject.lang.Cast.listTypeOf;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Cast.listTypeOf;
+import static se.jbee.lang.Type.raw;
 
 /**
  * A test that shows that class type variables can be used as long as actual

@@ -9,6 +9,7 @@ import se.jbee.inject.action.ActionModule;
 import se.jbee.inject.binder.Binder;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.config.ProducesBy;
+import se.jbee.lang.Type;
 
 import java.util.UUID;
 
@@ -16,14 +17,14 @@ import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Scope.dependencyInstance;
 import static se.jbee.inject.Scope.dependencyType;
 import static se.jbee.inject.action.Action.actionTypeOf;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * Tests the {@link Action} implementation.
  * <p>
  * {@link Action}s are a decoupling concept where input-output processing
  * operations are uniquely identified by their fully generic input and output
- * {@link se.jbee.inject.lang.Type}.
+ * {@link Type}.
  * <p>
  * The service bean actually implementing a particular {@link Action} as {@link
  * java.lang.reflect.Method} is unknown and unimportant to service users.

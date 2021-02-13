@@ -9,7 +9,7 @@ import se.jbee.inject.*;
 import se.jbee.inject.bind.*;
 import se.jbee.inject.binder.spi.*;
 import se.jbee.inject.config.*;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -33,9 +33,9 @@ import static se.jbee.inject.binder.Constructs.constructs;
 import static se.jbee.inject.binder.spi.ConnectorBinder.CONNECT_QUALIFIER;
 import static se.jbee.inject.config.Plugins.pluginPoint;
 import static se.jbee.inject.config.ProducesBy.declaredMethods;
-import static se.jbee.inject.lang.Type.raw;
-import static se.jbee.inject.lang.Utils.isClassConstructable;
-import static se.jbee.inject.lang.Utils.newArray;
+import static se.jbee.lang.Type.raw;
+import static se.jbee.lang.Utils.isClassConstructable;
+import static se.jbee.lang.Utils.newArray;
 
 /**
  * The default implementation of a fluent binder API that provides a lot

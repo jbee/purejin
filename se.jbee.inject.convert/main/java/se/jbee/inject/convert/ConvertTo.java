@@ -4,7 +4,7 @@ import se.jbee.inject.Converter;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.util.Deque;
 import java.util.LinkedHashMap;
@@ -12,7 +12,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import static se.jbee.inject.Instance.defaultInstanceOf;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * A {@link ConvertTo} groups {@link Converter}s that all convert to the same

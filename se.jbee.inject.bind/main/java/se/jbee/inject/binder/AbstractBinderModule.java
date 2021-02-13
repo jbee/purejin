@@ -12,7 +12,7 @@ import se.jbee.inject.binder.Binder.RootBinder;
 
 import java.lang.annotation.Annotation;
 
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * A {@link RootBinder} that can be initialized using the

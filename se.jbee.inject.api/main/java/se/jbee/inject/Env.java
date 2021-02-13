@@ -1,8 +1,8 @@
 package se.jbee.inject;
 
-import se.jbee.inject.lang.Cast;
-import se.jbee.inject.lang.Type;
-import se.jbee.inject.lang.Utils;
+import se.jbee.lang.Cast;
+import se.jbee.lang.Type;
+import se.jbee.lang.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +11,7 @@ import java.util.function.Function;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.DEFAULT;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * An {@link Env} is a like a key-value property map where the keys are {@link

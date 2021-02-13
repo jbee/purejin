@@ -1,7 +1,7 @@
 package test.integration.api;
 
 import org.junit.jupiter.api.Test;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.io.Serializable;
 import java.lang.annotation.ElementType;
@@ -10,8 +10,8 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static se.jbee.inject.lang.Cast.listTypeOf;
-import static se.jbee.inject.lang.Type.*;
+import static se.jbee.lang.Cast.listTypeOf;
+import static se.jbee.lang.Type.*;
 import static se.jbee.junit.assertion.Assertions.assertToStringEquals;
 
 @SuppressWarnings({ "rawtypes" })

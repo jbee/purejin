@@ -8,12 +8,12 @@ import se.jbee.inject.action.Action;
 import se.jbee.inject.action.ActionModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.config.ProducesBy;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static se.jbee.inject.action.Action.actionTypeOf;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * This test example shows how to build an application specific "service layer"

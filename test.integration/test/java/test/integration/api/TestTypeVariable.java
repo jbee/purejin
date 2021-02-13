@@ -1,8 +1,8 @@
 package test.integration.api;
 
 import org.junit.jupiter.api.Test;
-import se.jbee.inject.lang.Type;
-import se.jbee.inject.lang.TypeVariable;
+import se.jbee.lang.Type;
+import se.jbee.lang.TypeVariable;
 
 import java.util.List;
 import java.util.Map;
@@ -12,7 +12,7 @@ import java.util.function.UnaryOperator;
 import static java.util.stream.Collectors.toMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * Tests {@link TypeVariable} utility for formal correctness.

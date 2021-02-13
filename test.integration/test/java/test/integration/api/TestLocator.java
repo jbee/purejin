@@ -3,7 +3,7 @@ package test.integration.api;
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Dependency;
 import se.jbee.inject.Locator;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.util.List;
 import java.util.Set;
@@ -13,8 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.defaultInstanceOf;
-import static se.jbee.inject.lang.Type.classType;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.classType;
+import static se.jbee.lang.Type.raw;
 
 /**
  * Test to make sure that a {@link Locator} correctly decides whether or not it

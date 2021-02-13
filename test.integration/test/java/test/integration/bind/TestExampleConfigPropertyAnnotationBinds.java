@@ -8,7 +8,7 @@ import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.config.Config;
 import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.config.NamesBy;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -21,8 +21,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Type.parameterType;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.parameterType;
+import static se.jbee.lang.Type.raw;
 
 /**
  * A test that show how to add an annotation (here {@link ConfigProperty} that

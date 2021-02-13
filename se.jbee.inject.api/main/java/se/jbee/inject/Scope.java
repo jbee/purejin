@@ -5,7 +5,7 @@
  */
 package se.jbee.inject;
 
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.io.File;
 

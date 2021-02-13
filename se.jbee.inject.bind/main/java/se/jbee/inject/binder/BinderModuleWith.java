@@ -10,11 +10,11 @@ import se.jbee.inject.bind.Bindings;
 import se.jbee.inject.bind.Bootstrapper;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.bind.ModuleWith;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.lang.annotation.Annotation;
 
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * The default utility {@link ModuleWith}.

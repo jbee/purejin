@@ -2,7 +2,7 @@ package se.jbee.inject.schedule;
 
 import se.jbee.inject.Injector;
 import se.jbee.inject.event.EventTarget;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.lang.reflect.Method;
 import java.time.Duration;

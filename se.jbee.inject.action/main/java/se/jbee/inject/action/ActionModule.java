@@ -12,7 +12,7 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.config.Connector;
 import se.jbee.inject.config.Invoke;
 import se.jbee.inject.config.ProducesBy;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -28,8 +28,8 @@ import static java.util.Collections.unmodifiableList;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.action.Action.actionTypeOf;
 import static se.jbee.inject.binder.spi.ConnectorBinder.ACTION_CONNECTOR;
-import static se.jbee.inject.lang.Type.actualReturnType;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.actualReturnType;
+import static se.jbee.lang.Type.raw;
 
 /**
  * Base {@link Module} that needs to be extended and installed at least once to

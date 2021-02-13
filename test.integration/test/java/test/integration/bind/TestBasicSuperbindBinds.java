@@ -16,7 +16,7 @@ import java.util.List;
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * The tests demonstrates the meaning of a {@link Binder#withPublishedAccess()}

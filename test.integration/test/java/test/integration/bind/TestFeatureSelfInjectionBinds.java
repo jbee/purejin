@@ -7,7 +7,7 @@ import se.jbee.inject.Name;
 import se.jbee.inject.Scope;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -18,8 +18,8 @@ import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Cast.listTypeOf;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Cast.listTypeOf;
+import static se.jbee.lang.Type.raw;
 
 /**
  * Test the feature {@link se.jbee.inject.defaults.DefaultFeature#SELF} which

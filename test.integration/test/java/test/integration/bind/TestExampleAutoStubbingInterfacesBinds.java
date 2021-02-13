@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import se.jbee.inject.*;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
@@ -18,8 +18,8 @@ import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.anyOf;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Type.raw;
-import static se.jbee.inject.lang.Type.returnType;
+import static se.jbee.lang.Type.raw;
+import static se.jbee.lang.Type.returnType;
 
 /**
  * This test illustrates how to use binds with {@link Type#asUpperBound()} types

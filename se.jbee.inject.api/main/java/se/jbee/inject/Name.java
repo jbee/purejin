@@ -5,8 +5,8 @@
  */
 package se.jbee.inject;
 
-import se.jbee.inject.lang.Qualifying;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Qualifying;
+import se.jbee.lang.Type;
 
 import java.io.Serializable;
 import java.util.IdentityHashMap;

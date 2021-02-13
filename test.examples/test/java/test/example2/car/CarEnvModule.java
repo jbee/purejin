@@ -4,7 +4,7 @@ import se.jbee.inject.binder.Installs;
 import se.jbee.inject.binder.LocalEnvModule;
 import se.jbee.inject.config.NamesBy;
 import se.jbee.inject.config.ProducesBy;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 import test.example2.Car;
 import test.example2.car.pool.CarPoolEnvModule;
 

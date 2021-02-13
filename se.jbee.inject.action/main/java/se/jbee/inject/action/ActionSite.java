@@ -3,7 +3,7 @@ package se.jbee.inject.action;
 import se.jbee.inject.*;
 import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.config.Invoke;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 
 import static java.util.Arrays.asList;
 import static se.jbee.inject.Dependency.dependency;
-import static se.jbee.inject.lang.Type.actualReturnType;
+import static se.jbee.lang.Type.actualReturnType;
 
 /**
  * Describes a unique action implementation point. That is the particular

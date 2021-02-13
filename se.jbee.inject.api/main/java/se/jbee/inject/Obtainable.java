@@ -1,11 +1,11 @@
 package se.jbee.inject;
 
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * A {@link java.util.Optional} like type that is "wrapped" around the type that

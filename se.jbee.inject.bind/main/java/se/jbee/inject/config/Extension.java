@@ -1,7 +1,7 @@
 package se.jbee.inject.config;
 
 import se.jbee.inject.Injector;
-import se.jbee.inject.lang.Utils;
+import se.jbee.lang.Utils;
 
 /**
  * Marker interface to mark classes representing an {@link Injector} API

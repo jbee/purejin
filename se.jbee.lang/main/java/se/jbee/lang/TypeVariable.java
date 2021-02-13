@@ -1,4 +1,4 @@
-package se.jbee.inject.lang;
+package se.jbee.lang;
 
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;

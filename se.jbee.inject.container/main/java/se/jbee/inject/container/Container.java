@@ -7,7 +7,7 @@ package se.jbee.inject.container;
 
 import se.jbee.inject.*;
 import se.jbee.inject.UnresolvableDependency.ResourceResolutionFailed;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -19,8 +19,8 @@ import static java.lang.System.identityHashCode;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Resource.resourcesTypeOf;
-import static se.jbee.inject.lang.Type.raw;
-import static se.jbee.inject.lang.Utils.*;
+import static se.jbee.lang.Type.raw;
+import static se.jbee.lang.Utils.*;
 
 /**
  * The default {@link Injector} implementation that is based on

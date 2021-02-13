@@ -5,9 +5,9 @@
  */
 package se.jbee.inject.action;
 
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * The low user level representation of an action (a operation or

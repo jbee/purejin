@@ -10,7 +10,7 @@ import se.jbee.inject.binder.Constructs;
 import se.jbee.inject.binder.Produces;
 import se.jbee.inject.config.*;
 import se.jbee.inject.defaults.DefaultEnv;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

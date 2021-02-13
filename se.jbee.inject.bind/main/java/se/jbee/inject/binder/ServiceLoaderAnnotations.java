@@ -5,12 +5,12 @@ import se.jbee.inject.Extends;
 import se.jbee.inject.Name;
 import se.jbee.inject.bind.Module;
 import se.jbee.inject.bind.ModuleWith;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.lang.annotation.Annotation;
 import java.util.ServiceLoader;
 
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * A {@link Module} that is meant to be installed during the bootstrapping of a

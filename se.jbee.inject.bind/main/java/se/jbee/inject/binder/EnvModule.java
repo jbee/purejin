@@ -3,7 +3,7 @@ package se.jbee.inject.binder;
 import se.jbee.inject.*;
 import se.jbee.inject.bind.Bind;
 import se.jbee.inject.config.PublishesBy;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.util.Set;
 

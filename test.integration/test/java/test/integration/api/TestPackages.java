@@ -2,7 +2,7 @@ package test.integration.api;
 
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Packages;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.text.Format;
 import java.text.spi.DateFormatProvider;
@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Packages.packageOf;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 class TestPackages {
 

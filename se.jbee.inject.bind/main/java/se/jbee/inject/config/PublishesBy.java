@@ -3,7 +3,7 @@ package se.jbee.inject.config;
 import se.jbee.inject.Env;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Lift;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.lang.annotation.Annotation;
 import java.util.HashSet;

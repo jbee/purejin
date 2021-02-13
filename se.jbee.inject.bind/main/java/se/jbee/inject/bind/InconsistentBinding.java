@@ -3,7 +3,7 @@ package se.jbee.inject.bind;
 import se.jbee.inject.InconsistentDeclaration;
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 /**
  * Problems related to {@link Binding} and the bootstrapping process.

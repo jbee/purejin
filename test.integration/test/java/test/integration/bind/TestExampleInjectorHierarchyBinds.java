@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 import test.integration.container.Decorate;
 
 import java.util.HashSet;

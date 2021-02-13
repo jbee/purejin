@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 import static se.jbee.junit.assertion.Assertions.assertEqualsIgnoreOrder;
 
 /**

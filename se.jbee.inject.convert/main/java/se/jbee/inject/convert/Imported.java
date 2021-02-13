@@ -1,6 +1,6 @@
 package se.jbee.inject.convert;
 
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.io.Closeable;
 import java.io.Serializable;

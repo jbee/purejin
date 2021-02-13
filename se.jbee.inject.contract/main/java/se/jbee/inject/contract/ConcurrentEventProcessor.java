@@ -5,7 +5,7 @@
  */
 package se.jbee.inject.contract;
 
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -19,7 +19,7 @@ import java.util.function.BinaryOperator;
 
 import static java.lang.reflect.Proxy.newProxyInstance;
 import static se.jbee.inject.contract.EventException.unwrapGet;
-import static se.jbee.inject.lang.Type.returnType;
+import static se.jbee.lang.Type.returnType;
 
 /**
  * Default implementation of the {@link EventProcessor} supporting all

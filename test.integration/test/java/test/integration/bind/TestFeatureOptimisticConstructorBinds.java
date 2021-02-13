@@ -6,7 +6,7 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * This tests the behaviour of the {@link se.jbee.inject.config.ConstructsBy#OPTIMISTIC}

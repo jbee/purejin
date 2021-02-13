@@ -7,8 +7,8 @@ package se.jbee.inject;
 
 import se.jbee.inject.UnresolvableDependency.DependencyCycle;
 import se.jbee.inject.UnresolvableDependency.UnstableDependency;
-import se.jbee.inject.lang.Type;
-import se.jbee.inject.lang.Typed;
+import se.jbee.lang.Type;
+import se.jbee.lang.Typed;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -16,8 +16,8 @@ import java.util.Iterator;
 
 import static java.util.Arrays.asList;
 import static se.jbee.inject.Instance.defaultInstanceOf;
-import static se.jbee.inject.lang.Type.raw;
-import static se.jbee.inject.lang.Utils.*;
+import static se.jbee.lang.Type.raw;
+import static se.jbee.lang.Utils.*;
 
 /**
  * Describes what is wanted/needed as parameter to construct a instance of T.

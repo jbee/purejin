@@ -6,9 +6,9 @@ import se.jbee.inject.config.AccessesBy;
 import se.jbee.inject.config.NamesBy;
 import se.jbee.inject.config.ProducesBy;
 import se.jbee.inject.config.ScopesBy;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
-import static se.jbee.inject.lang.Type.classType;
+import static se.jbee.lang.Type.classType;
 
 /**
  * Base class for {@link se.jbee.inject.bind.Module}s that are used to bind

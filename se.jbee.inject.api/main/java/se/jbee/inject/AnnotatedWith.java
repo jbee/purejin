@@ -1,7 +1,7 @@
 package se.jbee.inject;
 
 import se.jbee.inject.Annotated.Enhancer;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;

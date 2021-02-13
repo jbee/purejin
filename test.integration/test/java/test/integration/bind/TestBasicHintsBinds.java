@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static se.jbee.inject.Hint.constant;
 import static se.jbee.inject.Instance.instance;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * The test illustrates how to use {@link Hint}s to give hints which

@@ -4,7 +4,7 @@ import se.jbee.inject.binder.LocalEnvModule;
 import se.jbee.inject.config.ProducesBy;
 import test.example2.Car;
 
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 public class CarPoolEnvModule extends LocalEnvModule  {
 	@Override

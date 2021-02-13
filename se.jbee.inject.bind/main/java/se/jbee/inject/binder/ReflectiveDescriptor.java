@@ -5,14 +5,14 @@ import se.jbee.inject.Descriptor;
 import se.jbee.inject.Hint;
 import se.jbee.inject.InconsistentDeclaration;
 import se.jbee.inject.config.HintsBy;
-import se.jbee.inject.lang.Type;
-import se.jbee.inject.lang.Typed;
+import se.jbee.lang.Type;
+import se.jbee.lang.Typed;
 
 import java.lang.reflect.*;
 import java.util.function.Function;
 
-import static se.jbee.inject.lang.Type.actualParameterType;
-import static se.jbee.inject.lang.Utils.arrayMap;
+import static se.jbee.lang.Type.actualParameterType;
+import static se.jbee.lang.Utils.arrayMap;
 
 abstract class ReflectiveDescriptor<M extends AnnotatedElement & Member, T>
 		implements Typed<T>, Annotated, Descriptor {

@@ -1,8 +1,8 @@
 package test.integration.api;
 
 import org.junit.jupiter.api.Test;
-import se.jbee.inject.lang.Cast;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Cast;
+import se.jbee.lang.Type;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

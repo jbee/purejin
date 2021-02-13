@@ -7,13 +7,13 @@ package se.jbee.inject.bind;
 
 import se.jbee.inject.*;
 import se.jbee.inject.binder.Constructs;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-import static se.jbee.inject.lang.Type.classType;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.classType;
+import static se.jbee.lang.Type.raw;
 
 /**
  * A {@linkplain ValueBinder} is a pure function that transforms a source value

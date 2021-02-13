@@ -7,12 +7,12 @@ package se.jbee.inject.bind;
 
 import se.jbee.inject.Env;
 import se.jbee.inject.Name;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * A {@link ModuleWith} is an extension to a usual {@link Module} that depends

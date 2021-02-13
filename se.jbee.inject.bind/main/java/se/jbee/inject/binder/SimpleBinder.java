@@ -5,7 +5,7 @@ import se.jbee.inject.bind.Bind;
 import se.jbee.inject.bind.Bindings;
 import se.jbee.inject.bind.ValueBinder;
 import se.jbee.inject.binder.spi.*;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.util.function.UnaryOperator;
 

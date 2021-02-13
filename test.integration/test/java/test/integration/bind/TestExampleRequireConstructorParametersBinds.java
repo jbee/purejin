@@ -15,7 +15,7 @@ import se.jbee.inject.binder.Constructs;
 import se.jbee.inject.binder.Supply;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.defaults.DefaultValueBinders;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.lang.reflect.Constructor;
 

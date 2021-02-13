@@ -5,12 +5,12 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.action.*;
 import se.jbee.inject.bootstrap.Bootstrap;
 import se.jbee.inject.config.ProducesBy;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.util.function.BiFunction;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * This test example explores how an abstraction similar to the interceptor

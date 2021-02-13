@@ -10,9 +10,9 @@ import se.jbee.inject.bind.Bootstrapper.DependentBootstrapper;
 import se.jbee.inject.bind.Bundle;
 import se.jbee.inject.bind.Dependent;
 import se.jbee.inject.bind.InconsistentBinding;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * The default utility base class for {@link Dependent}s.

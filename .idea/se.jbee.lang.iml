@@ -2,9 +2,9 @@
 <module type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
-    <content url="file://$MODULE_DIR$/se.jbee.inject.lang">
-      <sourceFolder url="file://$MODULE_DIR$/se.jbee.inject.lang/main/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/se.jbee.inject.lang/main/java-module" isTestSource="false" />
+    <content url="file://$MODULE_DIR$/se.jbee.lang">
+      <sourceFolder url="file://$MODULE_DIR$/se.jbee.lang/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/se.jbee.lang/main/java-module" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="inheritedJdk" />

@@ -5,13 +5,13 @@ import se.jbee.inject.Injector;
 import se.jbee.inject.Resource;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.jbee.inject.config.ProducesBy.declaredMethods;
-import static se.jbee.inject.lang.Cast.functionTypeOf;
+import static se.jbee.lang.Cast.functionTypeOf;
 
 /**
  * Tests the very special feature that injects the actual {@link Type} as 1st

@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 class TestBasicConstantBinds {
 

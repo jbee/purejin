@@ -8,7 +8,7 @@
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="se.jbee.inject.api" />
-    <orderEntry type="module" module-name="se.jbee.inject.lang" />
+    <orderEntry type="module" module-name="se.jbee.lang" />
     <orderEntry type="inheritedJdk" />
   </component>
 </module>

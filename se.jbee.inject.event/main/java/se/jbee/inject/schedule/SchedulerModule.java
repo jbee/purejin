@@ -6,7 +6,7 @@ import se.jbee.inject.config.Config;
 import se.jbee.inject.config.Connector;
 import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.config.Invoke;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 import se.jbee.inject.schedule.Schedule.ScheduleFactory;
 
 import java.lang.reflect.Method;
@@ -25,8 +25,8 @@ import java.util.function.Consumer;
 import static se.jbee.inject.Dependency.dependency;
 import static se.jbee.inject.Name.named;
 import static se.jbee.inject.binder.spi.ConnectorBinder.SCHEDULER_CONNECTOR;
-import static se.jbee.inject.lang.Cast.consumerTypeOf;
-import static se.jbee.inject.lang.Type.*;
+import static se.jbee.lang.Cast.consumerTypeOf;
+import static se.jbee.lang.Type.*;
 
 public final class SchedulerModule extends BinderModule {
 

@@ -2,11 +2,11 @@ package se.jbee.inject.binder.spi;
 
 import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import static se.jbee.inject.Instance.defaultInstanceOf;
 import static se.jbee.inject.Name.named;
-import static se.jbee.inject.lang.Type.raw;
+import static se.jbee.lang.Type.raw;
 
 /**
  * Make a binding local to the injected {@link Instance}.

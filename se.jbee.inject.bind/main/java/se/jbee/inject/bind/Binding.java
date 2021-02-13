@@ -6,9 +6,9 @@
 package se.jbee.inject.bind;
 
 import se.jbee.inject.*;
-import se.jbee.inject.lang.Qualifying;
-import se.jbee.inject.lang.Type;
-import se.jbee.inject.lang.Typed;
+import se.jbee.lang.Qualifying;
+import se.jbee.lang.Type;
+import se.jbee.lang.Typed;
 
 /**
  * A {@link Binding} is a {@link ResourceDescriptor} created during the

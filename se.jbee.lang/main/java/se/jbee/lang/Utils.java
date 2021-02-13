@@ -3,7 +3,7 @@
  *
  *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
  */
-package se.jbee.inject.lang;
+package se.jbee.lang;
 
 import java.lang.reflect.*;
 import java.util.ArrayList;
@@ -16,8 +16,8 @@ import static java.lang.System.arraycopy;
 import static java.lang.reflect.Array.newInstance;
 import static java.lang.reflect.Modifier.*;
 import static java.util.Arrays.copyOf;
-import static se.jbee.inject.lang.Type.classType;
-import static se.jbee.inject.lang.Type.parameterTypes;
+import static se.jbee.lang.Type.classType;
+import static se.jbee.lang.Type.parameterTypes;
 
 /**
  * Language level utility methods for the library.
@@ -339,13 +339,13 @@ public final class Utils {
 	public static <T> boolean isRecursiveTypeParameterPresent(Constructor<T> c) {
 		Class<T> t = c.getDeclaringClass();
 		return arrayContains(c.getParameterTypes(), t, Class::equals) // first check raw types
-				&& arrayContains(parameterTypes(c), classType(t), Type::equalTo); // then check full generic Type as it is much more work
+				&& arrayContains(parameterTypes(c), classType(t), se.jbee.lang.Type::equalTo); // then check full generic Type as it is much more work
 	}
 
 	public static boolean matchesInOrder(Executable member, Typed<?>[] hints) {
 		if (hints.length == 0)
 			return true;
-		Type<?>[] types = parameterTypes(member);
+		se.jbee.lang.Type<?>[] types = parameterTypes(member);
 		int i = 0;
 		for (Typed<?> hint : hints) {
 			while (i < types.length && !hint.type().isAssignableTo(types[i]))
@@ -359,7 +359,7 @@ public final class Utils {
 	public static boolean matchesInRandomOrder(Executable member, Typed<?>[] hints) {
 		if (hints.length == 0)
 			return true;
-		Type<?>[] types = parameterTypes(member);
+		se.jbee.lang.Type<?>[] types = parameterTypes(member);
 		for (Typed<?> hint : hints) {
 			boolean matched = false;
 			int i = 0;

@@ -1,6 +1,6 @@
 package se.jbee.inject.event;
 
-import se.jbee.inject.lang.Type;
+import se.jbee.lang.Type;
 
 import java.util.function.Consumer;
 

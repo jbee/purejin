@@ -2,7 +2,7 @@ package se.jbee.inject.config;
 
 import se.jbee.inject.Name;
 import se.jbee.inject.Scope;
-import se.jbee.inject.lang.TypeVariable;
+import se.jbee.lang.TypeVariable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.GenericDeclaration;
