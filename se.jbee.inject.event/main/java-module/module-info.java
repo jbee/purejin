@@ -7,7 +7,10 @@ module se.jbee.inject.event {
 	requires se.jbee.inject.lang;
 	requires se.jbee.inject.api;
 	requires se.jbee.inject.bind;
+	requires se.jbee.inject.bootstrap;
 
 	exports se.jbee.inject.event;
+	exports se.jbee.inject.schedule;
+	exports se.jbee.inject.disk;
 
 }

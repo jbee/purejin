@@ -8,7 +8,7 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.bootstrap.Bootstrap;
 
 import static se.jbee.inject.Name.named;
-import static test.integration.util.TestUtils.assertEqualSets;
+import static se.jbee.junit.assertion.Assertions.assertEqualsIgnoreOrder;
 
 /**
  * How to inject different arrays into different instances of the same parent
@@ -74,7 +74,7 @@ class TestBasicArrayBinds {
 	}
 
 	private void assertPreconditions(String command, Number... expected) {
-		assertEqualSets(expected,
+		assertEqualsIgnoreOrder(expected,
 				injector.resolve(command, Command.class).preconds);
 	}
 }

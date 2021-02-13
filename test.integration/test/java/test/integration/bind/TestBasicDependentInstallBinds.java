@@ -8,7 +8,7 @@ import se.jbee.inject.binder.BootstrapperBundle;
 import se.jbee.inject.binder.BundleFor;
 import se.jbee.inject.bootstrap.Bootstrap;
 
-import static test.integration.util.TestUtils.assertEqualSets;
+import static se.jbee.junit.assertion.Assertions.assertEqualsIgnoreOrder;
 
 /**
  * A test that shows how {@link BundleFor}s are used to install one or more (or
@@ -96,7 +96,7 @@ class TestBasicDependentInstallBinds {
 	void multipleChoicesArePossible() {
 		Env env = Bootstrap.DEFAULT_ENV.withDependent(Text.class, Text.A, Text.D);
 		Injector injector = Bootstrap.injector(env, RootBundle.class);
-		assertEqualSets(new String[] { "A", "D" },
+		assertEqualsIgnoreOrder(new String[] { "A", "D" },
 				injector.resolve(String[].class));
 	}
 }

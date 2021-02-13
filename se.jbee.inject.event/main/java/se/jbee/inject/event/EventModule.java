@@ -1,22 +1,13 @@
-/*
- *  Copyright (c) 2012-2019, Jan Bernitt
- *
- *  Licensed under the Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0
- */
 package se.jbee.inject.event;
 
-import se.jbee.inject.bind.Module;
 import se.jbee.inject.binder.BinderModule;
+import se.jbee.inject.binder.spi.ConnectorBinder;
+import se.jbee.inject.config.Connector;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
-/**
- * Base {@link Module} for modules that want to make known a handler to the
- * event system using {@link #handle(Class)}.
- *
- * @since 8.1
- */
+import static se.jbee.inject.event.EventTrigger.eventTriggerTypeOf;
+
 public abstract class EventModule extends BinderModule {
 
 	protected EventModule() {
@@ -24,40 +15,36 @@ public abstract class EventModule extends BinderModule {
 	}
 
 	/**
-	 * Registers the given event type so that it is handled by the
-	 * {@link EventProcessor} system.
-	 *
-	 * That means classes implementing the given event interface "automatically"
-	 * receive calls to any of the interface methods. When The event interface
-	 * should be injected to signal/call one of its methods a
-	 * {@link EventProcessor#getProxy(Class)} is injected.
-	 *
-	 * @param handlerType the type of the event/listener (must be an interface)
+	 * Responsible for setting up the basics of event feature.
 	 */
-	protected <T> void handle(Class<T> handlerType) {
-		if (!handlerType.isInterface())
-			throw new IllegalArgumentException(
-					"Event type has to be an interface but was: " + handlerType);
-		lift(handlerType).to((listener, as, context) -> {
-			context.resolve(EventProcessor.class).register(handlerType, listener);
-			return listener;
-		});
-		bind(handlerType).toSupplier((dep, context) -> //
-			context.resolve(EventProcessor.class).getProxy(handlerType));
-	}
-
 	public static final class EventBaseModule extends BinderModule {
 
 		@Override
 		protected void declare() {
-			asDefault().bind(EventProcessor.class).to(
-					ConcurrentEventProcessor.class);
-			asDefault().bind(PolicyProvider.class).to(
-					handlerType -> EventPolicy.DEFAULT);
-			asDefault().injectingInto(EventProcessor.class).bind(
-					ExecutorService.class).toProvider(Executors::newWorkStealingPool);
+			// have the dispatcher receive "event" type method connections
+			asDefault().bind(ConnectorBinder.EVENT_CONNECTOR, Connector.class)
+					.to(DefaultEventDispatcher.class);
+
+			// connect On
+			receiveIn(On.Aware.class, On.class);
+			//TODO should read: in(On.Aware.class).receive(On.class);
+			// or: receive(On.class).in(On.Aware.class);
+
+			// hook Shutdown into Runtime
+			asDefault().bind(eventTriggerTypeOf(On.Shutdown.class)) //
+					.to(EventBaseModule::activateOnShutdown);
 		}
 
+		private static void activateOnShutdown(Consumer<On.Shutdown> dispatcher) {
+			Runtime.getRuntime().addShutdownHook(new Thread(
+					() -> dispatcher.accept(new On.Shutdown())));
+		}
 	}
 
+	// use events to process schedules
+	// scheduler is just an event trigger
+	// add Run class to Schedule which is the event to run a scheduled method
+	// when a schedule is connected we also connect it as an event
+	// all events use a special dispatcher: ScheduledDispatch which uses a target ID to pick the richtig EventTarget/EventSite/Receiver by this ID (full method name)
+	// this means scheduled methods can also return events they want to trigger
 }

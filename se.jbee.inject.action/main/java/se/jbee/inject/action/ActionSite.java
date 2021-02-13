@@ -34,16 +34,16 @@ public final class ActionSite<A, B> {
 	public final Type<A> in;
 	public final Type<B> out;
 	private final AtomicBoolean isDisconnected = new AtomicBoolean();
-	private final Runnable disconnect;
+	private final Runnable onDisconnect;
 	private final InjectionSite injection;
 	private final int inputIndex;
 
 	public ActionSite(ActionTarget target, Type<A> in, Type<B> out,
-			Injector context, Consumer<ActionSite<?, ?>> disconnect) {
+			Injector context, Consumer<ActionSite<?, ?>> onDisconnect) {
 		this.target = target;
 		this.in = in;
 		this.out = out;
-		this.disconnect = () -> disconnect.accept(ActionSite.this);
+		this.onDisconnect = () -> onDisconnect.accept(ActionSite.this);
 		Env env = context.resolve(Env.class).in(ActionModule.class);
 		Hint<A> inArg = Hint.constantNull(in);
 		Hint<?>[] actualParameters = env.property(HintsBy.class)
@@ -55,7 +55,7 @@ public final class ActionSite<A, B> {
 
 	private void disconnect() {
 		if (isDisconnected.compareAndSet(false, true))
-			disconnect.run();
+			onDisconnect.run();
 	}
 
 	public boolean isDisconnected() {

@@ -164,7 +164,7 @@ public interface Scope {
 	 * ScopeLifeCycle}).
 	 */
 	static Name disk(File dir) {
-		return Name.named("disk:" + dir.getAbsolutePath());
+		return Name.named(dir.getAbsolutePath()).in("disk");
 	}
 
 	/**

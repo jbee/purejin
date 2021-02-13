@@ -7,6 +7,7 @@
       <sourceFolder url="file://$MODULE_DIR$/se.jbee.inject.event/main/java-module" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="se.jbee.inject.bootstrap" />
     <orderEntry type="module" module-name="se.jbee.inject.bind" />
     <orderEntry type="module" module-name="se.jbee.inject.api" />
     <orderEntry type="module" module-name="se.jbee.inject.lang" />

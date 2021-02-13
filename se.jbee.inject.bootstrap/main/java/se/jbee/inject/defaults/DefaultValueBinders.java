@@ -10,7 +10,6 @@ import se.jbee.inject.bind.*;
 import se.jbee.inject.binder.*;
 import se.jbee.inject.config.ConstructsBy;
 import se.jbee.inject.config.PublishesBy;
-import se.jbee.inject.config.HintsBy;
 import se.jbee.inject.lang.Type;
 
 import java.lang.reflect.Constructor;
@@ -32,9 +31,9 @@ public final class DefaultValueBinders {
 
 	public static final ValueBinder.Completion<Descriptor.BridgeDescriptor> BRIDGE = DefaultValueBinders::bindGenericReference;
 	public static final ValueBinder.Completion<Descriptor.ArrayDescriptor> ARRAY = DefaultValueBinders::bindArrayElements;
-	public static final ValueBinder.Completion<Constructs<?>> CONSTRUCTS = DefaultValueBinders::bindConstruction;
-	public static final ValueBinder.Completion<Produces<?>> PRODUCES = DefaultValueBinders::bindProduction;
-	public static final ValueBinder.Completion<Accesses<?>> ACCESSES = DefaultValueBinders::bindAccess;
+	public static final ValueBinder.Completion<Constructs<?>> CONSTRUCTS = DefaultValueBinders::bindConstructs;
+	public static final ValueBinder.Completion<Produces<?>> PRODUCES = DefaultValueBinders::bindProduces;
+	public static final ValueBinder.Completion<Accesses<?>> ACCESSES = DefaultValueBinders::bindAccesses;
 	public static final ValueBinder<Instance<?>> REFERENCE = DefaultValueBinders::bindReference;
 	public static final ValueBinder<Instance<?>> REFERENCE_PREFER_CONSTANTS = DefaultValueBinders::bindReferencePreferConstants;
 	public static final ValueBinder<Constant<?>> CONSTANT = DefaultValueBinders::bindConstant;
@@ -89,19 +88,19 @@ public final class DefaultValueBinders {
 						anyOf(raw(ref.type).castTo(item.type()))));
 	}
 
-	private static <T> Binding<T> bindConstruction(Env env, Binding<T> item,
+	private static <T> Binding<T> bindConstructs(Env env, Binding<T> item,
 			Constructs<?> ref) {
 		return item.complete(CONSTRUCTOR, byConstruction(ref.typed(item.type()))) //
 				.verifiedBy(env.verifierFor(ref));
 	}
 
-	private static <T> Binding<T> bindProduction(Env env, Binding<T> item,
+	private static <T> Binding<T> bindProduces(Env env, Binding<T> item,
 			Produces<?> ref) {
 		return item.complete(METHOD, byProduction(ref.typed(item.type()))) //
 				.verifiedBy(env.verifierFor(ref));
 	}
 
-	private static <T> Binding<T> bindAccess(Env env, Binding<T> item,
+	private static <T> Binding<T> bindAccesses(Env env, Binding<T> item,
 			Accesses<?> ref) {
 		// reference itself is used as supplier, as it also provides the default implementation
 		return item.complete(FIELD, ref.typed(item.type())) //
@@ -135,7 +134,7 @@ public final class DefaultValueBinders {
 	private static <T> void bindReferencePreferConstants(Env env,
 			Instance<?> ref, Binding<T> item, Bindings dest) {
 		Type<?> refType = ref.type();
-		if (isClassBanal(refType.rawType)) {
+		if (isClassBanal(refType.rawType) && refType.isAssignableTo(item.type())) {
 			Constructor<?> target = env.property(ConstructsBy.class) //
 					.reflect(refType.rawType.getDeclaredConstructors());
 			if (target != null) {

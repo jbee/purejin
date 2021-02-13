@@ -64,7 +64,7 @@ class TestExamplePropertyParameterAnnotationBinds {
 		@Override
 		protected void declare(Properties properties) {
 			bind(Properties.class).to(properties);
-			per(Scope.dependencyInstance).bind(named(Property.class).asPrefix(),
+			per(Scope.dependencyInstance).bind(Name.ANY.in(named(Property.class)),
 					raw(String.class)).toSupplier(new PropertySupplier());
 			// just to test
 			bind(ExampleBean.class).toConstructor();

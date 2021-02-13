@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Function;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static se.jbee.inject.Resource.resourcesTypeOf;
 import static se.jbee.inject.Scope.application;
@@ -101,8 +102,15 @@ public enum DefaultFeature implements Dependent<DefaultFeature> {
 	 */
 	SELF(true),
 
-	REFLECT(true)
+	/**
+	 * Adds: Default bindings for {@link New}, {@link Invoke} and {@link Get}.
+	 */
+	REFLECT(true),
 	;
+
+	public static final DefaultFeature[] INSTALLED_BY_DEFAULT = Arrays.stream(DefaultFeature.values()) //
+			.filter(e -> e.installedByDefault) //
+			.toArray(DefaultFeature[]::new);
 
 	public final boolean installedByDefault;
 

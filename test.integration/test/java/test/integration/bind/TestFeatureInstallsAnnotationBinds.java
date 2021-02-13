@@ -6,7 +6,7 @@ import se.jbee.inject.binder.BinderModule;
 import se.jbee.inject.binder.Installs;
 import se.jbee.inject.bootstrap.Bootstrap;
 
-import static test.integration.util.TestUtils.assertEqualSets;
+import static se.jbee.junit.assertion.Assertions.assertEqualsIgnoreOrder;
 
 /**
  * Just a short example that shows that the {@link Installs} annotation while
@@ -59,7 +59,7 @@ class TestFeatureInstallsAnnotationBinds {
 
 	@Test
 	void installsOnSupertypesAreOverridden() {
-		assertEqualSets(new String[] { "B", "C" },
+		assertEqualsIgnoreOrder(new String[] { "B", "C" },
 				context.resolve(String[].class));
 	}
 }

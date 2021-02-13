@@ -27,7 +27,9 @@ public final class Plugins implements ContextAware<Plugins>, Extension {
 	 * @return A fully qualified plugin point name
 	 */
 	public static Name pluginPoint(Class<?> point, String property) {
-		return Name.named(point).concat(property);
+		return property.isEmpty()
+				? Name.named(point)
+				: Name.named(property).in(Name.named(point));
 	}
 
 	private final Injector context;

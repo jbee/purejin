@@ -13,7 +13,7 @@ import se.jbee.inject.config.Feature;
 
 import java.lang.annotation.*;
 
-import static test.integration.util.TestUtils.assertEqualSets;
+import static se.jbee.junit.assertion.Assertions.assertEqualsIgnoreOrder;
 
 /**
  * A test that demonstrates how to use {@link Feature}s and {@link Edition}s to
@@ -130,7 +130,7 @@ class TestFeatureEditionFeatureBinds {
 			Integer... expected) {
 		Env env = Bootstrap.DEFAULT_ENV.with(Edition.class, edition);
 		Injector injector = Bootstrap.injector(env, RootBundle.class);
-		assertEqualSets(expected, injector.resolve(Integer[].class));
+		assertEqualsIgnoreOrder(expected, injector.resolve(Integer[].class));
 	}
 
 }

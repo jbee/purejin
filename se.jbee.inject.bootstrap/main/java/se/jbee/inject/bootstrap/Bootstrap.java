@@ -20,7 +20,6 @@ import se.jbee.inject.defaults.DefaultEnv;
 import se.jbee.inject.defaults.DefaultsBundle;
 import se.jbee.inject.lang.Lazy;
 
-import java.lang.reflect.Constructor;
 import java.util.*;
 
 import static se.jbee.inject.bind.Bindings.newBindings;
@@ -177,8 +176,7 @@ public final class Bootstrap {
 						key -> new LinkedHashSet<>()).add(bundle);
 			}
 			stack.push(bundle);
-			Bundle instance = createBundle(bundle);
-			instance.bootstrap(this);
+			createBundle(bundle).bootstrap(this);
 			if (stack.pop() != bundle)
 				throw new IllegalStateException(bundle.getCanonicalName());
 		}
@@ -212,11 +210,11 @@ public final class Bootstrap {
 		@SafeVarargs
 		public final <F extends Enum<F> & Dependent<F>> void install(F... elements) {
 			if (elements.length > 0) {
-				final F flag0 = elements[0];
-				if (!edition.featured(flag0.getClass()))
+				final F e0 = elements[0];
+				if (!edition.featured(e0.getClass()))
 					return;
-				final EnumSet<F> installing = EnumSet.of(flag0, elements);
-				flag0.bootstrap((on, bundle) -> {
+				final EnumSet<F> installing = EnumSet.of(e0, elements);
+				e0.bootstrap((on, bundle) -> {
 					if (installing.contains(on))
 						BuiltinBootstrapper.this.install(bundle);
 				});

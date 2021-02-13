@@ -11,6 +11,7 @@ import se.jbee.inject.binder.spi.*;
 import se.jbee.inject.config.*;
 import se.jbee.inject.lang.Type;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -29,7 +30,9 @@ import static se.jbee.inject.Name.named;
 import static se.jbee.inject.Source.source;
 import static se.jbee.inject.Target.targeting;
 import static se.jbee.inject.binder.Constructs.constructs;
+import static se.jbee.inject.binder.spi.ConnectorBinder.CONNECT_QUALIFIER;
 import static se.jbee.inject.config.Plugins.pluginPoint;
+import static se.jbee.inject.config.ProducesBy.declaredMethods;
 import static se.jbee.inject.lang.Type.raw;
 import static se.jbee.inject.lang.Utils.isClassConstructable;
 import static se.jbee.inject.lang.Utils.newArray;
@@ -40,22 +43,6 @@ import static se.jbee.inject.lang.Utils.newArray;
  */
 @SuppressWarnings({ "squid:S1448", "squid:S1200", "ClassReferencesSubclass" })
 public class Binder {
-
-	/**
-	 * Name of the {@link Connector} used for action feature.
-	 */
-	public static final String ACTION_CONNECTOR = "actions";
-
-	/**
-	 * Name of the {@link Connector} used for the scheduler feature.
-	 */
-	public static final String SCHEDULER_CONNECTOR = "scheduler";
-
-	/**
-	 * The qualifier {@link Name} used in the {@link Env} for the {@link
-	 * ProducesBy} value that is used by the {@link #connect()} method.
-	 */
-	public static final String CONNECT_QUALIFIER = "connect";
 
 	public static RootBinder create(Bind bind) {
 		return new RootBinder(bind);
@@ -337,6 +324,18 @@ public class Binder {
 				ProducesBy.OPTIMISTIC.in(api), raw(api));
 	}
 
+	public void scheduleIn(Class<?> bean, Class<? extends Annotation> schedule) {
+		connect(declaredMethods(true).annotatedWith(schedule)) //
+			.inAny(bean) //
+			.asScheduled(named(schedule));
+	}
+
+	public void receiveIn(Class<?> bean, Class<? extends Annotation> onEvent) {
+		connect(declaredMethods(true).annotatedWith(onEvent)) //
+			.inAny(bean) //
+			.asEvent();
+	}
+
 	protected Binder on(Bind bind) {
 		return new Binder(root, bind);
 	}
@@ -587,7 +586,7 @@ public class Binder {
 	 *            connecting
 	 * @since 8.1
 	 */
-	public static class ConnectTargetBinder<T> {
+	public static final class ConnectTargetBinder<T> implements ConnectorBinder {
 
 		private final Binder binder;
 		private final ProducesBy connectsBy;
@@ -600,22 +599,10 @@ public class Binder {
 			this.target = target;
 		}
 
-		public final ConnectTargetBinder<T> asAction() {
-			return to(ACTION_CONNECTOR);
-		}
-
-		public final ConnectTargetBinder<T> to(String connectorName) {
-			return to(named(connectorName));
-		}
-
-		public final ConnectTargetBinder<T> to(Class<?> connectorName) {
-			return to(named(connectorName));
-		}
-
-		public ConnectTargetBinder<T> to(Name connectorName) {
+		@Override
+		public void to(Name connectorName) {
 			binder.lift(target).to((instance, as, context) -> //
 					connect(connectorName, instance, as, context));
-			return this; // for multiple to
 		}
 
 		private T connect(Name connectorName, T instance, Type<?> as,

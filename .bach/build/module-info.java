@@ -28,7 +28,7 @@ import com.github.sormuras.bach.project.ProjectInfo.Tweak;
                                 "se.jbee.inject.bootstrap:se.jbee.inject.container",
                                 //
                                 "-group", "Add-ons",
-                                "se.jbee.inject.action:se.jbee.inject.event:se.jbee.inject.convert"
+                                "se.jbee.inject.action:se.jbee.inject.event:se.jbee.inject.convert:se.jbee.inject.contract"
                         }),
                 @Tweak(tool = "junit",
                         with = {

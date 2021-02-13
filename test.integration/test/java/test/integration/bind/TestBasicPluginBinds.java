@@ -14,7 +14,7 @@ import java.io.Serializable;
 import java.util.concurrent.Callable;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static test.integration.util.TestUtils.assertEqualSets;
+import static se.jbee.junit.assertion.Assertions.assertEqualsIgnoreOrder;
 
 /**
  * Plug-in-binds are a convenient way to define a named set of classes. The name
@@ -97,7 +97,7 @@ class TestBasicPluginBinds {
 	void packageLocalExtensionsAreResolvedWithAppropriateInjection() {
 		Class<?>[] classes = plugins.targeting(Module.class).forPoint(
 				Callable.class);
-		assertEqualSets(new Class<?>[] { ExtensionAction.class,
+		assertEqualsIgnoreOrder(new Class<?>[] { ExtensionAction.class,
 				ExtensionPackageLocalAction.class }, classes);
 	}
 
@@ -105,14 +105,14 @@ class TestBasicPluginBinds {
 	void instanceOfExtensionsAreResolvedWithAppropriateInjection() {
 		Class<?>[] classes = plugins.targeting(String.class).forPoint(
 				Callable.class);
-		assertEqualSets(new Class<?>[] { ExtensionAction.class,
+		assertEqualsIgnoreOrder(new Class<?>[] { ExtensionAction.class,
 				ExtensionInstanceOfAction.class }, classes);
 	}
 
 	@Test
 	void duplicatesAreEliminated() {
 		Class<?>[] classes = plugins.forPoint(Long.class);
-		assertEqualSets(new Class<?>[] { Integer.class, Float.class }, classes);
+		assertEqualsIgnoreOrder(new Class<?>[] { Integer.class, Float.class }, classes);
 	}
 
 	@Test
@@ -121,7 +121,7 @@ class TestBasicPluginBinds {
 		assertNotNull(bean);
 		assertNotNull(bean.plugins);
 		assertEquals(ContextAwarePlugins.class, bean.plugins.getTarget());
-		assertEqualSets(new Class<?>[] { String.class },
+		assertEqualsIgnoreOrder(new Class<?>[] { String.class },
 				bean.plugins.forPoint(CharSequence.class));
 	}
 }

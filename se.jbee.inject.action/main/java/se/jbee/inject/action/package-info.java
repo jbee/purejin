@@ -13,7 +13,7 @@
  * {@link se.jbee.inject.action.Action}s can also be used do emulate method
  * interception without bytecode manipulation. All calls to {@link
  * se.jbee.inject.action.Action}s are executed using the {@link
- * se.jbee.inject.action.Executor}. Any custom interception can be implemented
- * by providing a custom {@link se.jbee.inject.action.Executor} implementation.
+ * se.jbee.inject.action.ActionExecutor}. Any custom interception can be implemented
+ * by providing a custom {@link se.jbee.inject.action.ActionExecutor} implementation.
  */
 package se.jbee.inject.action;

@@ -20,7 +20,7 @@ import static se.jbee.inject.lang.Type.raw;
  * In particular this example brings back a the notion of "before" and "after"
  * hooks as used in AOP.
  * <p>
- * The {@link Action} concept includes the {@link Executor} that is responsible
+ * The {@link Action} concept includes the {@link ActionExecutor} that is responsible
  * for actually executing the action call. This allows to implement more
  * advanced methods of execution, like thread pooling or locking contexts or as
  * in this test adding concepts like interceptors.
@@ -65,7 +65,7 @@ class TestExampleServiceInterceptorBinds {
 			plug(AssertInvocationInterceptor.class) //
 					.into(ServiceInterceptor.class);
 			// replace the standard Executor with the instrumented one that runs interceptors
-			bind(Executor.class).to(InstrumentingExecutor.class);
+			bind(ActionExecutor.class).to(InstrumentingActionExecutor.class);
 		}
 	}
 
@@ -163,11 +163,12 @@ class TestExampleServiceInterceptorBinds {
 		assertEquals(interceptors[0].getClass(), AssertInvocationInterceptor.class);
 	}
 
-	public static final class InstrumentingExecutor implements Executor {
+	public static final class InstrumentingActionExecutor
+			implements ActionExecutor {
 
 		private final ServiceInterceptor<?>[] interceptors;
 
-		public InstrumentingExecutor(ServiceInterceptor<?>[] interceptors) {
+		public InstrumentingActionExecutor(ServiceInterceptor<?>[] interceptors) {
 			this.interceptors = interceptors;
 		}
 
