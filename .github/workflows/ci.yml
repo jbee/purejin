@@ -60,6 +60,6 @@ jobs:
             .bach/workspace/modules/se.jbee.inject@*-ea.jar
             .bach/workspace/modules/se.jbee.inject.api@*-ea.jar
             .bach/workspace/modules/se.jbee.inject.container@*-ea.jar
-            .bach/workspace/modules/se.jbee.inject.bind@$*-ea.jar
+            .bach/workspace/modules/se.jbee.inject.bind@*-ea.jar
             .bach/workspace/modules/se.jbee.inject.bootstrap@*-ea.jar
             .bach/workspace/modules/se.jbee.inject.action@*-ea.jar
