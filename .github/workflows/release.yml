@@ -46,8 +46,6 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-build-${{ env.VERSION }}
-      - name: 'Ls'
-        run: ls -la .bach/workspace/modules
       - name: 'Release ${{ needs.setup.outputs.version }}'
         uses: marvinpinto/action-automatic-releases@latest
         with:
@@ -57,10 +55,10 @@ jobs:
           title: "purejin ${{ env.VERSION }}"
           files: |
             .bach/workspace/documentation/*.zip
-            .bach/workspace/modules/se.jbee.lang@*-ea.jar
-            .bach/workspace/modules/se.jbee.inject@*-ea.jar
-            .bach/workspace/modules/se.jbee.inject.api@*-ea.jar
-            .bach/workspace/modules/se.jbee.inject.container@*-ea.jar
-            .bach/workspace/modules/se.jbee.inject.bind@*-ea.jar
-            .bach/workspace/modules/se.jbee.inject.bootstrap@*-ea.jar
-            .bach/workspace/modules/se.jbee.inject.action@*-ea.jar
+            .bach/workspace/modules/se.jbee.lang@*.jar
+            .bach/workspace/modules/se.jbee.inject@*.jar
+            .bach/workspace/modules/se.jbee.inject.api@*.jar
+            .bach/workspace/modules/se.jbee.inject.container@*.jar
+            .bach/workspace/modules/se.jbee.inject.bind@*.jar
+            .bach/workspace/modules/se.jbee.inject.bootstrap@*.jar
+            .bach/workspace/modules/se.jbee.inject.action@*.jar
