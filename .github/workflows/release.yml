@@ -56,10 +56,10 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-build-${{ needs.setup.outputs.version }}
-      - name: 'Release ${{ needs.setup.outputs.tag }}'
+      - name: 'Release ${{ needs.setup.outputs.version }}'
         uses: marvinpinto/action-automatic-releases@latest
         with:
-          automatic_release_tag: ${{ needs.setup.outputs.tag }}
+          automatic_release_tag: ${{ needs.setup.outputs.version }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           prerelease: false
           title: "purejin ${{ needs.setup.outputs.version }}"
