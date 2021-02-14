@@ -5,13 +5,13 @@ ______  __ _________   ____     |__|__| ____
 |   __/|____/ |__|    \___  >\__|  |__|___|  /
 |__|                      \/\______|       \/
 
-Build with Java 16, usable with Java 8+
+Build with Java 16+, usable with Java 8+
 
 Docs        http://jbee.github.io/purejin/
 Feedback    http://github.com/jbee/purejin/issues
 Contribute  http://github.com/jbee/purejin/pulls
 CI          https://github.com/jbee/purejin/actions
-JitPack     https://jitpack.io/com/github/jbee/purejin/
+Releases    https://github.com/jbee/purejin/releases
 --------------------------------------------------------------------------
 
 Build       https://github.com/sormuras/bach
@@ -23,7 +23,7 @@ Build       https://github.com/sormuras/bach
 
 License     http://www.apache.org/licenses/LICENSE-2.0
 
-Copyright (c) 2012-2020 Jan Bernitt
+Copyright (c) 2012-2021 Jan Bernitt
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
