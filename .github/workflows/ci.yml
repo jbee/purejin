@@ -11,6 +11,9 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  PROJECT_VERSION: '8.2-ea'
+
 jobs:
   build:
     name: "Build (JDK-${{ matrix.java }}, ${{ matrix.os }})"
@@ -33,7 +36,7 @@ jobs:
       - name: 'Set up version'
         run: |
           SHA7=$(echo "${{ github.sha }}" | cut -c1-7)
-          VERSION=8-ea+${SHA7}
+          VERSION=${PROJECT_VERSION}+${SHA7}
           echo "VERSION=${VERSION}" >> ${GITHUB_ENV}
       - name: 'Build with Bach'
         run: ./bach build
@@ -52,7 +55,7 @@ jobs:
         if: github.ref == 'refs/heads/master'
         uses: marvinpinto/action-automatic-releases@latest
         with:
-          automatic_release_tag: 'early-access'
+          automatic_release_tag: ${{ env.PROJECT_VERSION }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           prerelease: true
           title: "purejin ${{ env.VERSION }}"
