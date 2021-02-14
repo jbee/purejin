@@ -6,21 +6,11 @@ on:
 
 env:
   GITHUB_TOKEN: ${{ github.token }}
+  VERSION: ${{ github.event.release.tag_name }}
 
 jobs:
 
-  setup:
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.version.outputs.version }}
-    steps:
-      - name: 'Compute version string'
-        id: version
-        run: |
-          echo "::set-output name=version::${{ github.event.release.tag_name }}"
-
   build:
-    needs: [ setup ]
     runs-on: ubuntu-latest
     steps:
       - name: 'Check out repository'
@@ -29,41 +19,44 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 16-ea
-      - name: 'Build purejin ${{ needs.setup.outputs.version }}'
+      - name: 'Build purejin ${{ env.VERSION }}'
         run: |
           java \
-            -Dbach.project.version=${{ needs.setup.outputs.version }} \
+            -Dbach.project.version=$VERSION \
             --module-path .bach/cache \
             --module com.github.sormuras.bach \
             build
-      - name: 'Upload artifact ${{ github.event.repository.name }}-build-${{ needs.setup.outputs.version }}'
+      - name: 'Upload artifact ${{ github.event.repository.name }}-build-${{ env.VERSION }}'
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ github.event.repository.name }}-build-${{ needs.setup.outputs.version }}
+          name: ${{ github.event.repository.name }}-build-${{ env.VERSION }}
           path: |
             LICENSE
             .bach/workspace/logbook.md
             .bach/workspace/deploy
-            .bach/workspace/documentation
+            .bach/workspace/documentation/*.zip
             .bach/workspace/modules
 
   deploy-to-releases:
-    needs: [ setup, build ]
+    needs: [ build ]
     runs-on: ubuntu-latest
     steps:
-      - name: 'Download build artifact ${{ needs.setup.outputs.version }}'
+      - name: 'Download build artifact ${{ env.VERSION }}'
         uses: actions/download-artifact@v2
         with:
-          name: ${{ github.event.repository.name }}-build-${{ needs.setup.outputs.version }}
+          name: ${{ github.event.repository.name }}-build-${{ env.VERSION }}
+      - name: 'Ls'
+        run: ls -la .bach/workspace/modules
       - name: 'Release ${{ needs.setup.outputs.version }}'
         uses: marvinpinto/action-automatic-releases@latest
         with:
-          automatic_release_tag: ${{ needs.setup.outputs.version }}
+          automatic_release_tag: ${{ env.VERSION }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           prerelease: false
-          title: "purejin ${{ needs.setup.outputs.version }}"
+          title: "purejin ${{ env.VERSION }}"
           files: |
+            .bach/workspace/documentation/*.zip
             .bach/workspace/modules/se.jbee.lang@*-ea.jar
             .bach/workspace/modules/se.jbee.inject@*-ea.jar
             .bach/workspace/modules/se.jbee.inject.api@*-ea.jar
