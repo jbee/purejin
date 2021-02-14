@@ -1,0 +1,67 @@
+name: Release
+
+on:
+  release:
+    types: [ prereleased, released ]
+
+env:
+  GITHUB_TOKEN: ${{ github.token }}
+
+jobs:
+
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: 'Compute version string'
+        id: version
+        run: |
+          echo "::set-output name=version::${{ github.event.release.tag_name }}"
+
+  build:
+    needs: [ setup ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Check out repository'
+        uses: actions/checkout@v2
+      - name: 'Set up JDK'
+        uses: actions/setup-java@v1
+        with:
+          java-version: 16
+      - name: 'Build purejin ${{ needs.setup.outputs.version }}'
+        run: |
+          java \
+            -Dbach.project.version=${{ needs.setup.outputs.version }} \
+            --module-path .bach/cache \
+            --module com.github.sormuras.bach \
+            build
+      - name: 'Upload artifact ${{ github.event.repository.name }}-build-${{ needs.setup.outputs.version }}'
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ github.event.repository.name }}-build-${{ needs.setup.outputs.version }}
+          path: |
+            LICENSE
+            .bach/workspace/logbook.md
+            .bach/workspace/deploy
+            .bach/workspace/documentation
+            .bach/workspace/modules
+
+  deploy-to-releases:
+    needs: [ setup, build ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Download build artifact ${{ needs.setup.outputs.version }}'
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ github.event.repository.name }}-build-${{ needs.setup.outputs.version }}
+      - name: 'Release ${{ needs.setup.outputs.tag }}'
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          automatic_release_tag: ${{ needs.setup.outputs.tag }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: false
+          title: "purejin ${{ needs.setup.outputs.version }}"
+          files: |
+            .bach/workspace/modules/*.jar
