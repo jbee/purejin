@@ -28,11 +28,6 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java }}
-      # Initializes the CodeQL tools for scanning.
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v1
-        with:
-          languages: ${{ matrix.language }}
       - name: 'Emit version of JShell (trigger creation of user''s preferences directory)'
         run: jshell --version
       - name: 'Set up version'
@@ -69,5 +64,3 @@ jobs:
             .bach/workspace/modules/se.jbee.inject.bind@*-ea.jar
             .bach/workspace/modules/se.jbee.inject.bootstrap@*-ea.jar
             .bach/workspace/modules/se.jbee.inject.action@*-ea.jar
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v1
