@@ -4,7 +4,7 @@ import com.github.sormuras.bach.project.ProjectInfo.Tweak;
 
 @ProjectInfo(
         name = "purejin",
-        version = "8-ea",
+        version = "8.2-ea",
         compileModulesForJavaRelease = 8,
         features = {
                 Feature.GENERATE_API_DOCUMENTATION,
