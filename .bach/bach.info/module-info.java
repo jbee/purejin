@@ -1,24 +1,22 @@
-import com.github.sormuras.bach.project.Feature;
-import com.github.sormuras.bach.project.ProjectInfo;
-import com.github.sormuras.bach.project.ProjectInfo.Tweak;
+import com.github.sormuras.bach.ProjectInfo;
+import com.github.sormuras.bach.ProjectInfo.Externals;
+import com.github.sormuras.bach.ProjectInfo.Tools;
+import com.github.sormuras.bach.ProjectInfo.Tweak;
 
 @ProjectInfo(
         name = "purejin",
         version = "8.2-ea",
         compileModulesForJavaRelease = 8,
-        features = {
-                Feature.GENERATE_API_DOCUMENTATION,
-                Feature.INCLUDE_SOURCES_IN_MODULAR_JAR
-        },
+        includeSourceFilesIntoModules = true,
+        lookupExternals = @Externals(name = Externals.Name.JUNIT, version = "5.8.0-M1"),
+        tools = @Tools(skip = {"jdeps", "jlink"}),
         tweaks = {
-                @Tweak(tool = "javac", with = {"-encoding", "UTF-8", "-g", "-parameters"}),
-                @Tweak(tool = "javadoc",
-                        with = {
+                @Tweak(tool = "javac", option = "-g", value = {"-encoding", "UTF-8", "-parameters"}),
+                @Tweak(tool = "javadoc", option = "-notimestamp",
+                        value = {
                                 "-encoding", "UTF-8",
                                 "-use",
                                 "-linksource",
-                                "-notimestamp",
-                                "-quiet",
                                 "-Xdoclint:-missing",
                                 //
                                 "-group", "API",
@@ -31,11 +29,12 @@ import com.github.sormuras.bach.project.ProjectInfo.Tweak;
                                 "se.jbee.inject.action:se.jbee.inject.event:se.jbee.inject.convert:se.jbee.inject.contract"
                         }),
                 @Tweak(tool = "junit",
-                        with = {
+                        option = "--fail-if-no-tests",
+                        value = {
                                 "--config=junit.jupiter.execution.parallel.enabled=true",
                                 "--config=junit.jupiter.execution.parallel.mode.default=concurrent"
                         })
         })
-module build {
+module bach.info {
     requires com.github.sormuras.bach;
 }

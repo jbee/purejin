@@ -20,12 +20,7 @@ jobs:
         with:
           java-version: 16-ea
       - name: 'Build purejin ${{ env.VERSION }}'
-        run: |
-          java \
-            -Dbach.project.version=$VERSION \
-            --module-path .bach/cache \
-            --module com.github.sormuras.bach \
-            build
+        run: .bach/bin/bach --project-version ${VERSION} build
       - name: 'Upload artifact ${{ github.event.repository.name }}-build-${{ env.VERSION }}'
         if: always()
         uses: actions/upload-artifact@v2

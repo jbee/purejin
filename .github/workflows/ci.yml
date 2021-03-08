@@ -31,26 +31,26 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java }}
-      - name: 'Emit version of JShell (trigger creation of user''s preferences directory)'
-        run: jshell --version
       - name: 'Set up version'
         run: |
           SHA7=$(echo "${{ github.sha }}" | cut -c1-7)
           VERSION=${PROJECT_VERSION}+${SHA7}
           echo "VERSION=${VERSION}" >> ${GITHUB_ENV}
       - name: 'Build with Bach'
-        run: ./bach build
+        run: .bach/bin/bach --project-version ${VERSION} build
       - name: 'Report test summary'
         uses: docker://ghcr.io/enricomi/publish-unit-test-result-action:v1
         if: always()
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          files: .bach/workspace/reports/junit-test/*/*.xml
+          files: .bach/workspace/reports/junit/*/*.xml
       - name: 'Upload build artifact'
         uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-build-${{ env.VERSION }}
-          path: .bach/workspace/modules
+          path: |
+            .bach/workspace/logbook.md
+            .bach/workspace/modules
       - name: 'Release early-access build'
         if: github.ref == 'refs/heads/master'
         uses: marvinpinto/action-automatic-releases@latest
