@@ -49,4 +49,11 @@ public abstract class ConverterModule extends BinderModule {
 				.produceBy(PRODUCES_BY);
 	}
 
+	public static final class ConverterBaseModule extends BinderModule{
+
+		@Override
+		protected void declare() {
+
+		}
+	}
 }
