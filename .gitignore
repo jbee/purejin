@@ -1,10 +1,13 @@
-bin/
+
+
 target/
-dist/
 src/doc/
 lib/
 pom.*
 *~
-*.jar
+
 _site/
 dbnavigator.xml
+
+.bach/external-modules/
+.bach/workspace/
