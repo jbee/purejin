@@ -3,7 +3,7 @@
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$/se.jbee.junit.assertion">
-      <sourceFolder url="file://$MODULE_DIR$/se.jbee.junit.assertion/test/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/se.jbee.junit.assertion/test/java" isTestSource="true" />
     </content>
     <orderEntry type="jdk" jdkName="16" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
