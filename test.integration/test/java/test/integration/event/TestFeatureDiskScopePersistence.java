@@ -1,6 +1,7 @@
 package test.integration.event;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import se.jbee.inject.Injector;
 import se.jbee.inject.Name;
@@ -24,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  *
  * @see TestFeatureDiskScopeSync
  */
+@Disabled("An executor(?) thread prevents the JVM to exit normally")
 class TestFeatureDiskScopePersistence {
 
 	static final File dir = new File("target/scope/test");
