@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 
 if [[ $1 == 'boot' ]]; then
-  jshell --module-path .bach/bin --add-modules com.github.sormuras.bach
+  shift 1
+  jshell --module-path .bach/bin --add-modules ALL-MODULE-PATH .bach/bin/bach.jshell "$@"
+  exit $?
+fi
+
+if [[ $1 == 'clean' ]]; then
+  rm -rf .bach/workspace
   exit $?
 fi
 
@@ -10,7 +16,19 @@ if [[ $1 == 'init' ]]; then
     echo "Usage: bach init VERSION"
     exit 1
   fi
-  jshell -R-Dbach-version=$2 https://git.io/bach-init
+  jshell -R-Dbach-version="$2" https://git.io/bach-init
+  exit $?
+fi
+
+if [[ -f ".bach/src/$1.java" ]]; then
+  PROGRAM=".bach/src/$1.java"
+  shift 1
+  java --module-path .bach/bin --add-modules ALL-MODULE-PATH "$PROGRAM" "$@"
+  exit $?
+fi
+
+if [[ -f "$1" ]]; then
+  java --module-path .bach/bin --add-modules ALL-MODULE-PATH "$@"
   exit $?
 fi
 
