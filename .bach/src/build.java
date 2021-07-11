@@ -3,7 +3,6 @@ import com.github.sormuras.bach.Call;
 import com.github.sormuras.bach.Project;
 import com.github.sormuras.bach.Settings;
 import com.github.sormuras.bach.external.JUnit;
-import com.github.sormuras.bach.project.DeclaredModule;
 import com.github.sormuras.bach.project.ProjectSpace;
 import com.github.sormuras.bach.workflow.DeclaredModuleFinder;
 import java.io.File;
@@ -20,6 +19,7 @@ class build {
             .withTestSpace(build::test)
             .withExternalModuleLocators(JUnit.V_5_8_0_M1);
 
+    System.setProperty("java.util.logging.config.file", ".bach/src/logging.properties");
     Bach.build(new PureBach(project, Settings.of()));
   }
 
@@ -27,19 +27,33 @@ class build {
     return main.withJavaRelease(8)
         .withModuleSourcePaths("./*/main/java", "./*/main/java-module")
         .withModule("se.jbee.inject/main/java-module/module-info.java")
-        .withModule("se.jbee.inject.action/main/java-module/module-info.java", build::main)
-        .withModule("se.jbee.inject.api/main/java-module/module-info.java", build::main)
-        .withModule("se.jbee.inject.bind/main/java-module/module-info.java", build::main)
-        .withModule("se.jbee.inject.bootstrap/main/java-module/module-info.java", build::main)
-        .withModule("se.jbee.inject.container/main/java-module/module-info.java", build::main)
-        .withModule("se.jbee.inject.contract/main/java-module/module-info.java", build::main)
-        .withModule("se.jbee.inject.convert/main/java-module/module-info.java", build::main)
-        .withModule("se.jbee.inject.event/main/java-module/module-info.java", build::main)
-        .withModule("se.jbee.lang/main/java-module/module-info.java", build::main);
-  }
-
-  static DeclaredModule main(DeclaredModule module) {
-    return module.withSources(module.name() + "/main/java");
+        .withModule(
+            "se.jbee.inject.action/main/java-module/module-info.java",
+            module -> module.withSources(module.name() + "/main/java"))
+        .withModule(
+            "se.jbee.inject.api/main/java-module/module-info.java",
+            module -> module.withSources(module.name() + "/main/java"))
+        .withModule(
+            "se.jbee.inject.bind/main/java-module/module-info.java",
+            module -> module.withSources(module.name() + "/main/java"))
+        .withModule(
+            "se.jbee.inject.bootstrap/main/java-module/module-info.java",
+            module -> module.withSources(module.name() + "/main/java"))
+        .withModule(
+            "se.jbee.inject.container/main/java-module/module-info.java",
+            module -> module.withSources(module.name() + "/main/java"))
+        .withModule(
+            "se.jbee.inject.contract/main/java-module/module-info.java",
+            module -> module.withSources(module.name() + "/main/java"))
+        .withModule(
+            "se.jbee.inject.convert/main/java-module/module-info.java",
+            module -> module.withSources(module.name() + "/main/java"))
+        .withModule(
+            "se.jbee.inject.event/main/java-module/module-info.java",
+            module -> module.withSources(module.name() + "/main/java"))
+        .withModule(
+            "se.jbee.lang/main/java-module/module-info.java",
+            module -> module.withSources(module.name() + "/main/java"));
   }
 
   static ProjectSpace test(ProjectSpace test) {
@@ -47,10 +61,10 @@ class build {
         .withModule("se.jbee.junit.assertion/test/java/module-info.java")
         .withModule(
             "test.examples/test/java/module-info.java",
-            module -> module.withResources("test.examples/test/resources"))
+            module -> module.withResources(module.name() + "/test/resources"))
         .withModule(
             "test.integration/test/java/module-info.java",
-            module -> module.withResources("test.integration/test/resources"))
+            module -> module.withResources(module.name() + "/test/resources"))
         .withModulePaths(".bach/workspace/modules", ".bach/external-modules");
   }
 
