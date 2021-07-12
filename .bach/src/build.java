@@ -1,26 +1,25 @@
 import com.github.sormuras.bach.Bach;
 import com.github.sormuras.bach.Call;
+import com.github.sormuras.bach.Options;
 import com.github.sormuras.bach.Project;
 import com.github.sormuras.bach.Settings;
 import com.github.sormuras.bach.external.JUnit;
 import com.github.sormuras.bach.project.ProjectSpace;
 import com.github.sormuras.bach.workflow.DeclaredModuleFinder;
 import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
 
 class build {
   public static void main(String... args) {
-    var cli = Cli.of(args);
+    var options = Options.of(args);
     var project =
-        Project.of("purejin", cli.__project_version.orElse("8.2-ea"))
+        Project.of("purejin", "8.2-ea")
             .withMainSpace(build::main)
             .withTestSpace(build::test)
-            .withExternalModuleLocators(JUnit.V_5_8_0_M1);
+            .withExternalModuleLocators(JUnit.V_5_8_0_M1)
+            .with(options);
 
     System.setProperty("java.util.logging.config.file", ".bach/src/logging.properties");
-    Bach.build(new PureBach(project, Settings.of()));
+    Bach.build(new PureBach(project, Settings.of().with(options)));
   }
 
   static ProjectSpace main(ProjectSpace main) {
@@ -68,27 +67,9 @@ class build {
         .withModulePaths(".bach/workspace/modules", ".bach/external-modules");
   }
 
-  record Cli(Optional<String> __project_version, List<String> unhandled) {
-    static Cli of(String... args) {
-      String projectVersion = null;
-      var todo = new LinkedList<>(List.of(args));
-      var unhandled = new LinkedList<String>();
-      while (!todo.isEmpty()) {
-        switch (todo.peek()) {
-          case "--project-version" -> {
-            todo.pop();
-            projectVersion = todo.pop();
-          }
-          default -> unhandled.add(todo.pop());
-        }
-      }
-      return new Cli(Optional.ofNullable(projectVersion), List.copyOf(unhandled));
-    }
-  }
-
   static class PureBach extends Bach {
 
-    public PureBach(Project project, Settings settings) {
+    PureBach(Project project, Settings settings) {
       super(project, settings);
     }
 
