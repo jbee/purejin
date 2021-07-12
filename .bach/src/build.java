@@ -3,13 +3,16 @@ import com.github.sormuras.bach.Call;
 import com.github.sormuras.bach.Options;
 import com.github.sormuras.bach.Project;
 import com.github.sormuras.bach.Settings;
+import com.github.sormuras.bach.Workflow;
 import com.github.sormuras.bach.external.JUnit;
 import com.github.sormuras.bach.project.ProjectSpace;
+import com.github.sormuras.bach.workflow.BuildWorkflow;
 import com.github.sormuras.bach.workflow.DeclaredModuleFinder;
 import java.io.File;
 
 class build {
   public static void main(String... args) {
+    System.setProperty("java.util.logging.config.file", ".bach/src/logging.properties");
     var options = Options.of(args);
     var project =
         Project.of("purejin", "8.2-ea")
@@ -17,9 +20,9 @@ class build {
             .withTestSpace(build::test)
             .withExternalModuleLocators(JUnit.V_5_8_0_M1)
             .with(options);
-
-    System.setProperty("java.util.logging.config.file", ".bach/src/logging.properties");
-    Bach.build(new PureBach(project, Settings.of().with(options)));
+    var settings =
+        Settings.of().withWorkflowCheckpointListener(build::at).with(options);
+    Bach.build(new Bach(project, settings));
   }
 
   static ProjectSpace main(ProjectSpace main) {
@@ -67,39 +70,37 @@ class build {
         .withModulePaths(".bach/workspace/modules", ".bach/external-modules");
   }
 
-  static class PureBach extends Bach {
-
-    PureBach(Project project, Settings settings) {
-      super(project, settings);
+  static void at(Workflow.Checkpoint checkpoint) {
+    if (checkpoint instanceof BuildWorkflow.EndCheckpoint) {
+      generateApiDocumentation(checkpoint.bach());
     }
+  }
 
-    @Override
-    public void executeTests() {
-      super.executeTests();
-      var main = project.spaces().main();
-      var finder = DeclaredModuleFinder.of(main.modules());
-      execute(
-          Call.tool("javadoc")
-              .with("--module", String.join(",", finder.names().toList()))
-              .with("-d", folders.workspace("documentation", "api"))
-              .with(
-                  "--module-source-path",
-                  "./*/main/java-module" + File.pathSeparator + "./*/main/java")
-              .with("--module-path", ".bach/external-modules")
-              .with("-notimestamp")
-              .with("-encoding", project.defaults().encoding())
-              .with("-use")
-              .with("-linksource")
-              .with("-Xdoclint:-missing")
-              .with(
-                  "-group",
-                  "API",
-                  "se.jbee.inject:se.jbee.inject.api:se.jbee.inject.bind:se.jbee.inject.lang")
-              .with("-group", "Container", "se.jbee.inject.bootstrap:se.jbee.inject.container")
-              .with(
-                  "-group",
-                  "Add-ons",
-                  "se.jbee.inject.action:se.jbee.inject.event:se.jbee.inject.convert:se.jbee.inject.contract"));
-    }
+  static void generateApiDocumentation(Bach bach) {
+    var project = bach.project();
+    var main = project.spaces().main();
+    var finder = DeclaredModuleFinder.of(main.modules());
+    bach.execute(
+        Call.tool("javadoc")
+            .with("--module", String.join(",", finder.names().toList()))
+            .with("-d", bach.folders().workspace("documentation", "api"))
+            .with(
+                "--module-source-path",
+                "./*/main/java-module" + File.pathSeparator + "./*/main/java")
+            .with("--module-path", ".bach/external-modules")
+            .with("-notimestamp")
+            .with("-encoding", project.defaults().encoding())
+            .with("-use")
+            .with("-linksource")
+            .with("-Xdoclint:-missing")
+            .with(
+                "-group",
+                "API",
+                "se.jbee.inject:se.jbee.inject.api:se.jbee.inject.bind:se.jbee.inject.lang")
+            .with("-group", "Container", "se.jbee.inject.bootstrap:se.jbee.inject.container")
+            .with(
+                "-group",
+                "Add-ons",
+                "se.jbee.inject.action:se.jbee.inject.event:se.jbee.inject.convert:se.jbee.inject.contract"));
   }
 }
