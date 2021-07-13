@@ -37,7 +37,7 @@ jobs:
           VERSION=${PROJECT_VERSION}+${SHA7}
           echo "VERSION=${VERSION}" >> ${GITHUB_ENV}
       - name: 'Build with Bach'
-        run: .bach/bin/bach --project-version ${VERSION} build
+        run: .bach/bin/bach build --project-version ${VERSION}
       - name: 'Report test summary'
         uses: docker://ghcr.io/enricomi/publish-unit-test-result-action:v1
         if: always()
