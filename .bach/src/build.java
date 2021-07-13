@@ -1,9 +1,11 @@
 import com.github.sormuras.bach.Bach;
 import com.github.sormuras.bach.Call;
+import com.github.sormuras.bach.Checkpoint;
 import com.github.sormuras.bach.Options;
 import com.github.sormuras.bach.Project;
 import com.github.sormuras.bach.Settings;
-import com.github.sormuras.bach.Workflow;
+import com.github.sormuras.bach.Tweak;
+import com.github.sormuras.bach.call.JavacCall;
 import com.github.sormuras.bach.external.JUnit;
 import com.github.sormuras.bach.project.ProjectSpace;
 import com.github.sormuras.bach.workflow.BuildWorkflow;
@@ -21,7 +23,10 @@ class build {
             .withExternalModuleLocators(JUnit.V_5_8_0_M1)
             .with(options);
     var settings =
-        Settings.of().withWorkflowCheckpointListener(build::at).with(options);
+        Settings.of()
+            .withWorkflowTweakHandler(build::tweak)
+            .withWorkflowCheckpointHandler(build::at)
+            .with(options);
     Bach.build(new Bach(project, settings));
   }
 
@@ -70,9 +75,16 @@ class build {
         .withModulePaths(".bach/workspace/modules", ".bach/external-modules");
   }
 
-  static void at(Workflow.Checkpoint checkpoint) {
-    if (checkpoint instanceof BuildWorkflow.EndCheckpoint) {
-      generateApiDocumentation(checkpoint.bach());
+  static Call tweak(Tweak tweak) {
+    if (tweak.call() instanceof JavacCall call) {
+      return call.with("-Xlint");
+    }
+    return tweak.call();
+  }
+
+  static void at(Checkpoint checkpoint) {
+    if (checkpoint instanceof BuildWorkflow.SuccessCheckpoint) {
+      generateApiDocumentation(checkpoint.workflow().bach());
     }
   }
 
