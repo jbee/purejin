@@ -5,6 +5,7 @@ import com.github.sormuras.bach.Options;
 import com.github.sormuras.bach.Project;
 import com.github.sormuras.bach.Settings;
 import com.github.sormuras.bach.Tweak;
+import com.github.sormuras.bach.call.JUnitCall;
 import com.github.sormuras.bach.call.JavacCall;
 import com.github.sormuras.bach.external.JUnit;
 import com.github.sormuras.bach.project.ProjectSpace;
@@ -76,8 +77,12 @@ class build {
   }
 
   static Call tweak(Tweak tweak) {
-    if (tweak.call() instanceof JavacCall call) {
-      return call.with("-Xlint");
+    if (tweak.call() instanceof JavacCall javac) {
+      return javac.with("-Xlint");
+    }
+    if (tweak.call() instanceof JUnitCall junit) {
+      if (junit.arguments().contains("test.integration"))
+        return junit.with("--fail-if-no-tests");
     }
     return tweak.call();
   }
