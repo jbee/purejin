@@ -1,123 +1,129 @@
 import com.github.sormuras.bach.Bach;
-import com.github.sormuras.bach.Call;
-import com.github.sormuras.bach.Checkpoint;
+import com.github.sormuras.bach.Command;
 import com.github.sormuras.bach.Options;
 import com.github.sormuras.bach.Project;
-import com.github.sormuras.bach.Settings;
-import com.github.sormuras.bach.Tweak;
-import com.github.sormuras.bach.call.JUnitCall;
-import com.github.sormuras.bach.call.JavacCall;
+import com.github.sormuras.bach.ToolRun;
+import com.github.sormuras.bach.command.JavacCommand;
 import com.github.sormuras.bach.external.JUnit;
 import com.github.sormuras.bach.project.ProjectSpace;
-import com.github.sormuras.bach.workflow.BuildWorkflow;
-import com.github.sormuras.bach.workflow.DeclaredModuleFinder;
+import com.github.sormuras.bach.project.ProjectSpaces;
+import com.github.sormuras.bach.workflow.AbstractSpaceWorkflow;
+import com.github.sormuras.bach.workflow.WorkflowBuilder;
 import java.io.File;
+import java.util.Set;
 
 class build {
   public static void main(String... args) {
-    System.setProperty("java.util.logging.config.file", ".bach/src/logging.properties");
-    var options = Options.of(args);
     var project =
         Project.of("purejin", "8.2-ea")
-            .withMainSpace(build::main)
-            .withTestSpace(build::test)
-            .withExternalModuleLocators(JUnit.V_5_8_0_M1)
-            .with(options);
-    var settings =
-        Settings.of()
-            .withWorkflowTweakHandler(build::tweak)
-            .withWorkflowCheckpointHandler(build::at)
-            .with(options);
-    Bach.build(new Bach(project, settings));
+            .withSpaces(build::spaces)
+            .withExternals(externals -> externals.withExternalModuleLocator(JUnit.version("5.8.1")))
+            .with(Options.parse(args));
+    var main = project.space("main");
+    try (var bach = new PureBach()) {
+      bach.logMessage("Build project %s".formatted(project.toNameAndVersion()));
+      var builder = new WorkflowBuilder(bach, project);
+      builder.grab();
+      builder.compile();
+      builder.runAllTests();
+      builder.runWorkflow(new GenerateApiDocumentationWorkflow(bach, project, main));
+    }
+  }
+
+  static ProjectSpaces spaces(ProjectSpaces spaces) {
+    return spaces.withSpace("main", build::main).withSpace("test", Set.of("main"), build::test);
   }
 
   static ProjectSpace main(ProjectSpace main) {
-    return main.withJavaRelease(8)
-        .withModuleSourcePaths("./*/main/java", "./*/main/java-module")
+    return main.withRelease(8)
         .withModule("se.jbee.inject/main/java-module/module-info.java")
         .withModule(
             "se.jbee.inject.action/main/java-module/module-info.java",
-            module -> module.withSources(module.name() + "/main/java"))
+            module -> module.withSourcesFolder(module.name() + "/main/java"))
         .withModule(
             "se.jbee.inject.api/main/java-module/module-info.java",
-            module -> module.withSources(module.name() + "/main/java"))
+            module -> module.withSourcesFolder(module.name() + "/main/java"))
         .withModule(
             "se.jbee.inject.bind/main/java-module/module-info.java",
-            module -> module.withSources(module.name() + "/main/java"))
+            module -> module.withSourcesFolder(module.name() + "/main/java"))
         .withModule(
             "se.jbee.inject.bootstrap/main/java-module/module-info.java",
-            module -> module.withSources(module.name() + "/main/java"))
+            module -> module.withSourcesFolder(module.name() + "/main/java"))
         .withModule(
             "se.jbee.inject.container/main/java-module/module-info.java",
-            module -> module.withSources(module.name() + "/main/java"))
+            module -> module.withSourcesFolder(module.name() + "/main/java"))
         .withModule(
             "se.jbee.inject.contract/main/java-module/module-info.java",
-            module -> module.withSources(module.name() + "/main/java"))
+            module -> module.withSourcesFolder(module.name() + "/main/java"))
         .withModule(
             "se.jbee.inject.convert/main/java-module/module-info.java",
-            module -> module.withSources(module.name() + "/main/java"))
+            module -> module.withSourcesFolder(module.name() + "/main/java"))
         .withModule(
             "se.jbee.inject.event/main/java-module/module-info.java",
-            module -> module.withSources(module.name() + "/main/java"))
+            module -> module.withSourcesFolder(module.name() + "/main/java"))
         .withModule(
             "se.jbee.lang/main/java-module/module-info.java",
-            module -> module.withSources(module.name() + "/main/java"));
+            module -> module.withSourcesFolder(module.name() + "/main/java"));
   }
 
   static ProjectSpace test(ProjectSpace test) {
-    return test.withModuleSourcePaths("./*/test/java")
-        .withModule("se.jbee.junit.assertion/test/java/module-info.java")
+    return test.withModule("se.jbee.junit.assertion/test/java/module-info.java")
         .withModule(
             "test.examples/test/java/module-info.java",
-            module -> module.withResources(module.name() + "/test/resources"))
+            module -> module.withResourcesFolder(module.name() + "/test/resources"))
         .withModule(
             "test.integration/test/java/module-info.java",
-            module -> module.withResources(module.name() + "/test/resources"))
-        .withModulePaths(".bach/workspace/modules", ".bach/external-modules");
+            module -> module.withResourcesFolder(module.name() + "/test/resources"));
   }
 
-  static Call tweak(Tweak tweak) {
-    if (tweak.call() instanceof JavacCall javac) {
-      return javac.with("-Xlint");
-    }
-    if (tweak.call() instanceof JUnitCall junit) {
-      if (junit.arguments().contains("test.integration"))
-        return junit.with("--fail-if-no-tests");
-    }
-    return tweak.call();
-  }
-
-  static void at(Checkpoint checkpoint) {
-    if (checkpoint instanceof BuildWorkflow.SuccessCheckpoint) {
-      generateApiDocumentation(checkpoint.workflow().bach());
+  static class PureBach extends Bach {
+    @Override
+    public ToolRun run(Command<?> command) {
+      if (command instanceof JavacCommand javac) {
+        command = javac.add("-encoding", "UTF-8");
+      }
+      return super.run(command);
     }
   }
 
-  static void generateApiDocumentation(Bach bach) {
-    var project = bach.project();
-    var main = project.spaces().main();
-    var finder = DeclaredModuleFinder.of(main.modules());
-    bach.execute(
-        Call.tool("javadoc")
-            .with("--module", String.join(",", finder.names().toList()))
-            .with("-d", bach.folders().workspace("documentation", "api"))
-            .with(
-                "--module-source-path",
-                "./*/main/java-module" + File.pathSeparator + "./*/main/java")
-            .with("--module-path", ".bach/external-modules")
-            .with("-notimestamp")
-            .with("-encoding", project.defaults().encoding())
-            .with("-use")
-            .with("-linksource")
-            .with("-Xdoclint:-missing")
-            .with(
-                "-group",
-                "API",
-                "se.jbee.inject:se.jbee.inject.api:se.jbee.inject.bind:se.jbee.inject.lang")
-            .with("-group", "Container", "se.jbee.inject.bootstrap:se.jbee.inject.container")
-            .with(
-                "-group",
-                "Add-ons",
-                "se.jbee.inject.action:se.jbee.inject.event:se.jbee.inject.convert:se.jbee.inject.contract"));
+  static class GenerateApiDocumentationWorkflow extends AbstractSpaceWorkflow {
+
+    GenerateApiDocumentationWorkflow(Bach bach, Project project, ProjectSpace space) {
+      super(bach, project, space);
+    }
+
+    @Override
+    public void run() {
+      var api = bach.path().workspace("documentation", "api");
+      bach.logCaption("Generate API documentation");
+      bach.run(
+          Command.javadoc()
+              .add("--module", String.join(",", space.modules().names()))
+              .add("-d", api)
+              .add(
+                  "--module-source-path",
+                  "./*/main/java-module" + File.pathSeparator + "./*/main/java")
+              .add("--module-path", ".bach/external-modules")
+              .add("-notimestamp")
+              .add("-encoding", "UTF-8")
+              .add("-use")
+              .add("-linksource")
+              .add("-Xdoclint:-missing")
+              .add(
+                  "-group",
+                  "API",
+                  "se.jbee.inject:se.jbee.inject.api:se.jbee.inject.bind:se.jbee.inject.lang")
+              .add("-group", "Container", "se.jbee.inject.bootstrap:se.jbee.inject.container")
+              .add(
+                  "-group",
+                  "Add-ons",
+                  "se.jbee.inject.action:se.jbee.inject.event:se.jbee.inject.convert:se.jbee.inject.contract"));
+      bach.run(
+          Command.jar()
+              .mode("--create")
+              .file(api.resolveSibling("api.jar"))
+              .add("--no-manifest")
+              .filesAdd(api));
+    }
   }
 }
