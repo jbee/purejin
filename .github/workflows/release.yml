@@ -18,7 +18,7 @@ jobs:
       - name: 'Set up JDK'
         uses: actions/setup-java@v1
         with:
-          java-version: 16
+          java-version: 17
       - name: 'Build purejin ${{ env.VERSION }}'
         run: .bach/bin/bach build --project-version ${VERSION}
       - name: 'Upload artifact ${{ github.event.repository.name }}-build-${{ env.VERSION }}'
@@ -31,7 +31,7 @@ jobs:
             .bach/workspace/logbook.md
             .bach/workspace/deploy
             .bach/workspace/documentation/*.zip
-            .bach/workspace/modules
+            .bach/workspace/main/modules
 
   deploy-to-releases:
     needs: [ build ]
@@ -50,10 +50,10 @@ jobs:
           title: "purejin ${{ env.VERSION }}"
           files: |
             .bach/workspace/documentation/*.zip
-            .bach/workspace/modules/se.jbee.lang@*.jar
-            .bach/workspace/modules/se.jbee.inject@*.jar
-            .bach/workspace/modules/se.jbee.inject.api@*.jar
-            .bach/workspace/modules/se.jbee.inject.container@*.jar
-            .bach/workspace/modules/se.jbee.inject.bind@*.jar
-            .bach/workspace/modules/se.jbee.inject.bootstrap@*.jar
-            .bach/workspace/modules/se.jbee.inject.action@*.jar
+            .bach/workspace/main/modules/se.jbee.lang@*.jar
+            .bach/workspace/main/modules/se.jbee.inject@*.jar
+            .bach/workspace/main/modules/se.jbee.inject.api@*.jar
+            .bach/workspace/main/modules/se.jbee.inject.container@*.jar
+            .bach/workspace/main/modules/se.jbee.inject.bind@*.jar
+            .bach/workspace/main/modules/se.jbee.inject.bootstrap@*.jar
+            .bach/workspace/main/modules/se.jbee.inject.action@*.jar
