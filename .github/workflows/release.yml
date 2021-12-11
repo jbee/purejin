@@ -18,14 +18,9 @@ jobs:
       - name: 'Set up JDK'
         uses: actions/setup-java@v1
         with:
-          java-version: 16-ea
+          java-version: 16
       - name: 'Build purejin ${{ env.VERSION }}'
-        run: |
-          java \
-            -Dbach.project.version=$VERSION \
-            --module-path .bach/cache \
-            --module com.github.sormuras.bach \
-            build
+        run: .bach/bin/bach --project-version ${VERSION} build
       - name: 'Upload artifact ${{ github.event.repository.name }}-build-${{ env.VERSION }}'
         if: always()
         uses: actions/upload-artifact@v2

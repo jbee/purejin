@@ -16,8 +16,8 @@ Releases    https://github.com/jbee/purejin/releases
 
 Build       https://github.com/sormuras/bach
 
-- Install latest JDK (at least 16-ea) on your machine.
-- Launch `./bach build` on Linux/Mac or `bach build` on Windows.
+- Install JDK 16 (or higher) on your machine
+- Launch `.bach/bin/bach build` (Windows: `.bach\bin\bach build`)
 
 --------------------------------------------------------------------------
 
