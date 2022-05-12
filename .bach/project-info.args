@@ -1,2 +1,0 @@
---module-info-find-pattern
-  glob:*/{init,main,test}/{java,java-module}/module-info.java
