@@ -5,7 +5,7 @@ ______  __ _________   ____     |__|__| ____
 |   __/|____/ |__|    \___  >\__|  |__|___|  /
 |__|                      \/\______|       \/
 
-Build with Java 16+, usable with Java 8+
+Build with Java 17+, usable with Java 11+
 
 Docs        http://jbee.github.io/purejin/
 Feedback    http://github.com/jbee/purejin/issues
@@ -16,7 +16,7 @@ Releases    https://github.com/jbee/purejin/releases
 
 Build       https://github.com/sormuras/bach
 
-- Install JDK 16 (or higher) on your machine
+- Install JDK 17 (or higher) on your machine
 - Launch `.bach/bin/bach build` (Windows: `.bach\bin\bach build`)
 
 --------------------------------------------------------------------------
