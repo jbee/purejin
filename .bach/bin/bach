@@ -1,18 +1,42 @@
 #!/usr/bin/env bash
 
-if [[ $1 == 'boot' ]]; then
-  jshell --module-path .bach/bin --add-modules com.github.sormuras.bach
-  exit $?
-fi
-
 if [[ $1 == 'init' ]]; then
   if [[ -z $2 ]]; then
     echo "Usage: bach init VERSION"
     exit 1
   fi
-  jshell -R-Dbach-version=$2 https://git.io/bach-init
+  jshell -R-Dbach-version="$2" https://git.io/bach-init
   exit $?
 fi
 
-java --module-path .bach/bin --module com.github.sormuras.bach "$@"
+if [ "`echo .bach/bin/*.jar`" == ".bach/bin/*.jar" ]; then
+  if [[ ! -f '.bach/bach-init.version' ]]; then
+    echo "Usage: bach init VERSION"
+    exit 1
+  fi
+  VERSION=$(<.bach/bach-init.version)
+  jshell -R-Dbach-version=$VERSION https://git.io/bach-init
+fi
+
+if [[ $1 == 'boot' ]]; then
+  shift 1
+  jshell --module-path .bach/bin --add-modules ALL-MODULE-PATH,ALL-SYSTEM .bach/bin/bach.jshell "$@"
+  exit $?
+fi
+
+JAVA_LAUNCHER_ARGUMENTS=('--module-path=.bach/bin' '--add-modules=ALL-MODULE-PATH' '--add-modules=ALL-DEFAULT')
+
+if [[ -f ".bach/src/$1.java" ]]; then
+  PROGRAM=".bach/src/$1.java"
+  shift 1
+  java "${JAVA_LAUNCHER_ARGUMENTS[@]}" "$PROGRAM" "$@"
+  exit $?
+fi
+
+if [[ -f "$1" ]]; then
+  java "${JAVA_LAUNCHER_ARGUMENTS[@]}" "$@"
+  exit $?
+fi
+
+java "${JAVA_LAUNCHER_ARGUMENTS[@]}" --module com.github.sormuras.bach "$@"
 exit $?

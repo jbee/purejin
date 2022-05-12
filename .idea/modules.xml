@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/bach.info.iml" filepath="$PROJECT_DIR$/.idea/bach.info.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/project.iml" filepath="$PROJECT_DIR$/.idea/project.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/purejin.iml" filepath="$PROJECT_DIR$/.idea/purejin.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/se.jbee.inject.iml" filepath="$PROJECT_DIR$/.idea/se.jbee.inject.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/se.jbee.inject.action.iml" filepath="$PROJECT_DIR$/.idea/se.jbee.inject.action.iml" />

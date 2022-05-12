@@ -4,7 +4,6 @@
     <exclude-output />
     <content url="file://$MODULE_DIR$/se.jbee.inject.container">
       <sourceFolder url="file://$MODULE_DIR$/se.jbee.inject.container/main/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/se.jbee.inject.container/main/java-module" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="se.jbee.inject.api" />

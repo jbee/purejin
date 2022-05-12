@@ -1,25 +1,9 @@
-import static com.github.sormuras.bach.api.ExternalLibraryName.JUNIT;
+import com.github.sormuras.bach.Configurator;
 
-import com.github.sormuras.bach.api.ProjectInfo;
-import com.github.sormuras.bach.api.ProjectInfo.*;
-
+/*
 @ProjectInfo(
-        name = "purejin",
-        version = "8.2-ea",
-        main = @Main(javaRelease = 8, jarWithSources = true),
-        external = @External(libraries = @ExternalLibrary(name = JUNIT, version = "5.8.0-M1")),
         tool = @Tool(
                 skip = {"jdeps", "jlink"},
-                tweaks = {
-                    @Tweak(
-                        tool = "javac",
-                        with = """
-                            -g
-                            -encoding
-                              UTF-8
-                            -parameters
-                            -Xlint
-                            """),
                     @Tweak(
                         tool = "javadoc",
                         with = """
@@ -42,6 +26,8 @@ import com.github.sormuras.bach.api.ProjectInfo.*;
                     @Tweak(tool = "junit(test.integration)", with = "--fail-if-no-tests")
                 })
         )
-module bach.info {
+*/
+module project {
     requires com.github.sormuras.bach;
+    provides Configurator with project.PurejinConfigurator;
 }
