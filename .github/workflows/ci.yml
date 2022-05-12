@@ -21,7 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest ]
-        java: [ 16 ]
+        java: [ 17, 18 ]
         language: [ 'java' ]
     runs-on: ${{ matrix.os }}
     steps:
@@ -43,14 +43,14 @@ jobs:
         if: always()
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          files: .bach/workspace/reports/junit/*/*.xml
+          files: .bach/out/test-reports/junit*/*.xml
       - name: 'Upload build artifact'
         uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}-build-${{ env.VERSION }}
           path: |
-            .bach/workspace/logbook.md
-            .bach/workspace/modules
+            .bach/out/bach-logbook.jfr
+            .bach/out/main/modules
       - name: 'Release early-access build'
         if: github.ref == 'refs/heads/master'
         uses: marvinpinto/action-automatic-releases@latest
@@ -60,10 +60,10 @@ jobs:
           prerelease: true
           title: "purejin ${{ env.VERSION }}"
           files: |
-            .bach/workspace/modules/se.jbee.lang@*-ea.jar
-            .bach/workspace/modules/se.jbee.inject@*-ea.jar
-            .bach/workspace/modules/se.jbee.inject.api@*-ea.jar
-            .bach/workspace/modules/se.jbee.inject.container@*-ea.jar
-            .bach/workspace/modules/se.jbee.inject.bind@*-ea.jar
-            .bach/workspace/modules/se.jbee.inject.bootstrap@*-ea.jar
-            .bach/workspace/modules/se.jbee.inject.action@*-ea.jar
+            .bach/out/main/modules/se.jbee.lang@*-ea.jar
+            .bach/out/main/modules/se.jbee.inject@*-ea.jar
+            .bach/out/main/modules/se.jbee.inject.api@*-ea.jar
+            .bach/out/main/modules/se.jbee.inject.container@*-ea.jar
+            .bach/out/main/modules/se.jbee.inject.bind@*-ea.jar
+            .bach/out/main/modules/se.jbee.inject.bootstrap@*-ea.jar
+            .bach/out/main/modules/se.jbee.inject.action@*-ea.jar
