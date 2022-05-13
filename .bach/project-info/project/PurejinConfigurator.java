@@ -1,11 +1,11 @@
 package project;
 
 import com.github.sormuras.bach.Configurator;
-import com.github.sormuras.bach.project.Project;
+import com.github.sormuras.bach.Project;
 
 public class PurejinConfigurator implements Configurator {
 	@Override
-	public Project configure(Project project) {
+	public Project configureProject(Project project) {
 		return project
 				.withName("purejin")
 				.withVersion("8.2-ea")
