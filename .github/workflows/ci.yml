@@ -39,11 +39,10 @@ jobs:
       - name: 'Build with Bach'
         run: .bach/bin/bach --project-version ${VERSION} build
       - name: 'Report test summary'
-        uses: docker://ghcr.io/enricomi/publish-unit-test-result-action:v1
         if: always()
+        uses: test-summary/action@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          files: .bach/out/test-reports/junit*/*.xml
+          paths: .bach/out/test-reports/**/TEST-*.xml
       - name: 'Upload build artifact'
         uses: actions/upload-artifact@v2
         with:
