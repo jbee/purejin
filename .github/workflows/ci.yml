@@ -12,7 +12,7 @@ on:
     branches: [ master ]
 
 env:
-  PROJECT_VERSION: '8.2-ea'
+  PROJECT_VERSION: '11-ea'
 
 jobs:
   build:
