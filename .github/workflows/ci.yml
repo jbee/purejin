@@ -12,7 +12,7 @@ on:
     branches: [ master ]
 
 env:
-  PROJECT_VERSION: '8.2-ea'
+  PROJECT_VERSION: '11-ea'
 
 jobs:
   build:
@@ -21,7 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest ]
-        java: [ 17, 18 ]
+        java: [ 17 ]
         language: [ 'java' ]
     runs-on: ${{ matrix.os }}
     steps:
@@ -39,11 +39,10 @@ jobs:
       - name: 'Build with Bach'
         run: .bach/bin/bach --project-version ${VERSION} build
       - name: 'Report test summary'
-        uses: docker://ghcr.io/enricomi/publish-unit-test-result-action:v1
         if: always()
+        uses: test-summary/action@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          files: .bach/out/test-reports/junit*/*.xml
+          paths: .bach/out/test-reports/**/TEST-*.xml
       - name: 'Upload build artifact'
         uses: actions/upload-artifact@v2
         with:
@@ -60,10 +59,10 @@ jobs:
           prerelease: true
           title: "purejin ${{ env.VERSION }}"
           files: |
-            .bach/out/main/modules/se.jbee.lang@*-ea.jar
-            .bach/out/main/modules/se.jbee.inject@*-ea.jar
-            .bach/out/main/modules/se.jbee.inject.api@*-ea.jar
-            .bach/out/main/modules/se.jbee.inject.container@*-ea.jar
-            .bach/out/main/modules/se.jbee.inject.bind@*-ea.jar
-            .bach/out/main/modules/se.jbee.inject.bootstrap@*-ea.jar
-            .bach/out/main/modules/se.jbee.inject.action@*-ea.jar
+            .bach/out/main/modules/se.jbee.lang*.jar
+            .bach/out/main/modules/se.jbee.inject*.jar
+            .bach/out/main/modules/se.jbee.inject.api*.jar
+            .bach/out/main/modules/se.jbee.inject.container*.jar
+            .bach/out/main/modules/se.jbee.inject.bind*.jar
+            .bach/out/main/modules/se.jbee.inject.bootstrap*.jar
+            .bach/out/main/modules/se.jbee.inject.action*.jar

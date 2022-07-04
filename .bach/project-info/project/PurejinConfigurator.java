@@ -10,18 +10,26 @@ public class PurejinConfigurator implements Configurator {
 	public Project configureProject(Project project) {
 		return project
 				.withName("purejin")
-				.withVersion("8.2-ea")
+				.withVersion("11-ea")
 				.withTargetsJava(11)
-				.withTweak("main", ToolCallTweak.WORKFLOW_COMPILE_CLASSES_JAVAC,
-						javac -> javac.with("-g").with("-encoding",
-						"UTF-8").with(
-						"-parameters").with(
-						"-Xlint:-missing-explicit-ctor"))
-				.withTweak("test", ToolCallTweak.WORKFLOW_COMPILE_CLASSES_JAVAC,
-						javac -> javac.with("-g").with("-encoding",
-								"UTF-8").with(
-								"-parameters").with(
-								"-Xlint:-serial"))
-				;
+				.withTweak(
+						ToolCallTweak.WORKFLOW_COMPILE_CLASSES_JAVAC,
+						javac -> javac
+								.with("-g")
+								.with("-encoding", "UTF-8")
+								.with("-parameters")
+								.with("-Xlintmissing-explicit-ctor"))
+				.withTweak("test",
+						ToolCallTweak.WORKFLOW_COMPILE_CLASSES_JAVAC,
+						javac -> javac
+								.with("-g")
+								.with("-encoding", "UTF-8")
+								.with("-parameters")
+								.with("-Xlint:-serial"))
+				.withTweak("test",
+						ToolCallTweak.WORKFLOW_TEST_JUNIT,
+						junit -> junit
+								.with("--details", "NONE")
+								.with("--disable-banner"));
 	}
 }
