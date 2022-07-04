@@ -18,7 +18,7 @@ public class PurejinConfigurator implements Configurator {
 								.with("-g")
 								.with("-encoding", "UTF-8")
 								.with("-parameters")
-								.with("-Xlintmissing-explicit-ctor"))
+								.with("-Xlint:-missing-explicit-ctor"))
 				.withTweak("test",
 						ToolCallTweak.WORKFLOW_COMPILE_CLASSES_JAVAC,
 						javac -> javac
