@@ -4,9 +4,9 @@
  */
 module se.jbee.inject.event {
 
-	requires se.jbee.lang;
-	requires se.jbee.inject.api;
-	requires se.jbee.inject.bind;
+	requires transitive se.jbee.lang;
+	requires transitive se.jbee.inject.api;
+	requires transitive se.jbee.inject.bind;
 	requires se.jbee.inject.bootstrap;
 
 	exports se.jbee.inject.event;

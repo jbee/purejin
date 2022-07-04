@@ -3,8 +3,8 @@
  */
 module se.jbee.inject.container {
 
-	requires se.jbee.lang;
-	requires se.jbee.inject.api;
+	requires transitive se.jbee.lang;
+	requires transitive se.jbee.inject.api;
 
 	exports se.jbee.inject.container;
 }

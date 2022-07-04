@@ -7,8 +7,8 @@
  */
 module se.jbee.inject.bind {
 
-	requires se.jbee.lang;
-	requires se.jbee.inject.api;
+	requires transitive se.jbee.lang;
+	requires transitive se.jbee.inject.api;
 
 	exports se.jbee.inject.bind;
 	exports se.jbee.inject.binder;

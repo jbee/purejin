@@ -25,6 +25,8 @@ import static se.jbee.lang.Utils.*;
 public final class Packages
 		implements Qualifying<Packages>, Serializable, Comparable<Packages> {
 
+	private static final long serialVersionUID = -4308799735424634367L;
+
 	/**
 	 * Contains all packages including the (default) package.
 	 */

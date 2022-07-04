@@ -71,7 +71,7 @@ public final class LiftResources {
 			if (lift != null)
 				matching.put(lift, r);
 		}
-		Lift<?>[] unsorted = matching.keySet().toArray(new Lift[0]);
+		Lift<?>[] unsorted = matching.keySet().toArray(Lift[]::new);
 		Lift<?>[] sorted = unsorted.length <= 1
 				? unsorted
 				: sequencer.order(actualType, unsorted);

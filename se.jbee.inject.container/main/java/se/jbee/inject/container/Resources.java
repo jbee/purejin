@@ -108,7 +108,7 @@ final class Resources {
 					res.add(resource);
 			}
 		Collections.sort(res);
-		return res.isEmpty() ? null : res.toArray(new Resource[0]);
+		return res.isEmpty() ? null : res.toArray(Resource[]::new);
 	}
 
 	private Resource<?>[] createResources(SupplyContext context,
@@ -174,7 +174,7 @@ final class Resources {
 			private ResourceResolutionFailed noResourceFor(Dependency<?> dep) {
 				return new ResourceResolutionFailed("During bootstrapping only ",
 						dep, lifeCycleResourceByScope.values().toArray(
-								new Resource[0]));
+								Resource[]::new));
 			}
 		};
 	}

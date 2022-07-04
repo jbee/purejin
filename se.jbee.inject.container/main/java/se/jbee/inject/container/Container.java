@@ -9,6 +9,7 @@ import se.jbee.inject.*;
 import se.jbee.inject.UnresolvableDependency.ResourceResolutionFailed;
 import se.jbee.lang.Type;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -175,7 +176,7 @@ public final class Container implements Injector, Env {
 		return toArray(elements, elemType);
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked"})
 	private <R, T> Resource<T>[] resolveArrayElementResources(Dependency<R> resourceDep,
 			Type<T> generatedType) {
 		Dependency<T> dep = resourceDep.typed(generatedType);
