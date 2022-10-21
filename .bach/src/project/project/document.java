@@ -1,13 +1,11 @@
 package project;
 
-import java.util.List;
-import run.bach.Bach;
 import run.bach.ToolOperator;
 
-public class Document implements ToolOperator {
+public class document implements ToolOperator {
   @Override
-  public void operate(Bach bach, List<String> arguments) {
-    bach.run("javadoc",
+  public void run(Operation operation) {
+    operation.run("javadoc",
         """
         --module
           se.jbee.inject,se.jbee.inject.action,se.jbee.inject.api,se.jbee.inject.bind,se.jbee.inject.bootstrap,se.jbee.inject.container,se.jbee.inject.contract,se.jbee.inject.convert,se.jbee.inject.event,se.jbee.lang
@@ -30,6 +28,6 @@ public class Document implements ToolOperator {
         -group
           Add-ons
           se.jbee.inject.action:se.jbee.inject.event:se.jbee.inject.convert:se.jbee.inject.contract
-        """.lines().map(String::trim).toList());
+        """.lines().map(String::trim).toArray(String[]::new));
   }
 }

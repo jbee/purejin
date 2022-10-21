@@ -11,10 +11,7 @@ public class PurejinConfigurator implements Project.Composer, ToolTweak {
     return project
         .withName("purejin")
         .withVersion("11-ea")
-        .withTargetsJava(11)
-        .withRequiresModule("org.junit.jupiter")
-        .withRequiresModule("org.junit.platform.console")
-        .withRequiresModule("org.junit.platform.jfr");
+        .withTargetsJava(11);
   }
 
   @Override
