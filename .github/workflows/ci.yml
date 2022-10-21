@@ -26,27 +26,27 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: 'Check out sources'
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: 'Set up JDK'
-        uses: actions/setup-java@v1
+        uses: oracle-actions/setup-java@v1
         with:
-          java-version: ${{ matrix.java }}
+          release: ${{ matrix.java }}
       - name: 'Set up version'
         run: |
           SHA7=$(echo "${{ github.sha }}" | cut -c1-7)
           VERSION=${PROJECT_VERSION}+${SHA7}
           echo "VERSION=${VERSION}" >> ${GITHUB_ENV}
       - name: 'Build with Bach'
-        run: .bach/bin/bach --project-version ${VERSION} build
+        run: .bach/bin/bach build
       - name: 'Report test summary'
         if: always()
         uses: test-summary/action@v1
         with:
           paths: .bach/out/test-reports/**/TEST-*.xml
       - name: 'Upload build artifact'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.repository.name }}-build-${{ env.VERSION }}
           path: |
-            .bach/out/bach-logbook.jfr
+            .bach/out/bach-events.jfr
             .bach/out/main/modules

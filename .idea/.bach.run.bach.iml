@@ -2,11 +2,10 @@
 <module type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_17" inherit-compiler-output="true">
     <exclude-output />
-    <content url="file://$MODULE_DIR$/se.jbee.junit.assertion">
-      <sourceFolder url="file://$MODULE_DIR$/se.jbee.junit.assertion/test/java" isTestSource="true" />
+    <content url="file://$MODULE_DIR$/.bach/src/run.bach">
+      <sourceFolder url="file://$MODULE_DIR$/.bach/src/run.bach" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="bach-external-modules" level="project" />
   </component>
 </module>

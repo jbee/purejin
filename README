@@ -17,7 +17,7 @@ Releases    https://github.com/jbee/purejin/releases
 Build       https://github.com/sormuras/bach
 
 - Install JDK 17 (or higher) on your machine
-- Launch `.bach/bin/bach build` (Windows: `.bach\bin\bach build`)
+- Execute `java .bach/bin/bach.java build`
 
 --------------------------------------------------------------------------
 
