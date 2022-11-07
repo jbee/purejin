@@ -1,15 +1,12 @@
 package project;
 
-import com.github.sormuras.bach.Bach;
-import com.github.sormuras.bach.ToolOperator;
-import java.io.PrintWriter;
+import run.bach.ToolOperator;
 
-public class Document implements ToolOperator {
+public class document implements ToolOperator {
   @Override
-  public int run(Bach bach, PrintWriter out, PrintWriter err, String... args) {
-    bach.run(
+  public void run(Operation operation) {
+    operation.run("javadoc",
         """
-        javadoc
         --module
           se.jbee.inject,se.jbee.inject.action,se.jbee.inject.api,se.jbee.inject.bind,se.jbee.inject.bootstrap,se.jbee.inject.container,se.jbee.inject.contract,se.jbee.inject.convert,se.jbee.inject.event,se.jbee.lang
         --module-source-path
@@ -31,7 +28,6 @@ public class Document implements ToolOperator {
         -group
           Add-ons
           se.jbee.inject.action:se.jbee.inject.event:se.jbee.inject.convert:se.jbee.inject.contract
-        """);
-    return 0;
+        """.lines().map(String::trim).toArray(String[]::new));
   }
 }
