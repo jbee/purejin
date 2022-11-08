@@ -13,7 +13,7 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://$MODULE_DIR$/.bach/bin" />
+          <root url="jar://$MODULE_DIR$/.bach/bin/run.bach.jar!/" />
         </SOURCES>
         <jarDirectory url="file://$MODULE_DIR$/.bach/bin" recursive="false" />
       </library>
