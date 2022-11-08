@@ -40,7 +40,7 @@ jobs:
         run: .bach/bin/bach build
       - name: 'Report test summary'
         if: always()
-        uses: test-summary/action@v1
+        uses: test-summary/action@v2
         with:
           paths: .bach/out/test-reports/**/TEST-*.xml
       - name: 'Upload build artifact'
