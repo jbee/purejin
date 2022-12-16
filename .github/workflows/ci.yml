@@ -37,7 +37,7 @@ jobs:
           VERSION=${PROJECT_VERSION}+${SHA7}
           echo "VERSION=${VERSION}" >> ${GITHUB_ENV}
       - name: 'Build with Bach'
-        run: .bach/bin/bach build
+        run: .bach/bin/bach --project-version 11-ea-${VERSION} build
       - name: 'Report test summary'
         if: always()
         uses: test-summary/action@v2
@@ -48,5 +48,4 @@ jobs:
         with:
           name: ${{ github.event.repository.name }}-build-${{ env.VERSION }}
           path: |
-            .bach/out/bach-events.jfr
             .bach/out/main/modules
