@@ -1,4 +1,32 @@
-@run.bach.Command(
+import run.bach.Command;
+import run.bach.ProjectInfo;
+import run.bach.ProjectInfo.Space;
+
+@ProjectInfo(
+    name = "purejin",
+    version = "11-ea",
+    spaces = {
+      @Space(
+          name = "main",
+          release = 11,
+          modules = {
+            "se.jbee.inject",
+            "se.jbee.inject.action",
+            "se.jbee.inject.api",
+            "se.jbee.inject.bind",
+            "se.jbee.inject.bootstrap",
+            "se.jbee.inject.container",
+            "se.jbee.inject.contract",
+            "se.jbee.inject.convert",
+            "se.jbee.inject.event",
+            "se.jbee.lang"
+          }),
+      @Space(
+          name = "test",
+          requires = "main",
+          modules = {"se.jbee.junit.assertion", "test.examples", "test.integration"})
+    })
+@Command(
     name = "document",
     args = {
       """
