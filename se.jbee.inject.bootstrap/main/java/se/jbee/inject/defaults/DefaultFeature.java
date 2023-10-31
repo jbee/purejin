@@ -107,7 +107,7 @@ public enum DefaultFeature implements Dependent<DefaultFeature> {
 	REFLECT(true),
 	;
 
-	public static final DefaultFeature[] INSTALLED_BY_DEFAULT = Arrays.stream(DefaultFeature.values()) //
+	static final DefaultFeature[] INSTALLED_BY_DEFAULT = Arrays.stream(DefaultFeature.values()) //
 			.filter(e -> e.installedByDefault) //
 			.toArray(DefaultFeature[]::new);
 

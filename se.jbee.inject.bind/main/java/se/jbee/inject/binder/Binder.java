@@ -336,6 +336,12 @@ public class Binder {
 			.asEvent();
 	}
 
+	public void convertIn(Class<?> bean, Class<? extends Annotation> conversion) {
+		connect(declaredMethods(true).annotatedWith(conversion)) //
+			.inAny(bean) //
+			.asConversion();
+	}
+
 	protected Binder on(Bind bind) {
 		return new Binder(root, bind);
 	}

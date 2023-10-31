@@ -5,4 +5,7 @@ import se.jbee.inject.config.ProducesBy;
 public interface ConnectInBinder<B> {
 
 	B connect(ProducesBy connectsBy);
+
+
+	//TODO use - make a in(...).do
 }

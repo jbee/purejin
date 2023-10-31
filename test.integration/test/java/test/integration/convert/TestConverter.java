@@ -13,6 +13,7 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static se.jbee.inject.Converter.converterTypeOf;
 import static se.jbee.inject.Resource.resourceTypeOf;
 import static se.jbee.lang.Cast.listTypeOf;
 import static se.jbee.lang.Type.classType;
@@ -69,7 +70,7 @@ class TestConverter {
 	void converterMethodsWithTypeVariableUseScopeDependencyType() {
 		@SuppressWarnings("rawtypes")
 		Resource<Converter<String, List>> str2ints = context.resolve(
-				resourceTypeOf(Converter.converterTypeOf(raw(String.class),
+				resourceTypeOf(converterTypeOf(raw(String.class),
 						classType(List.class))));
 		assertEquals(Scope.dependencyType, str2ints.lifeCycle.scope);
 	}
@@ -77,10 +78,10 @@ class TestConverter {
 	@Test
 	void genericMethodConverters() {
 		Converter<String, List<Integer>> str2ints = context.resolve(
-				Converter.converterTypeOf(raw(String.class), listTypeOf(Integer.class)));
+				converterTypeOf(raw(String.class), listTypeOf(Integer.class)));
 		assertEquals(asList(42, 13), str2ints.convert("42, 13"));
 		Converter<String, List<Long>> str2longs = context.resolve(
-				Converter.converterTypeOf(raw(String.class), listTypeOf(Long.class)));
+				converterTypeOf(raw(String.class), listTypeOf(Long.class)));
 		assertEquals(asList(42L, 13L), str2longs.convert("42, 13"));
 	}
 }

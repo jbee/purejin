@@ -9,6 +9,7 @@ import se.jbee.inject.*;
 import se.jbee.inject.UnresolvableDependency.NoMethodForDependency;
 import se.jbee.inject.bind.Module;
 import se.jbee.inject.binder.BinderModule;
+import se.jbee.inject.config.ConnectionTarget;
 import se.jbee.inject.config.Connector;
 import se.jbee.inject.config.Invoke;
 import se.jbee.inject.config.ProducesBy;
@@ -80,7 +81,7 @@ public abstract class ActionModule extends BinderModule {
 		/**
 		 * A list of discovered methods for each implementation class.
 		 */
-		private final Map<Type<?>, Set<ActionSite.ActionTarget>> targetsByReturnType = new ConcurrentHashMap<>();
+		private final Map<Type<?>, Set<ConnectionTarget>> targetsByReturnType = new ConcurrentHashMap<>();
 
 		/**
 		 * All already created {@link Action}s identified by a unique function
@@ -103,7 +104,7 @@ public abstract class ActionModule extends BinderModule {
 			targetsByReturnType.computeIfAbsent(
 					actualReturnType(connected, as),
 					key -> ConcurrentHashMap.newKeySet()).add(
-					new ActionSite.ActionTarget(instance, as, connected, invoke));
+					new ConnectionTarget(instance, as, connected, invoke));
 			connectedCount.incrementAndGet();
 		}
 
@@ -151,11 +152,11 @@ public abstract class ActionModule extends BinderModule {
 
 		private <A, B> List<ActionSite<A, B>> resolveActions(Type<A> in,
 				Type<B> out, Injector context, AtomicInteger cachedAtCount) {
-			Set<ActionSite.ActionTarget> targets = targetsByReturnType.get(out);
+			Set<ConnectionTarget> targets = targetsByReturnType.get(out);
 			if (targets == null)
 				return emptyList();
 			List<ActionSite<A, B>> matching = new ArrayList<>();
-			for (ActionSite.ActionTarget candidate : targets) {
+			for (ConnectionTarget candidate : targets) {
 				if (candidate.isUsableFor(in, out))
 					matching.add(new ActionSite<>(candidate, in, out, context,
 							site -> {

@@ -17,6 +17,8 @@ public interface ConnectorBinder {
 
 	String EVENT_CONNECTOR = "on";
 
+	String CONVERSION_CONNECTOR = "conversions";
+
 	/**
 	 * Name of the {@link Connector} used for the scheduler feature.
 	 */
@@ -45,6 +47,10 @@ public interface ConnectorBinder {
 
 	default void asEvent() {
 		to(EVENT_CONNECTOR);
+	}
+
+	default void asConversion() {
+		to(CONVERSION_CONNECTOR);
 	}
 
 	default void asScheduled(String type) {

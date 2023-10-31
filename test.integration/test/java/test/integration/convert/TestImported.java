@@ -15,75 +15,75 @@ class TestImported {
 
 	@Test
 	void wildcardType() {
-		assertResolved("?", "?");
+		assertImportedAs("?", "?");
 	}
 
 	@Test
 	void wildcardGenericType() {
-		assertResolved("List<? extends Number>",
+		assertImportedAs("List<? extends Number>",
 				"java.util.List<? extends java.lang.Number>");
 	}
 
 	@Test
 	void wildcardNestedGenericType() {
-		assertResolved("Function<String, List<? extends Number>>",
+		assertImportedAs("Function<String, List<? extends Number>>",
 				"java.util.function.Function<java.lang.String,java.util.List<? extends java.lang.Number>>");
 	}
 
 	@Test
 	void oneDimensionalArray() {
-		assertResolved("Float[]", "java.lang.Float[]");
+		assertImportedAs("Float[]", "java.lang.Float[]");
 	}
 
 	@Test
 	void twoDimensionalArray() {
-		assertResolved("Double[][]", "java.lang.Double[][]");
+		assertImportedAs("Double[][]", "java.lang.Double[][]");
 	}
 
 	@Test
 	void singleGeneric() {
-		assertResolved("List<String>", "java.util.List<java.lang.String>");
+		assertImportedAs("List<String>", "java.util.List<java.lang.String>");
 	}
 
 	@Test
 	void singleGenericWithArray() {
-		assertResolved("List<String[]>", "java.util.List<java.lang.String[]>");
+		assertImportedAs("List<String[]>", "java.util.List<java.lang.String[]>");
 	}
 
 	@Test
 	void singleArrayOfGenericWithArray() {
-		assertResolved("List<String[]>[]",
+		assertImportedAs("List<String[]>[]",
 				"java.util.List<java.lang.String[]>[]");
 	}
 
 	@Test
 	void singleNestedGeneric() {
-		assertResolved("List<List<String>>",
+		assertImportedAs("List<List<String>>",
 				"java.util.List<java.util.List<java.lang.String>>");
 	}
 
 	@Test
 	void doubleGeneric() {
-		assertResolved("Function<String,Integer>",
+		assertImportedAs("Function<String,Integer>",
 				"java.util.function.Function<java.lang.String,java.lang.Integer>");
 	}
 
 	@Test
 	void doubleNestedGeneric() {
-		assertResolved(
+		assertImportedAs(
 				"Function<Function<String,Integer>,Function<String,Integer>>",
 				"java.util.function.Function<java.util.function.Function<java.lang.String,java.lang.Integer>,java.util.function.Function<java.lang.String,java.lang.Integer>>");
 	}
 
 	@Test
 	void trippleGeneric() {
-		assertResolved("BiFunction<String,Integer,Character>",
+		assertImportedAs("BiFunction<String,Integer,Character>",
 				"java.util.function.BiFunction<java.lang.String,java.lang.Integer,java.lang.Character>");
 	}
 
 	@Test
 	void trippleNestedGeneric() {
-		assertResolved(
+		assertImportedAs(
 				"BiFunction<String,BiFunction<String,String,Function<Integer,Integer>>,Character>",
 				"java.util.function.BiFunction<java.lang.String,java.util.function.BiFunction<java.lang.String,java.lang.String,java.util.function.Function<java.lang.Integer,java.lang.Integer>>,java.lang.Character>");
 	}
@@ -102,7 +102,7 @@ class TestImported {
 					+ "Function<String>\n" + "                ^ here");
 	}
 
-	private void assertResolved(String input, String expected) {
+	private void assertImportedAs(String input, String expected) {
 		assertEquals(expected, imported.resolve(input).toString());
 	}
 

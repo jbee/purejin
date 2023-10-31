@@ -19,48 +19,72 @@ public final class InjectionSite {
 
 	public final Dependency<?> site;
 
-	private final Hint<?>[] actualParameters;
+	private final Hint<?>[] parameters;
 	private final Generator<?>[] generators;
 	private final Object[] preResolvedArgs;
-	private final int[] lazyArgIndexes;
-	private final int lazyArgCount;
+	private final int[] dynamicArgIndexes;
+	private final int dynamicArgCount;
 
 	public InjectionSite(Injector context, Dependency<?> site,
 			Hint<?>[] actualParameters) {
 		this.site = site;
-		this.actualParameters = actualParameters;
+		this.parameters = actualParameters;
 		this.generators = new Generator<?>[actualParameters.length];
 		this.preResolvedArgs = new Object[actualParameters.length];
-		this.lazyArgIndexes = new int[actualParameters.length];
-		this.lazyArgCount = preResolveArgs(context);
+		this.dynamicArgIndexes = new int[actualParameters.length];
+		this.dynamicArgCount = preResolveArgs(context);
+	}
+
+	/**
+	 * @since 8.2
+	 */
+	public boolean hasDynamicArguments() {
+		return dynamicArgCount > 0;
+	}
+
+	/**
+	 * @since 8.2
+	 */
+	public boolean hasOnlyDynamicArguments() {
+		return dynamicArgCount == parameters.length;
 	}
 
 	public Object[] args(Injector context) throws UnresolvableDependency {
-		if (lazyArgCount == 0)
+		if (!hasDynamicArguments())
 			return preResolvedArgs;
+		if (hasOnlyDynamicArguments()) {
+			Object[] args = new Object[dynamicArgCount];
+			for (int i = 0; i < args.length; i++)
+				args[i] = resolveParameter(context, parameters[i], generators[i]);
+			return args;
+		}
 		// in this case we have to copy to become thread-safe!
 		Object[] args = preResolvedArgs.clone();
-		for (int j = 0; j < lazyArgCount; j++) {
-			int i = lazyArgIndexes[j];
-			Hint<?> hint = actualParameters[i];
-			Dependency<?> argDep = site.onInstance(hint.relativeRef).at(hint.at);
-			args[i] = generators[i] == null
-				? context.resolve(argDep)
-				: generate(generators[i], argDep);
+		for (int j = 0; j < dynamicArgCount; j++) {
+			int i = dynamicArgIndexes[j];
+			args[i] = resolveParameter(context, parameters[i],	generators[i]);
 		}
 		return args;
+	}
+
+	private Object resolveParameter(Injector context, Hint<?> hint,
+			Generator<?> generator) {
+		Dependency<?> argDep = site.onInstance(hint.relativeRef).at(hint.at);
+		return generator == null
+			? context.resolve(argDep)
+			: generate(generator, argDep);
 	}
 
 	private int preResolveArgs(Injector context) {
 		int lazyArgIndex = 0;
 		for (int i = 0; i < generators.length; i++) {
-			Hint<?> hint = actualParameters[i];
+			Hint<?> hint = parameters[i];
 			if (hint.type().rawType == Injector.class) {
 				preResolvedArgs[i] = context;
 			} else if (hint.isConstant()) {
 				preResolvedArgs[i] = hint.value;
 			} else if (hint.type().arrayDimensions() == 1) {
-				lazyArgIndexes[lazyArgIndex++] = i;
+				dynamicArgIndexes[lazyArgIndex++] = i;
 			} else if (hint.absoluteRef != null) {
 				preResolvedArgs[i] = context.resolve(hint.absoluteRef.at(hint.at));
 			} else { // relative ref
@@ -73,7 +97,7 @@ public final class InjectionSite {
 					preResolvedArgs[i] = generate(resource,
 							site.onInstance(hint.relativeRef).at(hint.at));
 				} else {
-					lazyArgIndexes[lazyArgIndex++] = i;
+					dynamicArgIndexes[lazyArgIndex++] = i;
 					generators[i] = resource;
 				}
 			}
