@@ -9,8 +9,9 @@ import run.bach.workflow.Structure.*;
 import run.bach.workflow.Workflow;
 
 record Project(Workflow workflow) implements Builder {
+  static final String VERSION = System.getProperty("--project-version", "11-ea");
   static Project ofCurrentWorkingDirectory() {
-    var basics = new Basics("purejin", "11-ea");
+    var basics = new Basics("purejin", VERSION);
     var main =
         new Space(
             "main",

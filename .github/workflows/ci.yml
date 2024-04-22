@@ -39,7 +39,7 @@ jobs:
           VERSION=${PROJECT_VERSION}+${SHA7}
           echo "VERSION=${VERSION}" >> ${GITHUB_ENV}
       - name: 'Build with Bach'
-        run: java --show-version @build ${VERSION}
+        run: java --show-version -D--project-version=${VERSION} @build
       - name: 'Report test summary'
         if: always()
         uses: test-summary/action@v2
