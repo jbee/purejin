@@ -2,7 +2,7 @@
 
 target/
 src/doc/
-lib/
+lib/*.jar
 pom.*
 *~
 
