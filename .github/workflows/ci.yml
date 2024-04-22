@@ -40,6 +40,8 @@ jobs:
           echo "VERSION=${VERSION}" >> ${GITHUB_ENV}
       - name: 'Build with Bach'
         run: java --show-version -D--project-version=${VERSION} @build
+      - name: 'Generate API documentation'
+        run: java -D--project-version=${VERSION} .bach/src/Document.java
       - name: 'Report test summary'
         if: always()
         uses: test-summary/action@v2

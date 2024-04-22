@@ -1,3 +1,4 @@
+import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 import run.bach.Bach;
@@ -51,12 +52,6 @@ record Project(Workflow workflow) implements Builder {
   }
 
   @Override
-  public void build() {
-    Builder.super.build();
-    // TODO document() by default?
-  }
-
-  @Override
   public ToolCall classesCompilerNewJavacToolCall() {
     return ToolCall.of("javac")
         .add("-g")
@@ -72,11 +67,13 @@ record Project(Workflow workflow) implements Builder {
 
   void document() {
     var main = workflow.structure().spaces().space("main");
+    var moduleSourcePaths = main.modules().toModuleSourcePaths();
+    var moduleSourcePath = String.join(File.pathSeparator, moduleSourcePaths);
     var javadoc =
         ToolCall.of("javadoc")
             .add("-quiet")
             .add("--module", main.modules().names(","))
-            .add("--module-source-path", main.modules().toModuleSourcePaths())
+            .add("--module-source-path", moduleSourcePath)
             .add("-d", workflow.folders().out("main", "api"))
             .add("-no" + "timestamp")
             .add("-encoding", "UTF-8")

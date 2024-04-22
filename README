@@ -16,8 +16,8 @@ Releases    https://github.com/jbee/purejin/releases
 
 Build       https://github.com/sormuras/bach
 
-- Checkout sources with submodules
 - Install JDK 22 (or higher) on your machine
+- Clone project sources with submodules
 - Execute `java @build`
 
 --------------------------------------------------------------------------
