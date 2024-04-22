@@ -5,7 +5,7 @@ ______  __ _________   ____     |__|__| ____
 |   __/|____/ |__|    \___  >\__|  |__|___|  /
 |__|                      \/\______|       \/
 
-Build with Java 17+, usable with Java 11+
+Build with Java 22+, usable with Java 11+
 
 Docs        http://jbee.github.io/purejin/
 Feedback    http://github.com/jbee/purejin/issues
@@ -16,14 +16,15 @@ Releases    https://github.com/jbee/purejin/releases
 
 Build       https://github.com/sormuras/bach
 
-- Install JDK 17 (or higher) on your machine
-- Execute `java .bach/bin/bach.java build`
+- Checkout sources with submodules
+- Install JDK 22 (or higher) on your machine
+- Execute `java @build`
 
 --------------------------------------------------------------------------
 
 License     http://www.apache.org/licenses/LICENSE-2.0
 
-Copyright (c) 2012-2021 Jan Bernitt
+Copyright (c) 2012-2024 Jan Bernitt
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE

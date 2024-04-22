@@ -1,0 +1,4 @@
+# Java Arguments File for building this project
+# Usage: java @build [ARGS...]
+
+.bach/src/Build.java

@@ -1,4 +1,5 @@
 out/
+var/
 
 *.class
 *.jar
