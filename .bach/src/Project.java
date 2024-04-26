@@ -1,6 +1,5 @@
 import java.io.File;
 import java.nio.file.Path;
-import java.util.List;
 import run.bach.Bach;
 import run.bach.ToolCall;
 import run.bach.ToolRunner;
@@ -11,33 +10,27 @@ import run.bach.workflow.Workflow;
 
 record Project(Workflow workflow) implements Builder {
   static final String VERSION = System.getProperty("--project-version", "11-ea");
+
   static Project ofCurrentWorkingDirectory() {
     var basics = new Basics("purejin", VERSION);
     var main =
-        new Space(
-            "main",
-            11,
-            "",
-            declareModule("main", "se.jbee.inject"),
-            declareModule("main", "se.jbee.inject.action"),
-            declareModule("main", "se.jbee.inject.api"),
-            declareModule("main", "se.jbee.inject.bind"),
-            declareModule("main", "se.jbee.inject.bootstrap"),
-            declareModule("main", "se.jbee.inject.container"),
-            declareModule("main", "se.jbee.inject.contract"),
-            declareModule("main", "se.jbee.inject.convert"),
-            declareModule("main", "se.jbee.inject.event"),
-            declareModule("main", "se.jbee.lang"));
+        new Space("main")
+            .withTargetingJavaRelease(11)
+            .with(mainModule("se.jbee.inject"))
+            .with(mainModule("se.jbee.inject.action"))
+            .with(mainModule("se.jbee.inject.api"))
+            .with(mainModule("se.jbee.inject.bind"))
+            .with(mainModule("se.jbee.inject.bootstrap"))
+            .with(mainModule("se.jbee.inject.container"))
+            .with(mainModule("se.jbee.inject.contract"))
+            .with(mainModule("se.jbee.inject.convert"))
+            .with(mainModule("se.jbee.inject.event"))
+            .with(mainModule("se.jbee.lang"));
     var test =
-        new Space(
-            "test",
-            List.of(main.name()),
-            0,
-            List.of(),
-            new DeclaredModules(
-                declareModule("test", "se.jbee.junit.assertion"),
-                declareModule("test", "test.examples"),
-                declareModule("test", "test.integration")));
+        new Space("test", main)
+            .with(testModule("se.jbee.junit.assertion"))
+            .with(testModule("test.examples"))
+            .with(testModule("test.integration"));
 
     return new Project(
         new Workflow(
@@ -46,13 +39,21 @@ record Project(Workflow workflow) implements Builder {
             ToolRunner.ofSystem()));
   }
 
+  private static DeclaredModule mainModule(String module) {
+    return declareModule("main", module);
+  }
+
+  private static DeclaredModule testModule(String module) {
+    return declareModule("test", module);
+  }
+
   private static DeclaredModule declareModule(String space, String module) {
     var content = Path.of(module);
     return new DeclaredModule(content, content.resolve(space + "/java/module-info.java"));
   }
 
   @Override
-  public ToolCall classesCompilerNewJavacToolCall() {
+  public ToolCall classesCompilerUsesJavacToolCall() {
     return ToolCall.of("javac")
         .add("-g")
         .add("-encoding", "UTF-8")
@@ -61,7 +62,7 @@ record Project(Workflow workflow) implements Builder {
   }
 
   @Override
-  public void testerRunJUnitPlatform(ToolCall junit) {
+  public void junitTesterRunJUnitToolCall(ToolCall junit) {
     run(junit.add("--details", "NONE").add("--disable-banner"));
   }
 
