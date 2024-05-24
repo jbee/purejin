@@ -1,9 +1,5 @@
-
-
+_site/
 target/
 src/doc/
-lib/*.jar
 pom.*
 *~
-
-_site/
