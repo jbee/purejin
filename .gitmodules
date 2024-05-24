@@ -1,3 +1,6 @@
 [submodule ".bach/src/run/bach"]
 	path = .bach/src/run/bach
 	url = https://github.com/sormuras/run.bach
+[submodule "junit"]
+	path = .bach/src/run/info/org/junit
+	url = https://github.com/junit-team/bach-info

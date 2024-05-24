@@ -1,12 +1,18 @@
 import java.io.File;
+import java.lang.module.ModuleFinder;
 import java.nio.file.Path;
-import run.bach.Bach;
+import run.bach.ModuleFinders;
 import run.bach.ToolCall;
 import run.bach.ToolRunner;
 import run.bach.workflow.Builder;
+import run.bach.workflow.Folders;
 import run.bach.workflow.Structure;
-import run.bach.workflow.Structure.*;
+import run.bach.workflow.Structure.Basics;
+import run.bach.workflow.Structure.DeclaredModule;
+import run.bach.workflow.Structure.Space;
+import run.bach.workflow.Structure.Spaces;
 import run.bach.workflow.Workflow;
+import run.info.org.junit.JUnit;
 
 record Project(Workflow workflow) implements Builder {
   static final String VERSION = System.getProperty("--project-version", "11-ea");
@@ -32,10 +38,11 @@ record Project(Workflow workflow) implements Builder {
             .with(testModule("test.examples"))
             .with(testModule("test.integration"));
 
+    var libraries = ModuleFinder.compose(ModuleFinders.ofProperties(JUnit.MODULES));
     return new Project(
         new Workflow(
-            Bach.Folders.ofCurrentWorkingDirectory(),
-            new Structure(basics, new Spaces(main, test)),
+            Folders.ofCurrentWorkingDirectory(),
+            new Structure(basics, new Spaces(main, test), libraries),
             ToolRunner.ofSystem()));
   }
 
