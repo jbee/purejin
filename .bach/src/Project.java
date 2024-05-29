@@ -1,7 +1,7 @@
 import java.io.File;
 import java.lang.module.ModuleFinder;
 import java.nio.file.Path;
-import run.bach.ModuleFinders;
+import run.bach.ModuleLocator;
 import run.bach.ToolCall;
 import run.bach.ToolRunner;
 import run.bach.workflow.Builder;
@@ -38,7 +38,7 @@ record Project(Workflow workflow) implements Builder {
             .with(testModule("test.examples"))
             .with(testModule("test.integration"));
 
-    var libraries = ModuleFinder.compose(ModuleFinders.ofProperties(JUnit.MODULES));
+    var libraries = ModuleLocator.compose(JUnit.modules());
     return new Project(
         new Workflow(
             Folders.ofCurrentWorkingDirectory(),
