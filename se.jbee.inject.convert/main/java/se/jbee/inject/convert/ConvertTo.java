@@ -6,6 +6,7 @@ import se.jbee.inject.Instance;
 import se.jbee.inject.Name;
 import se.jbee.lang.Type;
 
+import java.lang.reflect.AnnotatedElement;
 import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -41,24 +42,28 @@ public final class ConvertTo<B> {
 	private final Map<Type<?>, Converter<?, B>> ins = new LinkedHashMap<>();
 
 
-	@SuppressWarnings({"rawtypes", "unchecked"})
 	public ConvertTo(Converter<?, B> tail, Injector context) {
+		this(tail, context, tail.getClass());
+	}
+
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	public ConvertTo(Converter<?, B> tail, Injector context, AnnotatedElement conversions) {
 		Class<? extends Converter> tailType = tail.getClass();
 		Type<?> converterType = raw(
 				tailType).toSuperType(Converter.class);
 		Type<?> directInputType = converterType.parameter(0);
 		this.out = (Type) converterType.parameter(1);
 		ins.put(directInputType, tail);
-		initAnnotatedChains(tailType, directInputType, context);
+		initAnnotatedChains(conversions, directInputType, context);
 	}
 
 	@SuppressWarnings("unchecked")
-	private void initAnnotatedChains(Class<?> tailType, Type<?> directInputType,
+	private void initAnnotatedChains(AnnotatedElement to, Type<?> directInputType,
 			Injector context) {
 		Imported imports = Imported.base().add(
-				tailType.getAnnotation(Imports.class));
-		if (tailType.isAnnotationPresent(Converts.class)) {
-			for (Converts converts : tailType.getAnnotationsByType(
+				to.getAnnotation(Imports.class));
+		if (to.isAnnotationPresent(Converts.class)) {
+			for (Converts converts : to.getAnnotationsByType(
 					Converts.class)) {
 				Imported localImports = imports;
 				if (converts.imports().length > 0)
